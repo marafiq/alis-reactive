@@ -10,7 +10,7 @@
           {
             kind: mutate-element,
             target: status,
-            action: add-class,
+            jsEmit: el.classList.add(val),
             value: active
           }
         ]

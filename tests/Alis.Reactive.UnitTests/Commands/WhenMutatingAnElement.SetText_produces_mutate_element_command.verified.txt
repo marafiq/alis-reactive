@@ -10,7 +10,7 @@
           {
             kind: mutate-element,
             target: output,
-            action: set-text,
+            jsEmit: el.textContent = val,
             value: hello
           }
         ]

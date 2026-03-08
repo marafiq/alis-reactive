@@ -17,25 +17,25 @@ namespace Alis.Reactive.Builders
 
         public PipelineBuilder<TModel> AddClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "add-class", className));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.classList.add(val)", className));
             return _pipeline;
         }
 
         public PipelineBuilder<TModel> RemoveClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "remove-class", className));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.classList.remove(val)", className));
             return _pipeline;
         }
 
         public PipelineBuilder<TModel> ToggleClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "toggle-class", className));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.classList.toggle(val)", className));
             return _pipeline;
         }
 
         public PipelineBuilder<TModel> SetText(string text)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "set-text", text));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.textContent = val", text));
             return _pipeline;
         }
 
@@ -46,13 +46,13 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object?>> path)
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "set-text", source: sourcePath));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.textContent = val", source: sourcePath));
             return _pipeline;
         }
 
         public PipelineBuilder<TModel> SetHtml(string html)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "set-html", html));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.innerHTML = val", html));
             return _pipeline;
         }
 
@@ -62,19 +62,19 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object?>> path)
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "set-html", source: sourcePath));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.innerHTML = val", source: sourcePath));
             return _pipeline;
         }
 
         public PipelineBuilder<TModel> Show()
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "show"));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.removeAttribute('hidden')"));
             return _pipeline;
         }
 
         public PipelineBuilder<TModel> Hide()
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "hide"));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.setAttribute('hidden','')"));
             return _pipeline;
         }
     }

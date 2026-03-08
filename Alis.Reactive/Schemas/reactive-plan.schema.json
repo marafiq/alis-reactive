@@ -93,15 +93,12 @@
     },
     "MutateElementCommand": {
       "type": "object",
-      "required": ["kind", "target", "action"],
+      "required": ["kind", "target", "jsEmit"],
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "mutate-element" },
         "target": { "type": "string", "minLength": 1 },
-        "action": {
-          "type": "string",
-          "enum": ["add-class", "remove-class", "toggle-class", "set-text", "set-html", "show", "hide"]
-        },
+        "jsEmit": { "type": "string", "minLength": 1, "description": "JavaScript expression executed on the resolved element. Variables: el (element), val (resolved value)." },
         "value": { "type": "string" },
         "source": { "$ref": "#/$defs/BindExpr" }
       }

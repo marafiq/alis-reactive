@@ -10,19 +10,19 @@
           {
             kind: mutate-element,
             target: panel,
-            action: remove-class,
+            jsEmit: el.classList.remove(val),
             value: text-muted
           },
           {
             kind: mutate-element,
             target: panel,
-            action: add-class,
+            jsEmit: el.classList.add(val),
             value: text-green
           },
           {
             kind: mutate-element,
             target: panel,
-            action: set-text,
+            jsEmit: el.textContent = val,
             value: done
           }
         ]

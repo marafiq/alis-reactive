@@ -10,7 +10,7 @@
           {
             kind: mutate-element,
             target: step-1,
-            action: add-class,
+            jsEmit: el.classList.add(val),
             value: complete
           },
           {
@@ -20,7 +20,7 @@
           {
             kind: mutate-element,
             target: step-2,
-            action: set-text,
+            jsEmit: el.textContent = val,
             value: next
           }
         ]

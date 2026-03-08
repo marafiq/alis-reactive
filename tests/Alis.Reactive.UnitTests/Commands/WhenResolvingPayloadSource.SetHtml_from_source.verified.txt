@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: content,
-            action: set-html,
+            jsEmit: el.innerHTML = val,
             source: evt.stringValue
           }
         ]

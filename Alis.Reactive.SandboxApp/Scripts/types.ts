@@ -41,21 +41,12 @@ export interface DispatchCommand {
   payload?: EventPayload;
 }
 
-export type MutateAction =
-  | "add-class"
-  | "remove-class"
-  | "toggle-class"
-  | "set-text"
-  | "set-html"
-  | "show"
-  | "hide";
-
 export interface MutateElementCommand {
   kind: "mutate-element";
   target: string;
-  action: MutateAction;
+  jsEmit: string;
   value?: string;
-  source?: string; // dot-path into ExecContext, e.g. "evt.address.city"
+  source?: string;
 }
 
 // -- Execution Context ----------------------------------------

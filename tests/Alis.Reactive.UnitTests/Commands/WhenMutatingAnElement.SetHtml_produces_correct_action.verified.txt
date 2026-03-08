@@ -10,7 +10,7 @@
           {
             kind: mutate-element,
             target: container,
-            action: set-html,
+            jsEmit: el.innerHTML = val,
             value: <strong>done</strong>
           }
         ]

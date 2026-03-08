@@ -85,13 +85,29 @@ naming and polymorphic type discriminators (`"kind"` property).
 | Kind | Fields | Runtime behavior |
 |------|--------|-----------------|
 | `dispatch` | `event`, `payload?` | `document.dispatchEvent(new CustomEvent(event, { detail: payload }))` |
-| `mutate-element` | `target`, `action`, `value?` | `document.getElementById(target)` → execute action |
+| `mutate-element` | `target`, `jsEmit`, `value?`, `source?` | Resolve element → resolve val → execute jsEmit |
 
-**Mutate actions:** `add-class`, `remove-class`, `toggle-class`, `set-text`, `set-html`, `show`, `hide`
+**jsEmit (foundational pattern):** The plan carries the exact JavaScript expression to execute
+on the resolved element. The runtime is a dumb executor — it resolves the target element,
+resolves the value (static or BindExpr), and executes jsEmit via `new Function("el", "val", jsEmit)`.
+No switch statements, no action enums. The browser API IS the API — the runtime doesn't re-implement it.
 
-**Source binding (BindExpr):** `set-text` and `set-html` support a `source` field — a `BindExpr`
-(dot-notation path into execution context) instead of a static `value`. The runtime's `resolver.ts`
-module walks `"evt.address.city"` against the event's `detail` object at execution time.
+| C# DSL method | jsEmit in plan | Variables |
+|----------------|----------------|-----------|
+| `AddClass("x")` | `el.classList.add(val)` | val = "x" |
+| `RemoveClass("x")` | `el.classList.remove(val)` | val = "x" |
+| `ToggleClass("x")` | `el.classList.toggle(val)` | val = "x" |
+| `SetText("x")` | `el.textContent = val` | val = "x" |
+| `SetHtml("x")` | `el.innerHTML = val` | val = "x" |
+| `Show()` | `el.removeAttribute('hidden')` | — |
+| `Hide()` | `el.setAttribute('hidden','')` | — |
+
+Adding new DOM methods requires only a C# DSL method that emits the right jsEmit string.
+Zero runtime changes. Open/Closed principle applied to the runtime.
+
+**Source binding (BindExpr):** `value` provides a static val. `source` provides a BindExpr
+(dot-notation path into execution context) — resolved at runtime via `resolver.ts`.
+The runtime resolves: `source` present → `resolveToString(source, ctx)` → val. Otherwise → `value`.
 
 C# DSL: `p.Element("x").SetText(payload, x => x.Address.City)` →
 `ExpressionPathHelper` converts the expression to `"evt.address.city"`.

@@ -10,7 +10,7 @@
           {
             kind: mutate-element,
             target: menu,
-            action: toggle-class,
+            jsEmit: el.classList.toggle(val),
             value: expanded
           }
         ]

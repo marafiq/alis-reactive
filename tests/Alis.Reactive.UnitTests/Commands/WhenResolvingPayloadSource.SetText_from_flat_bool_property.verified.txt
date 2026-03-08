@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: active,
-            action: set-text,
+            jsEmit: el.textContent = val,
             source: evt.boolValue
           }
         ]

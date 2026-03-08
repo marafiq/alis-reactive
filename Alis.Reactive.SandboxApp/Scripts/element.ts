@@ -11,27 +11,7 @@ export function mutateElement(cmd: MutateElementCommand, ctx?: ExecContext): voi
     return;
   }
 
-  switch (cmd.action) {
-    case "add-class":
-      if (cmd.value) el.classList.add(cmd.value);
-      break;
-    case "remove-class":
-      if (cmd.value) el.classList.remove(cmd.value);
-      break;
-    case "toggle-class":
-      if (cmd.value) el.classList.toggle(cmd.value);
-      break;
-    case "set-text":
-      el.textContent = cmd.source ? resolveToString(cmd.source, ctx) : (cmd.value ?? "");
-      break;
-    case "set-html":
-      el.innerHTML = cmd.source ? resolveToString(cmd.source, ctx) : (cmd.value ?? "");
-      break;
-    case "show":
-      el.removeAttribute("hidden");
-      break;
-    case "hide":
-      el.setAttribute("hidden", "");
-      break;
-  }
+  const val = cmd.source ? resolveToString(cmd.source, ctx) : cmd.value;
+  log.trace("exec", { target: cmd.target, jsEmit: cmd.jsEmit, val });
+  new Function("el", "val", cmd.jsEmit)(el, val);
 }

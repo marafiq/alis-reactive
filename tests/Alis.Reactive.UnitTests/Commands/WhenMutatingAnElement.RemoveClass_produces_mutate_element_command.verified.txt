@@ -10,7 +10,7 @@
           {
             kind: mutate-element,
             target: status,
-            action: remove-class,
+            jsEmit: el.classList.remove(val),
             value: hidden
           }
         ]

@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: city,
-            action: set-text,
+            jsEmit: el.textContent = val,
             source: evt.address.city
           }
         ]

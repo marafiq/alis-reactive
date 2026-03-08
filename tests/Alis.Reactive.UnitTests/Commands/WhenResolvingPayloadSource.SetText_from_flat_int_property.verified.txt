@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: count,
-            action: set-text,
+            jsEmit: el.textContent = val,
             source: evt.intValue
           }
         ]

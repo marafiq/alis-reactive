@@ -10,12 +10,12 @@
           {
             kind: mutate-element,
             target: loader,
-            action: show
+            jsEmit: el.removeAttribute('hidden')
           },
           {
             kind: mutate-element,
             target: content,
-            action: hide
+            jsEmit: el.setAttribute('hidden','')
           }
         ]
       }
