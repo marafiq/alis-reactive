@@ -49,7 +49,8 @@
 
     "Reaction": {
       "oneOf": [
-        { "$ref": "#/$defs/SequentialReaction" }
+        { "$ref": "#/$defs/SequentialReaction" },
+        { "$ref": "#/$defs/ConditionalReaction" }
       ]
     },
     "SequentialReaction": {
@@ -90,6 +91,86 @@
       "type": "string",
       "enum": ["string", "number", "boolean", "raw"],
       "description": "Type coercion applied to resolved BindExpr value"
+    },
+
+    "GuardOp": {
+      "type": "string",
+      "enum": ["eq", "neq", "gt", "gte", "lt", "lte", "truthy", "falsy", "is-null", "not-null"],
+      "description": "Comparison operator for a ValueGuard"
+    },
+    "Guard": {
+      "oneOf": [
+        { "$ref": "#/$defs/ValueGuard" },
+        { "$ref": "#/$defs/AllGuard" },
+        { "$ref": "#/$defs/AnyGuard" }
+      ]
+    },
+    "ValueGuard": {
+      "type": "object",
+      "required": ["kind", "source", "coerceAs", "op"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "value" },
+        "source": { "$ref": "#/$defs/BindExpr" },
+        "coerceAs": { "$ref": "#/$defs/CoercionType" },
+        "op": { "$ref": "#/$defs/GuardOp" },
+        "operand": {
+          "description": "Comparison value for binary operators (eq, neq, gt, etc.)"
+        }
+      }
+    },
+    "AllGuard": {
+      "type": "object",
+      "required": ["kind", "guards"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "all" },
+        "guards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Guard" },
+          "minItems": 2
+        }
+      }
+    },
+    "AnyGuard": {
+      "type": "object",
+      "required": ["kind", "guards"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "any" },
+        "guards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Guard" },
+          "minItems": 2
+        }
+      }
+    },
+    "Branch": {
+      "type": "object",
+      "required": ["reaction"],
+      "additionalProperties": false,
+      "properties": {
+        "guard": {
+          "oneOf": [
+            { "$ref": "#/$defs/Guard" },
+            { "type": "null" }
+          ]
+        },
+        "reaction": { "$ref": "#/$defs/Reaction" }
+      }
+    },
+    "ConditionalReaction": {
+      "type": "object",
+      "required": ["kind", "branches"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "conditional" },
+        "branches": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Branch" },
+          "minItems": 1
+        }
+      }
     },
     "MutateElementCommand": {
       "type": "object",
