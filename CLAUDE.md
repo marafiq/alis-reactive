@@ -197,7 +197,8 @@ Test classes follow `When{Scenario}`, test methods describe the expected behavio
 
 `Scripts/__tests__/` — Vitest + jsdom
 
-**Pattern:** Each test creates a plan object, calls `boot()`, and asserts DOM state or event dispatches.
+**Pattern:** Integration tests call `boot()` and assert DOM state. Direct unit tests import
+resolver functions and test every edge case in isolation.
 
 | File | What it tests |
 |------|--------------|
@@ -208,7 +209,9 @@ Test classes follow `When{Scenario}`, test methods describe the expected behavio
 | `when-dispatching-an-event.test.ts` | Dispatch fires CustomEvent on document |
 | `when-dispatching-a-custom-event-with-payload.test.ts` | All primitive types survive serialization |
 | `when-mutating-an-element.test.ts` | All 7 mutate actions + mixed chains |
-| `when-resolving-payload-source.test.ts` | Source dot-path resolution: flat int/string/bool, nested address.city/street/zip, missing path fallback |
+| `when-resolving-payload-source.test.ts` | Source dot-path resolution via boot(): flat int/string/bool, nested, missing path fallback |
+| `when-resolving-bind-expr.test.ts` | Direct resolve()/resolveAs()/resolveToString() tests: flat/nested/edge cases, condition-ready patterns (numeric, presence, truthiness, emptiness, text, range) |
+| `when-coercing-resolved-values.test.ts` | Direct coerce() tests: all 4 types (string, number, boolean, raw) with every boundary value |
 
 **Run:** `npm test`
 
