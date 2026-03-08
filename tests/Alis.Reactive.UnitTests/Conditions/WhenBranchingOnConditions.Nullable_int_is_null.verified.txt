@@ -3,7 +3,7 @@
     {
       trigger: {
         kind: custom-event,
-        event: status-check
+        event: nullable-check
       },
       reaction: {
         kind: conditional,
@@ -11,24 +11,18 @@
           {
             guard: {
               kind: value,
-              source: evt.isActive,
-              coerceAs: boolean,
-              op: truthy
+              source: evt.nullableScore,
+              coerceAs: number,
+              op: is-null
             },
             reaction: {
               kind: sequential,
               commands: [
                 {
                   kind: mutate-element,
-                  target: badge,
-                  jsEmit: el.classList.add(val),
-                  value: active
-                },
-                {
-                  kind: mutate-element,
-                  target: status,
+                  target: result,
                   jsEmit: el.textContent = val,
-                  value: Online
+                  value: No Score
                 }
               ]
             }
@@ -39,15 +33,9 @@
               commands: [
                 {
                   kind: mutate-element,
-                  target: badge,
-                  jsEmit: el.classList.add(val),
-                  value: inactive
-                },
-                {
-                  kind: mutate-element,
-                  target: status,
+                  target: result,
                   jsEmit: el.textContent = val,
-                  value: Offline
+                  value: Has Score
                 }
               ]
             }

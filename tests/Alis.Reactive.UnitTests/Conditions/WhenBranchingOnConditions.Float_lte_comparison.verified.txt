@@ -3,30 +3,18 @@
     {
       trigger: {
         kind: custom-event,
-        event: score-checked
+        event: rate-check
       },
       reaction: {
         kind: conditional,
         branches: [
           {
             guard: {
-              kind: all,
-              guards: [
-                {
-                  kind: value,
-                  source: evt.score,
-                  coerceAs: number,
-                  op: gte,
-                  operand: 90
-                },
-                {
-                  kind: value,
-                  source: evt.status,
-                  coerceAs: string,
-                  op: eq,
-                  operand: active
-                }
-              ]
+              kind: value,
+              source: evt.rate,
+              coerceAs: number,
+              op: lte,
+              operand: 0.5
             },
             reaction: {
               kind: sequential,
@@ -35,7 +23,7 @@
                   kind: mutate-element,
                   target: result,
                   jsEmit: el.textContent = val,
-                  value: Pass
+                  value: Low
                 }
               ]
             }
@@ -48,7 +36,7 @@
                   kind: mutate-element,
                   target: result,
                   jsEmit: el.textContent = val,
-                  value: Fail
+                  value: High
                 }
               ]
             }

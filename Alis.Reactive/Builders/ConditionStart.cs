@@ -5,7 +5,7 @@ namespace Alis.Reactive.Builders
 {
     /// <summary>
     /// Entry point for inner guards inside And/Or lambdas.
-    /// Provides the When method that starts a condition source chain.
+    /// Provides the When method that starts a typed condition source chain.
     /// </summary>
     public sealed class ConditionStart<TModel> where TModel : class
     {
@@ -13,15 +13,14 @@ namespace Alis.Reactive.Builders
 
         /// <summary>
         /// Begins a condition on an event payload property.
-        /// The payload instance is used only for type inference; its value is ignored.
+        /// TProp is inferred from the expression — operators demand TProp operands.
         /// </summary>
-        public ConditionSourceBuilder<TModel> When<TPayload>(
+        public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
             TPayload payload,
-            Expression<Func<TPayload, object?>> path)
+            Expression<Func<TPayload, TProp>> path)
         {
             var source = ExpressionPathHelper.ToEventPath(path);
-            var propertyType = ExpressionPathHelper.GetPropertyType(path);
-            return new ConditionSourceBuilder<TModel>(source, propertyType);
+            return new ConditionSourceBuilder<TModel, TProp>(source);
         }
     }
 }

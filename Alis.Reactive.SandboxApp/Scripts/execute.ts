@@ -17,6 +17,8 @@ export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
     case "conditional":
       log.debug("conditional", { branches: reaction.branches.length });
       for (const branch of reaction.branches) {
+        // Loose equality (== null) is intentional: C# JsonIgnore omits the guard
+        // field entirely for else branches, so JS receives undefined (not null).
         if (branch.guard == null || evaluateGuard(branch.guard, ctx)) {
           log.trace("branch-taken", { guard: branch.guard?.kind ?? "else" });
           executeReaction(branch.reaction, ctx);

@@ -1,0 +1,48 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: balance-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: evt.balance,
+              coerceAs: number,
+              op: gt,
+              operand: 1000000
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: High Value
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Standard
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

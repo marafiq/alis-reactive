@@ -3,7 +3,7 @@
     {
       trigger: {
         kind: custom-event,
-        event: grade-check
+        event: score-checked
       },
       reaction: {
         kind: conditional,
@@ -44,26 +44,6 @@
                   target: grade,
                   jsEmit: el.textContent = val,
                   value: B
-                }
-              ]
-            }
-          },
-          {
-            guard: {
-              kind: value,
-              source: evt.score,
-              coerceAs: number,
-              op: gte,
-              operand: 70
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: grade,
-                  jsEmit: el.textContent = val,
-                  value: C
                 }
               ]
             }

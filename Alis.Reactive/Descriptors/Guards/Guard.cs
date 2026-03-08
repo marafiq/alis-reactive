@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -22,17 +23,21 @@ namespace Alis.Reactive.Descriptors.Guards
         public const string String = "string";
         public const string Number = "number";
         public const string Boolean = "boolean";
+        public const string Date = "date";
         public const string Raw = "raw";
 
-        public static string InferFromType(System.Type type)
+        public static string InferFromType(Type type)
         {
-            var underlying = System.Nullable.GetUnderlyingType(type) ?? type;
+            var underlying = Nullable.GetUnderlyingType(type) ?? type;
             if (underlying == typeof(string)) return String;
             if (underlying == typeof(bool)) return Boolean;
             if (underlying == typeof(int) || underlying == typeof(long) ||
                 underlying == typeof(double) || underlying == typeof(float) ||
                 underlying == typeof(decimal) || underlying == typeof(short) ||
                 underlying == typeof(byte)) return Number;
+            if (underlying == typeof(DateTime) || underlying == typeof(DateTimeOffset) ||
+                underlying == typeof(DateOnly)) return Date;
+            if (underlying.IsEnum) return String;
             return Raw;
         }
     }
@@ -66,6 +71,8 @@ namespace Alis.Reactive.Descriptors.Guards
 
         public AllGuard(IReadOnlyList<Guard> guards)
         {
+            if (guards == null || guards.Count == 0)
+                throw new ArgumentException("AllGuard requires at least one guard.", nameof(guards));
             Guards = guards;
         }
     }
@@ -76,6 +83,8 @@ namespace Alis.Reactive.Descriptors.Guards
 
         public AnyGuard(IReadOnlyList<Guard> guards)
         {
+            if (guards == null || guards.Count == 0)
+                throw new ArgumentException("AnyGuard requires at least one guard.", nameof(guards));
             Guards = guards;
         }
     }

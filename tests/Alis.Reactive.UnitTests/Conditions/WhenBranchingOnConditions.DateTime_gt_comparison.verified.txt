@@ -1,0 +1,48 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: deadline-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: evt.deadline,
+              coerceAs: date,
+              op: gt,
+              operand: DateTimeOffset_1
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: On Time
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Overdue
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

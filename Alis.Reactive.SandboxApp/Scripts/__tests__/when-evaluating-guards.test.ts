@@ -268,6 +268,110 @@ describe("when evaluating guards", () => {
     });
   });
 
+  // -- Operand coercion (C2 + I5 fix) --------------------------------------
+
+  describe("operand coercion", () => {
+    it("coerces string operand to number for eq comparison", () => {
+      // Source "95" coerced to 95 (number). Operand 95 already number.
+      // Both go through coerce("number") → match.
+      const guard: Guard = { kind: "value", source: "evt.score", coerceAs: "number", op: "eq", operand: 95 };
+      expect(evaluateGuard(guard, ctx({ score: "95" }))).toBe(true);
+    });
+
+    it("coerces number operand for string source in eq", () => {
+      // Source 42, coerceAs "string" → "42". Operand "42" → "42". Match.
+      const guard: Guard = { kind: "value", source: "evt.code", coerceAs: "string", op: "eq", operand: "42" };
+      expect(evaluateGuard(guard, ctx({ code: 42 }))).toBe(true);
+    });
+
+    it("coerces operand for gte comparison", () => {
+      // Source "100" → 100, operand "90" → 90. 100 >= 90 → true.
+      const guard: Guard = { kind: "value", source: "evt.score", coerceAs: "number", op: "gte", operand: "90" };
+      expect(evaluateGuard(guard, ctx({ score: "100" }))).toBe(true);
+    });
+
+    it("coerces operand for lt comparison", () => {
+      const guard: Guard = { kind: "value", source: "evt.count", coerceAs: "number", op: "lt", operand: "10" };
+      expect(evaluateGuard(guard, ctx({ count: "5" }))).toBe(true);
+    });
+  });
+
+  // -- Presence operators with typed coercion (is-null uses raw) ----------
+
+  describe("is-null with typed coerceAs", () => {
+    it("correctly detects null even when coerceAs is string", () => {
+      // Without the raw resolution fix, coerce(null, "string") → "" → not null. WRONG.
+      // With the fix, is-null uses raw resolution, so null is correctly detected.
+      const guard: Guard = { kind: "value", source: "evt.name", coerceAs: "string", op: "is-null" };
+      expect(evaluateGuard(guard, ctx({ name: null }))).toBe(true);
+    });
+
+    it("correctly detects null even when coerceAs is number", () => {
+      // Without fix: coerce(null, "number") → 0 → not null. WRONG.
+      const guard: Guard = { kind: "value", source: "evt.value", coerceAs: "number", op: "is-null" };
+      expect(evaluateGuard(guard, ctx({ value: null }))).toBe(true);
+    });
+
+    it("correctly detects non-null with typed coercion", () => {
+      const guard: Guard = { kind: "value", source: "evt.name", coerceAs: "string", op: "not-null" };
+      expect(evaluateGuard(guard, ctx({ name: "Alice" }))).toBe(true);
+    });
+
+    it("correctly detects undefined as null with typed coercion", () => {
+      const guard: Guard = { kind: "value", source: "evt.missing", coerceAs: "number", op: "is-null" };
+      expect(evaluateGuard(guard, ctx({}))).toBe(true);
+    });
+  });
+
+  // -- Date coercion (ISO string → timestamp) ----------------------------
+
+  describe("date coercion", () => {
+    it("compares ISO date strings via gt", () => {
+      // "2026-07-15" > "2026-06-01" → both coerced to timestamps → true
+      const guard: Guard = { kind: "value", source: "evt.deadline", coerceAs: "date", op: "gt", operand: "2026-06-01T00:00:00" };
+      expect(evaluateGuard(guard, ctx({ deadline: "2026-07-15T00:00:00" }))).toBe(true);
+    });
+
+    it("returns false when date is before operand", () => {
+      const guard: Guard = { kind: "value", source: "evt.deadline", coerceAs: "date", op: "gt", operand: "2026-06-01T00:00:00" };
+      expect(evaluateGuard(guard, ctx({ deadline: "2026-01-15T00:00:00" }))).toBe(false);
+    });
+
+    it("supports lte on dates", () => {
+      const guard: Guard = { kind: "value", source: "evt.deadline", coerceAs: "date", op: "lte", operand: "2026-06-01T00:00:00" };
+      expect(evaluateGuard(guard, ctx({ deadline: "2026-06-01T00:00:00" }))).toBe(true);
+    });
+
+    it("supports eq on dates", () => {
+      const guard: Guard = { kind: "value", source: "evt.deadline", coerceAs: "date", op: "eq", operand: "2026-06-01T00:00:00" };
+      expect(evaluateGuard(guard, ctx({ deadline: "2026-06-01T00:00:00" }))).toBe(true);
+    });
+
+    it("returns NaN for null date (is-null uses raw, not coerced)", () => {
+      const guard: Guard = { kind: "value", source: "evt.deadline", coerceAs: "date", op: "is-null" };
+      expect(evaluateGuard(guard, ctx({ deadline: null }))).toBe(true);
+    });
+  });
+
+  // -- Long/float as number coercion ------------------------------------
+
+  describe("long and float as number", () => {
+    it("compares large numbers (long equivalent) via gt", () => {
+      const guard: Guard = { kind: "value", source: "evt.balance", coerceAs: "number", op: "gt", operand: 1000000 };
+      expect(evaluateGuard(guard, ctx({ balance: 5000000 }))).toBe(true);
+    });
+
+    it("compares float values via lte", () => {
+      const guard: Guard = { kind: "value", source: "evt.rate", coerceAs: "number", op: "lte", operand: 0.5 };
+      expect(evaluateGuard(guard, ctx({ rate: 0.3 }))).toBe(true);
+    });
+
+    it("compares decimal-precision doubles via gt", () => {
+      const guard: Guard = { kind: "value", source: "evt.temp", coerceAs: "number", op: "gt", operand: 98.6 };
+      expect(evaluateGuard(guard, ctx({ temp: 101.3 }))).toBe(true);
+    });
+  });
+
   // -- Edge cases ---------------------------------------------------------
 
   describe("edge cases", () => {
@@ -279,6 +383,16 @@ describe("when evaluating guards", () => {
     it("returns true for is-null when source path is missing", () => {
       const guard: Guard = { kind: "value", source: "evt.nonexistent", coerceAs: "raw", op: "is-null" };
       expect(evaluateGuard(guard, ctx({}))).toBe(true);
+    });
+
+    it("throws on unknown guard kind", () => {
+      const guard = { kind: "unknown", source: "evt.x", coerceAs: "raw", op: "eq", operand: 1 } as any;
+      expect(() => evaluateGuard(guard, ctx({}))).toThrow("Unknown guard kind: unknown");
+    });
+
+    it("throws on unknown operator", () => {
+      const guard: any = { kind: "value", source: "evt.x", coerceAs: "raw", op: "nope" };
+      expect(() => evaluateGuard(guard, ctx({ x: 1 }))).toThrow("Unknown guard operator: nope");
     });
   });
 });

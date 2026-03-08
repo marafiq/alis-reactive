@@ -9,7 +9,7 @@ namespace Alis.Reactive.Builders
     public class PipelineBuilder<TModel> where TModel : class
     {
         internal List<Command> Commands { get; } = new List<Command>();
-        internal ConditionalReaction? Conditional { get; private set; }
+        internal List<Branch>? ConditionalBranches { get; private set; }
 
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
@@ -30,41 +30,48 @@ namespace Alis.Reactive.Builders
 
         /// <summary>
         /// Starts a conditional branch on an event payload property.
-        /// The payload instance is used only for type inference; its value is ignored.
+        /// TProp is inferred from the expression — operators on the returned builder
+        /// demand TProp operands (e.g. int property → Gte(int), string → Eq(string)).
         /// </summary>
-        public ConditionSourceBuilder<TModel> When<TPayload>(
+        public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
             TPayload payload,
-            Expression<Func<TPayload, object?>> path)
+            Expression<Func<TPayload, TProp>> path)
         {
+            if (Commands.Count > 0)
+                throw new InvalidOperationException(
+                    "Cannot call When() after adding direct commands (Dispatch, Element). " +
+                    "Use When().Then() to wrap all commands inside branches.");
+
             var source = ExpressionPathHelper.ToEventPath(path);
-            var propertyType = ExpressionPathHelper.GetPropertyType(path);
-            return new ConditionSourceBuilder<TModel>(source, propertyType, this);
+            return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
         /// <summary>
-        /// Sets the conditional reaction on this pipeline.
+        /// Sets the branch list for conditional reactions.
         /// Called by GuardBuilder.Then() when creating the first branch.
+        /// BranchBuilder continues to add branches to this same list.
         /// </summary>
-        internal void SetConditional(ConditionalReaction conditional)
+        internal void SetConditionalBranches(List<Branch> branches)
         {
-            Conditional = conditional;
+            ConditionalBranches = branches;
         }
 
         /// <summary>
         /// Builds the reaction for this pipeline.
-        /// If a conditional was set via When(), returns the ConditionalReaction.
-        /// Otherwise returns a SequentialReaction from the accumulated commands.
+        /// If conditional branches were set via When(), creates a ConditionalReaction
+        /// with a defensive copy. Otherwise returns a SequentialReaction.
         /// </summary>
         internal Reaction BuildReaction()
         {
-            if (Conditional != null)
+            if (ConditionalBranches != null)
             {
                 if (Commands.Count > 0)
                     throw new InvalidOperationException(
                         "A pipeline cannot mix When() conditions with direct commands (Dispatch, Element). " +
                         "Use When().Then() to wrap all commands inside branches.");
 
-                return Conditional;
+                // Defensive copy — the ConditionalReaction is an immutable descriptor
+                return new ConditionalReaction(ConditionalBranches.ToArray());
             }
 
             return new SequentialReaction(Commands);

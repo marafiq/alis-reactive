@@ -7,14 +7,11 @@
 
     IReactivePlan<ConditionsShowcaseModel> plan = new ReactivePlan<ConditionsShowcaseModel>();
 
-    // ── Section 1: When / Then / ElseIf / Else ──
-    // Entry 1a: On "set-score", display the score value
+    // ── Section 1: int — ElseIf grade ladder ──
     Html.On(plan, t => t.CustomEvent<ScorePayload>("set-score", (args, p) =>
     {
         p.Element("score-display").SetText(args, x => x.Score);
     }));
-
-    // Entry 1b: On "set-score", evaluate grade: >= 90 → A, >= 80 → B, else → F
     Html.On(plan, t => t.CustomEvent<ScorePayload>("set-score", (args, p) =>
         p.When(args, x => x.Score).Gte(90)
             .Then(then => then.Element("grade").SetText("A"))
@@ -23,8 +20,49 @@
             .Else(else_ => else_.Element("grade").SetText("F"))
     ));
 
-    // ── Section 2: AND composition ──
-    // On "check-and" event, score >= 90 AND status == "active"
+    // ── Section 2: long — balance threshold ──
+    Html.On(plan, t => t.CustomEvent<LongPayload>("check-long", (args, p) =>
+        p.When(args, x => x.Balance).Gt(1000000L)
+            .Then(then => then.Element("long-result").SetText("High Value"))
+            .Else(else_ => else_.Element("long-result").SetText("Standard"))
+    ));
+
+    // ── Section 3: double — temperature check ──
+    Html.On(plan, t => t.CustomEvent<DoublePayload>("check-double", (args, p) =>
+        p.When(args, x => x.Temperature).Gt(98.6)
+            .Then(then => then.Element("double-result").SetText("Fever"))
+            .Else(else_ => else_.Element("double-result").SetText("Normal"))
+    ));
+
+    // ── Section 4: bool — truthy/falsy ──
+    Html.On(plan, t => t.CustomEvent<BoolPayload>("check-bool", (args, p) =>
+        p.When(args, x => x.IsActive).Truthy()
+            .Then(then => then.Element("bool-result").SetText("Online"))
+            .Else(else_ => else_.Element("bool-result").SetText("Offline"))
+    ));
+
+    // ── Section 5: string — equality ──
+    Html.On(plan, t => t.CustomEvent<RolePayload>("check-string", (args, p) =>
+        p.When(args, x => x.Role).Eq("Alice")
+            .Then(then => then.Element("string-result").SetText("Welcome Alice!"))
+            .Else(else_ => else_.Element("string-result").SetText("Hello Stranger"))
+    ));
+
+    // ── Section 6: DateTime — deadline comparison ──
+    Html.On(plan, t => t.CustomEvent<DatePayload>("check-date", (args, p) =>
+        p.When(args, x => x.Deadline).Gt(new DateTime(2026, 6, 1))
+            .Then(then => then.Element("date-result").SetText("On Time"))
+            .Else(else_ => else_.Element("date-result").SetText("Overdue"))
+    ));
+
+    // ── Section 7: int? — nullable with is-null guard ──
+    Html.On(plan, t => t.CustomEvent<NullablePayload>("check-nullable", (args, p) =>
+        p.When(args, x => x.NullableScore).IsNull()
+            .Then(then => then.Element("nullable-result").SetText("No Score"))
+            .Else(else_ => else_.Element("nullable-result").SetText("Has Score"))
+    ));
+
+    // ── Section 8: AND — int + string compound ──
     Html.On(plan, t => t.CustomEvent<ScorePayload>("check-and", (args, p) =>
         p.When(args, x => x.Score).Gte(90)
             .And(g => g.When(args, x => x.Status).Eq("active"))
@@ -32,8 +70,7 @@
             .Else(else_ => else_.Element("and-result").SetText("Nope"))
     ));
 
-    // ── Section 3: OR composition ──
-    // On "check-or" event, role == "admin" OR role == "superuser"
+    // ── Section 9: OR — string alternatives ──
     Html.On(plan, t => t.CustomEvent<RolePayload>("check-or", (args, p) =>
         p.When(args, x => x.Role).Eq("admin")
             .Or(g => g.When(args, x => x.Role).Eq("superuser"))
@@ -45,113 +82,122 @@
     var formattedJson = plan.RenderFormatted();
 }
 
-<div class="space-y-8">
+<div class="space-y-6">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Conditions</h1>
-        <p class="mt-2 text-text-secondary">
-            Interactive condition branching: When/Then/ElseIf/Else, AND composition, and OR composition.
-            Click buttons to dispatch events and see condition evaluation in real time.
+        <h1 class="text-2xl font-bold tracking-tight">Conditions — All Types</h1>
+        <p class="mt-1 text-text-secondary text-sm">
+            Every primitive type through the typed guard chain. Operand type matches the C# property type at compile time.
         </p>
     </div>
 
-    <!-- Section 1: When / Then / ElseIf / Else -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">When / Then / ElseIf / Else</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Score &ge; 90 &rarr; grade "A" &bull;
-            Score &ge; 80 &rarr; grade "B" &bull;
-            Otherwise &rarr; grade "F"
-        </p>
-        <div class="flex gap-3 mb-6">
-            <button id="btn-high"
-                    onclick="document.dispatchEvent(new CustomEvent('set-score', {detail:{score:95}}))"
-                    class="px-4 py-2 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
-                Score 95
-            </button>
-            <button id="btn-mid"
-                    onclick="document.dispatchEvent(new CustomEvent('set-score', {detail:{score:85}}))"
-                    class="px-4 py-2 rounded-md bg-amber-600 text-white text-sm font-medium hover:bg-amber-700 transition-colors">
-                Score 85
-            </button>
-            <button id="btn-low"
-                    onclick="document.dispatchEvent(new CustomEvent('set-score', {detail:{score:40}}))"
-                    class="px-4 py-2 rounded-md bg-rose-600 text-white text-sm font-medium hover:bg-rose-700 transition-colors">
-                Score 40
-            </button>
+    <!-- Section 1: int (ElseIf) -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">int — ElseIf Grade Ladder</h2>
+        <p class="text-xs text-text-secondary mb-3">Score &ge; 90 &rarr; A &bull; &ge; 80 &rarr; B &bull; else &rarr; F</p>
+        <div class="flex gap-2 mb-4">
+            <button id="btn-score-95" onclick="document.dispatchEvent(new CustomEvent('set-score',{detail:{score:95}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">95</button>
+            <button id="btn-score-85" onclick="document.dispatchEvent(new CustomEvent('set-score',{detail:{score:85}}))" class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">85</button>
+            <button id="btn-score-40" onclick="document.dispatchEvent(new CustomEvent('set-score',{detail:{score:40}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">40</button>
         </div>
-        <div class="grid grid-cols-2 gap-4 font-mono text-sm">
-            <div class="flex justify-between border-b border-border pb-1">
-                <span class="text-text-secondary">Score</span>
-                <span id="score-display" class="text-text-muted">&mdash;</span>
-            </div>
-            <div class="flex justify-between border-b border-border pb-1">
-                <span class="text-text-secondary">Grade</span>
-                <span id="grade" class="text-text-muted">&mdash;</span>
-            </div>
+        <div class="grid grid-cols-2 gap-4 text-xs font-mono">
+            <div class="flex justify-between"><span class="text-text-secondary">Score</span><span id="score-display">&mdash;</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Grade</span><span id="grade">&mdash;</span></div>
         </div>
     </section>
 
-    <!-- Section 2: AND composition -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">AND Composition</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Both guards must pass: score &ge; 90 <strong>AND</strong> status == "active".
-        </p>
-        <div class="flex gap-3 mb-6">
-            <button id="btn-and-pass"
-                    onclick="document.dispatchEvent(new CustomEvent('check-and', {detail:{score:95, status:'active'}}))"
-                    class="px-4 py-2 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
-                Score 95 + Active
-            </button>
-            <button id="btn-and-fail"
-                    onclick="document.dispatchEvent(new CustomEvent('check-and', {detail:{score:95, status:'inactive'}}))"
-                    class="px-4 py-2 rounded-md bg-rose-600 text-white text-sm font-medium hover:bg-rose-700 transition-colors">
-                Score 95 + Inactive
-            </button>
+    <!-- Section 2: long -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">long — Balance Threshold</h2>
+        <p class="text-xs text-text-secondary mb-3">Balance &gt; 1,000,000 &rarr; "High Value" &bull; else &rarr; "Standard"</p>
+        <div class="flex gap-2 mb-4">
+            <button id="btn-long-high" onclick="document.dispatchEvent(new CustomEvent('check-long',{detail:{balance:5000000}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">5,000,000</button>
+            <button id="btn-long-low" onclick="document.dispatchEvent(new CustomEvent('check-long',{detail:{balance:500}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">500</button>
         </div>
-        <div class="font-mono text-sm">
-            <div class="flex justify-between border-b border-border pb-1">
-                <span class="text-text-secondary">Result</span>
-                <span id="and-result" class="text-text-muted">&mdash;</span>
-            </div>
-        </div>
+        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="long-result">&mdash;</span></div>
     </section>
 
-    <!-- Section 3: OR composition -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">OR Composition</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Either guard passes: role == "admin" <strong>OR</strong> role == "superuser".
-        </p>
-        <div class="flex gap-3 mb-6">
-            <button id="btn-admin"
-                    onclick="document.dispatchEvent(new CustomEvent('check-or', {detail:{role:'admin'}}))"
-                    class="px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors">
-                Admin
-            </button>
-            <button id="btn-superuser"
-                    onclick="document.dispatchEvent(new CustomEvent('check-or', {detail:{role:'superuser'}}))"
-                    class="px-4 py-2 rounded-md bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors">
-                Superuser
-            </button>
-            <button id="btn-viewer"
-                    onclick="document.dispatchEvent(new CustomEvent('check-or', {detail:{role:'viewer'}}))"
-                    class="px-4 py-2 rounded-md bg-rose-600 text-white text-sm font-medium hover:bg-rose-700 transition-colors">
-                Viewer
-            </button>
+    <!-- Section 3: double -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">double — Temperature Check</h2>
+        <p class="text-xs text-text-secondary mb-3">Temp &gt; 98.6 &rarr; "Fever" &bull; else &rarr; "Normal"</p>
+        <div class="flex gap-2 mb-4">
+            <button id="btn-double-high" onclick="document.dispatchEvent(new CustomEvent('check-double',{detail:{temperature:101.3}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">101.3</button>
+            <button id="btn-double-low" onclick="document.dispatchEvent(new CustomEvent('check-double',{detail:{temperature:97.2}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">97.2</button>
         </div>
-        <div class="font-mono text-sm">
-            <div class="flex justify-between border-b border-border pb-1">
-                <span class="text-text-secondary">Result</span>
-                <span id="or-result" class="text-text-muted">&mdash;</span>
-            </div>
+        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="double-result">&mdash;</span></div>
+    </section>
+
+    <!-- Section 4: bool -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">bool — Truthy / Falsy</h2>
+        <p class="text-xs text-text-secondary mb-3">IsActive truthy &rarr; "Online" &bull; else &rarr; "Offline"</p>
+        <div class="flex gap-2 mb-4">
+            <button id="btn-bool-true" onclick="document.dispatchEvent(new CustomEvent('check-bool',{detail:{isActive:true}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">true</button>
+            <button id="btn-bool-false" onclick="document.dispatchEvent(new CustomEvent('check-bool',{detail:{isActive:false}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">false</button>
         </div>
+        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="bool-result">&mdash;</span></div>
+    </section>
+
+    <!-- Section 5: string -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">string — Equality</h2>
+        <p class="text-xs text-text-secondary mb-3">Name == "Alice" &rarr; "Welcome Alice!" &bull; else &rarr; "Hello Stranger"</p>
+        <div class="flex gap-2 mb-4">
+            <button id="btn-string-match" onclick="document.dispatchEvent(new CustomEvent('check-string',{detail:{role:'Alice'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">Alice</button>
+            <button id="btn-string-miss" onclick="document.dispatchEvent(new CustomEvent('check-string',{detail:{role:'Bob'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">Bob</button>
+        </div>
+        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="string-result">&mdash;</span></div>
+    </section>
+
+    <!-- Section 6: DateTime -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">DateTime — Deadline Comparison</h2>
+        <p class="text-xs text-text-secondary mb-3">Deadline &gt; 2026-06-01 &rarr; "On Time" &bull; else &rarr; "Overdue"</p>
+        <div class="flex gap-2 mb-4">
+            <button id="btn-date-future" onclick="document.dispatchEvent(new CustomEvent('check-date',{detail:{deadline:'2026-07-15T00:00:00'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">2026-07-15</button>
+            <button id="btn-date-past" onclick="document.dispatchEvent(new CustomEvent('check-date',{detail:{deadline:'2026-01-15T00:00:00'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">2026-01-15</button>
+        </div>
+        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="date-result">&mdash;</span></div>
+    </section>
+
+    <!-- Section 7: int? (nullable) -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">int? — Nullable IsNull</h2>
+        <p class="text-xs text-text-secondary mb-3">NullableScore is null &rarr; "No Score" &bull; else &rarr; "Has Score"</p>
+        <div class="flex gap-2 mb-4">
+            <button id="btn-nullable-null" onclick="document.dispatchEvent(new CustomEvent('check-nullable',{detail:{nullableScore:null}}))" class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">null</button>
+            <button id="btn-nullable-value" onclick="document.dispatchEvent(new CustomEvent('check-nullable',{detail:{nullableScore:42}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">42</button>
+        </div>
+        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="nullable-result">&mdash;</span></div>
+    </section>
+
+    <!-- Section 8: AND composition (int + string) -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">AND — Mixed Types (int + string)</h2>
+        <p class="text-xs text-text-secondary mb-3">Score &ge; 90 <strong>AND</strong> Status == "active"</p>
+        <div class="flex gap-2 mb-4">
+            <button id="btn-and-pass" onclick="document.dispatchEvent(new CustomEvent('check-and',{detail:{score:95,status:'active'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">95 + active</button>
+            <button id="btn-and-fail" onclick="document.dispatchEvent(new CustomEvent('check-and',{detail:{score:95,status:'inactive'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">95 + inactive</button>
+        </div>
+        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="and-result">&mdash;</span></div>
+    </section>
+
+    <!-- Section 9: OR composition (string) -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">OR — String Alternatives</h2>
+        <p class="text-xs text-text-secondary mb-3">Role == "admin" <strong>OR</strong> "superuser"</p>
+        <div class="flex gap-2 mb-4">
+            <button id="btn-or-admin" onclick="document.dispatchEvent(new CustomEvent('check-or',{detail:{role:'admin'}}))" class="px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium">admin</button>
+            <button id="btn-or-super" onclick="document.dispatchEvent(new CustomEvent('check-or',{detail:{role:'superuser'}}))" class="px-3 py-1.5 rounded bg-violet-600 text-white text-xs font-medium">superuser</button>
+            <button id="btn-or-viewer" onclick="document.dispatchEvent(new CustomEvent('check-or',{detail:{role:'viewer'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">viewer</button>
+        </div>
+        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="or-result">&mdash;</span></div>
     </section>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-3">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
     </section>
 </div>
 

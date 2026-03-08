@@ -18,6 +18,16 @@ namespace Alis.Reactive
         }
 
         /// <summary>
+        /// Typed overload — no boxing Convert node needed because TProp matches the property type.
+        /// Used by the typed condition builders.
+        /// </summary>
+        public static string ToEventPath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return "evt." + string.Join(".", members);
+        }
+
+        /// <summary>
         /// Extracts the CLR property/field type from a member expression, unwrapping
         /// any Convert node that the compiler inserts for boxing value types.
         /// </summary>
@@ -33,7 +43,9 @@ namespace Alis.Reactive
                 if (member.Member is FieldInfo field) return field.FieldType;
             }
 
-            return typeof(object);
+            throw new ArgumentException(
+                $"Expression must be a property or field access, but got {body.NodeType}. " +
+                "Example: x => x.Score");
         }
 
         private static List<string> ExtractMemberChain(Expression expr)

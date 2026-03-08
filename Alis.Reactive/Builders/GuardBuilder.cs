@@ -46,13 +46,17 @@ namespace Alis.Reactive.Builders
 
         /// <summary>
         /// Combines this guard with another using AND (all must match).
+        /// Flattens nested AllGuards so chained .And().And() produces a single flat AllGuard.
         /// </summary>
         public GuardBuilder<TModel> And(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
         {
             var start = new ConditionStart<TModel>();
             var innerResult = inner(start);
-            var combined = new AllGuard(new List<Guard> { Guard, innerResult.Guard });
+            var guards = new List<Guard>();
+            Flatten<AllGuard>(Guard, guards);
+            Flatten<AllGuard>(innerResult.Guard, guards);
+            var combined = new AllGuard(guards);
 
             if (_pipeline != null)
                 return new GuardBuilder<TModel>(combined, _pipeline);
@@ -63,13 +67,17 @@ namespace Alis.Reactive.Builders
 
         /// <summary>
         /// Combines this guard with another using OR (any must match).
+        /// Flattens nested AnyGuards so chained .Or().Or() produces a single flat AnyGuard.
         /// </summary>
         public GuardBuilder<TModel> Or(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
         {
             var start = new ConditionStart<TModel>();
             var innerResult = inner(start);
-            var combined = new AnyGuard(new List<Guard> { Guard, innerResult.Guard });
+            var guards = new List<Guard>();
+            Flatten<AnyGuard>(Guard, guards);
+            Flatten<AnyGuard>(innerResult.Guard, guards);
+            var combined = new AnyGuard(guards);
 
             if (_pipeline != null)
                 return new GuardBuilder<TModel>(combined, _pipeline);
@@ -96,15 +104,30 @@ namespace Alis.Reactive.Builders
                 return _branchBuilder;
             }
 
-            // First branch — create BranchBuilder and set conditional on pipeline
+            // First branch — create BranchBuilder and set branches on pipeline
             if (_pipeline == null)
                 throw new InvalidOperationException(
                     "Then() requires a pipeline context. Use PipelineBuilder.When() or BranchBuilder.ElseIf() to start a condition.");
 
             var branches = new List<Branch> { branch };
-            var conditional = new ConditionalReaction(branches);
-            _pipeline.SetConditional(conditional);
+            _pipeline.SetConditionalBranches(branches);
             return new BranchBuilder<TModel>(_pipeline, branches);
+        }
+
+        /// <summary>
+        /// Flattens a guard into the target list. If the guard is the same composite
+        /// type as TComposite, its children are added directly (flattened).
+        /// Otherwise the guard is added as-is.
+        /// </summary>
+        private static void Flatten<TComposite>(Guard guard, List<Guard> target)
+            where TComposite : Guard
+        {
+            if (guard is AllGuard all && typeof(TComposite) == typeof(AllGuard))
+                target.AddRange(all.Guards);
+            else if (guard is AnyGuard any && typeof(TComposite) == typeof(AnyGuard))
+                target.AddRange(any.Guards);
+            else
+                target.Add(guard);
         }
     }
 }

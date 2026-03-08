@@ -89,7 +89,7 @@
     },
     "CoercionType": {
       "type": "string",
-      "enum": ["string", "number", "boolean", "raw"],
+      "enum": ["string", "number", "boolean", "date", "raw"],
       "description": "Type coercion applied to resolved BindExpr value"
     },
 

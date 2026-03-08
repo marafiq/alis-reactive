@@ -1,0 +1,47 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: date-nullable-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: evt.nullableDate,
+              coerceAs: date,
+              op: is-null
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: No Date
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Has Date
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

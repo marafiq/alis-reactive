@@ -1,0 +1,48 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: temp-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: evt.temperature,
+              coerceAs: number,
+              op: gt,
+              operand: 98.6
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Fever
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Normal
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

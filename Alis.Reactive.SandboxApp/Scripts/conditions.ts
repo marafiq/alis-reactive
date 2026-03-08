@@ -1,5 +1,5 @@
 import type { Guard, ValueGuard, ExecContext } from "./types";
-import { resolveAs } from "./resolver";
+import { resolve, resolveAs, coerce } from "./resolver";
 import { scope } from "./trace";
 
 const log = scope("conditions");
@@ -12,13 +12,29 @@ export function evaluateGuard(guard: Guard, ctx?: ExecContext): boolean {
       return guard.guards.every(g => evaluateGuard(g, ctx));
     case "any":
       return guard.guards.some(g => evaluateGuard(g, ctx));
+    default:
+      throw new Error(`Unknown guard kind: ${(guard as any).kind}`);
   }
 }
 
 function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
-  const resolved = resolveAs(guard.source, guard.coerceAs, ctx);
   const op = guard.op;
-  const operand = guard.operand;
+
+  // Presence operators (is-null, not-null) use RAW resolution — coercion
+  // would destroy null/undefined (e.g. coerce(null, "string") → "").
+  if (op === "is-null" || op === "not-null") {
+    const raw = resolve(guard.source, ctx);
+    log.trace("eval-presence", { source: guard.source, op, raw });
+    return op === "is-null" ? raw == null : raw != null;
+  }
+
+  // Truthy/falsy use typed coercion — correctly maps "false" → false for booleans.
+  // Comparison operators use typed coercion on BOTH source and operand so that
+  // comparisons are type-consistent (e.g. both sides are numbers).
+  const resolved = resolveAs(guard.source, guard.coerceAs, ctx);
+  const operand = guard.operand != null
+    ? coerce(guard.operand, guard.coerceAs)
+    : guard.operand;
 
   log.trace("eval", { source: guard.source, op, resolved, operand });
 
@@ -31,7 +47,7 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
     case "lte":      return (resolved as number) <= (operand as number);
     case "truthy":   return !!resolved;
     case "falsy":    return !resolved;
-    case "is-null":  return resolved == null;
-    case "not-null": return resolved != null;
+    default:
+      throw new Error(`Unknown guard operator: ${op}`);
   }
 }

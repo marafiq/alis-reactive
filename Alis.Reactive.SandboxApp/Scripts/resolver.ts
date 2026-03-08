@@ -16,7 +16,7 @@ export type BindExpr = string;
  * Coercion types for resolved values. The resolver can coerce raw values
  * to specific types for use in conditions, comparisons, and DOM rendering.
  */
-export type CoercionType = "string" | "number" | "boolean" | "raw";
+export type CoercionType = "string" | "number" | "boolean" | "date" | "raw";
 
 /**
  * Resolves a BindExpr against the execution context.
@@ -78,6 +78,12 @@ export function coerce(value: unknown, coerceAs: CoercionType): unknown {
         return value !== "" && value !== "false" && value !== "0";
       }
       return Boolean(value);
+
+    case "date": {
+      if (value == null) return NaN;
+      const d = new Date(value as string);
+      return d.getTime();
+    }
 
     case "raw":
       return value;

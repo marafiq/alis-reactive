@@ -1,0 +1,47 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: status-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: evt.isActive,
+              coerceAs: boolean,
+              op: truthy
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Online
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Offline
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

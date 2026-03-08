@@ -3,18 +3,30 @@
     {
       trigger: {
         kind: custom-event,
-        event: score-checked
+        event: compound-check
       },
       reaction: {
         kind: conditional,
         branches: [
           {
             guard: {
-              kind: value,
-              source: evt.score,
-              coerceAs: number,
-              op: gte,
-              operand: 90
+              kind: all,
+              guards: [
+                {
+                  kind: value,
+                  source: evt.score,
+                  coerceAs: number,
+                  op: gte,
+                  operand: 90
+                },
+                {
+                  kind: value,
+                  source: evt.status,
+                  coerceAs: string,
+                  op: eq,
+                  operand: active
+                }
+              ]
             },
             reaction: {
               kind: sequential,

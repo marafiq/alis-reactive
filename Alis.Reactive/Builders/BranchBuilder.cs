@@ -14,6 +14,7 @@ namespace Alis.Reactive.Builders
     {
         private readonly PipelineBuilder<TModel> _pipeline;
         private readonly List<Branch> _branches;
+        private bool _elseCalled;
 
         internal BranchBuilder(PipelineBuilder<TModel> pipeline, List<Branch> branches)
         {
@@ -22,15 +23,19 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Adds a new conditional branch with a guard.
+        /// Adds a new conditional branch with a typed guard.
+        /// TProp is inferred from the expression — operators demand TProp operands.
         /// </summary>
-        public ConditionSourceBuilder<TModel> ElseIf<TPayload>(
+        public ConditionSourceBuilder<TModel, TProp> ElseIf<TPayload, TProp>(
             TPayload payload,
-            Expression<Func<TPayload, object?>> path)
+            Expression<Func<TPayload, TProp>> path)
         {
+            if (_elseCalled)
+                throw new InvalidOperationException(
+                    "Cannot add ElseIf after Else. Else must be the last branch.");
+
             var source = ExpressionPathHelper.ToEventPath(path);
-            var propertyType = ExpressionPathHelper.GetPropertyType(path);
-            return new ConditionSourceBuilder<TModel>(source, propertyType, this);
+            return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
         /// <summary>
@@ -39,10 +44,15 @@ namespace Alis.Reactive.Builders
         /// </summary>
         public void Else(Action<PipelineBuilder<TModel>> configure)
         {
+            if (_elseCalled)
+                throw new InvalidOperationException(
+                    "Else has already been called. Only one Else branch is allowed and it must be last.");
+
             var pb = new PipelineBuilder<TModel>();
             configure(pb);
             var reaction = new SequentialReaction(pb.Commands);
             _branches.Add(new Branch(null, reaction));
+            _elseCalled = true;
         }
 
         /// <summary>
@@ -50,6 +60,10 @@ namespace Alis.Reactive.Builders
         /// </summary>
         internal void AddBranch(Branch branch)
         {
+            if (_elseCalled)
+                throw new InvalidOperationException(
+                    "Cannot add branches after Else. Else must be the last branch.");
+
             _branches.Add(branch);
         }
     }

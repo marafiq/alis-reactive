@@ -5,9 +5,9 @@ namespace Alis.Reactive.Builders
 {
     /// <summary>
     /// Provides operator methods (Eq, NotEq, Gt, etc.) that produce a ValueGuard.
-    /// Each operator method returns a GuardBuilder for composition (And/Or/Then).
+    /// TProp is the compile-time type of the source property — operators demand TProp operands.
     /// </summary>
-    public sealed class ConditionSourceBuilder<TModel> where TModel : class
+    public sealed class ConditionSourceBuilder<TModel, TProp> where TModel : class
     {
         private readonly string _source;
         private readonly string _coerceAs;
@@ -19,11 +19,10 @@ namespace Alis.Reactive.Builders
         /// <summary>
         /// Constructor for top-level: PipelineBuilder.When()
         /// </summary>
-        internal ConditionSourceBuilder(string source, Type propertyType,
-            PipelineBuilder<TModel> pipeline)
+        internal ConditionSourceBuilder(string source, PipelineBuilder<TModel> pipeline)
         {
             _source = source;
-            _coerceAs = CoercionTypes.InferFromType(propertyType);
+            _coerceAs = CoercionTypes.InferFromType(typeof(TProp));
             _pipeline = pipeline;
         }
 
@@ -31,42 +30,43 @@ namespace Alis.Reactive.Builders
         /// Constructor for inner guards: ConditionStart.When() inside And/Or lambdas.
         /// No pipeline or branch reference needed — just builds a guard.
         /// </summary>
-        internal ConditionSourceBuilder(string source, Type propertyType)
+        internal ConditionSourceBuilder(string source)
         {
             _source = source;
-            _coerceAs = CoercionTypes.InferFromType(propertyType);
+            _coerceAs = CoercionTypes.InferFromType(typeof(TProp));
         }
 
         /// <summary>
         /// Constructor for chained branches: BranchBuilder.ElseIf()
         /// </summary>
-        internal ConditionSourceBuilder(string source, Type propertyType,
-            BranchBuilder<TModel> branchBuilder)
+        internal ConditionSourceBuilder(string source, BranchBuilder<TModel> branchBuilder)
         {
             _source = source;
-            _coerceAs = CoercionTypes.InferFromType(propertyType);
+            _coerceAs = CoercionTypes.InferFromType(typeof(TProp));
             _branchBuilder = branchBuilder;
         }
 
-        // --- Operators ---
+        // --- Comparison operators (typed operand) ---
 
-        public GuardBuilder<TModel> Eq(object operand) =>
+        public GuardBuilder<TModel> Eq(TProp operand) =>
             Build(GuardOp.Eq, operand);
 
-        public GuardBuilder<TModel> NotEq(object operand) =>
+        public GuardBuilder<TModel> NotEq(TProp operand) =>
             Build(GuardOp.Neq, operand);
 
-        public GuardBuilder<TModel> Gt(object operand) =>
+        public GuardBuilder<TModel> Gt(TProp operand) =>
             Build(GuardOp.Gt, operand);
 
-        public GuardBuilder<TModel> Gte(object operand) =>
+        public GuardBuilder<TModel> Gte(TProp operand) =>
             Build(GuardOp.Gte, operand);
 
-        public GuardBuilder<TModel> Lt(object operand) =>
+        public GuardBuilder<TModel> Lt(TProp operand) =>
             Build(GuardOp.Lt, operand);
 
-        public GuardBuilder<TModel> Lte(object operand) =>
+        public GuardBuilder<TModel> Lte(TProp operand) =>
             Build(GuardOp.Lte, operand);
+
+        // --- Presence operators (no operand) ---
 
         public GuardBuilder<TModel> Truthy() =>
             Build(GuardOp.Truthy);

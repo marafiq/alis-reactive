@@ -47,7 +47,7 @@ export type Guard = ValueGuard | AllGuard | AnyGuard;
 export interface ValueGuard {
   kind: "value";
   source: string;
-  coerceAs: "string" | "number" | "boolean" | "raw";
+  coerceAs: "string" | "number" | "boolean" | "date" | "raw";
   op: GuardOp;
   operand?: unknown;
 }
