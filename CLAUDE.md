@@ -311,3 +311,24 @@ layout uses `src=` (not inline `import from`), and ASP.NET's tag helpers compute
 ```
 
 Every change goes through all three test layers before it's done. No exceptions.
+
+## Pre-Commit Verification (MANDATORY)
+
+**Before every commit, ALL tests must pass. No exceptions.**
+
+```bash
+# Full test suite — run all three from the repo root:
+cd /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive
+
+# 1. TS unit tests (vitest + jsdom) — 25 tests
+npm test
+
+# 2. C# unit + schema tests (NUnit + Verify + JsonSchema.Net) — 35 tests
+dotnet test tests/Alis.Reactive.UnitTests
+
+# 3. Playwright browser tests (browser behavior) — 10 tests
+dotnet test tests/Alis.Reactive.PlaywrightTests
+```
+
+If any test fails, fix the issue and re-run ALL tests before committing.
+Never commit with failing tests. Never skip Playwright.
