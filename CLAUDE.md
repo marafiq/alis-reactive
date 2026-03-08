@@ -52,6 +52,7 @@ the `ReactivePlan`. Nothing executes at this point.
 | `Alis.Reactive/Descriptors/Triggers/Trigger.cs` | `DomReadyTrigger`, `CustomEventTrigger` (polymorphic JSON) |
 | `Alis.Reactive/Descriptors/Reactions/Reaction.cs` | `SequentialReaction` (list of commands) |
 | `Alis.Reactive/Descriptors/Entry.cs` | One entry = trigger + reaction |
+| `Alis.Reactive/ExpressionPathHelper.cs` | Converts `x => x.Address.City` to `"evt.address.city"` dot-path for source binding |
 | `Alis.Reactive.Native/Extensions/HtmlExtensions.cs` | `Html.On()` extension — the view entry point |
 
 ### Layer 2: JSON Plan (Schema-Validated Contract)
@@ -88,6 +89,18 @@ naming and polymorphic type discriminators (`"kind"` property).
 
 **Mutate actions:** `add-class`, `remove-class`, `toggle-class`, `set-text`, `set-html`, `show`, `hide`
 
+**Source binding (BindExpr):** `set-text` and `set-html` support a `source` field — a `BindExpr`
+(dot-notation path into execution context) instead of a static `value`. The runtime's `resolver.ts`
+module walks `"evt.address.city"` against the event's `detail` object at execution time.
+
+C# DSL: `p.Element("x").SetText(payload, x => x.Address.City)` →
+`ExpressionPathHelper` converts the expression to `"evt.address.city"`.
+
+**Resolver (reusable module):** `resolver.ts` exports `resolve()`, `resolveAs()`, `resolveToString()`,
+and `coerce()`. Coercion types: `string` (null→""), `number` (NaN→0), `boolean` ("false"→false), `raw`.
+Schema defines `BindExpr` and `CoercionType` as reusable `$defs`. This module will be used by
+the Conditions module for guard evaluation, not just DOM mutations.
+
 ### Layer 3: JS Runtime (Plan Executor)
 
 ESM module bundled by esbuild. The runtime reads the plan JSON and executes it. Nothing more.
@@ -101,6 +114,7 @@ ESM module bundled by esbuild. The runtime reads the plan JSON and executes it. 
 | `Scripts/trigger.ts` | `wireTrigger()` — wires dom-ready and custom-event listeners |
 | `Scripts/execute.ts` | `executeReaction()` → `executeCommand()` — dispatch to command handlers |
 | `Scripts/element.ts` | `mutateElement()` — resolves element by ID, executes mutation action |
+| `Scripts/resolver.ts` | `resolve()`, `resolveAs()`, `resolveToString()`, `coerce()` — BindExpr dot-path resolution with type coercion |
 | `Scripts/trace.ts` | `scope()`, `setLevel()` — deterministic single-string trace output |
 | `Scripts/types.ts` | TypeScript interfaces mirroring the JSON plan schema |
 
@@ -146,7 +160,10 @@ is set, it enables tracing. This eliminates per-view inline scripts entirely.
 | `Alis.Reactive.Fusion` | Syncfusion component builders (future) | Core + SF EJ2 |
 | `Alis.Reactive.SandboxApp` | MVC app that uses the DSL + hosts the runtime | Native + ASP.NET |
 
-## Test Coverage — Three Layers, 100%
+## Test Coverage — Three Layers, 100% (BDD)
+
+All tests are **behavior-driven** — named after what the system does, not what the code does.
+Test classes follow `When{Scenario}`, test methods describe the expected behavior.
 
 ### Layer 1: C# Unit Tests (Verify + Schema)
 
@@ -162,6 +179,7 @@ is set, it enables tracing. This eliminates per-view inline scripts entirely.
 |------|--------------|
 | `Commands/WhenDispatchingAnEvent.cs` | Dispatch with/without payload, multiple commands |
 | `Commands/WhenMutatingAnElement.cs` | All 7 actions: AddClass, RemoveClass, ToggleClass, SetText, SetHtml, Show, Hide + mixed chains |
+| `Commands/WhenResolvingPayloadSource.cs` | Source-based SetText/SetHtml from event payload: flat primitives (int, long, double, string, bool) + nested dot-paths (address.city, address.zip) |
 | `Triggers/WhenTriggeringOnDomReady.cs` | DomReady trigger serialization |
 | `Triggers/WhenTriggeringOnCustomEvent.cs` | CustomEvent trigger, typed payload |
 | `Triggers/WhenTriggeringOnCustomEventWithAllSupportedTypes.cs` | All primitive types in payload |
@@ -190,6 +208,7 @@ is set, it enables tracing. This eliminates per-view inline scripts entirely.
 | `when-dispatching-an-event.test.ts` | Dispatch fires CustomEvent on document |
 | `when-dispatching-a-custom-event-with-payload.test.ts` | All primitive types survive serialization |
 | `when-mutating-an-element.test.ts` | All 7 mutate actions + mixed chains |
+| `when-resolving-payload-source.test.ts` | Source dot-path resolution: flat int/string/bool, nested address.city/street/zip, missing path fallback |
 
 **Run:** `npm test`
 
@@ -206,6 +225,7 @@ on test failure.
 | `Events/WhenPageLoads.cs` | Page title, content sections, plan JSON rendered, nav links |
 | `Events/WhenEventChainFires.cs` | 3-hop dispatch chain, chronological order, payload, DOM mutations |
 | `Events/WhenTraceIsEnabled.cs` | Boot trace in console, trace format |
+| `Payload/WhenPayloadPropertiesResolve.cs` | All primitives (int, long, double, string, bool) + nested (address.street, city, zip) resolved from event payload to DOM text |
 
 **Infrastructure:**
 - `WebServerFixture.cs` — Assembly-level setup, starts Kestrel on port 5220

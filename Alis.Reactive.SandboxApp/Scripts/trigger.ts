@@ -18,7 +18,10 @@ export function wireTrigger(trigger: Trigger, reaction: Reaction): void {
 
     case "custom-event":
       log.debug("custom-event: listening", { event: trigger.event });
-      document.addEventListener(trigger.event, () => executeReaction(reaction));
+      document.addEventListener(trigger.event, (e) => {
+        const detail = (e as CustomEvent).detail;
+        executeReaction(reaction, { evt: detail ?? {} });
+      });
       break;
   }
 }

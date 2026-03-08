@@ -55,4 +55,11 @@ export interface MutateElementCommand {
   target: string;
   action: MutateAction;
   value?: string;
+  source?: string; // dot-path into ExecContext, e.g. "evt.address.city"
+}
+
+// -- Execution Context ----------------------------------------
+
+export interface ExecContext {
+  evt?: Record<string, unknown>;
 }

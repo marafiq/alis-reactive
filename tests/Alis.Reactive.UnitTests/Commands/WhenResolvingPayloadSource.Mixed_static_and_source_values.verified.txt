@@ -1,0 +1,33 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test-event
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: label,
+            action: set-text,
+            value: Name:
+          },
+          {
+            kind: mutate-element,
+            target: value,
+            action: set-text,
+            source: evt.stringValue
+          },
+          {
+            kind: mutate-element,
+            target: status,
+            action: add-class,
+            value: text-green
+          }
+        ]
+      }
+    }
+  ]
+}

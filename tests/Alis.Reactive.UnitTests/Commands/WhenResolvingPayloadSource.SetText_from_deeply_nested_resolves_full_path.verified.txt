@@ -1,0 +1,33 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test-event
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: street,
+            action: set-text,
+            source: evt.address.street
+          },
+          {
+            kind: mutate-element,
+            target: city,
+            action: set-text,
+            source: evt.address.city
+          },
+          {
+            kind: mutate-element,
+            target: zip,
+            action: set-text,
+            source: evt.address.zip
+          }
+        ]
+      }
+    }
+  ]
+}

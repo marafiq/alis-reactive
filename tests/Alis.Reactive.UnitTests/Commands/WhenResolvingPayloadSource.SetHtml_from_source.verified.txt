@@ -1,0 +1,21 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test-event
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: content,
+            action: set-html,
+            source: evt.stringValue
+          }
+        ]
+      }
+    }
+  ]
+}

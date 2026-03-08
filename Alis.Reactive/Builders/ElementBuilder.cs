@@ -1,3 +1,5 @@
+using System;
+using System.Linq.Expressions;
 using Alis.Reactive.Descriptors.Commands;
 
 namespace Alis.Reactive.Builders
@@ -37,9 +39,30 @@ namespace Alis.Reactive.Builders
             return _pipeline;
         }
 
+        /// <summary>
+        /// Sets the element text from an event payload property resolved at runtime.
+        /// The source instance is used only for generic type inference — its value is ignored.
+        /// </summary>
+        public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object?>> path)
+        {
+            var sourcePath = ExpressionPathHelper.ToEventPath(path);
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "set-text", source: sourcePath));
+            return _pipeline;
+        }
+
         public PipelineBuilder<TModel> SetHtml(string html)
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, "set-html", html));
+            return _pipeline;
+        }
+
+        /// <summary>
+        /// Sets the element HTML from an event payload property resolved at runtime.
+        /// </summary>
+        public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object?>> path)
+        {
+            var sourcePath = ExpressionPathHelper.ToEventPath(path);
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "set-html", source: sourcePath));
             return _pipeline;
         }
 

@@ -1,7 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.EventsViewModel
 @using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
-@using System.Text.Json
 @{
     ViewData["Title"] = "Events & Dispatch";
 
@@ -41,9 +40,7 @@
     }));
 
     var planJson = plan.Render();
-    var formattedJson = JsonSerializer.Serialize(
-        JsonDocument.Parse(planJson).RootElement,
-        new JsonSerializerOptions { WriteIndented = true });
+    var formattedJson = plan.RenderFormatted();
 }
 
 <div class="space-y-8">

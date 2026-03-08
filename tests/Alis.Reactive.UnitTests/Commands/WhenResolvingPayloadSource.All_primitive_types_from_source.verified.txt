@@ -1,0 +1,45 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test-event
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: int-value,
+            action: set-text,
+            source: evt.intValue
+          },
+          {
+            kind: mutate-element,
+            target: long-value,
+            action: set-text,
+            source: evt.longValue
+          },
+          {
+            kind: mutate-element,
+            target: double-value,
+            action: set-text,
+            source: evt.doubleValue
+          },
+          {
+            kind: mutate-element,
+            target: string-value,
+            action: set-text,
+            source: evt.stringValue
+          },
+          {
+            kind: mutate-element,
+            target: bool-value,
+            action: set-text,
+            source: evt.boolValue
+          }
+        ]
+      }
+    }
+  ]
+}

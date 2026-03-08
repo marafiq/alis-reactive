@@ -9,6 +9,7 @@ namespace Alis.Reactive
     {
         void AddEntry(Entry entry);
         string Render();
+        string RenderFormatted();
     }
 
     public class ReactivePlan<TModel> : IReactivePlan<TModel> where TModel : class
@@ -24,12 +25,22 @@ namespace Alis.Reactive
         {
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
 
             return JsonSerializer.Serialize(new { entries = _entries }, options);
+        }
+
+        /// <summary>
+        /// Renders the plan JSON with indentation for display purposes.
+        /// </summary>
+        public string RenderFormatted()
+        {
+            var json = Render();
+            using var doc = JsonDocument.Parse(json);
+            return JsonSerializer.Serialize(doc.RootElement,
+                new JsonSerializerOptions { WriteIndented = true });
         }
     }
 }

@@ -81,6 +81,16 @@
         "payload": { "type": "object" }
       }
     },
+    "BindExpr": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Dot-notation path into execution context, e.g. evt.address.city"
+    },
+    "CoercionType": {
+      "type": "string",
+      "enum": ["string", "number", "boolean", "raw"],
+      "description": "Type coercion applied to resolved BindExpr value"
+    },
     "MutateElementCommand": {
       "type": "object",
       "required": ["kind", "target", "action"],
@@ -92,7 +102,8 @@
           "type": "string",
           "enum": ["add-class", "remove-class", "toggle-class", "set-text", "set-html", "show", "hide"]
         },
-        "value": { "type": "string" }
+        "value": { "type": "string" },
+        "source": { "$ref": "#/$defs/BindExpr" }
       }
     }
   }

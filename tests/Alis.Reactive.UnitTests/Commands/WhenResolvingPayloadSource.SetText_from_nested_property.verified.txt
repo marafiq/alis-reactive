@@ -1,0 +1,21 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test-event
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: city,
+            action: set-text,
+            source: evt.address.city
+          }
+        ]
+      }
+    }
+  ]
+}

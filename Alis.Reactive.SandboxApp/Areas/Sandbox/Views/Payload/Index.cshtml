@@ -1,0 +1,120 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.PayloadShowcaseModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    ViewData["Title"] = "Payload Access";
+
+    IReactivePlan<PayloadShowcaseModel> plan = new ReactivePlan<PayloadShowcaseModel>();
+
+    // Entry 1: On page load, dispatch event with rich payload containing all types + nested props
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Dispatch("payload-test", new PayloadShowcaseModel
+        {
+            IntValue = 42,
+            LongValue = 9007199254740991,
+            DoubleValue = 3.14159,
+            StringValue = "hello world",
+            BoolValue = true,
+            Address = new AddressModel
+            {
+                Street = "123 Main St",
+                City = "Seattle",
+                Zip = "98101"
+            }
+        });
+    }));
+
+    // Entry 2: On "payload-test" event, extract each property and render to DOM
+    Html.On(plan, t => t.CustomEvent<PayloadShowcaseModel>("payload-test", (payload, p) =>
+    {
+        // Flat primitive properties
+        p.Element("int-value").SetText(payload, x => x.IntValue);
+        p.Element("long-value").SetText(payload, x => x.LongValue);
+        p.Element("double-value").SetText(payload, x => x.DoubleValue);
+        p.Element("string-value").SetText(payload, x => x.StringValue);
+        p.Element("bool-value").SetText(payload, x => x.BoolValue);
+
+        // Nested properties — Address.Street, Address.City, Address.Zip
+        p.Element("address-street").SetText(payload, x => x.Address!.Street);
+        p.Element("address-city").SetText(payload, x => x.Address!.City);
+        p.Element("address-zip").SetText(payload, x => x.Address!.Zip);
+
+        // Mark test complete
+        p.Element("payload-status").RemoveClass("text-text-muted");
+        p.Element("payload-status").AddClass("text-green-600");
+        p.Element("payload-status").AddClass("font-semibold");
+        p.Element("payload-status").SetText("All payload properties resolved successfully");
+    }));
+
+    var planJson = plan.Render();
+    var formattedJson = plan.RenderFormatted();
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Payload Access</h1>
+        <p class="mt-2 text-text-secondary">
+            Dispatches a payload with all primitive types + nested Address object.
+            Each property is extracted via plan <code>source</code> binding and rendered to DOM.
+        </p>
+    </div>
+
+    <!-- Payload Property Grid — all driven by plan source resolution -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Resolved Payload Properties</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-sm">
+            <div class="space-y-3">
+                <h3 class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Flat Properties</h3>
+                <div class="flex justify-between border-b border-border pb-1">
+                    <span class="text-text-secondary">intValue (int)</span>
+                    <span id="int-value" class="text-text-muted">—</span>
+                </div>
+                <div class="flex justify-between border-b border-border pb-1">
+                    <span class="text-text-secondary">longValue (long)</span>
+                    <span id="long-value" class="text-text-muted">—</span>
+                </div>
+                <div class="flex justify-between border-b border-border pb-1">
+                    <span class="text-text-secondary">doubleValue (double)</span>
+                    <span id="double-value" class="text-text-muted">—</span>
+                </div>
+                <div class="flex justify-between border-b border-border pb-1">
+                    <span class="text-text-secondary">stringValue (string)</span>
+                    <span id="string-value" class="text-text-muted">—</span>
+                </div>
+                <div class="flex justify-between border-b border-border pb-1">
+                    <span class="text-text-secondary">boolValue (bool)</span>
+                    <span id="bool-value" class="text-text-muted">—</span>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <h3 class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Nested: Address</h3>
+                <div class="flex justify-between border-b border-border pb-1">
+                    <span class="text-text-secondary">address.street</span>
+                    <span id="address-street" class="text-text-muted">—</span>
+                </div>
+                <div class="flex justify-between border-b border-border pb-1">
+                    <span class="text-text-secondary">address.city</span>
+                    <span id="address-city" class="text-text-muted">—</span>
+                </div>
+                <div class="flex justify-between border-b border-border pb-1">
+                    <span class="text-text-secondary">address.zip</span>
+                    <span id="address-zip" class="text-text-muted">—</span>
+                </div>
+            </div>
+        </div>
+
+        <p id="payload-status" class="text-text-muted mt-6">Waiting for payload dispatch...</p>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
+    </section>
+</div>
+
+<script type="application/json" id="alis-plan" data-trace="trace">@Html.Raw(planJson)</script>

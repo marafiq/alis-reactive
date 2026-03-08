@@ -1,9 +1,10 @@
-import type { MutateElementCommand } from "./types";
+import type { MutateElementCommand, ExecContext } from "./types";
 import { scope } from "./trace";
+import { resolveToString } from "./resolver";
 
 const log = scope("element");
 
-export function mutateElement(cmd: MutateElementCommand): void {
+export function mutateElement(cmd: MutateElementCommand, ctx?: ExecContext): void {
   const el = document.getElementById(cmd.target);
   if (!el) {
     log.warn("target not found", { target: cmd.target });
@@ -21,10 +22,10 @@ export function mutateElement(cmd: MutateElementCommand): void {
       if (cmd.value) el.classList.toggle(cmd.value);
       break;
     case "set-text":
-      el.textContent = cmd.value ?? "";
+      el.textContent = cmd.source ? resolveToString(cmd.source, ctx) : (cmd.value ?? "");
       break;
     case "set-html":
-      el.innerHTML = cmd.value ?? "";
+      el.innerHTML = cmd.source ? resolveToString(cmd.source, ctx) : (cmd.value ?? "");
       break;
     case "show":
       el.removeAttribute("hidden");

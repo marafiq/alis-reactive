@@ -31,11 +31,15 @@ namespace Alis.Reactive.Descriptors.Commands
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Value { get; }
 
-        public MutateElementCommand(string target, string action, string? value = null)
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Source { get; }
+
+        public MutateElementCommand(string target, string action, string? value = null, string? source = null)
         {
             Target = target;
             Action = action;
             Value = value;
+            Source = source;
         }
     }
 }

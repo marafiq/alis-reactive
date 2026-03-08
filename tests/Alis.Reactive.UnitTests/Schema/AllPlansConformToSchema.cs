@@ -173,4 +173,62 @@ public class AllPlansConformToSchema : PlanTestBase
             });
         AssertSchemaValid(plan.Render());
     }
+
+    // -- Source-based payload access --
+
+    [Test]
+    public void SetText_with_flat_source()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<PayloadModel>("evt", (payload, p) =>
+            p.Element("name").SetText(payload, x => x.StringValue));
+        AssertSchemaValid(plan.Render());
+    }
+
+    [Test]
+    public void SetText_with_nested_source()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<PayloadModel>("evt", (payload, p) =>
+            p.Element("city").SetText(payload, x => x.Address!.City));
+        AssertSchemaValid(plan.Render());
+    }
+
+    [Test]
+    public void SetHtml_with_source()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<PayloadModel>("evt", (payload, p) =>
+            p.Element("content").SetHtml(payload, x => x.StringValue));
+        AssertSchemaValid(plan.Render());
+    }
+
+    [Test]
+    public void All_primitive_types_from_source()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<PayloadModel>("evt", (payload, p) =>
+        {
+            p.Element("int-val").SetText(payload, x => x.IntValue);
+            p.Element("long-val").SetText(payload, x => x.LongValue);
+            p.Element("double-val").SetText(payload, x => x.DoubleValue);
+            p.Element("string-val").SetText(payload, x => x.StringValue);
+            p.Element("bool-val").SetText(payload, x => x.BoolValue);
+        });
+        AssertSchemaValid(plan.Render());
+    }
+
+    [Test]
+    public void Mixed_static_and_source_values()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<PayloadModel>("evt", (payload, p) =>
+        {
+            p.Element("label").SetText("Name:");
+            p.Element("value").SetText(payload, x => x.StringValue);
+            p.Element("city").SetText(payload, x => x.Address!.City);
+            p.Element("status").AddClass("done");
+        });
+        AssertSchemaValid(plan.Render());
+    }
 }
