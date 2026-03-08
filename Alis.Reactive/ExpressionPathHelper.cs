@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Alis.Reactive
 {
@@ -14,6 +15,25 @@ namespace Alis.Reactive
         {
             var members = ExtractMemberChain(expression.Body);
             return "evt." + string.Join(".", members);
+        }
+
+        /// <summary>
+        /// Extracts the CLR property/field type from a member expression, unwrapping
+        /// any Convert node that the compiler inserts for boxing value types.
+        /// </summary>
+        public static Type GetPropertyType<TSource>(Expression<Func<TSource, object?>> expression)
+        {
+            var body = expression.Body;
+            if (body is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
+                body = unary.Operand;
+
+            if (body is MemberExpression member)
+            {
+                if (member.Member is PropertyInfo prop) return prop.PropertyType;
+                if (member.Member is FieldInfo field) return field.FieldType;
+            }
+
+            return typeof(object);
         }
 
         private static List<string> ExtractMemberChain(Expression expr)

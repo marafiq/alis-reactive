@@ -1,7 +1,6 @@
 using System;
 using Alis.Reactive.Descriptors;
 using Alis.Reactive.Descriptors.Triggers;
-using Alis.Reactive.Descriptors.Reactions;
 
 namespace Alis.Reactive.Builders
 {
@@ -20,7 +19,7 @@ namespace Alis.Reactive.Builders
             configure(pb);
             _plan.AddEntry(new Entry(
                 new DomReadyTrigger(),
-                new SequentialReaction(pb.Commands)
+                pb.BuildReaction()
             ));
             return this;
         }
@@ -31,7 +30,7 @@ namespace Alis.Reactive.Builders
             configure(pb);
             _plan.AddEntry(new Entry(
                 new CustomEventTrigger(eventName),
-                new SequentialReaction(pb.Commands)
+                pb.BuildReaction()
             ));
             return this;
         }
@@ -44,7 +43,7 @@ namespace Alis.Reactive.Builders
             configure(new TPayload(), pb);
             _plan.AddEntry(new Entry(
                 new CustomEventTrigger(eventName),
-                new SequentialReaction(pb.Commands)
+                pb.BuildReaction()
             ));
             return this;
         }

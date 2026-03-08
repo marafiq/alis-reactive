@@ -6,6 +6,7 @@ namespace Alis.Reactive.Descriptors.Reactions
 {
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
     [JsonDerivedType(typeof(SequentialReaction), "sequential")]
+    [JsonDerivedType(typeof(ConditionalReaction), "conditional")]
     public abstract class Reaction
     {
     }
@@ -17,6 +18,16 @@ namespace Alis.Reactive.Descriptors.Reactions
         public SequentialReaction(List<Command> commands)
         {
             Commands = commands;
+        }
+    }
+
+    public sealed class ConditionalReaction : Reaction
+    {
+        public IReadOnlyList<Branch> Branches { get; }
+
+        public ConditionalReaction(IReadOnlyList<Branch> branches)
+        {
+            Branches = branches;
         }
     }
 }
