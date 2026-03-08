@@ -1,0 +1,58 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: role-checked
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: any,
+              guards: [
+                {
+                  kind: value,
+                  source: evt.role,
+                  coerceAs: string,
+                  op: eq,
+                  operand: admin
+                },
+                {
+                  kind: value,
+                  source: evt.role,
+                  coerceAs: string,
+                  op: eq,
+                  operand: superuser
+                }
+              ]
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: panel,
+                  jsEmit: el.removeAttribute('hidden')
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: panel,
+                  jsEmit: el.setAttribute('hidden','')
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

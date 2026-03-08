@@ -1,0 +1,88 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: grade-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: evt.score,
+              coerceAs: number,
+              op: gte,
+              operand: 90
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: grade,
+                  jsEmit: el.textContent = val,
+                  value: A
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: evt.score,
+              coerceAs: number,
+              op: gte,
+              operand: 80
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: grade,
+                  jsEmit: el.textContent = val,
+                  value: B
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: evt.score,
+              coerceAs: number,
+              op: gte,
+              operand: 70
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: grade,
+                  jsEmit: el.textContent = val,
+                  value: C
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: grade,
+                  jsEmit: el.textContent = val,
+                  value: F
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

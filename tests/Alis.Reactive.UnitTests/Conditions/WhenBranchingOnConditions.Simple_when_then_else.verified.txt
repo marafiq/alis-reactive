@@ -1,0 +1,48 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: score-checked
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: evt.score,
+              coerceAs: number,
+              op: gte,
+              operand: 90
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Pass
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Fail
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: user-loaded
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: evt.name,
+              coerceAs: string,
+              op: not-null
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: greeting,
+                  jsEmit: el.textContent = val,
+                  value: Welcome
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
