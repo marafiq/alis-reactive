@@ -1,0 +1,48 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: dispatch,
+            event: init
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: refresh
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: dispatch,
+            event: reload
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: typed
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: dispatch,
+            event: done
+          }
+        ]
+      }
+    }
+  ]
+}

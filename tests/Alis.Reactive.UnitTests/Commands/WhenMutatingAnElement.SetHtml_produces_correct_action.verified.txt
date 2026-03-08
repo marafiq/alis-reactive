@@ -1,0 +1,20 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: container,
+            action: set-html,
+            value: <strong>done</strong>
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.EventsViewModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Events & Dispatch";
+
+    IReactivePlan<EventsViewModel> plan = new ReactivePlan<EventsViewModel>();
+
+    // Entry 1: On page load, dispatch "test" event and mark step 1 complete
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Element("step-1").AddClass("text-green-600");
+        p.Element("step-1").SetText("dom-ready fired → dispatched \"test\"");
+        p.Dispatch("test");
+    }));
+
+    // Entry 2: On "test" event, forward to "test-received" and mark step 2
+    Html.On(plan, t => t.CustomEvent("test", p =>
+    {
+        p.Element("step-2").AddClass("text-green-600");
+        p.Element("step-2").SetText("\"test\" received → dispatched \"test-received\"");
+        p.Dispatch("test-received");
+    }));
+
+    // Entry 3: On "test-received", dispatch "final" with payload and mark step 3
+    Html.On(plan, t => t.CustomEvent<EventsViewModel>("test-received", (payload, p) =>
+    {
+        p.Element("step-3").AddClass("text-green-600");
+        p.Element("step-3").SetText("\"test-received\" received → dispatched \"final\" with payload");
+        p.Dispatch("final", new EventsViewModel { EventName = "done" });
+    }));
+
+    // Entry 4: On "final" event, mark chain complete
+    Html.On(plan, t => t.CustomEvent("final", p =>
+    {
+        p.Element("chain-status").RemoveClass("text-text-muted");
+        p.Element("chain-status").AddClass("text-green-600");
+        p.Element("chain-status").AddClass("font-semibold");
+        p.Element("chain-status").SetText("Chain complete — all 3 hops executed successfully");
+    }));
+
+    var planJson = plan.Render();
+    var formattedJson = JsonSerializer.Serialize(
+        JsonDocument.Parse(planJson).RootElement,
+        new JsonSerializerOptions { WriteIndented = true });
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Events &amp; Dispatch</h1>
+        <p class="mt-2 text-text-secondary">
+            Three-hop event chain: dom-ready dispatches "test" &rarr; "test-received" &rarr; "final" with payload.
+            Open DevTools console to see trace output.
+        </p>
+    </div>
+
+    <!-- Chain Status — all driven by plan, zero manual JS -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Event Chain Status</h2>
+        <div class="space-y-2 font-mono text-sm">
+            <p id="step-1" class="text-text-muted">Step 1: waiting for dom-ready...</p>
+            <p id="step-2" class="text-text-muted">Step 2: waiting for "test" event...</p>
+            <p id="step-3" class="text-text-muted">Step 3: waiting for "test-received" event...</p>
+            <p id="chain-status" class="text-text-muted mt-4">Chain not started</p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
+    </section>
+
+    <!-- C# DSL -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">C# DSL</h2>
+        <pre class="rounded-md bg-slate-900 text-sky-400 p-4 font-mono text-xs overflow-x-auto"><code>// Entry 1: On page load, dispatch "test" event + update DOM
+Html.On(plan, t =&gt; t.DomReady(p =&gt;
+{
+    p.Element("step-1").AddClass("text-green-600");
+    p.Element("step-1").SetText("dom-ready fired");
+    p.Dispatch("test");
+}));
+
+// Entry 2: On "test" event, forward to "test-received"
+Html.On(plan, t =&gt; t.CustomEvent("test", p =&gt;
+{
+    p.Element("step-2").AddClass("text-green-600");
+    p.Dispatch("test-received");
+}));
+
+// Entry 3: On "test-received", dispatch "final" with payload
+Html.On(plan, t =&gt; t.CustomEvent&lt;EventsViewModel&gt;("test-received", (payload, p) =&gt;
+{
+    p.Element("step-3").AddClass("text-green-600");
+    p.Dispatch("final", new EventsViewModel { EventName = "done" });
+}));
+
+// Entry 4: On "final", mark chain complete
+Html.On(plan, t =&gt; t.CustomEvent("final", p =&gt;
+{
+    p.Element("chain-status").RemoveClass("text-text-muted");
+    p.Element("chain-status").AddClass("text-green-600");
+    p.Element("chain-status").SetText("Chain complete");
+}));</code></pre>
+    </section>
+
+    <!-- TypeScript Runtime -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Runtime Boot (TypeScript)</h2>
+        <pre class="rounded-md bg-slate-900 text-amber-400 p-4 font-mono text-xs overflow-x-auto"><code>// Two-phase boot: wire listeners first, then execute dom-ready
+export function boot(plan: Plan): void {
+  const deferred: Entry[] = [];
+
+  for (const entry of plan.entries) {
+    if (entry.trigger.kind === "dom-ready") {
+      deferred.push(entry);
+    } else {
+      wireTrigger(entry.trigger, entry.reaction);
+    }
+  }
+
+  for (const entry of deferred) {
+    wireTrigger(entry.trigger, entry.reaction);
+  }
+}</code></pre>
+    </section>
+</div>
+
+<script type="application/json" id="alis-plan" data-trace="trace">@Html.Raw(planJson)</script>

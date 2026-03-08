@@ -1,0 +1,12 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential
+      }
+    }
+  ]
+}

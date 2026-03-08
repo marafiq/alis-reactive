@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Alis.Reactive Sandbox</h1>
+        <p class="mt-2 text-text-secondary">
+            Proving ground for the reactive descriptor pattern.
+            Each feature is a self-contained demo with live behavior and source code.
+        </p>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <a asp-area="Sandbox" asp-controller="Events" asp-action="Index"
+           class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+            <h2 class="text-base font-semibold group-hover:text-accent transition-colors">
+                Events &amp; Dispatch
+            </h2>
+            <p class="mt-1 text-sm text-text-secondary">
+                Custom event triggers, dispatch commands, payload flow, and event chaining.
+            </p>
+        </a>
+    </div>
+</div>

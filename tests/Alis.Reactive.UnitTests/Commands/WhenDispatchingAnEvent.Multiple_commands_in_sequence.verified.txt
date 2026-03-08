@@ -1,0 +1,25 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: dispatch,
+            event: first
+          },
+          {
+            kind: dispatch,
+            event: second,
+            payload: {
+              id: x
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

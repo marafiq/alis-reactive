@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@source "../Views/**/*.cshtml";
+@source "../Areas/**/*.cshtml";
+@source "../Areas/**/*.cs";
+@source "../Controllers/**/*.cs";
+@source "../Models/**/*.cs";
+
+@theme {
+  --color-surface: #f8fafc;
+  --color-surface-alt: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+}

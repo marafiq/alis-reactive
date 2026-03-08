@@ -1,0 +1,32 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: panel,
+            action: remove-class,
+            value: text-muted
+          },
+          {
+            kind: mutate-element,
+            target: panel,
+            action: add-class,
+            value: text-green
+          },
+          {
+            kind: mutate-element,
+            target: panel,
+            action: set-text,
+            value: done
+          }
+        ]
+      }
+    }
+  ]
+}

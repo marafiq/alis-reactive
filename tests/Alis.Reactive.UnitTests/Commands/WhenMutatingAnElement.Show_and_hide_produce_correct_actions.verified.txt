@@ -1,0 +1,24 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: loader,
+            action: show
+          },
+          {
+            kind: mutate-element,
+            target: content,
+            action: hide
+          }
+        ]
+      }
+    }
+  ]
+}

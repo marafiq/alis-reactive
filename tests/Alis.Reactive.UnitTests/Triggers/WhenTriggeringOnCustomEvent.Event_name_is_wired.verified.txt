@@ -1,0 +1,19 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: data-loaded
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: dispatch,
+            event: refresh
+          }
+        ]
+      }
+    }
+  ]
+}

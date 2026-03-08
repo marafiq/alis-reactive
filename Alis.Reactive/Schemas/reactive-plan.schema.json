@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://alis.reactive/schemas/reactive-plan.schema.json",
+  "title": "Reactive Plan",
+  "description": "The complete runtime plan serialized by ReactivePlan.Render()",
+  "type": "object",
+  "required": ["entries"],
+  "additionalProperties": false,
+  "properties": {
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Entry" }
+    }
+  },
+  "$defs": {
+    "Entry": {
+      "type": "object",
+      "required": ["trigger", "reaction"],
+      "additionalProperties": false,
+      "properties": {
+        "trigger": { "$ref": "#/$defs/Trigger" },
+        "reaction": { "$ref": "#/$defs/Reaction" }
+      }
+    },
+
+    "Trigger": {
+      "oneOf": [
+        { "$ref": "#/$defs/DomReadyTrigger" },
+        { "$ref": "#/$defs/CustomEventTrigger" }
+      ]
+    },
+    "DomReadyTrigger": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "dom-ready" }
+      }
+    },
+    "CustomEventTrigger": {
+      "type": "object",
+      "required": ["kind", "event"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "custom-event" },
+        "event": { "type": "string", "minLength": 1 }
+      }
+    },
+
+    "Reaction": {
+      "oneOf": [
+        { "$ref": "#/$defs/SequentialReaction" }
+      ]
+    },
+    "SequentialReaction": {
+      "type": "object",
+      "required": ["kind", "commands"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "sequential" },
+        "commands": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        }
+      }
+    },
+
+    "Command": {
+      "oneOf": [
+        { "$ref": "#/$defs/DispatchCommand" },
+        { "$ref": "#/$defs/MutateElementCommand" }
+      ]
+    },
+    "DispatchCommand": {
+      "type": "object",
+      "required": ["kind", "event"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "dispatch" },
+        "event": { "type": "string" },
+        "payload": { "type": "object" }
+      }
+    },
+    "MutateElementCommand": {
+      "type": "object",
+      "required": ["kind", "target", "action"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "mutate-element" },
+        "target": { "type": "string", "minLength": 1 },
+        "action": {
+          "type": "string",
+          "enum": ["add-class", "remove-class", "toggle-class", "set-text", "set-html", "show", "hide"]
+        },
+        "value": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
+      <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
+      <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
+    </ItemGroup>
+
+</Project>
