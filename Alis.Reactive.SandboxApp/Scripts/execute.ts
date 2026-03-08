@@ -1,6 +1,7 @@
 import type { Reaction, Command, ExecContext } from "./types";
 import { scope } from "./trace";
 import { mutateElement } from "./element";
+import { evaluateGuard } from "./conditions";
 
 const log = scope("command");
 
@@ -11,6 +12,18 @@ export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
       for (const cmd of reaction.commands) {
         executeCommand(cmd, ctx);
       }
+      break;
+
+    case "conditional":
+      log.debug("conditional", { branches: reaction.branches.length });
+      for (const branch of reaction.branches) {
+        if (branch.guard === null || evaluateGuard(branch.guard, ctx)) {
+          log.trace("branch-taken", { guard: branch.guard?.kind ?? "else" });
+          executeReaction(branch.reaction, ctx);
+          return; // first match wins
+        }
+      }
+      log.trace("no-branch-taken");
       break;
   }
 }
