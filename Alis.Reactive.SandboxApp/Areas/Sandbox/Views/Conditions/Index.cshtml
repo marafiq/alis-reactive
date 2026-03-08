@@ -1,0 +1,158 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ConditionsShowcaseModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    ViewData["Title"] = "Conditions";
+
+    IReactivePlan<ConditionsShowcaseModel> plan = new ReactivePlan<ConditionsShowcaseModel>();
+
+    // ── Section 1: When / Then / ElseIf / Else ──
+    // Entry 1a: On "set-score", display the score value
+    Html.On(plan, t => t.CustomEvent<ScorePayload>("set-score", (args, p) =>
+    {
+        p.Element("score-display").SetText(args, x => x.Score);
+    }));
+
+    // Entry 1b: On "set-score", evaluate grade: >= 90 → A, >= 80 → B, else → F
+    Html.On(plan, t => t.CustomEvent<ScorePayload>("set-score", (args, p) =>
+        p.When(args, x => x.Score).Gte(90)
+            .Then(then => then.Element("grade").SetText("A"))
+            .ElseIf(args, x => x.Score).Gte(80)
+            .Then(then => then.Element("grade").SetText("B"))
+            .Else(else_ => else_.Element("grade").SetText("F"))
+    ));
+
+    // ── Section 2: AND composition ──
+    // On "check-and" event, score >= 90 AND status == "active"
+    Html.On(plan, t => t.CustomEvent<ScorePayload>("check-and", (args, p) =>
+        p.When(args, x => x.Score).Gte(90)
+            .And(g => g.When(args, x => x.Status).Eq("active"))
+            .Then(then => then.Element("and-result").SetText("Active High Scorer"))
+            .Else(else_ => else_.Element("and-result").SetText("Nope"))
+    ));
+
+    // ── Section 3: OR composition ──
+    // On "check-or" event, role == "admin" OR role == "superuser"
+    Html.On(plan, t => t.CustomEvent<RolePayload>("check-or", (args, p) =>
+        p.When(args, x => x.Role).Eq("admin")
+            .Or(g => g.When(args, x => x.Role).Eq("superuser"))
+            .Then(then => then.Element("or-result").SetText("Authorized"))
+            .Else(else_ => else_.Element("or-result").SetText("Denied"))
+    ));
+
+    var planJson = plan.Render();
+    var formattedJson = plan.RenderFormatted();
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Conditions</h1>
+        <p class="mt-2 text-text-secondary">
+            Interactive condition branching: When/Then/ElseIf/Else, AND composition, and OR composition.
+            Click buttons to dispatch events and see condition evaluation in real time.
+        </p>
+    </div>
+
+    <!-- Section 1: When / Then / ElseIf / Else -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">When / Then / ElseIf / Else</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Score &ge; 90 &rarr; grade "A" &bull;
+            Score &ge; 80 &rarr; grade "B" &bull;
+            Otherwise &rarr; grade "F"
+        </p>
+        <div class="flex gap-3 mb-6">
+            <button id="btn-high"
+                    onclick="document.dispatchEvent(new CustomEvent('set-score', {detail:{score:95}}))"
+                    class="px-4 py-2 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
+                Score 95
+            </button>
+            <button id="btn-mid"
+                    onclick="document.dispatchEvent(new CustomEvent('set-score', {detail:{score:85}}))"
+                    class="px-4 py-2 rounded-md bg-amber-600 text-white text-sm font-medium hover:bg-amber-700 transition-colors">
+                Score 85
+            </button>
+            <button id="btn-low"
+                    onclick="document.dispatchEvent(new CustomEvent('set-score', {detail:{score:40}}))"
+                    class="px-4 py-2 rounded-md bg-rose-600 text-white text-sm font-medium hover:bg-rose-700 transition-colors">
+                Score 40
+            </button>
+        </div>
+        <div class="grid grid-cols-2 gap-4 font-mono text-sm">
+            <div class="flex justify-between border-b border-border pb-1">
+                <span class="text-text-secondary">Score</span>
+                <span id="score-display" class="text-text-muted">&mdash;</span>
+            </div>
+            <div class="flex justify-between border-b border-border pb-1">
+                <span class="text-text-secondary">Grade</span>
+                <span id="grade" class="text-text-muted">&mdash;</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: AND composition -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">AND Composition</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Both guards must pass: score &ge; 90 <strong>AND</strong> status == "active".
+        </p>
+        <div class="flex gap-3 mb-6">
+            <button id="btn-and-pass"
+                    onclick="document.dispatchEvent(new CustomEvent('check-and', {detail:{score:95, status:'active'}}))"
+                    class="px-4 py-2 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
+                Score 95 + Active
+            </button>
+            <button id="btn-and-fail"
+                    onclick="document.dispatchEvent(new CustomEvent('check-and', {detail:{score:95, status:'inactive'}}))"
+                    class="px-4 py-2 rounded-md bg-rose-600 text-white text-sm font-medium hover:bg-rose-700 transition-colors">
+                Score 95 + Inactive
+            </button>
+        </div>
+        <div class="font-mono text-sm">
+            <div class="flex justify-between border-b border-border pb-1">
+                <span class="text-text-secondary">Result</span>
+                <span id="and-result" class="text-text-muted">&mdash;</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: OR composition -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">OR Composition</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Either guard passes: role == "admin" <strong>OR</strong> role == "superuser".
+        </p>
+        <div class="flex gap-3 mb-6">
+            <button id="btn-admin"
+                    onclick="document.dispatchEvent(new CustomEvent('check-or', {detail:{role:'admin'}}))"
+                    class="px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors">
+                Admin
+            </button>
+            <button id="btn-superuser"
+                    onclick="document.dispatchEvent(new CustomEvent('check-or', {detail:{role:'superuser'}}))"
+                    class="px-4 py-2 rounded-md bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors">
+                Superuser
+            </button>
+            <button id="btn-viewer"
+                    onclick="document.dispatchEvent(new CustomEvent('check-or', {detail:{role:'viewer'}}))"
+                    class="px-4 py-2 rounded-md bg-rose-600 text-white text-sm font-medium hover:bg-rose-700 transition-colors">
+                Viewer
+            </button>
+        </div>
+        <div class="font-mono text-sm">
+            <div class="flex justify-between border-b border-border pb-1">
+                <span class="text-text-secondary">Result</span>
+                <span id="or-result" class="text-text-muted">&mdash;</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
+    </section>
+</div>
+
+<script type="application/json" id="alis-plan" data-trace="trace">@Html.Raw(planJson)</script>

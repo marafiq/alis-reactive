@@ -17,7 +17,7 @@ export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
     case "conditional":
       log.debug("conditional", { branches: reaction.branches.length });
       for (const branch of reaction.branches) {
-        if (branch.guard === null || evaluateGuard(branch.guard, ctx)) {
+        if (branch.guard == null || evaluateGuard(branch.guard, ctx)) {
           log.trace("branch-taken", { guard: branch.guard?.kind ?? "else" });
           executeReaction(branch.reaction, ctx);
           return; // first match wins
