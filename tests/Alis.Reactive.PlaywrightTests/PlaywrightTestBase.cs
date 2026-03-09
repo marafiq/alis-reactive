@@ -52,6 +52,14 @@ public abstract class PlaywrightTestBase : PageTest
         Assert.That(_consoleErrors, Is.Empty, "Expected no console errors");
     }
 
+    protected void AssertNoConsoleErrorsExcept(params string[] allowedPatterns)
+    {
+        var unexpected = _consoleErrors
+            .Where(e => !allowedPatterns.Any(p => e.Contains(p)))
+            .ToList();
+        Assert.That(unexpected, Is.Empty, "Expected no unexpected console errors");
+    }
+
     protected async Task WaitForTraceMessage(string containing, int timeoutMs = 5000)
     {
         var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);

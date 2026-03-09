@@ -1,5 +1,6 @@
-import type { RequestDescriptor, StatusHandler, Command, ExecContext } from "./types";
+import type { RequestDescriptor, StatusHandler, ExecContext } from "./types";
 import { resolveGather } from "./gather";
+import { executeCommands } from "./commands";
 import { scope } from "./trace";
 
 const log = scope("http");
@@ -72,21 +73,3 @@ function routeHandlers(handlers: StatusHandler[] | undefined, status: number, ct
   }
 }
 
-/** Execute a list of commands synchronously — delegates to the same execution logic as sequential reactions. */
-function executeCommands(commands: Command[], ctx?: ExecContext): void {
-  // Inline execution to avoid circular dependency with execute.ts
-  for (const cmd of commands) {
-    switch (cmd.kind) {
-      case "dispatch":
-        document.dispatchEvent(new CustomEvent(cmd.event, { detail: cmd.payload ?? {} }));
-        break;
-      case "mutate-element": {
-        const el = document.getElementById(cmd.target);
-        if (!el) break;
-        const val = cmd.value;
-        new Function("el", "val", cmd.jsEmit)(el, val);
-        break;
-      }
-    }
-  }
-}

@@ -50,7 +50,7 @@ namespace Alis.Reactive.Builders.Conditions
 
             var pb = new PipelineBuilder<TModel>();
             configure(pb);
-            var reaction = new SequentialReaction(pb.Commands);
+            var reaction = pb.BuildReaction();
             _branches.Add(new Branch(null, reaction));
             _elseCalled = true;
         }

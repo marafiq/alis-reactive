@@ -71,6 +71,14 @@ export async function executeReactionAsync(reaction: Reaction, ctx?: ExecContext
         }
       }
       break;
+
+    case "http":
+      await executeHttpReaction(reaction, ctx);
+      return;
+
+    case "parallel-http":
+      await executeParallelHttpReaction(reaction, ctx);
+      return;
   }
 }
 

@@ -1,5 +1,6 @@
-import type { HttpReaction, ParallelHttpReaction, Command, StatusHandler, ExecContext } from "./types";
+import type { HttpReaction, ParallelHttpReaction, ExecContext } from "./types";
 import { execRequest } from "./http";
+import { executeCommands } from "./commands";
 import { scope } from "./trace";
 
 const log = scope("pipeline");
@@ -20,8 +21,11 @@ export async function executeParallelHttpReaction(reaction: ParallelHttpReaction
 
   log.debug("parallel", { count: reaction.requests.length });
 
-  // Fire all requests concurrently — each handles its own onSuccess/onError
-  await Promise.all(reaction.requests.map(req => execRequest(req, ctx)));
+  // Fire all requests concurrently — allSettled so one failure doesn't lose others
+  const results = await Promise.allSettled(reaction.requests.map(req => execRequest(req, ctx)));
+  for (const r of results) {
+    if (r.status === "rejected") log.error("parallel branch error", { reason: String(r.reason) });
+  }
 
   // After ALL complete, fire onAllSuccess handlers
   if (reaction.onAllSuccess) {
@@ -31,20 +35,3 @@ export async function executeParallelHttpReaction(reaction: ParallelHttpReaction
   }
 }
 
-/** Execute commands synchronously (same logic as http.ts inline executor). */
-function executeCommands(commands: Command[], ctx?: ExecContext): void {
-  for (const cmd of commands) {
-    switch (cmd.kind) {
-      case "dispatch":
-        document.dispatchEvent(new CustomEvent(cmd.event, { detail: cmd.payload ?? {} }));
-        break;
-      case "mutate-element": {
-        const el = document.getElementById(cmd.target);
-        if (!el) break;
-        const val = cmd.value;
-        new Function("el", "val", cmd.jsEmit)(el, val);
-        break;
-      }
-    }
-  }
-}
