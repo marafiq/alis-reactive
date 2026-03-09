@@ -2,6 +2,7 @@ import type { Reaction, Command, ExecContext } from "./types";
 import { scope } from "./trace";
 import { mutateElement } from "./element";
 import { evaluateGuard, evaluateGuardAsync, isConfirmGuard } from "./conditions";
+import { executeHttpReaction, executeParallelHttpReaction } from "./pipeline";
 
 const log = scope("command");
 
@@ -32,6 +33,16 @@ export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
         }
       }
       log.trace("no-branch-taken");
+      break;
+
+    case "http":
+      log.debug("http", { url: reaction.request.url });
+      executeHttpReaction(reaction, ctx);
+      break;
+
+    case "parallel-http":
+      log.debug("parallel-http", { count: reaction.requests.length });
+      executeParallelHttpReaction(reaction, ctx);
       break;
   }
 }
