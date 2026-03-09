@@ -1,0 +1,74 @@
+using System;
+using System.Collections.Generic;
+using Alis.Reactive.Descriptors.Commands;
+using Alis.Reactive.Descriptors.Requests;
+
+namespace Alis.Reactive.Builders.Requests
+{
+    public class HttpRequestBuilder<TModel> where TModel : class
+    {
+        private string _verb = "GET";
+        private string _url = "";
+        private List<GatherItem>? _gather;
+        private List<Command>? _whileLoading;
+        private ResponseBuilder<TModel>? _response;
+
+        internal HttpRequestBuilder<TModel> SetVerb(string verb)
+        {
+            _verb = verb;
+            return this;
+        }
+
+        internal HttpRequestBuilder<TModel> SetUrl(string url)
+        {
+            _url = url;
+            return this;
+        }
+
+        /// <summary>
+        /// Configures gather items for the request body/URL params.
+        /// </summary>
+        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> configure)
+        {
+            var builder = new GatherBuilder<TModel>();
+            configure(builder);
+            _gather = builder.Items;
+            return this;
+        }
+
+        /// <summary>
+        /// Configures commands to execute while the request is in-flight.
+        /// These commands are reverted after the response arrives.
+        /// </summary>
+        public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> configure)
+        {
+            var builder = new PipelineBuilder<TModel>();
+            configure(builder);
+            _whileLoading = builder.Commands;
+            return this;
+        }
+
+        /// <summary>
+        /// Configures success/error response handlers.
+        /// </summary>
+        public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> configure)
+        {
+            var builder = new ResponseBuilder<TModel>();
+            configure(builder);
+            _response = builder;
+            return this;
+        }
+
+        internal RequestDescriptor BuildRequestDescriptor()
+        {
+            return new RequestDescriptor(
+                _verb,
+                _url,
+                _gather,
+                _whileLoading,
+                _response?.SuccessHandlers.Count > 0 ? _response.SuccessHandlers : null,
+                _response?.ErrorHandlers.Count > 0 ? _response.ErrorHandlers : null,
+                _response?.ChainedRequest);
+        }
+    }
+}
