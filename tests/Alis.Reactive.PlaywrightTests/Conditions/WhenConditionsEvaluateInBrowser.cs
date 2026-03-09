@@ -470,4 +470,54 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Confirm dialog — OK path ──
+
+    [Test]
+    public async Task Confirm_ok_path()
+    {
+        await NavigateAndBoot();
+        var result = Page.Locator("#confirm-result");
+
+        // Click the trigger button — this dispatches 'check-confirm' custom event
+        await Page.Locator("#btn-confirm").ClickAsync();
+
+        // SF Dialog should appear with "Are you sure you want to proceed?"
+        var dialog = Page.Locator("#alisConfirmDialog");
+        await Expect(dialog).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Click OK button
+        var okButton = dialog.Locator("button.e-primary");
+        await okButton.ClickAsync();
+
+        // Result should be "Confirmed"
+        await Expect(result).ToHaveTextAsync("Confirmed");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Confirm dialog — Cancel path ──
+
+    [Test]
+    public async Task Confirm_cancel_path()
+    {
+        await NavigateAndBoot();
+        var result = Page.Locator("#confirm-result");
+
+        // Click the trigger button
+        await Page.Locator("#btn-confirm").ClickAsync();
+
+        // SF Dialog should appear
+        var dialog = Page.Locator("#alisConfirmDialog");
+        await Expect(dialog).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Click Cancel button (non-primary)
+        var cancelButton = dialog.Locator("button:not(.e-primary)").Last;
+        await cancelButton.ClickAsync();
+
+        // Result should be "Cancelled"
+        await Expect(result).ToHaveTextAsync("Cancelled");
+
+        AssertNoConsoleErrors();
+    }
 }
