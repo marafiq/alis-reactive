@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Guards;
 using Alis.Reactive.Descriptors.Reactions;
@@ -12,6 +13,8 @@ namespace Alis.Reactive.Builders
     {
         internal List<Command> Commands { get; } = new List<Command>();
         internal List<Branch>? ConditionalBranches { get; private set; }
+        private HttpRequestBuilder<TModel>? _httpBuilder;
+        private ParallelBuilder<TModel>? _parallelBuilder;
 
         /// <summary>
         /// Adds a command to the pipeline. Used by vendor-specific projects
@@ -69,6 +72,75 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(comp.DefaultId, this);
         }
 
+        // ── HTTP Request Methods ──
+
+        /// <summary>Starts a GET request to the given URL.</summary>
+        public HttpRequestBuilder<TModel> Get(string url)
+        {
+            EnsureNoConditionals();
+            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder.SetVerb("GET").SetUrl(url);
+            return _httpBuilder;
+        }
+
+        /// <summary>Starts a POST request to the given URL.</summary>
+        public HttpRequestBuilder<TModel> Post(string url)
+        {
+            EnsureNoConditionals();
+            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder.SetVerb("POST").SetUrl(url);
+            return _httpBuilder;
+        }
+
+        /// <summary>Starts a POST request with a gather configuration.</summary>
+        public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
+        {
+            EnsureNoConditionals();
+            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder.SetVerb("POST").SetUrl(url);
+            _httpBuilder.Gather(gather);
+            return _httpBuilder;
+        }
+
+        /// <summary>Starts a PUT request with a gather configuration.</summary>
+        public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
+        {
+            EnsureNoConditionals();
+            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder.SetVerb("PUT").SetUrl(url);
+            _httpBuilder.Gather(gather);
+            return _httpBuilder;
+        }
+
+        /// <summary>Starts a DELETE request to the given URL.</summary>
+        public HttpRequestBuilder<TModel> Delete(string url)
+        {
+            EnsureNoConditionals();
+            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder.SetVerb("DELETE").SetUrl(url);
+            return _httpBuilder;
+        }
+
+        /// <summary>Starts parallel HTTP requests that fire concurrently.</summary>
+        public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
+        {
+            EnsureNoConditionals();
+            _parallelBuilder = new ParallelBuilder<TModel>();
+            foreach (var branch in branches)
+            {
+                _parallelBuilder.AddBranch(branch);
+            }
+            return _parallelBuilder;
+        }
+
+        private void EnsureNoConditionals()
+        {
+            if (ConditionalBranches != null)
+                throw new InvalidOperationException(
+                    "Cannot add HTTP requests after conditional branches. " +
+                    "HTTP requests and conditions are mutually exclusive at the same pipeline level.");
+        }
+
         /// <summary>
         /// Starts a conditional branch on an event payload property.
         /// TProp is inferred from the expression — operators on the returned builder
@@ -108,6 +180,19 @@ namespace Alis.Reactive.Builders
 
         public Reaction BuildReaction()
         {
+            // Priority: parallel → single HTTP → conditional → sequential
+            if (_parallelBuilder != null)
+            {
+                var preFetch = Commands.Count > 0 ? Commands : null;
+                return _parallelBuilder.BuildReaction(preFetch);
+            }
+
+            if (_httpBuilder != null)
+            {
+                var preFetch = Commands.Count > 0 ? Commands : null;
+                return new HttpReaction(preFetch, _httpBuilder.BuildRequestDescriptor());
+            }
+
             if (ConditionalBranches != null)
                 return new ConditionalReaction(ConditionalBranches.ToArray());
 
