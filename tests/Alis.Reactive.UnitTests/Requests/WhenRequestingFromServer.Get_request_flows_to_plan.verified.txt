@@ -1,0 +1,28 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: GET,
+          url: /api/test,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: loaded
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

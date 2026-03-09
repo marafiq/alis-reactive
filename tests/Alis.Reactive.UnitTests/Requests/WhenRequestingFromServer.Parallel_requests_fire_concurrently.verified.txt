@@ -1,0 +1,34 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: parallel-http,
+        requests: [
+          {
+            verb: GET,
+            url: /api/residents
+          },
+          {
+            verb: GET,
+            url: /api/facilities
+          }
+        ],
+        onAllSuccess: [
+          {
+            commands: [
+              {
+                kind: mutate-element,
+                target: result,
+                jsEmit: el.textContent = val,
+                value: all loaded
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

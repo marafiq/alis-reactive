@@ -1,0 +1,44 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: GET,
+          url: /api/residents,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: residents,
+                  jsEmit: el.textContent = val,
+                  value: loaded
+                }
+              ]
+            }
+          ],
+          chained: {
+            verb: GET,
+            url: /api/facilities,
+            onSuccess: [
+              {
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: facilities,
+                    jsEmit: el.textContent = val,
+                    value: loaded
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

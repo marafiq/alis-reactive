@@ -1,0 +1,35 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/test,
+          gather: [
+            {
+              kind: static,
+              param: key,
+              value: val
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: saved
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

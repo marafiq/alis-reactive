@@ -25,6 +25,13 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
+        // ── Public convenience verbs (used in Chained / Parallel lambdas) ──
+
+        public HttpRequestBuilder<TModel> Get(string url) { _verb = "GET"; _url = url; return this; }
+        public HttpRequestBuilder<TModel> Post(string url) { _verb = "POST"; _url = url; return this; }
+        public HttpRequestBuilder<TModel> Put(string url) { _verb = "PUT"; _url = url; return this; }
+        public HttpRequestBuilder<TModel> Delete(string url) { _verb = "DELETE"; _url = url; return this; }
+
         /// <summary>
         /// Configures gather items for the request body/URL params.
         /// </summary>

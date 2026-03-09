@@ -1,0 +1,34 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: GET,
+          url: /api/test,
+          whileLoading: [
+            {
+              kind: mutate-element,
+              target: spinner,
+              jsEmit: el.removeAttribute('hidden')
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: spinner,
+                  jsEmit: el.setAttribute('hidden','')
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

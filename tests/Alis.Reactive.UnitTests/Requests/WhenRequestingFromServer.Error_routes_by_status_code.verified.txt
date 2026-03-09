@@ -1,0 +1,59 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/save,
+          gather: [
+            {
+              kind: static,
+              param: name,
+              value: test
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: ok
+                }
+              ]
+            }
+          ],
+          onError: [
+            {
+              statusCode: 400,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: error,
+                  jsEmit: el.textContent = val,
+                  value: bad request
+                }
+              ]
+            },
+            {
+              statusCode: 500,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: error,
+                  jsEmit: el.textContent = val,
+                  value: server error
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
