@@ -68,7 +68,9 @@
     "Reaction": {
       "oneOf": [
         { "$ref": "#/$defs/SequentialReaction" },
-        { "$ref": "#/$defs/ConditionalReaction" }
+        { "$ref": "#/$defs/ConditionalReaction" },
+        { "$ref": "#/$defs/HttpReaction" },
+        { "$ref": "#/$defs/ParallelHttpReaction" }
       ]
     },
     "SequentialReaction": {
@@ -243,6 +245,121 @@
         "value": { "type": "string" },
         "source": { "$ref": "#/$defs/BindExpr" },
         "when": { "$ref": "#/$defs/Guard" }
+      }
+    },
+
+    "GatherItem": {
+      "oneOf": [
+        { "$ref": "#/$defs/ComponentGather" },
+        { "$ref": "#/$defs/AllGather" },
+        { "$ref": "#/$defs/StaticGather" }
+      ]
+    },
+    "ComponentGather": {
+      "type": "object",
+      "required": ["kind", "componentId", "vendor", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "component" },
+        "componentId": { "type": "string", "minLength": 1, "description": "DOM element ID of the component" },
+        "vendor": { "$ref": "#/$defs/Vendor" },
+        "name": { "type": "string", "minLength": 1, "description": "Property name for the gathered value in the request body" },
+        "readExpr": { "type": "string", "minLength": 1, "description": "JS expression to read the value. Variables: el (DOM element). E.g. el.ej2_instances[0].value" }
+      }
+    },
+    "AllGather": {
+      "type": "object",
+      "required": ["kind", "formId"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "all" },
+        "formId": { "type": "string", "minLength": 1, "description": "Form element ID — all fields gathered via FormData" }
+      }
+    },
+    "StaticGather": {
+      "type": "object",
+      "required": ["kind", "param", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "static" },
+        "param": { "type": "string", "minLength": 1 },
+        "value": { "description": "Static value to include in the request" }
+      }
+    },
+
+    "StatusHandler": {
+      "type": "object",
+      "required": ["commands"],
+      "additionalProperties": false,
+      "properties": {
+        "statusCode": { "type": "integer", "description": "HTTP status code to match. Null = catch-all." },
+        "commands": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        }
+      }
+    },
+
+    "RequestDescriptor": {
+      "type": "object",
+      "required": ["verb", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "verb": { "type": "string", "enum": ["GET", "POST", "PUT", "DELETE"] },
+        "url": { "type": "string", "minLength": 1 },
+        "gather": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GatherItem" }
+        },
+        "whileLoading": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        },
+        "onSuccess": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StatusHandler" }
+        },
+        "onError": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StatusHandler" }
+        },
+        "chained": { "$ref": "#/$defs/RequestDescriptor" }
+      }
+    },
+
+    "HttpReaction": {
+      "type": "object",
+      "required": ["kind", "request"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "http" },
+        "preFetch": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        },
+        "request": { "$ref": "#/$defs/RequestDescriptor" }
+      }
+    },
+
+    "ParallelHttpReaction": {
+      "type": "object",
+      "required": ["kind", "requests"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "parallel-http" },
+        "preFetch": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        },
+        "requests": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RequestDescriptor" },
+          "minItems": 2
+        },
+        "onAllSuccess": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StatusHandler" }
+        }
       }
     }
   }
