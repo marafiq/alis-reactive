@@ -32,7 +32,7 @@ export interface ComponentEventTrigger {
 
 // -- Reactions ------------------------------------------------
 
-export type Reaction = SequentialReaction | ConditionalReaction;
+export type Reaction = SequentialReaction | ConditionalReaction | HttpReaction | ParallelHttpReaction;
 
 export interface SequentialReaction {
   kind: "sequential";
@@ -42,6 +42,57 @@ export interface SequentialReaction {
 export interface ConditionalReaction {
   kind: "conditional";
   branches: Branch[];
+}
+
+export interface HttpReaction {
+  kind: "http";
+  preFetch?: Command[];
+  request: RequestDescriptor;
+}
+
+export interface ParallelHttpReaction {
+  kind: "parallel-http";
+  preFetch?: Command[];
+  requests: RequestDescriptor[];
+  onAllSuccess?: StatusHandler[];
+}
+
+// -- HTTP Request Types ----------------------------------------
+
+export type GatherItem = ComponentGather | AllGather | StaticGather;
+
+export interface ComponentGather {
+  kind: "component";
+  componentId: string;
+  vendor: Vendor;
+  name: string;
+  readExpr?: string;
+}
+
+export interface AllGather {
+  kind: "all";
+  formId: string;
+}
+
+export interface StaticGather {
+  kind: "static";
+  param: string;
+  value: unknown;
+}
+
+export interface StatusHandler {
+  statusCode?: number;
+  commands: Command[];
+}
+
+export interface RequestDescriptor {
+  verb: "GET" | "POST" | "PUT" | "DELETE";
+  url: string;
+  gather?: GatherItem[];
+  whileLoading?: Command[];
+  onSuccess?: StatusHandler[];
+  onError?: StatusHandler[];
+  chained?: RequestDescriptor;
 }
 
 // -- BindSource -----------------------------------------------
