@@ -14,7 +14,7 @@ namespace Alis.Reactive
 
     public class ReactivePlan<TModel> : IReactivePlan<TModel> where TModel : class
     {
-        private static readonly JsonSerializerOptions SerializeOptions = new JsonSerializerOptions
+        private static readonly JsonSerializerOptions CompactOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
@@ -22,6 +22,8 @@ namespace Alis.Reactive
 
         private static readonly JsonSerializerOptions FormattedOptions = new JsonSerializerOptions
         {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             WriteIndented = true
         };
 
@@ -34,7 +36,7 @@ namespace Alis.Reactive
 
         public string Render()
         {
-            return JsonSerializer.Serialize(new { entries = _entries }, SerializeOptions);
+            return JsonSerializer.Serialize(new { entries = _entries }, CompactOptions);
         }
 
         /// <summary>
@@ -42,9 +44,7 @@ namespace Alis.Reactive
         /// </summary>
         public string RenderFormatted()
         {
-            var json = Render();
-            using var doc = JsonDocument.Parse(json);
-            return JsonSerializer.Serialize(doc.RootElement, FormattedOptions);
+            return JsonSerializer.Serialize(new { entries = _entries }, FormattedOptions);
         }
     }
 }

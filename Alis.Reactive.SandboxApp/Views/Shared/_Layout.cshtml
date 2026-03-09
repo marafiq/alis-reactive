@@ -52,47 +52,7 @@
 @Html.EJS().ScriptManager()
 @await RenderSectionAsync("Scripts", required: false)
 
-<!-- App-level confirm dialog — initialized via JS to avoid ScriptManager ordering + modal overlay issues -->
-<div id="alisConfirmDialog"></div>
-<script>
-(function() {
-    // Initialize SF Dialog directly via JS (not tag helper) for full control
-    var dialog = new ej.popups.Dialog({
-        isModal: true,
-        visible: false,
-        width: '400px',
-        animationSettings: { effect: 'None' },
-        showCloseIcon: false,
-        closeOnEscape: true,
-        target: document.body
-    });
-    dialog.appendTo('#alisConfirmDialog');
-
-    // App-level confirm contract — conditions module calls window.alis.confirm(msg) → Promise<boolean>
-    window.alis = window.alis || {};
-    var queue = Promise.resolve();
-    window.alis.confirm = function(message) {
-        var p = new Promise(function(outerResolve) {
-            queue = queue.then(function() {
-                return new Promise(function(resolve) {
-                    if (!dialog) { resolve(); outerResolve(false); return; }
-                    dialog.header = "Confirm";
-                    dialog.content = message;
-                    dialog.buttons = [
-                        { click: function() { dialog.close = null; dialog.hide(); resolve(); outerResolve(true); },
-                          buttonModel: { content: "OK", isPrimary: true, cssClass: "e-primary" } },
-                        { click: function() { dialog.close = null; dialog.hide(); resolve(); outerResolve(false); },
-                          buttonModel: { content: "Cancel" } }
-                    ];
-                    dialog.close = function() { resolve(); outerResolve(false); };
-                    dialog.show();
-                });
-            });
-        });
-        return p;
-    };
-})();
-</script>
+@Html.FusionConfirmDialog()
 <script type="module" src="~/js/alis-reactive.js" asp-append-version="true"></script>
 </body>
 </html>

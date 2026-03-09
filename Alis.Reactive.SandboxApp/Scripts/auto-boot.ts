@@ -1,5 +1,9 @@
 import { boot, trace } from "./boot";
+import { init as initConfirm } from "./confirm";
 import type { TraceLevel } from "./trace";
+
+// Initialize app-level infrastructure before processing plans
+initConfirm();
 
 // Discover all plan elements: [data-alis-plan] (new) or fallback to #alis-plan (legacy)
 const planEls = document.querySelectorAll<HTMLElement>("[data-alis-plan]");
