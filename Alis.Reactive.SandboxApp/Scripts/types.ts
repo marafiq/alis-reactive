@@ -9,7 +9,9 @@ export interface Entry {
 
 // -- Triggers -------------------------------------------------
 
-export type Trigger = DomReadyTrigger | CustomEventTrigger;
+export type Trigger = DomReadyTrigger | CustomEventTrigger | ComponentEventTrigger;
+
+export type Vendor = "fusion" | "native";
 
 export interface DomReadyTrigger {
   kind: "dom-ready";
@@ -18,6 +20,14 @@ export interface DomReadyTrigger {
 export interface CustomEventTrigger {
   kind: "custom-event";
   event: string;
+}
+
+export interface ComponentEventTrigger {
+  kind: "component-event";
+  componentId: string;
+  jsEvent: string;
+  vendor: Vendor;
+  bindingPath?: string;
 }
 
 // -- Reactions ------------------------------------------------
@@ -34,19 +44,32 @@ export interface ConditionalReaction {
   branches: Branch[];
 }
 
+// -- BindSource -----------------------------------------------
+
+export type BindSource = EventSource;
+// Future: export type BindSource = EventSource | ComponentSource;
+
+export interface EventSource {
+  kind: "event";
+  path: string;
+}
+
 // -- Guards & Branches ----------------------------------------
 
 export type GuardOp =
   | "eq" | "neq"
   | "gt" | "gte" | "lt" | "lte"
   | "truthy" | "falsy"
-  | "is-null" | "not-null";
+  | "is-null" | "not-null"
+  | "is-empty" | "not-empty"
+  | "in" | "not-in" | "between"
+  | "contains" | "starts-with" | "ends-with" | "matches" | "min-length";
 
-export type Guard = ValueGuard | AllGuard | AnyGuard;
+export type Guard = ValueGuard | AllGuard | AnyGuard | InvertGuard | ConfirmGuard;
 
 export interface ValueGuard {
   kind: "value";
-  source: string;
+  source: BindSource;
   coerceAs: "string" | "number" | "boolean" | "date" | "raw";
   op: GuardOp;
   operand?: unknown;
@@ -60,6 +83,16 @@ export interface AllGuard {
 export interface AnyGuard {
   kind: "any";
   guards: Guard[];
+}
+
+export interface InvertGuard {
+  kind: "not";
+  inner: Guard;
+}
+
+export interface ConfirmGuard {
+  kind: "confirm";
+  message: string;
 }
 
 export interface Branch {
@@ -77,6 +110,7 @@ export interface DispatchCommand {
   kind: "dispatch";
   event: string;
   payload?: EventPayload;
+  when?: Guard;
 }
 
 export interface MutateElementCommand {
@@ -85,6 +119,7 @@ export interface MutateElementCommand {
   jsEmit: string;
   value?: string;
   source?: string;
+  when?: Guard;
 }
 
 // -- Execution Context ----------------------------------------

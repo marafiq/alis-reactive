@@ -42,6 +42,39 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public bool? NullableBool { get; set; }
     }
 
+    // ── Nested payload (deep path conditions + null safety) ──
+
+    public class AddressInfo
+    {
+        public string? City { get; set; }
+        public string? Zip { get; set; }
+    }
+
+    public class NestedPayload
+    {
+        public AddressInfo? Address { get; set; }
+        public int Id { get; set; }
+    }
+
+    // ── New payloads for expanded operators ──
+
+    public class MembershipPayload
+    {
+        public string Category { get; set; } = "";
+        public int Priority { get; set; }
+    }
+
+    public class TextPayload
+    {
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+    }
+
+    public class RangePayload
+    {
+        public int Age { get; set; }
+    }
+
     // ── View model ──
 
     public class ConditionsShowcaseModel

@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Commands;
 
 namespace Alis.Reactive.Builders
@@ -76,6 +77,23 @@ namespace Alis.Reactive.Builders
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.setAttribute('hidden','')"));
             return _pipeline;
+        }
+
+        /// <summary>
+        /// Attaches a per-action guard to the LAST command added to the pipeline.
+        /// The guard is evaluated at runtime — if false, the command is skipped.
+        /// </summary>
+        public ElementBuilder<TModel> When<TPayload, TProp>(
+            TPayload payload,
+            Expression<Func<TPayload, TProp>> path,
+            Func<ConditionSourceBuilder<TModel, TProp>, GuardBuilder<TModel>> configure)
+        {
+            var source = new EventArgSource<TPayload, TProp>(path);
+            var csb = new ConditionSourceBuilder<TModel, TProp>(source);
+            var gb = configure(csb);
+            if (_pipeline.Commands.Count > 0)
+                _pipeline.Commands[_pipeline.Commands.Count - 1].When = gb.Guard;
+            return this;
         }
     }
 }

@@ -1,0 +1,27 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: cross-vendor
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Amount,
+            jsEmit: var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind(),
+            value: 0
+          },
+          {
+            kind: mutate-element,
+            target: status,
+            jsEmit: el.textContent = val,
+            value: Reset via Fusion event
+          }
+        ]
+      }
+    }
+  ]
+}

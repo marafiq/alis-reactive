@@ -1,0 +1,24 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: component-event,
+        componentId: Status,
+        jsEvent: change,
+        vendor: native,
+        bindingPath: Status
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: echo,
+            jsEmit: el.textContent = val,
+            value: changed
+          }
+        ]
+      }
+    }
+  ]
+}

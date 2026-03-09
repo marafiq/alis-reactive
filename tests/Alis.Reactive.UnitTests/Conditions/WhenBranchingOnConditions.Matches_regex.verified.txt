@@ -1,0 +1,51 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: regex-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.email
+              },
+              coerceAs: string,
+              op: matches,
+              operand: ^[a-z]+@[a-z]+\.[a-z]+$
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Valid
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Invalid
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -14,14 +14,20 @@
               guards: [
                 {
                   kind: value,
-                  source: evt.role,
+                  source: {
+                    kind: event,
+                    path: evt.role
+                  },
                   coerceAs: string,
                   op: eq,
                   operand: admin
                 },
                 {
                   kind: value,
-                  source: evt.role,
+                  source: {
+                    kind: event,
+                    path: evt.role
+                  },
                   coerceAs: string,
                   op: eq,
                   operand: superuser

@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using Alis.Reactive.Descriptors.Guards;
 using Alis.Reactive.Descriptors.Reactions;
 
-namespace Alis.Reactive.Builders
+namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
     /// Allows chaining ElseIf/Else branches after an initial When().Then() block.
@@ -34,7 +34,7 @@ namespace Alis.Reactive.Builders
                 throw new InvalidOperationException(
                     "Cannot add ElseIf after Else. Else must be the last branch.");
 
-            var source = ExpressionPathHelper.ToEventPath(path);
+            var source = new EventArgSource<TPayload, TProp>(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 

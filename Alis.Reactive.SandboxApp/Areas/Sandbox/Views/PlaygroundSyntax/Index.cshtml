@@ -1,0 +1,164 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.PlaygroundSyntaxModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Playground Syntax";
+
+    var statusItems = (IEnumerable<SelectListItem>)ViewBag.StatusItems;
+    var categoryItems = (IEnumerable<SelectListItem>)ViewBag.CategoryItems;
+    var cityItems = (IEnumerable<SelectListItem>)ViewBag.CityItems;
+    var stateItems = (IEnumerable<SelectListItem>)ViewBag.StateItems;
+
+    // ── Create the plan instance — one per view ──
+    var plan = new ReactivePlan<PlaygroundSyntaxModel>();
+
+    // ── One custom event to demo cross-vendor pipeline ──
+    Html.On(plan, t => t.CustomEvent("reset-all", p =>
+    {
+        p.Component<FusionNumericTextBox>(m => m.Amount).SetValue(0);
+        p.Component<NativeDropDown>(m => m.Status).SetValue("");
+        p.Element("status-echo").SetText("All fields reset");
+    }));
+}
+
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Playground Syntax</h1>
+        <p class="mt-1 text-text-secondary text-sm">
+            Exercises Html.Field() wrapping, .Reactive() on both Fusion and Native builders,
+            and cross-vendor pipelines via a single custom event.
+        </p>
+    </div>
+
+    <!-- Section 1: Fusion .Reactive() inside Html.Field() -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">1. Fusion — Html.Field + .Reactive() before .Render()</h2>
+        <p class="text-xs text-text-secondary mb-3">
+            <code class="bg-slate-100 px-1 rounded">Html.EJS().NumericTextBoxFor(expr).Reactive(plan, evt =&gt; evt.Changed, ...).Render()</code>
+        </p>
+        <div class="grid grid-cols-2 gap-4">
+            @{ Html.Field("Amount", true, m => m.Amount, expr =>
+                Html.EJS().NumericTextBoxFor(expr)
+                    .Min(0).Max(10000).Step(1)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("amount-echo").SetText("Amount changed");
+                    })
+                    .Render()
+            ); }
+        </div>
+        <div class="mt-3 text-xs font-mono flex justify-between">
+            <span class="text-text-secondary">Echo</span>
+            <span id="amount-echo">&mdash;</span>
+        </div>
+    </section>
+
+    <!-- Section 2: Native .Reactive() inside Html.Field() -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">2. Native — Html.Field + .Reactive() as last call</h2>
+        <p class="text-xs text-text-secondary mb-3">
+            <code class="bg-slate-100 px-1 rounded">Html.NativeDropDownFor(expr).Items(...).Reactive(plan, evt =&gt; evt.Changed, ...)</code>
+        </p>
+        <div class="grid grid-cols-2 gap-4">
+            @{ Html.Field("Status", true, m => m.Status, expr =>
+                Html.NativeDropDownFor(expr)
+                    .Items(statusItems)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("status-echo").SetText("Status changed");
+                    })
+            ); }
+            @{ Html.Field("Category", false, m => m.Category, expr =>
+                Html.NativeDropDownFor(expr)
+                    .Items(categoryItems)
+                    .Placeholder("-- Select Category --")
+            ); }
+        </div>
+        <div class="mt-3 text-xs font-mono flex justify-between">
+            <span class="text-text-secondary">Echo</span>
+            <span id="status-echo">&mdash;</span>
+        </div>
+    </section>
+
+    <!-- Section 3: Cross-vendor custom event — one pipeline, both vendors -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">3. Cross-Vendor — Html.On() custom event resets both</h2>
+        <p class="text-xs text-text-secondary mb-3">
+            One pipeline mutates Fusion NumericTextBox + Native &lt;select&gt; + DOM element.
+        </p>
+        <div class="flex gap-2">
+            <button onclick="document.dispatchEvent(new CustomEvent('reset-all'))"
+                    class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">Reset All Fields</button>
+        </div>
+    </section>
+
+    <!-- Section 4: Read properties (BindExpr) -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">4. Read Properties — BindExpr Strings</h2>
+        <p class="text-xs text-text-secondary mb-3">
+            <code class="bg-slate-100 px-1 rounded">p.Component&lt;T&gt;(m =&gt; m.Prop).Value()</code>
+            returns BindExpr for runtime resolution.
+        </p>
+        <div class="grid grid-cols-1 gap-2 text-xs font-mono">
+            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+                <span class="text-text-secondary">FusionNumericTextBox.Value()</span>
+                <span class="text-emerald-700">ref:Amount.value</span>
+            </div>
+            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+                <span class="text-text-secondary">NativeDropDown.Value()</span>
+                <span class="text-emerald-700">ref:Status.value</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Nested Properties — Element ID pattern verification -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-2">5. Nested Properties — Element ID = underscores, BindingPath = dots</h2>
+        <p class="text-xs text-text-secondary mb-3">
+            <code class="bg-slate-100 px-1 rounded">m =&gt; m.Address.City</code> → element ID <code class="bg-slate-100 px-1 rounded">Address_City</code>,
+            binding path <code class="bg-slate-100 px-1 rounded">Address.City</code>.
+            Both Fusion (SF) and Native (DOM) follow the same pattern.
+        </p>
+        <div class="grid grid-cols-2 gap-4">
+            @{ Html.Field("City", false, m => m.Address!.City, expr =>
+                Html.NativeDropDownFor(expr)
+                    .Items(cityItems)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("city-echo").SetText("City changed");
+                    })
+            ); }
+            @{ Html.Field("Postal Code", false, m => m.Address!.PostalCode, expr =>
+                Html.EJS().NumericTextBoxFor(expr)
+                    .Min(10000).Max(99999).Step(1)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("postal-echo").SetText("PostalCode changed");
+                    })
+                    .Render()
+            ); }
+        </div>
+        <div class="mt-3 text-xs font-mono space-y-1">
+            <div class="flex justify-between">
+                <span class="text-text-secondary">City echo</span>
+                <span id="city-echo">&mdash;</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-text-secondary">PostalCode echo</span>
+                <span id="postal-echo">&mdash;</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <h2 class="text-sm font-semibold mb-3">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

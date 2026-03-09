@@ -1,0 +1,58 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: composed-confirm
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: all,
+              guards: [
+                {
+                  kind: value,
+                  source: {
+                    kind: event,
+                    path: evt.score
+                  },
+                  coerceAs: number,
+                  op: gt,
+                  operand: 0
+                },
+                {
+                  kind: confirm,
+                  message: Delete this record?
+                }
+              ]
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: dispatch,
+                  event: do-delete
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Aborted
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

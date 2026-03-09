@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Alis.Reactive
 {
@@ -27,27 +26,6 @@ namespace Alis.Reactive
             return "evt." + string.Join(".", members);
         }
 
-        /// <summary>
-        /// Extracts the CLR property/field type from a member expression, unwrapping
-        /// any Convert node that the compiler inserts for boxing value types.
-        /// </summary>
-        public static Type GetPropertyType<TSource>(Expression<Func<TSource, object?>> expression)
-        {
-            var body = expression.Body;
-            if (body is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
-                body = unary.Operand;
-
-            if (body is MemberExpression member)
-            {
-                if (member.Member is PropertyInfo prop) return prop.PropertyType;
-                if (member.Member is FieldInfo field) return field.FieldType;
-            }
-
-            throw new ArgumentException(
-                $"Expression must be a property or field access, but got {body.NodeType}. " +
-                "Example: x => x.Score");
-        }
-
         private static List<string> ExtractMemberChain(Expression expr)
         {
             var members = new List<string>();
@@ -63,6 +41,34 @@ namespace Alis.Reactive
             }
 
             return members;
+        }
+
+        /// <summary>
+        /// Extracts the model binding path from a model expression.
+        /// m => m.FacilityId → "FacilityId", m => m.Address.City → "Address.City".
+        /// Dot-notation preserves the model structure for HTTP gather (JSON/FormData).
+        /// </summary>
+        public static string ToPropertyName<TModel>(Expression<Func<TModel, object?>> expression)
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join(".", members.ConvertAll(PascalRestore));
+        }
+
+        /// <summary>
+        /// Converts a model expression to the DOM element ID that ASP.NET / SF generates.
+        /// m => m.FacilityId → "FacilityId", m => m.Address.City → "Address_City".
+        /// Underscores match Html.IdFor() convention. Used by Component&lt;T&gt;(expr) for target resolution.
+        /// </summary>
+        public static string ToElementId<TModel>(Expression<Func<TModel, object?>> expression)
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join("_", members.ConvertAll(PascalRestore));
+        }
+
+        private static string PascalRestore(string camel)
+        {
+            if (string.IsNullOrEmpty(camel)) return camel;
+            return char.ToUpperInvariant(camel[0]) + camel.Substring(1);
         }
 
         private static string CamelCase(string name)

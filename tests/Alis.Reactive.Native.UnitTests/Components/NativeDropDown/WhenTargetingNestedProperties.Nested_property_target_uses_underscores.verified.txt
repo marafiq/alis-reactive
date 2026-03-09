@@ -1,0 +1,30 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: component-event,
+        componentId: Address_City,
+        jsEvent: change,
+        vendor: native,
+        bindingPath: Address.City
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Address_City,
+            jsEmit: el.value=val,
+            value: Portland
+          },
+          {
+            kind: mutate-element,
+            target: echo,
+            jsEmit: el.textContent = val,
+            value: City set
+          }
+        ]
+      }
+    }
+  ]
+}

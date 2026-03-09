@@ -1,0 +1,51 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: text-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.name
+              },
+              coerceAs: string,
+              op: contains,
+              operand: admin
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Has admin
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: No admin
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

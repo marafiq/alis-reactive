@@ -14,14 +14,20 @@
               guards: [
                 {
                   kind: value,
-                  source: evt.score,
+                  source: {
+                    kind: event,
+                    path: evt.score
+                  },
                   coerceAs: number,
                   op: gte,
                   operand: 90
                 },
                 {
                   kind: value,
-                  source: evt.status,
+                  source: {
+                    kind: event,
+                    path: evt.status
+                  },
                   coerceAs: string,
                   op: eq,
                   operand: active

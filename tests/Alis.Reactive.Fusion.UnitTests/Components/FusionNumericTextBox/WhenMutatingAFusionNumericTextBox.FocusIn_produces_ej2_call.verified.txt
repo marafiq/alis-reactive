@@ -1,0 +1,19 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Amount,
+            jsEmit: el.ej2_instances[0].focusIn()
+          }
+        ]
+      }
+    }
+  ]
+}

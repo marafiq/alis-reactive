@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Alis.Reactive.Descriptors.Guards;
 
 namespace Alis.Reactive.Descriptors.Commands
 {
@@ -7,6 +8,8 @@ namespace Alis.Reactive.Descriptors.Commands
     [JsonDerivedType(typeof(MutateElementCommand), "mutate-element")]
     public abstract class Command
     {
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Guard? When { get; set; }
     }
 
     public sealed class DispatchCommand : Command

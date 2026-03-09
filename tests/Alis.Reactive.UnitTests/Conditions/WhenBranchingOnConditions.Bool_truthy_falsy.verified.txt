@@ -11,7 +11,10 @@
           {
             guard: {
               kind: value,
-              source: evt.isActive,
+              source: {
+                kind: event,
+                path: evt.isActive
+              },
               coerceAs: boolean,
               op: truthy
             },

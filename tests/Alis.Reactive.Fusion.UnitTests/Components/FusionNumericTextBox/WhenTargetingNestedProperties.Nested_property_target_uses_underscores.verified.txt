@@ -1,0 +1,30 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: component-event,
+        componentId: Address_PostalCode,
+        jsEvent: change,
+        vendor: fusion,
+        bindingPath: Address.PostalCode
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Address_PostalCode,
+            jsEmit: var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind(),
+            value: 12345
+          },
+          {
+            kind: mutate-element,
+            target: echo,
+            jsEmit: el.textContent = val,
+            value: PostalCode set
+          }
+        ]
+      }
+    }
+  ]
+}

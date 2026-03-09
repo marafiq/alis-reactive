@@ -1,0 +1,19 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Status,
+            jsEmit: el.focus()
+          }
+        ]
+      }
+    }
+  ]
+}

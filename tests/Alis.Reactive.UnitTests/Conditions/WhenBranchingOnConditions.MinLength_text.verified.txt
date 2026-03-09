@@ -1,0 +1,51 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: minlen-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.name
+              },
+              coerceAs: string,
+              op: min-length,
+              operand: 3
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Long enough
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Too short
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

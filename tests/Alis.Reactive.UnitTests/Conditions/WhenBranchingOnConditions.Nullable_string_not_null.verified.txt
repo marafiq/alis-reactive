@@ -11,7 +11,10 @@
           {
             guard: {
               kind: value,
-              source: evt.name,
+              source: {
+                kind: event,
+                path: evt.name
+              },
               coerceAs: string,
               op: not-null
             },

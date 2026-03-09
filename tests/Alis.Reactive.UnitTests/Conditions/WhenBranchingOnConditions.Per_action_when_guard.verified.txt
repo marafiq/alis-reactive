@@ -1,0 +1,37 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: per-action-check
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: result,
+            jsEmit: el.textContent = val,
+            value: Always runs
+          },
+          {
+            kind: mutate-element,
+            target: bonus,
+            jsEmit: el.textContent = val,
+            value: Bonus!,
+            when: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.score
+              },
+              coerceAs: number,
+              op: gte,
+              operand: 90
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

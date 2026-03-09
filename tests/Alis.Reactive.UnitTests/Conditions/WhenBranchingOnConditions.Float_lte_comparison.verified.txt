@@ -11,7 +11,10 @@
           {
             guard: {
               kind: value,
-              source: evt.rate,
+              source: {
+                kind: event,
+                path: evt.rate
+              },
               coerceAs: number,
               op: lte,
               operand: 0.5

@@ -1,5 +1,5 @@
 import type { Guard, ValueGuard, ExecContext } from "./types";
-import { resolve, resolveAs, coerce } from "./resolver";
+import { resolveSource, resolveSourceAs, coerce } from "./resolver";
 import { scope } from "./trace";
 
 const log = scope("conditions");
@@ -12,9 +12,56 @@ export function evaluateGuard(guard: Guard, ctx?: ExecContext): boolean {
       return guard.guards.every(g => evaluateGuard(g, ctx));
     case "any":
       return guard.guards.some(g => evaluateGuard(g, ctx));
+    case "not":
+      return !evaluateGuard(guard.inner, ctx);
+    case "confirm":
+      // Sync evaluation — confirm is inherently async.
+      // In sync context, treat as true (pipeline proceeds).
+      // Use evaluateGuardAsync for proper confirm handling.
+      log.warn("ConfirmGuard evaluated synchronously — use evaluateGuardAsync for dialogs");
+      return true;
     default:
       throw new Error(`Unknown guard kind: ${(guard as any).kind}`);
   }
+}
+
+/**
+ * Async guard evaluation — required when branches contain ConfirmGuard.
+ * Calls window.alis.confirm(message) for confirm guards.
+ */
+export async function evaluateGuardAsync(guard: Guard, ctx?: ExecContext): Promise<boolean> {
+  switch (guard.kind) {
+    case "value":
+      return evaluateValueGuard(guard, ctx);
+    case "all":
+      for (const g of guard.guards) {
+        if (!await evaluateGuardAsync(g, ctx)) return false;
+      }
+      return true;
+    case "any":
+      for (const g of guard.guards) {
+        if (await evaluateGuardAsync(g, ctx)) return true;
+      }
+      return false;
+    case "not":
+      return !(await evaluateGuardAsync(guard.inner, ctx));
+    case "confirm":
+      return (window as any).alis?.confirm?.(guard.message) ?? Promise.resolve(false);
+    default:
+      throw new Error(`Unknown guard kind: ${(guard as any).kind}`);
+  }
+}
+
+/**
+ * Checks whether a guard tree contains any ConfirmGuard.
+ * Used to decide between sync and async evaluation paths.
+ */
+export function isConfirmGuard(guard: Guard): boolean {
+  if (guard.kind === "confirm") return true;
+  if (guard.kind === "not") return isConfirmGuard(guard.inner);
+  if (guard.kind === "all" || guard.kind === "any")
+    return guard.guards.some(isConfirmGuard);
+  return false;
 }
 
 function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
@@ -23,18 +70,31 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
   // Presence operators (is-null, not-null) use RAW resolution — coercion
   // would destroy null/undefined (e.g. coerce(null, "string") → "").
   if (op === "is-null" || op === "not-null") {
-    const raw = resolve(guard.source, ctx);
+    const raw = resolveSource(guard.source, ctx);
     log.trace("eval-presence", { source: guard.source, op, raw });
     return op === "is-null" ? raw == null : raw != null;
+  }
+
+  // is-empty / not-empty also use raw resolution
+  if (op === "is-empty" || op === "not-empty") {
+    const raw = resolveSource(guard.source, ctx);
+    log.trace("eval-presence", { source: guard.source, op, raw });
+    const isEmpty = raw === "" || raw === null || raw === undefined
+      || (Array.isArray(raw) && raw.length === 0);
+    return op === "is-empty" ? isEmpty : !isEmpty;
   }
 
   // Truthy/falsy use typed coercion — correctly maps "false" → false for booleans.
   // Comparison operators use typed coercion on BOTH source and operand so that
   // comparisons are type-consistent (e.g. both sides are numbers).
-  const resolved = resolveAs(guard.source, guard.coerceAs, ctx);
-  const operand = guard.operand != null
-    ? coerce(guard.operand, guard.coerceAs)
-    : guard.operand;
+  const resolved = resolveSourceAs(guard.source, guard.coerceAs, ctx);
+
+  // For array operands (in, not-in, between), coerce each element individually.
+  // For scalar operands, coerce the whole value.
+  const rawOp = guard.operand;
+  const operand = rawOp != null
+    ? (Array.isArray(rawOp) ? rawOp.map(v => coerce(v, guard.coerceAs)) : coerce(rawOp, guard.coerceAs))
+    : rawOp;
 
   log.trace("eval", { source: guard.source, op, resolved, operand });
 
@@ -47,6 +107,34 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
     case "lte":      return (resolved as number) <= (operand as number);
     case "truthy":   return !!resolved;
     case "falsy":    return !resolved;
+
+    // Membership — operand is coerced per-element above
+    case "in":
+      return Array.isArray(operand) && operand.includes(resolved);
+    case "not-in":
+      return !Array.isArray(operand) || !operand.includes(resolved);
+
+    // Range — operand is coerced per-element above
+    case "between":
+      return Array.isArray(operand) && (resolved as number) >= operand[0] && (resolved as number) <= operand[1];
+
+    // Text
+    case "contains":
+      return String(resolved ?? "").includes(String(operand));
+    case "starts-with":
+      return String(resolved ?? "").startsWith(String(operand));
+    case "ends-with":
+      return String(resolved ?? "").endsWith(String(operand));
+    case "matches": {
+      try {
+        return new RegExp(String(operand)).test(String(resolved ?? ""));
+      } catch {
+        return false;
+      }
+    }
+    case "min-length":
+      return String(resolved ?? "").length >= Number(operand);
+
     default:
       throw new Error(`Unknown guard operator: ${op}`);
   }

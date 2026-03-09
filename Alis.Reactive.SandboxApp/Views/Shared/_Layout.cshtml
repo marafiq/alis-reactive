@@ -4,6 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] — Alis.Reactive Sandbox</title>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/tailwind3.css"/>
     <link rel="stylesheet" href="~/css/alis-modern-tailwind.css" asp-append-version="true"/>
 </head>
 <body class="h-full bg-surface text-text-primary antialiased">
@@ -25,6 +26,10 @@
                        class="text-text-secondary hover:text-text-primary transition-colors">Payload</a>
                     <a asp-area="Sandbox" asp-controller="Conditions" asp-action="Index"
                        class="text-text-secondary hover:text-text-primary transition-colors">Conditions</a>
+                    <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="Index"
+                       class="text-text-secondary hover:text-text-primary transition-colors">Playground</a>
+                    <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="ReactiveConditions"
+                       class="text-text-secondary hover:text-text-primary transition-colors">Reactive Conditions</a>
                 </nav>
             </div>
         </div>
@@ -43,7 +48,42 @@
     </footer>
 </div>
 
+<script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+@Html.EJS().ScriptManager()
 @await RenderSectionAsync("Scripts", required: false)
+
+<!-- App-level confirm dialog (SF EJS Dialog) -->
+@Html.EJS().Dialog("alisConfirmDialog").IsModal(true).Visible(false).Width("400px").AnimationSettings(new Syncfusion.EJ2.Popups.DialogAnimationSettings { Effect = Syncfusion.EJ2.Popups.DialogEffect.None }).Render()
+
+<script>
+// App-level confirm contract — conditions module calls window.alis.confirm(msg) → Promise<boolean>
+window.alis = window.alis || {};
+(function() {
+    var queue = Promise.resolve();
+    window.alis.confirm = function(message) {
+        var p = new Promise(function(outerResolve) {
+            queue = queue.then(function() {
+                return new Promise(function(resolve) {
+                    var el = document.getElementById("alisConfirmDialog");
+                    var dialog = el && el.ej2_instances && el.ej2_instances[0];
+                    if (!dialog) { resolve(); outerResolve(false); return; }
+                    dialog.header = "Confirm";
+                    dialog.content = message;
+                    dialog.buttons = [
+                        { click: function() { dialog.close = null; dialog.hide(); resolve(); outerResolve(true); },
+                          buttonModel: { content: "OK", isPrimary: true, cssClass: "e-primary" } },
+                        { click: function() { dialog.close = null; dialog.hide(); resolve(); outerResolve(false); },
+                          buttonModel: { content: "Cancel" } }
+                    ];
+                    dialog.close = function() { resolve(); outerResolve(false); };
+                    dialog.show();
+                });
+            });
+        });
+        return p;
+    };
+})();
+</script>
 <script type="module" src="~/js/alis-reactive.js" asp-append-version="true"></script>
 </body>
 </html>

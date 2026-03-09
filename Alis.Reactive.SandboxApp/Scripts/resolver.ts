@@ -1,4 +1,4 @@
-import type { ExecContext } from "./types";
+import type { BindSource, ExecContext } from "./types";
 import { scope } from "./trace";
 
 const log = scope("resolver");
@@ -19,13 +19,26 @@ export type BindExpr = string;
 export type CoercionType = "string" | "number" | "boolean" | "date" | "raw";
 
 /**
- * Resolves a BindExpr against the execution context.
- * Returns the raw value at the path, or undefined if not found.
+ * Unified entry point — dispatches by source kind.
+ * Currently only handles "event" kind. "component" is a future extension.
  */
-export function resolve(expr: BindExpr, ctx?: ExecContext): unknown {
+export function resolveSource(source: BindSource, ctx?: ExecContext): unknown {
+  switch (source.kind) {
+    case "event":
+      return resolveEventPath(source.path, ctx);
+    // Future: case "component": return resolveComponentValue(source);
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Event path resolution — walks dot-notation path against execution context.
+ */
+export function resolveEventPath(path: string, ctx?: ExecContext): unknown {
   if (!ctx) return undefined;
 
-  const parts = expr.split(".");
+  const parts = path.split(".");
   let current: unknown = ctx;
 
   for (const part of parts) {
@@ -33,12 +46,29 @@ export function resolve(expr: BindExpr, ctx?: ExecContext): unknown {
     current = (current as Record<string, unknown>)[part];
   }
 
-  log.trace("resolve", { expr, value: current });
+  log.trace("resolve", { path, value: current });
   return current;
 }
 
 /**
+ * Resolves a BindExpr (plain string path) against the execution context.
+ * Kept for backward compatibility with MutateElementCommand.source (string).
+ */
+export function resolve(expr: BindExpr, ctx?: ExecContext): unknown {
+  return resolveEventPath(expr, ctx);
+}
+
+/**
+ * Resolves a BindSource and coerces the result to a specific type.
+ */
+export function resolveSourceAs(source: BindSource, coerceAs: CoercionType, ctx?: ExecContext): unknown {
+  const raw = resolveSource(source, ctx);
+  return coerce(raw, coerceAs);
+}
+
+/**
  * Resolves a BindExpr and coerces the result to a specific type.
+ * Kept for backward compatibility.
  */
 export function resolveAs(expr: BindExpr, coerceAs: CoercionType, ctx?: ExecContext): unknown {
   const raw = resolve(expr, ctx);

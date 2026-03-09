@@ -1,0 +1,21 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: amount-changed
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Amount,
+            jsEmit: var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind(),
+            value: 999
+          }
+        ]
+      }
+    }
+  ]
+}

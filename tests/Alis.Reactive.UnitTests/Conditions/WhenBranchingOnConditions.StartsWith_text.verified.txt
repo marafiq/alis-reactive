@@ -1,0 +1,51 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: starts-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.email
+              },
+              coerceAs: string,
+              op: starts-with,
+              operand: admin@
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Admin email
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Other email
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

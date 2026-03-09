@@ -1,0 +1,54 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: age-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.age
+              },
+              coerceAs: number,
+              op: between,
+              operand: [
+                18,
+                65
+              ]
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Working Age
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Outside Range
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

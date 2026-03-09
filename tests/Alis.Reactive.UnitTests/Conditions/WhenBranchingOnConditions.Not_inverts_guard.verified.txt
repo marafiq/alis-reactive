@@ -1,0 +1,54 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: not-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: not,
+              inner: {
+                kind: value,
+                source: {
+                  kind: event,
+                  path: evt.role
+                },
+                coerceAs: string,
+                op: eq,
+                operand: admin
+              }
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Not admin
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Is admin
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

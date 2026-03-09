@@ -1,0 +1,26 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Amount,
+            jsEmit: var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind(),
+            value: 100
+          },
+          {
+            kind: mutate-element,
+            target: echo,
+            jsEmit: el.textContent = val,
+            value: Amount updated
+          }
+        ]
+      }
+    }
+  ]
+}

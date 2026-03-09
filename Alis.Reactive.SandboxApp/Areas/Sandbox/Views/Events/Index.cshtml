@@ -39,7 +39,6 @@
         p.Element("chain-status").SetText("Chain complete — all 3 hops executed successfully");
     }));
 
-    var planJson = plan.Render();
     var formattedJson = plan.RenderFormatted();
 }
 
@@ -125,4 +124,4 @@ export function boot(plan: Plan): void {
     </section>
 </div>
 
-<script type="application/json" id="alis-plan" data-trace="trace">@Html.Raw(planJson)</script>
+@Html.RenderPlan(plan)

@@ -5,6 +5,7 @@ namespace Alis.Reactive.Descriptors.Triggers
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
     [JsonDerivedType(typeof(DomReadyTrigger), "dom-ready")]
     [JsonDerivedType(typeof(CustomEventTrigger), "custom-event")]
+    [JsonDerivedType(typeof(ComponentEventTrigger), "component-event")]
     public abstract class Trigger
     {
     }
@@ -20,6 +21,36 @@ namespace Alis.Reactive.Descriptors.Triggers
         public CustomEventTrigger(string @event)
         {
             Event = @event;
+        }
+    }
+
+    /// <summary>
+    /// Fires when a component's JS event fires (e.g. SF "change", DOM "click").
+    /// Created by vendor-specific .Reactive() extensions (Fusion, Native).
+    ///
+    /// Vendor tells the TS runtime HOW to wire:
+    ///   fusion → el.ej2_instances[0].addEventListener(jsEvent, ...)
+    ///   native → el.addEventListener(jsEvent, ...)
+    ///
+    /// BindingPath is the dot-notation model property path (e.g. "Address.City")
+    /// carried for future HTTP gather support. Optional — present when the
+    /// component is model-bound via an expression.
+    /// </summary>
+    public sealed class ComponentEventTrigger : Trigger
+    {
+        public string ComponentId { get; }
+        public string JsEvent { get; }
+        public string Vendor { get; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? BindingPath { get; }
+
+        public ComponentEventTrigger(string componentId, string jsEvent, string vendor, string? bindingPath = null)
+        {
+            ComponentId = componentId;
+            JsEvent = jsEvent;
+            Vendor = vendor;
+            BindingPath = bindingPath;
         }
     }
 }

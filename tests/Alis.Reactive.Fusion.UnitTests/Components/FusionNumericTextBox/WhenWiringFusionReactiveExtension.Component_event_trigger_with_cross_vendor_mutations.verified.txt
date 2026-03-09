@@ -1,0 +1,30 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: component-event,
+        componentId: Amount,
+        jsEvent: change,
+        vendor: fusion,
+        bindingPath: Amount
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Amount,
+            jsEmit: var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind(),
+            value: 0
+          },
+          {
+            kind: mutate-element,
+            target: echo,
+            jsEmit: el.textContent = val,
+            value: Reset
+          }
+        ]
+      }
+    }
+  ]
+}

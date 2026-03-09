@@ -11,7 +11,10 @@
           {
             guard: {
               kind: value,
-              source: evt.nullableScore,
+              source: {
+                kind: event,
+                path: evt.nullableScore
+              },
               coerceAs: number,
               op: is-null
             },

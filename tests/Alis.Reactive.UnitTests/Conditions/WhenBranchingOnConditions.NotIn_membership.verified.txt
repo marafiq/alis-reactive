@@ -1,0 +1,54 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: category-exclude
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.category
+              },
+              coerceAs: string,
+              op: not-in,
+              operand: [
+                X,
+                Y
+              ]
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Allowed
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Blocked
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

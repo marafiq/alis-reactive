@@ -11,7 +11,10 @@
           {
             guard: {
               kind: value,
-              source: evt.balance,
+              source: {
+                kind: event,
+                path: evt.balance
+              },
               coerceAs: number,
               op: gt,
               operand: 1000000

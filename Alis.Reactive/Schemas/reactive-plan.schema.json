@@ -26,7 +26,8 @@
     "Trigger": {
       "oneOf": [
         { "$ref": "#/$defs/DomReadyTrigger" },
-        { "$ref": "#/$defs/CustomEventTrigger" }
+        { "$ref": "#/$defs/CustomEventTrigger" },
+        { "$ref": "#/$defs/ComponentEventTrigger" }
       ]
     },
     "DomReadyTrigger": {
@@ -44,6 +45,23 @@
       "properties": {
         "kind": { "const": "custom-event" },
         "event": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Vendor": {
+      "type": "string",
+      "enum": ["fusion", "native"],
+      "description": "Component vendor — determines how the runtime resolves and wires the component"
+    },
+    "ComponentEventTrigger": {
+      "type": "object",
+      "required": ["kind", "componentId", "jsEvent", "vendor"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "component-event" },
+        "componentId": { "type": "string", "minLength": 1 },
+        "jsEvent": { "type": "string", "minLength": 1 },
+        "vendor": { "$ref": "#/$defs/Vendor" },
+        "bindingPath": { "type": "string", "minLength": 1, "description": "Dot-notation model binding path (e.g. Address.City). Carried for future HTTP gather." }
       }
     },
 
@@ -79,7 +97,23 @@
       "properties": {
         "kind": { "const": "dispatch" },
         "event": { "type": "string" },
-        "payload": { "type": "object" }
+        "payload": { "type": "object" },
+        "when": { "$ref": "#/$defs/Guard" }
+      }
+    },
+
+    "BindSource": {
+      "oneOf": [
+        { "$ref": "#/$defs/EventSource" }
+      ]
+    },
+    "EventSource": {
+      "type": "object",
+      "required": ["kind", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "event" },
+        "path": { "type": "string", "minLength": 1 }
       }
     },
     "BindExpr": {
@@ -95,14 +129,22 @@
 
     "GuardOp": {
       "type": "string",
-      "enum": ["eq", "neq", "gt", "gte", "lt", "lte", "truthy", "falsy", "is-null", "not-null"],
+      "enum": [
+        "eq", "neq", "gt", "gte", "lt", "lte",
+        "truthy", "falsy", "is-null", "not-null",
+        "is-empty", "not-empty",
+        "in", "not-in", "between",
+        "contains", "starts-with", "ends-with", "matches", "min-length"
+      ],
       "description": "Comparison operator for a ValueGuard"
     },
     "Guard": {
       "oneOf": [
         { "$ref": "#/$defs/ValueGuard" },
         { "$ref": "#/$defs/AllGuard" },
-        { "$ref": "#/$defs/AnyGuard" }
+        { "$ref": "#/$defs/AnyGuard" },
+        { "$ref": "#/$defs/InvertGuard" },
+        { "$ref": "#/$defs/ConfirmGuard" }
       ]
     },
     "ValueGuard": {
@@ -111,7 +153,7 @@
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "value" },
-        "source": { "$ref": "#/$defs/BindExpr" },
+        "source": { "$ref": "#/$defs/BindSource" },
         "coerceAs": { "$ref": "#/$defs/CoercionType" },
         "op": { "$ref": "#/$defs/GuardOp" },
         "operand": {
@@ -143,6 +185,24 @@
           "items": { "$ref": "#/$defs/Guard" },
           "minItems": 2
         }
+      }
+    },
+    "InvertGuard": {
+      "type": "object",
+      "required": ["kind", "inner"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "not" },
+        "inner": { "$ref": "#/$defs/Guard" }
+      }
+    },
+    "ConfirmGuard": {
+      "type": "object",
+      "required": ["kind", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "confirm" },
+        "message": { "type": "string", "minLength": 1 }
       }
     },
     "Branch": {
@@ -181,7 +241,8 @@
         "target": { "type": "string", "minLength": 1 },
         "jsEmit": { "type": "string", "minLength": 1, "description": "JavaScript expression executed on the resolved element. Variables: el (element), val (resolved value)." },
         "value": { "type": "string" },
-        "source": { "$ref": "#/$defs/BindExpr" }
+        "source": { "$ref": "#/$defs/BindExpr" },
+        "when": { "$ref": "#/$defs/Guard" }
       }
     }
   }

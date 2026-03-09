@@ -11,7 +11,10 @@
           {
             guard: {
               kind: value,
-              source: evt.deadline,
+              source: {
+                kind: event,
+                path: evt.deadline
+              },
               coerceAs: date,
               op: gt,
               operand: DateTimeOffset_1

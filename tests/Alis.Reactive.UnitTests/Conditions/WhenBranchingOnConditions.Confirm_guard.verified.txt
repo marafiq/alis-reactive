@@ -1,0 +1,43 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: delete-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: confirm,
+              message: Are you sure you want to delete?
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: dispatch,
+                  event: do-delete
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Cancelled
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

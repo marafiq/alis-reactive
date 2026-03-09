@@ -48,7 +48,6 @@
         p.Element("payload-status").SetText("All payload properties resolved successfully");
     }));
 
-    var planJson = plan.Render();
     var formattedJson = plan.RenderFormatted();
 }
 
@@ -117,4 +116,4 @@
     </section>
 </div>
 
-<script type="application/json" id="alis-plan" data-trace="trace">@Html.Raw(planJson)</script>
+@Html.RenderPlan(plan)

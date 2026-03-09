@@ -1,0 +1,55 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: category-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.category
+              },
+              coerceAs: string,
+              op: in,
+              operand: [
+                A,
+                B,
+                C
+              ]
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: In Group
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Not In Group
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

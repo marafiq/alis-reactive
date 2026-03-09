@@ -1,0 +1,51 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: amount-guarded
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: number,
+              op: gte,
+              operand: 100
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: Amount,
+                  jsEmit: var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind(),
+                  value: 100
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: echo,
+                  jsEmit: el.textContent = val,
+                  value: Under limit
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

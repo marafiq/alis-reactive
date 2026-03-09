@@ -11,7 +11,10 @@
           {
             guard: {
               kind: value,
-              source: evt.nullableDate,
+              source: {
+                kind: event,
+                path: evt.nullableDate
+              },
               coerceAs: date,
               op: is-null
             },

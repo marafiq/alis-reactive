@@ -11,4 +11,10 @@
         <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="Alis.Reactive.Fusion" />
+        <InternalsVisibleTo Include="Alis.Reactive.Native" />
+        <InternalsVisibleTo Include="Alis.Reactive.UnitTests" />
+    </ItemGroup>
+
 </Project>

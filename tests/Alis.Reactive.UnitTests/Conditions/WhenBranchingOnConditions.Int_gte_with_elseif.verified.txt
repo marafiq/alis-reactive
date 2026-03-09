@@ -11,7 +11,10 @@
           {
             guard: {
               kind: value,
-              source: evt.score,
+              source: {
+                kind: event,
+                path: evt.score
+              },
               coerceAs: number,
               op: gte,
               operand: 90
@@ -31,7 +34,10 @@
           {
             guard: {
               kind: value,
-              source: evt.score,
+              source: {
+                kind: event,
+                path: evt.score
+              },
               coerceAs: number,
               op: gte,
               operand: 80

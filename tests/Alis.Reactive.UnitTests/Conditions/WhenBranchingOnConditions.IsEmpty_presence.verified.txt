@@ -1,0 +1,50 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: empty-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.name
+              },
+              coerceAs: string,
+              op: is-empty
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Empty
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: Has value
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
