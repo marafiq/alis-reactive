@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Descriptors.Commands;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Descriptors.Requests
 {
@@ -38,6 +39,9 @@ namespace Alis.Reactive.Descriptors.Requests
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public RequestDescriptor? Chained { get; }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ValidationDescriptor? Validation { get; }
+
         public RequestDescriptor(
             string verb,
             string url,
@@ -45,7 +49,8 @@ namespace Alis.Reactive.Descriptors.Requests
             List<Command>? whileLoading = null,
             List<StatusHandler>? onSuccess = null,
             List<StatusHandler>? onError = null,
-            RequestDescriptor? chained = null)
+            RequestDescriptor? chained = null,
+            ValidationDescriptor? validation = null)
         {
             Verb = verb;
             Url = url;
@@ -54,6 +59,7 @@ namespace Alis.Reactive.Descriptors.Requests
             OnSuccess = onSuccess;
             OnError = onError;
             Chained = chained;
+            Validation = validation;
         }
     }
 }

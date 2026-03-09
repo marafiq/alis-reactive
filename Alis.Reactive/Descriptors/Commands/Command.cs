@@ -6,6 +6,7 @@ namespace Alis.Reactive.Descriptors.Commands
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
     [JsonDerivedType(typeof(DispatchCommand), "dispatch")]
     [JsonDerivedType(typeof(MutateElementCommand), "mutate-element")]
+    [JsonDerivedType(typeof(ValidationErrorsCommand), "validation-errors")]
     public abstract class Command
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -43,6 +44,16 @@ namespace Alis.Reactive.Descriptors.Commands
             JsEmit = jsEmit;
             Value = value;
             Source = source;
+        }
+    }
+
+    public sealed class ValidationErrorsCommand : Command
+    {
+        public string FormId { get; }
+
+        public ValidationErrorsCommand(string formId)
+        {
+            FormId = formId;
         }
     }
 }

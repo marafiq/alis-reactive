@@ -4,9 +4,11 @@
     <Project Path="tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.Native.UnitTests/Alis.Reactive.Native.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj" />
+    <Project Path="tests/Alis.Reactive.FluentValidator.UnitTests/Alis.Reactive.FluentValidator.UnitTests.csproj" />
   </Folder>
   <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
   <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
   <Project Path="Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
   <Project Path="Alis.Reactive/Alis.Reactive.csproj" />
+  <Project Path="Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj" />
 </Solution>

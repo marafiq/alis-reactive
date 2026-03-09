@@ -173,6 +173,16 @@ namespace Alis.Reactive.Builders
             return new GuardBuilder<TModel>(new ConfirmGuard(message), this);
         }
 
+        /// <summary>
+        /// Adds a validation-errors command — displays server-side validation errors
+        /// returned in the 400 response body at the correct form fields.
+        /// </summary>
+        public PipelineBuilder<TModel> ValidationErrors(string formId)
+        {
+            Commands.Add(new ValidationErrorsCommand(formId));
+            return this;
+        }
+
         internal void SetConditionalBranches(List<Branch> branches)
         {
             ConditionalBranches = branches;

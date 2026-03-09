@@ -1,4 +1,5 @@
 import type { Command, ExecContext } from "./types";
+import { showFieldErrors } from "./forms";
 import { scope } from "./trace";
 
 const log = scope("commands");
@@ -16,6 +17,12 @@ export function executeCommands(commands: Command[], ctx?: ExecContext): void {
         if (!el) break;
         const val = cmd.value;
         new Function("el", "val", cmd.jsEmit)(el, val);
+        break;
+      }
+      case "validation-errors": {
+        if (ctx?.responseBody) {
+          showFieldErrors(cmd.formId, ctx.responseBody);
+        }
         break;
       }
     }

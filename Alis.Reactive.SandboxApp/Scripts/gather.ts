@@ -41,10 +41,12 @@ export function resolveGather(items: GatherItem[], verb: string): GatherResult {
         }
         const fd = new FormData(form);
         fd.forEach((value, key) => {
+          // Empty string → null for JSON body (prevents deserialization errors for nullable types)
+          const v = isGet ? value : (value === "" ? null : value);
           if (isGet) {
             urlParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
           } else {
-            body[key] = value;
+            setNested(body, key, v);
           }
         });
         log.trace("all", { formId: g.formId });
@@ -64,4 +66,22 @@ export function resolveGather(items: GatherItem[], verb: string): GatherResult {
   }
 
   return { urlParams, body };
+}
+
+/** Convert dotted key "Address.Street" into nested object { Address: { Street: val } } */
+function setNested(obj: Record<string, unknown>, key: string, value: unknown): void {
+  const parts = key.split(".");
+  if (parts.length === 1) {
+    obj[key] = value;
+    return;
+  }
+  let cur = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const p = parts[i];
+    if (!(p in cur) || typeof cur[p] !== "object" || cur[p] === null) {
+      cur[p] = {};
+    }
+    cur = cur[p] as Record<string, unknown>;
+  }
+  cur[parts[parts.length - 1]] = value;
 }

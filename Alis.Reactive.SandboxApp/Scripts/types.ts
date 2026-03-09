@@ -93,6 +93,7 @@ export interface RequestDescriptor {
   onSuccess?: StatusHandler[];
   onError?: StatusHandler[];
   chained?: RequestDescriptor;
+  validation?: ValidationDescriptor;
 }
 
 // -- BindSource -----------------------------------------------
@@ -153,7 +154,7 @@ export interface Branch {
 
 // -- Commands -------------------------------------------------
 
-export type Command = DispatchCommand | MutateElementCommand;
+export type Command = DispatchCommand | MutateElementCommand | ValidationErrorsCommand;
 
 export type EventPayload = Record<string, unknown>;
 
@@ -173,8 +174,48 @@ export interface MutateElementCommand {
   when?: Guard;
 }
 
+export interface ValidationErrorsCommand {
+  kind: "validation-errors";
+  formId: string;
+  when?: Guard;
+}
+
 // -- Execution Context ----------------------------------------
 
 export interface ExecContext {
   evt?: Record<string, unknown>;
+  responseBody?: unknown;
+}
+
+// -- Validation -----------------------------------------------
+
+export interface ValidationDescriptor {
+  formId: string;
+  fields: ValidationField[];
+}
+
+export interface ValidationField {
+  fieldId: string;
+  fieldName: string;
+  errorId: string;
+  vendor: Vendor;
+  readExpr?: string;
+  rules: ValidationRule[];
+}
+
+export type ValidationRuleType =
+  | "required" | "minLength" | "maxLength" | "email" | "regex" | "url"
+  | "range" | "min" | "max" | "equalTo" | "atLeastOne";
+
+export interface ValidationRule {
+  rule: ValidationRuleType;
+  message: string;
+  constraint?: boolean | number | string | [number, number];
+  when?: ValidationCondition;
+}
+
+export interface ValidationCondition {
+  field: string;
+  op: "truthy" | "falsy" | "eq" | "neq";
+  value?: unknown;
 }

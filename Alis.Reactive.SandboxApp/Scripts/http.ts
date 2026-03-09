@@ -1,12 +1,22 @@
 import type { RequestDescriptor, StatusHandler, ExecContext } from "./types";
 import { resolveGather } from "./gather";
 import { executeCommands } from "./commands";
+import { register, validate } from "./forms";
 import { scope } from "./trace";
 
 const log = scope("http");
 
 /** Execute a single HTTP request with gather, whileLoading, response routing, and chaining. */
 export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Promise<void> {
+  // 0. Pre-request validation — register + validate, abort if fails
+  if (req.validation) {
+    register(req.validation);
+    if (!validate(req.validation.formId)) {
+      log.debug("validation failed, aborting request");
+      return;
+    }
+  }
+
   // 1. WhileLoading — execute commands immediately (revert is the caller's responsibility via onSuccess/onError)
   if (req.whileLoading) {
     executeCommands(req.whileLoading, ctx);
@@ -35,11 +45,14 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     // 4. Execute fetch
     const response = await fetch(url, init);
 
-    // 5. Route response
+    // 5. Route response — thread response body for error handlers (validation errors)
     if (response.ok) {
       routeHandlers(req.onSuccess, response.status, ctx);
     } else {
-      routeHandlers(req.onError, response.status, ctx);
+      let errorBody: unknown;
+      try { errorBody = await response.json(); } catch { /* no JSON body */ }
+      const errorCtx = errorBody ? { ...ctx, responseBody: errorBody } : ctx;
+      routeHandlers(req.onError, response.status, errorCtx);
     }
 
     // 6. Chained request — fires after current request completes successfully

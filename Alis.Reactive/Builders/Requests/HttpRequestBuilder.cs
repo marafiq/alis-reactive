@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Builders.Requests
 {
@@ -12,6 +13,7 @@ namespace Alis.Reactive.Builders.Requests
         private List<GatherItem>? _gather;
         private List<Command>? _whileLoading;
         private ResponseBuilder<TModel>? _response;
+        private ValidationDescriptor? _validation;
 
         internal HttpRequestBuilder<TModel> SetVerb(string verb)
         {
@@ -56,6 +58,17 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
+        /// Registers client-side validation for this request.
+        /// When present, the runtime validates the form before sending the request.
+        /// If validation fails, the request is aborted.
+        /// </summary>
+        public HttpRequestBuilder<TModel> Validate(ValidationDescriptor validation)
+        {
+            _validation = validation;
+            return this;
+        }
+
+        /// <summary>
         /// Configures success/error response handlers.
         /// </summary>
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> configure)
@@ -75,7 +88,8 @@ namespace Alis.Reactive.Builders.Requests
                 _whileLoading,
                 _response?.SuccessHandlers.Count > 0 ? _response.SuccessHandlers : null,
                 _response?.ErrorHandlers.Count > 0 ? _response.ErrorHandlers : null,
-                _response?.ChainedRequest);
+                _response?.ChainedRequest,
+                _validation);
         }
     }
 }
