@@ -1,0 +1,169 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.HttpShowcaseModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@{
+    ViewData["Title"] = "HTTP Requests";
+
+    IReactivePlan<HttpShowcaseModel> plan = new ReactivePlan<HttpShowcaseModel>();
+
+    // Section 1: DomReady → GET /Sandbox/Http/Residents → show result
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get("/Sandbox/Http/Residents")
+         .WhileLoading(l => l.Element("load-spinner").Show())
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("load-spinner").Hide();
+                s.Element("load-result").SetText("Loaded 2 residents from server");
+                s.Element("load-result").AddClass("text-green-600");
+            })
+         )
+    ));
+
+    // Section 2: Button click → POST with gather → success/error
+    Html.On(plan, t => t.CustomEvent("do-save", p =>
+        p.Post("/Sandbox/Http/Save", g => g.Static("name", "John Doe"))
+         .WhileLoading(l => l.Element("save-spinner").Show())
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("save-spinner").Hide();
+                s.Element("save-result").SetText("Save succeeded!");
+                s.Element("save-result").AddClass("text-green-600");
+                s.Element("save-result").RemoveClass("text-red-600");
+            })
+            .OnError(400, e =>
+            {
+                e.Element("save-spinner").Hide();
+                e.Element("save-result").SetText("Validation failed: Name is required");
+                e.Element("save-result").AddClass("text-red-600");
+                e.Element("save-result").RemoveClass("text-green-600");
+            })
+         )
+    ));
+
+    // Section 3: Button click → GET Residents → Chained GET Facilities → both results
+    Html.On(plan, t => t.CustomEvent("do-chain", p =>
+        p.Get("/Sandbox/Http/Residents")
+         .WhileLoading(l => l.Element("chain-spinner").Show())
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("chain-residents").SetText("Residents loaded");
+                s.Element("chain-residents").AddClass("text-green-600");
+            })
+            .Chained(c => c
+                .Get("/Sandbox/Http/Facilities")
+                .Response(r2 => r2
+                    .OnSuccess(s2 =>
+                    {
+                        s2.Element("chain-spinner").Hide();
+                        s2.Element("chain-facilities").SetText("Facilities loaded");
+                        s2.Element("chain-facilities").AddClass("text-green-600");
+                    })
+                )
+            )
+         )
+    ));
+
+    // Section 4: Button click → Parallel(Residents, Facilities) → all results
+    Html.On(plan, t => t.CustomEvent("do-parallel", p =>
+    {
+        p.Element("parallel-spinner").Show();
+        p.Parallel(
+            a => a.Get("/Sandbox/Http/Residents")
+                  .Response(ra => ra.OnSuccess(sa =>
+                  {
+                      sa.Element("parallel-residents").SetText("Residents loaded");
+                      sa.Element("parallel-residents").AddClass("text-green-600");
+                  })),
+            b => b.Get("/Sandbox/Http/Facilities")
+                  .Response(rb => rb.OnSuccess(sb =>
+                  {
+                      sb.Element("parallel-facilities").SetText("Facilities loaded");
+                      sb.Element("parallel-facilities").AddClass("text-green-600");
+                  }))
+        ).Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("parallel-spinner").Hide();
+                s.Element("parallel-all").SetText("All parallel requests completed!");
+                s.Element("parallel-all").AddClass("text-green-600");
+            })
+        );
+    }));
+
+    var formattedJson = plan.RenderFormatted();
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">HTTP Requests</h1>
+        <p class="mt-2 text-text-secondary">
+            Four HTTP patterns: auto-load on DomReady, POST with gather, chained sequential, and parallel concurrent.
+        </p>
+    </div>
+
+    <!-- Section 1: DomReady GET -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. DomReady → GET Residents</h2>
+        <p class="text-sm text-text-secondary mb-3">On page load, fetches residents from the server.</p>
+        <div class="space-y-2 font-mono text-sm">
+            <p id="load-spinner" hidden class="text-amber-600">Loading...</p>
+            <p id="load-result" class="text-text-muted">Waiting for DomReady...</p>
+        </div>
+    </section>
+
+    <!-- Section 2: POST with Gather -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. POST with Gather → Success/Error</h2>
+        <p class="text-sm text-text-secondary mb-3">Click to POST gathered data. Static value "John Doe" is sent.</p>
+        <button onclick="document.dispatchEvent(new CustomEvent('do-save'))"
+                class="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors">
+            Save
+        </button>
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="save-spinner" hidden class="text-amber-600">Saving...</p>
+            <p id="save-result" class="text-text-muted">Not saved yet</p>
+        </div>
+    </section>
+
+    <!-- Section 3: Chained Requests -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Chained: GET Residents → GET Facilities</h2>
+        <p class="text-sm text-text-secondary mb-3">First request completes, then the chained request fires.</p>
+        <button onclick="document.dispatchEvent(new CustomEvent('do-chain'))"
+                class="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors">
+            Load Chain
+        </button>
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="chain-spinner" hidden class="text-amber-600">Loading chain...</p>
+            <p id="chain-residents" class="text-text-muted">Residents: waiting...</p>
+            <p id="chain-facilities" class="text-text-muted">Facilities: waiting...</p>
+        </div>
+    </section>
+
+    <!-- Section 4: Parallel Requests -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Parallel: Residents + Facilities Concurrently</h2>
+        <p class="text-sm text-text-secondary mb-3">Both requests fire at the same time. All-success fires after both complete.</p>
+        <button onclick="document.dispatchEvent(new CustomEvent('do-parallel'))"
+                class="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors">
+            Load Parallel
+        </button>
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="parallel-spinner" hidden class="text-amber-600">Loading both...</p>
+            <p id="parallel-residents" class="text-text-muted">Residents: waiting...</p>
+            <p id="parallel-facilities" class="text-text-muted">Facilities: waiting...</p>
+            <p id="parallel-all" class="text-text-muted">All: waiting...</p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)
