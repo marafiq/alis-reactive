@@ -1,0 +1,77 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/save,
+          gather: [
+            {
+              kind: static,
+              param: name,
+              value: test
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: saved
+                }
+              ]
+            }
+          ],
+          onError: [
+            {
+              statusCode: 400,
+              commands: [
+                {
+                  kind: validation-errors,
+                  formId: testForm
+                }
+              ]
+            }
+          ],
+          validation: {
+            formId: testForm,
+            fields: [
+              {
+                fieldId: Name,
+                fieldName: Name,
+                vendor: native,
+                rules: [
+                  {
+                    rule: required,
+                    message: Name is required
+                  }
+                ]
+              },
+              {
+                fieldId: Email,
+                fieldName: Email,
+                vendor: native,
+                rules: [
+                  {
+                    rule: required,
+                    message: Email is required
+                  },
+                  {
+                    rule: email,
+                    message: Must be a valid email
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

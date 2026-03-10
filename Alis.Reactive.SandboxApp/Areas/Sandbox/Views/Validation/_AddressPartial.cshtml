@@ -4,18 +4,18 @@
         <label for="partial_Address_Street" class="text-xs font-medium text-text-secondary">Street *</label>
         <input type="text" id="partial_Address_Street" name="Address.Street"
                class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Street address" />
-        <span id="err_partial_Address_Street" class="text-xs text-red-600" hidden></span>
+        <span data-valmsg-for="Address.Street" class="text-[11px] text-danger"></span>
     </div>
     <div class="flex flex-col gap-1.5">
         <label for="partial_Address_City" class="text-xs font-medium text-text-secondary">City *</label>
         <input type="text" id="partial_Address_City" name="Address.City"
                class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="City" />
-        <span id="err_partial_Address_City" class="text-xs text-red-600" hidden></span>
+        <span data-valmsg-for="Address.City" class="text-[11px] text-danger"></span>
     </div>
     <div class="flex flex-col gap-1.5">
         <label for="partial_Address_ZipCode" class="text-xs font-medium text-text-secondary">Zip Code</label>
         <input type="text" id="partial_Address_ZipCode" name="Address.ZipCode"
                class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Min 5 chars" />
-        <span id="err_partial_Address_ZipCode" class="text-xs text-red-600" hidden></span>
+        <span data-valmsg-for="Address.ZipCode" class="text-[11px] text-danger"></span>
     </div>
 </div>

@@ -23,14 +23,14 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         // Click "Validate All" with empty Name field
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
 
-        // Name is required — error should appear
-        var nameError = Page.Locator("#err_Name");
+        // Name is required — error should appear (framework .Validate() handles registration + validation)
+        var nameError = Page.Locator("#all-rules-form [data-valmsg-for='Name']");
         await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(nameError).ToContainTextAsync("required");
 
-        // Result text should indicate failure
+        // With framework pattern, validation failure aborts the POST — result stays at default
         var result = Page.Locator("#all-rules-result");
-        await Expect(result).ToContainTextAsync("failed");
+        await Expect(result).ToContainTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
@@ -46,7 +46,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
 
-        var emailError = Page.Locator("#err_Email");
+        var emailError = Page.Locator("#all-rules-form [data-valmsg-for='Email']");
         await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(emailError).ToContainTextAsync("email");
 
@@ -65,7 +65,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
 
-        var phoneError = Page.Locator("#err_Phone");
+        var phoneError = Page.Locator("#all-rules-form [data-valmsg-for='Phone']");
         await Expect(phoneError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(phoneError).ToContainTextAsync("123-456-7890");
 
@@ -84,7 +84,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
 
-        var ageError = Page.Locator("#err_Age");
+        var ageError = Page.Locator("#all-rules-form [data-valmsg-for='Age']");
         await Expect(ageError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(ageError).ToContainTextAsync("between");
 
@@ -140,12 +140,13 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         await Page.CheckAsync("#IsEmployed");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
 
-        var jobError = Page.Locator("#err_JobTitle");
+        var jobError = Page.Locator("#conditional-form [data-valmsg-for='JobTitle']");
         await Expect(jobError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(jobError).ToContainTextAsync("required");
 
+        // With framework pattern, validation failure aborts the POST — result stays at default
         var result = Page.Locator("#conditional-result");
-        await Expect(result).ToContainTextAsync("failed");
+        await Expect(result).ToContainTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
@@ -158,7 +159,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         // Leave "Is Employed" unchecked — JobTitle should not be required
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
 
-        var jobError = Page.Locator("#err_JobTitle");
+        var jobError = Page.Locator("#conditional-form [data-valmsg-for='JobTitle']");
         await Expect(jobError).ToBeHiddenAsync(new() { Timeout = 3000 });
 
         var result = Page.Locator("#conditional-result");
@@ -178,7 +179,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         await Page.GetByRole(AriaRole.Button, new() { Name = "Show Errors First" }).ClickAsync();
 
         // Name error should be visible
-        var nameError = Page.Locator("#err_live_Name");
+        var nameError = Page.Locator("#live-form [data-valmsg-for='Name']");
         await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
 
         // Type into the field — error should clear
@@ -199,7 +200,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate + Save" }).ClickAsync();
 
         // Client-side errors should show (cmb_Name required)
-        var nameError = Page.Locator("#err_cmb_Name");
+        var nameError = Page.Locator("#combined-form [data-valmsg-for='Name']");
         await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
 
         // The spinner should NOT have appeared (request was blocked)
@@ -249,8 +250,8 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         await Expect(result).ToContainTextAsync("passed", new() { Timeout = 3000 });
 
         // Hidden field error spans should NOT be visible
-        await Expect(Page.Locator("#err_hf_Phone")).ToBeHiddenAsync();
-        await Expect(Page.Locator("#err_hf_Salary")).ToBeHiddenAsync();
+        await Expect(Page.Locator("#hidden-fields-form [data-valmsg-for='Phone']")).ToBeHiddenAsync();
+        await Expect(Page.Locator("#hidden-fields-form [data-valmsg-for='Salary']")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
@@ -271,13 +272,13 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Hidden Form" }).ClickAsync();
 
         // Now that fields are visible, they should be validated
-        var phoneError = Page.Locator("#err_hf_Phone");
+        var phoneError = Page.Locator("#hidden-fields-form [data-valmsg-for='Phone']");
         await Expect(phoneError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(phoneError).ToContainTextAsync("123-456-7890");
 
-        var salaryError = Page.Locator("#err_hf_Salary");
+        var salaryError = Page.Locator("#hidden-fields-form [data-valmsg-for='Salary']");
         await Expect(salaryError).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(salaryError).ToContainTextAsync("500000");
+        await Expect(salaryError).ToContainTextAsync("500,000");
 
         AssertNoConsoleErrors();
     }
@@ -298,17 +299,23 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task HiddenFieldsServerRejectsEmptyName()
+    public async Task HiddenFieldsClientBlocksEmptyName()
     {
         await NavigateTo(Path);
 
-        // Leave Name empty, submit to server
+        // Leave Name empty, click Submit — client .Validate(hiddenDesc) catches it
         await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Profile" }).ClickAsync();
 
-        var result = Page.Locator("#hidden-result");
-        await Expect(result).ToContainTextAsync("Server validation errors", new() { Timeout = 5000 });
+        // Client-side required error shows at the field (POST is aborted)
+        var nameError = Page.Locator("#hidden-fields-form [data-valmsg-for='Name']");
+        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(nameError).ToContainTextAsync("required");
 
-        AssertNoConsoleErrorsExcept("400");
+        // Result stays at default — no server request fired
+        var result = Page.Locator("#hidden-result");
+        await Expect(result).ToContainTextAsync("Click to validate or submit");
+
+        AssertNoConsoleErrors();
     }
 
     // ── Section 8: Fake DB Validation (ProblemDetails 400) ─────
@@ -329,7 +336,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         await Expect(result).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
 
         // Email error should display at the field
-        var emailError = Page.Locator("#err_db_Email");
+        var emailError = Page.Locator("#db-form [data-valmsg-for='Email']");
         await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(emailError).ToContainTextAsync("already registered");
 
@@ -350,7 +357,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         var result = Page.Locator("#db-result");
         await Expect(result).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
 
-        var nameError = Page.Locator("#err_db_Name");
+        var nameError = Page.Locator("#db-form [data-valmsg-for='Name']");
         await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(nameError).ToContainTextAsync("reserved");
 
@@ -375,22 +382,23 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DbValidationFluentRulesRunFirst()
+    public async Task DbValidationClientBlocksEmptyFields()
     {
         await NavigateTo(Path);
 
-        // Empty fields — FluentValidation fires before DB check
+        // Empty fields — client .Validate(dbDesc) catches required Name/Email before POST
         await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
 
-        var result = Page.Locator("#db-result");
-        await Expect(result).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
-
-        // Name error should show FluentValidation message (not DB message)
-        var nameError = Page.Locator("#err_db_Name");
+        // Client-side required error at the field (POST aborted, no server request)
+        var nameError = Page.Locator("#db-form [data-valmsg-for='Name']");
         await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(nameError).ToContainTextAsync("required");
 
-        AssertNoConsoleErrorsExcept("400");
+        // Result stays at default — no server request fired
+        var result = Page.Locator("#db-result");
+        await Expect(result).ToContainTextAsync("Not submitted yet");
+
+        AssertNoConsoleErrors();
     }
 
     // ── Section 9: Partial View + Server Validation ───────────
@@ -432,7 +440,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         await Expect(result).ToContainTextAsync("validation errors", new() { Timeout = 5000 });
 
         // Error spans in the partial should be visible (dotted names → underscore IDs)
-        var streetError = Page.Locator("#err_partial_Address_Street");
+        var streetError = Page.Locator("#partial-form [data-valmsg-for='Address.Street']");
         await Expect(streetError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(streetError).ToContainTextAsync("required");
 

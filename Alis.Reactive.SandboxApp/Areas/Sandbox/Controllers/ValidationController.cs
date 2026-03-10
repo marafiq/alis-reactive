@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.FluentValidator;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
@@ -7,15 +6,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
     [Area("Sandbox")]
     public class ValidationController : Controller
     {
-        private static readonly FluentValidationAdapter _adapter = new FluentValidationAdapter();
-
         public IActionResult Index()
         {
-            // Extract client-side validation rules from the FluentValidation validator
-            var descriptor = _adapter.ExtractRules(
-                typeof(ValidationShowcaseValidator), "validation-form");
-
-            ViewBag.ValidationDescriptor = descriptor;
             return View(new ValidationShowcaseModel());
         }
 
@@ -55,10 +47,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
             return Ok(new { message = "Saved successfully!" });
         }
 
-        /// <summary>
-        /// POST endpoint simulating hidden-fields form. Server validates only the visible fields.
-        /// Always accepts since hidden fields are excluded from client-side validation.
-        /// </summary>
         [HttpPost]
         public IActionResult SaveProfile([FromBody] ValidationShowcaseModel? model)
         {
@@ -67,7 +55,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
                 return BadRequest(new { errors = new Dictionary<string, string[]> { ["Name"] = new[] { "Request body is required." } } });
             }
 
-            // Only validate Name (the always-visible required field)
             var errors = new Dictionary<string, string[]>();
             if (string.IsNullOrWhiteSpace(model.Name))
             {
@@ -82,10 +69,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
             return Ok(new { message = "Profile saved! Hidden fields were correctly skipped." });
         }
 
-        /// <summary>
-        /// POST endpoint simulating fake database validation.
-        /// Checks for "duplicate" email and "reserved" usernames — returns 400 ProblemDetails.
-        /// </summary>
         [HttpPost]
         public IActionResult SaveWithDbCheck([FromBody] ValidationShowcaseModel? model)
         {
@@ -94,7 +77,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
                 return BadRequest(new { errors = new Dictionary<string, string[]> { ["Name"] = new[] { "Request body is required." } } });
             }
 
-            // First run FluentValidation
             var validator = new ValidationShowcaseValidator();
             var fvResult = validator.Validate(model);
 
@@ -108,7 +90,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
                 return BadRequest(new { errors = fvErrors });
             }
 
-            // Simulate database-level checks
             var dbErrors = new Dictionary<string, string[]>();
 
             if (model.Email != null && model.Email.Contains("taken"))
@@ -129,20 +110,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
             return Ok(new { message = "Saved to database successfully!" });
         }
 
-        /// <summary>
-        /// Returns a partial view with address fields — simulates dynamic form sections
-        /// loaded after the initial page render (e.g. "Add Address" button).
-        /// </summary>
+        [HttpPost]
+        public IActionResult ValidateClient() => Ok(new { message = "Client validation passed!" });
+
         [HttpGet]
         public IActionResult AddressPartial()
         {
             return PartialView("_AddressPartial");
         }
 
-        /// <summary>
-        /// POST endpoint that validates only the address portion.
-        /// Returns 400 with nested field errors (Address.Street, etc.) or 200.
-        /// </summary>
         [HttpPost]
         public IActionResult SaveAddress([FromBody] ValidationShowcaseModel? model)
         {

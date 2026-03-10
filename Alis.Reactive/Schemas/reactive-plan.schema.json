@@ -89,7 +89,9 @@
     "Command": {
       "oneOf": [
         { "$ref": "#/$defs/DispatchCommand" },
-        { "$ref": "#/$defs/MutateElementCommand" }
+        { "$ref": "#/$defs/MutateElementCommand" },
+        { "$ref": "#/$defs/ValidationErrorsCommand" },
+        { "$ref": "#/$defs/IntoCommand" }
       ]
     },
     "DispatchCommand": {
@@ -264,7 +266,7 @@
         "componentId": { "type": "string", "minLength": 1, "description": "DOM element ID of the component" },
         "vendor": { "$ref": "#/$defs/Vendor" },
         "name": { "type": "string", "minLength": 1, "description": "Property name for the gathered value in the request body" },
-        "readExpr": { "type": "string", "minLength": 1, "description": "JS expression to read the value. Variables: el (DOM element). E.g. el.ej2_instances[0].value" }
+        "readExpr": { "type": "string", "minLength": 1, "description": "Property path to read the value. Prefixes: el. (DOM element), comp. (vendor component instance). E.g. comp.value, el.checked" }
       }
     },
     "AllGather": {
@@ -311,6 +313,11 @@
           "type": "array",
           "items": { "$ref": "#/$defs/GatherItem" }
         },
+        "contentType": {
+          "type": "string",
+          "enum": ["form-data"],
+          "description": "Request body format. Omitted for JSON (default). Set to form-data for multipart/form-data (file uploads)."
+        },
         "whileLoading": {
           "type": "array",
           "items": { "$ref": "#/$defs/Command" }
@@ -323,7 +330,8 @@
           "type": "array",
           "items": { "$ref": "#/$defs/StatusHandler" }
         },
-        "chained": { "$ref": "#/$defs/RequestDescriptor" }
+        "chained": { "$ref": "#/$defs/RequestDescriptor" },
+        "validation": { "$ref": "#/$defs/ValidationDescriptor" }
       }
     },
 
@@ -359,6 +367,80 @@
         "onAllSuccess": {
           "type": "array",
           "items": { "$ref": "#/$defs/StatusHandler" }
+        }
+      }
+    },
+
+    "ValidationErrorsCommand": {
+      "type": "object",
+      "required": ["kind", "formId"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "validation-errors" },
+        "formId": { "type": "string", "minLength": 1 },
+        "when": { "$ref": "#/$defs/Guard" }
+      }
+    },
+    "IntoCommand": {
+      "type": "object",
+      "required": ["kind", "target"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "into" },
+        "target": { "type": "string", "minLength": 1 },
+        "when": { "$ref": "#/$defs/Guard" }
+      }
+    },
+
+    "ValidationCondition": {
+      "type": "object",
+      "required": ["field", "op"],
+      "additionalProperties": false,
+      "properties": {
+        "field": { "type": "string", "minLength": 1, "description": "Model property name to evaluate" },
+        "op": { "type": "string", "enum": ["truthy", "falsy", "eq", "neq"] },
+        "value": { "description": "Comparison value for eq/neq operators" }
+      }
+    },
+    "ValidationRuleType": {
+      "type": "string",
+      "enum": ["required", "minLength", "maxLength", "email", "regex", "url", "range", "min", "max", "equalTo", "atLeastOne"]
+    },
+    "ValidationRule": {
+      "type": "object",
+      "required": ["rule", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": { "$ref": "#/$defs/ValidationRuleType" },
+        "message": { "type": "string", "minLength": 1 },
+        "constraint": { "description": "Rule-specific constraint value" },
+        "when": { "$ref": "#/$defs/ValidationCondition" }
+      }
+    },
+    "ValidationField": {
+      "type": "object",
+      "required": ["fieldId", "fieldName", "vendor", "rules"],
+      "additionalProperties": false,
+      "properties": {
+        "fieldId": { "type": "string", "minLength": 1, "description": "DOM element ID" },
+        "fieldName": { "type": "string", "minLength": 1, "description": "Model property name (dot notation)" },
+        "vendor": { "$ref": "#/$defs/Vendor" },
+        "readExpr": { "type": "string", "minLength": 1, "description": "Property path to read the field value. Prefixes: el. (DOM element), comp. (vendor component instance). Null for native inputs (uses .value/.checked)." },
+        "rules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValidationRule" }
+        }
+      }
+    },
+    "ValidationDescriptor": {
+      "type": "object",
+      "required": ["formId", "fields"],
+      "additionalProperties": false,
+      "properties": {
+        "formId": { "type": "string", "minLength": 1, "description": "Form container element ID" },
+        "fields": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValidationField" }
         }
       }
     }

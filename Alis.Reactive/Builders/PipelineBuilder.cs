@@ -183,6 +183,16 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
+        /// <summary>
+        /// Injects the HTTP response body as innerHTML of the target element.
+        /// Used for loading partial views: p.Get("/url").Response(r => r.OnSuccess(s => s.Into("container")))
+        /// </summary>
+        public PipelineBuilder<TModel> Into(string elementId)
+        {
+            Commands.Add(new IntoCommand(elementId));
+            return this;
+        }
+
         internal void SetConditionalBranches(List<Branch> branches)
         {
             ConditionalBranches = branches;

@@ -1,31 +1,33 @@
 import type { GatherItem } from "./types";
+import { evalRead } from "./resolver";
 import { scope } from "./trace";
 
 const log = scope("gather");
 
 export interface GatherResult {
   urlParams: string[];
-  body: Record<string, unknown>;
+  body: Record<string, unknown> | FormData;
 }
 
-export function resolveGather(items: GatherItem[], verb: string): GatherResult {
+export function resolveGather(items: GatherItem[], verb: string, contentType?: string): GatherResult {
   const isGet = verb === "GET";
+  const useFormData = contentType === "form-data";
   const urlParams: string[] = [];
+  const formData = useFormData ? new FormData() : null;
   const body: Record<string, unknown> = {};
 
   for (const g of items) {
     switch (g.kind) {
       case "component": {
-        const el = document.getElementById(g.componentId);
-        if (!el) {
+        if (!document.getElementById(g.componentId)) {
           log.warn("gather target not found", { componentId: g.componentId });
           break;
         }
-        const value = g.readExpr
-          ? new Function("el", `return ${g.readExpr}`)(el)
-          : (el as HTMLInputElement).value;
+        const value = evalRead(g.componentId, g.vendor, g.readExpr);
         if (isGet) {
           urlParams.push(`${encodeURIComponent(g.name)}=${encodeURIComponent(String(value))}`);
+        } else if (formData) {
+          formData.append(g.name, String(value ?? ""));
         } else {
           body[g.name] = value;
         }
@@ -40,15 +42,21 @@ export function resolveGather(items: GatherItem[], verb: string): GatherResult {
           break;
         }
         const fd = new FormData(form);
-        fd.forEach((value, key) => {
-          // Empty string → null for JSON body (prevents deserialization errors for nullable types)
-          const v = isGet ? value : (value === "" ? null : value);
-          if (isGet) {
-            urlParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
-          } else {
-            setNested(body, key, v);
-          }
-        });
+        if (formData) {
+          // FormData mode: transfer entries directly (preserves File objects)
+          fd.forEach((value, key) => {
+            formData.append(key, value);
+          });
+        } else {
+          fd.forEach((value, key) => {
+            const v = isGet ? value : (value === "" ? null : value);
+            if (isGet) {
+              urlParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
+            } else {
+              setNested(body, key, v);
+            }
+          });
+        }
         log.trace("all", { formId: g.formId });
         break;
       }
@@ -56,6 +64,8 @@ export function resolveGather(items: GatherItem[], verb: string): GatherResult {
       case "static": {
         if (isGet) {
           urlParams.push(`${encodeURIComponent(g.param)}=${encodeURIComponent(String(g.value))}`);
+        } else if (formData) {
+          formData.append(g.param, String(g.value ?? ""));
         } else {
           body[g.param] = g.value;
         }
@@ -65,7 +75,7 @@ export function resolveGather(items: GatherItem[], verb: string): GatherResult {
     }
   }
 
-  return { urlParams, body };
+  return { urlParams, body: formData ?? body };
 }
 
 /** Convert dotted key "Address.Street" into nested object { Address: { Street: val } } */

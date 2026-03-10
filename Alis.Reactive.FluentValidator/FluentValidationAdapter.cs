@@ -36,7 +36,6 @@ namespace Alis.Reactive.FluentValidator
             {
                 var propertyPath = kvp.Key;
                 var elementId = propertyPath.Replace(".", "_");
-                var errorId = "err_" + elementId;
 
                 var rules = new List<ValidationRule>();
                 foreach (var er in kvp.Value)
@@ -47,7 +46,6 @@ namespace Alis.Reactive.FluentValidator
                 fields.Add(new ValidationField(
                     elementId,
                     propertyPath,
-                    errorId,
                     "native",
                     null,
                     rules));
@@ -60,6 +58,9 @@ namespace Alis.Reactive.FluentValidator
                 {
                     var field = FindOrCreateField(fields, cr.PropertyName);
                     field.Rules.Add(new ValidationRule(cr.Rule, cr.Message, cr.Constraint, cr.When));
+
+                    // Ensure condition source field is in the descriptor (no rules, but needed for value reading)
+                    FindOrCreateField(fields, cr.When.Field);
                 }
             }
 
@@ -79,7 +80,6 @@ namespace Alis.Reactive.FluentValidator
             var field = new ValidationField(
                 elementId,
                 propertyName,
-                "err_" + elementId,
                 "native",
                 null,
                 new List<ValidationRule>());

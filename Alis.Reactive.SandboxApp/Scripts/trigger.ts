@@ -46,8 +46,8 @@ export function wireTrigger(trigger: Trigger, reaction: Reaction): void {
         // Native: standard DOM event listener
         log.debug("component-event: native", { componentId: trigger.componentId, jsEvent: trigger.jsEvent });
         el.addEventListener(trigger.jsEvent, (e: Event) => {
-          const target = e.target as HTMLInputElement | HTMLSelectElement;
-          executeReaction(reaction, { evt: { value: target?.value, event: e } });
+          const target = e.target as HTMLInputElement;
+          executeReaction(reaction, { evt: { value: target?.value, checked: target?.checked, event: e } });
         });
       }
       break;

@@ -7,14 +7,14 @@ namespace Alis.Reactive.Fusion.Extensions
 {
     /// <summary>
     /// Adds Include&lt;TComponent&gt;() to GatherBuilder for Syncfusion components.
-    /// Vendor = "fusion", readExpr = "el.ej2_instances[0].value".
+    /// Vendor = "fusion", readExpr = "comp.value" (resolved by evalRead via ej2_instances[0]).
     /// </summary>
     public static class FusionGatherExtensions
     {
         /// <summary>
         /// Gathers the value of a Fusion component bound to a model property.
         /// The component is identified by the model expression (m => m.FacilityId)
-        /// and the value is read via el.ej2_instances[0].value.
+        /// and the value is read via evalRead: comp.value → ej2_instances[0].value.
         /// </summary>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Extensions
                 elementId,
                 "fusion",
                 propertyName,
-                "el.ej2_instances[0].value"));
+                "comp.value"));
             return self;
         }
 
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Fusion.Extensions
                 refId,
                 "fusion",
                 name,
-                "el.ej2_instances[0].value"));
+                "comp.value"));
             return self;
         }
     }

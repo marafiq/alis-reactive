@@ -63,6 +63,34 @@ public class WhenRenderingAField
         Assert.That(selectIndex, Is.LessThan(valStart));
     }
 
+    [Test]
+    public void Renders_prefixed_for_attribute()
+    {
+        var writer = new StringWriter();
+        var b = new FieldBuilder(writer, "Name").Label("Name").ForId("srv_Name");
+        b.Required();
+        using (b.Begin()) { writer.Write("<input id=\"srv_Name\" />"); }
+        var output = writer.ToString();
+        Assert.That(output, Does.Contain("for=\"srv_Name\""));
+        Assert.That(output, Does.Contain("data-valmsg-for=\"Name\""));
+    }
+
+    [Test]
+    public void Prefix_overload_generates_prefixed_for_and_unprefixed_valmsg()
+    {
+        var writer = new StringWriter();
+        var name = "Name";
+        var id = "srv_" + "Name";
+        var b = new FieldBuilder(writer, name).Label("Name").ForId(id);
+        b.Required();
+        using (b.Begin()) { writer.Write($"<input id=\"{id}\" name=\"{name}\" />"); }
+        var output = writer.ToString();
+
+        Assert.That(output, Does.Contain("for=\"srv_Name\""));
+        Assert.That(output, Does.Contain("data-valmsg-for=\"Name\""));
+        Assert.That(output, Does.Contain("id=\"srv_Name\""));
+    }
+
     private static string RenderField(string label, bool required, string name)
     {
         var writer = new StringWriter();

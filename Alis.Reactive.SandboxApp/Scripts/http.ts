@@ -1,17 +1,17 @@
 import type { RequestDescriptor, StatusHandler, ExecContext } from "./types";
 import { resolveGather } from "./gather";
 import { executeCommands } from "./commands";
-import { register, validate } from "./forms";
+import { validate, wireLiveClearing } from "./validation";
 import { scope } from "./trace";
 
 const log = scope("http");
 
 /** Execute a single HTTP request with gather, whileLoading, response routing, and chaining. */
 export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Promise<void> {
-  // 0. Pre-request validation — register + validate, abort if fails
+  // 0. Pre-request validation — stateless, no register step
   if (req.validation) {
-    register(req.validation);
-    if (!validate(req.validation.formId)) {
+    wireLiveClearing(req.validation);
+    if (!validate(req.validation)) {
       log.debug("validation failed, aborting request");
       return;
     }
@@ -23,7 +23,7 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
   }
 
   // 2. Gather
-  const gatherResult = resolveGather(req.gather ?? [], req.verb);
+  const gatherResult = resolveGather(req.gather ?? [], req.verb, req.contentType);
 
   // 3. Build fetch options
   let url = req.url;
@@ -34,9 +34,14 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     url = url + sep + gatherResult.urlParams.join("&");
   }
 
-  if (req.verb !== "GET" && Object.keys(gatherResult.body).length > 0) {
-    init.headers = { "Content-Type": "application/json" };
-    init.body = JSON.stringify(gatherResult.body);
+  if (req.verb !== "GET") {
+    if (gatherResult.body instanceof FormData) {
+      // FormData: browser auto-sets Content-Type with multipart boundary
+      init.body = gatherResult.body;
+    } else if (Object.keys(gatherResult.body).length > 0) {
+      init.headers = { "Content-Type": "application/json" };
+      init.body = JSON.stringify(gatherResult.body);
+    }
   }
 
   log.debug("fetch", { verb: req.verb, url });
@@ -45,13 +50,20 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     // 4. Execute fetch
     const response = await fetch(url, init);
 
-    // 5. Route response — thread response body for error handlers (validation errors)
+    // 5. Route response — thread response body for both success (Into) and error (validation errors)
     if (response.ok) {
-      routeHandlers(req.onSuccess, response.status, ctx);
+      let successBody: unknown;
+      try { successBody = await response.text(); } catch { /* no body */ }
+      const successCtx = successBody != null ? { ...ctx, responseBody: successBody } : ctx;
+      routeHandlers(req.onSuccess, response.status, successCtx);
     } else {
       let errorBody: unknown;
       try { errorBody = await response.json(); } catch { /* no JSON body */ }
-      const errorCtx = errorBody ? { ...ctx, responseBody: errorBody } : ctx;
+      const errorCtx: ExecContext = {
+        ...ctx,
+        responseBody: errorBody ?? undefined,
+        validationDesc: req.validation,
+      };
       routeHandlers(req.onError, response.status, errorCtx);
     }
 

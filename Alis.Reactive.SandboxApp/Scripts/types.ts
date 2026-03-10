@@ -89,6 +89,7 @@ export interface RequestDescriptor {
   verb: "GET" | "POST" | "PUT" | "DELETE";
   url: string;
   gather?: GatherItem[];
+  contentType?: "form-data";
   whileLoading?: Command[];
   onSuccess?: StatusHandler[];
   onError?: StatusHandler[];
@@ -154,7 +155,7 @@ export interface Branch {
 
 // -- Commands -------------------------------------------------
 
-export type Command = DispatchCommand | MutateElementCommand | ValidationErrorsCommand;
+export type Command = DispatchCommand | MutateElementCommand | ValidationErrorsCommand | IntoCommand;
 
 export type EventPayload = Record<string, unknown>;
 
@@ -180,11 +181,18 @@ export interface ValidationErrorsCommand {
   when?: Guard;
 }
 
+export interface IntoCommand {
+  kind: "into";
+  target: string;
+  when?: Guard;
+}
+
 // -- Execution Context ----------------------------------------
 
 export interface ExecContext {
   evt?: Record<string, unknown>;
   responseBody?: unknown;
+  validationDesc?: ValidationDescriptor;
 }
 
 // -- Validation -----------------------------------------------
@@ -197,7 +205,6 @@ export interface ValidationDescriptor {
 export interface ValidationField {
   fieldId: string;
   fieldName: string;
-  errorId: string;
   vendor: Vendor;
   readExpr?: string;
   rules: ValidationRule[];

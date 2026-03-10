@@ -2,16 +2,14 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { JSDOM } from "jsdom";
 import type { ValidationDescriptor, ValidationField } from "../types";
 
-let register: typeof import("../forms").register;
-let validate: typeof import("../forms").validate;
-let showFieldErrors: typeof import("../forms").showFieldErrors;
-let clearErrors: typeof import("../forms").clearErrors;
-let _reset: typeof import("../forms")._reset;
+let validate: typeof import("../validation").validate;
+let showServerErrors: typeof import("../validation").showServerErrors;
+let clearAll: typeof import("../validation").clearAll;
+let wireLiveClearing: typeof import("../validation").wireLiveClearing;
 
 function field(overrides: Partial<ValidationField> & { fieldId: string }): ValidationField {
   return {
     fieldName: overrides.fieldName ?? overrides.fieldId,
-    errorId: overrides.errorId ?? `err_${overrides.fieldId}`,
     vendor: overrides.vendor ?? "native",
     rules: overrides.rules ?? [],
     ...overrides,
@@ -22,117 +20,102 @@ function makeDesc(formId: string, fields: ValidationField[]): ValidationDescript
   return { formId, fields };
 }
 
+function errSpan(fieldName: string): string {
+  return `<span data-valmsg-for="${fieldName}"></span>`;
+}
+
 beforeEach(async () => {
-  // Reset modules so each test gets fresh state
   const dom = new JSDOM(`<!DOCTYPE html><html><body>
     <form id="testForm">
       <input id="Name" name="Name" value="" />
-      <span id="err_Name" style="display:none"></span>
+      ${errSpan("Name")}
 
       <input id="Email" name="Email" value="" />
-      <span id="err_Email" style="display:none"></span>
+      ${errSpan("Email")}
 
       <input id="Phone" name="Phone" value="" />
-      <span id="err_Phone" style="display:none"></span>
+      ${errSpan("Phone")}
 
       <input id="Age" name="Age" type="number" value="" />
-      <span id="err_Age" style="display:none"></span>
+      ${errSpan("Age")}
 
       <input id="Website" name="Website" value="" />
-      <span id="err_Website" style="display:none"></span>
+      ${errSpan("Website")}
 
       <input id="Salary" name="Salary" type="number" value="" />
-      <span id="err_Salary" style="display:none"></span>
+      ${errSpan("Salary")}
 
       <input id="Password" name="Password" type="password" value="" />
-      <span id="err_Password" style="display:none"></span>
+      ${errSpan("Password")}
 
       <input id="ConfirmPassword" name="ConfirmPassword" type="password" value="" />
-      <span id="err_ConfirmPassword" style="display:none"></span>
+      ${errSpan("ConfirmPassword")}
 
       <input id="Tags" name="Tags" value="" />
-      <span id="err_Tags" style="display:none"></span>
+      ${errSpan("Tags")}
 
       <input id="IsEmployed" name="IsEmployed" type="checkbox" />
-      <span id="err_IsEmployed" style="display:none"></span>
 
       <input id="JobTitle" name="JobTitle" value="" />
-      <span id="err_JobTitle" style="display:none"></span>
+      ${errSpan("JobTitle")}
 
       <input id="Address_Street" name="Address.Street" value="" />
-      <span id="err_Address_Street" style="display:none"></span>
+      ${errSpan("Address.Street")}
 
       <input id="Address_City" name="Address.City" value="" />
-      <span id="err_Address_City" style="display:none"></span>
+      ${errSpan("Address.City")}
 
       <div id="FusionDrop"></div>
-      <span id="err_FusionDrop" style="display:none"></span>
+      ${errSpan("FusionDrop")}
 
       <div id="hiddenField" style="display:none">
         <input id="HiddenInput" name="HiddenInput" value="" />
-        <span id="err_HiddenInput" style="display:none"></span>
+        ${errSpan("HiddenInput")}
       </div>
     </form>
   </body></html>`);
 
   (globalThis as any).document = dom.window.document;
   (globalThis as any).HTMLElement = dom.window.HTMLElement;
+  (globalThis as any).Event = dom.window.Event;
 
-  // Dynamic import — module is cached but we reset internal state
-  const mod = await import("../forms");
-  register = mod.register;
+  const mod = await import("../validation");
   validate = mod.validate;
-  showFieldErrors = mod.showFieldErrors;
-  clearErrors = mod.clearErrors;
-  _reset = mod._reset;
-
-  // Reset forms module state between tests
-  _reset();
+  showServerErrors = mod.showServerErrors;
+  clearAll = mod.clearAll;
+  wireLiveClearing = mod.wireLiveClearing;
 });
 
-// ── register ──────────────────────────────────────────────
-
-describe("register", () => {
-  it("stores descriptor and builds byName map", () => {
-    const desc = makeDesc("testForm", [
-      field({ fieldId: "Name", fieldName: "Name", rules: [{ rule: "required", message: "required" }] }),
-    ]);
-    register(desc);
-    // Verify it was stored by running validate (returns true for empty form with valid data)
-    document.getElementById("Name")!.setAttribute("value", "John");
-    (document.getElementById("Name")! as HTMLInputElement).value = "John";
-    const result = validate("testForm");
-    expect(result).toBe(true);
-  });
-});
+function errorSpan(fieldName: string): HTMLSpanElement | null {
+  return document.querySelector(`span[data-valmsg-for="${fieldName}"]`);
+}
 
 // ── validate — required ───────────────────────────────────
 
 describe("validate — required", () => {
   it("fails when field is empty", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "required", message: "Name is required" }] }),
-    ]));
-    const result = validate("testForm");
-    expect(result).toBe(false);
+    ]);
+    expect(validate(desc)).toBe(false);
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
-    expect(document.getElementById("err_Name")!.textContent).toBe("Name is required");
-  });
-
-  it("fails when value is null-ish", () => {
-    register(makeDesc("testForm", [
-      field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
-    ]));
-    (document.getElementById("Name")! as HTMLInputElement).value = "";
-    expect(validate("testForm")).toBe(false);
+    expect(errorSpan("Name")!.textContent).toBe("Name is required");
   });
 
   it("passes when field has value", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
-    ]));
+    ]);
     (document.getElementById("Name")! as HTMLInputElement).value = "John";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
+  });
+
+  it("fails for null-ish value", () => {
+    const desc = makeDesc("testForm", [
+      field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
+    ]);
+    (document.getElementById("Name")! as HTMLInputElement).value = "";
+    expect(validate(desc)).toBe(false);
   });
 });
 
@@ -140,19 +123,19 @@ describe("validate — required", () => {
 
 describe("validate — minLength", () => {
   it("fails when too short", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "minLength", message: "too short", constraint: 3 }] }),
-    ]));
+    ]);
     (document.getElementById("Name")! as HTMLInputElement).value = "ab";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("passes at exact length", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "minLength", message: "too short", constraint: 3 }] }),
-    ]));
+    ]);
     (document.getElementById("Name")! as HTMLInputElement).value = "abc";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 });
 
@@ -160,19 +143,19 @@ describe("validate — minLength", () => {
 
 describe("validate — maxLength", () => {
   it("fails when too long", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "maxLength", message: "too long", constraint: 5 }] }),
-    ]));
+    ]);
     (document.getElementById("Name")! as HTMLInputElement).value = "abcdef";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("passes at exact length", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "maxLength", message: "too long", constraint: 5 }] }),
-    ]));
+    ]);
     (document.getElementById("Name")! as HTMLInputElement).value = "abcde";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 });
 
@@ -180,27 +163,27 @@ describe("validate — maxLength", () => {
 
 describe("validate — email", () => {
   it("fails for invalid email", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Email", rules: [{ rule: "email", message: "bad email" }] }),
-    ]));
+    ]);
     (document.getElementById("Email")! as HTMLInputElement).value = "notanemail";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("passes for valid email", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Email", rules: [{ rule: "email", message: "bad email" }] }),
-    ]));
+    ]);
     (document.getElementById("Email")! as HTMLInputElement).value = "user@example.com";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 
   it("passes when empty (not required)", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Email", rules: [{ rule: "email", message: "bad email" }] }),
-    ]));
+    ]);
     (document.getElementById("Email")! as HTMLInputElement).value = "";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 });
 
@@ -208,28 +191,27 @@ describe("validate — email", () => {
 
 describe("validate — regex", () => {
   it("fails when pattern does not match", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Phone", rules: [{ rule: "regex", message: "bad format", constraint: "^\\d{3}-\\d{3}-\\d{4}$" }] }),
-    ]));
+    ]);
     (document.getElementById("Phone")! as HTMLInputElement).value = "123";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("passes when pattern matches", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Phone", rules: [{ rule: "regex", message: "bad format", constraint: "^\\d{3}-\\d{3}-\\d{4}$" }] }),
-    ]));
+    ]);
     (document.getElementById("Phone")! as HTMLInputElement).value = "123-456-7890";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 
   it("handles invalid regex gracefully", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Phone", rules: [{ rule: "regex", message: "bad", constraint: "[invalid" }] }),
-    ]));
+    ]);
     (document.getElementById("Phone")! as HTMLInputElement).value = "test";
-    // Should not throw, returns valid (false = don't block on bad regex)
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 });
 
@@ -237,95 +219,75 @@ describe("validate — regex", () => {
 
 describe("validate — url", () => {
   it("fails for non-URL", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Website", rules: [{ rule: "url", message: "bad url" }] }),
-    ]));
+    ]);
     (document.getElementById("Website")! as HTMLInputElement).value = "not-a-url";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
-  it("passes for http URL", () => {
-    register(makeDesc("testForm", [
+  it("passes for http/https URL", () => {
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Website", rules: [{ rule: "url", message: "bad url" }] }),
-    ]));
-    (document.getElementById("Website")! as HTMLInputElement).value = "http://example.com";
-    expect(validate("testForm")).toBe(true);
-  });
-
-  it("passes for https URL", () => {
-    register(makeDesc("testForm", [
-      field({ fieldId: "Website", rules: [{ rule: "url", message: "bad url" }] }),
-    ]));
-    (document.getElementById("Website")! as HTMLInputElement).value = "https://example.com/path";
-    expect(validate("testForm")).toBe(true);
+    ]);
+    (document.getElementById("Website")! as HTMLInputElement).value = "https://example.com";
+    expect(validate(desc)).toBe(true);
   });
 });
 
-// ── validate — min ────────────────────────────────────────
+// ── validate — min / max / range ──────────────────────────
 
 describe("validate — min", () => {
   it("fails below minimum", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Salary", rules: [{ rule: "min", message: "too low", constraint: 100 }] }),
-    ]));
+    ]);
     (document.getElementById("Salary")! as HTMLInputElement).value = "50";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("passes at minimum", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Salary", rules: [{ rule: "min", message: "too low", constraint: 100 }] }),
-    ]));
+    ]);
     (document.getElementById("Salary")! as HTMLInputElement).value = "100";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 });
-
-// ── validate — max ────────────────────────────────────────
 
 describe("validate — max", () => {
   it("fails above maximum", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Salary", rules: [{ rule: "max", message: "too high", constraint: 500 }] }),
-    ]));
+    ]);
     (document.getElementById("Salary")! as HTMLInputElement).value = "600";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("passes at maximum", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Salary", rules: [{ rule: "max", message: "too high", constraint: 500 }] }),
-    ]));
+    ]);
     (document.getElementById("Salary")! as HTMLInputElement).value = "500";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 });
 
-// ── validate — range ──────────────────────────────────────
-
 describe("validate — range", () => {
-  it("fails below range", () => {
-    register(makeDesc("testForm", [
+  it("fails outside range", () => {
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Age", rules: [{ rule: "range", message: "out of range", constraint: [0, 120] }] }),
-    ]));
+    ]);
     (document.getElementById("Age")! as HTMLInputElement).value = "-1";
-    expect(validate("testForm")).toBe(false);
-  });
-
-  it("fails above range", () => {
-    register(makeDesc("testForm", [
-      field({ fieldId: "Age", rules: [{ rule: "range", message: "out of range", constraint: [0, 120] }] }),
-    ]));
-    (document.getElementById("Age")! as HTMLInputElement).value = "121";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("passes within range", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Age", rules: [{ rule: "range", message: "out of range", constraint: [0, 120] }] }),
-    ]));
+    ]);
     (document.getElementById("Age")! as HTMLInputElement).value = "25";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 });
 
@@ -333,27 +295,27 @@ describe("validate — range", () => {
 
 describe("validate — equalTo", () => {
   it("fails when values differ", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Password", fieldName: "Password", rules: [] }),
       field({ fieldId: "ConfirmPassword", fieldName: "ConfirmPassword", rules: [
-        { rule: "equalTo", message: "must match password", constraint: "Password" },
+        { rule: "equalTo", message: "must match", constraint: "Password" },
       ] }),
-    ]));
+    ]);
     (document.getElementById("Password")! as HTMLInputElement).value = "secret";
     (document.getElementById("ConfirmPassword")! as HTMLInputElement).value = "different";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("passes when values match", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Password", fieldName: "Password", rules: [] }),
       field({ fieldId: "ConfirmPassword", fieldName: "ConfirmPassword", rules: [
-        { rule: "equalTo", message: "must match password", constraint: "Password" },
+        { rule: "equalTo", message: "must match", constraint: "Password" },
       ] }),
-    ]));
+    ]);
     (document.getElementById("Password")! as HTMLInputElement).value = "secret";
     (document.getElementById("ConfirmPassword")! as HTMLInputElement).value = "secret";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 });
 
@@ -361,19 +323,19 @@ describe("validate — equalTo", () => {
 
 describe("validate — atLeastOne", () => {
   it("fails when empty", () => {
-    register(makeDesc("testForm", [
-      field({ fieldId: "Tags", rules: [{ rule: "atLeastOne", message: "need at least one" }] }),
-    ]));
+    const desc = makeDesc("testForm", [
+      field({ fieldId: "Tags", rules: [{ rule: "atLeastOne", message: "need one" }] }),
+    ]);
     (document.getElementById("Tags")! as HTMLInputElement).value = "";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("passes when non-empty", () => {
-    register(makeDesc("testForm", [
-      field({ fieldId: "Tags", rules: [{ rule: "atLeastOne", message: "need at least one" }] }),
-    ]));
+    const desc = makeDesc("testForm", [
+      field({ fieldId: "Tags", rules: [{ rule: "atLeastOne", message: "need one" }] }),
+    ]);
     (document.getElementById("Tags")! as HTMLInputElement).value = "tag1";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 });
 
@@ -381,64 +343,62 @@ describe("validate — atLeastOne", () => {
 
 describe("validate — conditional rules", () => {
   it("applies when truthy condition is met", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "IsEmployed", fieldName: "IsEmployed", rules: [] }),
       field({ fieldId: "JobTitle", fieldName: "JobTitle", rules: [
         { rule: "required", message: "Job title required", when: { field: "IsEmployed", op: "truthy" } },
       ] }),
-    ]));
+    ]);
     (document.getElementById("IsEmployed")! as HTMLInputElement).checked = true;
     (document.getElementById("JobTitle")! as HTMLInputElement).value = "";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("skips when truthy condition is not met", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "IsEmployed", fieldName: "IsEmployed", rules: [] }),
       field({ fieldId: "JobTitle", fieldName: "JobTitle", rules: [
         { rule: "required", message: "Job title required", when: { field: "IsEmployed", op: "truthy" } },
       ] }),
-    ]));
+    ]);
     (document.getElementById("IsEmployed")! as HTMLInputElement).checked = false;
-    (document.getElementById("JobTitle")! as HTMLInputElement).value = "";
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 
   it("evaluates eq condition", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", fieldName: "Name", rules: [] }),
       field({ fieldId: "Email", fieldName: "Email", rules: [
-        { rule: "required", message: "Email required for VIP", when: { field: "Name", op: "eq", value: "VIP" } },
+        { rule: "required", message: "required for VIP", when: { field: "Name", op: "eq", value: "VIP" } },
       ] }),
-    ]));
+    ]);
     (document.getElementById("Name")! as HTMLInputElement).value = "VIP";
     (document.getElementById("Email")! as HTMLInputElement).value = "";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 
   it("evaluates neq condition", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", fieldName: "Name", rules: [] }),
       field({ fieldId: "Email", fieldName: "Email", rules: [
-        { rule: "required", message: "Email required", when: { field: "Name", op: "neq", value: "SKIP" } },
+        { rule: "required", message: "required", when: { field: "Name", op: "neq", value: "SKIP" } },
       ] }),
-    ]));
+    ]);
     (document.getElementById("Name")! as HTMLInputElement).value = "SKIP";
     (document.getElementById("Email")! as HTMLInputElement).value = "";
-    // When Name === "SKIP", neq("SKIP") is false → skip rule → valid
-    expect(validate("testForm")).toBe(true);
+    expect(validate(desc)).toBe(true);
   });
 
   it("evaluates falsy condition", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "IsEmployed", fieldName: "IsEmployed", rules: [] }),
       field({ fieldId: "JobTitle", fieldName: "JobTitle", rules: [
-        { rule: "required", message: "Explain unemployment", when: { field: "IsEmployed", op: "falsy" } },
+        { rule: "required", message: "explain", when: { field: "IsEmployed", op: "falsy" } },
       ] }),
-    ]));
+    ]);
     (document.getElementById("IsEmployed")! as HTMLInputElement).checked = false;
     (document.getElementById("JobTitle")! as HTMLInputElement).value = "";
-    expect(validate("testForm")).toBe(false);
+    expect(validate(desc)).toBe(false);
   });
 });
 
@@ -446,25 +406,15 @@ describe("validate — conditional rules", () => {
 
 describe("validate — first-fail-wins", () => {
   it("only shows first error per field", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [
         { rule: "required", message: "required" },
         { rule: "minLength", message: "too short", constraint: 3 },
       ] }),
-    ]));
+    ]);
     (document.getElementById("Name")! as HTMLInputElement).value = "";
-    validate("testForm");
-    // Should show "required", not "too short"
-    expect(document.getElementById("err_Name")!.textContent).toBe("required");
-  });
-
-  it("returns boolean", () => {
-    register(makeDesc("testForm", [
-      field({ fieldId: "Name", rules: [{ rule: "required", message: "r" }] }),
-    ]));
-    const result = validate("testForm");
-    expect(typeof result).toBe("boolean");
-    expect(result).toBe(false);
+    validate(desc);
+    expect(errorSpan("Name")!.textContent).toBe("required");
   });
 });
 
@@ -472,18 +422,17 @@ describe("validate — first-fail-wins", () => {
 
 describe("validate — fusion vendor", () => {
   it("reads value via readExpr", () => {
-    const el = document.getElementById("FusionDrop")!;
-    (el as any).ej2_instances = [{ value: "" }];
-
-    register(makeDesc("testForm", [
+    (document.getElementById("FusionDrop")! as any).ej2_instances = [{ value: "" }];
+    const desc = makeDesc("testForm", [
       field({
         fieldId: "FusionDrop",
+        fieldName: "FusionDrop",
         vendor: "fusion",
-        readExpr: "el.ej2_instances[0].value",
+        readExpr: "comp.value",
         rules: [{ rule: "required", message: "required" }],
       }),
-    ]));
-    expect(validate("testForm")).toBe(false);
+    ]);
+    expect(validate(desc)).toBe(false);
   });
 });
 
@@ -491,56 +440,70 @@ describe("validate — fusion vendor", () => {
 
 describe("validate — hidden fields", () => {
   it("skips hidden fields", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "HiddenInput", rules: [{ rule: "required", message: "required" }] }),
-    ]));
-    // HiddenInput is inside display:none div, so offsetParent is null
-    expect(validate("testForm")).toBe(true);
+    ]);
+    expect(validate(desc)).toBe(true);
   });
 });
 
-// ── showFieldErrors ───────────────────────────────────────
+// ── validate — nested properties ──────────────────────────
 
-describe("showFieldErrors", () => {
-  it("shows errors from MVC format", () => {
-    register(makeDesc("testForm", [
+describe("validate — nested properties", () => {
+  it("validates nested field with underscore ID and dotted name", () => {
+    const desc = makeDesc("testForm", [
+      field({ fieldId: "Address_Street", fieldName: "Address.Street", rules: [
+        { rule: "required", message: "Street required" },
+      ] }),
+    ]);
+    (document.getElementById("Address_Street")! as HTMLInputElement).value = "";
+    expect(validate(desc)).toBe(false);
+    expect(errorSpan("Address.Street")!.textContent).toBe("Street required");
+  });
+});
+
+// ── showServerErrors ──────────────────────────────────────
+
+describe("showServerErrors", () => {
+  it("shows errors from ProblemDetails format", () => {
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", fieldName: "Name", rules: [] }),
-    ]));
-    showFieldErrors("testForm", { errors: { Name: ["Name is required"] } });
-    expect(document.getElementById("err_Name")!.textContent).toBe("Name is required");
+    ]);
+    showServerErrors(desc, { errors: { Name: ["Name is required"] } });
+    expect(errorSpan("Name")!.textContent).toBe("Name is required");
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
   });
 
   it("shows errors from flat format", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Email", fieldName: "Email", rules: [] }),
-    ]));
-    showFieldErrors("testForm", { Email: ["Invalid email"] });
-    expect(document.getElementById("err_Email")!.textContent).toBe("Invalid email");
+    ]);
+    showServerErrors(desc, { Email: ["Invalid email"] });
+    expect(errorSpan("Email")!.textContent).toBe("Invalid email");
   });
 
   it("handles dotted nested property names", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Address_Street", fieldName: "Address.Street", rules: [] }),
-    ]));
-    showFieldErrors("testForm", { errors: { "Address.Street": ["Street is required"] } });
-    expect(document.getElementById("err_Address_Street")!.textContent).toBe("Street is required");
+    ]);
+    showServerErrors(desc, { errors: { "Address.Street": ["Street is required"] } });
+    expect(errorSpan("Address.Street")!.textContent).toBe("Street is required");
   });
 });
 
-// ── clearErrors ───────────────────────────────────────────
+// ── clearAll ──────────────────────────────────────────────
 
-describe("clearErrors", () => {
+describe("clearAll", () => {
   it("removes error class and hides spans", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
-    ]));
-    validate("testForm"); // triggers error
+    ]);
+    validate(desc);
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
 
-    clearErrors("testForm");
+    clearAll(desc);
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(false);
-    expect(document.getElementById("err_Name")!.style.display).toBe("none");
+    expect(errorSpan("Name")!.textContent).toBe("");
   });
 });
 
@@ -548,25 +511,38 @@ describe("clearErrors", () => {
 
 describe("live clearing", () => {
   it("input event clears field error", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
-    ]));
-    validate("testForm");
+    ]);
+    wireLiveClearing(desc);
+    validate(desc);
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
 
-    // Simulate typing
-    document.getElementById("Name")!.dispatchEvent(new Event("input"));
+    document.getElementById("Name")!.dispatchEvent(new Event("input", { bubbles: true }));
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(false);
   });
 
   it("change event clears field error", () => {
-    register(makeDesc("testForm", [
+    const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
-    ]));
-    validate("testForm");
+    ]);
+    wireLiveClearing(desc);
+    validate(desc);
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
 
-    document.getElementById("Name")!.dispatchEvent(new Event("change"));
+    document.getElementById("Name")!.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(false);
+  });
+
+  it("does not wire duplicate listeners", () => {
+    const desc = makeDesc("testForm", [
+      field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
+    ]);
+    wireLiveClearing(desc);
+    wireLiveClearing(desc);
+    validate(desc);
+
+    document.getElementById("Name")!.dispatchEvent(new Event("input", { bubbles: true }));
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(false);
   });
 });

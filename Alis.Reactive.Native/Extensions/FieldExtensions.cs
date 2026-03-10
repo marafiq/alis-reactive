@@ -31,5 +31,27 @@ namespace Alis.Reactive.Native.Extensions
             if (isRequired) b.Required();
             using (b.Begin()) { inputBuilder(expression).WriteTo(writer, HtmlEncoder.Default); }
         }
+
+        /// <summary>
+        /// Renders a model-bound form field with a prefix applied to the element ID.
+        /// The label's <c>for</c> attribute and the callback's <c>id</c> parameter
+        /// use the prefixed ID, while <c>data-valmsg-for</c> uses the unprefixed model name.
+        /// </summary>
+        public static void Field<TModel, TProp>(
+            this IHtmlHelper<TModel> html,
+            string label, bool isRequired,
+            Expression<Func<TModel, TProp>> expression,
+            string idPrefix,
+            Func<Expression<Func<TModel, TProp>>, string, IHtmlContent> inputBuilder)
+        {
+            var writer = html.ViewContext.Writer;
+            var name = html.NameFor(expression).ToString();
+            var id = idPrefix + html.IdFor(expression);
+            var b = new FieldBuilder(writer, name)
+                .Label(label)
+                .ForId(id);
+            if (isRequired) b.Required();
+            using (b.Begin()) { inputBuilder(expression, id).WriteTo(writer, HtmlEncoder.Default); }
+        }
     }
 }

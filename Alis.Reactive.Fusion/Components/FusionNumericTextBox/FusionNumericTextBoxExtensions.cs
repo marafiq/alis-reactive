@@ -36,7 +36,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Returns the BindExpr for reading this component's current numeric value.
-        /// The TS resolver resolves ref:{id}.value to el.ej2_instances[0].value
+        /// The TS resolver resolves comp.value via evalRead (vendor-aware)
         /// </summary>
         public static string Value<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)

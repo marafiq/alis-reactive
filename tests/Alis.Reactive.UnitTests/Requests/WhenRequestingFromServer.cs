@@ -143,6 +143,48 @@ public class WhenRequestingFromServer : PlanTestBase
         AssertSchemaValid(plan.Render());
     }
 
+    // ── Validation descriptor in plan ──
+
+    [Test]
+    public Task Post_with_validation_includes_descriptor() =>
+        VerifyJson(Build(p =>
+            p.Post("/api/save", g => g.Static("name", "test"))
+             .Validate(new Validation.ValidationDescriptor("testForm", new List<Validation.ValidationField>
+             {
+                 new("Name", "Name", "native", null, new List<Validation.ValidationRule>
+                 {
+                     new("required", "Name is required"),
+                 }),
+                 new("Email", "Email", "native", null, new List<Validation.ValidationRule>
+                 {
+                     new("required", "Email is required"),
+                     new("email", "Must be a valid email"),
+                 }),
+             }))
+             .Response(r => r
+                .OnSuccess(s => s.Element("result").SetText("saved"))
+                .OnError(400, e => e.ValidationErrors("testForm")))
+        ).Render());
+
+    [Test]
+    public void Post_with_validation_conforms_to_schema()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).DomReady(p =>
+            p.Post("/api/save", g => g.Static("name", "test"))
+             .Validate(new Validation.ValidationDescriptor("testForm", new List<Validation.ValidationField>
+             {
+                 new("Name", "Name", "native", null, new List<Validation.ValidationRule>
+                 {
+                     new("required", "Name is required"),
+                 }),
+             }))
+             .Response(r => r
+                .OnSuccess(s => s.Element("x").SetText("ok"))
+                .OnError(400, e => e.ValidationErrors("testForm"))));
+        AssertSchemaValid(plan.Render());
+    }
+
     private static IReactivePlan<TestModel> Build(Action<Builders.PipelineBuilder<TestModel>> configure)
     {
         var plan = CreatePlan();

@@ -2,21 +2,10 @@
 @using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Validation
-@using System.Text.Json
-@using System.Text.Json.Serialization
 @{
     ViewData["Title"] = "Validation";
 
-    IReactivePlan<ValidationShowcaseModel> plan = new ReactivePlan<ValidationShowcaseModel>();
-
-    var descriptor = (ValidationDescriptor?)ViewBag.ValidationDescriptor;
-
-    var jsonOpts = new JsonSerializerOptions
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
+    var plan = Html.ReactivePlan<ValidationShowcaseModel>();
 }
 
 <div class="space-y-8">
@@ -37,55 +26,38 @@
             Click &ldquo;Validate All&rdquo; with empty/invalid fields to see errors.
         </p>
         <form id="all-rules-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <!-- Name: required + maxLength -->
-            <div class="flex flex-col gap-1.5">
-                <label for="Name" class="text-xs font-medium text-text-secondary">Name *</label>
-                <input type="text" id="Name" name="Name"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Full name" />
-                <span id="err_Name" class="text-xs text-red-600" hidden></span>
-            </div>
-            <!-- Email: required + email -->
-            <div class="flex flex-col gap-1.5">
-                <label for="Email" class="text-xs font-medium text-text-secondary">Email *</label>
-                <input type="text" id="Email" name="Email"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="you@@example.com" />
-                <span id="err_Email" class="text-xs text-red-600" hidden></span>
-            </div>
-            <!-- Age: range 0–120 -->
-            <div class="flex flex-col gap-1.5">
-                <label for="Age" class="text-xs font-medium text-text-secondary">Age</label>
-                <input type="number" id="Age" name="Age"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="0–120" />
-                <span id="err_Age" class="text-xs text-red-600" hidden></span>
-            </div>
-            <!-- Phone: regex -->
-            <div class="flex flex-col gap-1.5">
-                <label for="Phone" class="text-xs font-medium text-text-secondary">Phone</label>
-                <input type="text" id="Phone" name="Phone"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="123-456-7890" />
-                <span id="err_Phone" class="text-xs text-red-600" hidden></span>
-            </div>
-            <!-- Salary: min 0, max 500000 -->
-            <div class="flex flex-col gap-1.5">
-                <label for="Salary" class="text-xs font-medium text-text-secondary">Salary</label>
-                <input type="number" id="Salary" name="Salary"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="0–500,000" />
-                <span id="err_Salary" class="text-xs text-red-600" hidden></span>
-            </div>
-            <!-- Password: minLength 8 -->
-            <div class="flex flex-col gap-1.5">
-                <label for="Password" class="text-xs font-medium text-text-secondary">Password</label>
-                <input type="password" id="Password" name="Password"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Min 8 characters" />
-                <span id="err_Password" class="text-xs text-red-600" hidden></span>
-            </div>
+            @{ Html.Field("Name", true, m => m.Name, expr =>
+                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Full name" })
+            ); }
+            @{ Html.Field("Email", true, m => m.Email, expr =>
+                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "you@example.com" })
+            ); }
+            @{ Html.Field("Age", false, m => m.Age, expr =>
+                Html.TextBoxFor(expr, new { type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–120" })
+            ); }
+            @{ Html.Field("Phone", false, m => m.Phone, expr =>
+                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
+            ); }
+            @{ Html.Field("Salary", false, m => m.Salary, expr =>
+                Html.TextBoxFor(expr, new { type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–500,000" })
+            ); }
+            @{ Html.Field("Password", false, m => m.Password, expr =>
+                Html.PasswordFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Min 8 characters" })
+            ); }
         </form>
         @(Html.NativeButton("validate-all-btn", "Validate All")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                // Sequential: just dispatch events to show results
-                p.Element("all-rules-result").SetText("Checking...");
+                p.Post("/Sandbox/Validation/ValidateClient")
+                 .Validate<ValidationShowcaseValidator>("all-rules-form")
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("all-rules-result").SetText("All fields passed client-side validation!");
+                        s.Element("all-rules-result").AddClass("text-green-600");
+                        s.Element("all-rules-result").RemoveClass("text-text-muted");
+                    }));
             }))
         <div class="mt-3 font-mono text-sm">
             <p id="all-rules-result" class="text-text-muted">Click to validate</p>
@@ -100,18 +72,12 @@
             ValidationErrors command displays them at the correct fields.
         </p>
         <form id="server-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div class="flex flex-col gap-1.5">
-                <label for="srv_Name" class="text-xs font-medium text-text-secondary">Name *</label>
-                <input type="text" id="srv_Name" name="Name"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Leave empty to trigger error" />
-                <span id="err_srv_Name" class="text-xs text-red-600" hidden></span>
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="srv_Email" class="text-xs font-medium text-text-secondary">Email *</label>
-                <input type="text" id="srv_Email" name="Email"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Leave empty to trigger error" />
-                <span id="err_srv_Email" class="text-xs text-red-600" hidden></span>
-            </div>
+            @{ Html.Field("Name", true, m => m.Name, "srv_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Leave empty to trigger error" })
+            ); }
+            @{ Html.Field("Email", true, m => m.Email, "srv_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Leave empty to trigger error" })
+            ); }
         </form>
         @(Html.NativeButton("server-save-btn", "Save (Server Validate)")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -152,24 +118,15 @@
             Server returns errors with dotted names (Address.Street) and showFieldErrors resolves them.
         </p>
         <form id="nested-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            <div class="flex flex-col gap-1.5">
-                <label for="Address_Street" class="text-xs font-medium text-text-secondary">Street *</label>
-                <input type="text" id="Address_Street" name="Address.Street"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Street address" />
-                <span id="err_Address_Street" class="text-xs text-red-600" hidden></span>
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="Address_City" class="text-xs font-medium text-text-secondary">City *</label>
-                <input type="text" id="Address_City" name="Address.City"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="City" />
-                <span id="err_Address_City" class="text-xs text-red-600" hidden></span>
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="Address_ZipCode" class="text-xs font-medium text-text-secondary">Zip Code</label>
-                <input type="text" id="Address_ZipCode" name="Address.ZipCode"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Min 5 characters" />
-                <span id="err_Address_ZipCode" class="text-xs text-red-600" hidden></span>
-            </div>
+            @{ Html.Field("Street", true, m => m.Address!.Street, expr =>
+                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Street address" })
+            ); }
+            @{ Html.Field("City", true, m => m.Address!.City, expr =>
+                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "City" })
+            ); }
+            @{ Html.Field("Zip Code", false, m => m.Address!.ZipCode, expr =>
+                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Min 5 characters" })
+            ); }
         </form>
         @(Html.NativeButton("nested-save-btn", "Save Address (Server)")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -213,18 +170,23 @@
                        class="h-4 w-4 rounded border-border text-accent" />
                 <label for="IsEmployed" class="text-sm font-medium">Is Employed</label>
             </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="JobTitle" class="text-xs font-medium text-text-secondary">Job Title</label>
-                <input type="text" id="JobTitle" name="JobTitle"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Required when employed" />
-                <span id="err_JobTitle" class="text-xs text-red-600" hidden></span>
-            </div>
+            @{ Html.Field("Job Title", false, m => m.JobTitle, expr =>
+                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required when employed" })
+            ); }
         </form>
         @(Html.NativeButton("conditional-validate-btn", "Validate Conditional")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Element("conditional-result").SetText("Checking...");
+                p.Post("/Sandbox/Validation/ValidateClient")
+                 .Validate<ValidationShowcaseValidator>("conditional-form")
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("conditional-result").SetText("Conditional validation passed!");
+                        s.Element("conditional-result").AddClass("text-green-600");
+                        s.Element("conditional-result").RemoveClass("text-text-muted");
+                    }));
             }))
         <div class="mt-3 font-mono text-sm">
             <p id="conditional-result" class="text-text-muted">Click to validate</p>
@@ -238,24 +200,26 @@
             After validation shows errors, typing into the field automatically clears that field's error.
         </p>
         <form id="live-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div class="flex flex-col gap-1.5">
-                <label for="live_Name" class="text-xs font-medium text-text-secondary">Name *</label>
-                <input type="text" id="live_Name" name="Name"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Type after error to clear" />
-                <span id="err_live_Name" class="text-xs text-red-600" hidden></span>
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="live_Email" class="text-xs font-medium text-text-secondary">Email *</label>
-                <input type="text" id="live_Email" name="Email"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Type after error to clear" />
-                <span id="err_live_Email" class="text-xs text-red-600" hidden></span>
-            </div>
+            @{ Html.Field("Name", true, m => m.Name, "live_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Type after error to clear" })
+            ); }
+            @{ Html.Field("Email", true, m => m.Email, "live_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Type after error to clear" })
+            ); }
         </form>
         @(Html.NativeButton("live-validate-btn", "Show Errors First")
             .CssClass("rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Element("live-result").SetText("Errors shown — now type in the fields to see live clearing");
+                p.Post("/Sandbox/Validation/ValidateClient")
+                 .Validate<ValidationShowcaseValidator>("live-form", "live_")
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("live-result").SetText("Both fields valid — clear them and try again");
+                        s.Element("live-result").AddClass("text-green-600");
+                        s.Element("live-result").RemoveClass("text-text-muted");
+                    }));
             }))
         <div class="mt-3 font-mono text-sm">
             <p id="live-result" class="text-text-muted">Click to trigger errors, then type to clear them</p>
@@ -270,79 +234,45 @@
             additional errors (e.g. conditional rules not extracted to client). Both layers display at the same fields.
         </p>
         <form id="combined-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div class="flex flex-col gap-1.5">
-                <label for="cmb_Name" class="text-xs font-medium text-text-secondary">Name *</label>
-                <input type="text" id="cmb_Name" name="Name"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Required" />
-                <span id="err_cmb_Name" class="text-xs text-red-600" hidden></span>
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="cmb_Email" class="text-xs font-medium text-text-secondary">Email *</label>
-                <input type="text" id="cmb_Email" name="Email"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Required + valid email" />
-                <span id="err_cmb_Email" class="text-xs text-red-600" hidden></span>
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="cmb_Age" class="text-xs font-medium text-text-secondary">Age</label>
-                <input type="number" id="cmb_Age" name="Age"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="0–120" />
-                <span id="err_cmb_Age" class="text-xs text-red-600" hidden></span>
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="cmb_Phone" class="text-xs font-medium text-text-secondary">Phone</label>
-                <input type="text" id="cmb_Phone" name="Phone"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="123-456-7890" />
-                <span id="err_cmb_Phone" class="text-xs text-red-600" hidden></span>
-            </div>
+            @{ Html.Field("Name", true, m => m.Name, "cmb_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required" })
+            ); }
+            @{ Html.Field("Email", true, m => m.Email, "cmb_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required + valid email" })
+            ); }
+            @{ Html.Field("Age", false, m => m.Age, "cmb_", (expr, id) =>
+                Html.TextBoxFor(expr, new { type = "number", id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–120" })
+            ); }
+            @{ Html.Field("Phone", false, m => m.Phone, "cmb_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
+            ); }
         </form>
-        @if (descriptor != null)
-        {
-            // Build a client-side descriptor for the combined form using the extracted rules,
-            // but with adjusted field IDs to match the "cmb_" prefixed DOM elements.
-            var combinedFields = new List<ValidationField>();
-            foreach (var field in descriptor.Fields)
+        @(Html.NativeButton("combined-save-btn", "Validate + Save")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                // Only include fields that exist in the combined form
-                var cmbFieldId = "cmb_" + field.FieldId;
-                if (field.FieldName == "Name" || field.FieldName == "Email" ||
-                    field.FieldName == "Age" || field.FieldName == "Phone")
-                {
-                    combinedFields.Add(new ValidationField(
-                        cmbFieldId, field.FieldName, "err_" + cmbFieldId,
-                        field.Vendor, field.ReadExpr, field.Rules));
-                }
-            }
-            var combinedDescriptor = new ValidationDescriptor("combined-form", combinedFields);
-
-            <text>
-            @(Html.NativeButton("combined-save-btn", "Validate + Save")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Post("/Sandbox/Validation/Save", g => g
-                        .IncludeAll("combined-form"))
-                     .Validate(combinedDescriptor)
-                     .WhileLoading(l => l.Element("combined-spinner").Show())
-                     .Response(r => r
-                        .OnSuccess(s =>
-                        {
-                            s.Element("combined-spinner").Hide();
-                            s.Element("combined-result").SetText("Saved! Client + server both passed.");
-                            s.Element("combined-result").AddClass("text-green-600");
-                            s.Element("combined-result").RemoveClass("text-red-600");
-                        })
-                        .OnError(400, e =>
-                        {
-                            e.Element("combined-spinner").Hide();
-                            e.Element("combined-result").SetText("Server returned validation errors");
-                            e.Element("combined-result").AddClass("text-red-600");
-                            e.Element("combined-result").RemoveClass("text-green-600");
-                            e.ValidationErrors("combined-form");
-                        })
-                     );
-                }))
-            </text>
-        }
+                p.Post("/Sandbox/Validation/Save", g => g
+                    .IncludeAll("combined-form"))
+                 .Validate<ValidationShowcaseValidator>("combined-form", "cmb_")
+                 .WhileLoading(l => l.Element("combined-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("combined-spinner").Hide();
+                        s.Element("combined-result").SetText("Saved! Client + server both passed.");
+                        s.Element("combined-result").AddClass("text-green-600");
+                        s.Element("combined-result").RemoveClass("text-red-600");
+                    })
+                    .OnError(400, e =>
+                    {
+                        e.Element("combined-spinner").Hide();
+                        e.Element("combined-result").SetText("Server returned validation errors");
+                        e.Element("combined-result").AddClass("text-red-600");
+                        e.Element("combined-result").RemoveClass("text-green-600");
+                        e.ValidationErrors("combined-form");
+                    })
+                 );
+            }))
         <div class="mt-3 space-y-2 font-mono text-sm">
             <p id="combined-spinner" hidden class="text-amber-600">Saving...</p>
             <p id="combined-result" class="text-text-muted">Not submitted yet</p>
@@ -354,40 +284,46 @@
         <h2 class="text-base font-semibold mb-4">7. Hidden Fields &mdash; Conditionally Hide &rarr; Validate &rarr; Submit</h2>
         <p class="text-sm text-text-secondary mb-4">
             Toggle &ldquo;Show Extra Fields&rdquo; to reveal/hide Phone and Salary fields.
-            When hidden (<code>display:none</code>), the validation engine skips them.
+            When hidden, the validation engine skips them.
             You should be able to submit with only the visible Name field filled.
         </p>
         <form id="hidden-fields-form" class="space-y-4 mb-4">
-            <div class="flex flex-col gap-1.5">
-                <label for="hf_Name" class="text-xs font-medium text-text-secondary">Name * (always visible)</label>
-                <input type="text" id="hf_Name" name="Name"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Required" />
-                <span id="err_hf_Name" class="text-xs text-red-600" hidden></span>
-            </div>
+            @{ Html.Field("Name (always visible)", true, m => m.Name, "hf_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required" })
+            ); }
             <div class="flex items-center gap-2">
-                <input type="checkbox" id="hf_toggle" class="h-4 w-4 rounded border-border text-accent" />
+                @(Html.NativeCheckBox("hf_toggle")
+                    .CssClass("h-4 w-4 rounded border-border text-accent")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.When(args, a => a.Checked).Truthy()
+                         .Then(t => { t.Element("hf_extras").Show(); })
+                         .Else(e => { e.Element("hf_extras").Hide(); });
+                    }))
                 <label for="hf_toggle" class="text-sm font-medium">Show Extra Fields</label>
             </div>
-            <div id="hf_extras" style="display:none" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="flex flex-col gap-1.5">
-                    <label for="hf_Phone" class="text-xs font-medium text-text-secondary">Phone (hidden by default)</label>
-                    <input type="text" id="hf_Phone" name="Phone"
-                           class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="123-456-7890" />
-                    <span id="err_hf_Phone" class="text-xs text-red-600" hidden></span>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <label for="hf_Salary" class="text-xs font-medium text-text-secondary">Salary (hidden by default)</label>
-                    <input type="number" id="hf_Salary" name="Salary"
-                           class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="0–500,000" />
-                    <span id="err_hf_Salary" class="text-xs text-red-600" hidden></span>
-                </div>
+            <div id="hf_extras" hidden class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @{ Html.Field("Phone (hidden by default)", false, m => m.Phone, "hf_", (expr, id) =>
+                    Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
+                ); }
+                @{ Html.Field("Salary (hidden by default)", false, m => m.Salary, "hf_", (expr, id) =>
+                    Html.TextBoxFor(expr, new { id, type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–500,000" })
+                ); }
             </div>
         </form>
         @(Html.NativeButton("hidden-validate-btn", "Validate Hidden Form")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mr-2")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Element("hidden-result").SetText("Checking...");
+                p.Post("/Sandbox/Validation/ValidateClient")
+                 .Validate<ValidationShowcaseValidator>("hidden-fields-form", "hf_")
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("hidden-result").SetText("All visible fields passed validation! (hidden fields skipped)");
+                        s.Element("hidden-result").AddClass("text-green-600");
+                        s.Element("hidden-result").RemoveClass("text-text-muted");
+                    }));
             }))
         @(Html.NativeButton("hidden-submit-btn", "Submit Profile")
             .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
@@ -395,6 +331,7 @@
             {
                 p.Post("/Sandbox/Validation/SaveProfile", g => g
                     .IncludeAll("hidden-fields-form"))
+                 .Validate<ValidationShowcaseValidator>("hidden-fields-form", "hf_")
                  .WhileLoading(l => l.Element("hidden-spinner").Show())
                  .Response(r => r
                     .OnSuccess(s =>
@@ -430,18 +367,12 @@
             Both errors return as standard 400 ProblemDetails and display at the correct fields.
         </p>
         <form id="db-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div class="flex flex-col gap-1.5">
-                <label for="db_Name" class="text-xs font-medium text-text-secondary">Name *</label>
-                <input type="text" id="db_Name" name="Name"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Try 'admin' to trigger DB error" />
-                <span id="err_db_Name" class="text-xs text-red-600" hidden></span>
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="db_Email" class="text-xs font-medium text-text-secondary">Email *</label>
-                <input type="text" id="db_Email" name="Email"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Try 'taken@@test.com' to trigger DB error" />
-                <span id="err_db_Email" class="text-xs text-red-600" hidden></span>
-            </div>
+            @{ Html.Field("Name", true, m => m.Name, "db_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Try 'admin' to trigger DB error" })
+            ); }
+            @{ Html.Field("Email", true, m => m.Email, "db_", (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Try 'taken@test.com' to trigger DB error" })
+            ); }
         </form>
         @(Html.NativeButton("db-save-btn", "Save with DB Check")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -449,6 +380,7 @@
             {
                 p.Post("/Sandbox/Validation/SaveWithDbCheck", g => g
                     .IncludeAll("db-form"))
+                 .Validate<ValidationShowcaseValidator>("db-form", "db_")
                  .WhileLoading(l => l.Element("db-spinner").Show())
                  .Response(r => r
                     .OnSuccess(s =>
@@ -476,16 +408,28 @@
 
     <!-- Section 9: Partial View + Server Validation -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">7. Partial View &mdash; Load Address Form &rarr; POST &rarr; Server Validate</h2>
+        <h2 class="text-base font-semibold mb-4">9. Partial View &mdash; Load Address Form &rarr; POST &rarr; Server Validate</h2>
         <p class="text-sm text-text-secondary mb-4">
             Click &ldquo;Load Address Form&rdquo; to fetch a partial view with address fields.
             Then fill/leave empty and click &ldquo;Save Address&rdquo; to validate server-side.
             Server returns 400 with dotted field names (Address.Street) that resolve to the partial&rsquo;s DOM elements.
         </p>
-        <button type="button" id="load-partial-btn"
-                class="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors">
-            Load Address Form
-        </button>
+        @(Html.NativeButton("load-partial-btn", "Load Address Form")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/Validation/AddressPartial")
+                 .WhileLoading(l => l.Element("partial-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("partial-spinner").Hide();
+                        s.Into("partial-container");
+                        s.Element("partial-status").SetText("Address form loaded");
+                        s.Element("partial-status").AddClass("text-green-600");
+                        s.Element("partial-status").RemoveClass("text-text-muted");
+                    }));
+            }))
         <div class="mt-3 space-y-3">
             <p id="partial-spinner" hidden class="text-amber-600 font-mono text-sm">Loading partial...</p>
             <p id="partial-status" class="text-text-muted font-mono text-sm">Not loaded yet</p>
@@ -524,180 +468,15 @@
         </div>
     </section>
 
-    <!-- Validation Descriptor JSON (extracted from FluentValidation) -->
-    @if (descriptor != null)
-    {
-        <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-            <h2 class="text-base font-semibold mb-4">Extracted Validation Descriptor</h2>
-            <p class="text-sm text-text-secondary mb-3">
-                This JSON was extracted from <code>ValidationShowcaseValidator</code> by <code>FluentValidationAdapter</code>.
-            </p>
-            <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code>@Html.Raw(JsonSerializer.Serialize(descriptor, jsonOpts))</code></pre>
-        </section>
-    }
-
-    <!-- Section 1 & 4 & 5: Client-side validation via inline script -->
-    <script type="application/json" id="alis-validation-descriptor" data-alis-validation>
-        @Html.Raw(JsonSerializer.Serialize(descriptor, jsonOpts))
-    </script>
-
-    <!-- Plan JSON -->
+    <!-- Plan JSON (includes validation descriptors extracted at render time) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <p class="text-sm text-text-secondary mb-3">
+            Validation rules are extracted from <code>ValidationShowcaseValidator</code> at render time via
+            <code>Validate&lt;TValidator&gt;(formId)</code> &mdash; no manual descriptor construction.
+        </p>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
     </section>
 </div>
 
 @Html.RenderPlan(plan)
-
-@section Scripts {
-    <script>
-        // Client-side validation for sections 1, 4, 5 that don't go through HTTP.
-        // Uses window.alis.forms exposed by alis-reactive.js (loaded after this script).
-        // Poll until forms API is available (alis-reactive.js is a deferred module).
-        (function waitForForms() {
-            var forms = window.alis && window.alis.forms;
-            if (!forms) { setTimeout(waitForForms, 30); return; }
-
-            var descEl = document.getElementById('alis-validation-descriptor');
-            if (!descEl) return;
-            var desc = JSON.parse(descEl.textContent);
-            if (!desc || !desc.fields) return;
-
-            // Section 1: Register the full descriptor for "all-rules-form"
-            var allRulesFields = desc.fields.filter(function(f) {
-                return ['Name','Email','Age','Phone','Salary','Password'].indexOf(f.fieldName) !== -1;
-            });
-            if (allRulesFields.length > 0) {
-                forms.register({ formId: 'all-rules-form', fields: allRulesFields });
-            }
-
-            // Section 4: Conditional form — extract just JobTitle
-            var conditionalFields = desc.fields.filter(function(f) {
-                return f.fieldName === 'JobTitle';
-            });
-            if (conditionalFields.length > 0) {
-                forms.register({ formId: 'conditional-form', fields: conditionalFields });
-            }
-
-            // Section 5: Live clearing — re-map Name/Email with live_ prefix IDs
-            var liveFields = desc.fields
-                .filter(function(f) { return f.fieldName === 'Name' || f.fieldName === 'Email'; })
-                .map(function(f) {
-                    return {
-                        fieldId: 'live_' + f.fieldId,
-                        fieldName: f.fieldName,
-                        errorId: 'err_live_' + f.fieldId,
-                        vendor: f.vendor,
-                        readExpr: f.readExpr,
-                        rules: f.rules
-                    };
-                });
-            if (liveFields.length > 0) {
-                forms.register({ formId: 'live-form', fields: liveFields });
-            }
-
-            // Section 7: Hidden fields form — register with required + regex + min/max rules
-            var hiddenFields = [
-                {
-                    fieldId: 'hf_Name', fieldName: 'Name', errorId: 'err_hf_Name',
-                    vendor: 'native', rules: [{ rule: 'required', message: 'Name is required.' }]
-                },
-                {
-                    fieldId: 'hf_Phone', fieldName: 'Phone', errorId: 'err_hf_Phone',
-                    vendor: 'native', rules: [{ rule: 'regex', message: 'Phone must match 123-456-7890.', constraint: '^\\d{3}-\\d{3}-\\d{4}$' }]
-                },
-                {
-                    fieldId: 'hf_Salary', fieldName: 'Salary', errorId: 'err_hf_Salary',
-                    vendor: 'native', rules: [
-                        { rule: 'min', message: 'Salary must be >= 0.', constraint: 0 },
-                        { rule: 'max', message: 'Salary must be <= 500000.', constraint: 500000 }
-                    ]
-                }
-            ];
-            forms.register({ formId: 'hidden-fields-form', fields: hiddenFields });
-
-            // Toggle extra fields visibility
-            var hfToggle = document.getElementById('hf_toggle');
-            var hfExtras = document.getElementById('hf_extras');
-            if (hfToggle && hfExtras) {
-                hfToggle.addEventListener('change', function() {
-                    hfExtras.style.display = hfToggle.checked ? '' : 'none';
-                });
-            }
-
-            // Wire buttons for client-side-only sections
-            var allBtn = document.getElementById('validate-all-btn');
-            if (allBtn) allBtn.addEventListener('click', function() {
-                var valid = forms.validate('all-rules-form');
-                var el = document.getElementById('all-rules-result');
-                if (el) {
-                    el.textContent = valid
-                        ? 'All fields passed client-side validation!'
-                        : 'Validation failed — see errors above';
-                    el.className = valid
-                        ? 'font-mono text-sm text-green-600'
-                        : 'font-mono text-sm text-red-600';
-                }
-            });
-
-            var condBtn = document.getElementById('conditional-validate-btn');
-            if (condBtn) condBtn.addEventListener('click', function() {
-                var valid = forms.validate('conditional-form');
-                var el = document.getElementById('conditional-result');
-                if (el) {
-                    el.textContent = valid
-                        ? 'Conditional validation passed!'
-                        : 'Validation failed — Job Title required when employed';
-                    el.className = valid
-                        ? 'font-mono text-sm text-green-600'
-                        : 'font-mono text-sm text-red-600';
-                }
-            });
-
-            // Section 7: Validate hidden form (client-side only)
-            var hiddenBtn = document.getElementById('hidden-validate-btn');
-            if (hiddenBtn) hiddenBtn.addEventListener('click', function() {
-                var valid = forms.validate('hidden-fields-form');
-                var el = document.getElementById('hidden-result');
-                if (el) {
-                    el.textContent = valid
-                        ? 'All visible fields passed validation! (hidden fields skipped)'
-                        : 'Validation failed — see errors above';
-                    el.className = valid
-                        ? 'font-mono text-sm text-green-600'
-                        : 'font-mono text-sm text-red-600';
-                }
-            });
-
-            var liveBtn = document.getElementById('live-validate-btn');
-            if (liveBtn) liveBtn.addEventListener('click', function() {
-                forms.validate('live-form');
-                var el = document.getElementById('live-result');
-                if (el) {
-                    el.textContent = 'Errors shown — now type in the fields to see live clearing';
-                    el.className = 'font-mono text-sm text-amber-600';
-                }
-            });
-
-            // Section 7: Load partial view via fetch, inject into container
-            var loadPartialBtn = document.getElementById('load-partial-btn');
-            if (loadPartialBtn) loadPartialBtn.addEventListener('click', function() {
-                var spinner = document.getElementById('partial-spinner');
-                var status = document.getElementById('partial-status');
-                var container = document.getElementById('partial-container');
-                if (spinner) spinner.removeAttribute('hidden');
-                fetch('/Sandbox/Validation/AddressPartial')
-                    .then(function(r) { return r.text(); })
-                    .then(function(html) {
-                        if (spinner) spinner.setAttribute('hidden', '');
-                        if (container) container.innerHTML = html;
-                        if (status) {
-                            status.textContent = 'Address form loaded';
-                            status.className = 'text-green-600 font-mono text-sm';
-                        }
-                    });
-            });
-        })();
-    </script>
-}

@@ -88,7 +88,6 @@ public class WhenExtractingAllRuleTypes
         foreach (var field in desc!.Fields)
         {
             Assert.That(field.FieldId, Is.EqualTo(field.FieldName.Replace(".", "_")));
-            Assert.That(field.ErrorId, Is.EqualTo("err_" + field.FieldId));
         }
     }
 }

@@ -36,7 +36,7 @@ describe("gather", () => {
     (el as any).ej2_instances = [{ value: 42 }];
 
     const items: GatherItem[] = [
-      { kind: "component", componentId: "FacilityId", vendor: "fusion", name: "FacilityId", readExpr: "el.ej2_instances[0].value" },
+      { kind: "component", componentId: "FacilityId", vendor: "fusion", name: "FacilityId", readExpr: "comp.value" },
     ];
     const result = resolveGather(items, "POST");
     expect(result.body).toEqual({ FacilityId: 42 });

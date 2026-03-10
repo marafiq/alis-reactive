@@ -13,15 +13,13 @@ namespace Alis.Reactive.Validation
         /// <summary>Model property name using dot notation (e.g. "Address.Street").</summary>
         public string FieldName { get; }
 
-        /// <summary>Error span element ID (e.g. "err_Address_Street").</summary>
-        public string ErrorId { get; }
-
         /// <summary>Component vendor: "fusion" or "native".</summary>
         public string Vendor { get; }
 
         /// <summary>
-        /// JS expression to read the field value. Null for native inputs (uses .value).
-        /// For fusion components, e.g. "ej2_instances[0].value".
+        /// Property path to read the field value. Null for native inputs (uses .value/.checked).
+        /// For fusion components: "comp.value" (resolved by evalRead via ej2_instances[0]).
+        /// For native elements: "el.value", "el.checked", etc.
         /// </summary>
         public string? ReadExpr { get; }
 
@@ -30,14 +28,12 @@ namespace Alis.Reactive.Validation
         public ValidationField(
             string fieldId,
             string fieldName,
-            string errorId,
             string vendor,
             string? readExpr,
             List<ValidationRule> rules)
         {
             FieldId = fieldId;
             FieldName = fieldName;
-            ErrorId = errorId;
             Vendor = vendor;
             ReadExpr = readExpr;
             Rules = rules;

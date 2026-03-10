@@ -1,4 +1,4 @@
-import type { BindSource, ExecContext } from "./types";
+import type { BindSource, ExecContext, Vendor } from "./types";
 import { scope } from "./trace";
 
 const log = scope("resolver");
@@ -81,6 +81,27 @@ export function resolveAs(expr: BindExpr, coerceAs: CoercionType, ctx?: ExecCont
 export function resolveToString(expr: BindExpr, ctx?: ExecContext): string {
   const raw = resolve(expr, ctx);
   return String(raw ?? "");
+}
+
+/**
+ * Reads the current value from a DOM component, vendor-agnostically.
+ * readExpr is a property path from the plan: "el.value", "el.checked", "comp.value".
+ * The vertical slice owns the expression — runtime just evaluates it.
+ */
+export function evalRead(id: string, vendor: Vendor, readExpr?: string | null): unknown {
+  const el = document.getElementById(id) as any;
+  if (!el) return undefined;
+  if (!readExpr) {
+    if (el.type === "checkbox") return el.checked;
+    return el.value;
+  }
+  const comp = vendor === "fusion" ? el.ej2_instances?.[0] : null;
+  if (readExpr.startsWith("comp.")) {
+    if (!comp) { log.warn("comp. readExpr on non-fusion element", { id, vendor }); return undefined; }
+    return comp[readExpr.substring(5)];
+  }
+  if (readExpr.startsWith("el.")) return el[readExpr.substring(3)];
+  return el.value;
 }
 
 /**

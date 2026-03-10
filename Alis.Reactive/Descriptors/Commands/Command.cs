@@ -7,6 +7,7 @@ namespace Alis.Reactive.Descriptors.Commands
     [JsonDerivedType(typeof(DispatchCommand), "dispatch")]
     [JsonDerivedType(typeof(MutateElementCommand), "mutate-element")]
     [JsonDerivedType(typeof(ValidationErrorsCommand), "validation-errors")]
+    [JsonDerivedType(typeof(IntoCommand), "into")]
     public abstract class Command
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -54,6 +55,20 @@ namespace Alis.Reactive.Descriptors.Commands
         public ValidationErrorsCommand(string formId)
         {
             FormId = formId;
+        }
+    }
+
+    /// <summary>
+    /// Injects the HTTP response body as innerHTML of the target element.
+    /// Used for loading partial views via GET requests.
+    /// </summary>
+    public sealed class IntoCommand : Command
+    {
+        public string Target { get; }
+
+        public IntoCommand(string target)
+        {
+            Target = target;
         }
     }
 }

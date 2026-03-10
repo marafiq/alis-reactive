@@ -1,30 +1,66 @@
 import type { Command, ExecContext } from "./types";
-import { showFieldErrors } from "./forms";
+import { mutateElement } from "./element";
+import { evaluateGuard, isConfirmGuard } from "./conditions";
+import { showServerErrors } from "./validation";
 import { scope } from "./trace";
 
-const log = scope("commands");
+const log = scope("command");
 
-/** Execute a list of commands synchronously — shared by pipeline.ts and http.ts. */
+/** Execute a single command with per-action When guard support. */
+export function executeCommand(cmd: Command, ctx?: ExecContext): void {
+  if (cmd.when) {
+    if (isConfirmGuard(cmd.when)) {
+      log.warn("ConfirmGuard on per-action When is not supported. Use branch-level Confirm.");
+      return;
+    }
+    if (!evaluateGuard(cmd.when, ctx)) {
+      log.trace("per-action-when-skipped", { kind: cmd.kind });
+      return;
+    }
+  }
+
+  switch (cmd.kind) {
+    case "dispatch":
+      log.trace("dispatch", { event: cmd.event, payload: cmd.payload });
+      document.dispatchEvent(new CustomEvent(cmd.event, { detail: cmd.payload ?? {} }));
+      break;
+
+    case "mutate-element":
+      log.trace("mutate-element", { target: cmd.target, jsEmit: cmd.jsEmit });
+      mutateElement(cmd, ctx);
+      break;
+
+    case "validation-errors": {
+      if (ctx?.responseBody) {
+        // Server-only validation: formId from command, no client fields needed.
+        // showServerErrors uses data-valmsg-for spans, not the field list.
+        const desc = ctx.validationDesc ?? { formId: cmd.formId, fields: [] };
+        showServerErrors(desc, ctx.responseBody);
+      }
+      break;
+    }
+
+    case "into": {
+      const container = document.getElementById(cmd.target);
+      if (container && ctx?.responseBody != null) {
+        const temp = document.createElement("div");
+        temp.innerHTML = String(ctx.responseBody);
+        container.innerHTML = "";
+        const ej = (globalThis as any).ej;
+        if (ej?.base?.append) {
+          ej.base.append(Array.from(temp.childNodes), container, true);
+        } else {
+          container.append(...Array.from(temp.childNodes));
+        }
+      }
+      break;
+    }
+  }
+}
+
+/** Execute a list of commands. */
 export function executeCommands(commands: Command[], ctx?: ExecContext): void {
   for (const cmd of commands) {
-    switch (cmd.kind) {
-      case "dispatch":
-        log.trace("dispatch", { event: cmd.event });
-        document.dispatchEvent(new CustomEvent(cmd.event, { detail: cmd.payload ?? {} }));
-        break;
-      case "mutate-element": {
-        const el = document.getElementById(cmd.target);
-        if (!el) break;
-        const val = cmd.value;
-        new Function("el", "val", cmd.jsEmit)(el, val);
-        break;
-      }
-      case "validation-errors": {
-        if (ctx?.responseBody) {
-          showFieldErrors(cmd.formId, ctx.responseBody);
-        }
-        break;
-      }
-    }
+    executeCommand(cmd, ctx);
   }
 }

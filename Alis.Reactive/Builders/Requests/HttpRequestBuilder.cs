@@ -11,9 +11,12 @@ namespace Alis.Reactive.Builders.Requests
         private string _verb = "GET";
         private string _url = "";
         private List<GatherItem>? _gather;
+        private string? _contentType;
         private List<Command>? _whileLoading;
         private ResponseBuilder<TModel>? _response;
         private ValidationDescriptor? _validation;
+        private Type? _validatorType;
+        private string? _validationPrefix;
 
         internal HttpRequestBuilder<TModel> SetVerb(string verb)
         {
@@ -46,6 +49,16 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
+        /// Sends the request body as application/json (default).
+        /// </summary>
+        public HttpRequestBuilder<TModel> AsJson() { _contentType = null; return this; }
+
+        /// <summary>
+        /// Sends the request body as multipart/form-data. Required for file uploads.
+        /// </summary>
+        public HttpRequestBuilder<TModel> AsFormData() { _contentType = "form-data"; return this; }
+
+        /// <summary>
         /// Configures commands to execute while the request is in-flight.
         /// These commands are reverted after the response arrives.
         /// </summary>
@@ -58,13 +71,40 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Registers client-side validation for this request.
+        /// Registers client-side validation from a pre-built descriptor.
         /// When present, the runtime validates the form before sending the request.
         /// If validation fails, the request is aborted.
         /// </summary>
         public HttpRequestBuilder<TModel> Validate(ValidationDescriptor validation)
         {
             _validation = validation;
+            return this;
+        }
+
+        /// <summary>
+        /// Registers client-side validation by validator type.
+        /// Rules are extracted automatically at Render() time via IValidationExtractor.
+        /// Field IDs use standard convention (property name = element ID).
+        /// </summary>
+        public HttpRequestBuilder<TModel> Validate<TValidator>(string formId)
+            where TValidator : class
+        {
+            _validatorType = typeof(TValidator);
+            _validation = new ValidationDescriptor(formId, new List<ValidationField>());
+            return this;
+        }
+
+        /// <summary>
+        /// Registers client-side validation by validator type with a field ID prefix.
+        /// Rules are extracted at Render() time, then remapped via WithPrefix.
+        /// Use when form field IDs have a prefix (e.g. "cmb_Name" instead of "Name").
+        /// </summary>
+        public HttpRequestBuilder<TModel> Validate<TValidator>(string formId, string prefix)
+            where TValidator : class
+        {
+            _validatorType = typeof(TValidator);
+            _validationPrefix = prefix;
+            _validation = new ValidationDescriptor(formId, new List<ValidationField>());
             return this;
         }
 
@@ -81,15 +121,24 @@ namespace Alis.Reactive.Builders.Requests
 
         internal RequestDescriptor BuildRequestDescriptor()
         {
-            return new RequestDescriptor(
+            var desc = new RequestDescriptor(
                 _verb,
                 _url,
                 _gather,
+                _contentType,
                 _whileLoading,
                 _response?.SuccessHandlers.Count > 0 ? _response.SuccessHandlers : null,
                 _response?.ErrorHandlers.Count > 0 ? _response.ErrorHandlers : null,
                 _response?.ChainedRequest,
                 _validation);
+
+            if (_validatorType != null)
+            {
+                desc.ValidatorType = _validatorType;
+                desc.ValidationPrefix = _validationPrefix;
+            }
+
+            return desc;
         }
     }
 }

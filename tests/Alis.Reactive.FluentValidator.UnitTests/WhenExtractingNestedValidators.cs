@@ -29,16 +29,6 @@ public class WhenExtractingNestedValidators
     }
 
     [Test]
-    public void Nested_error_ids_use_err_prefix()
-    {
-        var desc = _adapter.ExtractRules(typeof(NestedValidator), "testForm");
-
-        Assert.That(desc, Is.Not.Null);
-        var streetField = desc!.Fields.First(f => f.FieldName == "Address.Street");
-        Assert.That(streetField.ErrorId, Is.EqualTo("err_Address_Street"));
-    }
-
-    [Test]
     public void Deeply_nested_produces_correct_paths()
     {
         var desc = _adapter.ExtractRules(typeof(DeeplyNestedValidator), "testForm");
@@ -50,6 +40,5 @@ public class WhenExtractingNestedValidators
 
         var codeField = desc.Fields.First(f => f.FieldName == "DeepAddress.Country.Code");
         Assert.That(codeField.FieldId, Is.EqualTo("DeepAddress_Country_Code"));
-        Assert.That(codeField.ErrorId, Is.EqualTo("err_DeepAddress_Country_Code"));
     }
 }
