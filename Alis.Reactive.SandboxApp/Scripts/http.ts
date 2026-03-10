@@ -51,17 +51,14 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     const response = await fetch(url, init);
 
     // 5. Route response — thread response body for both success (Into) and error (validation errors)
+    const body = await readResponseBody(response);
     if (response.ok) {
-      let successBody: unknown;
-      try { successBody = await response.text(); } catch { /* no body */ }
-      const successCtx = successBody != null ? { ...ctx, responseBody: successBody } : ctx;
+      const successCtx = body != null ? { ...ctx, responseBody: body } : ctx;
       routeHandlers(req.onSuccess, response.status, successCtx);
     } else {
-      let errorBody: unknown;
-      try { errorBody = await response.json(); } catch { /* no JSON body */ }
       const errorCtx: ExecContext = {
         ...ctx,
-        responseBody: errorBody ?? undefined,
+        responseBody: body ?? undefined,
         validationDesc: req.validation,
       };
       routeHandlers(req.onError, response.status, errorCtx);
@@ -76,6 +73,14 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     // Route to catch-all error handler if available
     routeHandlers(req.onError, 0, ctx);
   }
+}
+
+async function readResponseBody(response: Response): Promise<unknown> {
+  const ct = response.headers.get("Content-Type") ?? "";
+  if (ct.includes("application/json")) return response.json();
+  if (ct.includes("text/")) return response.text();
+  if (ct.includes("html")) return response.text();
+  return null;
 }
 
 function routeHandlers(handlers: StatusHandler[] | undefined, status: number, ctx?: ExecContext): void {

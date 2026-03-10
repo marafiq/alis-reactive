@@ -15,11 +15,8 @@ export function evaluateGuard(guard: Guard, ctx?: ExecContext): boolean {
     case "not":
       return !evaluateGuard(guard.inner, ctx);
     case "confirm":
-      // Sync evaluation — confirm is inherently async.
-      // In sync context, treat as true (pipeline proceeds).
-      // Use evaluateGuardAsync for proper confirm handling.
-      log.warn("ConfirmGuard evaluated synchronously — use evaluateGuardAsync for dialogs");
-      return true;
+      log.warn("ConfirmGuard in sync context — denying (callers should use async path)");
+      return false;
     default:
       throw new Error(`Unknown guard kind: ${(guard as any).kind}`);
   }
@@ -129,6 +126,7 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
       try {
         return new RegExp(String(operand)).test(String(resolved ?? ""));
       } catch {
+        log.warn("invalid guard regex", { operand });
         return false;
       }
     }

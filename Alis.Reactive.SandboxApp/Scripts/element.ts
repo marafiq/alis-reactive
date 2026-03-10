@@ -13,5 +13,5 @@ export function mutateElement(cmd: MutateElementCommand, ctx?: ExecContext): voi
 
   const val = cmd.source ? resolveToString(cmd.source, ctx) : cmd.value;
   log.trace("exec", { target: cmd.target, jsEmit: cmd.jsEmit, val });
-  new Function("el", "val", cmd.jsEmit)(el, val);
+  new Function("el", "val", cmd.jsEmit).call(null, el, val);
 }

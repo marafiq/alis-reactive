@@ -4,7 +4,7 @@ import { executeCommand } from "./commands";
 import { evaluateGuard, evaluateGuardAsync, isConfirmGuard } from "./conditions";
 import { executeHttpReaction, executeParallelHttpReaction } from "./pipeline";
 
-const log = scope("command");
+const log = scope("execute");
 
 export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
   switch (reaction.kind) {
@@ -51,7 +51,7 @@ export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
  * Async execution path — only invoked when branches contain ConfirmGuard.
  * Zero overhead for non-confirm paths (never called).
  */
-export async function executeReactionAsync(reaction: Reaction, ctx?: ExecContext): Promise<void> {
+async function executeReactionAsync(reaction: Reaction, ctx?: ExecContext): Promise<void> {
   switch (reaction.kind) {
     case "sequential":
       for (const cmd of reaction.commands) {
