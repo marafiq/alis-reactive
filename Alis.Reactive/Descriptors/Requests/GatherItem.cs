@@ -28,11 +28,18 @@ namespace Alis.Reactive.Descriptors.Requests
 
     public sealed class AllGather : GatherItem
     {
-        public string FormId { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? FormId { get; }
 
         public AllGather(string formId)
         {
             FormId = formId;
+        }
+
+        /// <summary>Plan-driven marker — expanded at render time into explicit ComponentGather items.</summary>
+        internal AllGather()
+        {
+            FormId = null;
         }
     }
 

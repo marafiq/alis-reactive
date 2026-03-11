@@ -4,6 +4,7 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.Internal;
 using FluentValidation.Validators;
+using Alis.Reactive;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
@@ -25,6 +26,9 @@ namespace Alis.Reactive.FluentValidator
             var validator = Activator.CreateInstance(validatorType) as IValidator;
             if (validator == null) return null;
 
+            var modelType = GetModelType(validatorType);
+            var scope = modelType != null ? IdGenerator.TypeScope(modelType) + "__" : "";
+
             // Intermediate: property path → ordered list of (ruleType, message, constraint)
             var fieldRules = new Dictionary<string, List<ExtractedRule>>();
 
@@ -35,7 +39,7 @@ namespace Alis.Reactive.FluentValidator
             foreach (var kvp in fieldRules)
             {
                 var propertyPath = kvp.Key;
-                var elementId = propertyPath.Replace(".", "_");
+                var elementId = scope + propertyPath.Replace(".", "_");
 
                 var rules = new List<ValidationRule>();
                 foreach (var er in kvp.Value)
@@ -56,11 +60,11 @@ namespace Alis.Reactive.FluentValidator
             {
                 foreach (var cr in provider.GetConditionalRules())
                 {
-                    var field = FindOrCreateField(fields, cr.PropertyName);
+                    var field = FindOrCreateField(fields, cr.PropertyName, scope);
                     field.Rules.Add(new ValidationRule(cr.Rule, cr.Message, cr.Constraint, cr.When));
 
                     // Ensure condition source field is in the descriptor (no rules, but needed for value reading)
-                    FindOrCreateField(fields, cr.When.Field);
+                    FindOrCreateField(fields, cr.When.Field, scope);
                 }
             }
 
@@ -69,14 +73,14 @@ namespace Alis.Reactive.FluentValidator
             return new ValidationDescriptor(formId, fields);
         }
 
-        private static ValidationField FindOrCreateField(List<ValidationField> fields, string propertyName)
+        private static ValidationField FindOrCreateField(List<ValidationField> fields, string propertyName, string scope)
         {
             foreach (var f in fields)
             {
                 if (f.FieldName == propertyName) return f;
             }
 
-            var elementId = propertyName.Replace(".", "_");
+            var elementId = scope + propertyName.Replace(".", "_");
             var field = new ValidationField(
                 elementId,
                 propertyName,
@@ -85,6 +89,18 @@ namespace Alis.Reactive.FluentValidator
                 new List<ValidationRule>());
             fields.Add(field);
             return field;
+        }
+
+        private static Type? GetModelType(Type validatorType)
+        {
+            var type = validatorType;
+            while (type != null)
+            {
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(AbstractValidator<>))
+                    return type.GetGenericArguments()[0];
+                type = type.BaseType;
+            }
+            return null;
         }
 
         private static void ExtractFromValidator(

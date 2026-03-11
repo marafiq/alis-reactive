@@ -11,6 +11,7 @@ namespace Alis.Reactive
     public interface IReactivePlan<TModel> where TModel : class
     {
         void AddEntry(Entry entry);
+        void RegisterComponent(string componentId, string vendor, string bindingPath, string readExpr);
         string Render();
         string RenderFormatted();
     }
@@ -31,6 +32,7 @@ namespace Alis.Reactive
         };
 
         private readonly List<Entry> _entries = new List<Entry>();
+        private readonly List<ComponentRegistration> _components = new List<ComponentRegistration>();
         private readonly IValidationExtractor? _extractor;
 
         public ReactivePlan() : this(null) { }
@@ -45,16 +47,77 @@ namespace Alis.Reactive
             _entries.Add(entry);
         }
 
+        public void RegisterComponent(string componentId, string vendor, string bindingPath, string readExpr)
+        {
+            _components.Add(new ComponentRegistration(componentId, vendor, bindingPath, readExpr));
+        }
+
         public string Render()
         {
+            ResolveAllGather();
             ResolveAllValidation();
             return JsonSerializer.Serialize(new { entries = _entries }, CompactOptions);
         }
 
         public string RenderFormatted()
         {
+            ResolveAllGather();
             ResolveAllValidation();
             return JsonSerializer.Serialize(new { entries = _entries }, FormattedOptions);
+        }
+
+        private void ResolveAllGather()
+        {
+            foreach (var entry in _entries)
+            {
+                ResolveGatherInReaction(entry.Reaction);
+            }
+        }
+
+        private void ResolveGatherInReaction(Reaction reaction)
+        {
+            switch (reaction)
+            {
+                case HttpReaction hr:
+                    ResolveGatherInRequest(hr.Request);
+                    break;
+                case ParallelHttpReaction phr:
+                    foreach (var req in phr.Requests)
+                        ResolveGatherInRequest(req);
+                    break;
+                case ConditionalReaction cr:
+                    foreach (var branch in cr.Branches)
+                        ResolveGatherInReaction(branch.Reaction);
+                    break;
+            }
+        }
+
+        private void ResolveGatherInRequest(RequestDescriptor req)
+        {
+            if (req.Gather != null)
+            {
+                var expanded = new List<GatherItem>();
+                foreach (var item in req.Gather)
+                {
+                    if (item is AllGather ag && ag.FormId == null)
+                    {
+                        foreach (var c in _components)
+                        {
+                            expanded.Add(new ComponentGather(c.ComponentId, c.Vendor, c.BindingPath, c.ReadExpr));
+                        }
+                    }
+                    else
+                    {
+                        expanded.Add(item);
+                    }
+                }
+                req.Gather = expanded;
+            }
+
+            if (req.Chained != null)
+            {
+                ResolveGatherInRequest(req.Chained);
+            }
         }
 
         private void ResolveAllValidation()
@@ -93,10 +156,6 @@ namespace Alis.Reactive
                 var extracted = _extractor!.ExtractRules(req.ValidatorType, formId);
                 if (extracted != null)
                 {
-                    if (!string.IsNullOrEmpty(req.ValidationPrefix))
-                    {
-                        extracted = extracted.WithPrefix(formId, req.ValidationPrefix);
-                    }
                     req.Validation = extracted;
                 }
             }
@@ -113,6 +172,22 @@ namespace Alis.Reactive
             {
                 ResolveRequest(req.Chained);
             }
+        }
+    }
+
+    public sealed class ComponentRegistration
+    {
+        public string ComponentId { get; }
+        public string Vendor { get; }
+        public string BindingPath { get; }
+        public string ReadExpr { get; }
+
+        public ComponentRegistration(string componentId, string vendor, string bindingPath, string readExpr)
+        {
+            ComponentId = componentId;
+            Vendor = vendor;
+            BindingPath = bindingPath;
+            ReadExpr = readExpr;
         }
     }
 }

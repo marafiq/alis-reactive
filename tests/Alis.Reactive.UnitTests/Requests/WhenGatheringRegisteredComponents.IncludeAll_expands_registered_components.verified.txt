@@ -1,0 +1,44 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/save,
+          gather: [
+            {
+              kind: component,
+              componentId: comp1,
+              vendor: native,
+              name: Name,
+              readExpr: value
+            },
+            {
+              kind: component,
+              componentId: comp2,
+              vendor: fusion,
+              name: Amount,
+              readExpr: value
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: saved
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

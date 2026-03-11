@@ -27,6 +27,16 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
+        /// Gathers all registered components. Expanded at render time into explicit
+        /// ComponentGather items from the plan's component registry.
+        /// </summary>
+        public GatherBuilder<TModel> IncludeAll()
+        {
+            Items.Add(new AllGather());
+            return this;
+        }
+
+        /// <summary>
         /// Adds a static key/value pair to the request.
         /// </summary>
         public GatherBuilder<TModel> Static(string param, object value)

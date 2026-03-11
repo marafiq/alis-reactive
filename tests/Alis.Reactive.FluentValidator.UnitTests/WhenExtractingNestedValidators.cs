@@ -1,3 +1,5 @@
+using Alis.Reactive;
+
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
@@ -25,7 +27,8 @@ public class WhenExtractingNestedValidators
 
         Assert.That(desc, Is.Not.Null);
         var streetField = desc!.Fields.First(f => f.FieldName == "Address.Street");
-        Assert.That(streetField.FieldId, Is.EqualTo("Address_Street"));
+        var scope = IdGenerator.TypeScope(typeof(TestModel));
+        Assert.That(streetField.FieldId, Is.EqualTo(scope + "__Address_Street"));
     }
 
     [Test]
@@ -39,6 +42,7 @@ public class WhenExtractingNestedValidators
         Assert.That(fieldNames, Does.Contain("DeepAddress.Country.Code"));
 
         var codeField = desc.Fields.First(f => f.FieldName == "DeepAddress.Country.Code");
-        Assert.That(codeField.FieldId, Is.EqualTo("DeepAddress_Country_Code"));
+        var scope = IdGenerator.TypeScope(typeof(TestModel));
+        Assert.That(codeField.FieldId, Is.EqualTo(scope + "__DeepAddress_Country_Code"));
     }
 }

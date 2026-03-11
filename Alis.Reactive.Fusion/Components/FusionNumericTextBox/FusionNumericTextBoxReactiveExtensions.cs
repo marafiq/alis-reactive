@@ -38,6 +38,10 @@ namespace Alis.Reactive.Fusion.Components
             var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
+            if (bindingPath != null)
+            {
+                plan.RegisterComponent(componentId, "fusion", bindingPath, ComponentHelper.GetReadExpr<FusionNumericTextBox>());
+            }
 
             return builder;
         }

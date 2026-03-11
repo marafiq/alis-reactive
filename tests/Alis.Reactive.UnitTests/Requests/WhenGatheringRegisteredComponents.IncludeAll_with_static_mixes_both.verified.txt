@@ -1,0 +1,42 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/save,
+          gather: [
+            {
+              kind: static,
+              param: extra,
+              value: fixed
+            },
+            {
+              kind: component,
+              componentId: comp1,
+              vendor: native,
+              name: Status,
+              readExpr: value
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: saved
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

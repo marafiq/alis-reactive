@@ -36,6 +36,7 @@ namespace Alis.Reactive.Native.Components
             var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, "native", builder.BindingPath);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
+            plan.RegisterComponent(builder.ElementId, "native", builder.BindingPath, ComponentHelper.GetReadExpr<NativeDropDown>());
 
             return builder;
         }

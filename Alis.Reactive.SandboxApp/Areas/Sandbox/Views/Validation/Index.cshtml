@@ -213,7 +213,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/Validation/ValidateClient")
-                 .Validate<ValidationShowcaseValidator>("live-form", "live_")
+                 .Validate<ValidationShowcaseValidator>("live-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
@@ -254,7 +254,7 @@
             {
                 p.Post("/Sandbox/Validation/Save", g => g
                     .IncludeAll("combined-form"))
-                 .Validate<ValidationShowcaseValidator>("combined-form", "cmb_")
+                 .Validate<ValidationShowcaseValidator>("combined-form")
                  .WhileLoading(l => l.Element("combined-spinner").Show())
                  .Response(r => r
                     .OnSuccess(s =>
@@ -317,7 +317,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/Validation/ValidateClient")
-                 .Validate<ValidationShowcaseValidator>("hidden-fields-form", "hf_")
+                 .Validate<ValidationShowcaseValidator>("hidden-fields-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
@@ -332,7 +332,7 @@
             {
                 p.Post("/Sandbox/Validation/SaveProfile", g => g
                     .IncludeAll("hidden-fields-form"))
-                 .Validate<ValidationShowcaseValidator>("hidden-fields-form", "hf_")
+                 .Validate<ValidationShowcaseValidator>("hidden-fields-form")
                  .WhileLoading(l => l.Element("hidden-spinner").Show())
                  .Response(r => r
                     .OnSuccess(s =>
@@ -381,7 +381,7 @@
             {
                 p.Post("/Sandbox/Validation/SaveWithDbCheck", g => g
                     .IncludeAll("db-form"))
-                 .Validate<ValidationShowcaseValidator>("db-form", "db_")
+                 .Validate<ValidationShowcaseValidator>("db-form")
                  .WhileLoading(l => l.Element("db-spinner").Show())
                  .Response(r => r
                     .OnSuccess(s =>

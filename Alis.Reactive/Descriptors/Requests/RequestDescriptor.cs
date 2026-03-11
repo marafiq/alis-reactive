@@ -34,7 +34,7 @@ namespace Alis.Reactive.Descriptors.Requests
         public string Url { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<GatherItem>? Gather { get; }
+        public List<GatherItem>? Gather { get; internal set; }
 
         /// <summary>
         /// Request body format: "json" (default) or "form-data" (multipart/form-data for file uploads).
@@ -60,9 +60,6 @@ namespace Alis.Reactive.Descriptors.Requests
 
         [JsonIgnore]
         internal Type? ValidatorType { get; set; }
-
-        [JsonIgnore]
-        internal string? ValidationPrefix { get; set; }
 
         [JsonIgnore]
         internal Dictionary<string, string>? ReadExprOverrides { get; set; }

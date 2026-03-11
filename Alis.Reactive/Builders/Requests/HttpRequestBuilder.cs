@@ -16,7 +16,6 @@ namespace Alis.Reactive.Builders.Requests
         private ResponseBuilder<TModel>? _response;
         private ValidationDescriptor? _validation;
         private Type? _validatorType;
-        private string? _validationPrefix;
         private Dictionary<string, string>? _readExprOverrides;
 
         internal HttpRequestBuilder<TModel> SetVerb(string verb)
@@ -96,20 +95,6 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Registers client-side validation by validator type with a field ID prefix.
-        /// Rules are extracted at Render() time, then remapped via WithPrefix.
-        /// Use when form field IDs have a prefix (e.g. "cmb_Name" instead of "Name").
-        /// </summary>
-        public HttpRequestBuilder<TModel> Validate<TValidator>(string formId, string prefix)
-            where TValidator : class
-        {
-            _validatorType = typeof(TValidator);
-            _validationPrefix = prefix;
-            _validation = new ValidationDescriptor(formId, new List<ValidationField>());
-            return this;
-        }
-
-        /// <summary>
         /// Overrides readExpr for a specific validation field.
         /// Use when a field needs a non-default readExpr (e.g. checkboxes use "checked" instead of "value").
         /// </summary>
@@ -148,7 +133,6 @@ namespace Alis.Reactive.Builders.Requests
             if (_validatorType != null)
             {
                 desc.ValidatorType = _validatorType;
-                desc.ValidationPrefix = _validationPrefix;
             }
 
             if (_readExprOverrides != null)

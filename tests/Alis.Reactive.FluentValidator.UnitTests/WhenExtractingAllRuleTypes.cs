@@ -1,3 +1,5 @@
+using Alis.Reactive;
+
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
@@ -87,7 +89,8 @@ public class WhenExtractingAllRuleTypes
 
         foreach (var field in desc!.Fields)
         {
-            Assert.That(field.FieldId, Is.EqualTo(field.FieldName.Replace(".", "_")));
+            var scope = IdGenerator.TypeScope(typeof(TestModel));
+            Assert.That(field.FieldId, Is.EqualTo(scope + "__" + field.FieldName.Replace(".", "_")));
         }
     }
 }
