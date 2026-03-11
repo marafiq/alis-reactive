@@ -66,7 +66,7 @@ export interface ComponentGather {
   componentId: string;
   vendor: Vendor;
   name: string;
-  readExpr?: string;
+  readExpr: string;
 }
 
 export interface AllGather {
@@ -206,7 +206,7 @@ export interface ValidationField {
   fieldId: string;
   fieldName: string;
   vendor: Vendor;
-  readExpr?: string;
+  readExpr: string;
   rules: ValidationRule[];
 }
 

@@ -13,7 +13,7 @@ import type {
   ValidationRule,
   ValidationCondition,
 } from "./types";
-import { evalRead } from "./resolver";
+import { evalRead } from "./component";
 import { scope } from "./trace";
 
 const log = scope("validation");

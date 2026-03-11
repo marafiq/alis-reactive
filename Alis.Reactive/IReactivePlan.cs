@@ -101,6 +101,14 @@ namespace Alis.Reactive
                 }
             }
 
+            if (req.ReadExprOverrides != null && req.Validation != null)
+            {
+                foreach (var kvp in req.ReadExprOverrides)
+                {
+                    req.Validation = req.Validation.WithReadExpr(kvp.Key, kvp.Value);
+                }
+            }
+
             if (req.Chained != null)
             {
                 ResolveRequest(req.Chained);

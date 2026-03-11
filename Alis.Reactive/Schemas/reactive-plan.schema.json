@@ -50,7 +50,7 @@
     "Vendor": {
       "type": "string",
       "enum": ["fusion", "native"],
-      "description": "Component vendor — determines how the runtime resolves and wires the component"
+      "description": "Component vendor — determines the root object for all component interactions. native→el (DOM element), fusion→el.ej2_instances[0] (Syncfusion instance). Used by reads (readExpr), events (addEventListener), and writes (jsEmit embeds root access)."
     },
     "ComponentEventTrigger": {
       "type": "object",
@@ -259,14 +259,14 @@
     },
     "ComponentGather": {
       "type": "object",
-      "required": ["kind", "componentId", "vendor", "name"],
+      "required": ["kind", "componentId", "vendor", "name", "readExpr"],
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "component" },
         "componentId": { "type": "string", "minLength": 1, "description": "DOM element ID of the component" },
         "vendor": { "$ref": "#/$defs/Vendor" },
         "name": { "type": "string", "minLength": 1, "description": "Property name for the gathered value in the request body" },
-        "readExpr": { "type": "string", "minLength": 1, "description": "Property path to read the value. Prefixes: el. (DOM element), comp. (vendor component instance). E.g. comp.value, el.checked" }
+        "readExpr": { "type": "string", "minLength": 1, "description": "Property path from vendor-determined root. Vendor resolves root (native→el, fusion→ej2_instances[0]), then readExpr is walked from that root. Examples: 'checked', 'value'" }
       }
     },
     "AllGather": {
@@ -419,13 +419,13 @@
     },
     "ValidationField": {
       "type": "object",
-      "required": ["fieldId", "fieldName", "vendor", "rules"],
+      "required": ["fieldId", "fieldName", "vendor", "readExpr", "rules"],
       "additionalProperties": false,
       "properties": {
         "fieldId": { "type": "string", "minLength": 1, "description": "DOM element ID" },
         "fieldName": { "type": "string", "minLength": 1, "description": "Model property name (dot notation)" },
         "vendor": { "$ref": "#/$defs/Vendor" },
-        "readExpr": { "type": "string", "minLength": 1, "description": "Property path to read the field value. Prefixes: el. (DOM element), comp. (vendor component instance). Null for native inputs (uses .value/.checked)." },
+        "readExpr": { "type": "string", "minLength": 1, "description": "Property path from vendor-determined root. Vendor resolves root (native→el, fusion→ej2_instances[0]), then readExpr is walked from that root. Examples: 'value', 'checked'" },
         "rules": {
           "type": "array",
           "items": { "$ref": "#/$defs/ValidationRule" }

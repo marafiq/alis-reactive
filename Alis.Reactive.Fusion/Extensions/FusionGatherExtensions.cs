@@ -7,19 +7,20 @@ namespace Alis.Reactive.Fusion.Extensions
 {
     /// <summary>
     /// Adds Include&lt;TComponent&gt;() to GatherBuilder for Syncfusion components.
-    /// Vendor = "fusion", readExpr = "comp.value" (resolved by evalRead via ej2_instances[0]).
+    /// Vendor = "fusion", readExpr resolved from [ReadExpr] attribute on TComponent.
+    /// Vendor determines root (ej2_instances[0]), readExpr walks from that root.
     /// </summary>
     public static class FusionGatherExtensions
     {
         /// <summary>
         /// Gathers the value of a Fusion component bound to a model property.
-        /// The component is identified by the model expression (m => m.FacilityId)
-        /// and the value is read via evalRead: comp.value → ej2_instances[0].value.
+        /// The component is identified by the model expression (m => m.FacilityId).
+        /// ReadExpr is resolved from the component type's [ReadExpr] attribute.
         /// </summary>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             Expression<Func<TModel, object?>> expr)
-            where TComponent : FusionComponent
+            where TComponent : FusionComponent, IReadableComponent
             where TModel : class
         {
             var elementId = ExpressionPathHelper.ToElementId(expr);
@@ -28,7 +29,7 @@ namespace Alis.Reactive.Fusion.Extensions
                 elementId,
                 "fusion",
                 propertyName,
-                "comp.value"));
+                ComponentHelper.GetReadExpr<TComponent>()));
             return self;
         }
 
@@ -40,14 +41,14 @@ namespace Alis.Reactive.Fusion.Extensions
             this GatherBuilder<TModel> self,
             string refId,
             string name)
-            where TComponent : FusionComponent
+            where TComponent : FusionComponent, IReadableComponent
             where TModel : class
         {
             self.AddItem(new ComponentGather(
                 refId,
                 "fusion",
                 name,
-                "comp.value"));
+                ComponentHelper.GetReadExpr<TComponent>()));
             return self;
         }
     }

@@ -180,6 +180,7 @@
             {
                 p.Post("/Sandbox/Validation/ValidateClient")
                  .Validate<ValidationShowcaseValidator>("conditional-form")
+                 .ReadExpr("IsEmployed", "checked")
                  .Response(r => r
                     .OnSuccess(s =>
                     {

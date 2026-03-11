@@ -17,6 +17,7 @@ namespace Alis.Reactive.Builders.Requests
         private ValidationDescriptor? _validation;
         private Type? _validatorType;
         private string? _validationPrefix;
+        private Dictionary<string, string>? _readExprOverrides;
 
         internal HttpRequestBuilder<TModel> SetVerb(string verb)
         {
@@ -109,6 +110,18 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
+        /// Overrides readExpr for a specific validation field.
+        /// Use when a field needs a non-default readExpr (e.g. checkboxes use "checked" instead of "value").
+        /// </summary>
+        public HttpRequestBuilder<TModel> ReadExpr(string fieldName, string readExpr)
+        {
+            if (_readExprOverrides == null)
+                _readExprOverrides = new Dictionary<string, string>();
+            _readExprOverrides[fieldName] = readExpr;
+            return this;
+        }
+
+        /// <summary>
         /// Configures success/error response handlers.
         /// </summary>
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> configure)
@@ -136,6 +149,11 @@ namespace Alis.Reactive.Builders.Requests
             {
                 desc.ValidatorType = _validatorType;
                 desc.ValidationPrefix = _validationPrefix;
+            }
+
+            if (_readExprOverrides != null)
+            {
+                desc.ReadExprOverrides = _readExprOverrides;
             }
 
             return desc;

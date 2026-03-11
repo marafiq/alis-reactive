@@ -1,4 +1,5 @@
-import type { BindSource, ExecContext, Vendor } from "./types";
+import type { BindSource, ExecContext } from "./types";
+import { walk } from "./walk";
 import { scope } from "./trace";
 
 const log = scope("resolver");
@@ -34,20 +35,13 @@ export function resolveSource(source: BindSource, ctx?: ExecContext): unknown {
 
 /**
  * Event path resolution — walks dot-notation path against execution context.
+ * Uses walk() from walk.ts (shared primitive).
  */
 export function resolveEventPath(path: string, ctx?: ExecContext): unknown {
   if (!ctx) return undefined;
-
-  const parts = path.split(".");
-  let current: unknown = ctx;
-
-  for (const part of parts) {
-    if (current == null || typeof current !== "object") return undefined;
-    current = (current as Record<string, unknown>)[part];
-  }
-
-  log.trace("resolve", { path, value: current });
-  return current;
+  const result = walk(ctx, path);
+  log.trace("resolve", { path, value: result });
+  return result;
 }
 
 /**
@@ -84,34 +78,13 @@ export function resolveToString(expr: BindExpr, ctx?: ExecContext): string {
 }
 
 /**
- * Reads the current value from a DOM component, vendor-agnostically.
- * readExpr is a property path from the plan: "el.value", "el.checked", "comp.value".
- * The vertical slice owns the expression — runtime just evaluates it.
- */
-export function evalRead(id: string, vendor: Vendor, readExpr?: string | null): unknown {
-  const el = document.getElementById(id) as any;
-  if (!el) return undefined;
-  if (!readExpr) {
-    if (el.type === "checkbox") return el.checked;
-    return el.value;
-  }
-  const comp = vendor === "fusion" ? el.ej2_instances?.[0] : null;
-  if (readExpr.startsWith("comp.")) {
-    if (!comp) { log.warn("comp. readExpr on non-fusion element", { id, vendor }); return undefined; }
-    return comp[readExpr.substring(5)];
-  }
-  if (readExpr.startsWith("el.")) return el[readExpr.substring(3)];
-  return el.value;
-}
-
-/**
  * Coerces a raw value to the specified type.
  *
  * | CoercionType | Behavior |
  * |-------------|----------|
- * | "string"    | String(value), null/undefined → "" |
- * | "number"    | Number(value), NaN → 0 |
- * | "boolean"   | truthy check, "false"/"0"/"" → false |
+ * | "string"    | String(value), null/undefined -> "" |
+ * | "number"    | Number(value), NaN -> 0 |
+ * | "boolean"   | truthy check, "false"/"0"/"" -> false |
  * | "raw"       | no coercion, return as-is |
  */
 export function coerce(value: unknown, coerceAs: CoercionType): unknown {

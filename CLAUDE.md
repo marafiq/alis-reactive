@@ -323,7 +323,91 @@ Each runtime module (`element.ts`, `trigger.ts`, `execute.ts`) is a self-contain
 Each C# builder (`ElementBuilder`, `PipelineBuilder`, `TriggerBuilder`) is a self-contained unit.
 No shared base classes for behavior. Duplication between slices is intentional.
 
-### 7. ESM Only + Cache Busting
+### 7. Component Architecture (3 Foundational Modules — Never Violate)
+
+Every component interaction flows through three TS runtime modules. No module reinvents
+vendor-specific behavior. No module writes `ej2_instances` inline. Adding a new component
+type requires ZERO runtime changes — only a new C# vertical slice with `IReadableComponent`.
+
+#### walk.ts — Dot-Path Walking (Framework Fundamental)
+
+Pure utility. Zero side effects, zero DOM, zero vendor knowledge.
+
+`walk(root, "a.b.c")` → `root.a.b.c`
+
+| C# Expression | ExpressionPathHelper | Runtime |
+|----------------|---------------------|---------|
+| `x => x.Address.Street` | `"evt.address.street"` | `walk(ctx, "evt.address.street")` |
+| `IReadableComponent.ReadExpr` | `"value"` / `"checked"` | `walk(root, "value")` |
+
+**Right side vs Left side:**
+- **Right side (source):** walk ANY object (event, response, etc.) — vendor-agnostic → `walk.ts`
+- **Left side (target):** component interaction — vendor-AWARE (resolveRoot) → `component.ts`
+- walk feeds `val` into jsEmit — works for property assignment AND method calls with arguments
+
+#### component.ts — Vendor Root Resolution
+
+Single source of truth for vendor → root. The ONLY module that knows about `ej2_instances`.
+
+| Vendor | Root | readExpr example |
+|--------|------|------------------|
+| `native` | `el` (DOM element) | "value" → el.value, "checked" → el.checked |
+| `fusion` | `el.ej2_instances[0]` (SF instance) | "value" → ej2.value |
+
+Exports: `resolveRoot(el, vendor)`, `evalRead(id, vendor, readExpr)`
+Used by: `gather.ts`, `validation.ts`, `trigger.ts`
+
+#### resolver.ts — BindExpr / Source Resolution
+
+Walks event payload paths (`evt.address.city`) against ExecContext using `walk()`.
+Separate from component.ts — different root (ExecContext vs DOM element).
+
+#### How all interactions flow through the modules
+
+| Interaction | C# vertical slice owns | Runtime module | Pattern |
+|-------------|----------------------|----------------|---------|
+| Property read | vendor + readExpr | component.ts | resolveRoot + walk(readExpr) |
+| Property write | jsEmit expression | element.ts | new Function("el","val",jsEmit) |
+| Method call (void) | jsEmit expression | element.ts | new Function("el","val",jsEmit) |
+| Method call (args) | jsEmit + source | element.ts + resolver.ts | walk(ctx, source) → val → jsEmit |
+| Event wiring | vendor + jsEvent | trigger.ts | resolveRoot + .addEventListener() |
+| Source binding | BindExpr path | resolver.ts | walk(ctx, "evt.value") |
+
+#### "Value" is a singular concept
+
+Read and write are two sides of the same property:
+- NativeCheckBox: reads `el.checked` (readExpr), writes `el.checked=val` (jsEmit)
+- FusionNumericTextBox: reads `ej2.value` (readExpr), writes `ej2.value=val; dataBind()` (jsEmit)
+
+#### The Cardinal Rule: Plan carries ALL behavior. Runtime NEVER invents.
+
+- No `if (el.type === "checkbox")` heuristics in runtime
+- No `readExpr.startsWith("comp.")` prefix conventions
+- No fallback defaults — every component explicitly declares readExpr
+- New component = new C# vertical slice with `IReadableComponent`. Zero TS changes.
+- `component.ts` is the ONLY module with `ej2_instances` — zero vendor logic elsewhere
+
+#### Adding a New Component Type (Zero Runtime Changes)
+
+1. C# sealed class implementing `IComponent` + `IReadableComponent` (declares ReadExpr)
+2. Event args class (typed payload properties)
+3. Events singleton (TypedEventDescriptor registry)
+4. Extensions (jsEmit expressions for property writes, method calls, read expressions)
+5. Builder (IHtmlContent, renders HTML)
+6. Reactive extension (.Reactive() creates ComponentEventTrigger)
+7. Gather extension (uses TComponent.ReadExpr)
+8. Tests at all 3 layers
+
+The runtime does NOT change. The plan JSON carries vendor, readExpr, jsEmit, jsEvent.
+The runtime resolves root, walks paths, and executes jsEmit. That's it.
+
+#### Architecture Regression Test
+
+`/Sandbox/Architecture` page uses TestWidget (real JS component with ej2_instances pattern)
+to exercise ALL interaction types end-to-end. Playwright tests verify every module path.
+If any module breaks vendor-agnostic architecture, these tests catch it immediately.
+
+### 8. ESM Only + Cache Busting
 
 The runtime is bundled as ESM (`--format=esm`). The layout loads it via
 `<script type="module" src="~/js/alis-reactive.js" asp-append-version="true">`.
