@@ -80,6 +80,12 @@ namespace Alis.Reactive
             return string.Join("_", members.ConvertAll(PascalRestore));
         }
 
+        public static string ToElementId<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join("_", members.ConvertAll(PascalRestore));
+        }
+
         private static string PascalRestore(string camel)
         {
             if (string.IsNullOrEmpty(camel)) return camel;
