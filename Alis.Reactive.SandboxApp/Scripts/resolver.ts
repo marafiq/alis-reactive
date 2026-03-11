@@ -47,6 +47,7 @@ export function resolveEventPath(path: string, ctx?: ExecContext): unknown {
 /**
  * Resolves a BindExpr (plain string path) against the execution context.
  * Kept for backward compatibility with MutateElementCommand.source (string).
+ * @deprecated Use {@link resolveSource} with a typed BindSource instead.
  */
 export function resolve(expr: BindExpr, ctx?: ExecContext): unknown {
   return resolveEventPath(expr, ctx);
@@ -63,6 +64,7 @@ export function resolveSourceAs(source: BindSource, coerceAs: CoercionType, ctx?
 /**
  * Resolves a BindExpr and coerces the result to a specific type.
  * Kept for backward compatibility.
+ * @deprecated Use {@link resolveSourceAs} with a typed BindSource instead.
  */
 export function resolveAs(expr: BindExpr, coerceAs: CoercionType, ctx?: ExecContext): unknown {
   const raw = resolve(expr, ctx);
@@ -71,6 +73,7 @@ export function resolveAs(expr: BindExpr, coerceAs: CoercionType, ctx?: ExecCont
 
 /**
  * Resolves a BindExpr and coerces to string for DOM rendering.
+ * @deprecated Use {@link resolveSourceAs} with coercion type "string" instead.
  */
 export function resolveToString(expr: BindExpr, ctx?: ExecContext): string {
   const raw = resolve(expr, ctx);

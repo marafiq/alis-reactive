@@ -11,7 +11,7 @@ namespace Alis.Reactive.Descriptors.Commands
     public abstract class Command
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Guard? When { get; set; }
+        public Guard? When { get; internal set; }
     }
 
     public sealed class DispatchCommand : Command

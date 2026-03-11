@@ -1,7 +1,3 @@
-import { scope } from "./trace";
-
-const log = scope("walk");
-
 /**
  * Walks a dot-notation path on any object.
  * Shared primitive used by component reads (readExpr),
@@ -19,6 +15,5 @@ export function walk(root: unknown, path: string): unknown {
     if (current == null) return undefined;
     current = current[part];
   }
-  log.trace("walk", { path, result: current });
   return current;
 }
