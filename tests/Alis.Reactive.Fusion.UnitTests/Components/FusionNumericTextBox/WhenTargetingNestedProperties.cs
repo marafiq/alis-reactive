@@ -65,6 +65,6 @@ public class WhenTargetingNestedProperties : FusionTestBase
         var json = System.Text.Json.JsonSerializer.Serialize(reaction,
             new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
 
-        Assert.That(json, Does.Contain("\"target\":\"Address_PostalCode\""));
+        Assert.That(json, Does.Contain("\"target\":\"Alis_Reactive_Fusion_UnitTests_FusionTestModel__Address_PostalCode\""));
     }
 }

@@ -53,7 +53,7 @@ namespace Alis.Reactive.Builders
             Expression<Func<TModel, object?>> expr)
             where TComponent : IComponent
         {
-            var elementId = ExpressionPathHelper.ToElementId(expr);
+            var elementId = IdGenerator.For<TModel>(expr);
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 

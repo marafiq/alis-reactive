@@ -9,7 +9,7 @@
         commands: [
           {
             kind: mutate-element,
-            target: Status,
+            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
             jsEmit: el.value=val,
             value: pending
           },

@@ -50,7 +50,7 @@ public class WhenMutatingAFusionNumericTextBox : FusionTestBase
         Trigger(plan).DomReady(p =>
         {
             var expr = p.Component<FusionNumericTextBox>(m => m.Amount).Value();
-            Assert.That(expr, Is.EqualTo("ref:Amount.value"));
+            Assert.That(expr, Is.EqualTo("ref:Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount.value"));
         });
     }
 }

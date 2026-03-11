@@ -40,15 +40,7 @@ namespace Alis.Reactive.Native.Components
         {
             _html = html;
             _expression = expression;
-            _elementId = html.IdFor(expression).ToString();
-            _bindingPath = html.NameFor(expression).ToString();
-        }
-
-        internal NativeDropDownBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression, string elementId)
-        {
-            _html = html;
-            _expression = expression;
-            _elementId = elementId;
+            _elementId = IdGenerator.For<TModel, TProp>(expression);
             _bindingPath = html.NameFor(expression).ToString();
         }
 
@@ -113,17 +105,6 @@ namespace Alis.Reactive.Native.Components
             this IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
         {
             return new NativeDropDownBuilder<TModel, TProp>(html, expression);
-        }
-
-        /// <summary>
-        /// Creates a native &lt;select&gt; with a collision-free ID from IdGenerator.
-        /// The name attribute stays as the model binding path for MVC posting.
-        /// </summary>
-        public static NativeDropDownBuilder<TModel, TProp> AsNativeDropDownFor<TModel, TProp>(
-            this IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
-        {
-            var uniqueId = IdGenerator.For<TModel, TProp>(expression);
-            return new NativeDropDownBuilder<TModel, TProp>(html, expression, uniqueId);
         }
     }
 }

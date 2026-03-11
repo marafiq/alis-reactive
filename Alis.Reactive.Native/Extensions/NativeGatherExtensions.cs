@@ -22,7 +22,7 @@ namespace Alis.Reactive.Native.Extensions
             where TComponent : NativeComponent, IReadableComponent
             where TModel : class
         {
-            var elementId = ExpressionPathHelper.ToElementId(expr);
+            var elementId = IdGenerator.For<TModel>(expr);
             var propertyName = ExpressionPathHelper.ToPropertyName(expr);
             self.AddItem(new ComponentGather(
                 elementId,

@@ -26,23 +26,23 @@
             Click &ldquo;Validate All&rdquo; with empty/invalid fields to see errors.
         </p>
         <form id="all-rules-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, expr =>
-                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Full name" })
+            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Full name" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, expr =>
-                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "you@example.com" })
+            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "you@example.com" })
             ); }
-            @{ Html.Field("Age", false, m => m.Age, expr =>
-                Html.TextBoxFor(expr, new { type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–120" })
+            @{ Html.Field("Age", false, m => m.Age, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–120" })
             ); }
-            @{ Html.Field("Phone", false, m => m.Phone, expr =>
-                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
+            @{ Html.Field("Phone", false, m => m.Phone, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
             ); }
-            @{ Html.Field("Salary", false, m => m.Salary, expr =>
-                Html.TextBoxFor(expr, new { type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–500,000" })
+            @{ Html.Field("Salary", false, m => m.Salary, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–500,000" })
             ); }
-            @{ Html.Field("Password", false, m => m.Password, expr =>
-                Html.PasswordFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Min 8 characters" })
+            @{ Html.Field("Password", false, m => m.Password, (expr, id) =>
+                Html.PasswordFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Min 8 characters" })
             ); }
         </form>
         @(Html.NativeButton("validate-all-btn", "Validate All")
@@ -72,10 +72,10 @@
             ValidationErrors command displays them at the correct fields.
         </p>
         <form id="server-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, "srv_", (expr, id) =>
+            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Leave empty to trigger error" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, "srv_", (expr, id) =>
+            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Leave empty to trigger error" })
             ); }
         </form>
@@ -118,14 +118,14 @@
             Server returns errors with dotted names (Address.Street) and showFieldErrors resolves them.
         </p>
         <form id="nested-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            @{ Html.Field("Street", true, m => m.Address!.Street, expr =>
-                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Street address" })
+            @{ Html.Field("Street", true, m => m.Address!.Street, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Street address" })
             ); }
-            @{ Html.Field("City", true, m => m.Address!.City, expr =>
-                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "City" })
+            @{ Html.Field("City", true, m => m.Address!.City, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "City" })
             ); }
-            @{ Html.Field("Zip Code", false, m => m.Address!.ZipCode, expr =>
-                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Min 5 characters" })
+            @{ Html.Field("Zip Code", false, m => m.Address!.ZipCode, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Min 5 characters" })
             ); }
         </form>
         @(Html.NativeButton("nested-save-btn", "Save Address (Server)")
@@ -170,8 +170,8 @@
                        class="h-4 w-4 rounded border-border text-accent" />
                 <label for="IsEmployed" class="text-sm font-medium">Is Employed</label>
             </div>
-            @{ Html.Field("Job Title", false, m => m.JobTitle, expr =>
-                Html.TextBoxFor(expr, new { @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required when employed" })
+            @{ Html.Field("Job Title", false, m => m.JobTitle, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required when employed" })
             ); }
         </form>
         @(Html.NativeButton("conditional-validate-btn", "Validate Conditional")
@@ -201,10 +201,10 @@
             After validation shows errors, typing into the field automatically clears that field's error.
         </p>
         <form id="live-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, "live_", (expr, id) =>
+            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Type after error to clear" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, "live_", (expr, id) =>
+            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Type after error to clear" })
             ); }
         </form>
@@ -235,16 +235,16 @@
             additional errors (e.g. conditional rules not extracted to client). Both layers display at the same fields.
         </p>
         <form id="combined-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, "cmb_", (expr, id) =>
+            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, "cmb_", (expr, id) =>
+            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required + valid email" })
             ); }
-            @{ Html.Field("Age", false, m => m.Age, "cmb_", (expr, id) =>
-                Html.TextBoxFor(expr, new { type = "number", id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–120" })
+            @{ Html.Field("Age", false, m => m.Age, (expr, id) =>
+                Html.TextBoxFor(expr, new { id, type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–120" })
             ); }
-            @{ Html.Field("Phone", false, m => m.Phone, "cmb_", (expr, id) =>
+            @{ Html.Field("Phone", false, m => m.Phone, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
             ); }
         </form>
@@ -289,7 +289,7 @@
             You should be able to submit with only the visible Name field filled.
         </p>
         <form id="hidden-fields-form" class="space-y-4 mb-4">
-            @{ Html.Field("Name (always visible)", true, m => m.Name, "hf_", (expr, id) =>
+            @{ Html.Field("Name (always visible)", true, m => m.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required" })
             ); }
             <div class="flex items-center gap-2">
@@ -304,10 +304,10 @@
                 <label for="hf_toggle" class="text-sm font-medium">Show Extra Fields</label>
             </div>
             <div id="hf_extras" hidden class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                @{ Html.Field("Phone (hidden by default)", false, m => m.Phone, "hf_", (expr, id) =>
+                @{ Html.Field("Phone (hidden by default)", false, m => m.Phone, (expr, id) =>
                     Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
                 ); }
-                @{ Html.Field("Salary (hidden by default)", false, m => m.Salary, "hf_", (expr, id) =>
+                @{ Html.Field("Salary (hidden by default)", false, m => m.Salary, (expr, id) =>
                     Html.TextBoxFor(expr, new { id, type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–500,000" })
                 ); }
             </div>
@@ -368,10 +368,10 @@
             Both errors return as standard 400 ProblemDetails and display at the correct fields.
         </p>
         <form id="db-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, "db_", (expr, id) =>
+            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Try 'admin' to trigger DB error" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, "db_", (expr, id) =>
+            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Try 'taken@test.com' to trigger DB error" })
             ); }
         </form>

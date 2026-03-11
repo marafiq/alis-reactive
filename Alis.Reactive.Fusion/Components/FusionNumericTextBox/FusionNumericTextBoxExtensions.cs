@@ -1,4 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
+using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -12,6 +18,24 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class FusionNumericTextBoxExtensions
     {
+        // ── Builder: collision-free ID variant of SF NumericTextBoxFor ──
+
+        /// <summary>
+        /// Creates a Syncfusion NumericTextBox bound to a model property.
+        /// Uses IdGenerator to produce a unique element ID while preserving the model binding name.
+        /// </summary>
+        public static NumericTextBoxBuilder NumericTextBoxFor<TModel, TProp>(
+            this IHtmlHelper<TModel> html,
+            Expression<Func<TModel, TProp>> expression)
+            where TModel : class
+        {
+            var uniqueId = IdGenerator.For<TModel, TProp>(expression);
+            var name = html.NameFor(expression).ToString();
+
+            return html.EJS().NumericTextBoxFor(expression)
+                .HtmlAttributes(new Dictionary<string, object> { ["id"] = uniqueId, ["name"] = name });
+        }
+
         // ── Prop: assigns value, coerces to Number, calls dataBind() ──
 
         public static ComponentRef<FusionNumericTextBox, TModel> SetValue<TModel>(

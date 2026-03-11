@@ -13,7 +13,7 @@
         commands: [
           {
             kind: mutate-element,
-            target: Address_City,
+            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Address_City,
             jsEmit: el.value=val,
             value: Portland
           },

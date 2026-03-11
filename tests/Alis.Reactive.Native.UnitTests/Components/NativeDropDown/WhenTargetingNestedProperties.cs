@@ -65,7 +65,7 @@ public class WhenTargetingNestedProperties : NativeTestBase
         var json = System.Text.Json.JsonSerializer.Serialize(reaction,
             new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
 
-        Assert.That(json, Does.Contain("\"target\":\"Address_City\""));
+        Assert.That(json, Does.Contain("\"target\":\"Alis_Reactive_Native_UnitTests_NativeTestModel__Address_City\""));
     }
 
     [Test]

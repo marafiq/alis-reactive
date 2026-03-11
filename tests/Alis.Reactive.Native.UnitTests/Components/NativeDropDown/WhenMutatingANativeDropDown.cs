@@ -50,7 +50,7 @@ public class WhenMutatingANativeDropDown : NativeTestBase
         Trigger(plan).DomReady(p =>
         {
             var expr = p.Component<NativeDropDown>(m => m.Status).Value();
-            Assert.That(expr, Is.EqualTo("ref:Status.value"));
+            Assert.That(expr, Is.EqualTo("ref:Alis_Reactive_Native_UnitTests_NativeTestModel__Status.value"));
         });
     }
 

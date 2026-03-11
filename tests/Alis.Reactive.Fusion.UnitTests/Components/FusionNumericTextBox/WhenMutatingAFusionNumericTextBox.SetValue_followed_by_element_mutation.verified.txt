@@ -9,7 +9,7 @@
         commands: [
           {
             kind: mutate-element,
-            target: Amount,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
             jsEmit: var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind(),
             value: 100
           },

@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Extensions
             where TComponent : FusionComponent, IReadableComponent
             where TModel : class
         {
-            var elementId = ExpressionPathHelper.ToElementId(expr);
+            var elementId = IdGenerator.For<TModel>(expr);
             var propertyName = ExpressionPathHelper.ToPropertyName(expr);
             self.AddItem(new ComponentGather(
                 elementId,

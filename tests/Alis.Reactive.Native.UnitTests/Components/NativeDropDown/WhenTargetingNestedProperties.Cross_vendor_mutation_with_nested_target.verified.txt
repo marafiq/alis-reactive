@@ -13,13 +13,13 @@
         commands: [
           {
             kind: mutate-element,
-            target: Address_City,
+            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Address_City,
             jsEmit: el.value=val,
             value: Denver
           },
           {
             kind: mutate-element,
-            target: Address_State,
+            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Address_State,
             jsEmit: el.value=val,
             value: CO
           },
