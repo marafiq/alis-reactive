@@ -52,13 +52,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         {
             if (model == null)
             {
-                return BadRequest(new { errors = new Dictionary<string, string[]> { ["Name"] = new[] { "Request body is required." } } });
+                return BadRequest(new { errors = new Dictionary<string, string[]> { ["Hidden.Name"] = new[] { "Request body is required." } } });
             }
 
             var errors = new Dictionary<string, string[]>();
-            if (string.IsNullOrWhiteSpace(model.Name))
+            if (string.IsNullOrWhiteSpace(model.Hidden?.Name))
             {
-                errors["Name"] = new[] { "Name is required." };
+                errors["Hidden.Name"] = new[] { "Name is required." };
             }
 
             if (errors.Count > 0)
@@ -74,32 +74,37 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         {
             if (model == null)
             {
-                return BadRequest(new { errors = new Dictionary<string, string[]> { ["Name"] = new[] { "Request body is required." } } });
+                return BadRequest(new { errors = new Dictionary<string, string[]> { ["Db.Name"] = new[] { "Request body is required." } } });
             }
 
-            var validator = new ValidationShowcaseValidator();
-            var fvResult = validator.Validate(model);
-
-            if (!fvResult.IsValid)
+            // Validate only the Db section (not the full model)
+            var dbSection = model.Db;
+            if (dbSection != null)
             {
-                var fvErrors = new Dictionary<string, string[]>();
-                foreach (var failure in fvResult.Errors)
+                var sectionValidator = new BasicSectionValidator();
+                var fvResult = sectionValidator.Validate(dbSection);
+
+                if (!fvResult.IsValid)
                 {
-                    fvErrors[failure.PropertyName] = new[] { failure.ErrorMessage };
+                    var fvErrors = new Dictionary<string, string[]>();
+                    foreach (var failure in fvResult.Errors)
+                    {
+                        fvErrors["Db." + failure.PropertyName] = new[] { failure.ErrorMessage };
+                    }
+                    return BadRequest(new { errors = fvErrors });
                 }
-                return BadRequest(new { errors = fvErrors });
             }
 
             var dbErrors = new Dictionary<string, string[]>();
 
-            if (model.Email != null && model.Email.Contains("taken"))
+            if (model.Db?.Email != null && model.Db.Email.Contains("taken"))
             {
-                dbErrors["Email"] = new[] { "This email address is already registered." };
+                dbErrors["Db.Email"] = new[] { "This email address is already registered." };
             }
 
-            if (model.Name != null && model.Name.Equals("admin", StringComparison.OrdinalIgnoreCase))
+            if (model.Db?.Name != null && model.Db.Name.Equals("admin", StringComparison.OrdinalIgnoreCase))
             {
-                dbErrors["Name"] = new[] { "This username is reserved by the system." };
+                dbErrors["Db.Name"] = new[] { "This username is reserved by the system." };
             }
 
             if (dbErrors.Count > 0)
@@ -122,27 +127,27 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         [HttpPost]
         public IActionResult SaveAddress([FromBody] ValidationShowcaseModel? model)
         {
-            if (model?.Address == null)
+            if (model?.Nested?.Address == null)
             {
                 return BadRequest(new
                 {
                     errors = new Dictionary<string, string[]>
                     {
-                        ["Address.Street"] = new[] { "Street is required." },
-                        ["Address.City"] = new[] { "City is required." }
+                        ["Nested.Address.Street"] = new[] { "Street is required." },
+                        ["Nested.Address.City"] = new[] { "City is required." }
                     }
                 });
             }
 
             var addressValidator = new ValidationAddressValidator();
-            var result = addressValidator.Validate(model.Address);
+            var result = addressValidator.Validate(model.Nested.Address);
 
             if (!result.IsValid)
             {
                 var errors = new Dictionary<string, string[]>();
                 foreach (var failure in result.Errors)
                 {
-                    var key = "Address." + failure.PropertyName;
+                    var key = "Nested.Address." + failure.PropertyName;
                     errors[key] = new[] { failure.ErrorMessage };
                 }
                 return BadRequest(new { errors });

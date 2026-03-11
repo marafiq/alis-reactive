@@ -201,15 +201,21 @@ describe("GET with gather items as URL params", () => {
   });
 });
 
-describe("IncludeAll gather from form", () => {
-  it("gathers all form fields and sends as POST body", async () => {
-    (globalThis as any).fetch = mockFetch(200, { count: 3 });
+describe("component gather sends nested JSON body", () => {
+  it("gathers component values and sends as POST body", async () => {
+    (globalThis as any).fetch = mockFetch(200, { count: 1 });
+
+    // Add a native input with an id for component gather
+    const input = document.createElement("input");
+    input.id = "test-name";
+    input.value = "John";
+    document.body.appendChild(input);
 
     const req: RequestDescriptor = {
       verb: "POST",
       url: "/api/formdata",
       gather: [
-        { kind: "all", formId: "testForm" },
+        { kind: "component", componentId: "test-name", vendor: "native", name: "Name", readExpr: "value" },
       ],
       onSuccess: [{
         commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "submitted" }],
@@ -220,7 +226,7 @@ describe("IncludeAll gather from form", () => {
 
     expect(fetch).toHaveBeenCalledWith("/api/formdata", expect.objectContaining({
       method: "POST",
-      body: JSON.stringify({ FirstName: "John", LastName: "Doe", Email: "john@example.com" }),
+      body: JSON.stringify({ Name: "John" }),
     }));
     expect(document.getElementById("result")!.textContent).toBe("submitted");
   });

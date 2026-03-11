@@ -253,7 +253,6 @@
     "GatherItem": {
       "oneOf": [
         { "$ref": "#/$defs/ComponentGather" },
-        { "$ref": "#/$defs/AllGather" },
         { "$ref": "#/$defs/StaticGather" }
       ]
     },
@@ -267,15 +266,6 @@
         "vendor": { "$ref": "#/$defs/Vendor" },
         "name": { "type": "string", "minLength": 1, "description": "Property name for the gathered value in the request body" },
         "readExpr": { "type": "string", "minLength": 1, "description": "Property path from vendor-determined root. Vendor resolves root (native→el, fusion→ej2_instances[0]), then readExpr is walked from that root. Examples: 'checked', 'value'" }
-      }
-    },
-    "AllGather": {
-      "type": "object",
-      "required": ["kind", "formId"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "all" },
-        "formId": { "type": "string", "minLength": 1, "description": "Form element ID — all fields gathered via FormData" }
       }
     },
     "StaticGather": {

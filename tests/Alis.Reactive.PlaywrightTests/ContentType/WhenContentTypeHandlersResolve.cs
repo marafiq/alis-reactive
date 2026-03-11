@@ -5,6 +5,9 @@ public class WhenContentTypeHandlersResolve : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/ContentType";
 
+    /// <summary>IdGenerator type scope for ContentTypeModel.</summary>
+    private const string S = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ContentTypeModel";
+
     [Test]
     public async Task PageLoadsWithCorrectTitle()
     {
@@ -61,7 +64,7 @@ public class WhenContentTypeHandlersResolve : PlaywrightTestBase
         await Expect(Page.Locator("#partial-loaded-marker")).ToHaveTextAsync("Partial loaded successfully");
 
         // Native input rendered via Html.TextBoxFor with value from model
-        await Expect(Page.Locator("#NativeValue")).ToHaveValueAsync("native-partial-value");
+        await Expect(Page.Locator($"#{S}__NativeValue")).ToHaveValueAsync("native-partial-value");
 
         // Fusion NumericTextBox rendered via Html.EJS().NumericTextBoxFor() + ej.base.append
         // SF wraps the raw input — check the container has the SF component class

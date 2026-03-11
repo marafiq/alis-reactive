@@ -59,7 +59,7 @@ export interface ParallelHttpReaction {
 
 // -- HTTP Request Types ----------------------------------------
 
-export type GatherItem = ComponentGather | AllGather | StaticGather;
+export type GatherItem = ComponentGather | StaticGather;
 
 export interface ComponentGather {
   kind: "component";
@@ -67,11 +67,6 @@ export interface ComponentGather {
   vendor: Vendor;
   name: string;
   readExpr: string;
-}
-
-export interface AllGather {
-  kind: "all";
-  formId: string;
 }
 
 export interface StaticGather {

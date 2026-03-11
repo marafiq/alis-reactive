@@ -16,6 +16,9 @@ namespace Alis.Reactive.PlaywrightTests.Reactive;
 [TestFixture]
 public class WhenConditionsFireInsideReactive : PlaywrightTestBase
 {
+    /// <summary>IdGenerator type scope for PlaygroundSyntaxModel.</summary>
+    private const string S = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_PlaygroundSyntaxModel";
+
     private async Task NavigateAndBoot()
     {
         await NavigateTo("/Sandbox/PlaygroundSyntax/ReactiveConditions");
@@ -29,7 +32,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#Status").SelectOptionAsync("active");
+        await Page.Locator($"#{S}__Status").SelectOptionAsync("active");
 
         var result = Page.Locator("#status-result");
         await Expect(result).ToContainTextAsync("Active", new() { Timeout = 3000 });
@@ -43,7 +46,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#Status").SelectOptionAsync("inactive");
+        await Page.Locator($"#{S}__Status").SelectOptionAsync("inactive");
 
         await Expect(Page.Locator("#status-result")).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
         await Expect(Page.Locator("#address-section")).ToBeHiddenAsync();
@@ -56,7 +59,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#Status").SelectOptionAsync("pending");
+        await Page.Locator($"#{S}__Status").SelectOptionAsync("pending");
 
         await Expect(Page.Locator("#status-result")).ToContainTextAsync("Pending", new() { Timeout = 3000 });
         await Expect(Page.Locator("#address-section")).ToBeVisibleAsync();
@@ -69,10 +72,10 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#Status").SelectOptionAsync("inactive");
+        await Page.Locator($"#{S}__Status").SelectOptionAsync("inactive");
         await Expect(Page.Locator("#address-section")).ToBeHiddenAsync(new() { Timeout = 3000 });
 
-        await Page.Locator("#Status").SelectOptionAsync("active");
+        await Page.Locator($"#{S}__Status").SelectOptionAsync("active");
         await Expect(Page.Locator("#address-section")).ToBeVisibleAsync(new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
@@ -140,7 +143,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#Address_City").SelectOptionAsync("seattle");
+        await Page.Locator($"#{S}__Address_City").SelectOptionAsync("seattle");
 
         await Expect(Page.Locator("#city-auto")).ToContainTextAsync("WA, 98101", new() { Timeout = 3000 });
 
@@ -152,7 +155,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#Address_City").SelectOptionAsync("portland");
+        await Page.Locator($"#{S}__Address_City").SelectOptionAsync("portland");
 
         await Expect(Page.Locator("#city-auto")).ToContainTextAsync("OR, 97201", new() { Timeout = 3000 });
 
@@ -164,7 +167,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#Address_City").SelectOptionAsync("denver");
+        await Page.Locator($"#{S}__Address_City").SelectOptionAsync("denver");
 
         await Expect(Page.Locator("#city-auto")).ToContainTextAsync("CO, 80201", new() { Timeout = 3000 });
 
@@ -176,10 +179,10 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#Address_City").SelectOptionAsync("seattle");
+        await Page.Locator($"#{S}__Address_City").SelectOptionAsync("seattle");
         await Expect(Page.Locator("#city-auto")).ToContainTextAsync("WA", new() { Timeout = 3000 });
 
-        await Page.Locator("#Address_City").SelectOptionAsync("");
+        await Page.Locator($"#{S}__Address_City").SelectOptionAsync("");
         await Expect(Page.Locator("#city-auto")).ToHaveTextAsync("Select a city", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
@@ -224,9 +227,9 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
 
         await Expect(Page.Locator("h1")).ToHaveTextAsync("Reactive Conditions");
         await Expect(Page.Locator("#plan-json")).ToBeVisibleAsync();
-        await Expect(Page.Locator("#Status")).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{S}__Status")).ToBeVisibleAsync();
         await Expect(Page.Locator("#Amount").First).ToBeVisibleAsync();
-        await Expect(Page.Locator("#Address_City")).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{S}__Address_City")).ToBeVisibleAsync();
 
         AssertNoConsoleErrors();
     }

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders.Requests
@@ -18,11 +20,14 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Gathers all fields from a form via FormData.
+        /// Gathers a native HTML input bound to a model property.
+        /// Assumes vendor="native", readExpr="value".
         /// </summary>
-        public GatherBuilder<TModel> IncludeAll(string formId)
+        public GatherBuilder<TModel> Include(Expression<Func<TModel, object?>> expr)
         {
-            Items.Add(new AllGather(formId));
+            var componentId = IdGenerator.For<TModel>(expr);
+            var propertyName = ExpressionPathHelper.ToPropertyName(expr);
+            Items.Add(new ComponentGather(componentId, "native", propertyName, "value"));
             return this;
         }
 

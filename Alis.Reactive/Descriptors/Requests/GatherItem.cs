@@ -4,7 +4,6 @@ namespace Alis.Reactive.Descriptors.Requests
 {
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
     [JsonDerivedType(typeof(ComponentGather), "component")]
-    [JsonDerivedType(typeof(AllGather), "all")]
     [JsonDerivedType(typeof(StaticGather), "static")]
     public abstract class GatherItem
     {
@@ -26,20 +25,11 @@ namespace Alis.Reactive.Descriptors.Requests
         }
     }
 
+    /// <summary>Plan-driven marker — expanded at render time into explicit ComponentGather items.</summary>
     public sealed class AllGather : GatherItem
     {
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? FormId { get; }
-
-        public AllGather(string formId)
-        {
-            FormId = formId;
-        }
-
-        /// <summary>Plan-driven marker — expanded at render time into explicit ComponentGather items.</summary>
         internal AllGather()
         {
-            FormId = null;
         }
     }
 

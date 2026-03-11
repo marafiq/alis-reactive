@@ -23,41 +23,17 @@ export function resolveGather(items: GatherItem[], verb: string, contentType?: s
           log.warn("gather target not found", { componentId: g.componentId });
           break;
         }
-        const value = evalRead(g.componentId, g.vendor, g.readExpr);
+        const raw = evalRead(g.componentId, g.vendor, g.readExpr);
+        // Normalize: empty string → null for JSON body (avoids deserialization errors on numeric types)
+        const value = raw === "" ? null : raw;
         if (isGet) {
-          urlParams.push(`${encodeURIComponent(g.name)}=${encodeURIComponent(String(value))}`);
+          urlParams.push(`${encodeURIComponent(g.name)}=${encodeURIComponent(String(raw))}`);
         } else if (formData) {
-          formData.append(g.name, String(value ?? ""));
+          formData.append(g.name, String(raw ?? ""));
         } else {
-          body[g.name] = value;
+          setNested(body, g.name, value);
         }
         log.trace("component", { name: g.name, value });
-        break;
-      }
-
-      case "all": {
-        const form = document.getElementById(g.formId) as HTMLFormElement | null;
-        if (!form) {
-          log.warn("form not found", { formId: g.formId });
-          break;
-        }
-        const fd = new FormData(form);
-        if (formData) {
-          // FormData mode: transfer entries directly (preserves File objects)
-          fd.forEach((value, key) => {
-            formData.append(key, value);
-          });
-        } else {
-          fd.forEach((value, key) => {
-            const v = isGet ? value : (value === "" ? null : value);
-            if (isGet) {
-              urlParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
-            } else {
-              setNested(body, key, v);
-            }
-          });
-        }
-        log.trace("all", { formId: g.formId });
         break;
       }
 

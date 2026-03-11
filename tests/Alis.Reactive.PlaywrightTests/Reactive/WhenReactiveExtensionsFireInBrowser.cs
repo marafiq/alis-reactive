@@ -6,15 +6,18 @@ namespace Alis.Reactive.PlaywrightTests.Reactive;
 ///
 /// Page under test: /Sandbox/PlaygroundSyntax
 ///
-/// ID Pattern Discovery (nested property m => m.Address.City):
-///   - Native (ASP.NET Html.IdFor): Address_City  (underscores)
-///   - Fusion (SF EJ2):             AddressCity    (dots removed, no separator)
+/// ID Pattern (nested property m => m.Address.City):
+///   - Native (IdGenerator):  {TypeScope}__Address_City
+///   - Fusion (SF EJ2):       AddressPostalCode (dots removed, no separator)
 ///
-/// Both vendors carry bindingPath as dot-notation (Address.City) for future HTTP gather.
+/// Both vendors carry bindingPath as dot-notation (Address.City) for HTTP gather.
 /// </summary>
 [TestFixture]
 public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
 {
+    /// <summary>IdGenerator type scope for PlaygroundSyntaxModel.</summary>
+    private const string S = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_PlaygroundSyntaxModel";
+
     private async Task NavigateAndBoot()
     {
         await NavigateTo("/Sandbox/PlaygroundSyntax");
@@ -86,7 +89,7 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         var echo = Page.Locator("#status-echo");
         await Expect(echo).ToHaveTextAsync("\u2014");
 
-        await Page.Locator("#Status").SelectOptionAsync("Active");
+        await Page.Locator($"#{S}__Status").SelectOptionAsync("Active");
 
         await Expect(echo).ToHaveTextAsync("Status changed", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
@@ -101,7 +104,7 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         var amountEcho = Page.Locator("#amount-echo");
 
         // Category dropdown has NO .Reactive() — selecting must not affect any echo
-        await Page.Locator("#Category").SelectOptionAsync("Category A");
+        await Page.Locator($"#{S}__Category").SelectOptionAsync("Category A");
 
         await Expect(statusEcho).ToHaveTextAsync("\u2014");
         await Expect(amountEcho).ToHaveTextAsync("\u2014");
@@ -115,8 +118,8 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // m => m.Address.City → Native convention: Address_City (underscores)
-        var citySelect = Page.Locator("#Address_City");
+        // m => m.Address.City → IdGenerator: {TypeScope}__Address_City
+        var citySelect = Page.Locator($"#{S}__Address_City");
         await Expect(citySelect).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
@@ -140,7 +143,7 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         var echo = Page.Locator("#city-echo");
         await Expect(echo).ToHaveTextAsync("\u2014");
 
-        await Page.Locator("#Address_City").SelectOptionAsync("seattle");
+        await Page.Locator($"#{S}__Address_City").SelectOptionAsync("seattle");
 
         await Expect(echo).ToHaveTextAsync("City changed", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
@@ -169,10 +172,10 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        // Native nested: underscores
-        Assert.That(planJson, Does.Contain("\"componentId\": \"Address_City\""),
-            "Native nested componentId must use underscores");
-        // Fusion nested: dots removed
+        // Native nested: IdGenerator format
+        Assert.That(planJson, Does.Contain($"\"componentId\": \"{S}__Address_City\""),
+            "Native nested componentId must use IdGenerator format");
+        // Fusion nested: dots removed (SF convention)
         Assert.That(planJson, Does.Contain("\"componentId\": \"AddressPostalCode\""),
             "Fusion nested componentId must have dots removed (SF convention)");
 
@@ -189,7 +192,7 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         var statusEcho = Page.Locator("#status-echo");
 
         // First trigger a native change
-        await Page.Locator("#Status").SelectOptionAsync("Active");
+        await Page.Locator($"#{S}__Status").SelectOptionAsync("Active");
         await Expect(statusEcho).ToHaveTextAsync("Status changed", new() { Timeout = 3000 });
 
         // Reset All — cross-vendor pipeline resets both + updates echo
@@ -204,7 +207,7 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var statusSelect = Page.Locator("#Status");
+        var statusSelect = Page.Locator($"#{S}__Status");
         await statusSelect.SelectOptionAsync("Pending");
 
         await Page.Locator("button:has-text('Reset All Fields')").ClickAsync();

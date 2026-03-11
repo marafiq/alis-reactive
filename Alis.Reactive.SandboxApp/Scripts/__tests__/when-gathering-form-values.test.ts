@@ -60,9 +60,11 @@ describe("gather", () => {
     expect(result.body).toEqual({ action: "save", version: 2 });
   });
 
-  it("all form fields flow into POST body", () => {
+  it("multiple component gathers flow into POST body", () => {
     const items: GatherItem[] = [
-      { kind: "all", formId: "myForm" },
+      { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName", readExpr: "value" },
+      { kind: "component", componentId: "LastName", vendor: "native", name: "LastName", readExpr: "value" },
+      { kind: "component", componentId: "FacilityId", vendor: "native", name: "FacilityId", readExpr: "value" },
     ];
     const result = resolveGather(items, "POST");
     expect(result.body).toEqual({
@@ -79,6 +81,28 @@ describe("gather", () => {
     ];
     const result = resolveGather(items, "POST");
     expect(result.body).toEqual({ FirstName: "John", csrfToken: "abc123" });
+  });
+
+  it("dotted component names produce nested JSON body", () => {
+    const items: GatherItem[] = [
+      { kind: "component", componentId: "FirstName", vendor: "native", name: "Server.Name", readExpr: "value" },
+    ];
+    const result = resolveGather(items, "POST");
+    expect(result.body).toEqual({ Server: { Name: "John" } });
+  });
+
+  it("empty component value sends null in JSON body", () => {
+    // Add an empty input
+    const input = document.createElement("input");
+    input.id = "EmptyField";
+    input.value = "";
+    document.body.appendChild(input);
+
+    const items: GatherItem[] = [
+      { kind: "component", componentId: "EmptyField", vendor: "native", name: "EmptyField", readExpr: "value" },
+    ];
+    const result = resolveGather(items, "POST");
+    expect(result.body).toEqual({ EmptyField: null });
   });
 
   it("empty gather returns empty result", () => {

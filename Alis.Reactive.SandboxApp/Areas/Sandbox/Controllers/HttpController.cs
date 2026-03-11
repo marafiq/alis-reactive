@@ -71,7 +71,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         // ── Section 7: POST FormData ─────────────────────────
 
         [HttpPost]
-        public IActionResult SaveFormData([FromForm] SaveFormRequest? request)
+        public IActionResult SaveFormData([FromBody] SaveFormRequest? request)
         {
             var fields = new List<string>();
             if (!string.IsNullOrEmpty(request?.FirstName)) fields.Add("FirstName");

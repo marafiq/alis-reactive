@@ -113,10 +113,33 @@ namespace Alis.Reactive.FluentValidator
             foreach (var rule in rules)
             {
                 var propertyName = rule.PropertyName;
-                if (string.IsNullOrEmpty(propertyName)) continue;
 
                 // Skip rules with conditions — these are server-side only
                 if (rule.HasCondition || rule.HasAsyncCondition) continue;
+
+                // Include() rules have empty PropertyName — recurse with same prefix
+                if (string.IsNullOrEmpty(propertyName))
+                {
+                    foreach (IRuleComponent component in rule.Components)
+                    {
+                        if (component.Validator is IChildValidatorAdaptor adaptor)
+                        {
+                            try
+                            {
+                                var nested = Activator.CreateInstance(adaptor.ValidatorType) as IValidator;
+                                if (nested != null)
+                                {
+                                    ExtractFromValidator(nested, prefix, fieldRules);
+                                }
+                            }
+                            catch
+                            {
+                                // Skip if nested validator can't be instantiated
+                            }
+                        }
+                    }
+                    continue;
+                }
 
                 var fullPath = string.IsNullOrEmpty(prefix)
                     ? propertyName

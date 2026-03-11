@@ -30,16 +30,19 @@ export function validate(desc: ValidationDescriptor): boolean {
   let valid = true;
 
   for (const f of desc.fields) {
-    const el = container.querySelector<HTMLElement>(`[id="${f.fieldId}"]`);
+    const el = document.getElementById(f.fieldId);
     if (!el) continue;
+
+    // Only validate elements that belong to this form
+    if (!container.contains(el)) continue;
 
     if (isHidden(el)) continue;
 
     const root = resolveRoot(el, f.vendor);
     const value = walk(root, f.readExpr);
     for (const rule of f.rules) {
-      if (rule.when && !evalCondition(rule.when, byName, container)) continue;
-      if (ruleFails(rule, value, byName, container)) {
+      if (rule.when && !evalCondition(rule.when, byName)) continue;
+      if (ruleFails(rule, value, byName)) {
         showError(desc.formId, f, rule.message);
         valid = false;
         break; // first failing rule wins
@@ -68,8 +71,7 @@ export function showServerErrors(desc: ValidationDescriptor, data: unknown): voi
 
     const field = desc.fields.find(f => f.fieldName === name);
     if (field) {
-      const container = document.getElementById(desc.formId);
-      const el = container?.querySelector<HTMLElement>(`[id="${field.fieldId}"]`);
+      const el = document.getElementById(field.fieldId);
       if (el) el.classList.add(ERR_CLASS);
     }
   }
@@ -113,8 +115,7 @@ function findErrorSpan(containerId: string, fieldName: string): HTMLElement | nu
 }
 
 function showError(containerId: string, field: ValidationField, message: string): void {
-  const container = document.getElementById(containerId);
-  const el = container?.querySelector<HTMLElement>(`[id="${field.fieldId}"]`);
+  const el = document.getElementById(field.fieldId);
   if (el) el.classList.add(ERR_CLASS);
 
   const span = findErrorSpan(containerId, field.fieldName);
@@ -132,15 +133,14 @@ function clearFieldError(containerId: string, field: ValidationField): void {
     span.setAttribute("hidden", "");
     span.style.display = "none";
   }
-  const container = document.getElementById(containerId);
-  const el = container?.querySelector<HTMLElement>(`[id="${field.fieldId}"]`);
+  const el = document.getElementById(field.fieldId);
   if (el) el.classList.remove(ERR_CLASS);
 }
 
-function evalCondition(cond: ValidationCondition, byName: Map<string, ValidationField>, container: HTMLElement): boolean {
+function evalCondition(cond: ValidationCondition, byName: Map<string, ValidationField>): boolean {
   const srcField = byName.get(cond.field);
   if (!srcField) return true;
-  const el = container.querySelector<HTMLElement>(`[id="${srcField.fieldId}"]`);
+  const el = document.getElementById(srcField.fieldId);
   if (!el) return true;
   const root = resolveRoot(el, srcField.vendor);
   const val = walk(root, srcField.readExpr);
@@ -155,7 +155,7 @@ function evalCondition(cond: ValidationCondition, byName: Map<string, Validation
   }
 }
 
-function ruleFails(rule: ValidationRule, value: unknown, byName: Map<string, ValidationField>, container: HTMLElement): boolean {
+function ruleFails(rule: ValidationRule, value: unknown, byName: Map<string, ValidationField>): boolean {
   const str = value == null ? "" : String(value);
   const empty = value == null || str === "" || value === false;
 
@@ -189,7 +189,7 @@ function ruleFails(rule: ValidationRule, value: unknown, byName: Map<string, Val
     case "equalTo": {
       const other = byName.get(String(rule.constraint));
       if (!other) return false;
-      const otherEl = container.querySelector<HTMLElement>(`[id="${other.fieldId}"]`);
+      const otherEl = document.getElementById(other.fieldId);
       if (!otherEl) return false;
       const otherRoot = resolveRoot(otherEl, other.vendor);
       return String(value ?? "") !== String(walk(otherRoot, other.readExpr) ?? "");

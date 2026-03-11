@@ -2,23 +2,51 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ValidationShowcaseModel
     {
-        // Basic fields
+        public AllRulesSection AllRules { get; set; } = new();
+        public BasicSection Server { get; set; } = new();
+        public NestedSection Nested { get; set; } = new();
+        public ConditionalSection Conditional { get; set; } = new();
+        public BasicSection Live { get; set; } = new();
+        public CombinedSection Combined { get; set; } = new();
+        public HiddenFieldsSection Hidden { get; set; } = new();
+        public BasicSection Db { get; set; } = new();
+    }
+
+    public class BasicSection
+    {
         public string? Name { get; set; }
         public string? Email { get; set; }
+    }
+
+    public class AllRulesSection : BasicSection
+    {
         public int? Age { get; set; }
         public string? Phone { get; set; }
         public decimal? Salary { get; set; }
-        public string? Website { get; set; }
-
-        // Password pair (equalTo)
         public string? Password { get; set; }
-        public string? ConfirmPassword { get; set; }
+    }
 
-        // Conditional field
+    public class CombinedSection : BasicSection
+    {
+        public int? Age { get; set; }
+        public string? Phone { get; set; }
+    }
+
+    public class HiddenFieldsSection
+    {
+        public string? Name { get; set; }
+        public string? Phone { get; set; }
+        public decimal? Salary { get; set; }
+    }
+
+    public class ConditionalSection
+    {
         public bool IsEmployed { get; set; }
         public string? JobTitle { get; set; }
+    }
 
-        // Nested address
+    public class NestedSection
+    {
         public ValidationAddress? Address { get; set; }
     }
 

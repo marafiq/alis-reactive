@@ -2,10 +2,12 @@
 @using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "Validation";
 
     var plan = Html.ReactivePlan<ValidationShowcaseModel>();
+    var isEmployedId = IdGenerator.For<ValidationShowcaseModel>(m => m.Conditional!.IsEmployed);
 }
 
 <div class="space-y-8">
@@ -26,22 +28,22 @@
             Click &ldquo;Validate All&rdquo; with empty/invalid fields to see errors.
         </p>
         <form id="all-rules-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
+            @{ Html.Field("Name", true, m => m.AllRules!.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Full name" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
+            @{ Html.Field("Email", true, m => m.AllRules!.Email, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "you@example.com" })
             ); }
-            @{ Html.Field("Age", false, m => m.Age, (expr, id) =>
+            @{ Html.Field("Age", false, m => m.AllRules!.Age, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–120" })
             ); }
-            @{ Html.Field("Phone", false, m => m.Phone, (expr, id) =>
+            @{ Html.Field("Phone", false, m => m.AllRules!.Phone, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
             ); }
-            @{ Html.Field("Salary", false, m => m.Salary, (expr, id) =>
+            @{ Html.Field("Salary", false, m => m.AllRules!.Salary, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–500,000" })
             ); }
-            @{ Html.Field("Password", false, m => m.Password, (expr, id) =>
+            @{ Html.Field("Password", false, m => m.AllRules!.Password, (expr, id) =>
                 Html.PasswordFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Min 8 characters" })
             ); }
         </form>
@@ -72,10 +74,10 @@
             ValidationErrors command displays them at the correct fields.
         </p>
         <form id="server-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
+            @{ Html.Field("Name", true, m => m.Server!.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Leave empty to trigger error" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
+            @{ Html.Field("Email", true, m => m.Server!.Email, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Leave empty to trigger error" })
             ); }
         </form>
@@ -84,7 +86,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/Validation/Save", g => g
-                    .IncludeAll("server-form"))
+                    .Include(m => m.Server!.Name)
+                    .Include(m => m.Server!.Email))
                  .WhileLoading(l => l.Element("server-spinner").Show())
                  .Response(r => r
                     .OnSuccess(s =>
@@ -110,30 +113,23 @@
         </div>
     </section>
 
-    <!-- Section 3: Nested Properties -->
+    <!-- Section 3: Nested Properties (Server Validation) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. Nested Properties &mdash; Address.Street, Address.City, Address.ZipCode</h2>
+        <h2 class="text-base font-semibold mb-4">3. Nested Properties &mdash; Server Validation with Dotted Field Names</h2>
         <p class="text-sm text-text-secondary mb-4">
-            Tests that nested property validation works. Field IDs use underscore convention: Address_Street.
-            Server returns errors with dotted names (Address.Street) and showFieldErrors resolves them.
+            Posts empty nested address data to the server. Server validates with FluentValidation and returns 400
+            with dotted field names (Nested.Address.Street). The error spans are resolved by the data-valmsg-for attribute.
         </p>
-        <form id="nested-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            @{ Html.Field("Street", true, m => m.Address!.Street, (expr, id) =>
-                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Street address" })
-            ); }
-            @{ Html.Field("City", true, m => m.Address!.City, (expr, id) =>
-                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "City" })
-            ); }
-            @{ Html.Field("Zip Code", false, m => m.Address!.ZipCode, (expr, id) =>
-                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Min 5 characters" })
-            ); }
+        <form id="nested-form" class="mb-4">
+            <p class="text-sm text-text-secondary italic">
+                Address fields are in the partial view (Section 9). This section tests server-side nested validation.
+            </p>
         </form>
         @(Html.NativeButton("nested-save-btn", "Save Address (Server)")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Validation/Save", g => g
-                    .IncludeAll("nested-form"))
+                p.Post("/Sandbox/Validation/SaveAddress")
                  .WhileLoading(l => l.Element("nested-spinner").Show())
                  .Response(r => r
                     .OnSuccess(s =>
@@ -147,7 +143,6 @@
                         e.Element("nested-spinner").Hide();
                         e.Element("nested-result").SetText("Validation errors at nested fields");
                         e.Element("nested-result").AddClass("text-red-600");
-                        e.ValidationErrors("nested-form");
                     })
                  );
             }))
@@ -166,11 +161,11 @@
         </p>
         <form id="conditional-form" class="space-y-4 mb-4">
             <div class="flex items-center gap-2">
-                <input type="checkbox" id="IsEmployed" name="IsEmployed"
+                <input type="checkbox" id="@isEmployedId" name="Conditional.IsEmployed"
                        class="h-4 w-4 rounded border-border text-accent" />
-                <label for="IsEmployed" class="text-sm font-medium">Is Employed</label>
+                <label for="@isEmployedId" class="text-sm font-medium">Is Employed</label>
             </div>
-            @{ Html.Field("Job Title", false, m => m.JobTitle, (expr, id) =>
+            @{ Html.Field("Job Title", false, m => m.Conditional!.JobTitle, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required when employed" })
             ); }
         </form>
@@ -180,7 +175,7 @@
             {
                 p.Post("/Sandbox/Validation/ValidateClient")
                  .Validate<ValidationShowcaseValidator>("conditional-form")
-                 .ReadExpr("IsEmployed", "checked")
+                 .ReadExpr("Conditional.IsEmployed", "checked")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
@@ -201,10 +196,10 @@
             After validation shows errors, typing into the field automatically clears that field's error.
         </p>
         <form id="live-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
+            @{ Html.Field("Name", true, m => m.Live!.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Type after error to clear" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
+            @{ Html.Field("Email", true, m => m.Live!.Email, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Type after error to clear" })
             ); }
         </form>
@@ -235,16 +230,16 @@
             additional errors (e.g. conditional rules not extracted to client). Both layers display at the same fields.
         </p>
         <form id="combined-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
+            @{ Html.Field("Name", true, m => m.Combined!.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
+            @{ Html.Field("Email", true, m => m.Combined!.Email, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required + valid email" })
             ); }
-            @{ Html.Field("Age", false, m => m.Age, (expr, id) =>
+            @{ Html.Field("Age", false, m => m.Combined!.Age, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–120" })
             ); }
-            @{ Html.Field("Phone", false, m => m.Phone, (expr, id) =>
+            @{ Html.Field("Phone", false, m => m.Combined!.Phone, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
             ); }
         </form>
@@ -253,7 +248,10 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/Validation/Save", g => g
-                    .IncludeAll("combined-form"))
+                    .Include(m => m.Combined!.Name)
+                    .Include(m => m.Combined!.Email)
+                    .Include(m => m.Combined!.Age)
+                    .Include(m => m.Combined!.Phone))
                  .Validate<ValidationShowcaseValidator>("combined-form")
                  .WhileLoading(l => l.Element("combined-spinner").Show())
                  .Response(r => r
@@ -289,7 +287,7 @@
             You should be able to submit with only the visible Name field filled.
         </p>
         <form id="hidden-fields-form" class="space-y-4 mb-4">
-            @{ Html.Field("Name (always visible)", true, m => m.Name, (expr, id) =>
+            @{ Html.Field("Name (always visible)", true, m => m.Hidden!.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Required" })
             ); }
             <div class="flex items-center gap-2">
@@ -304,10 +302,10 @@
                 <label for="hf_toggle" class="text-sm font-medium">Show Extra Fields</label>
             </div>
             <div id="hf_extras" hidden class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                @{ Html.Field("Phone (hidden by default)", false, m => m.Phone, (expr, id) =>
+                @{ Html.Field("Phone (hidden by default)", false, m => m.Hidden!.Phone, (expr, id) =>
                     Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "123-456-7890" })
                 ); }
-                @{ Html.Field("Salary (hidden by default)", false, m => m.Salary, (expr, id) =>
+                @{ Html.Field("Salary (hidden by default)", false, m => m.Hidden!.Salary, (expr, id) =>
                     Html.TextBoxFor(expr, new { id, type = "number", @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "0–500,000" })
                 ); }
             </div>
@@ -331,7 +329,9 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/Validation/SaveProfile", g => g
-                    .IncludeAll("hidden-fields-form"))
+                    .Include(m => m.Hidden!.Name)
+                    .Include(m => m.Hidden!.Phone)
+                    .Include(m => m.Hidden!.Salary))
                  .Validate<ValidationShowcaseValidator>("hidden-fields-form")
                  .WhileLoading(l => l.Element("hidden-spinner").Show())
                  .Response(r => r
@@ -368,10 +368,10 @@
             Both errors return as standard 400 ProblemDetails and display at the correct fields.
         </p>
         <form id="db-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
+            @{ Html.Field("Name", true, m => m.Db!.Name, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Try 'admin' to trigger DB error" })
             ); }
-            @{ Html.Field("Email", true, m => m.Email, (expr, id) =>
+            @{ Html.Field("Email", true, m => m.Db!.Email, (expr, id) =>
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm", placeholder = "Try 'taken@test.com' to trigger DB error" })
             ); }
         </form>
@@ -380,7 +380,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/Validation/SaveWithDbCheck", g => g
-                    .IncludeAll("db-form"))
+                    .Include(m => m.Db!.Name)
+                    .Include(m => m.Db!.Email))
                  .Validate<ValidationShowcaseValidator>("db-form")
                  .WhileLoading(l => l.Element("db-spinner").Show())
                  .Response(r => r
@@ -413,7 +414,7 @@
         <p class="text-sm text-text-secondary mb-4">
             Click &ldquo;Load Address Form&rdquo; to fetch a partial view with address fields.
             Then fill/leave empty and click &ldquo;Save Address&rdquo; to validate server-side.
-            Server returns 400 with dotted field names (Address.Street) that resolve to the partial&rsquo;s DOM elements.
+            Server returns 400 with dotted field names (Nested.Address.Street) that resolve to the partial&rsquo;s DOM elements.
         </p>
         @(Html.NativeButton("load-partial-btn", "Load Address Form")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -444,7 +445,9 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Post("/Sandbox/Validation/SaveAddress", g => g
-                        .IncludeAll("partial-form"))
+                        .Include(m => m.Nested!.Address!.Street)
+                        .Include(m => m.Nested!.Address!.City)
+                        .Include(m => m.Nested!.Address!.ZipCode))
                      .WhileLoading(l => l.Element("partial-save-spinner").Show())
                      .Response(r => r
                         .OnSuccess(s =>

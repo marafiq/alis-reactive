@@ -224,7 +224,10 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Http/SaveFormData", g => g.IncludeAll("formdata-form"))
+                p.Post("/Sandbox/Http/SaveFormData", g => g
+                    .Static("FirstName", "John")
+                    .Static("LastName", "Doe")
+                    .Static("Email", "john@example.com"))
                  .WhileLoading(l => l.Element("formdata-spinner").Show())
                  .Response(r => r
                     .OnSuccess(s =>

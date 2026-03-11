@@ -99,7 +99,7 @@ namespace Alis.Reactive
                 var expanded = new List<GatherItem>();
                 foreach (var item in req.Gather)
                 {
-                    if (item is AllGather ag && ag.FormId == null)
+                    if (item is AllGather)
                     {
                         foreach (var c in _components)
                         {
