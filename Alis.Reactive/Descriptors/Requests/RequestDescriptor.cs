@@ -13,7 +13,15 @@ namespace Alis.Reactive.Descriptors.Requests
 
         public List<Command> Commands { get; }
 
-        public StatusHandler(int? statusCode, List<Command> commands)
+        /// <summary>Default handler — fires on any status within its routing group (2xx for success, any for error).</summary>
+        public StatusHandler(List<Command> commands)
+        {
+            StatusCode = null;
+            Commands = commands;
+        }
+
+        /// <summary>Status-specific handler — fires only when the response matches this exact code.</summary>
+        public StatusHandler(int statusCode, List<Command> commands)
         {
             StatusCode = statusCode;
             Commands = commands;

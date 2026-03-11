@@ -51,6 +51,18 @@ namespace Alis.Reactive.Builders
             return _pipeline;
         }
 
+        /// <summary>
+        /// Sets the element text from an HTTP response body property.
+        /// Same phantom pattern as event payload overload — compiler resolves via ResponseBody&lt;T&gt;.
+        /// </summary>
+        public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
+            where TResponse : class
+        {
+            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.textContent = val", source: sourcePath));
+            return _pipeline;
+        }
+
         public PipelineBuilder<TModel> SetHtml(string html)
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.innerHTML = val", html));

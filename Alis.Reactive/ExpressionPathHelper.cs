@@ -6,25 +6,40 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Converts a member expression like x => x.Address.City into a camelCase dot-path
-    /// prefixed with "evt." for use as a plan source binding.
+    /// with a caller-specified prefix for use as a plan source binding.
+    ///
+    /// Prefixes map to ExecContext properties at runtime:
+    ///   "evt"          → ctx.evt.address.city       (event payloads)
+    ///   "responseBody" → ctx.responseBody.data.name  (HTTP success JSON)
+    ///
+    /// walk.ts resolves any prefix — the C# side just generates the path.
     /// </summary>
     public static class ExpressionPathHelper
     {
-        public static string ToEventPath<TSource>(Expression<Func<TSource, object?>> expression)
+        public static string ToPath<TSource>(string prefix, Expression<Func<TSource, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return "evt." + string.Join(".", members);
+            return prefix + "." + string.Join(".", members);
         }
+
+        public static string ToPath<TSource, TProp>(string prefix, Expression<Func<TSource, TProp>> expression)
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return prefix + "." + string.Join(".", members);
+        }
+
+        public static string ToEventPath<TSource>(Expression<Func<TSource, object?>> expression)
+            => ToPath("evt", expression);
 
         /// <summary>
         /// Typed overload — no boxing Convert node needed because TProp matches the property type.
         /// Used by the typed condition builders.
         /// </summary>
         public static string ToEventPath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return "evt." + string.Join(".", members);
-        }
+            => ToPath<TSource, TProp>("evt", expression);
+
+        public static string ToResponsePath<TSource>(Expression<Func<TSource, object?>> expression)
+            => ToPath("responseBody", expression);
 
         private static List<string> ExtractMemberChain(Expression expr)
         {
