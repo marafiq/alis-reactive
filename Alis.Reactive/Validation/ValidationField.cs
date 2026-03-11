@@ -17,11 +17,11 @@ namespace Alis.Reactive.Validation
         public string Vendor { get; }
 
         /// <summary>
-        /// Property path to read the field value. Null for native inputs (uses .value/.checked).
-        /// For fusion components: "comp.value" (resolved by evalRead via ej2_instances[0]).
-        /// For native elements: "el.value", "el.checked", etc.
+        /// Property path from vendor-determined root. Vendor resolves root
+        /// (native→el, fusion→ej2_instances[0]), then readExpr is walked from that root.
+        /// Examples: "value", "checked".
         /// </summary>
-        public string? ReadExpr { get; }
+        public string ReadExpr { get; }
 
         public List<ValidationRule> Rules { get; }
 
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Validation
             string fieldId,
             string fieldName,
             string vendor,
-            string? readExpr,
+            string readExpr,
             List<ValidationRule> rules)
         {
             FieldId = fieldId;

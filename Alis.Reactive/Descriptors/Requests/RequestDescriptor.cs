@@ -56,6 +56,9 @@ namespace Alis.Reactive.Descriptors.Requests
         [JsonIgnore]
         internal string? ValidationPrefix { get; set; }
 
+        [JsonIgnore]
+        internal Dictionary<string, string>? ReadExprOverrides { get; set; }
+
         public RequestDescriptor(
             string verb,
             string url,

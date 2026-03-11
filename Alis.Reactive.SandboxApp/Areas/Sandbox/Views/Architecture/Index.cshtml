@@ -1,0 +1,376 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ArchitectureModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.Descriptors
+@using Alis.Reactive.Descriptors.Commands
+@using Alis.Reactive.Descriptors.Triggers
+@using Alis.Reactive.Descriptors.Reactions
+@using Alis.Reactive.Validation
+@using System.Collections.Generic
+@{
+    ViewData["Title"] = "Architecture";
+
+    var plan = Html.ReactivePlan<ArchitectureModel>();
+
+    // ── Section 1: Property Write (jsEmit) — dom-ready writes to both vendors ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<TestWidgetNative>("native-write").SetValue("written-native");
+        p.Component<TestWidgetSyncFusion>("fusion-write").SetValue("written-fusion");
+    }));
+
+    // ── Section 2: Void Method Call — dom-ready calls focus() on fusion widget ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<TestWidgetSyncFusion>("fusion-focus").Focus();
+    }));
+
+    // ── Section 3: Gather — button → dispatch → custom-event → POST with gather ──
+
+    Html.On(plan, t => t.CustomEvent("do-gather-native", p =>
+    {
+        p.Post("/Sandbox/Architecture/Echo", g =>
+            g.Include<TestWidgetNative, ArchitectureModel>("native-gather", "nativeVal"))
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("gather-native-result").SetText("gathered");
+            }));
+    }));
+
+    Html.On(plan, t => t.CustomEvent("do-gather-fusion", p =>
+    {
+        p.Post("/Sandbox/Architecture/Echo", g =>
+            g.Include<TestWidgetSyncFusion, ArchitectureModel>("fusion-gather", "fusionVal"))
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("gather-fusion-result").SetText("gathered");
+            }));
+    }));
+
+    // ── Section 4: Event Wiring — component-event triggers wired directly ──
+
+    // Native: "change" event on native input → walk evt.value → SetText
+    {
+        var pb = new PipelineBuilder<ArchitectureModel>();
+        pb.AddCommand(new MutateElementCommand("native-event-result", "el.textContent = val", source: "evt.value"));
+        plan.AddEntry(new Entry(
+            new ComponentEventTrigger("native-event", "change", "native"),
+            pb.BuildReaction()));
+    }
+
+    // Fusion: "change" event on TestWidget → walk evt.newValue → SetText
+    {
+        var pb = new PipelineBuilder<ArchitectureModel>();
+        pb.AddCommand(new MutateElementCommand("fusion-event-result", "el.textContent = val", source: "evt.newValue"));
+        plan.AddEntry(new Entry(
+            new ComponentEventTrigger("fusion-event", "change", "fusion"),
+            pb.BuildReaction()));
+    }
+
+    // ── Section 5: Deep Dot-Path Walk ──
+
+    Html.On(plan, t => t.CustomEvent("deep-walk-ready", p =>
+    {
+        p.AddCommand(new MutateElementCommand("deep-total", "el.textContent = val", source: "evt.result.detail.total"));
+        p.AddCommand(new MutateElementCommand("deep-city", "el.textContent = val", source: "evt.result.detail.address.city"));
+    }));
+
+    // ── Section 7: Both vendors gathered together ──
+
+    Html.On(plan, t => t.CustomEvent("do-gather-both", p =>
+    {
+        p.Post("/Sandbox/Architecture/Echo", g =>
+        {
+            g.Include<TestWidgetNative, ArchitectureModel>("native-both", "nativeVal");
+            g.Include<TestWidgetSyncFusion, ArchitectureModel>("fusion-both", "fusionVal");
+        })
+        .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("both-vendors-result").SetText("both-gathered");
+            }));
+    }));
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Architecture Verification</h1>
+        <p class="mt-2 text-text-secondary">
+            Vendor-agnostic component architecture: same readExpr, same walk, different vendor root.
+            Each section tests one interaction type with both native and fusion vendors.
+        </p>
+    </div>
+
+    <!-- Section 1: Property Write via jsEmit -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Property Write (jsEmit)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            dom-ready writes values. Native: <code>el.value=val</code>.
+            Fusion: <code>var c=el.ej2_instances[0]; c.value=val</code>.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Native (el.value)</label>
+                <input id="native-write" type="text" readonly
+                       class="rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Fusion (ej2.value)</label>
+                <div id="fusion-write" data-test-widget data-initial-value=""
+                     class="rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Void Method Call -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Void Method Call (jsEmit)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            dom-ready calls <code>focus()</code> on the fusion TestWidget.
+        </p>
+        <div>
+            <label class="block text-sm font-medium mb-1">Fusion (ej2.focus())</label>
+            <div id="fusion-focus" data-test-widget
+                 class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
+        </div>
+    </section>
+
+    <!-- Section 3: Property Read via Gather -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Property Read (Gather)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Both vendors use readExpr <code>"value"</code>. Native reads <code>el.value</code>,
+            fusion reads <code>ej2_instances[0].value</code>.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Native Input</label>
+                <input id="native-gather" type="text" value="native-42"
+                       class="rounded-md border border-border px-3 py-1.5 text-sm w-full" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Fusion TestWidget</label>
+                <div id="fusion-gather" data-test-widget data-initial-value="fusion-42"
+                     class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
+            </div>
+        </div>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("gather-native-btn", "Gather Native")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Dispatch("do-gather-native");
+                }))
+            @(Html.NativeButton("gather-fusion-btn", "Gather Fusion")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Dispatch("do-gather-fusion");
+                }))
+        </div>
+        <div class="font-mono text-sm space-y-1">
+            <p>Native: <span id="gather-native-result" class="text-text-muted">not gathered</span></p>
+            <p>Fusion: <span id="gather-fusion-result" class="text-text-muted">not gathered</span></p>
+        </div>
+    </section>
+
+    <!-- Section 4: Event Wiring -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Event Wiring</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Type in native input (fires DOM change) or fusion TestWidget inner input
+            (widget fires "change" with <code>{newValue}</code>).
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Native Input</label>
+                <input id="native-event" type="text"
+                       class="rounded-md border border-border px-3 py-1.5 text-sm w-full" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Fusion TestWidget</label>
+                <div id="fusion-event" data-test-widget
+                     class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
+            </div>
+        </div>
+        <div class="font-mono text-sm space-y-1">
+            <p>Native event: <span id="native-event-result" class="text-text-muted">&mdash;</span></p>
+            <p>Fusion event: <span id="fusion-event-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 5: Deep Dot-Path Walk -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">5. Deep Dot-Path Walk</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Dispatches nested payload, walks <code>evt.result.detail.total</code>
+            and <code>evt.result.detail.address.city</code>.
+        </p>
+        @(Html.NativeButton("deep-walk-btn", "Walk Deep Paths")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("deep-walk-ready", new
+                {
+                    result = new
+                    {
+                        detail = new
+                        {
+                            total = 99.5,
+                            address = new { city = "NY" }
+                        }
+                    }
+                });
+            }))
+        <div class="font-mono text-sm space-y-1">
+            <p>Total: <span id="deep-total" class="text-text-muted">&mdash;</span></p>
+            <p>City: <span id="deep-city" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 6: Validation (Cross-Vendor) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">6. Validation (Cross-Vendor)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Native input and fusion TestWidget both validated with readExpr <code>"value"</code>.
+        </p>
+        <form id="arch-val-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Native (required)</label>
+                <input id="native-val-field" type="text"
+                       class="rounded-md border border-border px-3 py-1.5 text-sm w-full" />
+                <span data-valmsg-for="native-val-field" hidden
+                      class="text-red-600 text-xs mt-1 block"></span>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Fusion (required)</label>
+                <div id="fusion-val-field" data-test-widget
+                     class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
+                <span data-valmsg-for="fusion-val-field" hidden
+                      class="text-red-600 text-xs mt-1 block"></span>
+            </div>
+        </form>
+        @(Html.NativeButton("validate-btn", "Validate")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Architecture/ValidateClient")
+                 .Validate(new ValidationDescriptor("arch-val-form", new List<ValidationField>
+                 {
+                     new ValidationField("native-val-field", "native-val-field", "native", "value",
+                         new List<ValidationRule> { new ValidationRule("required", "Required") }),
+                     new ValidationField("fusion-val-field", "fusion-val-field", "fusion", "value",
+                         new List<ValidationRule> { new ValidationRule("required", "Required") })
+                 }))
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("val-result").SetText("Both fields passed!");
+                        s.Element("val-result").AddClass("text-green-600");
+                        s.Element("val-result").RemoveClass("text-text-muted");
+                    }));
+            }))
+        <div class="mt-3 font-mono text-sm">
+            <p id="val-result" class="text-text-muted">Click to validate</p>
+        </div>
+    </section>
+
+    <!-- Section 7: Cross-Vendor EqualTo -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">7. Cross-Vendor EqualTo</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Native password + fusion confirm. EqualTo rule compares across vendors.
+        </p>
+        <form id="equalto-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Password (native)</label>
+                <input id="native-password" type="password"
+                       class="rounded-md border border-border px-3 py-1.5 text-sm w-full" />
+                <span data-valmsg-for="native-password" hidden
+                      class="text-red-600 text-xs mt-1 block"></span>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Confirm (fusion)</label>
+                <div id="fusion-confirm" data-test-widget
+                     class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
+                <span data-valmsg-for="fusion-confirm" hidden
+                      class="text-red-600 text-xs mt-1 block"></span>
+            </div>
+        </form>
+        @(Html.NativeButton("cross-validate-btn", "Validate EqualTo")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Architecture/ValidateClient")
+                 .Validate(new ValidationDescriptor("equalto-form", new List<ValidationField>
+                 {
+                     new ValidationField("native-password", "native-password", "native", "value",
+                         new List<ValidationRule> { new ValidationRule("required", "Required") }),
+                     new ValidationField("fusion-confirm", "fusion-confirm", "fusion", "value",
+                         new List<ValidationRule>
+                         {
+                             new ValidationRule("required", "Required"),
+                             new ValidationRule("equalTo", "Must match", "native-password")
+                         })
+                 }))
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("equalto-result").SetText("Passwords match!");
+                        s.Element("equalto-result").AddClass("text-green-600");
+                        s.Element("equalto-result").RemoveClass("text-text-muted");
+                    }));
+            }))
+        <div class="mt-3 font-mono text-sm">
+            <p id="equalto-result" class="text-text-muted">Click to validate</p>
+        </div>
+    </section>
+
+    <!-- Section 8: Both Vendors Gathered Together -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">8. Same ReadExpr Gathers Both Vendors</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            One button gathers native and fusion values together. Same readExpr <code>"value"</code>,
+            different vendor roots.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Native</label>
+                <input id="native-both" type="text" value="n-both"
+                       class="rounded-md border border-border px-3 py-1.5 text-sm w-full" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Fusion</label>
+                <div id="fusion-both" data-test-widget data-initial-value="f-both"
+                     class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
+            </div>
+        </div>
+        @(Html.NativeButton("both-vendors-btn", "Gather Both")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-gather-both");
+            }))
+        <p id="both-vendors-result" class="font-mono text-sm text-text-muted">not gathered</p>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/test-widget.js" asp-append-version="true"></script>
+}
+
+@Html.RenderPlan(plan)

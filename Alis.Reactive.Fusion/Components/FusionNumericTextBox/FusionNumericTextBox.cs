@@ -6,7 +6,8 @@ namespace Alis.Reactive.Fusion.Components
     /// p.Component&lt;FusionNumericTextBox&gt;(m => m.Amount) to unlock
     /// the NumericTextBox-specific extension methods.
     /// </summary>
-    public sealed class FusionNumericTextBox : FusionComponent, IFusionInputComponent
+    [ReadExpr("value")]
+    public sealed class FusionNumericTextBox : FusionComponent, IFusionInputComponent, IReadableComponent
     {
     }
 }

@@ -47,7 +47,7 @@ namespace Alis.Reactive.FluentValidator
                     elementId,
                     propertyPath,
                     "native",
-                    null,
+                    "value",
                     rules));
             }
 
@@ -81,7 +81,7 @@ namespace Alis.Reactive.FluentValidator
                 elementId,
                 propertyName,
                 "native",
-                null,
+                "value",
                 new List<ValidationRule>());
             fields.Add(field);
             return field;

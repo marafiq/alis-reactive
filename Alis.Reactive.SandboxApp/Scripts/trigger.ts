@@ -1,4 +1,5 @@
 import type { Trigger, Reaction } from "./types";
+import { resolveRoot } from "./component";
 import { scope } from "./trace";
 import { executeReaction } from "./execute";
 
@@ -30,26 +31,18 @@ export function wireTrigger(trigger: Trigger, reaction: Reaction): void {
         log.warn("component-event: element not found", { componentId: trigger.componentId });
         break;
       }
-
-      if (trigger.vendor === "fusion") {
-        // Syncfusion: access the EJ2 component instance and wire via its event API
-        const comp = (el as any).ej2_instances?.[0];
-        if (!comp) {
-          log.warn("component-event: no ej2 instance", { componentId: trigger.componentId });
-          break;
-        }
-        log.debug("component-event: fusion", { componentId: trigger.componentId, jsEvent: trigger.jsEvent });
-        comp.addEventListener(trigger.jsEvent, (args: any) => {
-          executeReaction(reaction, { evt: args ?? {} });
-        });
-      } else {
-        // Native: standard DOM event listener
-        log.debug("component-event: native", { componentId: trigger.componentId, jsEvent: trigger.jsEvent });
-        el.addEventListener(trigger.jsEvent, (e: Event) => {
-          const target = e.target as HTMLInputElement;
-          executeReaction(reaction, { evt: { value: target?.value, checked: target?.checked, event: e } });
-        });
+      const root = resolveRoot(el, trigger.vendor);
+      if (!root) {
+        log.warn("component-event: no root", { componentId: trigger.componentId, vendor: trigger.vendor });
+        break;
       }
+      log.debug("component-event", { componentId: trigger.componentId, jsEvent: trigger.jsEvent, vendor: trigger.vendor });
+      (root as EventTarget).addEventListener(trigger.jsEvent, (e: any) => {
+        const detail = trigger.vendor === "native"
+          ? { value: e.target?.value, checked: e.target?.checked, event: e }
+          : (e ?? {});
+        executeReaction(reaction, { evt: detail });
+      });
       break;
     }
   }

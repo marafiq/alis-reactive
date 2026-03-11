@@ -3,7 +3,8 @@
   "scripts": {
     "build": "esbuild Alis.Reactive.SandboxApp/Scripts/auto-boot.ts --bundle --outfile=Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js --format=esm --minify",
     "build:css": "npx @tailwindcss/cli -i Alis.Reactive.SandboxApp/Styles/app.css -o Alis.Reactive.SandboxApp/wwwroot/css/alis-modern-tailwind.css --minify",
-    "build:all": "npm run build && npm run build:css",
+    "build:test-widget": "esbuild Alis.Reactive.SandboxApp/Scripts/test-widget.ts --bundle --format=iife --outfile=Alis.Reactive.SandboxApp/wwwroot/js/test-widget.js",
+    "build:all": "npm run build && npm run build:test-widget && npm run build:css",
     "watch": "esbuild Alis.Reactive.SandboxApp/Scripts/auto-boot.ts --bundle --outfile=Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js --format=esm --watch",
     "watch:css": "npx @tailwindcss/cli -i Alis.Reactive.SandboxApp/Styles/app.css -o Alis.Reactive.SandboxApp/wwwroot/css/alis-modern-tailwind.css --watch",
     "typecheck": "tsc --project Alis.Reactive.SandboxApp/Scripts/tsconfig.json --noEmit",

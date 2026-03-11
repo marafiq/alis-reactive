@@ -151,11 +151,11 @@ public class WhenRequestingFromServer : PlanTestBase
             p.Post("/api/save", g => g.Static("name", "test"))
              .Validate(new Validation.ValidationDescriptor("testForm", new List<Validation.ValidationField>
              {
-                 new("Name", "Name", "native", null, new List<Validation.ValidationRule>
+                 new("Name", "Name", "native", "value", new List<Validation.ValidationRule>
                  {
                      new("required", "Name is required"),
                  }),
-                 new("Email", "Email", "native", null, new List<Validation.ValidationRule>
+                 new("Email", "Email", "native", "value", new List<Validation.ValidationRule>
                  {
                      new("required", "Email is required"),
                      new("email", "Must be a valid email"),
@@ -174,7 +174,7 @@ public class WhenRequestingFromServer : PlanTestBase
             p.Post("/api/save", g => g.Static("name", "test"))
              .Validate(new Validation.ValidationDescriptor("testForm", new List<Validation.ValidationField>
              {
-                 new("Name", "Name", "native", null, new List<Validation.ValidationRule>
+                 new("Name", "Name", "native", "value", new List<Validation.ValidationRule>
                  {
                      new("required", "Name is required"),
                  }),

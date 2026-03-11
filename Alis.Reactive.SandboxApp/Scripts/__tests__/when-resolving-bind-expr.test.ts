@@ -79,9 +79,10 @@ describe("when resolving a BindExpr against execution context", () => {
       expect(resolve("evt.address.city", ctx)).toBeUndefined();
     });
 
-    it("returns undefined when intermediate is a primitive", () => {
+    it("walks through primitive properties (JS semantics)", () => {
       const ctx: ExecContext = { evt: { name: "Alice" } };
-      expect(resolve("evt.name.length", ctx)).toBeUndefined();
+      // walk follows JS property access: "Alice".length === 5
+      expect(resolve("evt.name.length", ctx)).toBe(5);
     });
 
     it("returns the nested object itself when path ends at object", () => {

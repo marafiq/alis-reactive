@@ -23,7 +23,7 @@ beforeEach(async () => {
 describe("gather", () => {
   it("native input value appears in POST body", () => {
     const items: GatherItem[] = [
-      { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName" },
+      { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName", readExpr: "value" },
     ];
     const result = resolveGather(items, "POST");
     expect(result.body).toEqual({ FirstName: "John" });
@@ -31,12 +31,12 @@ describe("gather", () => {
   });
 
   it("fusion component value appears in POST body", () => {
-    // Mock ej2_instances on the element
+    // Mock ej2_instances on the element — vendor resolves root, readExpr walks from root
     const el = document.getElementById("FacilityId")!;
     (el as any).ej2_instances = [{ value: 42 }];
 
     const items: GatherItem[] = [
-      { kind: "component", componentId: "FacilityId", vendor: "fusion", name: "FacilityId", readExpr: "comp.value" },
+      { kind: "component", componentId: "FacilityId", vendor: "fusion", name: "FacilityId", readExpr: "value" },
     ];
     const result = resolveGather(items, "POST");
     expect(result.body).toEqual({ FacilityId: 42 });
@@ -44,7 +44,7 @@ describe("gather", () => {
 
   it("GET request carries values as URL params", () => {
     const items: GatherItem[] = [
-      { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName" },
+      { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName", readExpr: "value" },
     ];
     const result = resolveGather(items, "GET");
     expect(result.urlParams).toEqual(["FirstName=John"]);
@@ -74,7 +74,7 @@ describe("gather", () => {
 
   it("mixed gather items combine correctly", () => {
     const items: GatherItem[] = [
-      { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName" },
+      { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName", readExpr: "value" },
       { kind: "static", param: "csrfToken", value: "abc123" },
     ];
     const result = resolveGather(items, "POST");

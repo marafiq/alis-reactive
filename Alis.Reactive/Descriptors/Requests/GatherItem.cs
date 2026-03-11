@@ -15,11 +15,9 @@ namespace Alis.Reactive.Descriptors.Requests
         public string ComponentId { get; }
         public string Vendor { get; }
         public string Name { get; }
+        public string ReadExpr { get; }
 
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? ReadExpr { get; }
-
-        public ComponentGather(string componentId, string vendor, string name, string? readExpr = null)
+        public ComponentGather(string componentId, string vendor, string name, string readExpr)
         {
             ComponentId = componentId;
             Vendor = vendor;

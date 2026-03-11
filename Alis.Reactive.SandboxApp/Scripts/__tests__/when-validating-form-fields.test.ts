@@ -11,6 +11,7 @@ function field(overrides: Partial<ValidationField> & { fieldId: string }): Valid
   return {
     fieldName: overrides.fieldName ?? overrides.fieldId,
     vendor: overrides.vendor ?? "native",
+    readExpr: overrides.readExpr ?? "value",
     rules: overrides.rules ?? [],
     ...overrides,
   };
@@ -344,7 +345,7 @@ describe("validate — atLeastOne", () => {
 describe("validate — conditional rules", () => {
   it("applies when truthy condition is met", () => {
     const desc = makeDesc("testForm", [
-      field({ fieldId: "IsEmployed", fieldName: "IsEmployed", rules: [] }),
+      field({ fieldId: "IsEmployed", fieldName: "IsEmployed", readExpr: "checked", rules: [] }),
       field({ fieldId: "JobTitle", fieldName: "JobTitle", rules: [
         { rule: "required", message: "Job title required", when: { field: "IsEmployed", op: "truthy" } },
       ] }),
@@ -356,7 +357,7 @@ describe("validate — conditional rules", () => {
 
   it("skips when truthy condition is not met", () => {
     const desc = makeDesc("testForm", [
-      field({ fieldId: "IsEmployed", fieldName: "IsEmployed", rules: [] }),
+      field({ fieldId: "IsEmployed", fieldName: "IsEmployed", readExpr: "checked", rules: [] }),
       field({ fieldId: "JobTitle", fieldName: "JobTitle", rules: [
         { rule: "required", message: "Job title required", when: { field: "IsEmployed", op: "truthy" } },
       ] }),
@@ -391,7 +392,7 @@ describe("validate — conditional rules", () => {
 
   it("evaluates falsy condition", () => {
     const desc = makeDesc("testForm", [
-      field({ fieldId: "IsEmployed", fieldName: "IsEmployed", rules: [] }),
+      field({ fieldId: "IsEmployed", fieldName: "IsEmployed", readExpr: "checked", rules: [] }),
       field({ fieldId: "JobTitle", fieldName: "JobTitle", rules: [
         { rule: "required", message: "explain", when: { field: "IsEmployed", op: "falsy" } },
       ] }),
@@ -421,14 +422,14 @@ describe("validate — first-fail-wins", () => {
 // ── validate — fusion vendor ──────────────────────────────
 
 describe("validate — fusion vendor", () => {
-  it("reads value via readExpr", () => {
+  it("reads value via readExpr from vendor root", () => {
     (document.getElementById("FusionDrop")! as any).ej2_instances = [{ value: "" }];
     const desc = makeDesc("testForm", [
       field({
         fieldId: "FusionDrop",
         fieldName: "FusionDrop",
         vendor: "fusion",
-        readExpr: "comp.value",
+        readExpr: "value",
         rules: [{ rule: "required", message: "required" }],
       }),
     ]);
