@@ -12,13 +12,14 @@ namespace Alis.Reactive.Builders.Conditions
     /// </summary>
     public sealed class BranchBuilder<TModel> where TModel : class
     {
-        private readonly PipelineBuilder<TModel> _pipeline;
         private readonly List<Branch> _branches;
         private bool _elseCalled;
 
+        internal PipelineBuilder<TModel> Pipeline { get; }
+
         internal BranchBuilder(PipelineBuilder<TModel> pipeline, List<Branch> branches)
         {
-            _pipeline = pipeline;
+            Pipeline = pipeline;
             _branches = branches;
         }
 
@@ -52,6 +53,7 @@ namespace Alis.Reactive.Builders.Conditions
             configure(pb);
             var reaction = pb.BuildReaction();
             _branches.Add(new Branch(null, reaction));
+            Pipeline.MergeBuildContexts(pb.BuildContexts);
             _elseCalled = true;
         }
 

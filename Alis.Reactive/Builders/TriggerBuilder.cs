@@ -18,10 +18,7 @@ namespace Alis.Reactive.Builders
         {
             var pb = new PipelineBuilder<TModel>();
             configure(pb);
-            _plan.AddEntry(new Entry(
-                new DomReadyTrigger(),
-                pb.BuildReaction()
-            ));
+            AddEntryWithContexts(new DomReadyTrigger(), pb);
             return this;
         }
 
@@ -29,10 +26,7 @@ namespace Alis.Reactive.Builders
         {
             var pb = new PipelineBuilder<TModel>();
             configure(pb);
-            _plan.AddEntry(new Entry(
-                new CustomEventTrigger(eventName),
-                pb.BuildReaction()
-            ));
+            AddEntryWithContexts(new CustomEventTrigger(eventName), pb);
             return this;
         }
 
@@ -42,11 +36,14 @@ namespace Alis.Reactive.Builders
         {
             var pb = new PipelineBuilder<TModel>();
             configure(new TPayload(), pb);
-            _plan.AddEntry(new Entry(
-                new CustomEventTrigger(eventName),
-                pb.BuildReaction()
-            ));
+            AddEntryWithContexts(new CustomEventTrigger(eventName), pb);
             return this;
+        }
+
+        private void AddEntryWithContexts(Trigger trigger, PipelineBuilder<TModel> pb)
+        {
+            _plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+            (_plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
         }
     }
 }

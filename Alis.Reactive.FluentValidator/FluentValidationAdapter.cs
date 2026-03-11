@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using FluentValidation;
 using FluentValidation.Internal;
@@ -17,13 +18,22 @@ namespace Alis.Reactive.FluentValidator
     /// </summary>
     public sealed class FluentValidationAdapter : IValidationExtractor
     {
+        private readonly Func<Type, IValidator?> _factory;
+
+        public FluentValidationAdapter() : this(null) { }
+
+        public FluentValidationAdapter(Func<Type, IValidator?>? factory)
+        {
+            _factory = factory ?? (type => Activator.CreateInstance(type) as IValidator);
+        }
+
         /// <summary>
         /// Extract client rules from the given validator type for a form.
         /// Returns null if no extractable rules are found.
         /// </summary>
         public ValidationDescriptor? ExtractRules(Type validatorType, string formId)
         {
-            var validator = Activator.CreateInstance(validatorType) as IValidator;
+            var validator = _factory(validatorType);
             if (validator == null) return null;
 
             var modelType = GetModelType(validatorType);
@@ -32,7 +42,7 @@ namespace Alis.Reactive.FluentValidator
             // Intermediate: property path → ordered list of (ruleType, message, constraint)
             var fieldRules = new Dictionary<string, List<ExtractedRule>>();
 
-            ExtractFromValidator(validator, "", fieldRules);
+            ExtractFromValidator(validator, "", fieldRules, _factory);
 
             // Build fields
             var fields = new List<ValidationField>();
@@ -106,7 +116,8 @@ namespace Alis.Reactive.FluentValidator
         private static void ExtractFromValidator(
             IValidator validator,
             string prefix,
-            Dictionary<string, List<ExtractedRule>> fieldRules)
+            Dictionary<string, List<ExtractedRule>> fieldRules,
+            Func<Type, IValidator?> factory)
         {
             if (!(validator is IEnumerable<IValidationRule> rules)) return;
 
@@ -126,15 +137,16 @@ namespace Alis.Reactive.FluentValidator
                         {
                             try
                             {
-                                var nested = Activator.CreateInstance(adaptor.ValidatorType) as IValidator;
+                                var nested = factory(adaptor.ValidatorType);
                                 if (nested != null)
                                 {
-                                    ExtractFromValidator(nested, prefix, fieldRules);
+                                    ExtractFromValidator(nested, prefix, fieldRules, factory);
                                 }
                             }
-                            catch
+                            catch (Exception ex)
                             {
                                 // Skip if nested validator can't be instantiated
+                                Debug.WriteLine($"[FluentValidationAdapter] Failed to create validator {adaptor.ValidatorType.Name}: {ex.Message}");
                             }
                         }
                     }
@@ -155,15 +167,16 @@ namespace Alis.Reactive.FluentValidator
                     {
                         try
                         {
-                            var nested = Activator.CreateInstance(adaptor.ValidatorType) as IValidator;
+                            var nested = factory(adaptor.ValidatorType);
                             if (nested != null)
                             {
-                                ExtractFromValidator(nested, fullPath, fieldRules);
+                                ExtractFromValidator(nested, fullPath, fieldRules, factory);
                             }
                         }
-                        catch
+                        catch (Exception ex)
                         {
                             // Skip if nested validator can't be instantiated
+                            Debug.WriteLine($"[FluentValidationAdapter] Failed to create validator {adaptor.ValidatorType.Name}: {ex.Message}");
                         }
                         continue;
                     }

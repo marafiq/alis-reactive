@@ -6,7 +6,8 @@
         componentId: Amount,
         jsEvent: change,
         vendor: fusion,
-        bindingPath: Amount
+        bindingPath: Amount,
+        readExpr: value
       },
       reaction: {
         kind: sequential,

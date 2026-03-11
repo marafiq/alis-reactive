@@ -61,7 +61,8 @@
         "componentId": { "type": "string", "minLength": 1 },
         "jsEvent": { "type": "string", "minLength": 1 },
         "vendor": { "$ref": "#/$defs/Vendor" },
-        "bindingPath": { "type": "string", "minLength": 1, "description": "Dot-notation model binding path (e.g. Address.City). Carried for future HTTP gather." }
+        "bindingPath": { "type": "string", "minLength": 1, "description": "Dot-notation model binding path (e.g. Address.City). Carried for future HTTP gather." },
+        "readExpr": { "type": "string", "minLength": 1, "description": "Property path from vendor-determined root for reading the component value in event payload. Examples: 'value', 'checked'. Runtime uses walk(el, readExpr) — plan-driven, no hardcoded property lists." }
       }
     },
 

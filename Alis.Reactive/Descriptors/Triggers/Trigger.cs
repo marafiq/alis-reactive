@@ -45,12 +45,23 @@ namespace Alis.Reactive.Descriptors.Triggers
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? BindingPath { get; }
 
-        public ComponentEventTrigger(string componentId, string jsEvent, string vendor, string? bindingPath = null)
+        /// <summary>
+        /// Property path from the vendor-determined root for reading the component's value.
+        /// Examples: "value" (NativeDropDown), "checked" (NativeCheckBox).
+        /// Null for non-readable components (e.g. NativeButton).
+        /// The runtime uses walk(el, readExpr) to extract the event payload — plan-driven,
+        /// no hardcoded property lists in the runtime.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ReadExpr { get; }
+
+        public ComponentEventTrigger(string componentId, string jsEvent, string vendor, string? bindingPath = null, string? readExpr = null)
         {
             ComponentId = componentId;
             JsEvent = jsEvent;
             Vendor = vendor;
             BindingPath = bindingPath;
+            ReadExpr = readExpr;
         }
     }
 }

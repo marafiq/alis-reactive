@@ -10,6 +10,7 @@ namespace Alis.Reactive.Builders.Requests
         internal List<StatusHandler> SuccessHandlers { get; } = new List<StatusHandler>();
         internal List<StatusHandler> ErrorHandlers { get; } = new List<StatusHandler>();
         internal RequestDescriptor? ChainedRequest { get; private set; }
+        internal Dictionary<RequestDescriptor, RequestBuildContext>? ChainedBuildContexts { get; private set; }
 
         /// <summary>
         /// Registers a success handler (status 2xx, no specific code filter).
@@ -59,6 +60,7 @@ namespace Alis.Reactive.Builders.Requests
             var chainedBuilder = new HttpRequestBuilder<TModel>();
             configure(chainedBuilder);
             ChainedRequest = chainedBuilder.BuildRequestDescriptor();
+            ChainedBuildContexts = chainedBuilder.BuildContexts;
             return this;
         }
     }

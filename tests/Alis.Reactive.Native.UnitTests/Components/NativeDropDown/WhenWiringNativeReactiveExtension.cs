@@ -27,7 +27,7 @@ public class WhenWiringNativeReactiveExtension : NativeTestBase
         var pb = new PipelineBuilder<NativeTestModel>();
         pb.Element("echo").SetText("Status changed");
 
-        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "native", "Status");
+        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "native", "Status", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();
@@ -47,7 +47,7 @@ public class WhenWiringNativeReactiveExtension : NativeTestBase
             .Then(then => then.Element("panel").Show())
             .Else(else_ => else_.Element("panel").Hide());
 
-        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "native", "Status");
+        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "native", "Status", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();
@@ -66,7 +66,7 @@ public class WhenWiringNativeReactiveExtension : NativeTestBase
         pb.Component<NativeDropDown>(m => m.Category).SetValue("A");
         pb.Element("echo").SetText("Both updated");
 
-        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "native", "Status");
+        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "native", "Status", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();

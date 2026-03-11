@@ -1,22 +1,12 @@
 import type { RequestDescriptor, StatusHandler, ExecContext } from "./types";
 import { resolveGather } from "./gather";
 import { executeCommands } from "./commands";
-import { validate, wireLiveClearing } from "./validation";
 import { scope } from "./trace";
 
 const log = scope("http");
 
 /** Execute a single HTTP request with gather, whileLoading, response routing, and chaining. */
 export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Promise<void> {
-  // 0. Pre-request validation — stateless, no register step
-  if (req.validation) {
-    wireLiveClearing(req.validation);
-    if (!validate(req.validation)) {
-      log.debug("validation failed, aborting request");
-      return;
-    }
-  }
-
   // 1. WhileLoading — execute commands immediately (revert is the caller's responsibility via onSuccess/onError)
   if (req.whileLoading) {
     executeCommands(req.whileLoading, ctx);

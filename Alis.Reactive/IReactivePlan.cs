@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Reactions;
 using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.Resolvers;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive
@@ -33,6 +33,7 @@ namespace Alis.Reactive
 
         private readonly List<Entry> _entries = new List<Entry>();
         private readonly List<ComponentRegistration> _components = new List<ComponentRegistration>();
+        private readonly Dictionary<RequestDescriptor, RequestBuildContext> _buildContexts = new Dictionary<RequestDescriptor, RequestBuildContext>();
         private readonly IValidationExtractor? _extractor;
 
         public ReactivePlan() : this(null) { }
@@ -52,126 +53,31 @@ namespace Alis.Reactive
             _components.Add(new ComponentRegistration(componentId, vendor, bindingPath, readExpr));
         }
 
+        internal void RegisterBuildContexts(Dictionary<RequestDescriptor, RequestBuildContext>? contexts)
+        {
+            if (contexts == null) return;
+            foreach (var kvp in contexts)
+                _buildContexts[kvp.Key] = kvp.Value;
+        }
+
         public string Render()
         {
-            ResolveAllGather();
-            ResolveAllValidation();
+            ResolveAll();
             return JsonSerializer.Serialize(new { entries = _entries }, CompactOptions);
         }
 
         public string RenderFormatted()
         {
-            ResolveAllGather();
-            ResolveAllValidation();
+            ResolveAll();
             return JsonSerializer.Serialize(new { entries = _entries }, FormattedOptions);
         }
 
-        private void ResolveAllGather()
+        private void ResolveAll()
         {
-            foreach (var entry in _entries)
-            {
-                ResolveGatherInReaction(entry.Reaction);
-            }
-        }
+            GatherResolver.Resolve(_entries, _components);
 
-        private void ResolveGatherInReaction(Reaction reaction)
-        {
-            switch (reaction)
-            {
-                case HttpReaction hr:
-                    ResolveGatherInRequest(hr.Request);
-                    break;
-                case ParallelHttpReaction phr:
-                    foreach (var req in phr.Requests)
-                        ResolveGatherInRequest(req);
-                    break;
-                case ConditionalReaction cr:
-                    foreach (var branch in cr.Branches)
-                        ResolveGatherInReaction(branch.Reaction);
-                    break;
-            }
-        }
-
-        private void ResolveGatherInRequest(RequestDescriptor req)
-        {
-            if (req.Gather != null)
-            {
-                var expanded = new List<GatherItem>();
-                foreach (var item in req.Gather)
-                {
-                    if (item is AllGather)
-                    {
-                        foreach (var c in _components)
-                        {
-                            expanded.Add(new ComponentGather(c.ComponentId, c.Vendor, c.BindingPath, c.ReadExpr));
-                        }
-                    }
-                    else
-                    {
-                        expanded.Add(item);
-                    }
-                }
-                req.Gather = expanded;
-            }
-
-            if (req.Chained != null)
-            {
-                ResolveGatherInRequest(req.Chained);
-            }
-        }
-
-        private void ResolveAllValidation()
-        {
-            if (_extractor == null) return;
-
-            foreach (var entry in _entries)
-            {
-                ResolveReaction(entry.Reaction);
-            }
-        }
-
-        private void ResolveReaction(Reaction reaction)
-        {
-            switch (reaction)
-            {
-                case HttpReaction hr:
-                    ResolveRequest(hr.Request);
-                    break;
-                case ParallelHttpReaction phr:
-                    foreach (var req in phr.Requests)
-                        ResolveRequest(req);
-                    break;
-                case ConditionalReaction cr:
-                    foreach (var branch in cr.Branches)
-                        ResolveReaction(branch.Reaction);
-                    break;
-            }
-        }
-
-        private void ResolveRequest(RequestDescriptor req)
-        {
-            if (req.ValidatorType != null && req.Validation != null)
-            {
-                var formId = req.Validation.FormId;
-                var extracted = _extractor!.ExtractRules(req.ValidatorType, formId);
-                if (extracted != null)
-                {
-                    req.Validation = extracted;
-                }
-            }
-
-            if (req.ReadExprOverrides != null && req.Validation != null)
-            {
-                foreach (var kvp in req.ReadExprOverrides)
-                {
-                    req.Validation = req.Validation.WithReadExpr(kvp.Key, kvp.Value);
-                }
-            }
-
-            if (req.Chained != null)
-            {
-                ResolveRequest(req.Chained);
-            }
+            if (_extractor != null)
+                ValidationResolver.Resolve(_entries, _extractor, _buildContexts);
         }
     }
 

@@ -2,6 +2,7 @@ import type { Command, ExecContext } from "./types";
 import { mutateElement } from "./element";
 import { evaluateGuard, isConfirmGuard } from "./conditions";
 import { showServerErrors } from "./validation";
+import { injectHtml } from "./component";
 import { scope } from "./trace";
 
 const log = scope("command");
@@ -43,15 +44,7 @@ export function executeCommand(cmd: Command, ctx?: ExecContext): void {
     case "into": {
       const container = document.getElementById(cmd.target);
       if (container && ctx?.responseBody != null) {
-        const temp = document.createElement("div");
-        temp.innerHTML = String(ctx.responseBody);
-        container.innerHTML = "";
-        const ej = (globalThis as any).ej;
-        if (ej?.base?.append) {
-          ej.base.append(Array.from(temp.childNodes), container, true);
-        } else {
-          container.append(...Array.from(temp.childNodes));
-        }
+        injectHtml(container, String(ctx.responseBody));
       }
       break;
     }

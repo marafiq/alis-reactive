@@ -1,5 +1,6 @@
 import type { Trigger, Reaction } from "./types";
 import { resolveRoot } from "./component";
+import { walk } from "./walk";
 import { scope } from "./trace";
 import { executeReaction } from "./execute";
 
@@ -38,8 +39,9 @@ export function wireTrigger(trigger: Trigger, reaction: Reaction): void {
       }
       log.debug("component-event", { componentId: trigger.componentId, jsEvent: trigger.jsEvent, vendor: trigger.vendor });
       (root as EventTarget).addEventListener(trigger.jsEvent, (e: any) => {
+        const expr = trigger.readExpr ?? "value";
         const detail = trigger.vendor === "native"
-          ? { value: e.target?.value, checked: e.target?.checked, event: e }
+          ? { [expr]: walk(el, expr), event: e }
           : (e ?? {});
         executeReaction(reaction, { evt: detail });
       });

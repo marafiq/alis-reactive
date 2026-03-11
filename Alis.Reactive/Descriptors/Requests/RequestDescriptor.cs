@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Descriptors.Commands;
@@ -57,12 +56,6 @@ namespace Alis.Reactive.Descriptors.Requests
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ValidationDescriptor? Validation { get; internal set; }
-
-        [JsonIgnore]
-        internal Type? ValidatorType { get; set; }
-
-        [JsonIgnore]
-        internal Dictionary<string, string>? ReadExprOverrides { get; set; }
 
         public RequestDescriptor(
             string verb,

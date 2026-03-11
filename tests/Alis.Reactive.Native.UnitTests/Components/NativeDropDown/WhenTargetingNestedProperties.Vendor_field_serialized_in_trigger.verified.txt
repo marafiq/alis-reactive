@@ -6,7 +6,8 @@
         componentId: Status,
         jsEvent: change,
         vendor: native,
-        bindingPath: Status
+        bindingPath: Status,
+        readExpr: value
       },
       reaction: {
         kind: sequential,

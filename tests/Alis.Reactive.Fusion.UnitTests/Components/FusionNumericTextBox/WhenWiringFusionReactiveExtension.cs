@@ -29,7 +29,7 @@ public class WhenWiringFusionReactiveExtension : FusionTestBase
         var args = descriptor.Args;
         pb.Element("echo").SetText("Amount changed");
 
-        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount");
+        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount", "value");
         var entry = new Entry(trigger, pb.BuildReaction());
         plan.AddEntry(entry);
 
@@ -50,7 +50,7 @@ public class WhenWiringFusionReactiveExtension : FusionTestBase
             .Then(then => then.Component<FusionNumericTextBox>(m => m.Amount).SetValue(100))
             .Else(else_ => else_.Element("echo").SetText("Under limit"));
 
-        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount");
+        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();
@@ -68,7 +68,7 @@ public class WhenWiringFusionReactiveExtension : FusionTestBase
         pb.Component<FusionNumericTextBox>(m => m.Amount).SetValue(0);
         pb.Element("echo").SetText("Reset");
 
-        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount");
+        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();

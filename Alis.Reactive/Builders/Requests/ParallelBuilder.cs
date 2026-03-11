@@ -11,11 +11,23 @@ namespace Alis.Reactive.Builders.Requests
         private readonly List<RequestDescriptor> _branches = new List<RequestDescriptor>();
         private ResponseBuilder<TModel>? _response;
 
+        /// <summary>
+        /// Build contexts collected from all branch builders.
+        /// </summary>
+        internal Dictionary<RequestDescriptor, RequestBuildContext>? BuildContexts { get; private set; }
+
         internal void AddBranch(Action<HttpRequestBuilder<TModel>> configure)
         {
             var builder = new HttpRequestBuilder<TModel>();
             configure(builder);
             _branches.Add(builder.BuildRequestDescriptor());
+
+            if (builder.BuildContexts != null)
+            {
+                BuildContexts ??= new Dictionary<RequestDescriptor, RequestBuildContext>();
+                foreach (var kvp in builder.BuildContexts)
+                    BuildContexts[kvp.Key] = kvp.Value;
+            }
         }
 
         /// <summary>

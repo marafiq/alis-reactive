@@ -6,15 +6,19 @@ using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Guards;
 using Alis.Reactive.Descriptors.Reactions;
+using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders
 {
     public class PipelineBuilder<TModel> where TModel : class
     {
+        private enum PipelineMode { Sequential, Http, Parallel, Conditional }
+
         internal List<Command> Commands { get; } = new List<Command>();
         internal List<Branch>? ConditionalBranches { get; private set; }
         private HttpRequestBuilder<TModel>? _httpBuilder;
         private ParallelBuilder<TModel>? _parallelBuilder;
+        private PipelineMode _mode = PipelineMode.Sequential;
 
         /// <summary>
         /// Adds a command to the pipeline. Used by vendor-specific projects
@@ -77,7 +81,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a GET request to the given URL.</summary>
         public HttpRequestBuilder<TModel> Get(string url)
         {
-            EnsureNoConditionals();
+            SetMode(PipelineMode.Http);
             _httpBuilder = new HttpRequestBuilder<TModel>();
             _httpBuilder.SetVerb("GET").SetUrl(url);
             return _httpBuilder;
@@ -86,7 +90,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a POST request to the given URL.</summary>
         public HttpRequestBuilder<TModel> Post(string url)
         {
-            EnsureNoConditionals();
+            SetMode(PipelineMode.Http);
             _httpBuilder = new HttpRequestBuilder<TModel>();
             _httpBuilder.SetVerb("POST").SetUrl(url);
             return _httpBuilder;
@@ -95,7 +99,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a POST request with a gather configuration.</summary>
         public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
         {
-            EnsureNoConditionals();
+            SetMode(PipelineMode.Http);
             _httpBuilder = new HttpRequestBuilder<TModel>();
             _httpBuilder.SetVerb("POST").SetUrl(url);
             _httpBuilder.Gather(gather);
@@ -105,7 +109,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a PUT request with a gather configuration.</summary>
         public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
         {
-            EnsureNoConditionals();
+            SetMode(PipelineMode.Http);
             _httpBuilder = new HttpRequestBuilder<TModel>();
             _httpBuilder.SetVerb("PUT").SetUrl(url);
             _httpBuilder.Gather(gather);
@@ -115,7 +119,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a DELETE request to the given URL.</summary>
         public HttpRequestBuilder<TModel> Delete(string url)
         {
-            EnsureNoConditionals();
+            SetMode(PipelineMode.Http);
             _httpBuilder = new HttpRequestBuilder<TModel>();
             _httpBuilder.SetVerb("DELETE").SetUrl(url);
             return _httpBuilder;
@@ -124,7 +128,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts parallel HTTP requests that fire concurrently.</summary>
         public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
         {
-            EnsureNoConditionals();
+            SetMode(PipelineMode.Parallel);
             _parallelBuilder = new ParallelBuilder<TModel>();
             foreach (var branch in branches)
             {
@@ -133,12 +137,12 @@ namespace Alis.Reactive.Builders
             return _parallelBuilder;
         }
 
-        private void EnsureNoConditionals()
+        private void SetMode(PipelineMode mode)
         {
-            if (ConditionalBranches != null)
+            if (_mode != PipelineMode.Sequential && _mode != mode)
                 throw new InvalidOperationException(
-                    "Cannot add HTTP requests after conditional branches. " +
-                    "HTTP requests and conditions are mutually exclusive at the same pipeline level.");
+                    $"Cannot switch to {mode} — pipeline is already in {_mode} mode.");
+            _mode = mode;
         }
 
         /// <summary>
@@ -150,10 +154,7 @@ namespace Alis.Reactive.Builders
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            if (Commands.Count > 0)
-                throw new InvalidOperationException(
-                    "Cannot call When() after adding direct commands (Dispatch, Element). " +
-                    "Use When().Then() to wrap all commands inside branches.");
+            SetMode(PipelineMode.Conditional);
 
             var source = new EventArgSource<TPayload, TProp>(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
@@ -165,10 +166,7 @@ namespace Alis.Reactive.Builders
         /// </summary>
         public GuardBuilder<TModel> Confirm(string message)
         {
-            if (Commands.Count > 0)
-                throw new InvalidOperationException(
-                    "Cannot call Confirm() after adding direct commands (Dispatch, Element). " +
-                    "Use Confirm().Then() to wrap all commands inside branches.");
+            SetMode(PipelineMode.Conditional);
 
             return new GuardBuilder<TModel>(new ConfirmGuard(message), this);
         }
@@ -193,30 +191,59 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
+        /// <summary>
+        /// <summary>
+        /// Build contexts collected after BuildReaction() — contains metadata for
+        /// all RequestDescriptors built within this pipeline (including chained/parallel/conditional).
+        /// </summary>
+        internal Dictionary<RequestDescriptor, RequestBuildContext>? BuildContexts { get; private set; }
+
         internal void SetConditionalBranches(List<Branch> branches)
         {
             ConditionalBranches = branches;
         }
 
+        /// <summary>
+        /// Merges build contexts from a nested pipeline (e.g. conditional branches)
+        /// into this pipeline's context collection.
+        /// </summary>
+        internal void MergeBuildContexts(Dictionary<RequestDescriptor, RequestBuildContext>? source)
+        {
+            if (source == null) return;
+            BuildContexts ??= new Dictionary<RequestDescriptor, RequestBuildContext>();
+            foreach (var kvp in source)
+                BuildContexts[kvp.Key] = kvp.Value;
+        }
+
         public Reaction BuildReaction()
         {
-            // Priority: parallel → single HTTP → conditional → sequential
-            if (_parallelBuilder != null)
+            Reaction reaction = _mode switch
             {
-                var preFetch = Commands.Count > 0 ? Commands : null;
-                return _parallelBuilder.BuildReaction(preFetch);
-            }
+                PipelineMode.Parallel => _parallelBuilder!.BuildReaction(
+                    Commands.Count > 0 ? Commands : null),
+                PipelineMode.Http => new HttpReaction(
+                    Commands.Count > 0 ? Commands : null,
+                    _httpBuilder!.BuildRequestDescriptor()),
+                PipelineMode.Conditional => new ConditionalReaction(
+                    ConditionalBranches!.ToArray()),
+                _ => new SequentialReaction(Commands),
+            };
 
-            if (_httpBuilder != null)
+            CollectBuildContexts();
+            return reaction;
+        }
+
+        private void CollectBuildContexts()
+        {
+            Dictionary<RequestDescriptor, RequestBuildContext>? source = _mode switch
             {
-                var preFetch = Commands.Count > 0 ? Commands : null;
-                return new HttpReaction(preFetch, _httpBuilder.BuildRequestDescriptor());
-            }
+                PipelineMode.Http => _httpBuilder?.BuildContexts,
+                PipelineMode.Parallel => _parallelBuilder?.BuildContexts,
+                _ => null,
+            };
 
-            if (ConditionalBranches != null)
-                return new ConditionalReaction(ConditionalBranches.ToArray());
-
-            return new SequentialReaction(Commands);
+            if (source != null)
+                MergeBuildContexts(source);
         }
     }
 }

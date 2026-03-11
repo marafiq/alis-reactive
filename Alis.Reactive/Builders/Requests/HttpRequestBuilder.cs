@@ -117,6 +117,11 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
+        /// <summary>
+        /// Build contexts collected during BuildRequestDescriptor (includes chained requests).
+        /// </summary>
+        internal Dictionary<RequestDescriptor, RequestBuildContext>? BuildContexts { get; private set; }
+
         internal RequestDescriptor BuildRequestDescriptor()
         {
             var desc = new RequestDescriptor(
@@ -130,17 +135,30 @@ namespace Alis.Reactive.Builders.Requests
                 _response?.ChainedRequest,
                 _validation);
 
-            if (_validatorType != null)
-            {
-                desc.ValidatorType = _validatorType;
-            }
-
-            if (_readExprOverrides != null)
-            {
-                desc.ReadExprOverrides = _readExprOverrides;
-            }
+            // Collect build contexts for this descriptor and any chained/nested descriptors
+            CollectBuildContext(desc);
+            MergeChainedContexts();
 
             return desc;
+        }
+
+        private void CollectBuildContext(RequestDescriptor desc)
+        {
+            if (_validatorType != null || _readExprOverrides != null)
+            {
+                BuildContexts ??= new Dictionary<RequestDescriptor, RequestBuildContext>();
+                BuildContexts[desc] = new RequestBuildContext(_validatorType, _readExprOverrides);
+            }
+        }
+
+        private void MergeChainedContexts()
+        {
+            if (_response?.ChainedBuildContexts != null)
+            {
+                BuildContexts ??= new Dictionary<RequestDescriptor, RequestBuildContext>();
+                foreach (var kvp in _response.ChainedBuildContexts)
+                    BuildContexts[kvp.Key] = kvp.Value;
+            }
         }
     }
 }

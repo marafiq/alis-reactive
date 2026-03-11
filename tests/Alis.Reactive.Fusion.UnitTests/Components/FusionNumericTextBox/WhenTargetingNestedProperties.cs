@@ -29,7 +29,7 @@ public class WhenTargetingNestedProperties : FusionTestBase
         pb.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).SetValue(12345);
         pb.Element("echo").SetText("PostalCode set");
 
-        var trigger = new ComponentEventTrigger("Address_PostalCode", descriptor.JsEvent, "fusion", "Address.PostalCode");
+        var trigger = new ComponentEventTrigger("Address_PostalCode", descriptor.JsEvent, "fusion", "Address.PostalCode", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();
@@ -46,7 +46,7 @@ public class WhenTargetingNestedProperties : FusionTestBase
         var pb = new PipelineBuilder<FusionTestModel>();
         pb.Element("echo").SetText("changed");
 
-        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount");
+        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();

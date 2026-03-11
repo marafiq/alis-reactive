@@ -4,7 +4,6 @@ import type { RequestDescriptor, ExecContext, Reaction, ConditionalReaction } fr
 
 let execRequest: typeof import("../http").execRequest;
 let executeReaction: typeof import("../execute").executeReaction;
-let executeReactionAsync: typeof import("../execute").executeReactionAsync;
 
 function mockFetch(status: number, body: unknown) {
   return vi.fn().mockResolvedValue({
@@ -39,7 +38,6 @@ beforeEach(async () => {
 
   const execMod = await import("../execute");
   executeReaction = execMod.executeReaction;
-  executeReactionAsync = execMod.executeReactionAsync;
 });
 
 describe("PUT verb", () => {

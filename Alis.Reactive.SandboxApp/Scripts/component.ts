@@ -40,3 +40,16 @@ export function evalRead(id: string, vendor: Vendor, readExpr: string): unknown 
 
   return walk(root, readExpr);
 }
+
+/** Inject HTML into a container, using ej.base.append when available (SF component init). */
+export function injectHtml(container: HTMLElement, html: string): void {
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  container.innerHTML = "";
+  const ej = (globalThis as any).ej;
+  if (ej?.base?.append) {
+    ej.base.append(Array.from(temp.childNodes), container, true);
+  } else {
+    container.append(...Array.from(temp.childNodes));
+  }
+}

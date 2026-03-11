@@ -28,6 +28,7 @@ export interface ComponentEventTrigger {
   jsEvent: string;
   vendor: Vendor;
   bindingPath?: string;
+  readExpr?: string;
 }
 
 // -- Reactions ------------------------------------------------

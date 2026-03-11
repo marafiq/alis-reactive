@@ -29,7 +29,7 @@ public class WhenTargetingNestedProperties : NativeTestBase
         pb.Component<NativeDropDown>(m => m.Address!.City).SetValue("Portland");
         pb.Element("echo").SetText("City set");
 
-        var trigger = new ComponentEventTrigger("Address_City", descriptor.JsEvent, "native", "Address.City");
+        var trigger = new ComponentEventTrigger("Address_City", descriptor.JsEvent, "native", "Address.City", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();
@@ -46,7 +46,7 @@ public class WhenTargetingNestedProperties : NativeTestBase
         var pb = new PipelineBuilder<NativeTestModel>();
         pb.Element("echo").SetText("changed");
 
-        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "native", "Status");
+        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "native", "Status", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();
@@ -79,7 +79,7 @@ public class WhenTargetingNestedProperties : NativeTestBase
         pb.Component<NativeDropDown>(m => m.Address!.State).SetValue("CO");
         pb.Element("echo").SetText("Address updated");
 
-        var trigger = new ComponentEventTrigger("Address_City", descriptor.JsEvent, "native", "Address.City");
+        var trigger = new ComponentEventTrigger("Address_City", descriptor.JsEvent, "native", "Address.City", "value");
         plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
 
         var json = plan.Render();

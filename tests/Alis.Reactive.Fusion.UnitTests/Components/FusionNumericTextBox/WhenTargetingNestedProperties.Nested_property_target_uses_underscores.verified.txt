@@ -6,7 +6,8 @@
         componentId: Address_PostalCode,
         jsEvent: change,
         vendor: fusion,
-        bindingPath: Address.PostalCode
+        bindingPath: Address.PostalCode,
+        readExpr: value
       },
       reaction: {
         kind: sequential,

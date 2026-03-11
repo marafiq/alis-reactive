@@ -6,7 +6,8 @@
         componentId: Address_City,
         jsEvent: change,
         vendor: native,
-        bindingPath: Address.City
+        bindingPath: Address.City,
+        readExpr: value
       },
       reaction: {
         kind: sequential,
