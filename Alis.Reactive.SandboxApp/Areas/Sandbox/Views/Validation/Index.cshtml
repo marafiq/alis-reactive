@@ -7,10 +7,6 @@
     ViewData["Title"] = "Validation";
 
     var plan = Html.ReactivePlan<ValidationShowcaseModel>();
-    var isEmployedId = IdGenerator.For<ValidationShowcaseModel>(m => m.Conditional!.IsEmployed);
-
-    // Register the raw checkbox in ComponentsMap so validation uses "checked" readExpr
-    plan.RegisterComponent(isEmployedId, "native", "Conditional.IsEmployed", "checked");
 }
 
 <div class="space-y-8">
@@ -163,9 +159,10 @@
             Unchecked = no validation on Job Title.
         </p>
         <form id="conditional-form" class="space-y-4 mb-4">
+            @{ var isEmployedId = IdGenerator.For<ValidationShowcaseModel>(m => m.Conditional!.IsEmployed); }
             <div class="flex items-center gap-2">
-                <input type="checkbox" id="@isEmployedId" name="Conditional.IsEmployed"
-                       class="h-4 w-4 rounded border-border text-accent" />
+                @(Html.NativeCheckBoxFor(plan, m => m.Conditional!.IsEmployed)
+                    .CssClass("h-4 w-4 rounded border-border text-accent"))
                 <label for="@isEmployedId" class="text-sm font-medium">Is Employed</label>
             </div>
             @{ Html.Field("Job Title", false, m => m.Conditional!.JobTitle, (expr, id) =>
