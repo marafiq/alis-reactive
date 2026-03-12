@@ -4,7 +4,7 @@
 
 **Goal:** Eliminate reflection, unify vendor root resolution, fix broken source bindings, make ComponentsMap the single source of truth, and deliver complete FusionNumericTextBox + FusionDropDownList vertical slices.
 
-**Architecture:** Components declare identity via `static abstract` interface members (`Vendor`, `ReadExpr`). The plan's ComponentsMap is populated at builder creation time. MutateElementCommand carries vendor for root resolution. BindSource is structured (EventSource + ComponentSource) everywhere — commands, guards, and conditions use the same pipeline. `TypedComponentSource<TProp>` preserves compile-time typed conditions.
+**Architecture:** Components declare identity via instance interface properties (`Vendor`, `ReadExpr`) — C# 8.0 compatible, no `static abstract`. `ComponentRef<TComponent>` uses `new()` constraint with cached instance. The plan's ComponentsMap is populated at builder creation time. MutateElementCommand carries vendor for root resolution. BindSource is structured (EventSource + ComponentSource) everywhere — commands, guards, and conditions use the same pipeline. `TypedComponentSource<TProp>` preserves compile-time typed conditions.
 
 **Tech Stack:** C# (.NET 8, System.Text.Json), TypeScript (Vitest, jsdom), Playwright, NUnit + Verify, JSON Schema 2020-12
 
@@ -18,7 +18,7 @@ These tasks change the foundational types. Everything else depends on them.
 
 ---
 
-### Task 1: IComponent.Vendor + IInputComponent.ReadExpr — Replace Reflection with Static Abstract
+### Task 1: IComponent.Vendor + IInputComponent.ReadExpr — Replace Reflection with Instance Interface Properties
 
 **Files:**
 - Modify: `Alis.Reactive/IComponent.cs`
@@ -32,17 +32,17 @@ These tasks change the foundational types. Everything else depends on them.
 
 **Step 1: Modify IComponent.cs**
 
-Replace `IReadableComponent`, `ReadExprAttribute`, and `ComponentHelper` with interface contracts:
+Replace `IReadableComponent`, `ReadExprAttribute`, and `ComponentHelper` with interface contracts (C# 8.0 — instance properties, not `static abstract`):
 
 ```csharp
 public interface IComponent
 {
-    static abstract string Vendor { get; }
+    string Vendor { get; }
 }
 
 public interface IInputComponent : IComponent
 {
-    static abstract string ReadExpr { get; }
+    string ReadExpr { get; }
 }
 
 public interface IAppLevelComponent : IComponent
@@ -59,52 +59,52 @@ Keep `FusionComponent` and `NativeComponent` base classes for project organizati
 
 **Step 2: Update all component classes**
 
-Each component adds `static string Vendor` and (for input components) `static string ReadExpr`:
+Each component adds instance `Vendor` and (for input components) `ReadExpr` properties:
 
 ```csharp
 // FusionNumericTextBox.cs
 public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
 {
-    public static string Vendor => "fusion";
-    public static string ReadExpr => "value";
+    public string Vendor => "fusion";
+    public string ReadExpr => "value";
 }
 
 // NativeCheckBox.cs
 public sealed class NativeCheckBox : NativeComponent, IInputComponent
 {
-    public static string Vendor => "native";
-    public static string ReadExpr => "checked";
+    public string Vendor => "native";
+    public string ReadExpr => "checked";
 }
 
 // NativeDropDown.cs
 public sealed class NativeDropDown : NativeComponent, IInputComponent
 {
-    public static string Vendor => "native";
-    public static string ReadExpr => "value";
+    public string Vendor => "native";
+    public string ReadExpr => "value";
 }
 
 // NativeButton.cs (NOT IInputComponent — no form value)
-public sealed class NativeButton : NativeComponent
+public sealed class NativeButton : NativeComponent, IComponent
 {
-    public static string Vendor => "native";
+    public string Vendor => "native";
 }
 
 // TestWidgetSyncFusion.cs
 public sealed class TestWidgetSyncFusion : FusionComponent, IInputComponent
 {
-    public static string Vendor => "fusion";
-    public static string ReadExpr => "value";
+    public string Vendor => "fusion";
+    public string ReadExpr => "value";
 }
 
 // FusionConfirm.cs — check if it implements IComponent or IAppLevelComponent
-// Add: public static string Vendor => "fusion";
+// Add: public string Vendor => "fusion";
 ```
 
 Also check and update `TestWidgetNative.cs` if it exists.
 
 **Step 3: Replace all ComponentHelper.GetReadExpr<T>() calls**
 
-Find all ~11 call sites and replace with `TComponent.ReadExpr`:
+Find all ~11 call sites and replace with instance access via `new TComponent().ReadExpr`:
 
 - `Alis.Reactive.Fusion/Extensions/FusionGatherExtensions.cs` — 2 calls
 - `Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxReactiveExtensions.cs` — 2 calls
@@ -112,9 +112,10 @@ Find all ~11 call sites and replace with `TComponent.ReadExpr`:
 - `Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownReactiveExtensions.cs` — 2 calls
 - `Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxReactiveExtensions.cs` — 1 call
 
-Pattern: `ComponentHelper.GetReadExpr<TComponent>()` → `TComponent.ReadExpr`
+Pattern: `ComponentHelper.GetReadExpr<TComponent>()` → `new TComponent().ReadExpr`
+(or use a cached static instance if method is called frequently)
 
-For gather extensions that have `where TComponent : IReadableComponent`, change to `where TComponent : IInputComponent`.
+For gather extensions that have `where TComponent : IReadableComponent`, change to `where TComponent : IInputComponent, new()`.
 
 **Step 4: Build and verify**
 
@@ -129,10 +130,11 @@ Expected: All pass (behavior unchanged, only mechanism changed).
 **Step 6: Commit**
 
 ```bash
-git add -A && git commit -m "refactor: replace ReadExprAttribute reflection with static abstract interface members
+git add -A && git commit -m "refactor: replace ReadExprAttribute reflection with instance interface properties
 
-IComponent.Vendor and IInputComponent.ReadExpr enforce contracts at compile
-time. Delete ReadExprAttribute, ComponentHelper, IReadableComponent."
+IComponent.Vendor and IInputComponent.ReadExpr enforce contracts via C# 8.0
+instance properties + new() constraint. Delete ReadExprAttribute, ComponentHelper,
+IReadableComponent."
 ```
 
 ---
@@ -307,9 +309,11 @@ public sealed class MutateElementCommand : Command
 
 ```csharp
 public class ComponentRef<TComponent, TModel>
-    where TComponent : IComponent
+    where TComponent : IComponent, new()
     where TModel : class
 {
+    private static readonly TComponent _instance = new TComponent();
+
     internal string TargetId { get; }
     internal PipelineBuilder<TModel> Pipeline { get; }
 
@@ -325,14 +329,16 @@ public class ComponentRef<TComponent, TModel>
         BindSource? source = null)
     {
         Pipeline.AddCommand(new MutateElementCommand(
-            TargetId, jsEmit, value, source, vendor: TComponent.Vendor));
+            TargetId, jsEmit, value, source, vendor: _instance.Vendor));
         return this;
     }
 
     public TypedComponentSource<TProp> ReadProperty<TProp>(string property)
-        => new TypedComponentSource<TProp>(TargetId, TComponent.Vendor, property);
+        => new TypedComponentSource<TProp>(TargetId, _instance.Vendor, property);
 }
 ```
+
+C# 8.0 pattern: `new()` constraint + `static readonly` cached instance reads Vendor at type-load time. Expression-bodied properties return constants — no allocation overhead per call.
 
 Note: `ReadProperty<TProp>` is generic to carry the property type for conditions.
 
@@ -421,7 +427,7 @@ Expected: Compiles. Tests will fail because snapshots have old source format —
 git add -A && git commit -m "refactor: MutateElementCommand gains vendor, source becomes BindSource
 
 vendor enables runtime root resolution. source unifies with Guard's
-BindSource pattern. ComponentRef passes TComponent.Vendor to commands."
+BindSource pattern. ComponentRef passes vendor to commands via cached instance."
 ```
 
 ---
@@ -1072,8 +1078,8 @@ Follow exact naming conventions from FusionNumericTextBox. Component declares Ve
 ```csharp
 public sealed class FusionDropDownList : FusionComponent, IInputComponent
 {
-    public static string Vendor => "fusion";
-    public static string ReadExpr => "value";
+    public string Vendor => "fusion";
+    public string ReadExpr => "value";
 }
 ```
 
@@ -1151,7 +1157,7 @@ Same pattern as Task 12. Exercise all supported API. Playwright tests verify bro
 **Step 1: Update CLAUDE.md**
 
 Add to architecture rules:
-- IComponent declares Vendor, IInputComponent declares ReadExpr — static abstract, no reflection
+- IComponent declares Vendor, IInputComponent declares ReadExpr — instance interface properties (C# 8.0), no reflection
 - ComponentsMap is single source of truth — populated at builder creation time
 - MutateElementCommand carries vendor — runtime resolves root before jsEmit
 - jsEmit operates on vendor-resolved root, never on raw DOM element for components

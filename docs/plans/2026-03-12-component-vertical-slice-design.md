@@ -21,38 +21,40 @@ A component is a **complete, self-contained vertical slice**. It declares its id
 
 ## Design
 
-### 1. Interface Contracts (No Reflection)
+### 1. Interface Contracts (No Reflection) — C# 8.0 Compatible
 
 ```csharp
 public interface IComponent
 {
-    static abstract string Vendor { get; }
+    string Vendor { get; }
 }
 
 public interface IInputComponent : IComponent
 {
-    static abstract string ReadExpr { get; }
+    string ReadExpr { get; }
 }
 
 // Example
 public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
 {
-    public static string Vendor => "fusion";
-    public static string ReadExpr => "value";
+    public string Vendor => "fusion";
+    public string ReadExpr => "value";
 }
 
 public sealed class NativeCheckBox : NativeComponent, IInputComponent
 {
-    public static string Vendor => "native";
-    public static string ReadExpr => "checked";
+    public string Vendor => "native";
+    public string ReadExpr => "checked";
 }
 
-public sealed class NativeButton : NativeComponent
+public sealed class NativeButton : NativeComponent, IComponent
 {
-    public static string Vendor => "native";
+    public string Vendor => "native";
     // NOT IInputComponent — buttons have no form value
 }
 ```
+
+**C# 8.0 constraint:** Instance properties (not `static abstract` — requires C# 11). Builder extensions instantiate the component to read Vendor/ReadExpr at registration time. `ComponentRef<TComponent>` uses `where TComponent : IComponent, new()` to access vendor via `new TComponent().Vendor`.
 
 **Deleted:** `ReadExprAttribute`, `ComponentHelper`, `IReadableComponent`.
 
@@ -63,13 +65,14 @@ public sealed class NativeButton : NativeComponent
 Html.NumericTextBoxFor(plan, m => m.Amount)
 
 // Inside the extension:
+var component = new FusionNumericTextBox();
 var id = IdGenerator.For<TModel, TProp>(expression);
 var bindingPath = html.NameFor(expression).ToString();
 plan.ComponentsMap.Add(bindingPath, new ComponentMapEntry(
     id,
-    FusionNumericTextBox.Vendor,    // "fusion"
-    bindingPath,                     // "Amount"
-    FusionNumericTextBox.ReadExpr   // "value"
+    component.Vendor,    // "fusion"
+    bindingPath,          // "Amount"
+    component.ReadExpr   // "value"
 ));
 ```
 
@@ -81,15 +84,17 @@ The component is in the map **the moment it's created in the view**. Not when `.
 
 **Deleted:** `ReadExprOverrides`, `.ReadExpr()` on `HttpRequestBuilder`, `WithReadExpr()` on `ValidationDescriptor`.
 
-### 3. ComponentRef Carries Vendor
+### 3. ComponentRef Carries Vendor (C# 8.0 — `new()` constraint)
 
 ```csharp
 public class ComponentRef<TComponent, TModel>
-    where TComponent : IComponent
+    where TComponent : IComponent, new()
     where TModel : class
 {
+    private static readonly TComponent _instance = new TComponent();
+
     internal string TargetId { get; }
-    internal string Vendor => TComponent.Vendor;
+    internal string Vendor => _instance.Vendor;
     internal PipelineBuilder<TModel> Pipeline { get; }
 
     internal ComponentRef Emit(string jsEmit, string? value = null)
@@ -100,9 +105,11 @@ public class ComponentRef<TComponent, TModel>
     }
 
     internal ComponentSource ReadProperty(string property)
-        => new ComponentSource(TargetId, TComponent.Vendor, property);
+        => new ComponentSource(TargetId, _instance.Vendor, property);
 }
 ```
+
+**C# 8.0 pattern:** `new()` constraint + static cached instance. The component is a lightweight phantom type — one shared instance per `TComponent` is sufficient since Vendor/ReadExpr are constant expression-bodied properties.
 
 ### 4. Vertical Slice Extensions — jsEmit Operates on Component Root
 
@@ -347,7 +354,7 @@ New Fusion component following same naming conventions. Full JS API scope TBD du
 
 ### Existing Components (update to new architecture)
 
-NativeCheckBox, NativeDropDown, NativeButton, TestWidgetSyncFusion — all updated to use `IInputComponent` / `IComponent` with `static abstract`, ComponentsMap registration, clean jsEmit.
+NativeCheckBox, NativeDropDown, NativeButton, TestWidgetSyncFusion — all updated to use `IInputComponent` / `IComponent` with instance interface properties, ComponentsMap registration, clean jsEmit.
 
 ## Sandbox Pages
 
