@@ -31,6 +31,17 @@ namespace Alis.Reactive
         }
 
         /// <summary>
+        /// Generates element ID from a model Type and property path string.
+        /// Matches the format of For&lt;TModel, TProp&gt;() — "{Scope}__{PropertyPath}".
+        /// Dots in property path become underscores (matching Html.IdFor convention).
+        /// </summary>
+        public static string For(Type modelType, string propertyPath)
+        {
+            var scope = TypeScope(modelType);
+            return scope + "__" + propertyPath.Replace(".", "_");
+        }
+
+        /// <summary>
         /// Converts typeof(TModel).FullName to an HTML-safe scope string.
         /// Dots and plus signs become underscores: "Alis.Reactive.Models.OrderModel" → "Alis_Reactive_Models_OrderModel".
         /// </summary>

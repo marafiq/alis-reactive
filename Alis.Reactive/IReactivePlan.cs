@@ -86,7 +86,7 @@ namespace Alis.Reactive
             GatherResolver.Resolve(_entries, _componentsMap);
 
             if (_extractor != null)
-                ValidationResolver.Resolve(_entries, _extractor, _buildContexts);
+                ValidationResolver.Resolve(_entries, _extractor, _buildContexts, _componentsMap);
         }
     }
 

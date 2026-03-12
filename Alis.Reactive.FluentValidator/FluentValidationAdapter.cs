@@ -30,14 +30,18 @@ namespace Alis.Reactive.FluentValidator
         /// <summary>
         /// Extract client rules from the given validator type for a form.
         /// Returns null if no extractable rules are found.
+        /// When componentsMap is provided, fields matching a registered component
+        /// use that component's ID, vendor, and readExpr instead of native defaults.
         /// </summary>
-        public ValidationDescriptor? ExtractRules(Type validatorType, string formId)
+        public ValidationDescriptor? ExtractRules(
+            Type validatorType,
+            string formId,
+            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap = null)
         {
             var validator = _factory(validatorType);
             if (validator == null) return null;
 
             var modelType = GetModelType(validatorType);
-            var scope = modelType != null ? IdGenerator.TypeScope(modelType) + "__" : "";
 
             // Intermediate: property path → ordered list of (ruleType, message, constraint)
             var fieldRules = new Dictionary<string, List<ExtractedRule>>();
@@ -49,7 +53,24 @@ namespace Alis.Reactive.FluentValidator
             foreach (var kvp in fieldRules)
             {
                 var propertyPath = kvp.Key;
-                var elementId = scope + propertyPath.Replace(".", "_");
+                string elementId;
+                string vendor;
+                string readExpr;
+
+                if (componentsMap != null && componentsMap.TryGetValue(propertyPath, out var entry))
+                {
+                    elementId = entry.ComponentId;
+                    vendor = entry.Vendor;
+                    readExpr = entry.ReadExpr;
+                }
+                else
+                {
+                    elementId = modelType != null
+                        ? IdGenerator.For(modelType, propertyPath)
+                        : propertyPath.Replace(".", "_");
+                    vendor = "native";
+                    readExpr = "value";
+                }
 
                 var rules = new List<ValidationRule>();
                 foreach (var er in kvp.Value)
@@ -60,8 +81,8 @@ namespace Alis.Reactive.FluentValidator
                 fields.Add(new ValidationField(
                     elementId,
                     propertyPath,
-                    "native",
-                    "value",
+                    vendor,
+                    readExpr,
                     rules));
             }
 
@@ -70,11 +91,11 @@ namespace Alis.Reactive.FluentValidator
             {
                 foreach (var cr in provider.GetConditionalRules())
                 {
-                    var field = FindOrCreateField(fields, cr.PropertyName, scope);
+                    var field = FindOrCreateField(fields, cr.PropertyName, modelType, componentsMap);
                     field.Rules.Add(new ValidationRule(cr.Rule, cr.Message, cr.Constraint, cr.When));
 
                     // Ensure condition source field is in the descriptor (no rules, but needed for value reading)
-                    FindOrCreateField(fields, cr.When.Field, scope);
+                    FindOrCreateField(fields, cr.When.Field, modelType, componentsMap);
                 }
             }
 
@@ -83,19 +104,41 @@ namespace Alis.Reactive.FluentValidator
             return new ValidationDescriptor(formId, fields);
         }
 
-        private static ValidationField FindOrCreateField(List<ValidationField> fields, string propertyName, string scope)
+        private static ValidationField FindOrCreateField(
+            List<ValidationField> fields,
+            string propertyName,
+            Type? modelType,
+            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap)
         {
             foreach (var f in fields)
             {
                 if (f.FieldName == propertyName) return f;
             }
 
-            var elementId = scope + propertyName.Replace(".", "_");
+            string elementId;
+            string vendor;
+            string readExpr;
+
+            if (componentsMap != null && componentsMap.TryGetValue(propertyName, out var entry))
+            {
+                elementId = entry.ComponentId;
+                vendor = entry.Vendor;
+                readExpr = entry.ReadExpr;
+            }
+            else
+            {
+                elementId = modelType != null
+                    ? IdGenerator.For(modelType, propertyName)
+                    : propertyName.Replace(".", "_");
+                vendor = "native";
+                readExpr = "value";
+            }
+
             var field = new ValidationField(
                 elementId,
                 propertyName,
-                "native",
-                "value",
+                vendor,
+                readExpr,
                 new List<ValidationRule>());
             fields.Add(field);
             return field;

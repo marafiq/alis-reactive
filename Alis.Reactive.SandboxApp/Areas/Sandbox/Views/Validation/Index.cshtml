@@ -8,6 +8,9 @@
 
     var plan = Html.ReactivePlan<ValidationShowcaseModel>();
     var isEmployedId = IdGenerator.For<ValidationShowcaseModel>(m => m.Conditional!.IsEmployed);
+
+    // Register the raw checkbox in ComponentsMap so validation uses "checked" readExpr
+    plan.RegisterComponent(isEmployedId, "native", "Conditional.IsEmployed", "checked");
 }
 
 <div class="space-y-8">
@@ -175,7 +178,6 @@
             {
                 p.Post("/Sandbox/Validation/ValidateClient")
                  .Validate<ValidationShowcaseValidator>("conditional-form")
-                 .ReadExpr("Conditional.IsEmployed", "checked")
                  .Response(r => r
                     .OnSuccess(s =>
                     {

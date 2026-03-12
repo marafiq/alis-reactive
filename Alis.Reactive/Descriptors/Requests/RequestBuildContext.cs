@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Alis.Reactive.Descriptors.Requests
 {
@@ -10,12 +9,10 @@ namespace Alis.Reactive.Descriptors.Requests
     internal sealed class RequestBuildContext
     {
         internal Type? ValidatorType { get; }
-        internal Dictionary<string, string>? ReadExprOverrides { get; }
 
-        internal RequestBuildContext(Type? validatorType, Dictionary<string, string>? readExprOverrides)
+        internal RequestBuildContext(Type? validatorType)
         {
             ValidatorType = validatorType;
-            ReadExprOverrides = readExprOverrides;
         }
     }
 }
