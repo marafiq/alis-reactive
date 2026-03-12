@@ -1,0 +1,214 @@
+namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
+
+/// <summary>
+/// Exercises all FusionDropDownList API end-to-end in the browser:
+/// property writes, method calls, property reads, events, conditions, and gather.
+///
+/// Page under test: /Sandbox/DropDownList
+///
+/// Syncfusion DropDownList renders an input element inside the wrapper div.
+/// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
+/// Playwright interacts with the wrapper; the ej2 instance fires events.
+/// </summary>
+[TestFixture]
+public class WhenUsingDropDownList : PlaywrightTestBase
+{
+    private const string Path = "/Sandbox/DropDownList";
+
+    // IdGenerator produces: {TypeScope}__{PropertyName}
+    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DropDownListModel";
+    private const string CategoryId = Scope + "__Category";
+
+    private async Task NavigateAndBoot()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 10000);
+    }
+
+    // ── Page loads ──
+
+    [Test]
+    public async Task PageLoadsWithNoErrors()
+    {
+        await NavigateAndBoot();
+        await Expect(Page).ToHaveTitleAsync("DropDownList — Alis.Reactive Sandbox");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task PlanJsonIsRendered()
+    {
+        await NavigateAndBoot();
+        var planJson = await Page.Locator("#plan-json").TextContentAsync();
+        Assert.That(planJson, Does.Contain("mutate-element"),
+            "Plan must contain mutate-element commands");
+        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
+            "Plan must contain fusion vendor");
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 1: Property Write ──
+
+    [Test]
+    public async Task DomReadySetsInitialValue()
+    {
+        await NavigateAndBoot();
+        // SF DropDownList wrapper gets the IdGenerator-based ID
+        var wrapper = Page.Locator($"#{CategoryId}");
+        await Expect(wrapper).ToBeVisibleAsync();
+
+        // Wait for the value to be set by dom-ready via ej2 instance
+        await Page.WaitForFunctionAsync(
+            $"() => {{ const el = document.getElementById('{CategoryId}'); return el && el.ej2_instances && el.ej2_instances[0] && el.ej2_instances[0].value === 'Books'; }}",
+            null,
+            new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 2: Property Read ──
+
+    [Test]
+    public async Task DomReadyReadsValueIntoEcho()
+    {
+        await NavigateAndBoot();
+        // The value-echo should show "Books" after dom-ready reads comp.Value()
+        var echo = Page.Locator("#value-echo");
+        await Expect(echo).Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+        var text = await echo.TextContentAsync();
+        Assert.That(text, Does.Contain("Books"),
+            "Value echo should contain Books after dom-ready property read");
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 3: Method Calls (ShowPopup/HidePopup) ──
+
+    [Test]
+    public async Task ShowPopupButtonOpensDropdown()
+    {
+        await NavigateAndBoot();
+
+        // Click ShowPopup button
+        await Page.Locator("#show-popup-btn").ClickAsync();
+
+        // The SF popup list should be visible
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task HidePopupButtonClosesDropdown()
+    {
+        await NavigateAndBoot();
+
+        // Open popup first
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Click HidePopup button
+        await Page.Locator("#hide-popup-btn").ClickAsync();
+
+        // The SF popup list should be hidden
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeHiddenAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 4: Events ──
+
+    [Test]
+    public async Task ChangeEventDisplaysNewValue()
+    {
+        await NavigateAndBoot();
+
+        // Open the dropdown and select an item
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Click on "Electronics" in the popup list
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Electronics" }).ClickAsync();
+
+        // SF change event payload contains the selected value
+        await Expect(Page.Locator("#change-value"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+        var changeText = await Page.Locator("#change-value").TextContentAsync();
+        Assert.That(changeText, Does.Contain("Electronics"),
+            $"Change value should contain Electronics but was '{changeText}'");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task FocusEventShowsFocusState()
+    {
+        await NavigateAndBoot();
+
+        // SF DropDownList renders: <span class="e-ddl" tabindex="0"> wrapping <input id="CategoryId" tabindex="-1">.
+        // The wrapper span intercepts pointer events. Click the wrapper to trigger SF focus.
+        var wrapper = Page.Locator($"span.e-ddl:has(#{CategoryId})");
+        await wrapper.ClickAsync();
+
+        await Expect(Page.Locator("#focus-state"))
+            .ToHaveTextAsync("focused", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task BlurEventShowsBlurState()
+    {
+        await NavigateAndBoot();
+
+        // Click the wrapper span to trigger focus
+        var wrapper = Page.Locator($"span.e-ddl:has(#{CategoryId})");
+        await wrapper.ClickAsync();
+        await Expect(Page.Locator("#focus-state"))
+            .ToHaveTextAsync("focused", new() { Timeout = 5000 });
+
+        // Press Escape to close popup then Tab out to trigger blur
+        await Page.Keyboard.PressAsync("Escape");
+        await Page.Keyboard.PressAsync("Tab");
+        await Expect(Page.Locator("#focus-state"))
+            .ToHaveTextAsync("blurred", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 5: Condition (Selected Indicator) ──
+
+    [Test]
+    public async Task SelectedConditionShowsIndicatorWhenValueNotNull()
+    {
+        await NavigateAndBoot();
+
+        // Selected indicator starts hidden (no selection yet from change event)
+        // Note: DomReady sets "Books" via SetValue but the condition is wired to Changed event
+        // We need to trigger a change event by selecting an item
+
+        // Open popup and select an item
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Clothing" }).ClickAsync();
+
+        // Indicator should appear with text "selected"
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToHaveTextAsync("selected", new() { Timeout = 3000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 6: Gather ──
+
+    [Test]
+    public async Task GatherButtonPostsComponentValue()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#gather-btn").ClickAsync();
+        await Expect(Page.Locator("#gather-result"))
+            .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+}
