@@ -38,11 +38,11 @@
     <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
         <h2 class="text-sm font-semibold mb-2">1. Fusion — Html.Field + .Reactive() before .Render()</h2>
         <p class="text-xs text-text-secondary mb-3">
-            <code class="bg-slate-100 px-1 rounded">Html.EJS().NumericTextBoxFor(expr).Reactive(plan, evt =&gt; evt.Changed, ...).Render()</code>
+            <code class="bg-slate-100 px-1 rounded">Html.NumericTextBoxFor(expr).Reactive(plan, evt =&gt; evt.Changed, ...).Render()</code>
         </p>
         <div class="grid grid-cols-2 gap-4">
             @{ Html.Field("Amount", true, m => m.Amount, (expr, id) =>
-                Html.EJS().NumericTextBoxFor(expr)
+                Html.NumericTextBoxFor(plan, expr)
                     .Min(0).Max(10000).Step(1)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -65,7 +65,7 @@
         </p>
         <div class="grid grid-cols-2 gap-4">
             @{ Html.Field("Status", true, m => m.Status, (expr, id) =>
-                Html.NativeDropDownFor(expr)
+                Html.NativeDropDownFor(plan, expr)
                     .Items(statusItems)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -73,7 +73,7 @@
                     })
             ); }
             @{ Html.Field("Category", false, m => m.Category, (expr, id) =>
-                Html.NativeDropDownFor(expr)
+                Html.NativeDropDownFor(plan, expr)
                     .Items(categoryItems)
                     .Placeholder("-- Select Category --")
             ); }
@@ -125,7 +125,7 @@
         </p>
         <div class="grid grid-cols-2 gap-4">
             @{ Html.Field("City", false, m => m.Address!.City, (expr, id) =>
-                Html.NativeDropDownFor(expr)
+                Html.NativeDropDownFor(plan, expr)
                     .Items(cityItems)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -133,7 +133,7 @@
                     })
             ); }
             @{ Html.Field("Postal Code", false, m => m.Address!.PostalCode, (expr, id) =>
-                Html.EJS().NumericTextBoxFor(expr)
+                Html.NumericTextBoxFor(plan, expr)
                     .Min(10000).Max(99999).Step(1)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {

@@ -24,11 +24,11 @@ namespace Alis.Reactive.Native.Components
     {
         private static readonly NativeButton _component = new NativeButton();
 
-        public static NativeButtonBuilder<TModel> Reactive<TModel>(
+        public static NativeButtonBuilder<TModel> Reactive<TModel, TArgs>(
             this NativeButtonBuilder<TModel> builder,
             IReactivePlan<TModel> plan,
-            Func<NativeButtonEvents, TypedEventDescriptor<NativeButtonClickArgs>> eventSelector,
-            Action<NativeButtonClickArgs, PipelineBuilder<TModel>> pipeline)
+            Func<NativeButtonEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
             var descriptor = eventSelector(NativeButtonEvents.Instance);

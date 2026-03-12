@@ -7,8 +7,7 @@ namespace Alis.Reactive.PlaywrightTests.Reactive;
 /// Page under test: /Sandbox/PlaygroundSyntax
 ///
 /// ID Pattern (nested property m => m.Address.City):
-///   - Native (IdGenerator):  {TypeScope}__Address_City
-///   - Fusion (SF EJ2):       AddressPostalCode (dots removed, no separator)
+///   - All vendors (IdGenerator): {TypeScope}__Address_City
 ///
 /// Both vendors carry bindingPath as dot-notation (Address.City) for HTTP gather.
 /// </summary>
@@ -70,7 +69,7 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         await Expect(echo).ToHaveTextAsync("\u2014");
 
         // SF NumericTextBox: type a value, Tab triggers change event
-        var numericInput = Page.Locator("#Amount");
+        var numericInput = Page.Locator($"#{S}__Amount").First;
         await numericInput.ClickAsync();
         await numericInput.FillAsync("42");
         await numericInput.PressAsync("Tab");
@@ -125,12 +124,12 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Fusion_nested_element_id_removes_dots()
+    public async Task Fusion_nested_element_id_uses_idgenerator()
     {
         await NavigateAndBoot();
 
-        // m => m.Address.PostalCode → SF convention: AddressPostalCode (dots removed)
-        var postalInput = Page.Locator("#AddressPostalCode");
+        // m => m.Address!.PostalCode → IdGenerator: {TypeScope}__Address_PostalCode
+        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
         await Expect(postalInput).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
@@ -157,7 +156,7 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         var echo = Page.Locator("#postal-echo");
         await Expect(echo).ToHaveTextAsync("\u2014");
 
-        var postalInput = Page.Locator("#AddressPostalCode");
+        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
         await postalInput.ClickAsync();
         await postalInput.FillAsync("98101");
         await postalInput.PressAsync("Tab");
@@ -167,7 +166,7 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Plan_json_shows_vendor_specific_component_ids()
+    public async Task Plan_json_shows_idgenerator_component_ids()
     {
         await NavigateAndBoot();
 
@@ -175,9 +174,9 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         // Native nested: IdGenerator format
         Assert.That(planJson, Does.Contain($"\"componentId\": \"{S}__Address_City\""),
             "Native nested componentId must use IdGenerator format");
-        // Fusion nested: dots removed (SF convention)
-        Assert.That(planJson, Does.Contain("\"componentId\": \"AddressPostalCode\""),
-            "Fusion nested componentId must have dots removed (SF convention)");
+        // Fusion nested: IdGenerator format (same as native now)
+        Assert.That(planJson, Does.Contain($"\"componentId\": \"{S}__Address_PostalCode\""),
+            "Fusion nested componentId must use IdGenerator format");
 
         AssertNoConsoleErrors();
     }

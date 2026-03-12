@@ -25,11 +25,11 @@ namespace Alis.Reactive.Native.Components
     {
         private static readonly NativeCheckBox _component = new NativeCheckBox();
 
-        public static NativeCheckBoxBuilder<TModel> Reactive<TModel>(
+        public static NativeCheckBoxBuilder<TModel> Reactive<TModel, TArgs>(
             this NativeCheckBoxBuilder<TModel> builder,
             IReactivePlan<TModel> plan,
-            Func<NativeCheckBoxEvents, TypedEventDescriptor<NativeCheckBoxChangeArgs>> eventSelector,
-            Action<NativeCheckBoxChangeArgs, PipelineBuilder<TModel>> pipeline)
+            Func<NativeCheckBoxEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
             var descriptor = eventSelector(NativeCheckBoxEvents.Instance);

@@ -24,11 +24,11 @@ namespace Alis.Reactive.Native.Components
     {
         private static readonly NativeDropDown _component = new NativeDropDown();
 
-        public static NativeDropDownBuilder<TModel, TProp> Reactive<TModel, TProp>(
+        public static NativeDropDownBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeDropDownBuilder<TModel, TProp> builder,
             IReactivePlan<TModel> plan,
-            Func<NativeDropDownEvents, TypedEventDescriptor<NativeDropDownChangeArgs>> eventSelector,
-            Action<NativeDropDownChangeArgs, PipelineBuilder<TModel>> pipeline)
+            Func<NativeDropDownEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
             var descriptor = eventSelector(NativeDropDownEvents.Instance);

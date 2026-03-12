@@ -92,7 +92,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator("#Amount").First;
+        var input = Page.Locator($"#{S}__Amount").First;
         await input.ClickAsync();
         await input.FillAsync("5000");
         await input.PressAsync("Tab");
@@ -109,7 +109,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator("#Amount").First;
+        var input = Page.Locator($"#{S}__Amount").First;
         await input.ClickAsync();
         await input.FillAsync("2500");
         await input.PressAsync("Tab");
@@ -126,7 +126,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator("#Amount").First;
+        var input = Page.Locator($"#{S}__Amount").First;
         await input.ClickAsync();
         await input.FillAsync("500");
         await input.PressAsync("Tab");
@@ -228,7 +228,7 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
         await Expect(Page.Locator("h1")).ToHaveTextAsync("Reactive Conditions");
         await Expect(Page.Locator("#plan-json")).ToBeVisibleAsync();
         await Expect(Page.Locator($"#{S}__Status")).ToBeVisibleAsync();
-        await Expect(Page.Locator("#Amount").First).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{S}__Amount").First).ToBeVisibleAsync();
         await Expect(Page.Locator($"#{S}__Address_City")).ToBeVisibleAsync();
 
         AssertNoConsoleErrors();

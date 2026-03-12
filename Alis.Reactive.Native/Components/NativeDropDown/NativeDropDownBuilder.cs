@@ -98,6 +98,8 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeDropDownHtmlExtensions
     {
+        private static readonly NativeDropDown _component = new NativeDropDown();
+
         /// <summary>
         /// Creates a native &lt;select&gt; builder bound to a model property.
         /// </summary>
@@ -117,15 +119,14 @@ namespace Alis.Reactive.Native.Components
             Expression<Func<TModel, TProp>> expression)
             where TModel : class
         {
-            var component = new NativeDropDown();
             var uniqueId = IdGenerator.For<TModel, TProp>(expression);
             var name = html.NameFor(expression).ToString();
 
             plan.AddToComponentsMap(name, new ComponentRegistration(
                 uniqueId,
-                component.Vendor,
+                _component.Vendor,
                 name,
-                component.ReadExpr));
+                _component.ReadExpr));
 
             return new NativeDropDownBuilder<TModel, TProp>(html, expression);
         }
