@@ -11,9 +11,9 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Vertical slice extension methods for FusionNumericTextBox.
     ///
-    /// Fusion jsEmit convention (el.ej2_instances[0]):
-    ///   Prop  → var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind()
-    ///   Call  → el.ej2_instances[0].focusIn()
+    /// Fusion jsEmit convention (el = vendor-resolved root, i.e. the ej2 instance):
+    ///   Prop  → el.value=Number(val)
+    ///   Call  → el.focusIn()
     ///   Read  → ref:{id}.value
     /// </summary>
     public static class FusionNumericTextBoxExtensions
@@ -67,7 +67,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             return self.Emit(
-                "var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind()",
+                "el.value=Number(val)",
                 value.ToString(CultureInfo.InvariantCulture));
         }
 
@@ -77,7 +77,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.ej2_instances[0].focusIn()");
+            return self.Emit("el.focusIn()");
         }
 
         // ── Read: returns BindExpr for the component's current value ──

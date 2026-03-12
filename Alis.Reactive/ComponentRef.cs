@@ -10,9 +10,10 @@ namespace Alis.Reactive
     /// constrain TComponent to add mutation methods (SetValue, Show, etc.).
     ///
     /// The ref itself is vendor-agnostic — the jsEmit string in each
-    /// extension method carries the vendor-specific behavior:
-    ///   Fusion: "var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind()"
-    ///   Native: "el.value=val"
+    /// extension method carries the vendor-specific behavior.
+    /// Runtime resolves vendor root before passing el to jsEmit:
+    ///   Fusion: "el.value=Number(val)" (el = ej2 instance)
+    ///   Native: "el.value=val" (el = DOM element)
     /// </summary>
     public class ComponentRef<TComponent, TModel>
         where TComponent : IComponent, new()

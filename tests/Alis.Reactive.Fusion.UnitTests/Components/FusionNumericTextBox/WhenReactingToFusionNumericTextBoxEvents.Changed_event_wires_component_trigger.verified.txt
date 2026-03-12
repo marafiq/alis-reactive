@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            jsEmit: var c=el.ej2_instances[0]; c.value=Number(val); c.dataBind(),
+            jsEmit: el.value=Number(val),
             value: 999,
             vendor: fusion
           }
