@@ -45,7 +45,7 @@ export function validate(desc: ValidationDescriptor): boolean {
       if (ruleFails(rule, value, byName)) {
         showError(desc.formId, f, rule.message);
         valid = false;
-        break; // first failing rule wins
+        break;
       }
     }
   }

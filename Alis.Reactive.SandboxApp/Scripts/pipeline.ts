@@ -43,11 +43,8 @@ export async function executeParallelHttpReaction(reaction: ParallelHttpReaction
     if (r.status === "rejected") log.error("parallel branch error", { reason: String(r.reason) });
   }
 
-  // After ALL complete, fire onAllSuccess handlers
-  if (reaction.onAllSuccess) {
-    for (const handler of reaction.onAllSuccess) {
-      executeCommands(handler.commands, ctx);
-    }
+  if (reaction.onAllSettled) {
+    executeCommands(reaction.onAllSettled, ctx);
   }
 }
 

@@ -1,6 +1,6 @@
 import type { MutateElementCommand, ExecContext } from "./types";
 import { scope } from "./trace";
-import { resolve } from "./resolver";
+import { resolveEventPath } from "./resolver";
 
 const log = scope("element");
 
@@ -11,7 +11,7 @@ export function mutateElement(cmd: MutateElementCommand, ctx?: ExecContext): voi
     return;
   }
 
-  const val = cmd.source ? resolve(cmd.source, ctx) : cmd.value;
+  const val = cmd.source ? resolveEventPath(cmd.source, ctx) : cmd.value;
   log.trace("exec", { target: cmd.target, jsEmit: cmd.jsEmit, val });
   new Function("el", "val", cmd.jsEmit).call(null, el, val);
 }

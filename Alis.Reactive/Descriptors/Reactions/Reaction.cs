@@ -56,16 +56,16 @@ namespace Alis.Reactive.Descriptors.Reactions
         public List<RequestDescriptor> Requests { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<StatusHandler>? OnAllSuccess { get; }
+        public List<Command>? OnAllSettled { get; }
 
         public ParallelHttpReaction(
             List<Command>? preFetch,
             List<RequestDescriptor> requests,
-            List<StatusHandler>? onAllSuccess = null)
+            List<Command>? onAllSettled = null)
         {
             PreFetch = preFetch;
             Requests = requests;
-            OnAllSuccess = onAllSuccess;
+            OnAllSettled = onAllSettled;
         }
     }
 }

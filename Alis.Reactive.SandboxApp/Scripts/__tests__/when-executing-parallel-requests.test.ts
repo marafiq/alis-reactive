@@ -57,7 +57,7 @@ describe("parallel http reactions", () => {
           onSuccess: [{ commands: [{ kind: "mutate-element", target: "facilities", jsEmit: "el.textContent = val", value: "loaded" }] }],
         },
       ],
-      onAllSuccess: [{ commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "all done" }] }],
+      onAllSettled: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "all done" }],
     };
 
     await executeParallelHttpReaction(reaction);

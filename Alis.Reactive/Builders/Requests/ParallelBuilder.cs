@@ -6,14 +6,15 @@ using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    /// <summary>
+    /// Builds a parallel HTTP reaction — multiple requests fire concurrently.
+    /// Each branch owns its own response chain. OnAllSettled fires after all branches complete.
+    /// </summary>
     public class ParallelBuilder<TModel> where TModel : class
     {
         private readonly List<RequestDescriptor> _branches = new List<RequestDescriptor>();
-        private ResponseBuilder<TModel>? _response;
+        private PipelineBuilder<TModel>? _onAllSettled;
 
-        /// <summary>
-        /// Build contexts collected from all branch builders.
-        /// </summary>
         internal Dictionary<RequestDescriptor, RequestBuildContext>? BuildContexts { get; private set; }
 
         internal void AddBranch(Action<HttpRequestBuilder<TModel>> configure)
@@ -31,13 +32,13 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Configures handlers that fire after ALL parallel requests complete successfully.
+        /// Commands to execute after all parallel requests complete, regardless of individual success or failure.
         /// </summary>
-        public ParallelBuilder<TModel> Response(Action<ResponseBuilder<TModel>> configure)
+        public ParallelBuilder<TModel> OnAllSettled(Action<PipelineBuilder<TModel>> configure)
         {
-            var builder = new ResponseBuilder<TModel>();
-            configure(builder);
-            _response = builder;
+            var pb = new PipelineBuilder<TModel>();
+            configure(pb);
+            _onAllSettled = pb;
             return this;
         }
 
@@ -46,7 +47,7 @@ namespace Alis.Reactive.Builders.Requests
             return new ParallelHttpReaction(
                 preFetch,
                 _branches,
-                _response?.SuccessHandlers.Count > 0 ? _response.SuccessHandlers : null);
+                _onAllSettled?.Commands.Count > 0 ? _onAllSettled.Commands : null);
         }
     }
 }

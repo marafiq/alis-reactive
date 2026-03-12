@@ -55,7 +55,7 @@ export interface ParallelHttpReaction {
   kind: "parallel-http";
   preFetch?: Command[];
   requests: RequestDescriptor[];
-  onAllSuccess?: StatusHandler[];
+  onAllSettled?: Command[];
 }
 
 // -- HTTP Request Types ----------------------------------------

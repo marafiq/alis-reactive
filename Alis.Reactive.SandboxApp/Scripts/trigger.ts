@@ -10,10 +10,8 @@ export function wireTrigger(trigger: Trigger, reaction: Reaction): void {
   switch (trigger.kind) {
     case "dom-ready":
       if (document.readyState === "complete" || document.readyState === "interactive") {
-        log.debug("dom-ready: immediate");
         executeReaction(reaction);
       } else {
-        log.debug("dom-ready: deferred");
         document.addEventListener("DOMContentLoaded", () => executeReaction(reaction));
       }
       break;

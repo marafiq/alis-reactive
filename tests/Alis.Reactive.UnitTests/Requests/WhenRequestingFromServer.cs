@@ -65,9 +65,7 @@ public class WhenRequestingFromServer : PlanTestBase
             p.Parallel(
                 a => a.Get("/api/residents"),
                 b => b.Get("/api/facilities")
-            ).Response(r => r
-                .OnSuccess(s => s.Element("result").SetText("all loaded"))
-            )
+            ).OnAllSettled(s => s.Element("result").SetText("all loaded"))
         ).Render());
 
     [Test]
@@ -127,7 +125,7 @@ public class WhenRequestingFromServer : PlanTestBase
             p.Parallel(
                 a => a.Get("/api/a"),
                 b => b.Get("/api/b")
-            ).Response(r => r.OnSuccess(s => s.Dispatch("all-done"))));
+            ).OnAllSettled(s => s.Dispatch("all-done")));
         AssertSchemaValid(plan.Render());
     }
 

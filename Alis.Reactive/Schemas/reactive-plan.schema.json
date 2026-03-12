@@ -355,9 +355,9 @@
           "items": { "$ref": "#/$defs/RequestDescriptor" },
           "minItems": 2
         },
-        "onAllSuccess": {
+        "onAllSettled": {
           "type": "array",
-          "items": { "$ref": "#/$defs/StatusHandler" }
+          "items": { "$ref": "#/$defs/Command" }
         }
       }
     },

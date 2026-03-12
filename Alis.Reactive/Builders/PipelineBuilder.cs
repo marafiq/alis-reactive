@@ -192,7 +192,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// <summary>
         /// Build contexts collected after BuildReaction() — contains metadata for
         /// all RequestDescriptors built within this pipeline (including chained/parallel/conditional).
         /// </summary>
