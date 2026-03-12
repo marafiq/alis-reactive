@@ -12,6 +12,8 @@ namespace Alis.Reactive
     {
         void AddEntry(Entry entry);
         void RegisterComponent(string componentId, string vendor, string bindingPath, string readExpr);
+        void AddToComponentsMap(string bindingPath, ComponentRegistration entry);
+        IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap { get; }
         string Render();
         string RenderFormatted();
     }
@@ -32,7 +34,7 @@ namespace Alis.Reactive
         };
 
         private readonly List<Entry> _entries = new List<Entry>();
-        private readonly List<ComponentRegistration> _components = new List<ComponentRegistration>();
+        private readonly Dictionary<string, ComponentRegistration> _componentsMap = new Dictionary<string, ComponentRegistration>();
         private readonly Dictionary<RequestDescriptor, RequestBuildContext> _buildContexts = new Dictionary<RequestDescriptor, RequestBuildContext>();
         private readonly IValidationExtractor? _extractor;
 
@@ -43,6 +45,8 @@ namespace Alis.Reactive
             _extractor = extractor;
         }
 
+        public IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
+
         public void AddEntry(Entry entry)
         {
             _entries.Add(entry);
@@ -50,7 +54,12 @@ namespace Alis.Reactive
 
         public void RegisterComponent(string componentId, string vendor, string bindingPath, string readExpr)
         {
-            _components.Add(new ComponentRegistration(componentId, vendor, bindingPath, readExpr));
+            _componentsMap[bindingPath] = new ComponentRegistration(componentId, vendor, bindingPath, readExpr);
+        }
+
+        public void AddToComponentsMap(string bindingPath, ComponentRegistration entry)
+        {
+            _componentsMap[bindingPath] = entry;
         }
 
         internal void RegisterBuildContexts(Dictionary<RequestDescriptor, RequestBuildContext>? contexts)
@@ -74,7 +83,7 @@ namespace Alis.Reactive
 
         private void ResolveAll()
         {
-            GatherResolver.Resolve(_entries, _components);
+            GatherResolver.Resolve(_entries, _componentsMap);
 
             if (_extractor != null)
                 ValidationResolver.Resolve(_entries, _extractor, _buildContexts);

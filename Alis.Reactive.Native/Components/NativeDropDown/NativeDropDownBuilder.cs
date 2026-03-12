@@ -106,5 +106,28 @@ namespace Alis.Reactive.Native.Components
         {
             return new NativeDropDownBuilder<TModel, TProp>(html, expression);
         }
+
+        /// <summary>
+        /// Creates a native &lt;select&gt; builder bound to a model property and registers it in the plan's ComponentsMap.
+        /// Use this overload on reactive pages so the plan knows about the component at builder creation time.
+        /// </summary>
+        public static NativeDropDownBuilder<TModel, TProp> NativeDropDownFor<TModel, TProp>(
+            this IHtmlHelper<TModel> html,
+            IReactivePlan<TModel> plan,
+            Expression<Func<TModel, TProp>> expression)
+            where TModel : class
+        {
+            var component = new NativeDropDown();
+            var uniqueId = IdGenerator.For<TModel, TProp>(expression);
+            var name = html.NameFor(expression).ToString();
+
+            plan.AddToComponentsMap(name, new ComponentRegistration(
+                uniqueId,
+                component.Vendor,
+                name,
+                component.ReadExpr));
+
+            return new NativeDropDownBuilder<TModel, TProp>(html, expression);
+        }
     }
 }

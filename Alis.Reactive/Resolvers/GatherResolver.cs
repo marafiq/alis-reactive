@@ -10,33 +10,33 @@ namespace Alis.Reactive.Resolvers
     /// </summary>
     internal static class GatherResolver
     {
-        internal static void Resolve(List<Entry> entries, IReadOnlyList<ComponentRegistration> components)
+        internal static void Resolve(List<Entry> entries, IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
         {
             foreach (var entry in entries)
             {
-                ResolveReaction(entry.Reaction, components);
+                ResolveReaction(entry.Reaction, componentsMap);
             }
         }
 
-        private static void ResolveReaction(Reaction reaction, IReadOnlyList<ComponentRegistration> components)
+        private static void ResolveReaction(Reaction reaction, IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
         {
             switch (reaction)
             {
                 case HttpReaction hr:
-                    ResolveRequest(hr.Request, components);
+                    ResolveRequest(hr.Request, componentsMap);
                     break;
                 case ParallelHttpReaction phr:
                     foreach (var req in phr.Requests)
-                        ResolveRequest(req, components);
+                        ResolveRequest(req, componentsMap);
                     break;
                 case ConditionalReaction cr:
                     foreach (var branch in cr.Branches)
-                        ResolveReaction(branch.Reaction, components);
+                        ResolveReaction(branch.Reaction, componentsMap);
                     break;
             }
         }
 
-        private static void ResolveRequest(RequestDescriptor req, IReadOnlyList<ComponentRegistration> components)
+        private static void ResolveRequest(RequestDescriptor req, IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
         {
             if (req.Gather != null && req.Gather.Exists(item => item is AllGather))
             {
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Resolvers
                 {
                     if (item is AllGather)
                     {
-                        foreach (var c in components)
+                        foreach (var c in componentsMap.Values)
                         {
                             expanded.Add(new ComponentGather(c.ComponentId, c.Vendor, c.BindingPath, c.ReadExpr));
                         }
@@ -60,7 +60,7 @@ namespace Alis.Reactive.Resolvers
 
             if (req.Chained != null)
             {
-                ResolveRequest(req.Chained, components);
+                ResolveRequest(req.Chained, componentsMap);
             }
         }
     }
