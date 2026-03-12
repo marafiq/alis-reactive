@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text.Encodings.Web;
+using Alis.Reactive;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -75,6 +76,8 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeCheckBoxHtmlExtensions
     {
+        private static readonly NativeCheckBox _component = new NativeCheckBox();
+
         /// <summary>
         /// Creates a native &lt;input type="checkbox"&gt; builder with an explicit element ID.
         /// </summary>
@@ -82,6 +85,26 @@ namespace Alis.Reactive.Native.Components
             this IHtmlHelper<TModel> html, string elementId)
             where TModel : class
         {
+            return new NativeCheckBoxBuilder<TModel>(elementId);
+        }
+
+        /// <summary>
+        /// Creates a native &lt;input type="checkbox"&gt; builder and registers it in the plan's ComponentsMap.
+        /// Use this overload on reactive pages so the plan knows about the component.
+        /// </summary>
+        public static NativeCheckBoxBuilder<TModel> NativeCheckBox<TModel>(
+            this IHtmlHelper<TModel> html,
+            IReactivePlan<TModel> plan,
+            string elementId,
+            string bindingPath)
+            where TModel : class
+        {
+            plan.AddToComponentsMap(bindingPath, new ComponentRegistration(
+                elementId,
+                _component.Vendor,
+                bindingPath,
+                _component.ReadExpr));
+
             return new NativeCheckBoxBuilder<TModel>(elementId);
         }
     }
