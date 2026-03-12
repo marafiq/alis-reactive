@@ -1,4 +1,5 @@
 using Alis.Reactive.Builders;
+using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Commands;
 
 namespace Alis.Reactive
@@ -14,9 +15,11 @@ namespace Alis.Reactive
     ///   Native: "el.value=val"
     /// </summary>
     public class ComponentRef<TComponent, TModel>
-        where TComponent : IComponent
+        where TComponent : IComponent, new()
         where TModel : class
     {
+        private static readonly TComponent _instance = new TComponent();
+
         internal string TargetId { get; }
         internal PipelineBuilder<TModel> Pipeline { get; }
 
@@ -29,11 +32,23 @@ namespace Alis.Reactive
         /// <summary>
         /// Emits a MutateElementCommand with the given jsEmit string.
         /// Called by vendor extension methods — not by DSL users directly.
+        /// Vendor is resolved from the cached TComponent instance.
         /// </summary>
-        internal ComponentRef<TComponent, TModel> Emit(string jsEmit, string? value = null, string? source = null)
+        internal ComponentRef<TComponent, TModel> Emit(
+            string jsEmit,
+            string? value = null,
+            BindSource? source = null)
         {
-            Pipeline.AddCommand(new MutateElementCommand(TargetId, jsEmit, value, source));
+            Pipeline.AddCommand(new MutateElementCommand(
+                TargetId, jsEmit, value, source, vendor: _instance.Vendor));
             return this;
         }
+
+        /// <summary>
+        /// Creates a TypedComponentSource for reading a property from this component.
+        /// Used as a BindSource in SetText/SetHtml or guard conditions.
+        /// </summary>
+        public TypedComponentSource<TProp> ReadProperty<TProp>(string property)
+            => new TypedComponentSource<TProp>(TargetId, _instance.Vendor, property);
     }
 }

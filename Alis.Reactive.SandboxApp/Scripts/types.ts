@@ -173,7 +173,8 @@ export interface MutateElementCommand {
   target: string;
   jsEmit: string;
   value?: string;
-  source?: string;
+  source?: BindSource;
+  vendor?: Vendor;
   when?: Guard;
 }
 

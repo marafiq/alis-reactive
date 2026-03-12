@@ -55,7 +55,7 @@ namespace Alis.Reactive.Builders
         /// </summary>
         public ComponentRef<TComponent, TModel> Component<TComponent>(
             Expression<Func<TModel, object?>> expr)
-            where TComponent : IComponent
+            where TComponent : IComponent, new()
         {
             var elementId = IdGenerator.For<TModel>(expr);
             return new ComponentRef<TComponent, TModel>(elementId, this);
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Resolve component by string ref (non-input components by ID).</summary>
         public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
-            where TComponent : IComponent
+            where TComponent : IComponent, new()
         {
             return new ComponentRef<TComponent, TModel>(refId, this);
         }

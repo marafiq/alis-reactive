@@ -47,7 +47,7 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object?>> path)
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.textContent = val", source: sourcePath));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.textContent = val", source: new EventSource(sourcePath)));
             return _pipeline;
         }
 
@@ -59,8 +59,28 @@ namespace Alis.Reactive.Builders
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.textContent = val", source: sourcePath));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.textContent = val", source: new EventSource(sourcePath)));
             return _pipeline;
+        }
+
+        /// <summary>
+        /// Sets the element text from a BindSource (event or component).
+        /// </summary>
+        public ElementBuilder<TModel> SetText(BindSource source)
+        {
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId, "el.textContent = val", source: source));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the element text from a typed source (type-safe for conditions).
+        /// </summary>
+        public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
+        {
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId, "el.textContent = val", source: source.ToBindSource()));
+            return this;
         }
 
         public PipelineBuilder<TModel> SetHtml(string html)
@@ -75,8 +95,28 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object?>> path)
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.innerHTML = val", source: sourcePath));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, "el.innerHTML = val", source: new EventSource(sourcePath)));
             return _pipeline;
+        }
+
+        /// <summary>
+        /// Sets the element HTML from a BindSource (event or component).
+        /// </summary>
+        public ElementBuilder<TModel> SetHtml(BindSource source)
+        {
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId, "el.innerHTML = val", source: source));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the element HTML from a typed source (type-safe for conditions).
+        /// </summary>
+        public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
+        {
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId, "el.innerHTML = val", source: source.ToBindSource()));
+            return this;
         }
 
         public PipelineBuilder<TModel> Show()

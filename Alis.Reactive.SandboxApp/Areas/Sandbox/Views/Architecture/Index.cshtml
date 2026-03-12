@@ -5,6 +5,7 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.Builders.Conditions
 @using Alis.Reactive.Descriptors
 @using Alis.Reactive.Descriptors.Commands
 @using Alis.Reactive.Descriptors.Triggers
@@ -60,7 +61,7 @@
     // Native: "change" event on native input → walk evt.value → SetText
     {
         var pb = new PipelineBuilder<ArchitectureModel>();
-        pb.AddCommand(new MutateElementCommand("native-event-result", "el.textContent = val", source: "evt.value"));
+        pb.AddCommand(new MutateElementCommand("native-event-result", "el.textContent = val", source: new EventSource("evt.value")));
         plan.AddEntry(new Entry(
             new ComponentEventTrigger("native-event", "change", "native"),
             pb.BuildReaction()));
@@ -69,7 +70,7 @@
     // Fusion: "change" event on TestWidget → walk evt.newValue → SetText
     {
         var pb = new PipelineBuilder<ArchitectureModel>();
-        pb.AddCommand(new MutateElementCommand("fusion-event-result", "el.textContent = val", source: "evt.newValue"));
+        pb.AddCommand(new MutateElementCommand("fusion-event-result", "el.textContent = val", source: new EventSource("evt.newValue")));
         plan.AddEntry(new Entry(
             new ComponentEventTrigger("fusion-event", "change", "fusion"),
             pb.BuildReaction()));
@@ -79,8 +80,8 @@
 
     Html.On(plan, t => t.CustomEvent("deep-walk-ready", p =>
     {
-        p.AddCommand(new MutateElementCommand("deep-total", "el.textContent = val", source: "evt.result.detail.total"));
-        p.AddCommand(new MutateElementCommand("deep-city", "el.textContent = val", source: "evt.result.detail.address.city"));
+        p.AddCommand(new MutateElementCommand("deep-total", "el.textContent = val", source: new EventSource("evt.result.detail.total")));
+        p.AddCommand(new MutateElementCommand("deep-city", "el.textContent = val", source: new EventSource("evt.result.detail.address.city")));
     }));
 
     // ── Section 7: Both vendors gathered together ──

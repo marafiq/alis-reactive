@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Guards;
 
 namespace Alis.Reactive.Descriptors.Commands
@@ -37,14 +38,23 @@ namespace Alis.Reactive.Descriptors.Commands
         public string? Value { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Source { get; }
+        public BindSource? Source { get; }
 
-        public MutateElementCommand(string target, string jsEmit, string? value = null, string? source = null)
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Vendor { get; }
+
+        public MutateElementCommand(
+            string target,
+            string jsEmit,
+            string? value = null,
+            BindSource? source = null,
+            string? vendor = null)
         {
             Target = target;
             JsEmit = jsEmit;
             Value = value;
             Source = source;
+            Vendor = vendor;
         }
     }
 

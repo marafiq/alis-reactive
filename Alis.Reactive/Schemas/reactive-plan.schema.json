@@ -258,7 +258,8 @@
         "target": { "type": "string", "minLength": 1 },
         "jsEmit": { "type": "string", "minLength": 1, "description": "JavaScript expression executed on the resolved element. Variables: el (element), val (resolved value)." },
         "value": { "type": "string" },
-        "source": { "$ref": "#/$defs/BindExpr" },
+        "source": { "$ref": "#/$defs/BindSource" },
+        "vendor": { "$ref": "#/$defs/Vendor" },
         "when": { "$ref": "#/$defs/Guard" }
       }
     },
