@@ -12,13 +12,15 @@
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
             jsEmit: el.value=val,
-            value: active
+            value: active,
+            vendor: native
           },
           {
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Category,
             jsEmit: el.value=val,
-            value: A
+            value: A,
+            vendor: native
           },
           {
             kind: mutate-element,

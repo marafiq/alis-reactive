@@ -12,19 +12,28 @@
             kind: mutate-element,
             target: street,
             jsEmit: el.textContent = val,
-            source: evt.address.street
+            source: {
+              kind: event,
+              path: evt.address.street
+            }
           },
           {
             kind: mutate-element,
             target: city,
             jsEmit: el.textContent = val,
-            source: evt.address.city
+            source: {
+              kind: event,
+              path: evt.address.city
+            }
           },
           {
             kind: mutate-element,
             target: zip,
             jsEmit: el.textContent = val,
-            source: evt.address.zip
+            source: {
+              kind: event,
+              path: evt.address.zip
+            }
           }
         ]
       }

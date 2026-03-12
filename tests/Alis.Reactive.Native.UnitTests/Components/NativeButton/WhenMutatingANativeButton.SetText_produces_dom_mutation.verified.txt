@@ -11,7 +11,8 @@
             kind: mutate-element,
             target: submitBtn,
             jsEmit: el.textContent=val,
-            value: Save
+            value: Save,
+            vendor: native
           }
         ]
       }

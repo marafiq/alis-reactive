@@ -16,7 +16,8 @@
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Address_City,
             jsEmit: el.value=val,
-            value: Portland
+            value: Portland,
+            vendor: native
           },
           {
             kind: mutate-element,

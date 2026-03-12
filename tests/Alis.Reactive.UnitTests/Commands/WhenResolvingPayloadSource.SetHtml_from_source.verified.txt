@@ -12,7 +12,10 @@
             kind: mutate-element,
             target: content,
             jsEmit: el.innerHTML = val,
-            source: evt.stringValue
+            source: {
+              kind: event,
+              path: evt.stringValue
+            }
           }
         ]
       }

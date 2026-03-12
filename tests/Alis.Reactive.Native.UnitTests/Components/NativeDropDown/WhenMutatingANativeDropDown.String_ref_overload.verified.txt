@@ -11,7 +11,8 @@
             kind: mutate-element,
             target: filterDropdown,
             jsEmit: el.value=val,
-            value: B
+            value: B,
+            vendor: native
           }
         ]
       }

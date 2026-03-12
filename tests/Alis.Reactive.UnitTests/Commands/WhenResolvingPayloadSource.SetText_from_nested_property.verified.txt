@@ -12,7 +12,10 @@
             kind: mutate-element,
             target: city,
             jsEmit: el.textContent = val,
-            source: evt.address.city
+            source: {
+              kind: event,
+              path: evt.address.city
+            }
           }
         ]
       }

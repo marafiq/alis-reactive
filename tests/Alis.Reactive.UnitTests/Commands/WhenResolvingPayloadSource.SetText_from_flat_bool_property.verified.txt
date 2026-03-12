@@ -12,7 +12,10 @@
             kind: mutate-element,
             target: active,
             jsEmit: el.textContent = val,
-            source: evt.boolValue
+            source: {
+              kind: event,
+              path: evt.boolValue
+            }
           }
         ]
       }

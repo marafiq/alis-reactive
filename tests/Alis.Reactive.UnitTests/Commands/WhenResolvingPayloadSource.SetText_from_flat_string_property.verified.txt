@@ -12,7 +12,10 @@
             kind: mutate-element,
             target: name,
             jsEmit: el.textContent = val,
-            source: evt.stringValue
+            source: {
+              kind: event,
+              path: evt.stringValue
+            }
           }
         ]
       }

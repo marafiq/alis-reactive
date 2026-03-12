@@ -11,13 +11,15 @@
             kind: mutate-element,
             target: submitBtn,
             jsEmit: el.textContent=val,
-            value: Updated
+            value: Updated,
+            vendor: native
           },
           {
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
             jsEmit: el.value=val,
-            value: active
+            value: active,
+            vendor: native
           }
         ]
       }

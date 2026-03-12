@@ -10,7 +10,8 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            jsEmit: el.ej2_instances[0].focusIn()
+            jsEmit: el.ej2_instances[0].focusIn(),
+            vendor: fusion
           }
         ]
       }

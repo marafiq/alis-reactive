@@ -11,7 +11,8 @@
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
             jsEmit: el.value=val,
-            value: pending
+            value: pending,
+            vendor: native
           },
           {
             kind: mutate-element,

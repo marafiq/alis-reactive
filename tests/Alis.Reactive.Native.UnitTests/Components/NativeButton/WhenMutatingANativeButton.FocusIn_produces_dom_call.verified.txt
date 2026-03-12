@@ -10,7 +10,8 @@
           {
             kind: mutate-element,
             target: submitBtn,
-            jsEmit: el.focus()
+            jsEmit: el.focus(),
+            vendor: native
           }
         ]
       }
