@@ -38,7 +38,7 @@
                  "active"   → Amount=100, City="seattle", show success
                  "inactive" → Amount=0,   hide address,   show warning
                  else       → reset message, show address -->
-            @{ Html.Field("Status", true, m => m.Status, (expr, id) =>
+            @{ Html.Field("Status", true, m => m.Status, expr =>
                 Html.NativeDropDownFor(plan, expr)
                     .Items(statusItems)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -79,7 +79,7 @@
                  >= 5000 → "High value order"
                  >= 1000 → "Standard order"
                  else    → "Small order" -->
-            @{ Html.Field("Amount", true, m => m.Amount, (expr, id) =>
+            @{ Html.Field("Amount", true, m => m.Amount, expr =>
                 Html.NumericTextBoxFor(plan, expr)
                     .Min(0).Max(99999).Step(100)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -120,7 +120,7 @@
                  "portland" → State=OR, PostalCode=97201
                  "denver"   → State=CO, PostalCode=80201
                  else       → clear both -->
-            @{ Html.Field("City", false, m => m.Address!.City, (expr, id) =>
+            @{ Html.Field("City", false, m => m.Address!.City, expr =>
                 Html.NativeDropDownFor(plan, expr)
                     .Items(cityItems)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -155,12 +155,12 @@
                     })
             ); }
 
-            @{ Html.Field("State", false, m => m.Address!.State, (expr, id) =>
+            @{ Html.Field("State", false, m => m.Address!.State, expr =>
                 Html.NativeDropDownFor(plan, expr)
                     .Items(stateItems)
             ); }
 
-            @{ Html.Field("Postal Code", false, m => m.Address!.PostalCode, (expr, id) =>
+            @{ Html.Field("Postal Code", false, m => m.Address!.PostalCode, expr =>
                 Html.NumericTextBoxFor(plan, expr)
                     .Min(10000).Max(99999).Step(1)
                     .Render()

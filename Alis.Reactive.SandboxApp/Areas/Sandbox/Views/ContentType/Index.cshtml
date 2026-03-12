@@ -112,7 +112,7 @@
         <h2 class="text-base font-semibold mb-4">3. HTML Partial via Into</h2>
         <p class="text-sm text-text-secondary mb-4">
             <code>Into("partial-container")</code> injects server-rendered HTML.
-            Partial includes native <code>&lt;input&gt;</code> via <code>Html.TextBoxFor()</code> and Syncfusion <code>NumericTextBox</code> via <code>Html.EJS().NumericTextBoxFor()</code>.
+            Partial includes native <code>&lt;input&gt;</code> via <code>Html.NativeTextBoxFor()</code> and Syncfusion <code>NumericTextBox</code> via <code>Html.NumericTextBoxFor()</code>.
             SF components initialize via <code>ej.base.append</code> which executes the inline <code>ScriptManager</code> output.
         </p>
         @(Html.NativeButton("partial-btn", "Load Partial")

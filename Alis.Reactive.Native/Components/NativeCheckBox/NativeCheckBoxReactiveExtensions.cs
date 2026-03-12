@@ -7,13 +7,14 @@ using Alis.Reactive.Descriptors.Triggers;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto NativeCheckBoxBuilder variants.
+    /// Wires reactive event pipelines onto NativeCheckBoxBuilder.
+    /// Non-model-bound (UI toggle): Reactive&lt;TModel, TArgs&gt;
+    /// Model-bound: Reactive&lt;TModel, TProp, TArgs&gt; (TProp inferred from builder)
     /// </summary>
     public static class NativeCheckBoxReactiveExtensions
     {
         private static readonly NativeCheckBox _component = new NativeCheckBox();
 
-        /// <summary>Reactive extension for non-model-bound checkbox (UI toggle).</summary>
         public static NativeCheckBoxBuilder<TModel> Reactive<TModel, TArgs>(
             this NativeCheckBoxBuilder<TModel> builder,
             IReactivePlan<TModel> plan,
@@ -33,7 +34,6 @@ namespace Alis.Reactive.Native.Components
             return builder;
         }
 
-        /// <summary>Reactive extension for model-bound checkbox.</summary>
         public static NativeCheckBoxBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeCheckBoxBuilder<TModel, TProp> builder,
             IReactivePlan<TModel> plan,

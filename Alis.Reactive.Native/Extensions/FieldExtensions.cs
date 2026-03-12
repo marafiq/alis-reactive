@@ -18,13 +18,13 @@ namespace Alis.Reactive.Native.Extensions
         /// <summary>
         /// Renders a model-bound form field.
         /// The expression resolves the field name; the id is generated via IdGenerator.For().
-        /// The callback receives both the expression and the generated id string.
+        /// The callback receives the expression — input builders derive their own id internally.
         /// </summary>
         public static void Field<TModel, TProp>(
             this IHtmlHelper<TModel> html,
             string label, bool isRequired,
             Expression<Func<TModel, TProp>> expression,
-            Func<Expression<Func<TModel, TProp>>, string, IHtmlContent> inputBuilder)
+            Func<Expression<Func<TModel, TProp>>, IHtmlContent> inputBuilder)
         {
             var writer = html.ViewContext.Writer;
             var id = IdGenerator.For<TModel, TProp>(expression);
@@ -32,7 +32,7 @@ namespace Alis.Reactive.Native.Extensions
                 .Label(label)
                 .ForId(id);
             if (isRequired) b.Required();
-            using (b.Begin()) { inputBuilder(expression, id).WriteTo(writer, HtmlEncoder.Default); }
+            using (b.Begin()) { inputBuilder(expression).WriteTo(writer, HtmlEncoder.Default); }
         }
     }
 }

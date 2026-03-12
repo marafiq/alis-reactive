@@ -37,27 +37,27 @@
     <section>
         <h2 class="text-sm font-semibold mb-2">1. JSON POST — Include (gathers by name)</h2>
         <form id="json-form" class="grid grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
-                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm w-full" })
+            @{ Html.Field("Name", true, m => m.Name, expr =>
+                Html.NativeTextBoxFor(expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             ); }
-            @{ Html.Field("Amount (SF)", true, m => m.Amount, (expr, id) =>
+            @{ Html.Field("Amount (SF)", true, m => m.Amount, expr =>
                 Html.NumericTextBoxFor(plan, expr)
                     .Min(0).Max(99999).Step(1)
                     .Render()
             ); }
-            @{ Html.Field("Status (Native)", false, m => m.Status, (expr, id) =>
+            @{ Html.Field("Status (Native)", false, m => m.Status, expr =>
                 Html.NativeDropDownFor(plan, expr)
                     .Items(statusItems)
                     .Placeholder("-- Select --")
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             ); }
-            @{ Html.Field("City (Native)", false, m => m.Address!.City, (expr, id) =>
+            @{ Html.Field("City (Native)", false, m => m.Address!.City, expr =>
                 Html.NativeDropDownFor(plan, expr)
                     .Items(cityItems)
                     .Placeholder("-- Select --")
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             ); }
-            @{ Html.Field("Postal Code (SF)", false, m => m.Address!.PostalCode, (expr, id) =>
+            @{ Html.Field("Postal Code (SF)", false, m => m.Address!.PostalCode, expr =>
                 Html.NumericTextBoxFor(plan, expr)
                     .Min(10000).Max(99999).Step(1)
                     .Render()
@@ -88,15 +88,15 @@
     <section>
         <h2 class="text-sm font-semibold mb-2">2. FormData POST — Include (gathers by name)</h2>
         <form id="form-form" class="grid grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, (expr, id) =>
-                Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm w-full" })
+            @{ Html.Field("Name", true, m => m.Name, expr =>
+                Html.NativeTextBoxFor(expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             ); }
-            @{ Html.Field("Amount (SF)", true, m => m.Amount, (expr, id) =>
+            @{ Html.Field("Amount (SF)", true, m => m.Amount, expr =>
                 Html.NumericTextBoxFor(plan, expr)
                     .Min(0).Max(99999).Step(1)
                     .Render()
             ); }
-            @{ Html.Field("Status (Native)", false, m => m.Status, (expr, id) =>
+            @{ Html.Field("Status (Native)", false, m => m.Status, expr =>
                 Html.NativeDropDownFor(plan, expr)
                     .Items(statusItems)
                     .Placeholder("-- Select --")
