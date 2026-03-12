@@ -22,6 +22,8 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeDropDownReactiveExtensions
     {
+        private static readonly NativeDropDown _component = new NativeDropDown();
+
         public static NativeDropDownBuilder<TModel, TProp> Reactive<TModel, TProp>(
             this NativeDropDownBuilder<TModel, TProp> builder,
             IReactivePlan<TModel> plan,
@@ -33,11 +35,11 @@ namespace Alis.Reactive.Native.Components
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
-            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, "native", builder.BindingPath, new NativeDropDown().ReadExpr);
+            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, _component.Vendor, builder.BindingPath, _component.ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
             (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
-            plan.RegisterComponent(builder.ElementId, "native", builder.BindingPath, new NativeDropDown().ReadExpr);
+            plan.RegisterComponent(builder.ElementId, _component.Vendor, builder.BindingPath, _component.ReadExpr);
 
             return builder;
         }

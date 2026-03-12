@@ -23,6 +23,8 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeCheckBoxReactiveExtensions
     {
+        private static readonly NativeCheckBox _component = new NativeCheckBox();
+
         public static NativeCheckBoxBuilder<TModel> Reactive<TModel>(
             this NativeCheckBoxBuilder<TModel> builder,
             IReactivePlan<TModel> plan,
@@ -34,7 +36,7 @@ namespace Alis.Reactive.Native.Components
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
-            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, "native", readExpr: new NativeCheckBox().ReadExpr);
+            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, _component.Vendor, readExpr: _component.ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
             (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);

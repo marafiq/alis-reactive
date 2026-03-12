@@ -18,6 +18,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class FusionDropDownListExtensions
     {
+        private static readonly FusionDropDownList _component = new FusionDropDownList();
+
         // ── Builder: collision-free ID variant of SF DropDownListFor ──
 
         /// <summary>
@@ -46,15 +48,14 @@ namespace Alis.Reactive.Fusion.Components
             Expression<Func<TModel, TProp>> expression)
             where TModel : class
         {
-            var component = new FusionDropDownList();
             var uniqueId = IdGenerator.For<TModel, TProp>(expression);
             var name = html.NameFor(expression).ToString();
 
             plan.AddToComponentsMap(name, new ComponentRegistration(
                 uniqueId,
-                component.Vendor,
+                _component.Vendor,
                 name,
-                component.ReadExpr));
+                _component.ReadExpr));
 
             return html.EJS().DropDownListFor(expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = uniqueId, ["name"] = name });

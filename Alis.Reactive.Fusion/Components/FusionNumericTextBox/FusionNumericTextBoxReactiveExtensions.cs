@@ -22,6 +22,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class FusionNumericTextBoxReactiveExtensions
     {
+        private static readonly FusionNumericTextBox _component = new FusionNumericTextBox();
+
         /// <summary>Wires the Changed event (typed payload with Value, PreviousValue, IsInteracted).</summary>
         public static NumericTextBoxBuilder Reactive<TModel>(
             this NumericTextBoxBuilder builder,
@@ -29,25 +31,7 @@ namespace Alis.Reactive.Fusion.Components
             Func<FusionNumericTextBoxEvents, TypedEventDescriptor<FusionNumericTextBoxChangeArgs>> eventSelector,
             Action<FusionNumericTextBoxChangeArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
-        {
-            var descriptor = eventSelector(FusionNumericTextBoxEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
-
-            var componentId = ExtractComponentId(builder);
-            var bindingPath = ExtractProperty(builder, "Name");
-
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
-            var entry = new Entry(trigger, pb.BuildReaction());
-            plan.AddEntry(entry);
-            (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
-            if (bindingPath != null)
-            {
-                plan.RegisterComponent(componentId, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
-            }
-
-            return builder;
-        }
+            => ReactiveCore(builder, plan, eventSelector(FusionNumericTextBoxEvents.Instance), pipeline);
 
         /// <summary>Wires the Focus event (void payload).</summary>
         public static NumericTextBoxBuilder Reactive<TModel>(
@@ -56,25 +40,7 @@ namespace Alis.Reactive.Fusion.Components
             Func<FusionNumericTextBoxEvents, TypedEventDescriptor<FusionNumericTextBoxFocusArgs>> eventSelector,
             Action<FusionNumericTextBoxFocusArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
-        {
-            var descriptor = eventSelector(FusionNumericTextBoxEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
-
-            var componentId = ExtractComponentId(builder);
-            var bindingPath = ExtractProperty(builder, "Name");
-
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
-            var entry = new Entry(trigger, pb.BuildReaction());
-            plan.AddEntry(entry);
-            (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
-            if (bindingPath != null)
-            {
-                plan.RegisterComponent(componentId, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
-            }
-
-            return builder;
-        }
+            => ReactiveCore(builder, plan, eventSelector(FusionNumericTextBoxEvents.Instance), pipeline);
 
         /// <summary>Wires the Blur event (void payload).</summary>
         public static NumericTextBoxBuilder Reactive<TModel>(
@@ -83,21 +49,28 @@ namespace Alis.Reactive.Fusion.Components
             Func<FusionNumericTextBoxEvents, TypedEventDescriptor<FusionNumericTextBoxBlurArgs>> eventSelector,
             Action<FusionNumericTextBoxBlurArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
+            => ReactiveCore(builder, plan, eventSelector(FusionNumericTextBoxEvents.Instance), pipeline);
+
+        private static NumericTextBoxBuilder ReactiveCore<TModel, TArgs>(
+            NumericTextBoxBuilder builder,
+            IReactivePlan<TModel> plan,
+            TypedEventDescriptor<TArgs> descriptor,
+            Action<TArgs, PipelineBuilder<TModel>> pipeline)
+            where TModel : class
         {
-            var descriptor = eventSelector(FusionNumericTextBoxEvents.Instance);
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
             var componentId = ExtractComponentId(builder);
             var bindingPath = ExtractProperty(builder, "Name");
 
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
+            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, _component.Vendor, bindingPath, _component.ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
             (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
             if (bindingPath != null)
             {
-                plan.RegisterComponent(componentId, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
+                plan.RegisterComponent(componentId, _component.Vendor, bindingPath, _component.ReadExpr);
             }
 
             return builder;

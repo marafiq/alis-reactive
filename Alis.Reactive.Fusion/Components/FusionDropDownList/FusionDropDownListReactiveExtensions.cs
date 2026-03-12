@@ -22,6 +22,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class FusionDropDownListReactiveExtensions
     {
+        private static readonly FusionDropDownList _component = new FusionDropDownList();
+
         /// <summary>Wires the Changed event (typed payload with Value, IsInteracted).</summary>
         public static DropDownListBuilder Reactive<TModel>(
             this DropDownListBuilder builder,
@@ -29,25 +31,7 @@ namespace Alis.Reactive.Fusion.Components
             Func<FusionDropDownListEvents, TypedEventDescriptor<FusionDropDownListChangeArgs>> eventSelector,
             Action<FusionDropDownListChangeArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
-        {
-            var descriptor = eventSelector(FusionDropDownListEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
-
-            var componentId = ExtractComponentId(builder);
-            var bindingPath = ExtractProperty(builder, "Name");
-
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionDropDownList().ReadExpr);
-            var entry = new Entry(trigger, pb.BuildReaction());
-            plan.AddEntry(entry);
-            (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
-            if (bindingPath != null)
-            {
-                plan.RegisterComponent(componentId, "fusion", bindingPath, new FusionDropDownList().ReadExpr);
-            }
-
-            return builder;
-        }
+            => ReactiveCore(builder, plan, eventSelector(FusionDropDownListEvents.Instance), pipeline);
 
         /// <summary>Wires the Focus event (void payload).</summary>
         public static DropDownListBuilder Reactive<TModel>(
@@ -56,25 +40,7 @@ namespace Alis.Reactive.Fusion.Components
             Func<FusionDropDownListEvents, TypedEventDescriptor<FusionDropDownListFocusArgs>> eventSelector,
             Action<FusionDropDownListFocusArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
-        {
-            var descriptor = eventSelector(FusionDropDownListEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
-
-            var componentId = ExtractComponentId(builder);
-            var bindingPath = ExtractProperty(builder, "Name");
-
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionDropDownList().ReadExpr);
-            var entry = new Entry(trigger, pb.BuildReaction());
-            plan.AddEntry(entry);
-            (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
-            if (bindingPath != null)
-            {
-                plan.RegisterComponent(componentId, "fusion", bindingPath, new FusionDropDownList().ReadExpr);
-            }
-
-            return builder;
-        }
+            => ReactiveCore(builder, plan, eventSelector(FusionDropDownListEvents.Instance), pipeline);
 
         /// <summary>Wires the Blur event (void payload).</summary>
         public static DropDownListBuilder Reactive<TModel>(
@@ -83,21 +49,28 @@ namespace Alis.Reactive.Fusion.Components
             Func<FusionDropDownListEvents, TypedEventDescriptor<FusionDropDownListBlurArgs>> eventSelector,
             Action<FusionDropDownListBlurArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
+            => ReactiveCore(builder, plan, eventSelector(FusionDropDownListEvents.Instance), pipeline);
+
+        private static DropDownListBuilder ReactiveCore<TModel, TArgs>(
+            DropDownListBuilder builder,
+            IReactivePlan<TModel> plan,
+            TypedEventDescriptor<TArgs> descriptor,
+            Action<TArgs, PipelineBuilder<TModel>> pipeline)
+            where TModel : class
         {
-            var descriptor = eventSelector(FusionDropDownListEvents.Instance);
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
             var componentId = ExtractComponentId(builder);
             var bindingPath = ExtractProperty(builder, "Name");
 
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionDropDownList().ReadExpr);
+            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, _component.Vendor, bindingPath, _component.ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
             (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
             if (bindingPath != null)
             {
-                plan.RegisterComponent(componentId, "fusion", bindingPath, new FusionDropDownList().ReadExpr);
+                plan.RegisterComponent(componentId, _component.Vendor, bindingPath, _component.ReadExpr);
             }
 
             return builder;
