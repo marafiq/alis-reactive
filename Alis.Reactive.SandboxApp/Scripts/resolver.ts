@@ -1,5 +1,6 @@
 import type { BindSource, ExecContext } from "./types";
 import { walk } from "./walk";
+import { evalRead } from "./component";
 import { scope } from "./trace";
 
 const log = scope("resolver");
@@ -21,13 +22,14 @@ export type CoercionType = "string" | "number" | "boolean" | "date" | "raw";
 
 /**
  * Unified entry point — dispatches by source kind.
- * Currently only handles "event" kind. "component" is a future extension.
+ * Handles both "event" (walk execution context) and "component" (read from DOM component).
  */
 export function resolveSource(source: BindSource, ctx?: ExecContext): unknown {
   switch (source.kind) {
     case "event":
       return resolveEventPath(source.path, ctx);
-    // Future: case "component": return resolveComponentValue(source);
+    case "component":
+      return evalRead(source.componentId, source.vendor, source.readExpr);
     default:
       return undefined;
   }

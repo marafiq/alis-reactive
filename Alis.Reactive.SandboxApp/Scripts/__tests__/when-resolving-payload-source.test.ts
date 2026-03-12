@@ -18,7 +18,7 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "custom-event", event: "src-test-1" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "name", jsEmit: "el.textContent = val", source: "evt.stringValue" }],
+            commands: [{ kind: "mutate-element", target: "name", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.stringValue" } }],
           },
         },
       ],
@@ -43,7 +43,7 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "custom-event", event: "src-test-2" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "count", jsEmit: "el.textContent = val", source: "evt.intValue" }],
+            commands: [{ kind: "mutate-element", target: "count", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.intValue" } }],
           },
         },
       ],
@@ -68,7 +68,7 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "custom-event", event: "src-test-3" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "active", jsEmit: "el.textContent = val", source: "evt.boolValue" }],
+            commands: [{ kind: "mutate-element", target: "active", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.boolValue" } }],
           },
         },
       ],
@@ -97,7 +97,7 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "custom-event", event: "src-test-4" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "city", jsEmit: "el.textContent = val", source: "evt.address.city" }],
+            commands: [{ kind: "mutate-element", target: "city", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.address.city" } }],
           },
         },
       ],
@@ -127,9 +127,9 @@ describe("when resolving payload source in mutate-element", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "street", jsEmit: "el.textContent = val", source: "evt.address.street" },
-              { kind: "mutate-element", target: "city2", jsEmit: "el.textContent = val", source: "evt.address.city" },
-              { kind: "mutate-element", target: "zip", jsEmit: "el.textContent = val", source: "evt.address.zip" },
+              { kind: "mutate-element", target: "street", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.address.street" } },
+              { kind: "mutate-element", target: "city2", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.address.city" } },
+              { kind: "mutate-element", target: "zip", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.address.zip" } },
             ],
           },
         },
@@ -174,11 +174,11 @@ describe("when resolving payload source in mutate-element", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "t-int", jsEmit: "el.textContent = val", source: "evt.intValue" },
-              { kind: "mutate-element", target: "t-long", jsEmit: "el.textContent = val", source: "evt.longValue" },
-              { kind: "mutate-element", target: "t-double", jsEmit: "el.textContent = val", source: "evt.doubleValue" },
-              { kind: "mutate-element", target: "t-string", jsEmit: "el.textContent = val", source: "evt.stringValue" },
-              { kind: "mutate-element", target: "t-bool", jsEmit: "el.textContent = val", source: "evt.boolValue" },
+              { kind: "mutate-element", target: "t-int", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.intValue" } },
+              { kind: "mutate-element", target: "t-long", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.longValue" } },
+              { kind: "mutate-element", target: "t-double", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.doubleValue" } },
+              { kind: "mutate-element", target: "t-string", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.stringValue" } },
+              { kind: "mutate-element", target: "t-bool", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.boolValue" } },
             ],
           },
         },
@@ -226,7 +226,7 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "custom-event", event: "src-test-7" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "missing", jsEmit: "el.textContent = val", source: "evt.nonexistent.deep" }],
+            commands: [{ kind: "mutate-element", target: "missing", jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.nonexistent.deep" } }],
           },
         },
       ],

@@ -183,7 +183,7 @@ describe("when triggering on component event", () => {
               kind: "mutate-element",
               target: "echo-args",
               jsEmit: "el.textContent = val",
-              source: "evt.value",
+              source: { kind: "event", path: "evt.value" },
             }],
           },
         }],

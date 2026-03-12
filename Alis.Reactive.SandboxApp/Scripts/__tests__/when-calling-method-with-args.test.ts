@@ -31,7 +31,7 @@ describe("when calling component method with args (source walk → val → jsEmi
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fusion-args",
             jsEmit: "var c=el.ej2_instances[0]; c.setItems(val)",
-            source: "evt.data.items",
+            source: { kind: "event", path: "evt.data.items" },
           }] },
         },
       ] });
@@ -55,7 +55,7 @@ describe("when calling component method with args (source walk → val → jsEmi
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fusion-set",
             jsEmit: "var c=el.ej2_instances[0]; c.value=val",
-            source: "evt.result.detail.newValue",
+            source: { kind: "event", path: "evt.result.detail.newValue" },
           }] },
         },
       ] });
@@ -83,7 +83,7 @@ describe("when calling component method with args (source walk → val → jsEmi
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "native-args",
             jsEmit: "el.setAttribute('data-status', val)",
-            source: "evt.attr.val",
+            source: { kind: "event", path: "evt.attr.val" },
           }] },
         },
       ] });
@@ -109,7 +109,7 @@ describe("when calling component method with args (source walk → val → jsEmi
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "native-set",
             jsEmit: "el.value=val",
-            source: "evt.form.username",
+            source: { kind: "event", path: "evt.form.username" },
           }] },
         },
       ] });
