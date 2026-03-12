@@ -109,7 +109,8 @@
 
     "BindSource": {
       "oneOf": [
-        { "$ref": "#/$defs/EventSource" }
+        { "$ref": "#/$defs/EventSource" },
+        { "$ref": "#/$defs/ComponentSource" }
       ]
     },
     "EventSource": {
@@ -119,6 +120,17 @@
       "properties": {
         "kind": { "const": "event" },
         "path": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ComponentSource": {
+      "type": "object",
+      "required": ["kind", "componentId", "vendor", "readExpr"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "component" },
+        "componentId": { "type": "string", "minLength": 1 },
+        "vendor": { "$ref": "#/$defs/Vendor" },
+        "readExpr": { "type": "string", "minLength": 1 }
       }
     },
     "BindExpr": {
