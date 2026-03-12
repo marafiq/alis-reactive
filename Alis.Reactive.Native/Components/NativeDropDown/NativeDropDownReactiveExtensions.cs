@@ -33,11 +33,11 @@ namespace Alis.Reactive.Native.Components
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
-            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, "native", builder.BindingPath, ComponentHelper.GetReadExpr<NativeDropDown>());
+            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, "native", builder.BindingPath, new NativeDropDown().ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
             (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
-            plan.RegisterComponent(builder.ElementId, "native", builder.BindingPath, ComponentHelper.GetReadExpr<NativeDropDown>());
+            plan.RegisterComponent(builder.ElementId, "native", builder.BindingPath, new NativeDropDown().ReadExpr);
 
             return builder;
         }

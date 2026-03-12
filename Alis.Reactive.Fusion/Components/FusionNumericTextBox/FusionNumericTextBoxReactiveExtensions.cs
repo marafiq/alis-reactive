@@ -35,13 +35,13 @@ namespace Alis.Reactive.Fusion.Components
             var componentId = ExtractProperty(builder, "ID") ?? "unknown";
             var bindingPath = ExtractProperty(builder, "Name");
 
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, ComponentHelper.GetReadExpr<FusionNumericTextBox>());
+            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
             (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
             if (bindingPath != null)
             {
-                plan.RegisterComponent(componentId, "fusion", bindingPath, ComponentHelper.GetReadExpr<FusionNumericTextBox>());
+                plan.RegisterComponent(componentId, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
             }
 
             return builder;

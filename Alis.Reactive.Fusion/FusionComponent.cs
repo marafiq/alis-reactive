@@ -8,6 +8,8 @@ namespace Alis.Reactive.Fusion
     /// </summary>
     public abstract class FusionComponent : IComponent
     {
+        /// <inheritdoc />
+        public string Vendor => "fusion";
     }
 
     /// <summary>

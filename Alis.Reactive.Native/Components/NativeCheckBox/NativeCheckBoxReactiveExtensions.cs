@@ -34,7 +34,7 @@ namespace Alis.Reactive.Native.Components
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
-            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, "native", readExpr: ComponentHelper.GetReadExpr<NativeCheckBox>());
+            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, "native", readExpr: new NativeCheckBox().ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
             (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);

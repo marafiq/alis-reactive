@@ -4,8 +4,9 @@ namespace Alis.Reactive.Native.Components
     /// Native HTML &lt;input type="checkbox"&gt; element.
     /// Phantom type — constrains which vertical slice extensions are available.
     /// </summary>
-    [ReadExpr("checked")]
-    public sealed class NativeCheckBox : NativeComponent, IReadableComponent
+    public sealed class NativeCheckBox : NativeComponent, IInputComponent
     {
+        /// <inheritdoc />
+        public string ReadExpr => "checked";
     }
 }

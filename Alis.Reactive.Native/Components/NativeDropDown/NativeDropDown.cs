@@ -4,8 +4,9 @@ namespace Alis.Reactive.Native.Components
     /// Native HTML &lt;select&gt; dropdown.
     /// Phantom type — constrains which vertical slice extensions are available.
     /// </summary>
-    [ReadExpr("value")]
-    public sealed class NativeDropDown : NativeComponent, INativeInputComponent, IReadableComponent
+    public sealed class NativeDropDown : NativeComponent, INativeInputComponent, IInputComponent
     {
+        /// <inheritdoc />
+        public string ReadExpr => "value";
     }
 }

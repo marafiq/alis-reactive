@@ -5,8 +5,9 @@ namespace Alis.Reactive.Fusion.Components
     /// Phantom type — proves vendor resolves root via ej2_instances[0],
     /// and readExpr walks from that root.
     /// </summary>
-    [ReadExpr("value")]
-    public sealed class TestWidgetSyncFusion : FusionComponent, IReadableComponent
+    public sealed class TestWidgetSyncFusion : FusionComponent, IInputComponent
     {
+        /// <inheritdoc />
+        public string ReadExpr => "value";
     }
 }

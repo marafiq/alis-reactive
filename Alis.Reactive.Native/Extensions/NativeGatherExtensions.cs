@@ -7,19 +7,19 @@ namespace Alis.Reactive.Native.Extensions
 {
     /// <summary>
     /// Adds Include&lt;TComponent&gt;() to GatherBuilder for native DOM components.
-    /// Vendor = "native", readExpr resolved from [ReadExpr] attribute on TComponent.
+    /// Vendor = "native", readExpr resolved from IInputComponent.ReadExpr on TComponent.
     /// </summary>
     public static class NativeGatherExtensions
     {
         /// <summary>
         /// Gathers the value of a native DOM component bound to a model property.
         /// The component is identified by the model expression (m => m.FirstName).
-        /// ReadExpr is resolved from the component type's [ReadExpr] attribute.
+        /// ReadExpr is resolved from the component type's IInputComponent.ReadExpr property.
         /// </summary>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             Expression<Func<TModel, object?>> expr)
-            where TComponent : NativeComponent, IReadableComponent
+            where TComponent : NativeComponent, IInputComponent, new()
             where TModel : class
         {
             var elementId = IdGenerator.For<TModel>(expr);
@@ -28,7 +28,7 @@ namespace Alis.Reactive.Native.Extensions
                 elementId,
                 "native",
                 propertyName,
-                ComponentHelper.GetReadExpr<TComponent>()));
+                new TComponent().ReadExpr));
             return self;
         }
 
@@ -39,14 +39,14 @@ namespace Alis.Reactive.Native.Extensions
             this GatherBuilder<TModel> self,
             string refId,
             string name)
-            where TComponent : NativeComponent, IReadableComponent
+            where TComponent : NativeComponent, IInputComponent, new()
             where TModel : class
         {
             self.AddItem(new ComponentGather(
                 refId,
                 "native",
                 name,
-                ComponentHelper.GetReadExpr<TComponent>()));
+                new TComponent().ReadExpr));
             return self;
         }
     }
