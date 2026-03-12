@@ -1,0 +1,25 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: component-event,
+        componentId: Status,
+        jsEvent: focus,
+        vendor: fusion,
+        bindingPath: Status,
+        readExpr: value
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: status,
+            jsEmit: el.textContent = val,
+            value: Focused
+          }
+        ]
+      }
+    }
+  ]
+}

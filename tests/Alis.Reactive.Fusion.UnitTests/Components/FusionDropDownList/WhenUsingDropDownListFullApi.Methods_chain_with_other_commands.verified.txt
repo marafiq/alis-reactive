@@ -1,0 +1,33 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+            jsEmit: el.value=val,
+            value: US,
+            vendor: fusion
+          },
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+            jsEmit: el.showPopup(),
+            vendor: fusion
+          },
+          {
+            kind: mutate-element,
+            target: echo,
+            jsEmit: el.textContent = val,
+            value: Initialized
+          }
+        ]
+      }
+    }
+  ]
+}

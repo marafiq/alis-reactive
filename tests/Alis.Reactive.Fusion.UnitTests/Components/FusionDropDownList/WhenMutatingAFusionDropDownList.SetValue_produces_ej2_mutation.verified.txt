@@ -1,0 +1,21 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+            jsEmit: el.value=val,
+            value: US,
+            vendor: fusion
+          }
+        ]
+      }
+    }
+  ]
+}

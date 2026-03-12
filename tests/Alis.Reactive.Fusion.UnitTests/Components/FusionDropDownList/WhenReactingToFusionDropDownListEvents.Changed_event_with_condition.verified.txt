@@ -1,0 +1,52 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: status-guarded
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: eq,
+              operand: US
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+                  jsEmit: el.value=val,
+                  value: US,
+                  vendor: fusion
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: echo,
+                  jsEmit: el.textContent = val,
+                  value: Not US
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

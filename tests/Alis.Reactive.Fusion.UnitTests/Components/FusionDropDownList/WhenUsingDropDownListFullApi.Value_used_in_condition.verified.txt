@@ -1,0 +1,52 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: component,
+                componentId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+                vendor: fusion,
+                readExpr: value
+              },
+              coerceAs: string,
+              op: eq,
+              operand: US
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Selected US
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Other
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: component-event,
+        componentId: Status,
+        jsEvent: change,
+        vendor: fusion,
+        bindingPath: Status,
+        readExpr: value
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+            jsEmit: el.value=val,
+            vendor: fusion
+          },
+          {
+            kind: mutate-element,
+            target: echo,
+            jsEmit: el.textContent = val,
+            value: Reset
+          }
+        ]
+      }
+    }
+  ]
+}

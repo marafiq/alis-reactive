@@ -1,0 +1,27 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: cross-vendor
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+            jsEmit: el.value=val,
+            vendor: fusion
+          },
+          {
+            kind: mutate-element,
+            target: status,
+            jsEmit: el.textContent = val,
+            value: Reset via DropDown event
+          }
+        ]
+      }
+    }
+  ]
+}
