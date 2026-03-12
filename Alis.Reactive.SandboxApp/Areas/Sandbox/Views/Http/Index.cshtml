@@ -214,9 +214,15 @@
         <h2 class="text-base font-semibold mb-4">7. POST FormData &rarr; IncludeAll Gather</h2>
         <p class="text-sm text-text-secondary mb-3">Gathers all form fields and sends as JSON body (IncludeAll pattern).</p>
         <form id="formdata-form" class="flex flex-col gap-3 mb-3">
-            <input type="text" name="FirstName" value="John" class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="First name" />
-            <input type="text" name="LastName" value="Doe" class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Last name" />
-            <input type="email" name="Email" value="john@@example.com" class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Email" />
+            @{ Html.Field("First Name", false, m => m.FirstName, expr =>
+                Html.NativeTextBoxFor(expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("First name")
+            ); }
+            @{ Html.Field("Last Name", false, m => m.LastName, expr =>
+                Html.NativeTextBoxFor(expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Last name")
+            ); }
+            @{ Html.Field("Email", false, m => m.Email, expr =>
+                Html.NativeTextBoxFor(expr).Type("email").CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Email")
+            ); }
         </form>
         @(Html.NativeButton("formdata-btn", "Submit Form")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")

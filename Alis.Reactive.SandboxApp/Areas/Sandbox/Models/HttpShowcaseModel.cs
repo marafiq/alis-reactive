@@ -4,5 +4,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public string? Name { get; set; }
         public int? FacilityId { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Email { get; set; }
     }
 }

@@ -7,7 +7,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            var model = new Models.HttpShowcaseModel
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "john@example.com"
+            };
+            return View(model);
         }
 
         // ── Section 1: DomReady GET ──────────────────────────
