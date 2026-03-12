@@ -23,13 +23,14 @@ namespace Alis.Reactive.Fusion.Extensions
             where TComponent : FusionComponent, IInputComponent, new()
             where TModel : class
         {
+            var component = new TComponent();
             var elementId = IdGenerator.For<TModel>(expr);
             var propertyName = ExpressionPathHelper.ToPropertyName(expr);
             self.AddItem(new ComponentGather(
                 elementId,
-                "fusion",
+                component.Vendor,
                 propertyName,
-                new TComponent().ReadExpr));
+                component.ReadExpr));
             return self;
         }
 
@@ -44,11 +45,12 @@ namespace Alis.Reactive.Fusion.Extensions
             where TComponent : FusionComponent, IInputComponent, new()
             where TModel : class
         {
+            var component = new TComponent();
             self.AddItem(new ComponentGather(
                 refId,
-                "fusion",
+                component.Vendor,
                 name,
-                new TComponent().ReadExpr));
+                component.ReadExpr));
             return self;
         }
     }

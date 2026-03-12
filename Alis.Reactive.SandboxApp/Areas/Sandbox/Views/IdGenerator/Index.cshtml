@@ -41,24 +41,24 @@
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm w-full" })
             ); }
             @{ Html.Field("Amount (SF)", true, m => m.Amount, (expr, id) =>
-                Html.NumericTextBoxFor(expr)
+                Html.NumericTextBoxFor(plan, expr)
                     .Min(0).Max(99999).Step(1)
                     .Render()
             ); }
             @{ Html.Field("Status (Native)", false, m => m.Status, (expr, id) =>
-                Html.NativeDropDownFor(expr)
+                Html.NativeDropDownFor(plan, expr)
                     .Items(statusItems)
                     .Placeholder("-- Select --")
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             ); }
             @{ Html.Field("City (Native)", false, m => m.Address!.City, (expr, id) =>
-                Html.NativeDropDownFor(expr)
+                Html.NativeDropDownFor(plan, expr)
                     .Items(cityItems)
                     .Placeholder("-- Select --")
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             ); }
             @{ Html.Field("Postal Code (SF)", false, m => m.Address!.PostalCode, (expr, id) =>
-                Html.NumericTextBoxFor(expr)
+                Html.NumericTextBoxFor(plan, expr)
                     .Min(10000).Max(99999).Step(1)
                     .Render()
             ); }
@@ -92,12 +92,12 @@
                 Html.TextBoxFor(expr, new { id, @class = "rounded-md border border-border px-3 py-1.5 text-sm w-full" })
             ); }
             @{ Html.Field("Amount (SF)", true, m => m.Amount, (expr, id) =>
-                Html.NumericTextBoxFor(expr)
+                Html.NumericTextBoxFor(plan, expr)
                     .Min(0).Max(99999).Step(1)
                     .Render()
             ); }
             @{ Html.Field("Status (Native)", false, m => m.Status, (expr, id) =>
-                Html.NativeDropDownFor(expr)
+                Html.NativeDropDownFor(plan, expr)
                     .Items(statusItems)
                     .Placeholder("-- Select --")
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")

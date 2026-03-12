@@ -22,13 +22,14 @@ namespace Alis.Reactive.Native.Extensions
             where TComponent : NativeComponent, IInputComponent, new()
             where TModel : class
         {
+            var component = new TComponent();
             var elementId = IdGenerator.For<TModel>(expr);
             var propertyName = ExpressionPathHelper.ToPropertyName(expr);
             self.AddItem(new ComponentGather(
                 elementId,
-                "native",
+                component.Vendor,
                 propertyName,
-                new TComponent().ReadExpr));
+                component.ReadExpr));
             return self;
         }
 
@@ -42,11 +43,12 @@ namespace Alis.Reactive.Native.Extensions
             where TComponent : NativeComponent, IInputComponent, new()
             where TModel : class
         {
+            var component = new TComponent();
             self.AddItem(new ComponentGather(
                 refId,
-                "native",
+                component.Vendor,
                 name,
-                new TComponent().ReadExpr));
+                component.ReadExpr));
             return self;
         }
     }
