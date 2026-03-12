@@ -1,0 +1,39 @@
+{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: component,
+                componentId: my-numeric,
+                vendor: fusion,
+                readExpr: value
+              },
+              coerceAs: number,
+              op: eq,
+              operand: 100
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  jsEmit: el.textContent = val,
+                  value: exact match
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
