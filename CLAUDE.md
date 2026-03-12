@@ -172,9 +172,10 @@ is set, it enables tracing. This eliminates per-view inline scripts entirely.
 | Project | Purpose | Dependencies |
 |---------|---------|-------------|
 | `Alis.Reactive` | Core framework — descriptors, builders, plan, schema | None (zero deps) |
-| `Alis.Reactive.Native` | MVC extensions — `Html.On()` | Core + ASP.NET |
-| `Alis.Reactive.Fusion` | Syncfusion component builders (future) | Core + SF EJ2 |
-| `Alis.Reactive.SandboxApp` | MVC app that uses the DSL + hosts the runtime | Native + ASP.NET |
+| `Alis.Reactive.Native` | Native DOM component vertical slices + `Html.On()` | Core + ASP.NET |
+| `Alis.Reactive.Fusion` | Syncfusion component vertical slices | Core + SF EJ2 |
+| `Alis.Reactive.FluentValidator` | FluentValidation integration — `IValidationExtractor` | Core + FluentValidation |
+| `Alis.Reactive.SandboxApp` | MVC app that uses the DSL + hosts the runtime | Native + Fusion + ASP.NET |
 
 ## Test Coverage — Three Layers, 100% (BDD)
 
@@ -270,6 +271,9 @@ npm run typecheck
 # All tests
 npm test                                                    # TS unit tests (vitest)
 dotnet test tests/Alis.Reactive.UnitTests                   # C# unit + schema tests
+dotnet test tests/Alis.Reactive.Native.UnitTests             # Native component tests
+dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion component tests
+dotnet test tests/Alis.Reactive.FluentValidator.UnitTests    # FluentValidator tests
 dotnet test tests/Alis.Reactive.PlaywrightTests              # Browser tests
 
 # Full build
@@ -327,7 +331,50 @@ No shared base classes for behavior. Duplication between slices is intentional.
 
 Every component interaction flows through three TS runtime modules. No module reinvents
 vendor-specific behavior. No module writes `ej2_instances` inline. Adding a new component
-type requires ZERO runtime changes — only a new C# vertical slice with `IReadableComponent`.
+type requires ZERO runtime changes — only a new C# vertical slice with `IInputComponent`.
+
+#### Component Interfaces (Instance Properties — No Reflection)
+
+Component metadata is declared via C# 8.0 interface properties, not attributes or reflection:
+
+| Interface | Properties | Purpose |
+|-----------|------------|---------|
+| `IComponent` | `Vendor` | Base — declares vendor ("native" or "fusion") |
+| `IInputComponent` | `Vendor`, `ReadExpr` | Input components — declares property path for reading |
+| `IAppLevelComponent` | `Vendor`, `DefaultId` | App-level singletons with well-known element IDs |
+
+Every component is a `sealed class` with `new()` constraint. `ComponentRef<TComponent>` caches
+a static `TComponent` instance — vendor and readExpr are resolved once at builder creation time,
+not at runtime via reflection.
+
+#### ComponentsMap — Single Source of Truth
+
+`IReactivePlan.ComponentsMap` is populated when component builders register their components.
+It maps `bindingPath → ComponentRegistration(componentId, vendor, bindingPath, readExpr)`.
+Used by:
+- **GatherResolver** — resolves gather placeholders to structured `ComponentSource` at render time
+- **ValidationResolver** — resolves validation rules to the correct component read expressions
+- Never queried at JS runtime — all resolution happens at C# render time
+
+#### BindSource — Structured Source Binding (No Raw Strings)
+
+`BindSource` is a polymorphic type discriminated by `"kind"`:
+
+| Kind | Class | Fields | Use case |
+|------|-------|--------|----------|
+| `"event"` | `EventSource` | `path` | Event payload binding: `evt.address.city` |
+| `"component"` | `ComponentSource` | `componentId`, `vendor`, `readExpr` | Component value reading |
+
+`TypedComponentSource<TProp>` preserves the typed condition pipeline — created by
+`ComponentRef.ReadProperty<TProp>()`, flows through `When()` guard conditions with
+full type safety, and serializes to `ComponentSource` at render time.
+
+#### MutateElementCommand — Vendor-Aware Mutations
+
+`MutateElementCommand` carries an optional `vendor` field. When present, the runtime
+resolves the vendor root (e.g., `ej2_instances[0]` for Fusion) before passing `el` to jsEmit.
+When absent (plain DOM mutations), `el` is the raw DOM element. This means jsEmit expressions
+like `el.value=Number(val)` work identically for both vendors — the root resolution is transparent.
 
 #### walk.ts — Dot-Path Walking (Framework Fundamental)
 
@@ -338,7 +385,7 @@ Pure utility. Zero side effects, zero DOM, zero vendor knowledge.
 | C# Expression | ExpressionPathHelper | Runtime |
 |----------------|---------------------|---------|
 | `x => x.Address.Street` | `"evt.address.street"` | `walk(ctx, "evt.address.street")` |
-| `IReadableComponent.ReadExpr` | `"value"` / `"checked"` | `walk(root, "value")` |
+| `IInputComponent.ReadExpr` | `"value"` / `"checked"` | `walk(root, "value")` |
 
 **Right side vs Left side:**
 - **Right side (source):** walk ANY object (event, response, etc.) — vendor-agnostic → `walk.ts`
@@ -371,7 +418,7 @@ Separate from component.ts — different root (ExecContext vs DOM element).
 | Method call (void) | jsEmit expression | element.ts | new Function("el","val",jsEmit) |
 | Method call (args) | jsEmit + source | element.ts + resolver.ts | walk(ctx, source) → val → jsEmit |
 | Event wiring | vendor + jsEvent | trigger.ts | resolveRoot + .addEventListener() |
-| Source binding | BindExpr path | resolver.ts | walk(ctx, "evt.value") |
+| Source binding | BindSource (structured) | resolver.ts | EventSource or ComponentSource → val |
 
 #### "Value" is a singular concept
 
@@ -383,19 +430,19 @@ Read and write are two sides of the same property:
 
 - No `if (el.type === "checkbox")` heuristics in runtime
 - No `readExpr.startsWith("comp.")` prefix conventions
-- No fallback defaults — every component explicitly declares readExpr
-- New component = new C# vertical slice with `IReadableComponent`. Zero TS changes.
+- No fallback defaults — every component explicitly declares readExpr via `IInputComponent`
+- New component = new C# vertical slice with `IInputComponent`. Zero TS changes.
 - `component.ts` is the ONLY module with `ej2_instances` — zero vendor logic elsewhere
 
 #### Adding a New Component Type (Zero Runtime Changes)
 
-1. C# sealed class implementing `IComponent` + `IReadableComponent` (declares ReadExpr)
+1. C# sealed class implementing `IComponent` + `IInputComponent` (declares Vendor + ReadExpr as instance properties)
 2. Event args class (typed payload properties)
 3. Events singleton (TypedEventDescriptor registry)
 4. Extensions (jsEmit expressions for property writes, method calls, read expressions)
-5. Builder (IHtmlContent, renders HTML)
+5. Builder (IHtmlContent, renders HTML, registers component in ComponentsMap)
 6. Reactive extension (.Reactive() creates ComponentEventTrigger)
-7. Gather extension (uses TComponent.ReadExpr)
+7. Gather extension (uses TComponent.ReadExpr via `new()` constraint)
 8. Tests at all 3 layers
 
 The runtime does NOT change. The plan JSON carries vendor, readExpr, jsEmit, jsEvent.
@@ -440,18 +487,29 @@ Every change goes through all three test layers before it's done. No exceptions.
 **Before every commit, ALL tests must pass. No exceptions.**
 
 ```bash
-# Full test suite — run all three from the repo root:
+# Full test suite — run all from the repo root:
 cd /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive
 
-# 1. TS unit tests (vitest + jsdom) — 25 tests
+# 1. TS unit tests (vitest + jsdom) — 362 tests
 npm test
 
-# 2. C# unit + schema tests (NUnit + Verify + JsonSchema.Net) — 35 tests
+# 2. C# unit + schema tests — 110 tests
 dotnet test tests/Alis.Reactive.UnitTests
 
-# 3. Playwright browser tests (browser behavior) — 10 tests
+# 3. Native component unit tests — 31 tests
+dotnet test tests/Alis.Reactive.Native.UnitTests
+
+# 4. Fusion component unit tests — 61 tests
+dotnet test tests/Alis.Reactive.Fusion.UnitTests
+
+# 5. FluentValidator unit tests — 28 tests
+dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
+
+# 6. Playwright browser tests (browser behavior) — 154 tests
 dotnet test tests/Alis.Reactive.PlaywrightTests
 ```
+
+**Total: 746 tests (362 TS + 230 C# unit + 154 Playwright)**
 
 If any test fails, fix the issue and re-run ALL tests before committing.
 Never commit with failing tests. Never skip Playwright.
