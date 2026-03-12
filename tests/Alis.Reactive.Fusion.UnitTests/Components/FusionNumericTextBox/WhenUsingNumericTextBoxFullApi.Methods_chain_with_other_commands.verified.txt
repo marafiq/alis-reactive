@@ -1,0 +1,40 @@
+﻿{
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+            jsEmit: el.min=Number(val),
+            value: 0,
+            vendor: fusion
+          },
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+            jsEmit: el.value=Number(val),
+            value: 50,
+            vendor: fusion
+          },
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+            jsEmit: el.increment(),
+            vendor: fusion
+          },
+          {
+            kind: mutate-element,
+            target: echo,
+            jsEmit: el.textContent = val,
+            value: Initialized
+          }
+        ]
+      }
+    }
+  ]
+}

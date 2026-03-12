@@ -1,4 +1,5 @@
 using Alis.Reactive;
+using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Fusion.Components;
 using static VerifyNUnit.Verifier;
 
@@ -44,13 +45,21 @@ public class WhenMutatingAFusionNumericTextBox : FusionTestBase
     }
 
     [Test]
-    public void Value_returns_bind_expr()
+    public void Value_returns_typed_component_source()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            var expr = p.Component<FusionNumericTextBox>(m => m.Amount).Value();
-            Assert.That(expr, Is.EqualTo("ref:Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount.value"));
+            var source = p.Component<FusionNumericTextBox>(m => m.Amount).Value();
+            Assert.That(source, Is.TypeOf<TypedComponentSource<decimal>>());
+
+            var bindSource = source.ToBindSource();
+            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
+
+            var cs = (ComponentSource)bindSource;
+            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount"));
+            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
+            Assert.That(cs.ReadExpr, Is.EqualTo("value"));
         });
     }
 }

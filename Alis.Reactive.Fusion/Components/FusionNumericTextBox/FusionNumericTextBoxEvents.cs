@@ -14,5 +14,15 @@ namespace Alis.Reactive.Fusion.Components
         public TypedEventDescriptor<FusionNumericTextBoxChangeArgs> Changed =>
             new TypedEventDescriptor<FusionNumericTextBoxChangeArgs>(
                 "change", new FusionNumericTextBoxChangeArgs());
+
+        /// <summary>Fires when the component receives focus (SF "focus" event).</summary>
+        public TypedEventDescriptor<FusionNumericTextBoxFocusArgs> Focus =>
+            new TypedEventDescriptor<FusionNumericTextBoxFocusArgs>(
+                "focus", new FusionNumericTextBoxFocusArgs());
+
+        /// <summary>Fires when the component loses focus (SF "blur" event).</summary>
+        public TypedEventDescriptor<FusionNumericTextBoxBlurArgs> Blur =>
+            new TypedEventDescriptor<FusionNumericTextBoxBlurArgs>(
+                "blur", new FusionNumericTextBoxBlurArgs());
     }
 }
