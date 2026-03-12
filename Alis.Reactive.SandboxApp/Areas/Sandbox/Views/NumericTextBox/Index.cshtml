@@ -1,0 +1,230 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.NumericTextBoxModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@{
+    ViewData["Title"] = "NumericTextBox";
+
+    var plan = Html.ReactivePlan<NumericTextBoxModel>();
+
+    // ── Section 1: Property Write (SetValue + SetMin) from DomReady ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<FusionNumericTextBox>(m => m.Amount).SetValue(42);
+        p.Component<FusionNumericTextBox>(m => m.Amount).SetMin(0);
+    }));
+
+    // ── Section 2: Property Read — display current value in echo text ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var comp = p.Component<FusionNumericTextBox>(m => m.Amount);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
+
+    // ── Section 4: Condition — When(comp.Value()).Gt(0) ──
+    // This is wired via the Changed event on the Temperature NumericTextBox
+
+    // ── Section 5: Gather — POST with Include ──
+
+    Html.On(plan, t => t.CustomEvent("do-gather", p =>
+    {
+        p.Post("/Sandbox/NumericTextBox/Echo", g =>
+            g.Include<FusionNumericTextBox, NumericTextBoxModel>(m => m.Amount))
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("gather-result").SetText("gathered");
+            }));
+    }));
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">FusionNumericTextBox — Full API</h1>
+        <p class="mt-2 text-text-secondary">
+            Exercises all supported FusionNumericTextBox API: property writes, method calls,
+            property reads, events, conditions, and gather.
+        </p>
+    </div>
+
+    <!-- Section 1: Property Write (SetValue + SetMin) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Property Write (SetValue + SetMin)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, sets value=42 and min=0 via jsEmit on the Syncfusion ej2 instance.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Amount (SF NumericTextBox)</label>
+                @(Html.NumericTextBoxFor(plan, m => m.Amount)
+                    .Min(-100).Max(99999).Step(1)
+                    .Render())
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Property Read — Echo Value -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Property Read (Value as Source)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the Amount component's <code>value</code> property and displays it in a text element.
+        </p>
+        <div class="font-mono text-sm">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 3: Method Calls (Increment / Decrement) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Method Calls (Increment / Decrement)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Buttons invoke <code>el.increment()</code> and <code>el.decrement()</code> on the Syncfusion instance.
+            After each call, the <code>change</code> event fires and updates the echo.
+        </p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("increment-btn", "Increment")
+                .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionNumericTextBox>(m => m.Amount).Increment();
+                }))
+            @(Html.NativeButton("decrement-btn", "Decrement")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionNumericTextBox>(m => m.Amount).Decrement();
+                }))
+        </div>
+        <div class="font-mono text-sm">
+            <p>Method result: <span id="method-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 4: Events — Changed, Focus, Blur -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Events (Changed, Focus, Blur)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            The Temperature field wires all three events. Change shows the new value,
+            Focus/Blur show focus state.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Temperature (SF NumericTextBox)</label>
+                @(Html.NumericTextBoxFor(plan, m => m.Temperature)
+                    .Min(-50).Max(150).Step(1)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("change-value").SetText(args, x => x.Value);
+                    })
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        var comp = p.Component<FusionNumericTextBox>(m => m.Temperature);
+                        p.When(comp.Value()).Gt(0m)
+                            .Then(then =>
+                            {
+                                then.Element("positive-indicator").Show();
+                                then.Element("positive-indicator").SetText("positive");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("positive-indicator").Hide();
+                            });
+                    })
+                    .Reactive(plan, evt => evt.Focus, (args, p) =>
+                    {
+                        p.Element("focus-state").SetText("focused");
+                    })
+                    .Reactive(plan, evt => evt.Blur, (args, p) =>
+                    {
+                        p.Element("focus-state").SetText("blurred");
+                    })
+                    .Render())
+            </div>
+        </div>
+        <div class="font-mono text-sm space-y-1">
+            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
+            <p>Focus state: <span id="focus-state" class="text-text-muted">&mdash;</span></p>
+            <p>Positive: <span id="positive-indicator" hidden class="text-emerald-600">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 5: Condition — Positive Indicator -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">5. Condition (Value > 0)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            The positive indicator in Section 4 uses <code>p.When(comp.Value()).Gt(0m)</code>.
+            Enter a positive number in Temperature and tab out to see it appear.
+            Enter 0 or negative to hide it.
+        </p>
+    </section>
+
+    <!-- Section 6: Gather — Include in POST -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">6. Gather (Include in POST)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Click to POST the Amount value gathered from the Syncfusion component via
+            <code>Include&lt;FusionNumericTextBox&gt;</code>.
+        </p>
+        @(Html.NativeButton("gather-btn", "Gather Amount")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-gather");
+            }))
+        <div class="font-mono text-sm">
+            <p>Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
+        </div>
+    </section>
+
+    <!-- Section 7: Increment/Decrement Tracking -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">7. Quantity with Increment/Decrement Tracking</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            A standalone quantity field with its own change event.
+            Increment and decrement buttons update the value and the echo tracks changes.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Quantity (SF NumericTextBox)</label>
+                @(Html.NumericTextBoxFor(plan, m => m.Quantity)
+                    .Min(0).Max(100).Step(1).Value(1)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("method-result").SetText(args, x => x.Value);
+                        p.Element("qty-echo").SetText(args, x => x.Value);
+                    })
+                    .Render())
+            </div>
+        </div>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("qty-inc-btn", "Qty +1")
+                .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionNumericTextBox>(m => m.Quantity).Increment();
+                }))
+            @(Html.NativeButton("qty-dec-btn", "Qty -1")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionNumericTextBox>(m => m.Quantity).Decrement();
+                }))
+        </div>
+        <div class="font-mono text-sm">
+            <p>Quantity echo: <span id="qty-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

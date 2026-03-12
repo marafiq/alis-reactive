@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Alis.Reactive;
 using Alis.Reactive.Builders;
@@ -33,7 +34,7 @@ namespace Alis.Reactive.Fusion.Components
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
-            var componentId = ExtractProperty(builder, "ID") ?? "unknown";
+            var componentId = ExtractComponentId(builder);
             var bindingPath = ExtractProperty(builder, "Name");
 
             var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
@@ -60,7 +61,7 @@ namespace Alis.Reactive.Fusion.Components
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
-            var componentId = ExtractProperty(builder, "ID") ?? "unknown";
+            var componentId = ExtractComponentId(builder);
             var bindingPath = ExtractProperty(builder, "Name");
 
             var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
@@ -87,7 +88,7 @@ namespace Alis.Reactive.Fusion.Components
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
-            var componentId = ExtractProperty(builder, "ID") ?? "unknown";
+            var componentId = ExtractComponentId(builder);
             var bindingPath = ExtractProperty(builder, "Name");
 
             var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, "fusion", bindingPath, new FusionNumericTextBox().ReadExpr);
@@ -100,6 +101,33 @@ namespace Alis.Reactive.Fusion.Components
             }
 
             return builder;
+        }
+
+        /// <summary>
+        /// Resolves the actual element ID that will be used in the browser DOM.
+        /// SF's HtmlAttributes(["id"] = ...) overrides the rendered element id at client-side init,
+        /// so we must check htmlAttributes first, then fall back to the builder's ID property.
+        /// </summary>
+        private static string ExtractComponentId(NumericTextBoxBuilder builder)
+        {
+            // SF stores HtmlAttributes on model.HtmlAttributes — check for id override
+            var model = builder.GetType()
+                .GetField("model", BindingFlags.Public | BindingFlags.Instance)
+                ?.GetValue(builder);
+
+            if (model != null)
+            {
+                var htmlAttrs = model.GetType()
+                    .GetProperty("HtmlAttributes", BindingFlags.Public | BindingFlags.Instance)
+                    ?.GetValue(model);
+
+                if (htmlAttrs is IDictionary<string, object> dict && dict.TryGetValue("id", out var idVal))
+                {
+                    return idVal?.ToString() ?? builder.ID ?? "unknown";
+                }
+            }
+
+            return builder.ID ?? "unknown";
         }
 
         private static string? ExtractProperty(object builder, string propertyName) =>
