@@ -115,7 +115,7 @@
         <h2 class="text-base font-semibold mb-4">1. Property Write (jsEmit)</h2>
         <p class="text-sm text-text-secondary mb-4">
             dom-ready writes values. Native: <code>el.value=val</code>.
-            Fusion: <code>var c=el.ej2_instances[0]; c.value=val</code>.
+            Fusion: <code>el.value=val</code> (vendor root resolved by runtime).
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>

@@ -101,8 +101,9 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
         await NavigateTo("/Sandbox/Payload");
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"source\": \"evt.intValue\""), "intValue source");
-        Assert.That(planJson, Does.Contain("\"source\": \"evt.address.city\""), "nested source");
-        Assert.That(planJson, Does.Contain("\"source\": \"evt.address.zip\""), "nested zip source");
+        // Source is now structured BindSource: { "kind": "event", "path": "..." }
+        Assert.That(planJson, Does.Contain("\"path\": \"evt.intValue\""), "intValue source");
+        Assert.That(planJson, Does.Contain("\"path\": \"evt.address.city\""), "nested source");
+        Assert.That(planJson, Does.Contain("\"path\": \"evt.address.zip\""), "nested zip source");
     }
 }
