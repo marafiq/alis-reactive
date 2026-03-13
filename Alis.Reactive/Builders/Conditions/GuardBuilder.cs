@@ -118,7 +118,6 @@ namespace Alis.Reactive.Builders.Conditions
             if (_branchBuilder != null)
             {
                 _branchBuilder.AddBranch(branch);
-                _branchBuilder.Pipeline.MergeBuildContexts(pb.BuildContexts);
                 return _branchBuilder;
             }
 
@@ -126,7 +125,6 @@ namespace Alis.Reactive.Builders.Conditions
                 throw new InvalidOperationException(
                     "Then() requires a pipeline context. Use PipelineBuilder.When() or BranchBuilder.ElseIf() to start a condition.");
 
-            _pipeline.MergeBuildContexts(pb.BuildContexts);
             var branches = new List<Branch> { branch };
             _pipeline.SetConditionalBranches(branches);
             return new BranchBuilder<TModel>(_pipeline, branches);

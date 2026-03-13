@@ -4,15 +4,34 @@
   "title": "Reactive Plan",
   "description": "The complete runtime plan serialized by ReactivePlan.Render()",
   "type": "object",
-  "required": ["entries"],
+  "required": ["planId", "components", "entries"],
   "additionalProperties": false,
   "properties": {
+    "planId": {
+      "type": "string",
+      "description": "typeof(TModel).FullName — runtime merge key"
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/ComponentEntry" },
+      "description": "Binding path → component registration. Shared by gather and validation."
+    },
     "entries": {
       "type": "array",
       "items": { "$ref": "#/$defs/Entry" }
     }
   },
   "$defs": {
+    "ComponentEntry": {
+      "type": "object",
+      "required": ["id", "vendor", "readExpr"],
+      "properties": {
+        "id": { "type": "string", "description": "DOM element ID" },
+        "vendor": { "$ref": "#/$defs/Vendor" },
+        "readExpr": { "type": "string", "description": "Property path from vendor root" }
+      },
+      "additionalProperties": false
+    },
     "Entry": {
       "type": "object",
       "required": ["trigger", "reaction"],
@@ -267,8 +286,17 @@
     "GatherItem": {
       "oneOf": [
         { "$ref": "#/$defs/ComponentGather" },
-        { "$ref": "#/$defs/StaticGather" }
+        { "$ref": "#/$defs/StaticGather" },
+        { "$ref": "#/$defs/AllGather" }
       ]
+    },
+    "AllGather": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "const": "all" }
+      },
+      "additionalProperties": false
     },
     "ComponentGather": {
       "type": "object",
@@ -423,13 +451,10 @@
     },
     "ValidationField": {
       "type": "object",
-      "required": ["fieldId", "fieldName", "vendor", "readExpr", "rules"],
+      "required": ["fieldName", "rules"],
       "additionalProperties": false,
       "properties": {
-        "fieldId": { "type": "string", "minLength": 1, "description": "DOM element ID" },
-        "fieldName": { "type": "string", "minLength": 1, "description": "Model property name (dot notation)" },
-        "vendor": { "$ref": "#/$defs/Vendor" },
-        "readExpr": { "type": "string", "minLength": 1, "description": "Property path from vendor-determined root. Vendor resolves root (native→el, fusion→ej2_instances[0]), then readExpr is walked from that root. Examples: 'value', 'checked'" },
+        "fieldName": { "type": "string", "minLength": 1, "description": "Model property name (dot notation). Runtime enriches fieldId/vendor/readExpr from plan.components." },
         "rules": {
           "type": "array",
           "items": { "$ref": "#/$defs/ValidationRule" }

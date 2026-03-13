@@ -1,4 +1,17 @@
 ﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  components: {
+    Name: {
+      id: comp1,
+      vendor: native,
+      readExpr: value
+    },
+    Amount: {
+      id: comp2,
+      vendor: fusion,
+      readExpr: value
+    }
+  },
   entries: [
     {
       trigger: {
@@ -11,18 +24,7 @@
           url: /api/save,
           gather: [
             {
-              kind: component,
-              componentId: comp1,
-              vendor: native,
-              name: Name,
-              readExpr: value
-            },
-            {
-              kind: component,
-              componentId: comp2,
-              vendor: fusion,
-              name: Amount,
-              readExpr: value
+              kind: all
             }
           ],
           onSuccess: [

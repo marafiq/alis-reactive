@@ -1,4 +1,12 @@
 ﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  components: {
+    Status: {
+      id: comp1,
+      vendor: native,
+      readExpr: value
+    }
+  },
   entries: [
     {
       trigger: {
@@ -16,11 +24,7 @@
               value: fixed
             },
             {
-              kind: component,
-              componentId: comp1,
-              vendor: native,
-              name: Status,
-              readExpr: value
+              kind: all
             }
           ],
           onSuccess: [

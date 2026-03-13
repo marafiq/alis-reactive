@@ -53,7 +53,6 @@ namespace Alis.Reactive.Builders.Conditions
             configure(pb);
             var reaction = pb.BuildReaction();
             _branches.Add(new Branch(null, reaction));
-            Pipeline.MergeBuildContexts(pb.BuildContexts);
             _elseCalled = true;
         }
 

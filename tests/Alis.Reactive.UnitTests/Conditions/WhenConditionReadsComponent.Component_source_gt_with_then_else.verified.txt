@@ -1,4 +1,5 @@
-{
+﻿{
+  planId: Alis.Reactive.UnitTests.AmountModel,
   entries: [
     {
       trigger: {

@@ -56,7 +56,7 @@ public class WhenGatheringRegisteredComponents : PlanTestBase
     }
 
     [Test]
-    public void No_registered_components_produces_empty_gather()
+    public void No_registered_components_still_includes_all_marker()
     {
         var plan = CreatePlan();
 
@@ -73,6 +73,6 @@ public class WhenGatheringRegisteredComponents : PlanTestBase
             .GetProperty("request")
             .GetProperty("gather");
 
-        Assert.That(gather.GetArrayLength(), Is.EqualTo(0));
+        Assert.That(gather.GetArrayLength(), Is.EqualTo(1));
     }
 }

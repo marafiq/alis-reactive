@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Requests;
 using Alis.Reactive.Resolvers;
 using Alis.Reactive.Validation;
 
@@ -34,7 +33,6 @@ namespace Alis.Reactive
 
         private readonly List<Entry> _entries = new List<Entry>();
         private readonly Dictionary<string, ComponentRegistration> _componentsMap = new Dictionary<string, ComponentRegistration>();
-        private readonly Dictionary<RequestDescriptor, RequestBuildContext> _buildContexts = new Dictionary<RequestDescriptor, RequestBuildContext>();
         private readonly IValidationExtractor? _extractor;
 
         public ReactivePlan() : this(null) { }
@@ -43,6 +41,8 @@ namespace Alis.Reactive
         {
             _extractor = extractor;
         }
+
+        public string PlanId { get; } = typeof(TModel).FullName!;
 
         public IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
 
@@ -56,31 +56,47 @@ namespace Alis.Reactive
             _componentsMap[bindingPath] = entry;
         }
 
-        internal void RegisterBuildContexts(Dictionary<RequestDescriptor, RequestBuildContext>? contexts)
-        {
-            if (contexts == null) return;
-            foreach (var kvp in contexts)
-                _buildContexts[kvp.Key] = kvp.Value;
-        }
-
         public string Render()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(new { entries = _entries }, CompactOptions);
+            return JsonSerializer.Serialize(new
+            {
+                planId = PlanId,
+                components = SerializeComponentsMap(),
+                entries = _entries
+            }, CompactOptions);
         }
 
         public string RenderFormatted()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(new { entries = _entries }, FormattedOptions);
+            return JsonSerializer.Serialize(new
+            {
+                planId = PlanId,
+                components = SerializeComponentsMap(),
+                entries = _entries
+            }, FormattedOptions);
+        }
+
+        private Dictionary<string, object> SerializeComponentsMap()
+        {
+            var result = new Dictionary<string, object>();
+            foreach (var kvp in _componentsMap)
+            {
+                result[kvp.Key] = new
+                {
+                    id = kvp.Value.ComponentId,
+                    vendor = kvp.Value.Vendor,
+                    readExpr = kvp.Value.ReadExpr
+                };
+            }
+            return result;
         }
 
         private void ResolveAll()
         {
-            GatherResolver.Resolve(_entries, _componentsMap);
-
             if (_extractor != null)
-                ValidationResolver.Resolve(_entries, _extractor, _buildContexts, _componentsMap);
+                ValidationResolver.Resolve(_entries, _extractor);
         }
     }
 

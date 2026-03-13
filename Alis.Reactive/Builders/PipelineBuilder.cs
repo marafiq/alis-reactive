@@ -203,32 +203,14 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>
-        /// Build contexts collected after BuildReaction() — contains metadata for
-        /// all RequestDescriptors built within this pipeline (including chained/parallel/conditional).
-        /// </summary>
-        internal Dictionary<RequestDescriptor, RequestBuildContext>? BuildContexts { get; private set; }
-
         internal void SetConditionalBranches(List<Branch> branches)
         {
             ConditionalBranches = branches;
         }
 
-        /// <summary>
-        /// Merges build contexts from a nested pipeline (e.g. conditional branches)
-        /// into this pipeline's context collection.
-        /// </summary>
-        internal void MergeBuildContexts(Dictionary<RequestDescriptor, RequestBuildContext>? source)
-        {
-            if (source == null) return;
-            BuildContexts ??= new Dictionary<RequestDescriptor, RequestBuildContext>();
-            foreach (var kvp in source)
-                BuildContexts[kvp.Key] = kvp.Value;
-        }
-
         public Reaction BuildReaction()
         {
-            Reaction reaction = _mode switch
+            return _mode switch
             {
                 PipelineMode.Parallel => _parallelBuilder!.BuildReaction(
                     Commands.Count > 0 ? Commands : null),
@@ -239,22 +221,6 @@ namespace Alis.Reactive.Builders
                     ConditionalBranches!.ToArray()),
                 _ => new SequentialReaction(Commands),
             };
-
-            CollectBuildContexts();
-            return reaction;
-        }
-
-        private void CollectBuildContexts()
-        {
-            Dictionary<RequestDescriptor, RequestBuildContext>? source = _mode switch
-            {
-                PipelineMode.Http => _httpBuilder?.BuildContexts,
-                PipelineMode.Parallel => _parallelBuilder?.BuildContexts,
-                _ => null,
-            };
-
-            if (source != null)
-                MergeBuildContexts(source);
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Alis.Reactive.Descriptors.Requests
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
     [JsonDerivedType(typeof(ComponentGather), "component")]
     [JsonDerivedType(typeof(StaticGather), "static")]
+    [JsonDerivedType(typeof(AllGather), "all")]
     public abstract class GatherItem
     {
     }

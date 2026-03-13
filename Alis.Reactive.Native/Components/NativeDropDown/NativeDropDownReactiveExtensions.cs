@@ -38,7 +38,6 @@ namespace Alis.Reactive.Native.Components
             var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, _component.Vendor, builder.BindingPath, _component.ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
-            (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
 
             return builder;
         }

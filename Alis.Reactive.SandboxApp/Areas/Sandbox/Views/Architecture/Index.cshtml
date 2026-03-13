@@ -266,9 +266,9 @@
                 p.Post("/Sandbox/Architecture/ValidateClient")
                  .Validate(new ValidationDescriptor("arch-val-form", new List<ValidationField>
                  {
-                     new ValidationField("native-val-field", "native-val-field", "native", "value",
+                     new ValidationField("native-val-field",
                          new List<ValidationRule> { new ValidationRule("required", "Required") }),
-                     new ValidationField("fusion-val-field", "fusion-val-field", "fusion", "value",
+                     new ValidationField("fusion-val-field",
                          new List<ValidationRule> { new ValidationRule("required", "Required") })
                  }))
                  .Response(r => r
@@ -313,9 +313,9 @@
                 p.Post("/Sandbox/Architecture/ValidateClient")
                  .Validate(new ValidationDescriptor("equalto-form", new List<ValidationField>
                  {
-                     new ValidationField("native-password", "native-password", "native", "value",
+                     new ValidationField("native-password",
                          new List<ValidationRule> { new ValidationRule("required", "Required") }),
-                     new ValidationField("fusion-confirm", "fusion-confirm", "fusion", "value",
+                     new ValidationField("fusion-confirm",
                          new List<ValidationRule>
                          {
                              new ValidationRule("required", "Required"),

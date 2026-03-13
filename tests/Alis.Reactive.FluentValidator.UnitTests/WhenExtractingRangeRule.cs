@@ -1,17 +1,14 @@
-using Alis.Reactive;
-
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
 public class WhenExtractingRangeRule
 {
     private readonly FluentValidationAdapter _adapter = new();
-    private static readonly IReadOnlyDictionary<string, ComponentRegistration> _map = TestComponentsMap.ForTestModel();
 
     [Test]
     public void InclusiveBetween_produces_range_rule_with_array_constraint()
     {
-        var desc = _adapter.ExtractRules(typeof(RangeValidator), "testForm", _map);
+        var desc = _adapter.ExtractRules(typeof(RangeValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc!.Fields[0].Rules[0];

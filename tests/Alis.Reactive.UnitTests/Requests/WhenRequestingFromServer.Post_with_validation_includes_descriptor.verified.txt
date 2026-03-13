@@ -1,4 +1,5 @@
 ﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
   entries: [
     {
       trigger: {
@@ -43,10 +44,7 @@
             formId: testForm,
             fields: [
               {
-                fieldId: Name,
                 fieldName: Name,
-                vendor: native,
-                readExpr: value,
                 rules: [
                   {
                     rule: required,
@@ -55,10 +53,7 @@
                 ]
               },
               {
-                fieldId: Email,
                 fieldName: Email,
-                vendor: native,
-                readExpr: value,
                 rules: [
                   {
                     rule: required,
