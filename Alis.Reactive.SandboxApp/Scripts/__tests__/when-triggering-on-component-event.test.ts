@@ -17,6 +17,8 @@ describe("when triggering on component event", () => {
       document.body.appendChild(el);
 
       boot({
+        planId: "Test.Model",
+        components: {},
         entries: [{
           trigger: {
             kind: "component-event",
@@ -49,6 +51,8 @@ describe("when triggering on component event", () => {
       document.body.appendChild(el);
 
       boot({
+        planId: "Test.Model",
+        components: {},
         entries: [{
           trigger: {
             kind: "component-event",
@@ -86,6 +90,8 @@ describe("when triggering on component event", () => {
       document.body.appendChild(el);
 
       boot({
+        planId: "Test.Model",
+        components: {},
         entries: [{
           trigger: {
             kind: "component-event",
@@ -137,6 +143,8 @@ describe("when triggering on component event", () => {
       document.body.appendChild(el);
 
       boot({
+        planId: "Test.Model",
+        components: {},
         entries: [{
           trigger: {
             kind: "component-event",
@@ -170,6 +178,8 @@ describe("when triggering on component event", () => {
       document.body.appendChild(el);
 
       boot({
+        planId: "Test.Model",
+        components: {},
         entries: [{
           trigger: {
             kind: "component-event",
@@ -207,6 +217,8 @@ describe("when triggering on component event", () => {
       document.addEventListener("comp-wired", () => order.push("comp-reaction"));
 
       boot({
+        planId: "Test.Model",
+        components: {},
         entries: [
           {
             trigger: { kind: "dom-ready" },

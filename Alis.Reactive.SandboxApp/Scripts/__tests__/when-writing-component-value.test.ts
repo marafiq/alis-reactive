@@ -11,7 +11,7 @@ describe("when writing component value via jsEmit", () => {
       input.id = "native-write";
       document.body.appendChild(input);
 
-      boot({ entries: [{
+      boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "native-write",
@@ -31,7 +31,7 @@ describe("when writing component value via jsEmit", () => {
       (el as any).ej2_instances = [widget];
       document.body.appendChild(el);
 
-      boot({ entries: [{
+      boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-write",

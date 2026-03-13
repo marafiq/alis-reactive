@@ -8,6 +8,8 @@ describe("when composing a plan", () => {
     document.addEventListener("comp-b", () => events.push("b"));
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -33,11 +35,13 @@ describe("when composing a plan", () => {
   });
 
   it("handles empty plan without error", () => {
-    expect(() => boot({ entries: [] })).not.toThrow();
+    expect(() => boot({ planId: "Test.Model", components: {}, entries: [] })).not.toThrow();
   });
 
   it("handles empty command list without error", () => {
     expect(() => boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [] },

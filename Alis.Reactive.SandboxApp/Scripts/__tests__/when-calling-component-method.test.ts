@@ -13,7 +13,7 @@ describe("when calling component method via jsEmit (void)", () => {
       input.focus = () => { focused = true; };
       document.body.appendChild(input);
 
-      boot({ entries: [{
+      boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "native-method",
@@ -33,7 +33,7 @@ describe("when calling component method via jsEmit (void)", () => {
       (el as any).ej2_instances = [widget];
       document.body.appendChild(el);
 
-      boot({ entries: [{
+      boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-method",

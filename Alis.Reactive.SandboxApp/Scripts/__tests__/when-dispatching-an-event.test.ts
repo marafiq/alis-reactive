@@ -8,6 +8,8 @@ describe("when dispatching an event", () => {
     document.addEventListener("evt-a", () => { received = true; });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -27,6 +29,8 @@ describe("when dispatching an event", () => {
     });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -50,6 +54,8 @@ describe("when dispatching an event", () => {
     });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -68,6 +74,8 @@ describe("when dispatching an event", () => {
     document.addEventListener("evt-d2", () => order.push("second"));
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {

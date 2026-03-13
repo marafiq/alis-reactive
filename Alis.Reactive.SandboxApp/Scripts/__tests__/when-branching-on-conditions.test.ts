@@ -27,6 +27,8 @@ beforeEach(async () => {
 describe("when branching on conditions", () => {
   it("takes then-branch when guard passes", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -65,6 +67,8 @@ describe("when branching on conditions", () => {
 
   it("takes else-branch when guard fails", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -103,6 +107,8 @@ describe("when branching on conditions", () => {
 
   it("evaluates multi-branch (ElseIf behavior) — first matching branch wins", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -148,6 +154,8 @@ describe("when branching on conditions", () => {
 
   it("evaluates AND composition (all guards must pass)", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -192,6 +200,8 @@ describe("when branching on conditions", () => {
 
   it("evaluates NOT guard (inverts result)", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -230,6 +240,8 @@ describe("when branching on conditions", () => {
 
   it("evaluates In membership", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -268,6 +280,8 @@ describe("when branching on conditions", () => {
 
   it("evaluates Between range", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -306,6 +320,8 @@ describe("when branching on conditions", () => {
 
   it("evaluates per-action when guard — skips command when false", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -336,6 +352,8 @@ describe("when branching on conditions", () => {
 
   it("evaluates per-action when guard — executes command when true", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },

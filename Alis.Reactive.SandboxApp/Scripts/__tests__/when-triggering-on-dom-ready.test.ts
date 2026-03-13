@@ -7,6 +7,8 @@ describe("when triggering on dom-ready", () => {
     document.addEventListener("ready-evt", () => { executed = true; });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {

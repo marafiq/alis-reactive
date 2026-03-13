@@ -13,7 +13,7 @@ describe("when wiring component event with payload", () => {
       const result = document.createElement("div");
       result.id = "native-evt-result"; document.body.appendChild(result);
 
-      boot({ entries: [{
+      boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "component-event", componentId: "native-evt",
           jsEvent: "change", vendor: "native" },
         reaction: { kind: "sequential", commands: [{
@@ -37,7 +37,7 @@ describe("when wiring component event with payload", () => {
       const result = document.createElement("div");
       result.id = "fusion-evt-result"; document.body.appendChild(result);
 
-      boot({ entries: [{
+      boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "component-event", componentId: "fusion-evt",
           jsEvent: "change", vendor: "fusion" },
         reaction: { kind: "sequential", commands: [{
@@ -63,7 +63,7 @@ describe("when wiring component event with payload", () => {
       const result = document.createElement("div");
       result.id = "fusion-items-evt-result"; document.body.appendChild(result);
 
-      boot({ entries: [{
+      boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "component-event", componentId: "fusion-items-evt",
           jsEvent: "items-changed", vendor: "fusion" },
         reaction: { kind: "sequential", commands: [{

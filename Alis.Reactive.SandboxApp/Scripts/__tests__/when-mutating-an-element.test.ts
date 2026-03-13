@@ -25,6 +25,8 @@ beforeEach(async () => {
 describe("mutate-element command", () => {
   it("adds a class to an element", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -39,6 +41,8 @@ describe("mutate-element command", () => {
 
   it("removes a class from an element", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -53,6 +57,8 @@ describe("mutate-element command", () => {
 
   it("sets text content", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -67,6 +73,8 @@ describe("mutate-element command", () => {
 
   it("sets inner HTML", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -81,6 +89,8 @@ describe("mutate-element command", () => {
 
   it("shows a hidden element", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -95,6 +105,8 @@ describe("mutate-element command", () => {
 
   it("hides a visible element", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -109,6 +121,8 @@ describe("mutate-element command", () => {
 
   it("toggles a class", () => {
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -127,6 +141,8 @@ describe("mutate-element command", () => {
     document.addEventListener("step-done", () => events.push("step-done"));
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {

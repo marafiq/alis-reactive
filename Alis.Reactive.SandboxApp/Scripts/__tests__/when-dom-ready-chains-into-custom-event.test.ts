@@ -9,6 +9,8 @@ describe("when dom-ready chains into custom-event", () => {
     document.addEventListener("hop-3", () => chain.push("hop-3"));
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -42,6 +44,8 @@ describe("when dom-ready chains into custom-event", () => {
     document.addEventListener("from-dom-ready", () => { received = true; });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         // dom-ready is first in array, but should execute AFTER custom-event is wired
         {

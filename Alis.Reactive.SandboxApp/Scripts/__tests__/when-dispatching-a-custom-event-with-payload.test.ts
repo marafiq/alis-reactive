@@ -20,6 +20,8 @@ describe("when dispatching a custom event with payload", () => {
     };
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -43,6 +45,8 @@ describe("when dispatching a custom event with payload", () => {
     });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -66,6 +70,8 @@ describe("when dispatching a custom event with payload", () => {
     });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: {
@@ -90,6 +96,8 @@ describe("when dispatching a custom event with payload", () => {
     });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },

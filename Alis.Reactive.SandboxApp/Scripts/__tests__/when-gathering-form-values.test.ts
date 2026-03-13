@@ -25,7 +25,7 @@ describe("gather", () => {
     const items: GatherItem[] = [
       { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName", readExpr: "value" },
     ];
-    const result = resolveGather(items, "POST");
+    const result = resolveGather(items, "POST", {});
     expect(result.body).toEqual({ FirstName: "John" });
     expect(result.urlParams).toEqual([]);
   });
@@ -38,7 +38,7 @@ describe("gather", () => {
     const items: GatherItem[] = [
       { kind: "component", componentId: "FacilityId", vendor: "fusion", name: "FacilityId", readExpr: "value" },
     ];
-    const result = resolveGather(items, "POST");
+    const result = resolveGather(items, "POST", {});
     expect(result.body).toEqual({ FacilityId: 42 });
   });
 
@@ -46,7 +46,7 @@ describe("gather", () => {
     const items: GatherItem[] = [
       { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName", readExpr: "value" },
     ];
-    const result = resolveGather(items, "GET");
+    const result = resolveGather(items, "GET", {});
     expect(result.urlParams).toEqual(["FirstName=John"]);
     expect(result.body).toEqual({});
   });
@@ -56,7 +56,7 @@ describe("gather", () => {
       { kind: "static", param: "action", value: "save" },
       { kind: "static", param: "version", value: 2 },
     ];
-    const result = resolveGather(items, "POST");
+    const result = resolveGather(items, "POST", {});
     expect(result.body).toEqual({ action: "save", version: 2 });
   });
 
@@ -66,7 +66,7 @@ describe("gather", () => {
       { kind: "component", componentId: "LastName", vendor: "native", name: "LastName", readExpr: "value" },
       { kind: "component", componentId: "FacilityId", vendor: "native", name: "FacilityId", readExpr: "value" },
     ];
-    const result = resolveGather(items, "POST");
+    const result = resolveGather(items, "POST", {});
     expect(result.body).toEqual({
       FirstName: "John",
       LastName: "Doe",
@@ -79,7 +79,7 @@ describe("gather", () => {
       { kind: "component", componentId: "FirstName", vendor: "native", name: "FirstName", readExpr: "value" },
       { kind: "static", param: "csrfToken", value: "abc123" },
     ];
-    const result = resolveGather(items, "POST");
+    const result = resolveGather(items, "POST", {});
     expect(result.body).toEqual({ FirstName: "John", csrfToken: "abc123" });
   });
 
@@ -87,7 +87,7 @@ describe("gather", () => {
     const items: GatherItem[] = [
       { kind: "component", componentId: "FirstName", vendor: "native", name: "Server.Name", readExpr: "value" },
     ];
-    const result = resolveGather(items, "POST");
+    const result = resolveGather(items, "POST", {});
     expect(result.body).toEqual({ Server: { Name: "John" } });
   });
 
@@ -101,12 +101,12 @@ describe("gather", () => {
     const items: GatherItem[] = [
       { kind: "component", componentId: "EmptyField", vendor: "native", name: "EmptyField", readExpr: "value" },
     ];
-    const result = resolveGather(items, "POST");
+    const result = resolveGather(items, "POST", {});
     expect(result.body).toEqual({ EmptyField: null });
   });
 
   it("empty gather returns empty result", () => {
-    const result = resolveGather([], "POST");
+    const result = resolveGather([], "POST", {});
     expect(result.body).toEqual({});
     expect(result.urlParams).toEqual([]);
   });

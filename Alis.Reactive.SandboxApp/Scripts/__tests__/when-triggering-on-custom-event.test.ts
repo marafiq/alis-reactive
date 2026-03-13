@@ -7,6 +7,8 @@ describe("when triggering on custom event", () => {
     document.addEventListener("output-1", () => { executed = true; });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "custom-event", event: "input-1" },
         reaction: {
@@ -24,6 +26,8 @@ describe("when triggering on custom event", () => {
     document.addEventListener("output-2", () => { executed = true; });
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [{
         trigger: { kind: "custom-event", event: "input-2" },
         reaction: {
@@ -43,6 +47,8 @@ describe("when triggering on custom event", () => {
     document.addEventListener("chain-end", () => chain.push("end"));
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "custom-event", event: "chain-start" },

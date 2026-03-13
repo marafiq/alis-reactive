@@ -6,6 +6,8 @@ describe("when resolving payload source in mutate-element", () => {
     document.body.innerHTML = '<span id="name">—</span>';
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -31,6 +33,8 @@ describe("when resolving payload source in mutate-element", () => {
     document.body.innerHTML = '<span id="count">—</span>';
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -56,6 +60,8 @@ describe("when resolving payload source in mutate-element", () => {
     document.body.innerHTML = '<span id="active">—</span>';
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -81,6 +87,8 @@ describe("when resolving payload source in mutate-element", () => {
     document.body.innerHTML = '<span id="city">—</span>';
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -110,6 +118,8 @@ describe("when resolving payload source in mutate-element", () => {
     document.body.innerHTML = '<span id="street">—</span><span id="city2">—</span><span id="zip">—</span>';
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -151,6 +161,8 @@ describe("when resolving payload source in mutate-element", () => {
     `;
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -196,6 +208,8 @@ describe("when resolving payload source in mutate-element", () => {
     document.body.innerHTML = '<span id="static-test">—</span>';
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },
@@ -214,6 +228,8 @@ describe("when resolving payload source in mutate-element", () => {
     document.body.innerHTML = '<span id="missing">—</span>';
 
     boot({
+      planId: "Test.Model",
+      components: {},
       entries: [
         {
           trigger: { kind: "dom-ready" },

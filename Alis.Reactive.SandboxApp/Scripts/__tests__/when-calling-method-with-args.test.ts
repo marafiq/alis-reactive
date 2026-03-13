@@ -18,7 +18,7 @@ describe("when calling component method with args (source walk → val → jsEmi
     it("walks source path and passes ARRAY val to real TestWidget.setItems()", () => {
       const { widget } = mountWidget("fusion-args");
 
-      boot({ entries: [
+      boot({ planId: "Test.Model", components: {}, entries: [
         {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
@@ -42,7 +42,7 @@ describe("when calling component method with args (source walk → val → jsEmi
     it("walks deep nested source and passes SCALAR val to property setter", () => {
       const { widget } = mountWidget("fusion-set");
 
-      boot({ entries: [
+      boot({ planId: "Test.Model", components: {}, entries: [
         {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
@@ -70,7 +70,7 @@ describe("when calling component method with args (source walk → val → jsEmi
       input.id = "native-args";
       document.body.appendChild(input);
 
-      boot({ entries: [
+      boot({ planId: "Test.Model", components: {}, entries: [
         {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
@@ -96,7 +96,7 @@ describe("when calling component method with args (source walk → val → jsEmi
       input.id = "native-set";
       document.body.appendChild(input);
 
-      boot({ entries: [
+      boot({ planId: "Test.Model", components: {}, entries: [
         {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
