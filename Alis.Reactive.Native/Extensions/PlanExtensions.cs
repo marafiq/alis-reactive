@@ -27,13 +27,12 @@ namespace Alis.Reactive.Native.Extensions
         /// <summary>
         /// Creates a ReactivePlan for a partial view that participates in a parent plan.
         /// Same planId as ReactivePlan — runtime merges by planId.
+        /// No HttpContext, no ViewData, no shared state.
         /// </summary>
         public static IReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class
         {
-            var extractor = html.ViewContext.HttpContext.RequestServices
-                .GetService<IValidationExtractor>();
-            return new ReactivePlan<TModel>(extractor);
+            return new ReactivePlan<TModel>();
         }
 
         /// <summary>

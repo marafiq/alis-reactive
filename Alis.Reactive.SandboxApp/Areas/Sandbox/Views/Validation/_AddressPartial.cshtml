@@ -4,7 +4,7 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
-    var plan = new ReactivePlan<ValidationShowcaseModel>();
+    var plan = Html.ResolvePlan<ValidationShowcaseModel>();
 }
 <!-- Partial: Address fields loaded dynamically -->
 <div id="address-section" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -18,3 +18,5 @@
         Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Min 5 chars")
     ); }
 </div>
+
+@Html.RenderPlan(plan, "AddressPartial")

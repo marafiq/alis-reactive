@@ -5,6 +5,9 @@ import { wireTrigger } from "./trigger";
 
 const log = scope("boot");
 
+/** Booted plans keyed by planId — used by mergePlan for AJAX partial injection. */
+const bootedPlans = new Map<string, Plan>();
+
 export function boot(plan: Plan): void {
   log.info("booting", { entries: plan.entries.length });
 
@@ -27,7 +30,43 @@ export function boot(plan: Plan): void {
     wireTrigger(entry.trigger, entry.reaction, plan.components);
   }
 
+  bootedPlans.set(plan.planId, plan);
   log.info("booted");
+}
+
+/**
+ * Merge an AJAX-injected partial plan into an already-booted plan.
+ * Merges components, enriches validation, wires new triggers (two-phase).
+ */
+export function mergePlan(incoming: Plan): void {
+  const existing = bootedPlans.get(incoming.planId);
+  if (existing) {
+    Object.assign(existing.components, incoming.components);
+    log.info("merge", { planId: incoming.planId, newComponents: Object.keys(incoming.components).length });
+  }
+
+  // Use merged components for enrichment (existing or incoming-only)
+  const components = existing?.components ?? incoming.components;
+
+  enrichValidation({ ...incoming, components } as Plan);
+
+  const deferred: Entry[] = [];
+  for (const entry of incoming.entries) {
+    if (entry.trigger.kind === "dom-ready") {
+      deferred.push(entry);
+    } else {
+      wireTrigger(entry.trigger, entry.reaction, components);
+    }
+  }
+  for (const entry of deferred) {
+    wireTrigger(entry.trigger, entry.reaction, components);
+  }
+
+  if (existing) {
+    existing.entries.push(...incoming.entries);
+  } else {
+    bootedPlans.set(incoming.planId, incoming);
+  }
 }
 
 export const trace = { setLevel };
