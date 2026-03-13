@@ -25,6 +25,18 @@ namespace Alis.Reactive.Native.Extensions
         }
 
         /// <summary>
+        /// Creates a ReactivePlan for a partial view that participates in a parent plan.
+        /// Same planId as ReactivePlan — runtime merges by planId.
+        /// </summary>
+        public static IReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
+            where TModel : class
+        {
+            var extractor = html.ViewContext.HttpContext.RequestServices
+                .GetService<IValidationExtractor>();
+            return new ReactivePlan<TModel>(extractor);
+        }
+
+        /// <summary>
         /// Renders the plan as a JSON script tag for runtime discovery.
         /// ID defaults to "alis-plan-{TModelName}".
         /// </summary>
@@ -49,9 +61,10 @@ namespace Alis.Reactive.Native.Extensions
             where TModel : class
         {
             var id = $"alis-plan-{planName}";
+            var dataModel = typeof(TModel).FullName;
             var json = plan.Render();
             return new HtmlString(
-                $"<script type=\"application/json\" id=\"{id}\" data-alis-plan data-trace=\"trace\">{json}</script>");
+                $"<script type=\"application/json\" id=\"{id}\" data-alis-plan data-model=\"{dataModel}\" data-trace=\"trace\">{json}</script>");
         }
     }
 }

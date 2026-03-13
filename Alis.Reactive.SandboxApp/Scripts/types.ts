@@ -1,5 +1,13 @@
 export interface Plan {
+  planId: string;
+  components: Record<string, ComponentEntry>;
   entries: Entry[];
+}
+
+export interface ComponentEntry {
+  id: string;
+  vendor: Vendor;
+  readExpr: string;
 }
 
 export interface Entry {
@@ -60,7 +68,11 @@ export interface ParallelHttpReaction {
 
 // -- HTTP Request Types ----------------------------------------
 
-export type GatherItem = ComponentGather | StaticGather;
+export type GatherItem = ComponentGather | StaticGather | AllGather;
+
+export interface AllGather {
+  kind: "all";
+}
 
 export interface ComponentGather {
   kind: "component";
@@ -196,6 +208,7 @@ export interface ExecContext {
   evt?: Record<string, unknown>;
   responseBody?: unknown;
   validationDesc?: ValidationDescriptor;
+  components?: Record<string, ComponentEntry>;
 }
 
 // -- Validation -----------------------------------------------
@@ -206,11 +219,12 @@ export interface ValidationDescriptor {
 }
 
 export interface ValidationField {
-  fieldId: string;
   fieldName: string;
-  vendor: Vendor;
-  readExpr: string;
   rules: ValidationRule[];
+  // Enriched at boot from plan.components:
+  fieldId?: string;
+  vendor?: Vendor;
+  readExpr?: string;
 }
 
 export type ValidationRuleType =

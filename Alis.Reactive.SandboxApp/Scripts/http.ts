@@ -13,7 +13,7 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
   }
 
   // 2. Gather
-  const gatherResult = resolveGather(req.gather ?? [], req.verb, req.contentType);
+  const gatherResult = resolveGather(req.gather ?? [], req.verb, ctx?.components ?? {}, req.contentType);
 
   // 3. Build fetch options
   let url = req.url;

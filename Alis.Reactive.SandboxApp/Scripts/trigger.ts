@@ -1,4 +1,4 @@
-import type { Trigger, Reaction } from "./types";
+import type { Trigger, Reaction, ComponentEntry } from "./types";
 import { resolveRoot } from "./component";
 import { walk } from "./walk";
 import { scope } from "./trace";
@@ -6,13 +6,17 @@ import { executeReaction } from "./execute";
 
 const log = scope("trigger");
 
-export function wireTrigger(trigger: Trigger, reaction: Reaction): void {
+export function wireTrigger(
+  trigger: Trigger,
+  reaction: Reaction,
+  components?: Record<string, ComponentEntry>
+): void {
   switch (trigger.kind) {
     case "dom-ready":
       if (document.readyState === "complete" || document.readyState === "interactive") {
-        executeReaction(reaction);
+        executeReaction(reaction, { components });
       } else {
-        document.addEventListener("DOMContentLoaded", () => executeReaction(reaction));
+        document.addEventListener("DOMContentLoaded", () => executeReaction(reaction, { components }));
       }
       break;
 
@@ -20,7 +24,7 @@ export function wireTrigger(trigger: Trigger, reaction: Reaction): void {
       log.debug("custom-event: listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e) => {
         const detail = (e as CustomEvent).detail;
-        executeReaction(reaction, { evt: detail ?? {} });
+        executeReaction(reaction, { evt: detail ?? {}, components });
       });
       break;
 
@@ -41,7 +45,7 @@ export function wireTrigger(trigger: Trigger, reaction: Reaction): void {
         const detail = trigger.vendor === "native"
           ? { [expr]: walk(el, expr), event: e }
           : (e ?? {});
-        executeReaction(reaction, { evt: detail });
+        executeReaction(reaction, { evt: detail, components });
       });
       break;
     }

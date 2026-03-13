@@ -1,4 +1,4 @@
-import type { GatherItem } from "./types";
+import type { GatherItem, ComponentEntry } from "./types";
 import { evalRead } from "./component";
 import { scope } from "./trace";
 
@@ -9,7 +9,12 @@ export interface GatherResult {
   body: Record<string, unknown> | FormData;
 }
 
-export function resolveGather(items: GatherItem[], verb: string, contentType?: string): GatherResult {
+export function resolveGather(
+  items: GatherItem[],
+  verb: string,
+  components: Record<string, ComponentEntry>,
+  contentType?: string
+): GatherResult {
   const isGet = verb === "GET";
   const useFormData = contentType === "form-data";
   const urlParams: string[] = [];
@@ -24,7 +29,7 @@ export function resolveGather(items: GatherItem[], verb: string, contentType?: s
           break;
         }
         const raw = evalRead(g.componentId, g.vendor, g.readExpr);
-        // Normalize: empty string → null for JSON body (avoids deserialization errors on numeric types)
+        // Normalize: empty string -> null for JSON body (avoids deserialization errors on numeric types)
         const value = raw === "" ? null : raw;
         if (isGet) {
           urlParams.push(`${encodeURIComponent(g.name)}=${encodeURIComponent(String(raw))}`);
@@ -46,6 +51,26 @@ export function resolveGather(items: GatherItem[], verb: string, contentType?: s
           body[g.param] = g.value;
         }
         log.trace("static", { param: g.param, value: g.value });
+        break;
+      }
+
+      case "all": {
+        for (const [bindingPath, comp] of Object.entries(components)) {
+          if (!document.getElementById(comp.id)) {
+            log.warn("gather target not found", { componentId: comp.id });
+            continue;
+          }
+          const raw = evalRead(comp.id, comp.vendor, comp.readExpr);
+          const value = raw === "" ? null : raw;
+          if (isGet) {
+            urlParams.push(`${encodeURIComponent(bindingPath)}=${encodeURIComponent(String(raw))}`);
+          } else if (formData) {
+            formData.append(bindingPath, String(raw ?? ""));
+          } else {
+            setNested(body, bindingPath, value);
+          }
+          log.trace("component", { name: bindingPath, value });
+        }
         break;
       }
     }

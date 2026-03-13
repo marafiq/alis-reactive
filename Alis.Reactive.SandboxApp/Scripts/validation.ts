@@ -30,6 +30,7 @@ export function validate(desc: ValidationDescriptor): boolean {
   let valid = true;
 
   for (const f of desc.fields) {
+    if (!f.fieldId || !f.vendor || !f.readExpr) continue;
     const el = document.getElementById(f.fieldId);
     if (!el) continue;
 
@@ -70,7 +71,7 @@ export function showServerErrors(desc: ValidationDescriptor, data: unknown): voi
     }
 
     const field = desc.fields.find(f => f.fieldName === name);
-    if (field) {
+    if (field && field.fieldId) {
       const el = document.getElementById(field.fieldId);
       if (el) el.classList.add(ERR_CLASS);
     }
@@ -115,6 +116,7 @@ function findErrorSpan(containerId: string, fieldName: string): HTMLElement | nu
 }
 
 function showError(containerId: string, field: ValidationField, message: string): void {
+  if (!field.fieldId) return;
   const el = document.getElementById(field.fieldId);
   if (el) el.classList.add(ERR_CLASS);
 
@@ -133,13 +135,15 @@ function clearFieldError(containerId: string, field: ValidationField): void {
     span.setAttribute("hidden", "");
     span.style.display = "none";
   }
-  const el = document.getElementById(field.fieldId);
-  if (el) el.classList.remove(ERR_CLASS);
+  if (field.fieldId) {
+    const el = document.getElementById(field.fieldId);
+    if (el) el.classList.remove(ERR_CLASS);
+  }
 }
 
 function evalCondition(cond: ValidationCondition, byName: Map<string, ValidationField>): boolean {
   const srcField = byName.get(cond.field);
-  if (!srcField) return true;
+  if (!srcField || !srcField.fieldId || !srcField.vendor || !srcField.readExpr) return true;
   const el = document.getElementById(srcField.fieldId);
   if (!el) return true;
   const root = resolveRoot(el, srcField.vendor);
@@ -188,7 +192,7 @@ function ruleFails(rule: ValidationRule, value: unknown, byName: Map<string, Val
     }
     case "equalTo": {
       const other = byName.get(String(rule.constraint));
-      if (!other) return false;
+      if (!other || !other.fieldId || !other.vendor || !other.readExpr) return false;
       const otherEl = document.getElementById(other.fieldId);
       if (!otherEl) return false;
       const otherRoot = resolveRoot(otherEl, other.vendor);
