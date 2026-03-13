@@ -13,9 +13,10 @@
     <div>
         <h1 class="text-2xl font-bold tracking-tight">Validation Showcase</h1>
         <p class="mt-2 text-text-secondary">
-            Nine validation patterns: all rule types, server-side 400, nested properties,
+            Eleven validation patterns: all rule types, server-side 400, nested properties,
             conditional rules, live clearing, combined client+server, hidden field skipping,
-            fake DB validation (ProblemDetails 400), and partial view + server validation.
+            fake DB validation (ProblemDetails 400), partial view + client validation,
+            second partial (same TModel), and standalone partial (own TModel, own plan).
         </p>
     </div>
     <!-- Section 1: All Rule Types (Client-Side) -->
@@ -408,11 +409,11 @@
 
     <!-- Section 9: Partial View + Server Validation -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">9. Partial View &mdash; Load Address Form &rarr; POST &rarr; Server Validate</h2>
+        <h2 class="text-base font-semibold mb-4">9. Partial View &mdash; Load Address Form &rarr; Client Validate &rarr; POST &rarr; Server Validate</h2>
         <p class="text-sm text-text-secondary mb-4">
             Click &ldquo;Load Address Form&rdquo; to fetch a partial view with address fields.
-            Then fill/leave empty and click &ldquo;Save Address&rdquo; to validate server-side.
-            Server returns 400 with dotted field names (Nested.Address.Street) that resolve to the partial&rsquo;s DOM elements.
+            Then leave empty and click &ldquo;Save Address&rdquo; to see client-side validation on dynamically loaded fields.
+            Valid data posts to server; server returns 400 with dotted field names (Nested.Address.Street) that resolve to the partial&rsquo;s DOM elements.
         </p>
         @(Html.NativeButton("load-partial-btn", "Load Address Form")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -446,6 +447,7 @@
                         .Include(m => m.Nested!.Address!.Street)
                         .Include(m => m.Nested!.Address!.City)
                         .Include(m => m.Nested!.Address!.ZipCode))
+                     .Validate<ValidationShowcaseValidator>("partial-form")
                      .WhileLoading(l => l.Element("partial-save-spinner").Show())
                      .Response(r => r
                         .OnSuccess(s =>
@@ -467,6 +469,98 @@
                 }))
             <p id="partial-save-spinner" hidden class="text-amber-600 font-mono text-sm mt-2">Saving...</p>
             <p id="partial-save-result" class="text-text-muted font-mono text-sm mt-2">Not submitted yet</p>
+        </div>
+    </section>
+
+    <!-- Section 10: Second Partial — Delivery Note (same TModel, nested property) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">10. Second Partial &mdash; Delivery Note (Same TModel)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Another AJAX partial using <code>ResolvePlan&lt;ValidationShowcaseModel&gt;</code>.
+            Same planId, merges components. Client validation via <code>ValidationShowcaseValidator</code> chain.
+        </p>
+        @(Html.NativeButton("load-delivery-btn", "Load Delivery Note Form")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/Validation/DeliveryNotePartial")
+                 .WhileLoading(l => l.Element("delivery-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("delivery-spinner").Hide();
+                        s.Into("delivery-container");
+                        s.Element("delivery-status").SetText("Delivery note form loaded");
+                        s.Element("delivery-status").AddClass("text-green-600");
+                        s.Element("delivery-status").RemoveClass("text-text-muted");
+                    }));
+            }))
+        <div class="mt-3 space-y-3">
+            <p id="delivery-spinner" hidden class="text-amber-600 font-mono text-sm">Loading...</p>
+            <p id="delivery-status" class="text-text-muted font-mono text-sm">Not loaded yet</p>
+            <form id="delivery-form">
+                <div id="delivery-container" class="mb-4">
+                    <!-- Delivery note partial loads here — merges into parent plan -->
+                </div>
+            </form>
+            @(Html.NativeButton("save-delivery-btn", "Save Delivery Note")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Validation/SaveDeliveryNote", g => g
+                        .Include(m => m.Nested!.Delivery!.Instructions)
+                        .Include(m => m.Nested!.Delivery!.ContactPhone))
+                     .Validate<ValidationShowcaseValidator>("delivery-form")
+                     .Response(r => r
+                        .OnSuccess(s =>
+                        {
+                            s.Element("delivery-result").SetText("Delivery note saved!");
+                            s.Element("delivery-result").AddClass("text-green-600");
+                            s.Element("delivery-result").RemoveClass("text-red-600");
+                            s.Element("delivery-result").RemoveClass("text-text-muted");
+                        })
+                        .OnError(400, e =>
+                        {
+                            e.Element("delivery-result").SetText("Server validation errors");
+                            e.Element("delivery-result").AddClass("text-red-600");
+                            e.Element("delivery-result").RemoveClass("text-green-600");
+                            e.ValidationErrors("delivery-form");
+                        })
+                     );
+                }))
+            <p id="delivery-result" class="text-text-muted font-mono text-sm mt-2">Not submitted yet</p>
+        </div>
+    </section>
+
+    <!-- Section 11: Standalone Partial — Own TModel, Own Plan -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">11. Standalone Partial &mdash; Own TModel, Own Plan</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Loads a contact form partial with <code>ContactFormModel</code> (different TModel).
+            Independent plan &mdash; own components, own validation, own request chain. Does not merge with parent.
+        </p>
+        @(Html.NativeButton("load-contact-btn", "Load Contact Form")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/Validation/ContactFormPartial")
+                 .WhileLoading(l => l.Element("contact-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("contact-spinner").Hide();
+                        s.Into("contact-container");
+                        s.Element("contact-status").SetText("Contact form loaded");
+                        s.Element("contact-status").AddClass("text-green-600");
+                        s.Element("contact-status").RemoveClass("text-text-muted");
+                    }));
+            }))
+        <div class="mt-3 space-y-3">
+            <p id="contact-spinner" hidden class="text-amber-600 font-mono text-sm">Loading...</p>
+            <p id="contact-status" class="text-text-muted font-mono text-sm">Not loaded yet</p>
+            <div id="contact-container">
+                <!-- Standalone contact form partial loads here — independent plan -->
+            </div>
         </div>
     </section>
 

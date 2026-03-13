@@ -1,0 +1,52 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ContactFormModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    var plan = Html.ReactivePlan<ContactFormModel>();
+}
+<!-- Standalone partial: own TModel, own plan, own request chain -->
+<form id="contact-form">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+        @{ Html.Field("Name *", false, m => m.Name, expr =>
+            Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Your name")
+        ); }
+        @{ Html.Field("Email *", false, m => m.Email, expr =>
+            Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("you@example.com")
+        ); }
+    </div>
+    <div class="mb-3">
+        @{ Html.Field("Message *", false, m => m.Message, expr =>
+            Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full").Placeholder("At least 10 characters")
+        ); }
+    </div>
+    @(Html.NativeButton("send-contact-btn", "Send Message")
+        .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post("/Sandbox/Validation/SendContact", g => g
+                .Include(m => m.Name)
+                .Include(m => m.Email)
+                .Include(m => m.Message))
+             .Validate<ContactFormValidator>("contact-form")
+             .Response(r => r
+                .OnSuccess(s =>
+                {
+                    s.Element("contact-result").SetText("Message sent!");
+                    s.Element("contact-result").AddClass("text-green-600");
+                    s.Element("contact-result").RemoveClass("text-red-600");
+                    s.Element("contact-result").RemoveClass("text-text-muted");
+                })
+                .OnError(400, e =>
+                {
+                    e.Element("contact-result").SetText("Validation errors");
+                    e.Element("contact-result").AddClass("text-red-600");
+                    e.ValidationErrors("contact-form");
+                })
+             );
+        }))
+    <p id="contact-result" class="text-text-muted font-mono text-sm mt-2">Not submitted yet</p>
+</form>
+
+@Html.RenderPlan(plan)

@@ -1,4 +1,5 @@
 ﻿{
+  planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
   entries: [
     {
       trigger: {

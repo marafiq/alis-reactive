@@ -16,8 +16,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.Combined).SetValidator(new CombinedSectionValidator());
             RuleFor(x => x.Hidden).SetValidator(new HiddenFieldsSectionValidator());
             RuleFor(x => x.Conditional).SetValidator(new ConditionalSectionValidator());
-            // Nested address validation is server-side only (SaveAddress endpoint).
-            // Not included here — the partial is loaded dynamically and has no client-side form.
+            RuleFor(x => x.Nested).SetValidator(new NestedSectionValidator());
         }
 
         public IReadOnlyList<ConditionalRuleMetadata> GetConditionalRules()
@@ -113,6 +112,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public NestedSectionValidator()
         {
             RuleFor(x => x.Address!).SetValidator(new ValidationAddressValidator());
+            RuleFor(x => x.Delivery!).SetValidator(new DeliveryNoteValidator());
+        }
+    }
+
+    public class DeliveryNoteValidator : AbstractValidator<DeliveryNote>
+    {
+        public DeliveryNoteValidator()
+        {
+            RuleFor(x => x.Instructions)
+                .NotEmpty().WithMessage("Delivery instructions are required.");
+
+            RuleFor(x => x.ContactPhone)
+                .Matches(@"^\d{3}-\d{3}-\d{4}$").WithMessage("Phone must match format 123-456-7890.");
         }
     }
 

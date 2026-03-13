@@ -2,7 +2,7 @@ import type { Command, ExecContext } from "./types";
 import { mutateElement } from "./element";
 import { evaluateGuard, isConfirmGuard } from "./conditions";
 import { showServerErrors } from "./validation";
-import { injectHtml } from "./component";
+import { injectHtml } from "./inject";
 import { scope } from "./trace";
 
 const log = scope("command");

@@ -26,7 +26,7 @@ namespace Alis.Reactive.Descriptors.Requests
         }
     }
 
-    /// <summary>Plan-driven marker — expanded at render time into explicit ComponentGather items.</summary>
+    /// <summary>Plan-driven marker — runtime expands from merged plan.components at gather time.</summary>
     public sealed class AllGather : GatherItem
     {
         internal AllGather()

@@ -1,4 +1,5 @@
 ﻿{
+  planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
   entries: [
     {
       trigger: {

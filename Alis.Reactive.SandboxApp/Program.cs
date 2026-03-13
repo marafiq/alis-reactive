@@ -1,10 +1,11 @@
+using Alis.Reactive;
 using Alis.Reactive.FluentValidator;
-using Alis.Reactive.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<IValidationExtractor, FluentValidationAdapter>();
+
+ReactivePlanConfig.UseValidationExtractor(new FluentValidationAdapter());
 
 var app = builder.Build();
 

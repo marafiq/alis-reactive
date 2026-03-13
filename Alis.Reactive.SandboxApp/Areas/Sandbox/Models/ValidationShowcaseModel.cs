@@ -48,6 +48,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class NestedSection
     {
         public ValidationAddress? Address { get; set; }
+        public DeliveryNote? Delivery { get; set; }
     }
 
     public class ValidationAddress
@@ -55,5 +56,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? Street { get; set; }
         public string? City { get; set; }
         public string? ZipCode { get; set; }
+    }
+
+    public class DeliveryNote
+    {
+        public string? Instructions { get; set; }
+        public string? ContactPhone { get; set; }
     }
 }

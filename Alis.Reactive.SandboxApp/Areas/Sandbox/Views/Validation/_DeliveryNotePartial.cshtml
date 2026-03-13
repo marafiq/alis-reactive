@@ -1,0 +1,18 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ValidationShowcaseModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    var plan = Html.ResolvePlan<ValidationShowcaseModel>();
+}
+<!-- Partial: Delivery note — same TModel, nested property -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    @{ Html.Field("Instructions *", false, m => m.Nested!.Delivery!.Instructions, expr =>
+        Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Leave at door, etc.")
+    ); }
+    @{ Html.Field("Contact Phone", false, m => m.Nested!.Delivery!.ContactPhone, expr =>
+        Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("123-456-7890")
+    ); }
+</div>
+
+@Html.RenderPlan(plan)

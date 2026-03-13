@@ -24,11 +24,11 @@ export function resolveGather(
   for (const g of items) {
     switch (g.kind) {
       case "component": {
-        if (!document.getElementById(g.componentId)) {
+        const raw = evalRead(g.componentId, g.vendor, g.readExpr);
+        if (raw === undefined) {
           log.warn("gather target not found", { componentId: g.componentId });
           break;
         }
-        const raw = evalRead(g.componentId, g.vendor, g.readExpr);
         // Normalize: empty string -> null for JSON body (avoids deserialization errors on numeric types)
         const value = raw === "" ? null : raw;
         if (isGet) {
@@ -56,11 +56,11 @@ export function resolveGather(
 
       case "all": {
         for (const [bindingPath, comp] of Object.entries(components)) {
-          if (!document.getElementById(comp.id)) {
+          const raw = evalRead(comp.id, comp.vendor, comp.readExpr);
+          if (raw === undefined) {
             log.warn("gather target not found", { componentId: comp.id });
             continue;
           }
-          const raw = evalRead(comp.id, comp.vendor, comp.readExpr);
           const value = raw === "" ? null : raw;
           if (isGet) {
             urlParams.push(`${encodeURIComponent(bindingPath)}=${encodeURIComponent(String(raw))}`);

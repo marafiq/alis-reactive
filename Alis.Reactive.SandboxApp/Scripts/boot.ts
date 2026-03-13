@@ -11,27 +11,29 @@ const bootedPlans = new Map<string, Plan>();
 export function boot(plan: Plan): void {
   log.info("booting", { entries: plan.entries.length });
 
-  // Enrich validation fields from plan.components before wiring triggers
-  enrichValidation(plan);
-
-  // Two-phase boot: wire all listeners first, then execute dom-ready reactions.
-  // This ensures custom-event listeners exist before dom-ready dispatches into them.
-  const deferred: Entry[] = [];
-
-  for (const entry of plan.entries) {
-    if (entry.trigger.kind === "dom-ready") {
-      deferred.push(entry);
-    } else {
-      wireTrigger(entry.trigger, entry.reaction, plan.components);
-    }
-  }
-
-  for (const entry of deferred) {
-    wireTrigger(entry.trigger, entry.reaction, plan.components);
-  }
+  enrichEntries(plan.entries, plan.components);
+  wireEntries(plan.entries, plan.components);
 
   bootedPlans.set(plan.planId, plan);
   log.info("booted");
+}
+
+/**
+ * Two-phase wiring: wire all non-dom-ready listeners first, then execute dom-ready.
+ * This ensures custom-event listeners exist before dom-ready dispatches into them.
+ */
+function wireEntries(entries: Entry[], components: Record<string, ComponentEntry>): void {
+  const deferred: Entry[] = [];
+  for (const entry of entries) {
+    if (entry.trigger.kind === "dom-ready") {
+      deferred.push(entry);
+    } else {
+      wireTrigger(entry.trigger, entry.reaction, components);
+    }
+  }
+  for (const entry of deferred) {
+    wireTrigger(entry.trigger, entry.reaction, components);
+  }
 }
 
 /**
@@ -45,22 +47,16 @@ export function mergePlan(incoming: Plan): void {
     log.info("merge", { planId: incoming.planId, newComponents: Object.keys(incoming.components).length });
   }
 
-  // Use merged components for enrichment (existing or incoming-only)
+  // Use merged components for enrichment and wiring
   const components = existing?.components ?? incoming.components;
 
-  enrichValidation({ ...incoming, components } as Plan);
-
-  const deferred: Entry[] = [];
-  for (const entry of incoming.entries) {
-    if (entry.trigger.kind === "dom-ready") {
-      deferred.push(entry);
-    } else {
-      wireTrigger(entry.trigger, entry.reaction, components);
-    }
+  // Re-enrich existing entries — parent plan may have validation descriptors
+  // that reference components only now available from the merged partial.
+  if (existing) {
+    enrichEntries(existing.entries, components);
   }
-  for (const entry of deferred) {
-    wireTrigger(entry.trigger, entry.reaction, components);
-  }
+  enrichEntries(incoming.entries, components);
+  wireEntries(incoming.entries, components);
 
   if (existing) {
     existing.entries.push(...incoming.entries);
@@ -73,10 +69,10 @@ export const trace = { setLevel };
 
 // -- Validation enrichment -----------------------------------------------
 
-/** Walk the reaction tree and enrich validation fields from plan.components. */
-function enrichValidation(plan: Plan): void {
-  for (const entry of plan.entries) {
-    enrichReaction(entry.reaction, plan.components);
+/** Walk entries and enrich validation fields from plan.components. */
+function enrichEntries(entries: Entry[], components: Record<string, ComponentEntry>): void {
+  for (const entry of entries) {
+    enrichReaction(entry.reaction, components);
   }
 }
 
@@ -120,6 +116,8 @@ function enrichValidationFields(
       f.fieldId = comp.id;
       f.vendor = comp.vendor;
       f.readExpr = comp.readExpr;
+    } else {
+      log.warn("validation field not in components", { fieldName: f.fieldName });
     }
   }
 }

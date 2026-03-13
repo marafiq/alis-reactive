@@ -119,9 +119,81 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         public IActionResult ValidateClient() => Ok(new { message = "Client validation passed!" });
 
         [HttpGet]
+        public IActionResult ContactFormPartial()
+        {
+            return PartialView("_ContactFormPartial", new ContactFormModel());
+        }
+
+        [HttpPost]
+        public IActionResult SendContact([FromBody] ContactFormModel? model)
+        {
+            if (model == null)
+            {
+                return BadRequest(new
+                {
+                    errors = new Dictionary<string, string[]>
+                    {
+                        ["Name"] = new[] { "Name is required." }
+                    }
+                });
+            }
+
+            var validator = new ContactFormValidator();
+            var result = validator.Validate(model);
+
+            if (!result.IsValid)
+            {
+                var errors = new Dictionary<string, string[]>();
+                foreach (var failure in result.Errors)
+                {
+                    errors[failure.PropertyName] = new[] { failure.ErrorMessage };
+                }
+                return BadRequest(new { errors });
+            }
+
+            return Ok(new { message = "Message sent!" });
+        }
+
+        [HttpGet]
         public IActionResult AddressPartial()
         {
             return PartialView("_AddressPartial", new ValidationShowcaseModel());
+        }
+
+        [HttpGet]
+        public IActionResult DeliveryNotePartial()
+        {
+            return PartialView("_DeliveryNotePartial", new ValidationShowcaseModel());
+        }
+
+        [HttpPost]
+        public IActionResult SaveDeliveryNote([FromBody] ValidationShowcaseModel? model)
+        {
+            if (model?.Nested?.Delivery == null)
+            {
+                return BadRequest(new
+                {
+                    errors = new Dictionary<string, string[]>
+                    {
+                        ["Nested.Delivery.Instructions"] = new[] { "Delivery instructions are required." }
+                    }
+                });
+            }
+
+            var validator = new DeliveryNoteValidator();
+            var result = validator.Validate(model.Nested.Delivery);
+
+            if (!result.IsValid)
+            {
+                var errors = new Dictionary<string, string[]>();
+                foreach (var failure in result.Errors)
+                {
+                    errors["Nested.Delivery." + failure.PropertyName] = new[] { failure.ErrorMessage };
+                }
+                return BadRequest(new { errors });
+            }
+
+            return Ok(new { message = "Delivery note saved!" });
         }
 
         [HttpPost]

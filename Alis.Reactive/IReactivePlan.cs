@@ -33,14 +33,8 @@ namespace Alis.Reactive
 
         private readonly List<Entry> _entries = new List<Entry>();
         private readonly Dictionary<string, ComponentRegistration> _componentsMap = new Dictionary<string, ComponentRegistration>();
-        private readonly IValidationExtractor? _extractor;
 
-        public ReactivePlan() : this(null) { }
-
-        public ReactivePlan(IValidationExtractor? extractor)
-        {
-            _extractor = extractor;
-        }
+        public ReactivePlan() { }
 
         public string PlanId { get; } = typeof(TModel).FullName!;
 
@@ -95,8 +89,22 @@ namespace Alis.Reactive
 
         private void ResolveAll()
         {
-            if (_extractor != null)
-                ValidationResolver.Resolve(_entries, _extractor);
+            var extractor = ReactivePlanConfig.Extractor;
+            if (extractor != null)
+                ValidationResolver.Resolve(_entries, extractor);
+        }
+    }
+
+    /// <summary>
+    /// One-time configuration. Call at app startup.
+    /// </summary>
+    public static class ReactivePlanConfig
+    {
+        internal static IValidationExtractor? Extractor { get; private set; }
+
+        public static void UseValidationExtractor(IValidationExtractor extractor)
+        {
+            Extractor = extractor;
         }
     }
 
