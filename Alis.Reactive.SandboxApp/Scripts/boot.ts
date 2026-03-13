@@ -14,6 +14,9 @@ const mergedAbort = new Map<string, AbortController>();
 /** Entries added via mergePlan — keyed by sourceId. Removed on re-merge before adding new ones. */
 const mergedEntries = new Map<string, Entry[]>();
 
+/** Component keys added via mergePlan — keyed by sourceId. Removed on re-merge before adding new ones. */
+const mergedComponentKeys = new Map<string, string[]>();
+
 export function boot(plan: Plan): void {
   log.info("booting", { entries: plan.entries.length });
 
@@ -52,15 +55,8 @@ function wireEntries(entries: Entry[], components: Record<string, ComponentEntry
  */
 export function mergePlan(incoming: Plan): void {
   const existing = bootedPlans.get(incoming.planId);
-  if (existing) {
-    Object.assign(existing.components, incoming.components);
-    log.info("merge", { planId: incoming.planId, newComponents: Object.keys(incoming.components).length });
-  }
 
-  // Use merged components for enrichment and wiring
-  const components = existing?.components ?? incoming.components;
-
-  // Clean up previous merge from same source (prevents listener/entry accumulation)
+  // Clean up previous merge from same source (prevents listener/entry/component accumulation)
   const sourceId = incoming.sourceId;
   if (sourceId) {
     const oldAbort = mergedAbort.get(sourceId);
@@ -76,7 +72,24 @@ export function mergePlan(incoming: Plan): void {
         if (idx >= 0) existing.entries.splice(idx, 1);
       }
     }
+
+    // Remove stale component registrations from previous merge of this source
+    const oldKeys = mergedComponentKeys.get(sourceId);
+    if (oldKeys && existing) {
+      for (const key of oldKeys) {
+        delete existing.components[key];
+      }
+    }
   }
+
+  // Merge incoming components AFTER stale cleanup
+  if (existing) {
+    Object.assign(existing.components, incoming.components);
+    log.info("merge", { planId: incoming.planId, newComponents: Object.keys(incoming.components).length });
+  }
+
+  // Use merged components for enrichment and wiring
+  const components = existing?.components ?? incoming.components;
 
   // Create new abort controller for this merge
   const abort = sourceId ? new AbortController() : undefined;
@@ -98,10 +111,16 @@ export function mergePlan(incoming: Plan): void {
     bootedPlans.set(incoming.planId, incoming);
   }
 
-  // Track merged entries for cleanup on re-merge
+  // Track merged entries and component keys for cleanup on re-merge
   if (sourceId) {
     mergedEntries.set(sourceId, [...incoming.entries]);
+    mergedComponentKeys.set(sourceId, Object.keys(incoming.components));
   }
+}
+
+/** Returns the booted plan for a given planId (used by tests and runtime inspection). */
+export function getBootedPlan(planId: string): Plan | undefined {
+  return bootedPlans.get(planId);
 }
 
 export const trace = { setLevel };
