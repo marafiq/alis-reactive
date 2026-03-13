@@ -17,8 +17,13 @@ export function resolveRoot(el: any, vendor: Vendor): unknown {
   switch (vendor) {
     case "native":
       return el;
-    case "fusion":
-      return el.ej2_instances?.[0];
+    case "fusion": {
+      const root = el.ej2_instances?.[0];
+      if (root == null) throw new Error(`[alis] no vendor root for "${el.id}" (vendor: ${vendor}) — is the component initialized?`);
+      return root;
+    }
+    default:
+      throw new Error(`[alis] unknown vendor: "${vendor}"`);
   }
 }
 
@@ -30,14 +35,9 @@ export function resolveRoot(el: any, vendor: Vendor): unknown {
  */
 export function evalRead(id: string, vendor: Vendor, readExpr: string): unknown {
   const el = document.getElementById(id) as any;
-  if (!el) return undefined;
+  if (!el) throw new Error(`[alis] element not found: ${id}`);
 
   const root = resolveRoot(el, vendor);
-  if (root == null) {
-    log.warn("no root", { id, vendor });
-    return undefined;
-  }
-
   return walk(root, readExpr);
 }
 

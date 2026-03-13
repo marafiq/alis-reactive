@@ -37,7 +37,12 @@ export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
       break;
 
     case "conditional":
-      log.debug("conditional", { branches: reaction.branches.length });
+      log.debug("conditional", { commands: reaction.commands?.length ?? 0, branches: reaction.branches.length });
+      if (reaction.commands) {
+        for (const cmd of reaction.commands) {
+          executeCommand(cmd, ctx);
+        }
+      }
       for (const branch of reaction.branches) {
         if (branch.guard == null || evaluateGuard(branch.guard, ctx)) {
           log.trace("branch-taken", { guard: branch.guard?.kind ?? "else" });
@@ -74,7 +79,12 @@ async function dispatchAsync(reaction: Reaction, ctx?: ExecContext): Promise<voi
       return;
 
     case "conditional":
-      log.debug("conditional", { branches: reaction.branches.length });
+      log.debug("conditional", { commands: reaction.commands?.length ?? 0, branches: reaction.branches.length });
+      if (reaction.commands) {
+        for (const cmd of reaction.commands) {
+          executeCommand(cmd, ctx);
+        }
+      }
       for (const branch of reaction.branches) {
         if (branch.guard == null) {
           await dispatchAsync(branch.reaction, ctx);

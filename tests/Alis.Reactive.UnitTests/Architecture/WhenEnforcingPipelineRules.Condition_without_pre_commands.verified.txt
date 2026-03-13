@@ -1,0 +1,50 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: status-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.status
+              },
+              coerceAs: string,
+              op: eq,
+              operand: active
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: badge,
+                  jsEmit: el.removeAttribute('hidden')
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: badge,
+                  jsEmit: el.setAttribute('hidden','')
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

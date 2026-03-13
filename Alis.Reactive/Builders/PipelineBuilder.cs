@@ -218,6 +218,7 @@ namespace Alis.Reactive.Builders
                     Commands.Count > 0 ? Commands : null,
                     _httpBuilder!.BuildRequestDescriptor()),
                 PipelineMode.Conditional => new ConditionalReaction(
+                    Commands.Count > 0 ? Commands : null,
                     ConditionalBranches!.ToArray()),
                 _ => new SequentialReaction(Commands),
             };

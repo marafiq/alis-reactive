@@ -9,14 +9,17 @@ const log = scope("trigger");
 export function wireTrigger(
   trigger: Trigger,
   reaction: Reaction,
-  components?: Record<string, ComponentEntry>
+  components?: Record<string, ComponentEntry>,
+  signal?: AbortSignal
 ): void {
+  const opts = signal ? { signal } : undefined;
+
   switch (trigger.kind) {
     case "dom-ready":
       if (document.readyState === "complete" || document.readyState === "interactive") {
         executeReaction(reaction, { components });
       } else {
-        document.addEventListener("DOMContentLoaded", () => executeReaction(reaction, { components }));
+        document.addEventListener("DOMContentLoaded", () => executeReaction(reaction, { components }), opts);
       }
       break;
 
@@ -25,20 +28,13 @@ export function wireTrigger(
       document.addEventListener(trigger.event, (e) => {
         const detail = (e as CustomEvent).detail;
         executeReaction(reaction, { evt: detail ?? {}, components });
-      });
+      }, opts);
       break;
 
     case "component-event": {
       const el = document.getElementById(trigger.componentId);
-      if (!el) {
-        log.warn("component-event: element not found", { componentId: trigger.componentId });
-        break;
-      }
+      if (!el) throw new Error(`[alis] element not found: ${trigger.componentId}`);
       const root = resolveRoot(el, trigger.vendor);
-      if (!root) {
-        log.warn("component-event: no root", { componentId: trigger.componentId, vendor: trigger.vendor });
-        break;
-      }
       log.debug("component-event", { componentId: trigger.componentId, jsEvent: trigger.jsEvent, vendor: trigger.vendor });
       (root as EventTarget).addEventListener(trigger.jsEvent, (e: any) => {
         const expr = trigger.readExpr ?? "value";
@@ -46,7 +42,7 @@ export function wireTrigger(
           ? { [expr]: walk(el, expr), event: e }
           : (e ?? {});
         executeReaction(reaction, { evt: detail, components });
-      });
+      }, opts);
       break;
     }
   }

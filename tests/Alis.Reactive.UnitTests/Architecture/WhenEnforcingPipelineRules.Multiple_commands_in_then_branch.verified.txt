@@ -1,0 +1,71 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: role-check
+      },
+      reaction: {
+        kind: conditional,
+        commands: [
+          {
+            kind: mutate-element,
+            target: loading,
+            jsEmit: el.setAttribute('hidden','')
+          }
+        ],
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.role
+              },
+              coerceAs: string,
+              op: eq,
+              operand: admin
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: admin-panel,
+                  jsEmit: el.removeAttribute('hidden')
+                },
+                {
+                  kind: mutate-element,
+                  target: delete-btn,
+                  jsEmit: el.removeAttribute('hidden')
+                },
+                {
+                  kind: dispatch,
+                  event: admin-loaded
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: admin-panel,
+                  jsEmit: el.setAttribute('hidden','')
+                },
+                {
+                  kind: mutate-element,
+                  target: delete-btn,
+                  jsEmit: el.setAttribute('hidden','')
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -25,8 +25,11 @@ export function injectHtml(container: HTMLElement, html: string): void {
     container.append(...Array.from(temp.childNodes));
   }
 
-  // Merge extracted plans into booted plans
+  // Merge extracted plans into booted plans (sourceId = container ID for dedup on reload)
   for (const plan of plans) {
+    if (container.id) {
+      plan.sourceId = container.id;
+    }
     mergePlan(plan);
   }
 }

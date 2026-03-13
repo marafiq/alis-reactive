@@ -26,10 +26,14 @@ namespace Alis.Reactive.Descriptors.Reactions
 
     public sealed class ConditionalReaction : Reaction
     {
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<Command>? Commands { get; }
+
         public IReadOnlyList<Branch> Branches { get; }
 
-        public ConditionalReaction(IReadOnlyList<Branch> branches)
+        public ConditionalReaction(List<Command>? commands, IReadOnlyList<Branch> branches)
         {
+            Commands = commands;
             Branches = branches;
         }
     }

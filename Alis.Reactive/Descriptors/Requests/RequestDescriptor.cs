@@ -6,7 +6,7 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Descriptors.Requests
 {
-    public class StatusHandler
+    public sealed class StatusHandler
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? StatusCode { get; }
@@ -28,7 +28,7 @@ namespace Alis.Reactive.Descriptors.Requests
         }
     }
 
-    public class RequestDescriptor
+    public sealed class RequestDescriptor
     {
         public string Verb { get; }
         public string Url { get; }

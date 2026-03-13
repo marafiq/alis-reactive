@@ -7,10 +7,7 @@ const log = scope("element");
 
 export function mutateElement(cmd: MutateElementCommand, ctx?: ExecContext): void {
   const domEl = document.getElementById(cmd.target);
-  if (!domEl) {
-    log.warn("target not found", { target: cmd.target });
-    return;
-  }
+  if (!domEl) throw new Error(`[alis] target not found: ${cmd.target}`);
 
   const el = cmd.vendor ? resolveRoot(domEl, cmd.vendor) : domEl;
   const val = cmd.source ? resolveSource(cmd.source, ctx) : cmd.value;

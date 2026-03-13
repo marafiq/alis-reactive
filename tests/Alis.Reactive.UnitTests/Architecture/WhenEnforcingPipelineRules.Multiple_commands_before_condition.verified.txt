@@ -1,0 +1,66 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: order-submitted
+      },
+      reaction: {
+        kind: conditional,
+        commands: [
+          {
+            kind: mutate-element,
+            target: confirmation,
+            jsEmit: el.removeAttribute('hidden')
+          },
+          {
+            kind: dispatch,
+            event: audit-log
+          },
+          {
+            kind: mutate-element,
+            target: spinner,
+            jsEmit: el.setAttribute('hidden','')
+          }
+        ],
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.total
+              },
+              coerceAs: number,
+              op: gte,
+              operand: 100
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: express,
+                  jsEmit: el.removeAttribute('hidden')
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: standard,
+                  jsEmit: el.removeAttribute('hidden')
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

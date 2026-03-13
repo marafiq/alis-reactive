@@ -20,8 +20,8 @@ describe("when reading component value", () => {
       expect(evalRead("native-cb", "native", "checked")).toBe(true);
     });
 
-    it("returns undefined for missing element", () => {
-      expect(evalRead("missing", "native", "value")).toBeUndefined();
+    it("throws for missing element", () => {
+      expect(() => evalRead("missing", "native", "value")).toThrow("element not found: missing");
     });
   });
 
@@ -46,11 +46,11 @@ describe("when reading component value", () => {
       expect(evalRead("fusion-items", "fusion", "items.length")).toBe(3);
     });
 
-    it("returns undefined when ej2_instances missing", () => {
+    it("throws when ej2_instances missing", () => {
       const el = document.createElement("div");
       el.id = "no-ej2";
       document.body.appendChild(el);
-      expect(evalRead("no-ej2", "fusion", "value")).toBeUndefined();
+      expect(() => evalRead("no-ej2", "fusion", "value")).toThrow("no vendor root");
     });
   });
 

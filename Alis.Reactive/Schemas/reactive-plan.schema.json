@@ -261,6 +261,10 @@
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "conditional" },
+        "commands": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        },
         "branches": {
           "type": "array",
           "items": { "$ref": "#/$defs/Branch" },

@@ -2,6 +2,8 @@ export interface Plan {
   planId: string;
   components: Record<string, ComponentEntry>;
   entries: Entry[];
+  /** Set by inject.ts from container ID — used by mergePlan to deduplicate on partial reload. */
+  sourceId?: string;
 }
 
 export interface ComponentEntry {
@@ -50,6 +52,7 @@ export interface SequentialReaction {
 
 export interface ConditionalReaction {
   kind: "conditional";
+  commands?: Command[];
   branches: Branch[];
 }
 

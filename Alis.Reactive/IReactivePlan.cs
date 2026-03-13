@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -104,8 +105,15 @@ namespace Alis.Reactive
 
         public static void UseValidationExtractor(IValidationExtractor extractor)
         {
+            if (Extractor != null)
+                throw new InvalidOperationException(
+                    "Validation extractor is already registered. " +
+                    "UseValidationExtractor must be called exactly once at app startup.");
             Extractor = extractor;
         }
+
+        /// <summary>Test-only: resets static state so UseValidationExtractor can be called again.</summary>
+        internal static void Reset() => Extractor = null;
     }
 
     public sealed class ComponentRegistration
