@@ -3,7 +3,7 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingComparisonRules
 {
-    private readonly FluentValidationAdapter _adapter = new();
+    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void GreaterThanOrEqualTo_produces_min_rule()

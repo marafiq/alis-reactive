@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using FluentValidation;
 using FluentValidation.Internal;
@@ -13,17 +12,17 @@ namespace Alis.Reactive.FluentValidator
     /// Extracts client-side validation rules from FluentValidation validators.
     /// Unconditional rules are extracted for client-side use.
     /// Conditional rules (.When()/.Unless()) are skipped (server-side only).
-    /// Explicit conditional rules from IConditionalRuleProvider are included with a When guard.
+    /// ReactiveValidator WhenField() conditions are included with a When guard.
     /// </summary>
     public sealed class FluentValidationAdapter : IValidationExtractor
     {
         private readonly Func<Type, IValidator?> _factory;
 
-        public FluentValidationAdapter() : this(null) { }
-
-        public FluentValidationAdapter(Func<Type, IValidator?>? factory)
+        public FluentValidationAdapter(Func<Type, IValidator?> factory)
         {
-            _factory = factory ?? (type => Activator.CreateInstance(type) as IValidator);
+            _factory = factory ?? throw new ArgumentException(
+                "A validator factory is required. Pass a function that resolves " +
+                "IValidator instances (e.g. from your DI container).", nameof(factory));
         }
 
         /// <summary>
@@ -39,7 +38,14 @@ namespace Alis.Reactive.FluentValidator
             // Intermediate: property path → ordered list of (ruleType, message, constraint)
             var fieldRules = new Dictionary<string, List<ExtractedRule>>();
 
-            ExtractFromValidator(validator, "", fieldRules, _factory);
+            // Read client conditions if validator extends ReactiveValidator<T>
+            IReadOnlyDictionary<IValidationRule, ValidationCondition>? clientConditions = null;
+            if (validator is IClientConditionSource source)
+            {
+                clientConditions = source.ClientConditions;
+            }
+
+            ExtractFromValidator(validator, "", fieldRules, _factory, clientConditions);
 
             // Build fields
             var fields = new List<ValidationField>();
@@ -54,42 +60,17 @@ namespace Alis.Reactive.FluentValidator
                 fields.Add(new ValidationField(propertyPath, rules));
             }
 
-            // Merge conditional rules from IConditionalRuleProvider
-            if (validator is IConditionalRuleProvider provider)
-            {
-                foreach (var cr in provider.GetConditionalRules())
-                {
-                    var field = FindOrCreateField(fields, cr.PropertyName);
-                    field.Rules.Add(new ValidationRule(cr.Rule, cr.Message, cr.Constraint, cr.When));
-
-                    // Ensure condition source field is in the descriptor (no rules, but needed for value reading)
-                    FindOrCreateField(fields, cr.When.Field);
-                }
-            }
-
             if (fields.Count == 0) return null;
 
             return new ValidationDescriptor(formId, fields);
-        }
-
-        private static ValidationField FindOrCreateField(
-            List<ValidationField> fields, string propertyName)
-        {
-            foreach (var f in fields)
-            {
-                if (f.FieldName == propertyName) return f;
-            }
-
-            var field = new ValidationField(propertyName, new List<ValidationRule>());
-            fields.Add(field);
-            return field;
         }
 
         private static void ExtractFromValidator(
             IValidator validator,
             string prefix,
             Dictionary<string, List<ExtractedRule>> fieldRules,
-            Func<Type, IValidator?> factory)
+            Func<Type, IValidator?> factory,
+            IReadOnlyDictionary<IValidationRule, ValidationCondition>? clientConditions = null)
         {
             if (!(validator is IEnumerable<IValidationRule> rules)) return;
 
@@ -97,8 +78,30 @@ namespace Alis.Reactive.FluentValidator
             {
                 var propertyName = rule.PropertyName;
 
-                // Skip rules with conditions — these are server-side only
-                if (rule.HasCondition || rule.HasAsyncCondition) continue;
+                // Check if this conditional rule was registered via WhenField()
+                ValidationCondition? ruleCondition = null;
+                if (rule.HasCondition || rule.HasAsyncCondition)
+                {
+                    if (clientConditions != null && clientConditions.TryGetValue(rule, out var cc))
+                    {
+                        // Apply prefix to condition field for nested validators
+                        var condField = string.IsNullOrEmpty(prefix)
+                            ? cc.Field
+                            : prefix + "." + cc.Field;
+                        ruleCondition = new ValidationCondition(condField, cc.Op, cc.Value);
+
+                        // Ensure condition source field is in the descriptor (runtime needs it for value reading)
+                        var condSourcePath = condField;
+                        if (!fieldRules.ContainsKey(condSourcePath))
+                        {
+                            fieldRules[condSourcePath] = new List<ExtractedRule>();
+                        }
+                    }
+                    else
+                    {
+                        continue; // Server-only .When() — skip
+                    }
+                }
 
                 // Include() rules have empty PropertyName — recurse with same prefix
                 if (string.IsNullOrEmpty(propertyName))
@@ -107,19 +110,9 @@ namespace Alis.Reactive.FluentValidator
                     {
                         if (component.Validator is IChildValidatorAdaptor adaptor)
                         {
-                            try
-                            {
-                                var nested = factory(adaptor.ValidatorType);
-                                if (nested != null)
-                                {
-                                    ExtractFromValidator(nested, prefix, fieldRules, factory);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                // Skip if nested validator can't be instantiated
-                                Debug.WriteLine($"[FluentValidationAdapter] Failed to create validator {adaptor.ValidatorType.Name}: {ex.Message}");
-                            }
+                            var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
+                            var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
+                            ExtractFromValidator(nested, prefix, fieldRules, factory, nestedConditions);
                         }
                     }
                     continue;
@@ -137,23 +130,13 @@ namespace Alis.Reactive.FluentValidator
                     // Handle nested validators recursively
                     if (component.Validator is IChildValidatorAdaptor adaptor)
                     {
-                        try
-                        {
-                            var nested = factory(adaptor.ValidatorType);
-                            if (nested != null)
-                            {
-                                ExtractFromValidator(nested, fullPath, fieldRules, factory);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            // Skip if nested validator can't be instantiated
-                            Debug.WriteLine($"[FluentValidationAdapter] Failed to create validator {adaptor.ValidatorType.Name}: {ex.Message}");
-                        }
+                        var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
+                        var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
+                        ExtractFromValidator(nested, fullPath, fieldRules, factory, nestedConditions);
                         continue;
                     }
 
-                    var extracted = MapComponent(component, propertyName);
+                    var extracted = MapComponent(component, propertyName, ruleCondition);
                     if (extracted.Count > 0)
                     {
                         if (!fieldRules.TryGetValue(fullPath, out var list))
@@ -167,7 +150,32 @@ namespace Alis.Reactive.FluentValidator
             }
         }
 
-        private static List<ExtractedRule> MapComponent(IRuleComponent component, string propertyName)
+        private static IValidator ResolveNestedValidator(Func<Type, IValidator?> factory, Type validatorType)
+        {
+            IValidator? nested;
+            try
+            {
+                nested = factory(validatorType);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"Failed to create nested validator '{validatorType.Name}'. " +
+                    $"Ensure it is registered in the validator factory.", ex);
+            }
+
+            if (nested == null)
+            {
+                throw new InvalidOperationException(
+                    $"Validator factory returned null for nested validator '{validatorType.Name}'. " +
+                    $"Ensure it is registered in the validator factory.");
+            }
+
+            return nested;
+        }
+
+        private static List<ExtractedRule> MapComponent(
+            IRuleComponent component, string propertyName, ValidationCondition? ruleCondition = null)
         {
             var result = new List<ExtractedRule>();
             var validator = component.Validator;
@@ -187,26 +195,24 @@ namespace Alis.Reactive.FluentValidator
                     result.Add(new ExtractedRule(
                         "required",
                         customMsg ?? $"'{displayName}' is required.",
-                        null));
+                        null, ruleCondition));
                     break;
 
                 case ILengthValidator lv:
                 {
-                    // Length(min, max) produces a single validator with both values.
-                    // MinimumLength(n) → Min=n, Max=-1. MaximumLength(n) → Min=0, Max=n.
                     if (lv.Min > 0)
                     {
                         result.Add(new ExtractedRule(
                             "minLength",
                             customMsg ?? $"'{displayName}' must be at least {lv.Min} characters.",
-                            lv.Min));
+                            lv.Min, ruleCondition));
                     }
                     if (lv.Max > 0)
                     {
                         result.Add(new ExtractedRule(
                             "maxLength",
                             customMsg ?? $"'{displayName}' must be at most {lv.Max} characters.",
-                            lv.Max));
+                            lv.Max, ruleCondition));
                     }
                     break;
                 }
@@ -215,7 +221,7 @@ namespace Alis.Reactive.FluentValidator
                     result.Add(new ExtractedRule(
                         "email",
                         customMsg ?? $"'{displayName}' must be a valid email address.",
-                        null));
+                        null, ruleCondition));
                     break;
 
                 case IRegularExpressionValidator rv:
@@ -224,7 +230,7 @@ namespace Alis.Reactive.FluentValidator
                         result.Add(new ExtractedRule(
                             "regex",
                             customMsg ?? $"'{displayName}' format is invalid.",
-                            rv.Expression));
+                            rv.Expression, ruleCondition));
                     }
                     break;
 
@@ -232,23 +238,30 @@ namespace Alis.Reactive.FluentValidator
                     result.Add(new ExtractedRule(
                         "range",
                         customMsg ?? $"'{displayName}' must be between {bv.From} and {bv.To}.",
-                        new object[] { bv.From, bv.To }));
+                        new object[] { bv.From, bv.To }, ruleCondition));
                     break;
 
                 case IComparisonValidator cv:
-                    if (cv.Comparison == Comparison.GreaterThanOrEqual)
+                    if (cv.Comparison == Comparison.Equal && cv.MemberToCompare != null)
+                    {
+                        result.Add(new ExtractedRule(
+                            "equalTo",
+                            customMsg ?? $"'{displayName}' must match '{Humanize(cv.MemberToCompare.Name)}'.",
+                            cv.MemberToCompare.Name, ruleCondition));
+                    }
+                    else if (cv.Comparison == Comparison.GreaterThanOrEqual)
                     {
                         result.Add(new ExtractedRule(
                             "min",
                             customMsg ?? $"'{displayName}' must be at least {cv.ValueToCompare}.",
-                            cv.ValueToCompare));
+                            cv.ValueToCompare, ruleCondition));
                     }
                     else if (cv.Comparison == Comparison.LessThanOrEqual)
                     {
                         result.Add(new ExtractedRule(
                             "max",
                             customMsg ?? $"'{displayName}' must be at most {cv.ValueToCompare}.",
-                            cv.ValueToCompare));
+                            cv.ValueToCompare, ruleCondition));
                     }
                     break;
             }

@@ -3,7 +3,7 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingEmailRule
 {
-    private readonly FluentValidationAdapter _adapter = new();
+    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void EmailAddress_produces_email_rule()

@@ -3,7 +3,7 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingConditionalRules
 {
-    private readonly FluentValidationAdapter _adapter = new();
+    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void Conditional_rules_with_When_are_skipped()
@@ -17,7 +17,7 @@ public class WhenExtractingConditionalRules
     }
 
     [Test]
-    public void IConditionalRuleProvider_merges_conditional_rules_with_When_field()
+    public void ReactiveValidator_WhenField_merges_conditional_rules()
     {
         var desc = _adapter.ExtractRules(typeof(ConditionalProviderValidator), "testForm");
 

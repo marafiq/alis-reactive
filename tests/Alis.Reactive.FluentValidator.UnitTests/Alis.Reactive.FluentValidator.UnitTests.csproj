@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.4" />
-        <PackageReference Include="FluentValidation" Version="11.*" />
+        <PackageReference Include="FluentValidation" Version="12.*" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
         <PackageReference Include="NUnit" Version="4.5.0" />
         <PackageReference Include="NUnit.Analyzers" Version="4.7.0" />

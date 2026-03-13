@@ -168,28 +168,71 @@ public class ConditionalValidator : AbstractValidator<TestModel>
     }
 }
 
-// --- Conditional rules via IConditionalRuleProvider ---
+// --- Conditional rules via ReactiveValidator (replaces IConditionalRuleProvider) ---
 
-public class ConditionalProviderValidator : AbstractValidator<TestModel>, IConditionalRuleProvider
+public class ConditionalProviderValidator : ReactiveValidator<TestModel>
 {
     public ConditionalProviderValidator()
     {
         RuleFor(x => x.Name).NotEmpty();
-        // The .When() rule below is skipped by the adapter.
-        // The IConditionalRuleProvider supplies the explicit conditional rule instead.
-        RuleFor(x => x.JobTitle).NotEmpty().When(x => x.IsEmployed);
-    }
-
-    public IReadOnlyList<ConditionalRuleMetadata> GetConditionalRules()
-    {
-        return new List<ConditionalRuleMetadata>
+        WhenField(x => x.IsEmployed, () =>
         {
-            new ConditionalRuleMetadata(
-                "JobTitle",
-                "required",
-                "'Job Title' is required when employed.",
-                new ValidationCondition("IsEmployed", "truthy"))
-        };
+            RuleFor(x => x.JobTitle).NotEmpty();
+        });
+    }
+}
+
+// --- ReactiveValidator conditional rules ---
+
+public class ReactiveConditionalValidator : ReactiveValidator<TestModel>
+{
+    public ReactiveConditionalValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty();
+        WhenField(x => x.IsEmployed, () =>
+        {
+            RuleFor(x => x.JobTitle).NotEmpty();
+        });
+    }
+}
+
+public class ReactiveMultipleRulesValidator : ReactiveValidator<TestModel>
+{
+    public ReactiveMultipleRulesValidator()
+    {
+        WhenField(x => x.IsEmployed, () =>
+        {
+            RuleFor(x => x.JobTitle).NotEmpty().MinimumLength(3);
+            RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m);
+        });
+    }
+}
+
+public class ReactiveEqConditionValidator : ReactiveValidator<TestModel>
+{
+    public ReactiveEqConditionValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty();
+        WhenField(x => x.Name, "Admin", () =>
+        {
+            RuleFor(x => x.Email).EmailAddress();
+        });
+    }
+}
+
+public class ReactiveMixedValidator : ReactiveValidator<TestModel>
+{
+    public ReactiveMixedValidator()
+    {
+        // Unconditional
+        RuleFor(x => x.Name).NotEmpty();
+        // Client-conditional via WhenField
+        WhenField(x => x.IsEmployed, () =>
+        {
+            RuleFor(x => x.JobTitle).NotEmpty();
+        });
+        // Server-only via .When() — should be skipped by adapter
+        RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m).When(x => x.Age > 18);
     }
 }
 
@@ -207,6 +250,34 @@ public class MultipleRulesValidator : AbstractValidator<TestModel>
     public MultipleRulesValidator()
     {
         RuleFor(x => x.Name).NotEmpty().MinimumLength(3).MaximumLength(100);
+    }
+}
+
+// --- EqualTo rules ---
+
+public class EqualToValidator : AbstractValidator<TestModel>
+{
+    public EqualToValidator()
+    {
+        RuleFor(x => x.ConfirmEmail).Equal(x => x.Email);
+    }
+}
+
+public class EqualToWithCustomMessageValidator : AbstractValidator<TestModel>
+{
+    public EqualToWithCustomMessageValidator()
+    {
+        RuleFor(x => x.ConfirmEmail).Equal(x => x.Email).WithMessage("Emails must match.");
+    }
+}
+
+// --- Broken nested validator (for fail-fast test) ---
+
+public class BrokenNestedValidator : AbstractValidator<TestModel>
+{
+    public BrokenNestedValidator()
+    {
+        RuleFor(x => x.Address!).SetValidator(new TestAddressValidator());
     }
 }
 

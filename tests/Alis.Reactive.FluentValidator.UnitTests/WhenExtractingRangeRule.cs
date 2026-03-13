@@ -3,7 +3,7 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingRangeRule
 {
-    private readonly FluentValidationAdapter _adapter = new();
+    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void InclusiveBetween_produces_range_rule_with_array_constraint()

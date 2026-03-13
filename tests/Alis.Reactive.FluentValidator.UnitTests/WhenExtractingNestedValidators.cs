@@ -3,7 +3,7 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingNestedValidators
 {
-    private readonly FluentValidationAdapter _adapter = new();
+    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void Nested_properties_use_dotted_field_names()

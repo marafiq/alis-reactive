@@ -5,7 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-ReactivePlanConfig.UseValidationExtractor(new FluentValidationAdapter());
+ReactivePlanConfig.UseValidationExtractor(
+    new FluentValidationAdapter(type => (FluentValidation.IValidator?)Activator.CreateInstance(type)));
 
 var app = builder.Build();
 

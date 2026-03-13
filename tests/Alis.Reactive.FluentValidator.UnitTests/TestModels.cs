@@ -31,4 +31,5 @@ public class TestModel
     public TestDeepAddress? DeepAddress { get; set; }
     public bool IsEmployed { get; set; }
     public string? JobTitle { get; set; }
+    public string? ConfirmEmail { get; set; }
 }

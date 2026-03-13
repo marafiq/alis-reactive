@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using FluentValidation;
-using Alis.Reactive.Validation;
+using Alis.Reactive.FluentValidator;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    public class ValidationShowcaseValidator : AbstractValidator<ValidationShowcaseModel>,
-        IConditionalRuleProvider
+    public class ValidationShowcaseValidator : AbstractValidator<ValidationShowcaseModel>
     {
         public ValidationShowcaseValidator()
         {
@@ -17,18 +15,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.Hidden).SetValidator(new HiddenFieldsSectionValidator());
             RuleFor(x => x.Conditional).SetValidator(new ConditionalSectionValidator());
             RuleFor(x => x.Nested).SetValidator(new NestedSectionValidator());
-        }
-
-        public IReadOnlyList<ConditionalRuleMetadata> GetConditionalRules()
-        {
-            return new List<ConditionalRuleMetadata>
-            {
-                new ConditionalRuleMetadata(
-                    "Conditional.JobTitle",
-                    "required",
-                    "Job title is required when employed.",
-                    new ValidationCondition("Conditional.IsEmployed", "truthy"))
-            };
         }
     }
 
@@ -98,12 +84,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
-    public class ConditionalSectionValidator : AbstractValidator<ConditionalSection>
+    public class ConditionalSectionValidator : ReactiveValidator<ConditionalSection>
     {
         public ConditionalSectionValidator()
         {
-            // IsEmployed is used for condition evaluation only — no rules on it
-            // JobTitle has a conditional rule from IConditionalRuleProvider
+            WhenField(x => x.IsEmployed, () =>
+            {
+                RuleFor(x => x.JobTitle)
+                    .NotEmpty().WithMessage("Job title is required when employed.");
+            });
         }
     }
 
