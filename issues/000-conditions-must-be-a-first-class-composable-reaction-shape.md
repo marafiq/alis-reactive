@@ -204,3 +204,69 @@ Yes. If the frozen DSL can legally express a workflow, the framework must execut
 This is enforced by 26 dedicated tests (12 C# snapshot+schema, 14 TS runtime) committed in `a91917e`.
 
 The ConditionalReaction now carries an optional `Commands[]` field (committed in `8856522`) which enables unconditional actions to coexist with condition blocks in the same pipeline — the architectural fix that makes shape #6 work correctly instead of silently dropping commands.
+
+### 4. Response handler surface coverage
+
+GPT-5.4's review correctly identified that the named shapes were only tested in trigger-level pipelines. Conditions inside response handler surfaces (`OnSuccess`, `OnError`) were a separate gap — and it turned out to be a **real bug**, not just missing tests.
+
+#### The bug
+
+`ResponseBuilder.OnSuccess()` called `new StatusHandler(builder.Commands)`, which only serialized the raw command list. When a developer used conditions inside `OnSuccess`:
+
+```csharp
+.OnSuccess(s => s
+    .When(evt, e => e.Role, v => v.Equals("admin"))
+        .Then(t => t.Element("admin-notice").Show())
+        .Else(e => e.Element("admin-notice").Hide()))
+```
+
+The conditional branches were silently dropped. `builder.BuildReaction()` produced a `ConditionalReaction`, but `StatusHandler` only accepted `List<Command>` — the reaction was discarded.
+
+#### The fix (commit `1139d8f`)
+
+**C# — `StatusHandler`**: Added a `Reaction?` property alongside `Commands?`. New constructors accept either commands or a full reaction. `JsonIgnore(WhenWritingNull)` on both ensures backward-compatible serialization.
+
+**C# — `ResponseBuilder.BuildHandler()`**: Now calls `builder.BuildReaction()`. If the result is `SequentialReaction`, it extracts commands (backward compatible). If it's any other reaction type (conditional, http), it passes the full reaction to `StatusHandler`.
+
+**JSON Schema**: `StatusHandler` changed from `"required": ["commands"]` to `oneOf: [{ required: ["commands"] }, { required: ["reaction"] }]`.
+
+**TS types**: `StatusHandler.commands` made optional, `reaction?: Reaction` added.
+
+**TS runtime — `http.ts`**: `executeHandler()` checks `h.reaction` first (dispatches to `executeReaction()`), falls back to `h.commands` (dispatches to `executeCommands()`).
+
+#### DSL preserved
+
+The developer-facing DSL is unchanged. The same `OnSuccess(s => s.When(...))` syntax that always compiled now actually works. No new API surface.
+
+#### Proof — response handler tests
+
+| Shape | C# Test | TS Test | Status |
+|-------|---------|---------|--------|
+| if/else inside OnSuccess | `Conditions_inside_OnSuccess` | `if-else inside OnSuccess executes the matching branch` | Passing |
+| else branch inside OnSuccess | — | `else branch executes inside OnSuccess when condition is false` | Passing |
+| if/elseif/else inside OnSuccess | `IfElseIfElse_inside_OnSuccess` | `if-elseif-else inside OnSuccess picks the right branch` | Passing |
+| Conditions inside OnError | `Conditions_inside_OnError` | `conditions inside OnError execute correctly` | Passing |
+| HTTP inside OnSuccess branch | `Http_inside_OnSuccess_branch` | `http reaction inside OnSuccess branch executes correctly` | Passing |
+| Compound AND inside OnSuccess | `Compound_And_inside_OnSuccess` | `compound AND inside OnSuccess evaluates correctly` | Passing |
+| Confirm inside OnSuccess | `Confirm_inside_OnSuccess` | — | Passing |
+| Unconditional + condition in OnSuccess | `Unconditional_actions_plus_condition_inside_OnSuccess` | — | Passing |
+| Plain commands in OnSuccess (backward compat) | — | `plain commands in OnSuccess still work (backward compatible)` | Passing |
+
+7 C# snapshot+schema tests in `WhenUsingConditionsInEveryDslSurface.cs`.
+7 TS runtime tests in `when-using-conditions-in-response-handlers.test.ts`.
+
+#### Total coverage for issue 000
+
+| Layer | Tests | Commit |
+|-------|-------|--------|
+| C# trigger-level shapes | 12 snapshot+schema | `a91917e` |
+| TS trigger-level shapes | 14 runtime | `a91917e` |
+| C# response handler shapes | 7 snapshot+schema | `1139d8f` |
+| TS response handler shapes | 7 runtime | `1139d8f` |
+| **Total** | **40 tests** | |
+
+All 40 tests pass. Full suite verification: 405 TS + 138 C# unit + 31 Native + 61 Fusion + 25 FluentValidator + 163 Playwright = **823 tests, 0 failures**.
+
+### 5. Final answer
+
+Every legal non-nested DSL shape listed in this issue is supported across **all surfaces** where `PipelineBuilder` is accepted — triggers, `OnSuccess`, and `OnError`. The response handler gap identified by GPT-5.4 was a real serialization bug that has been fixed. The frozen DSL is honored.
