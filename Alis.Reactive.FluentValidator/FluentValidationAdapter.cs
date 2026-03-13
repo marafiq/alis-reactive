@@ -36,7 +36,7 @@ namespace Alis.Reactive.FluentValidator
         public ValidationDescriptor? ExtractRules(
             Type validatorType,
             string formId,
-            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap = null)
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
         {
             var validator = _factory(validatorType);
             if (validator == null) return null;
@@ -57,20 +57,16 @@ namespace Alis.Reactive.FluentValidator
                 string vendor;
                 string readExpr;
 
-                if (componentsMap != null && componentsMap.TryGetValue(propertyPath, out var entry))
+                if (!componentsMap.TryGetValue(propertyPath, out var entry))
                 {
-                    elementId = entry.ComponentId;
-                    vendor = entry.Vendor;
-                    readExpr = entry.ReadExpr;
+                    throw new InvalidOperationException(
+                        $"Validation field '{propertyPath}' is not registered in the plan's ComponentsMap. " +
+                        $"Use the plan-aware builder overload (e.g. Html.NativeTextBoxFor(plan, expr)) to register it.");
                 }
-                else
-                {
-                    elementId = modelType != null
-                        ? IdGenerator.For(modelType, propertyPath)
-                        : propertyPath.Replace(".", "_");
-                    vendor = "native";
-                    readExpr = "value";
-                }
+
+                elementId = entry.ComponentId;
+                vendor = entry.Vendor;
+                readExpr = entry.ReadExpr;
 
                 var rules = new List<ValidationRule>();
                 foreach (var er in kvp.Value)
@@ -91,11 +87,11 @@ namespace Alis.Reactive.FluentValidator
             {
                 foreach (var cr in provider.GetConditionalRules())
                 {
-                    var field = FindOrCreateField(fields, cr.PropertyName, modelType, componentsMap);
+                    var field = FindOrCreateField(fields, cr.PropertyName, componentsMap);
                     field.Rules.Add(new ValidationRule(cr.Rule, cr.Message, cr.Constraint, cr.When));
 
                     // Ensure condition source field is in the descriptor (no rules, but needed for value reading)
-                    FindOrCreateField(fields, cr.When.Field, modelType, componentsMap);
+                    FindOrCreateField(fields, cr.When.Field, componentsMap);
                 }
             }
 
@@ -105,40 +101,26 @@ namespace Alis.Reactive.FluentValidator
         }
 
         private static ValidationField FindOrCreateField(
-            List<ValidationField> fields,
-            string propertyName,
-            Type? modelType,
-            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap)
+            List<ValidationField> fields, string propertyName,
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
         {
             foreach (var f in fields)
             {
                 if (f.FieldName == propertyName) return f;
             }
 
-            string elementId;
-            string vendor;
-            string readExpr;
-
-            if (componentsMap != null && componentsMap.TryGetValue(propertyName, out var entry))
+            if (!componentsMap.TryGetValue(propertyName, out var entry))
             {
-                elementId = entry.ComponentId;
-                vendor = entry.Vendor;
-                readExpr = entry.ReadExpr;
-            }
-            else
-            {
-                elementId = modelType != null
-                    ? IdGenerator.For(modelType, propertyName)
-                    : propertyName.Replace(".", "_");
-                vendor = "native";
-                readExpr = "value";
+                throw new InvalidOperationException(
+                    $"Validation field '{propertyName}' is not registered in the plan's ComponentsMap. " +
+                    $"Use the plan-aware builder overload (e.g. Html.NativeTextBoxFor(plan, expr)) to register it.");
             }
 
             var field = new ValidationField(
-                elementId,
+                entry.ComponentId,
                 propertyName,
-                vendor,
-                readExpr,
+                entry.Vendor,
+                entry.ReadExpr,
                 new List<ValidationRule>());
             fields.Add(field);
             return field;

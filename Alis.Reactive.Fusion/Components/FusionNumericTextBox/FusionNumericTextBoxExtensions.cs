@@ -29,22 +29,6 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         public static NumericTextBoxBuilder NumericTextBoxFor<TModel, TProp>(
             this IHtmlHelper<TModel> html,
-            Expression<Func<TModel, TProp>> expression)
-            where TModel : class
-        {
-            var uniqueId = IdGenerator.For<TModel, TProp>(expression);
-            var name = html.NameFor(expression).ToString();
-
-            return html.EJS().NumericTextBoxFor(expression)
-                .HtmlAttributes(new Dictionary<string, object> { ["id"] = uniqueId, ["name"] = name });
-        }
-
-        /// <summary>
-        /// Creates a Syncfusion NumericTextBox bound to a model property and registers it in the plan's ComponentsMap.
-        /// Use this overload on reactive pages so the plan knows about the component at builder creation time.
-        /// </summary>
-        public static NumericTextBoxBuilder NumericTextBoxFor<TModel, TProp>(
-            this IHtmlHelper<TModel> html,
             IReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression)
             where TModel : class

@@ -12,6 +12,6 @@ namespace Alis.Reactive.Validation
         ValidationDescriptor? ExtractRules(
             Type validatorType,
             string formId,
-            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap = null);
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap);
     }
 }

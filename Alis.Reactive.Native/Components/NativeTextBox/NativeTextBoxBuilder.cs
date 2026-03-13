@@ -76,12 +76,6 @@ namespace Alis.Reactive.Native.Components
         private static readonly NativeTextBox _component = new NativeTextBox();
 
         public static NativeTextBoxBuilder<TModel, TProp> NativeTextBoxFor<TModel, TProp>(
-            this IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
-        {
-            return new NativeTextBoxBuilder<TModel, TProp>(html, expression);
-        }
-
-        public static NativeTextBoxBuilder<TModel, TProp> NativeTextBoxFor<TModel, TProp>(
             this IHtmlHelper<TModel> html,
             IReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression)

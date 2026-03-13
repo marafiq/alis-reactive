@@ -38,7 +38,7 @@
         <h2 class="text-sm font-semibold mb-2">1. JSON POST — Include (gathers by name)</h2>
         <form id="json-form" class="grid grid-cols-2 gap-4 mb-4">
             @{ Html.Field("Name", true, m => m.Name, expr =>
-                Html.NativeTextBoxFor(expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             ); }
             @{ Html.Field("Amount (SF)", true, m => m.Amount, expr =>
                 Html.NumericTextBoxFor(plan, expr)
@@ -89,7 +89,7 @@
         <h2 class="text-sm font-semibold mb-2">2. FormData POST — Include (gathers by name)</h2>
         <form id="form-form" class="grid grid-cols-2 gap-4 mb-4">
             @{ Html.Field("Name", true, m => m.Name, expr =>
-                Html.NativeTextBoxFor(expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             ); }
             @{ Html.Field("Amount (SF)", true, m => m.Amount, expr =>
                 Html.NumericTextBoxFor(plan, expr)

@@ -6,11 +6,12 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 public class WhenExtractingNestedValidators
 {
     private readonly FluentValidationAdapter _adapter = new();
+    private static readonly IReadOnlyDictionary<string, ComponentRegistration> _map = TestComponentsMap.ForTestModel();
 
     [Test]
     public void Nested_properties_use_dotted_field_names()
     {
-        var desc = _adapter.ExtractRules(typeof(NestedValidator), "testForm");
+        var desc = _adapter.ExtractRules(typeof(NestedValidator), "testForm", _map);
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();
@@ -23,7 +24,7 @@ public class WhenExtractingNestedValidators
     [Test]
     public void Nested_field_ids_use_underscore_separator()
     {
-        var desc = _adapter.ExtractRules(typeof(NestedValidator), "testForm");
+        var desc = _adapter.ExtractRules(typeof(NestedValidator), "testForm", _map);
 
         Assert.That(desc, Is.Not.Null);
         var streetField = desc!.Fields.First(f => f.FieldName == "Address.Street");
@@ -34,7 +35,7 @@ public class WhenExtractingNestedValidators
     [Test]
     public void Deeply_nested_produces_correct_paths()
     {
-        var desc = _adapter.ExtractRules(typeof(DeeplyNestedValidator), "testForm");
+        var desc = _adapter.ExtractRules(typeof(DeeplyNestedValidator), "testForm", _map);
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();

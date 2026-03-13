@@ -454,7 +454,15 @@ The runtime resolves root, walks paths, and executes jsEmit. That's it.
 to exercise ALL interaction types end-to-end. Playwright tests verify every module path.
 If any module breaks vendor-agnostic architecture, these tests catch it immediately.
 
-### 8. ESM Only + Cache Busting
+### 8. No Fallbacks — Fail Fast
+
+Never use fallback defaults for missing data. If a component is not registered in the plan,
+if a vendor string is unknown, if a readExpr is missing — **throw immediately** with a clear
+error message telling the developer what they forgot to register. Fallbacks hide bugs.
+In UI code, a silent fallback means the wrong component gets read, the wrong vendor gets
+resolved, or the wrong field gets validated — all silently. Throw, don't guess.
+
+### 9. ESM Only + Cache Busting
 
 The runtime is bundled as ESM (`--format=esm`). The layout loads it via
 `<script type="module" src="~/js/alis-reactive.js" asp-append-version="true">`.

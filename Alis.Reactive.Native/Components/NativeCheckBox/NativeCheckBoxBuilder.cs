@@ -147,12 +147,6 @@ namespace Alis.Reactive.Native.Components
         // ── Model-bound ──
 
         public static NativeCheckBoxBuilder<TModel, TProp> NativeCheckBoxFor<TModel, TProp>(
-            this IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
-        {
-            return new NativeCheckBoxBuilder<TModel, TProp>(html, expression);
-        }
-
-        public static NativeCheckBoxBuilder<TModel, TProp> NativeCheckBoxFor<TModel, TProp>(
             this IHtmlHelper<TModel> html,
             IReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression)

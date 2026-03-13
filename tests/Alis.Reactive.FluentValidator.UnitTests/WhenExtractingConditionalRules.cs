@@ -1,14 +1,17 @@
+using Alis.Reactive;
+
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
 public class WhenExtractingConditionalRules
 {
     private readonly FluentValidationAdapter _adapter = new();
+    private static readonly IReadOnlyDictionary<string, ComponentRegistration> _map = TestComponentsMap.ForTestModel();
 
     [Test]
     public void Conditional_rules_with_When_are_skipped()
     {
-        var desc = _adapter.ExtractRules(typeof(ConditionalValidator), "testForm");
+        var desc = _adapter.ExtractRules(typeof(ConditionalValidator), "testForm", _map);
 
         Assert.That(desc, Is.Not.Null);
         // Only Name should appear (JobTitle has .When() so it's skipped)
@@ -19,7 +22,7 @@ public class WhenExtractingConditionalRules
     [Test]
     public void IConditionalRuleProvider_merges_conditional_rules_with_When_field()
     {
-        var desc = _adapter.ExtractRules(typeof(ConditionalProviderValidator), "testForm");
+        var desc = _adapter.ExtractRules(typeof(ConditionalProviderValidator), "testForm", _map);
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();

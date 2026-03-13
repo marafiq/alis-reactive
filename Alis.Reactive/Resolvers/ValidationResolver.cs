@@ -17,7 +17,7 @@ namespace Alis.Reactive.Resolvers
             List<Entry> entries,
             IValidationExtractor extractor,
             IReadOnlyDictionary<RequestDescriptor, RequestBuildContext> buildContexts,
-            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap = null)
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
         {
             foreach (var entry in entries)
             {
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Resolvers
             Reaction reaction,
             IValidationExtractor extractor,
             IReadOnlyDictionary<RequestDescriptor, RequestBuildContext> buildContexts,
-            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap)
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
         {
             switch (reaction)
             {
@@ -51,7 +51,7 @@ namespace Alis.Reactive.Resolvers
             RequestDescriptor req,
             IValidationExtractor extractor,
             IReadOnlyDictionary<RequestDescriptor, RequestBuildContext> buildContexts,
-            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap)
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
         {
             buildContexts.TryGetValue(req, out var ctx);
 
