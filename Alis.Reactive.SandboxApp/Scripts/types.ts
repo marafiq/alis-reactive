@@ -93,7 +93,8 @@ export interface StaticGather {
 
 export interface StatusHandler {
   statusCode?: number;
-  commands: Command[];
+  commands?: Command[];
+  reaction?: Reaction;
 }
 
 export interface RequestDescriptor {

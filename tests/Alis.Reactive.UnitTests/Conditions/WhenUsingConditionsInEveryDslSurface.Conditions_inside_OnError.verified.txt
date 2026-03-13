@@ -1,0 +1,64 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: save
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/save,
+          onError: [
+            {
+              statusCode: 500,
+              reaction: {
+                kind: conditional,
+                branches: [
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.role
+                      },
+                      coerceAs: string,
+                      op: eq,
+                      operand: admin
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: error,
+                          jsEmit: el.textContent = val,
+                          value: Admin: check server logs
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: error,
+                          jsEmit: el.textContent = val,
+                          value: Please try again
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

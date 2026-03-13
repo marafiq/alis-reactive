@@ -1,0 +1,63 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: delete-check
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/can-delete,
+          onSuccess: [
+            {
+              reaction: {
+                kind: conditional,
+                branches: [
+                  {
+                    guard: {
+                      kind: confirm,
+                      message: Permanently delete this record?
+                    },
+                    reaction: {
+                      kind: http,
+                      request: {
+                        verb: POST,
+                        url: /api/delete,
+                        onSuccess: [
+                          {
+                            commands: [
+                              {
+                                kind: dispatch,
+                                event: deleted
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: status,
+                          jsEmit: el.textContent = val,
+                          value: Cancelled
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

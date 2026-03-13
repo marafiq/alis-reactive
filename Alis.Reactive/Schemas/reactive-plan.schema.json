@@ -327,15 +327,19 @@
 
     "StatusHandler": {
       "type": "object",
-      "required": ["commands"],
       "additionalProperties": false,
       "properties": {
         "statusCode": { "type": "integer", "description": "HTTP status code to match. Null = catch-all." },
         "commands": {
           "type": "array",
           "items": { "$ref": "#/$defs/Command" }
-        }
-      }
+        },
+        "reaction": { "$ref": "#/$defs/Reaction", "description": "Full reaction for non-sequential handlers (conditional, http). Mutually exclusive with commands." }
+      },
+      "oneOf": [
+        { "required": ["commands"] },
+        { "required": ["reaction"] }
+      ]
     },
 
     "RequestDescriptor": {

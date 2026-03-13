@@ -1,0 +1,94 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: process
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/process,
+          onSuccess: [
+            {
+              reaction: {
+                kind: conditional,
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: status,
+                    jsEmit: el.textContent = val,
+                    value: Done
+                  }
+                ],
+                branches: [
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.total
+                      },
+                      coerceAs: number,
+                      op: gte,
+                      operand: 1000
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: tier,
+                          jsEmit: el.textContent = val,
+                          value: Gold
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.total
+                      },
+                      coerceAs: number,
+                      op: gte,
+                      operand: 500
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: tier,
+                          jsEmit: el.textContent = val,
+                          value: Silver
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: tier,
+                          jsEmit: el.textContent = val,
+                          value: Bronze
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

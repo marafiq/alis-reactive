@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Descriptors.Commands;
+using Alis.Reactive.Descriptors.Reactions;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Descriptors.Requests
@@ -11,20 +12,38 @@ namespace Alis.Reactive.Descriptors.Requests
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? StatusCode { get; }
 
-        public List<Command> Commands { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<Command>? Commands { get; }
 
-        /// <summary>Default handler — fires on any status within its routing group (2xx for success, any for error).</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Reaction? Reaction { get; }
+
+        /// <summary>Default handler — sequential commands only.</summary>
         public StatusHandler(List<Command> commands)
         {
             StatusCode = null;
             Commands = commands;
         }
 
-        /// <summary>Status-specific handler — fires only when the response matches this exact code.</summary>
+        /// <summary>Status-specific handler — sequential commands only.</summary>
         public StatusHandler(int statusCode, List<Command> commands)
         {
             StatusCode = statusCode;
             Commands = commands;
+        }
+
+        /// <summary>Default handler — full reaction (conditional, http, etc.).</summary>
+        public StatusHandler(Reaction reaction)
+        {
+            StatusCode = null;
+            Reaction = reaction;
+        }
+
+        /// <summary>Status-specific handler — full reaction.</summary>
+        public StatusHandler(int statusCode, Reaction reaction)
+        {
+            StatusCode = statusCode;
+            Reaction = reaction;
         }
     }
 

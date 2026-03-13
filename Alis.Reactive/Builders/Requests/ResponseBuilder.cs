@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Descriptors.Commands;
+using Alis.Reactive.Descriptors.Reactions;
 using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders.Requests
@@ -18,7 +19,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var builder = new PipelineBuilder<TModel>();
             configure(builder);
-            SuccessHandlers.Add(new StatusHandler(builder.Commands));
+            SuccessHandlers.Add(BuildHandler(null, builder));
             return this;
         }
 
@@ -36,7 +37,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var builder = new PipelineBuilder<TModel>();
             configure(new ResponseBody<TResponse>(new TResponse()), builder);
-            SuccessHandlers.Add(new StatusHandler(builder.Commands));
+            SuccessHandlers.Add(BuildHandler(null, builder));
             return this;
         }
 
@@ -47,7 +48,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var builder = new PipelineBuilder<TModel>();
             configure(builder);
-            ErrorHandlers.Add(new StatusHandler(statusCode, builder.Commands));
+            ErrorHandlers.Add(BuildHandler(statusCode, builder));
             return this;
         }
 
@@ -61,5 +62,25 @@ namespace Alis.Reactive.Builders.Requests
             ChainedRequest = chainedBuilder.BuildRequestDescriptor();
             return this;
         }
+
+        /// <summary>
+        /// Builds a StatusHandler from a PipelineBuilder. Sequential reactions use
+        /// commands (backward compatible). Non-sequential (conditional, http) use
+        /// the full reaction — conditions inside response handlers are preserved.
+        /// </summary>
+        private static StatusHandler BuildHandler(int? statusCode, PipelineBuilder<TModel> builder)
+        {
+            var reaction = builder.BuildReaction();
+            if (reaction is SequentialReaction sr)
+            {
+                return statusCode.HasValue
+                    ? new StatusHandler(statusCode.Value, sr.Commands)
+                    : new StatusHandler(sr.Commands);
+            }
+            return statusCode.HasValue
+                ? new StatusHandler(statusCode.Value, reaction)
+                : new StatusHandler(reaction);
+        }
     }
 }
+

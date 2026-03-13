@@ -1,6 +1,7 @@
 import type { RequestDescriptor, StatusHandler, ExecContext } from "./types";
 import { resolveGather } from "./gather";
 import { executeCommands } from "./commands";
+import { executeReaction } from "./execute";
 import { scope } from "./trace";
 
 const log = scope("http");
@@ -79,7 +80,7 @@ function routeHandlers(handlers: StatusHandler[] | undefined, status: number, ct
   // Try specific status match first
   for (const h of handlers) {
     if (h.statusCode != null && h.statusCode === status) {
-      executeCommands(h.commands, ctx);
+      executeHandler(h, ctx);
       return;
     }
   }
@@ -87,9 +88,17 @@ function routeHandlers(handlers: StatusHandler[] | undefined, status: number, ct
   // Fall through to catch-all (no statusCode)
   for (const h of handlers) {
     if (h.statusCode == null) {
-      executeCommands(h.commands, ctx);
+      executeHandler(h, ctx);
       return;
     }
+  }
+}
+
+function executeHandler(h: StatusHandler, ctx?: ExecContext): void {
+  if (h.reaction) {
+    executeReaction(h.reaction, ctx);
+  } else if (h.commands) {
+    executeCommands(h.commands, ctx);
   }
 }
 

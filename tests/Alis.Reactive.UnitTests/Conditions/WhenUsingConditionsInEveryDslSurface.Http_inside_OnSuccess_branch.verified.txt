@@ -1,0 +1,68 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: check
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/check,
+          onSuccess: [
+            {
+              reaction: {
+                kind: conditional,
+                branches: [
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.isActive
+                      },
+                      coerceAs: boolean,
+                      op: truthy
+                    },
+                    reaction: {
+                      kind: http,
+                      request: {
+                        verb: POST,
+                        url: /api/activate,
+                        onSuccess: [
+                          {
+                            commands: [
+                              {
+                                kind: dispatch,
+                                event: activated
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: error,
+                          jsEmit: el.textContent = val,
+                          value: Inactive
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

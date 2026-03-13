@@ -1,0 +1,69 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: save
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/save,
+          onSuccess: [
+            {
+              reaction: {
+                kind: conditional,
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: status,
+                    jsEmit: el.textContent = val,
+                    value: Saved
+                  }
+                ],
+                branches: [
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.role
+                      },
+                      coerceAs: string,
+                      op: eq,
+                      operand: admin
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: admin-notice,
+                          jsEmit: el.removeAttribute('hidden')
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: admin-notice,
+                          jsEmit: el.setAttribute('hidden','')
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
