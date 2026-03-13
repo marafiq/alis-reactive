@@ -62,15 +62,23 @@ namespace Alis.Reactive.Builders
 ";
 
     private static CSharpAnalyzerTest<IncompleteConditionalChainAnalyzer, DefaultVerifier> CreateTest(
-        string source, params DiagnosticResult[] expected)
+        string source, string fileName = "Test0.cs", params DiagnosticResult[] expected)
     {
         var test = new CSharpAnalyzerTest<IncompleteConditionalChainAnalyzer, DefaultVerifier>
         {
-            TestCode = source,
             ReferenceAssemblies = ReferenceAssemblies.Net.Net80,
         };
 
         test.TestState.Sources.Add(("TypeStubs.cs", TypeStubs));
+        if (fileName == "Test0.cs")
+        {
+            test.TestCode = source;
+        }
+        else
+        {
+            test.TestCode = string.Empty;
+            test.TestState.Sources.Add((fileName, source));
+        }
         test.ExpectedDiagnostics.AddRange(expected);
         return test;
     }
@@ -80,7 +88,7 @@ namespace Alis.Reactive.Builders
             .WithLocation(markupKey);
 
     [Test]
-    public async Task Dangling_When_Eq_reports_ALIS001()
+    public async Task Dangling_When_Eq_in_plain_cs_does_not_report()
     {
         const string source = @"
 using Alis.Reactive.Builders;
@@ -94,15 +102,15 @@ public class MyClass
     {
         var pb = new PipelineBuilder<MyClass>();
         var payload = new Payload();
-        {|#0:pb.When(payload, x => x.Status).Eq(""ok"")|};
+        pb.When(payload, x => x.Status).Eq(""ok"");
     }
 }
 ";
-        await CreateTest(source, ExpectALIS001(0)).RunAsync();
+        await CreateTest(source).RunAsync();
     }
 
     [Test]
-    public async Task Dangling_Confirm_reports_ALIS001()
+    public async Task Dangling_Confirm_in_plain_cs_does_not_report()
     {
         const string source = @"
 using Alis.Reactive.Builders;
@@ -112,11 +120,11 @@ public class MyClass
     public void Example()
     {
         var pb = new PipelineBuilder<MyClass>();
-        {|#0:pb.Confirm(""Are you sure?"")|};
+        pb.Confirm(""Are you sure?"");
     }
 }
 ";
-        await CreateTest(source, ExpectALIS001(0)).RunAsync();
+        await CreateTest(source).RunAsync();
     }
 
     [Test]
@@ -159,5 +167,45 @@ public class MyClass
 }
 ";
         await CreateTest(source).RunAsync();
+    }
+
+    [Test]
+    public async Task Dangling_When_Eq_in_generated_file_reports_ALIS001()
+    {
+        const string source = @"
+using Alis.Reactive.Builders;
+using Alis.Reactive.Builders.Conditions;
+
+public class Payload { public string Value { get; set; } = """"; }
+
+public class GeneratedView
+{
+    public void Execute()
+    {
+        var p = new PipelineBuilder<GeneratedView>();
+        var args = new Payload();
+        {|#0:p.When(args, x => x.Value).Eq(""active"")|};
+    }
+}
+";
+        await CreateTest(source, "ReactiveConditions.g.cs", ExpectALIS001(0)).RunAsync();
+    }
+
+    [Test]
+    public async Task Dangling_Confirm_in_generated_file_reports_ALIS001()
+    {
+        const string source = @"
+using Alis.Reactive.Builders;
+
+public class GeneratedView
+{
+    public void Execute()
+    {
+        var p = new PipelineBuilder<GeneratedView>();
+        {|#0:p.Confirm(""Are you sure?"")|};
+    }
+}
+";
+        await CreateTest(source, "ReactiveConditions.g.cs", ExpectALIS001(0)).RunAsync();
     }
 }

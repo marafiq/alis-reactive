@@ -7,6 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj"
+                        OutputItemType="Analyzer"
+                        ReferenceOutputAssembly="false" />
       <ProjectReference Include="..\Alis.Reactive.FluentValidator\Alis.Reactive.FluentValidator.csproj" />
       <ProjectReference Include="..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
       <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />

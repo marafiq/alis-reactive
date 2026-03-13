@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System;
 
 namespace Alis.Reactive.Analyzers
 {
@@ -26,7 +27,8 @@ namespace Alis.Reactive.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.ConfigureGeneratedCodeAnalysis(
+                GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(AnalyzeExpressionStatement, SyntaxKind.ExpressionStatement);
         }
@@ -34,6 +36,9 @@ namespace Alis.Reactive.Analyzers
         private static void AnalyzeExpressionStatement(SyntaxNodeAnalysisContext context)
         {
             var statement = (ExpressionStatementSyntax)context.Node;
+            if (!IsRazorGeneratedFile(statement.SyntaxTree))
+                return;
+
             var typeInfo = context.SemanticModel.GetTypeInfo(statement.Expression, context.CancellationToken);
             var type = typeInfo.Type;
 
@@ -43,6 +48,16 @@ namespace Alis.Reactive.Analyzers
             if (!IsDanglingBuilderType(type)) return;
 
             context.ReportDiagnostic(Diagnostic.Create(Rule, statement.Expression.GetLocation()));
+        }
+
+        private static bool IsRazorGeneratedFile(SyntaxTree tree)
+        {
+            var path = tree.FilePath;
+            if (string.IsNullOrEmpty(path)) return false;
+
+            return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
+                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase)
+                || path.EndsWith(".g.cs", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsDanglingBuilderType(ITypeSymbol type)
