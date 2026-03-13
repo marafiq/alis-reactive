@@ -1,0 +1,55 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: delete-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: confirm,
+              message: Are you sure you want to delete?
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: item,
+                  jsEmit: el.setAttribute('hidden','')
+                },
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Deleted
+                },
+                {
+                  kind: dispatch,
+                  event: item-deleted
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Cancelled
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: role-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.role
+              },
+              coerceAs: string,
+              op: eq,
+              operand: admin
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: panel,
+                  jsEmit: el.removeAttribute('hidden')
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: panel,
+                  jsEmit: el.setAttribute('hidden','')
+                },
+                {
+                  kind: mutate-element,
+                  target: notice,
+                  jsEmit: el.textContent = val,
+                  value: Contact admin for access
+                },
+                {
+                  kind: dispatch,
+                  event: access-denied
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

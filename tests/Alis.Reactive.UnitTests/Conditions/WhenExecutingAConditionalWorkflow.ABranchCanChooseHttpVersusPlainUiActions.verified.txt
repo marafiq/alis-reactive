@@ -1,0 +1,64 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: action-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.isActive
+              },
+              coerceAs: boolean,
+              op: truthy
+            },
+            reaction: {
+              kind: http,
+              request: {
+                verb: POST,
+                url: /api/process,
+                onSuccess: [
+                  {
+                    commands: [
+                      {
+                        kind: mutate-element,
+                        target: result,
+                        jsEmit: el.textContent = val,
+                        value: Processed
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: error,
+                  jsEmit: el.textContent = val,
+                  value: Account inactive
+                },
+                {
+                  kind: mutate-element,
+                  target: retry-btn,
+                  jsEmit: el.removeAttribute('hidden')
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

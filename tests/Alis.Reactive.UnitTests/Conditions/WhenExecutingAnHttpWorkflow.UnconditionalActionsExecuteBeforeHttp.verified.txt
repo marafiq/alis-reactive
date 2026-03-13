@@ -1,0 +1,47 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        preFetch: [
+          {
+            kind: mutate-element,
+            target: spinner,
+            jsEmit: el.removeAttribute('hidden')
+          },
+          {
+            kind: mutate-element,
+            target: status,
+            jsEmit: el.textContent = val,
+            value: Loading...
+          }
+        ],
+        request: {
+          verb: POST,
+          url: /api/load,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: spinner,
+                  jsEmit: el.setAttribute('hidden','')
+                },
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Loaded
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

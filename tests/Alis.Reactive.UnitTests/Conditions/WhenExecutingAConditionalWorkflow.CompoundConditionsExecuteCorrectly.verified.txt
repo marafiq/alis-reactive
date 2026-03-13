@@ -1,0 +1,63 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: compound-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: all,
+              guards: [
+                {
+                  kind: value,
+                  source: {
+                    kind: event,
+                    path: evt.isActive
+                  },
+                  coerceAs: boolean,
+                  op: truthy
+                },
+                {
+                  kind: value,
+                  source: {
+                    kind: event,
+                    path: evt.isAdmin
+                  },
+                  coerceAs: boolean,
+                  op: truthy
+                }
+              ]
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: admin-panel,
+                  jsEmit: el.removeAttribute('hidden')
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: admin-panel,
+                  jsEmit: el.setAttribute('hidden','')
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

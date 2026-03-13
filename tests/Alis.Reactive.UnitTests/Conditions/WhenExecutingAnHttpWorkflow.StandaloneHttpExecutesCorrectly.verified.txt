@@ -1,0 +1,29 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/init,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  jsEmit: el.textContent = val,
+                  value: Ready
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

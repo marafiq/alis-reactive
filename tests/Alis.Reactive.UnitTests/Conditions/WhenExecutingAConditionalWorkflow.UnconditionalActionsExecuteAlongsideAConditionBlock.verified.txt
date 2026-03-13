@@ -1,0 +1,62 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: workflow
+      },
+      reaction: {
+        kind: conditional,
+        commands: [
+          {
+            kind: mutate-element,
+            target: status,
+            jsEmit: el.textContent = val,
+            value: Processing...
+          },
+          {
+            kind: dispatch,
+            event: workflow-started
+          }
+        ],
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.role
+              },
+              coerceAs: string,
+              op: eq,
+              operand: admin
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: admin-panel,
+                  jsEmit: el.removeAttribute('hidden')
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: admin-panel,
+                  jsEmit: el.setAttribute('hidden','')
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: save-check
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.role
+              },
+              coerceAs: string,
+              op: eq,
+              operand: admin
+            },
+            reaction: {
+              kind: http,
+              request: {
+                verb: POST,
+                url: /api/admin/save,
+                onSuccess: [
+                  {
+                    commands: [
+                      {
+                        kind: dispatch,
+                        event: saved
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: error,
+                  jsEmit: el.textContent = val,
+                  value: Unauthorized
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
