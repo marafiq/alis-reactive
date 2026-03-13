@@ -36,6 +36,28 @@ public class WhenEnforcingArchitectureRules
         ReactivePlanConfig.Reset();
     }
 
+    [Test]
+    public void Render_throws_when_validator_used_without_extractor()
+    {
+        ReactivePlanConfig.Reset();
+
+        var plan = new ReactivePlan<TestModel>();
+        var trigger = new Builders.TriggerBuilder<TestModel>(plan);
+        trigger.DomReady(p =>
+        {
+            p.Post("/api/save")
+             .Validate<FakeValidator>("my-form")
+             .Response(r => r.OnSuccess(s => s.Dispatch("saved")));
+        });
+
+        var ex = Assert.Throws<InvalidOperationException>(() => plan.Render());
+        Assert.That(ex!.Message, Does.Contain("UseValidationExtractor"));
+
+        ReactivePlanConfig.Reset();
+    }
+
+    private class FakeValidator { }
+
     private class DummyExtractor : Validation.IValidationExtractor
     {
         public Validation.ValidationDescriptor? ExtractRules(Type validatorType, string formId)

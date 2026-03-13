@@ -12,6 +12,42 @@ namespace Alis.Reactive.Resolvers
     /// </summary>
     internal static class ValidationResolver
     {
+        internal static bool HasValidatorTypes(List<Entry> entries)
+        {
+            foreach (var entry in entries)
+                if (ReactionHasValidatorType(entry.Reaction))
+                    return true;
+            return false;
+        }
+
+        private static bool ReactionHasValidatorType(Reaction reaction)
+        {
+            switch (reaction)
+            {
+                case HttpReaction hr:
+                    return RequestHasValidatorType(hr.Request);
+                case ParallelHttpReaction phr:
+                    foreach (var req in phr.Requests)
+                        if (RequestHasValidatorType(req))
+                            return true;
+                    return false;
+                case ConditionalReaction cr:
+                    foreach (var branch in cr.Branches)
+                        if (ReactionHasValidatorType(branch.Reaction))
+                            return true;
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        private static bool RequestHasValidatorType(RequestDescriptor req)
+        {
+            if (req.ValidatorType != null)
+                return true;
+            return req.Chained != null && RequestHasValidatorType(req.Chained);
+        }
+
         internal static void Resolve(List<Entry> entries, IValidationExtractor extractor)
         {
             foreach (var entry in entries)

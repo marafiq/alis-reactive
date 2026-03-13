@@ -92,7 +92,15 @@ namespace Alis.Reactive
         {
             var extractor = ReactivePlanConfig.Extractor;
             if (extractor != null)
+            {
                 ValidationResolver.Resolve(_entries, extractor);
+            }
+            else if (ValidationResolver.HasValidatorTypes(_entries))
+            {
+                throw new InvalidOperationException(
+                    "One or more requests use Validate<TValidator>() but no validation extractor is registered. " +
+                    "Call ReactivePlanConfig.UseValidationExtractor(...) at app startup.");
+            }
         }
     }
 
