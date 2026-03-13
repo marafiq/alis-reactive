@@ -55,6 +55,16 @@ namespace Alis.Reactive
                 expr = member.Expression!;
             }
 
+            // After walking all MemberExpression nodes, we must be at a ParameterExpression.
+            // Anything else (MethodCallExpression, BinaryExpression, etc.) is a computed
+            // expression — not a property path — and must fail fast.
+            if (!(expr is ParameterExpression))
+            {
+                throw new InvalidOperationException(
+                    $"ExpressionPathHelper only supports simple property-access chains " +
+                    $"(e.g. m => m.Address.City). Got unsupported expression node: {expr.NodeType}.");
+            }
+
             return members;
         }
 
