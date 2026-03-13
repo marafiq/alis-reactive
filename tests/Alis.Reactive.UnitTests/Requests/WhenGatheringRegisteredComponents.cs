@@ -10,8 +10,8 @@ public class WhenGatheringRegisteredComponents : PlanTestBase
     public Task IncludeAll_expands_registered_components()
     {
         var plan = CreatePlan();
-        plan.RegisterComponent("comp1", "native", "Name", "value");
-        plan.RegisterComponent("comp2", "fusion", "Amount", "value");
+        plan.AddToComponentsMap("Name", new ComponentRegistration("comp1", "native", "Name", "value"));
+        plan.AddToComponentsMap("Amount", new ComponentRegistration("comp2", "fusion", "Amount", "value"));
 
         Trigger(plan).DomReady(p =>
             p.Post("/api/save", g => g.IncludeAll())
@@ -27,7 +27,7 @@ public class WhenGatheringRegisteredComponents : PlanTestBase
     public Task IncludeAll_with_static_mixes_both()
     {
         var plan = CreatePlan();
-        plan.RegisterComponent("comp1", "native", "Status", "value");
+        plan.AddToComponentsMap("Status", new ComponentRegistration("comp1", "native", "Status", "value"));
 
         Trigger(plan).DomReady(p =>
             p.Post("/api/save", g => g
@@ -45,7 +45,7 @@ public class WhenGatheringRegisteredComponents : PlanTestBase
     public void IncludeAll_expands_conforms_to_schema()
     {
         var plan = CreatePlan();
-        plan.RegisterComponent("comp1", "native", "Name", "value");
+        plan.AddToComponentsMap("Name", new ComponentRegistration("comp1", "native", "Name", "value"));
 
         Trigger(plan).DomReady(p =>
             p.Post("/api/save", g => g.IncludeAll())

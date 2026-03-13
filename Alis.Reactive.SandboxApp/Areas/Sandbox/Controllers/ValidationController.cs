@@ -121,7 +121,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         [HttpGet]
         public IActionResult AddressPartial()
         {
-            return PartialView("_AddressPartial");
+            return PartialView("_AddressPartial", new ValidationShowcaseModel());
         }
 
         [HttpPost]

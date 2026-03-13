@@ -16,7 +16,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.Combined).SetValidator(new CombinedSectionValidator());
             RuleFor(x => x.Hidden).SetValidator(new HiddenFieldsSectionValidator());
             RuleFor(x => x.Conditional).SetValidator(new ConditionalSectionValidator());
-            RuleFor(x => x.Nested).SetValidator(new NestedSectionValidator());
+            // Nested address validation is server-side only (SaveAddress endpoint).
+            // Not included here — the partial is loaded dynamically and has no client-side form.
         }
 
         public IReadOnlyList<ConditionalRuleMetadata> GetConditionalRules()

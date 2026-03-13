@@ -41,8 +41,6 @@ namespace Alis.Reactive.FluentValidator
             var validator = _factory(validatorType);
             if (validator == null) return null;
 
-            var modelType = GetModelType(validatorType);
-
             // Intermediate: property path → ordered list of (ruleType, message, constraint)
             var fieldRules = new Dictionary<string, List<ExtractedRule>>();
 
@@ -124,18 +122,6 @@ namespace Alis.Reactive.FluentValidator
                 new List<ValidationRule>());
             fields.Add(field);
             return field;
-        }
-
-        private static Type? GetModelType(Type validatorType)
-        {
-            var type = validatorType;
-            while (type != null)
-            {
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(AbstractValidator<>))
-                    return type.GetGenericArguments()[0];
-                type = type.BaseType;
-            }
-            return null;
         }
 
         private static void ExtractFromValidator(

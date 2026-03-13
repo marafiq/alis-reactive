@@ -11,7 +11,6 @@ namespace Alis.Reactive
     public interface IReactivePlan<TModel> where TModel : class
     {
         void AddEntry(Entry entry);
-        void RegisterComponent(string componentId, string vendor, string bindingPath, string readExpr);
         void AddToComponentsMap(string bindingPath, ComponentRegistration entry);
         IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap { get; }
         string Render();
@@ -50,11 +49,6 @@ namespace Alis.Reactive
         public void AddEntry(Entry entry)
         {
             _entries.Add(entry);
-        }
-
-        public void RegisterComponent(string componentId, string vendor, string bindingPath, string readExpr)
-        {
-            _componentsMap[bindingPath] = new ComponentRegistration(componentId, vendor, bindingPath, readExpr);
         }
 
         public void AddToComponentsMap(string bindingPath, ComponentRegistration entry)

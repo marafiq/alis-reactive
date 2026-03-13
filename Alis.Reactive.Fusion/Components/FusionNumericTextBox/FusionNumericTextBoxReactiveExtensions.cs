@@ -42,7 +42,6 @@ namespace Alis.Reactive.Fusion.Components
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
             (plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
-            plan.RegisterComponent(componentId, _component.Vendor, bindingPath, _component.ReadExpr);
 
             return builder;
         }

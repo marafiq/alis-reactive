@@ -7,18 +7,6 @@
     ViewData["Title"] = "Validation";
 
     var plan = Html.ReactivePlan<ValidationShowcaseModel>();
-
-    // Nested address fields are rendered in a dynamically loaded partial (_AddressPartial).
-    // Register them in the plan now so validation extraction has their ComponentsMap entries.
-    plan.RegisterComponent(
-        IdGenerator.For<ValidationShowcaseModel>(m => m.Nested!.Address!.Street),
-        "native", "Nested.Address.Street", "value");
-    plan.RegisterComponent(
-        IdGenerator.For<ValidationShowcaseModel>(m => m.Nested!.Address!.City),
-        "native", "Nested.Address.City", "value");
-    plan.RegisterComponent(
-        IdGenerator.For<ValidationShowcaseModel>(m => m.Nested!.Address!.ZipCode),
-        "native", "Nested.Address.ZipCode", "value");
 }
 
 <div class="space-y-8">
@@ -30,7 +18,6 @@
             fake DB validation (ProblemDetails 400), and partial view + server validation.
         </p>
     </div>
-
     <!-- Section 1: All Rule Types (Client-Side) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">1. All Rule Types &mdash; Client-Side Validation</h2>

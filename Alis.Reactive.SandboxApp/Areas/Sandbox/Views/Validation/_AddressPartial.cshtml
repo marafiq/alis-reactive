@@ -1,28 +1,20 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ValidationShowcaseModel
 @using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
-    var streetId = IdGenerator.For<ValidationShowcaseModel>(m => m.Nested!.Address!.Street);
-    var cityId = IdGenerator.For<ValidationShowcaseModel>(m => m.Nested!.Address!.City);
-    var zipId = IdGenerator.For<ValidationShowcaseModel>(m => m.Nested!.Address!.ZipCode);
+    var plan = new ReactivePlan<ValidationShowcaseModel>();
 }
 <!-- Partial: Address fields loaded dynamically -->
 <div id="address-section" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <div class="flex flex-col gap-1.5">
-        <label for="@streetId" class="text-xs font-medium text-text-secondary">Street *</label>
-        <input type="text" id="@streetId" name="Nested.Address.Street"
-               class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Street address" />
-        <span data-valmsg-for="Nested.Address.Street" class="text-[11px] text-danger"></span>
-    </div>
-    <div class="flex flex-col gap-1.5">
-        <label for="@cityId" class="text-xs font-medium text-text-secondary">City *</label>
-        <input type="text" id="@cityId" name="Nested.Address.City"
-               class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="City" />
-        <span data-valmsg-for="Nested.Address.City" class="text-[11px] text-danger"></span>
-    </div>
-    <div class="flex flex-col gap-1.5">
-        <label for="@zipId" class="text-xs font-medium text-text-secondary">Zip Code</label>
-        <input type="text" id="@zipId" name="Nested.Address.ZipCode"
-               class="rounded-md border border-border px-3 py-1.5 text-sm" placeholder="Min 5 chars" />
-        <span data-valmsg-for="Nested.Address.ZipCode" class="text-[11px] text-danger"></span>
-    </div>
+    @{ Html.Field("Street *", false, m => m.Nested!.Address!.Street, expr =>
+        Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Street address")
+    ); }
+    @{ Html.Field("City *", false, m => m.Nested!.Address!.City, expr =>
+        Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("City")
+    ); }
+    @{ Html.Field("Zip Code", false, m => m.Nested!.Address!.ZipCode, expr =>
+        Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Min 5 chars")
+    ); }
 </div>
