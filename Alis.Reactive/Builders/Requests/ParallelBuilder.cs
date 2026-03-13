@@ -29,6 +29,11 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>();
             configure(pb);
+            var reaction = pb.BuildReaction();
+            if (!(reaction is SequentialReaction))
+                throw new InvalidOperationException(
+                    "OnAllSettled only supports plain commands (sequential). " +
+                    "Conditions, HTTP, and parallel pipelines are not valid here.");
             _onAllSettled = pb;
             return this;
         }

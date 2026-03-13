@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Descriptors.Commands;
+using Alis.Reactive.Descriptors.Reactions;
 using Alis.Reactive.Descriptors.Requests;
 using Alis.Reactive.Validation;
 
@@ -65,7 +66,12 @@ namespace Alis.Reactive.Builders.Requests
         {
             var builder = new PipelineBuilder<TModel>();
             configure(builder);
-            _whileLoading = builder.Commands;
+            var reaction = builder.BuildReaction();
+            if (!(reaction is SequentialReaction sr))
+                throw new InvalidOperationException(
+                    "WhileLoading only supports plain commands (sequential). " +
+                    "Conditions, HTTP, and parallel pipelines are not valid here.");
+            _whileLoading = sr.Commands;
             return this;
         }
 
