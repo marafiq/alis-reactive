@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: container,
-            jsEmit: el.innerHTML = val,
+            prop: innerHTML,
             value: <strong>done</strong>
           }
         ]

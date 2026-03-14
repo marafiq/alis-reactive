@@ -34,7 +34,7 @@
                         {
                           kind: mutate-element,
                           target: error,
-                          jsEmit: el.textContent = val,
+                          prop: textContent,
                           value: Admin: check server logs
                         }
                       ]
@@ -47,7 +47,7 @@
                         {
                           kind: mutate-element,
                           target: error,
-                          jsEmit: el.textContent = val,
+                          prop: textContent,
                           value: Please try again
                         }
                       ]

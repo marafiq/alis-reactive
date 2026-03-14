@@ -16,21 +16,21 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Address_City,
-            jsEmit: el.value=val,
+            prop: value,
             value: Denver,
             vendor: native
           },
           {
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Address_State,
-            jsEmit: el.value=val,
+            prop: value,
             value: CO,
             vendor: native
           },
           {
             kind: mutate-element,
             target: echo,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: Address updated
           }
         ]

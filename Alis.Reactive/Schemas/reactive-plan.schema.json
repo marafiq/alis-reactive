@@ -69,7 +69,7 @@
     "Vendor": {
       "type": "string",
       "enum": ["fusion", "native"],
-      "description": "Component vendor — determines the root object for all component interactions. native→el (DOM element), fusion→el.ej2_instances[0] (Syncfusion instance). Used by reads (readExpr), events (addEventListener), and writes (jsEmit embeds root access)."
+      "description": "Component vendor — determines the root object for all component interactions. native→el (DOM element), fusion→el.ej2_instances[0] (Syncfusion instance). Used by reads (readExpr), events (addEventListener), and writes (bracket notation on resolved root)."
     },
     "ComponentEventTrigger": {
       "type": "object",
@@ -274,17 +274,25 @@
     },
     "MutateElementCommand": {
       "type": "object",
-      "required": ["kind", "target", "jsEmit"],
+      "required": ["kind", "target"],
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "mutate-element" },
         "target": { "type": "string", "minLength": 1 },
-        "jsEmit": { "type": "string", "minLength": 1, "description": "JavaScript expression executed on the resolved element. Variables: el (element), val (resolved value)." },
+        "prop": { "type": "string", "minLength": 1, "description": "Property name to set on the resolved root: root[prop] = val" },
+        "method": { "type": "string", "minLength": 1, "description": "Method name to call on the resolved root (or chain): root[method](val)" },
+        "chain": { "type": "string", "minLength": 1, "description": "Intermediate object on root before calling method: root[chain][method](val)" },
+        "coerce": { "$ref": "#/$defs/CoercionType" },
+        "args": { "type": "array", "items": {}, "description": "Literal arguments passed to method: root[method](...args)" },
         "value": { "type": "string" },
         "source": { "$ref": "#/$defs/BindSource" },
         "vendor": { "$ref": "#/$defs/Vendor" },
         "when": { "$ref": "#/$defs/Guard" }
-      }
+      },
+      "oneOf": [
+        { "required": ["prop"] },
+        { "required": ["method"] }
+      ]
     },
 
     "GatherItem": {

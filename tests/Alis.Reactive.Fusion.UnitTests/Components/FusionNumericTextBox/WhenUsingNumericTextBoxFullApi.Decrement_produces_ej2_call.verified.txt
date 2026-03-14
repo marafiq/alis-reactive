@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            jsEmit: el.decrement(),
+            method: decrement,
             vendor: fusion
           }
         ]

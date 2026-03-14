@@ -11,7 +11,8 @@
           {
             kind: mutate-element,
             target: status,
-            jsEmit: el.classList.remove(val),
+            method: remove,
+            chain: classList,
             value: hidden
           }
         ]

@@ -30,7 +30,7 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: In Group
                 }
               ]
@@ -43,7 +43,7 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Not In Group
                 }
               ]

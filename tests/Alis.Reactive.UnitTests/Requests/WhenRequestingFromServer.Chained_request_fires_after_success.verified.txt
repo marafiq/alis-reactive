@@ -16,7 +16,7 @@
                 {
                   kind: mutate-element,
                   target: residents,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: loaded
                 }
               ]
@@ -31,7 +31,7 @@
                   {
                     kind: mutate-element,
                     target: facilities,
-                    jsEmit: el.textContent = val,
+                    prop: textContent,
                     value: loaded
                   }
                 ]

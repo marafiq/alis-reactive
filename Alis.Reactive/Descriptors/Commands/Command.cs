@@ -32,7 +32,21 @@ namespace Alis.Reactive.Descriptors.Commands
     public sealed class MutateElementCommand : Command
     {
         public string Target { get; }
-        public string JsEmit { get; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Prop { get; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Method { get; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Chain { get; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Coerce { get; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public object[]? Args { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Value { get; }
@@ -45,13 +59,21 @@ namespace Alis.Reactive.Descriptors.Commands
 
         public MutateElementCommand(
             string target,
-            string jsEmit,
+            string? prop = null,
+            string? method = null,
+            string? chain = null,
+            string? coerce = null,
+            object[]? args = null,
             string? value = null,
             BindSource? source = null,
             string? vendor = null)
         {
             Target = target;
-            JsEmit = jsEmit;
+            Prop = prop;
+            Method = method;
+            Chain = chain;
+            Coerce = coerce;
+            Args = args;
             Value = value;
             Source = source;
             Vendor = vendor;

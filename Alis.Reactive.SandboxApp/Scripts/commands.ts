@@ -27,7 +27,7 @@ export function executeCommand(cmd: Command, ctx?: ExecContext): void {
       break;
 
     case "mutate-element":
-      log.trace("mutate-element", { target: cmd.target, jsEmit: cmd.jsEmit });
+      log.trace("mutate-element", { target: cmd.target, prop: cmd.prop, method: cmd.method });
       mutateElement(cmd, ctx);
       break;
 

@@ -32,7 +32,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo",
-              jsEmit: "el.textContent = val",
+              prop: "textContent",
               value: "changed!",
             }],
           },
@@ -65,7 +65,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-idle",
-              jsEmit: "el.textContent = val",
+              prop: "textContent",
               value: "fired",
             }],
           },
@@ -105,7 +105,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-nested",
-              jsEmit: "el.textContent = val",
+              prop: "textContent",
               value: "nested works",
             }],
           },
@@ -158,7 +158,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-fusion",
-              jsEmit: "el.textContent = val",
+              prop: "textContent",
               value: "fusion changed",
             }],
           },
@@ -192,7 +192,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-args",
-              jsEmit: "el.textContent = val",
+              prop: "textContent",
               source: { kind: "event", path: "evt.value" },
             }],
           },

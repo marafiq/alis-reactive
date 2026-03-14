@@ -19,12 +19,19 @@
                   {
                     kind: mutate-element,
                     target: spinner,
-                    jsEmit: el.setAttribute('hidden','')
+                    method: setAttribute,
+                    args: [
+                      hidden,
+                      
+                    ]
                   },
                   {
                     kind: mutate-element,
                     target: content,
-                    jsEmit: el.removeAttribute('hidden')
+                    method: removeAttribute,
+                    args: [
+                      hidden
+                    ]
                   },
                   {
                     kind: dispatch,
@@ -49,7 +56,10 @@
                         {
                           kind: mutate-element,
                           target: admin-tools,
-                          jsEmit: el.removeAttribute('hidden')
+                          method: removeAttribute,
+                          args: [
+                            hidden
+                          ]
                         }
                       ]
                     }
@@ -61,7 +71,11 @@
                         {
                           kind: mutate-element,
                           target: admin-tools,
-                          jsEmit: el.setAttribute('hidden','')
+                          method: setAttribute,
+                          args: [
+                            hidden,
+                            
+                          ]
                         }
                       ]
                     }

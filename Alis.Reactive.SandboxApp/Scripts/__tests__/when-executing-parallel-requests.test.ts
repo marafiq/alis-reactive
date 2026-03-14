@@ -30,7 +30,6 @@ beforeEach(async () => {
 
   (globalThis as any).document = dom.window.document;
   (globalThis as any).CustomEvent = dom.window.CustomEvent;
-  (globalThis as any).Function = dom.window.Function;
   (globalThis as any).FormData = dom.window.FormData;
 
   const mod = await import("../pipeline");
@@ -50,14 +49,14 @@ describe("parallel http reactions", () => {
       requests: [
         {
           verb: "GET", url: "/api/residents",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", jsEmit: "el.textContent = val", value: "loaded" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", prop: "textContent", value: "loaded" }] }],
         },
         {
           verb: "GET", url: "/api/facilities",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "facilities", jsEmit: "el.textContent = val", value: "loaded" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "facilities", prop: "textContent", value: "loaded" }] }],
         },
       ],
-      onAllSettled: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "all done" }],
+      onAllSettled: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "all done" }],
     };
 
     await executeParallelHttpReaction(reaction);
@@ -78,11 +77,11 @@ describe("parallel http reactions", () => {
       requests: [
         {
           verb: "GET", url: "/api/residents",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", jsEmit: "el.textContent = val", value: "loaded" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", prop: "textContent", value: "loaded" }] }],
         },
         {
           verb: "GET", url: "/api/facilities",
-          onError: [{ commands: [{ kind: "mutate-element", target: "error", jsEmit: "el.textContent = val", value: "failed" }] }],
+          onError: [{ commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "failed" }] }],
         },
       ],
     };
@@ -101,11 +100,11 @@ describe("http reaction with preFetch", () => {
     const reaction: HttpReaction = {
       kind: "http",
       preFetch: [
-        { kind: "mutate-element", target: "spinner", jsEmit: "el.removeAttribute('hidden')" },
+        { kind: "mutate-element", target: "spinner", method: "removeAttribute", args: ["hidden"] },
       ],
       request: {
         verb: "GET", url: "/api/test",
-        onSuccess: [{ commands: [{ kind: "mutate-element", target: "spinner", jsEmit: "el.setAttribute('hidden','')" }] }],
+        onSuccess: [{ commands: [{ kind: "mutate-element", target: "spinner", method: "setAttribute", args: ["hidden", ""] }] }],
       },
     };
 

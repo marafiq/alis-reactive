@@ -23,7 +23,7 @@
     plan.AddToComponentsMap("native-password", new ComponentRegistration("native-password", "native", "native-password", "value"));
     plan.AddToComponentsMap("fusion-confirm", new ComponentRegistration("fusion-confirm", "fusion", "fusion-confirm", "value"));
 
-    // ── Section 1: Property Write (jsEmit) — dom-ready writes to both vendors ──
+    // ── Section 1: Property Write (structured prop) — dom-ready writes to both vendors ──
 
     Html.On(plan, t => t.DomReady(p =>
     {
@@ -67,7 +67,7 @@
     // Native: "change" event on native input → walk evt.value → SetText
     {
         var pb = new PipelineBuilder<ArchitectureModel>();
-        pb.AddCommand(new MutateElementCommand("native-event-result", "el.textContent = val", source: new EventSource("evt.value")));
+        pb.AddCommand(new MutateElementCommand("native-event-result", prop: "textContent", source: new EventSource("evt.value")));
         plan.AddEntry(new Entry(
             new ComponentEventTrigger("native-event", "change", "native"),
             pb.BuildReaction()));
@@ -76,7 +76,7 @@
     // Fusion: "change" event on TestWidget → walk evt.newValue → SetText
     {
         var pb = new PipelineBuilder<ArchitectureModel>();
-        pb.AddCommand(new MutateElementCommand("fusion-event-result", "el.textContent = val", source: new EventSource("evt.newValue")));
+        pb.AddCommand(new MutateElementCommand("fusion-event-result", prop: "textContent", source: new EventSource("evt.newValue")));
         plan.AddEntry(new Entry(
             new ComponentEventTrigger("fusion-event", "change", "fusion"),
             pb.BuildReaction()));
@@ -86,8 +86,8 @@
 
     Html.On(plan, t => t.CustomEvent("deep-walk-ready", p =>
     {
-        p.AddCommand(new MutateElementCommand("deep-total", "el.textContent = val", source: new EventSource("evt.result.detail.total")));
-        p.AddCommand(new MutateElementCommand("deep-city", "el.textContent = val", source: new EventSource("evt.result.detail.address.city")));
+        p.AddCommand(new MutateElementCommand("deep-total", prop: "textContent", source: new EventSource("evt.result.detail.total")));
+        p.AddCommand(new MutateElementCommand("deep-city", prop: "textContent", source: new EventSource("evt.result.detail.address.city")));
     }));
 
     // ── Section 7: Both vendors gathered together ──
@@ -116,9 +116,9 @@
         </p>
     </div>
 
-    <!-- Section 1: Property Write via jsEmit -->
+    <!-- Section 1: Property Write via structured prop -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Property Write (jsEmit)</h2>
+        <h2 class="text-base font-semibold mb-4">1. Property Write (structured prop)</h2>
         <p class="text-sm text-text-secondary mb-4">
             dom-ready writes values. Native: <code>el.value=val</code>.
             Fusion: <code>el.value=val</code> (vendor root resolved by runtime).
@@ -139,7 +139,7 @@
 
     <!-- Section 2: Void Method Call -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. Void Method Call (jsEmit)</h2>
+        <h2 class="text-base font-semibold mb-4">2. Void Method Call (structured method)</h2>
         <p class="text-sm text-text-secondary mb-4">
             dom-ready calls <code>focus()</code> on the fusion TestWidget.
         </p>

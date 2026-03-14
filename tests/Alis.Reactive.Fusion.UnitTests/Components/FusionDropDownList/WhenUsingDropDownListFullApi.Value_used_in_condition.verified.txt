@@ -27,7 +27,7 @@
                 {
                   kind: mutate-element,
                   target: status,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Selected US
                 }
               ]
@@ -40,7 +40,7 @@
                 {
                   kind: mutate-element,
                   target: status,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Other
                 }
               ]

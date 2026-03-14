@@ -11,19 +11,21 @@
           {
             kind: mutate-element,
             target: panel,
-            jsEmit: el.classList.remove(val),
+            method: remove,
+            chain: classList,
             value: text-muted
           },
           {
             kind: mutate-element,
             target: panel,
-            jsEmit: el.classList.add(val),
+            method: add,
+            chain: classList,
             value: text-green
           },
           {
             kind: mutate-element,
             target: panel,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: done
           }
         ]

@@ -11,7 +11,8 @@
           {
             kind: mutate-element,
             target: menu,
-            jsEmit: el.classList.toggle(val),
+            method: toggle,
+            chain: classList,
             value: expanded
           }
         ]

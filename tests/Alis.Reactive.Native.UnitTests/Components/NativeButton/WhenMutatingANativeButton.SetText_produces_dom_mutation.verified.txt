@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: submitBtn,
-            jsEmit: el.textContent=val,
+            prop: textContent,
             value: Save,
             vendor: native
           }

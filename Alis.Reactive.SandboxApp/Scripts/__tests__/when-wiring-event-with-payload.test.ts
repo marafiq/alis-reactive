@@ -18,7 +18,7 @@ describe("when wiring component event with payload", () => {
           jsEvent: "change", vendor: "native" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "native-evt-result",
-          jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.value" },
+          prop: "textContent", source: { kind: "event", path: "evt.value" },
         }] },
       }] });
 
@@ -42,7 +42,7 @@ describe("when wiring component event with payload", () => {
           jsEvent: "change", vendor: "fusion" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-evt-result",
-          jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.newValue" },
+          prop: "textContent", source: { kind: "event", path: "evt.newValue" },
         }] },
       }] });
 
@@ -68,7 +68,7 @@ describe("when wiring component event with payload", () => {
           jsEvent: "items-changed", vendor: "fusion" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-items-evt-result",
-          jsEmit: "el.textContent = val", source: { kind: "event", path: "evt.count" },
+          prop: "textContent", source: { kind: "event", path: "evt.count" },
         }] },
       }] });
 

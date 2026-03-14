@@ -32,7 +32,10 @@
                 {
                   kind: mutate-element,
                   target: express,
-                  jsEmit: el.removeAttribute('hidden')
+                  method: removeAttribute,
+                  args: [
+                    hidden
+                  ]
                 }
               ]
             }

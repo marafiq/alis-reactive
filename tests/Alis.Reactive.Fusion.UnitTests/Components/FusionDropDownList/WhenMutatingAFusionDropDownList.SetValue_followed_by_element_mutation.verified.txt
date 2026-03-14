@@ -11,14 +11,14 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-            jsEmit: el.value=val,
+            prop: value,
             value: CA,
             vendor: fusion
           },
           {
             kind: mutate-element,
             target: echo,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: Status updated
           }
         ]

@@ -11,7 +11,8 @@
           {
             kind: mutate-element,
             target: step-1,
-            jsEmit: el.classList.add(val),
+            method: add,
+            chain: classList,
             value: complete
           },
           {
@@ -21,7 +22,7 @@
           {
             kind: mutate-element,
             target: step-2,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: next
           }
         ]

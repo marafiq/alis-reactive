@@ -17,7 +17,6 @@ beforeEach(async () => {
 
   (globalThis as any).document = dom.window.document;
   (globalThis as any).CustomEvent = dom.window.CustomEvent;
-  (globalThis as any).Function = dom.window.Function;
 
   // Re-import to get fresh module with new document
   const mod = await import("../boot");
@@ -46,14 +45,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Pass" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Pass" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Fail" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Fail" }],
                 },
               },
             ],
@@ -86,14 +85,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Pass" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Pass" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Fail" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Fail" }],
                 },
               },
             ],
@@ -126,21 +125,21 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "A" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "A" }],
                 },
               },
               {
                 guard: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 80 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "B" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "B" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "C" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "C" }],
                 },
               },
             ],
@@ -179,14 +178,14 @@ describe("when branching on conditions", () => {
                 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Active High Scorer" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Active High Scorer" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Nope" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Nope" }],
                 },
               },
             ],
@@ -219,14 +218,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "not", inner: { kind: "value", source: es("evt.role"), coerceAs: "string", op: "eq", operand: "admin" } },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Not Admin" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Not Admin" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Is Admin" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Is Admin" }],
                 },
               },
             ],
@@ -259,14 +258,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.category"), coerceAs: "string", op: "in", operand: ["A", "B", "C"] },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "In Group" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "In Group" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Not In Group" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Not In Group" }],
                 },
               },
             ],
@@ -299,14 +298,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.age"), coerceAs: "number", op: "between", operand: [18, 65] },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Working Age" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Working Age" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Outside Range" }],
+                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Outside Range" }],
                 },
               },
             ],
@@ -335,9 +334,9 @@ describe("when branching on conditions", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Always" },
+              { kind: "mutate-element", target: "result", prop: "textContent", value: "Always" },
               {
-                kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Bonus",
+                kind: "mutate-element", target: "result", prop: "textContent", value: "Bonus",
                 when: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
               },
             ],
@@ -367,9 +366,9 @@ describe("when branching on conditions", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Always" },
+              { kind: "mutate-element", target: "result", prop: "textContent", value: "Always" },
               {
-                kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "Bonus",
+                kind: "mutate-element", target: "result", prop: "textContent", value: "Bonus",
                 when: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
               },
             ],

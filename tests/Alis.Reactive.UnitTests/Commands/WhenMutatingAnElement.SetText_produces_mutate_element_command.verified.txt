@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: output,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: hello
           }
         ]

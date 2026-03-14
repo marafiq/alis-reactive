@@ -30,7 +30,7 @@
                       {
                         kind: mutate-element,
                         target: result,
-                        jsEmit: el.textContent = val,
+                        prop: textContent,
                         value: Processed
                       }
                     ]
@@ -46,13 +46,16 @@
                 {
                   kind: mutate-element,
                   target: error,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Account inactive
                 },
                 {
                   kind: mutate-element,
                   target: retry-btn,
-                  jsEmit: el.removeAttribute('hidden')
+                  method: removeAttribute,
+                  args: [
+                    hidden
+                  ]
                 }
               ]
             }

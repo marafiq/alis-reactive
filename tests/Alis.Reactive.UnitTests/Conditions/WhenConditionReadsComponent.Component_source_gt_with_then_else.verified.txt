@@ -27,7 +27,7 @@
                 {
                   kind: mutate-element,
                   target: status,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: positive
                 }
               ]
@@ -40,7 +40,7 @@
                 {
                   kind: mutate-element,
                   target: status,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: zero or negative
                 }
               ]

@@ -11,7 +11,8 @@
           {
             kind: mutate-element,
             target: status,
-            jsEmit: el.classList.add(val),
+            method: add,
+            chain: classList,
             value: active
           }
         ]

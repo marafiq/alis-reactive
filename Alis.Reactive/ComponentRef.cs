@@ -9,11 +9,10 @@ namespace Alis.Reactive
     /// Returned by p.Component&lt;T&gt;(). Vendor-specific extension methods
     /// constrain TComponent to add mutation methods (SetValue, Show, etc.).
     ///
-    /// The ref itself is vendor-agnostic — the jsEmit string in each
-    /// extension method carries the vendor-specific behavior.
-    /// Runtime resolves vendor root before passing el to jsEmit:
-    ///   Fusion: "el.value=Number(val)" (el = ej2 instance)
-    ///   Native: "el.value=val" (el = DOM element)
+    /// The ref itself is vendor-agnostic — structured prop/method fields in each
+    /// extension method carry the vendor-specific behavior.
+    /// Runtime resolves vendor root via resolveRoot, then uses bracket notation:
+    ///   root[prop]=val or root[method](val)
     /// </summary>
     public class ComponentRef<TComponent, TModel>
         where TComponent : IComponent, new()
@@ -31,17 +30,29 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Emits a MutateElementCommand with the given jsEmit string.
+        /// Emits a MutateElementCommand with structured prop/method fields.
         /// Called by vendor extension methods — not by DSL users directly.
         /// Vendor is resolved from the cached TComponent instance.
         /// </summary>
         internal ComponentRef<TComponent, TModel> Emit(
-            string jsEmit,
+            string? prop = null,
+            string? method = null,
+            string? chain = null,
             string? value = null,
-            BindSource? source = null)
+            BindSource? source = null,
+            string? coerce = null,
+            object[]? args = null)
         {
             Pipeline.AddCommand(new MutateElementCommand(
-                TargetId, jsEmit, value, source, vendor: _instance.Vendor));
+                TargetId,
+                prop: prop,
+                method: method,
+                chain: chain,
+                coerce: coerce,
+                args: args,
+                value: value,
+                source: source,
+                vendor: _instance.Vendor));
             return this;
         }
 

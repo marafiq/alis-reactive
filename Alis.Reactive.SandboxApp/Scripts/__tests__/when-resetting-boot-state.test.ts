@@ -15,7 +15,7 @@ describe("when resetting boot state", () => {
           commands: [{
             kind: "mutate-element",
             target: "status",
-            jsEmit: "el.textContent = val",
+            prop: "textContent",
             value: "stale",
           }],
         },

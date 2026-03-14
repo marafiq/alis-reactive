@@ -25,7 +25,7 @@
                 {
                   kind: mutate-element,
                   target: greeting,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Welcome
                 }
               ]

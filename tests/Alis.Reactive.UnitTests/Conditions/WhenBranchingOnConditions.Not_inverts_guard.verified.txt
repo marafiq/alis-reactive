@@ -29,7 +29,7 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Not admin
                 }
               ]
@@ -42,7 +42,7 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Is admin
                 }
               ]

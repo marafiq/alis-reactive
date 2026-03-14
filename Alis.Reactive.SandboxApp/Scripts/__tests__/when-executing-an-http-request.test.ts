@@ -25,7 +25,6 @@ beforeEach(async () => {
 
   (globalThis as any).document = dom.window.document;
   (globalThis as any).CustomEvent = dom.window.CustomEvent;
-  (globalThis as any).Function = dom.window.Function;
   (globalThis as any).FormData = dom.window.FormData;
 
   const mod = await import("../http");
@@ -40,7 +39,7 @@ describe("http request execution", () => {
       verb: "GET",
       url: "/api/test",
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "loaded" }],
+        commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "loaded" }],
       }],
     };
 
@@ -58,7 +57,7 @@ describe("http request execution", () => {
       url: "/api/save",
       onError: [{
         statusCode: 400,
-        commands: [{ kind: "mutate-element", target: "error", jsEmit: "el.textContent = val", value: "bad request" }],
+        commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "bad request" }],
       }],
     };
 
@@ -77,10 +76,10 @@ describe("http request execution", () => {
       verb: "GET",
       url: "/api/test",
       whileLoading: [
-        { kind: "mutate-element", target: "spinner", jsEmit: "el.removeAttribute('hidden')" },
+        { kind: "mutate-element", target: "spinner", method: "removeAttribute", args: ["hidden"] },
       ],
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "spinner", jsEmit: "el.setAttribute('hidden','')" }],
+        commands: [{ kind: "mutate-element", target: "spinner", method: "setAttribute", args: ["hidden", ""] }],
       }],
     };
 
@@ -124,13 +123,13 @@ describe("http request execution", () => {
       verb: "GET",
       url: "/api/residents",
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "residents", jsEmit: "el.textContent = val", value: "loaded" }],
+        commands: [{ kind: "mutate-element", target: "residents", prop: "textContent", value: "loaded" }],
       }],
       chained: {
         verb: "GET",
         url: "/api/facilities",
         onSuccess: [{
-          commands: [{ kind: "mutate-element", target: "facilities", jsEmit: "el.textContent = val", value: "loaded" }],
+          commands: [{ kind: "mutate-element", target: "facilities", prop: "textContent", value: "loaded" }],
         }],
       },
     };
@@ -154,7 +153,7 @@ describe("http request execution", () => {
         { kind: "static", param: "name", value: "test" },
       ],
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "result", jsEmit: "el.textContent = val", value: "ok" }],
+        commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "ok" }],
       }],
     };
 
@@ -173,8 +172,8 @@ describe("http request execution", () => {
       verb: "GET",
       url: "/api/test",
       onError: [
-        { statusCode: 400, commands: [{ kind: "mutate-element", target: "error", jsEmit: "el.textContent = val", value: "400" }] },
-        { commands: [{ kind: "mutate-element", target: "error", jsEmit: "el.textContent = val", value: "catch-all" }] },
+        { statusCode: 400, commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "400" }] },
+        { commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "catch-all" }] },
       ],
     };
 

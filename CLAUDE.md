@@ -72,7 +72,7 @@ naming and polymorphic type discriminators (`"kind"` property).
         "kind": "sequential",
         "commands": [
           { "kind": "dispatch", "event": "name", "payload?": {} },
-          { "kind": "mutate-element", "target": "elementId", "action": "add-class", "value?": "className" }
+          { "kind": "mutate-element", "target": "elementId", "method": "add", "chain": "classList", "value": "className" }
         ]
       }
     }
@@ -85,25 +85,36 @@ naming and polymorphic type discriminators (`"kind"` property).
 | Kind | Fields | Runtime behavior |
 |------|--------|-----------------|
 | `dispatch` | `event`, `payload?` | `document.dispatchEvent(new CustomEvent(event, { detail: payload }))` |
-| `mutate-element` | `target`, `jsEmit`, `value?`, `source?` | Resolve element → resolve val → execute jsEmit |
+| `mutate-element` | `target`, `prop?`/`method?`, `value?`, `source?` | resolveRoot → bracket notation: `root[prop]=val` or `root[method](val)` |
 
-**jsEmit (foundational pattern):** The plan carries the exact JavaScript expression to execute
-on the resolved element. The runtime is a dumb executor — it resolves the target element,
-resolves the value (static or BindExpr), and executes jsEmit via `new Function("el", "val", jsEmit)`.
-No switch statements, no action enums. The browser API IS the API — the runtime doesn't re-implement it.
+**Structured mutations (prop/method):** The plan carries structured `prop` or `method` fields.
+The runtime resolves the vendor root via `resolveRoot(domEl, vendor)`, then uses bracket notation:
+`root[prop] = val` for property sets, `root[method](val)` for method calls. Zero `new Function()`,
+zero `eval`, CSP-compatible. No switch statements, no action enums.
 
-| C# DSL method | jsEmit in plan | Variables |
-|----------------|----------------|-----------|
-| `AddClass("x")` | `el.classList.add(val)` | val = "x" |
-| `RemoveClass("x")` | `el.classList.remove(val)` | val = "x" |
-| `ToggleClass("x")` | `el.classList.toggle(val)` | val = "x" |
-| `SetText("x")` | `el.textContent = val` | val = "x" |
-| `SetHtml("x")` | `el.innerHTML = val` | val = "x" |
-| `Show()` | `el.removeAttribute('hidden')` | — |
-| `Hide()` | `el.setAttribute('hidden','')` | — |
+**Six mutation patterns:**
 
-Adding new DOM methods requires only a C# DSL method that emits the right jsEmit string.
-Zero runtime changes. Open/Closed principle applied to the runtime.
+| C# DSL method | Plan JSON | Runtime execution |
+|----------------|-----------|-------------------|
+| `AddClass("x")` | `{ method: "add", chain: "classList", value: "x" }` | `root.classList.add("x")` |
+| `RemoveClass("x")` | `{ method: "remove", chain: "classList", value: "x" }` | `root.classList.remove("x")` |
+| `ToggleClass("x")` | `{ method: "toggle", chain: "classList", value: "x" }` | `root.classList.toggle("x")` |
+| `SetText("x")` | `{ prop: "textContent", value: "x" }` | `root.textContent = "x"` |
+| `SetHtml("x")` | `{ prop: "innerHTML", value: "x" }` | `root.innerHTML = "x"` |
+| `Show()` | `{ method: "removeAttribute", args: ["hidden"] }` | `root.removeAttribute("hidden")` |
+| `Hide()` | `{ method: "setAttribute", args: ["hidden", ""] }` | `root.setAttribute("hidden", "")` |
+
+**Component mutations use the same patterns:**
+
+| Pattern | Example | Plan JSON |
+|---------|---------|-----------|
+| Prop set | `SetValue("x")` | `{ prop: "value", value: "x", vendor: "fusion" }` |
+| Prop set + coerce | `SetValue(42m)` | `{ prop: "value", value: "42", coerce: "number", vendor: "fusion" }` |
+| Void method | `Focus()` | `{ method: "focus", vendor: "fusion" }` |
+| Method + arg | `SetItems(source)` | `{ method: "setItems", source: {...}, vendor: "fusion" }` |
+
+Adding a new component = just a `prop` name or `method` name in the C# extension.
+Zero runtime changes. `resolveRoot` is the vendor-neutral execution layer.
 
 **Source binding (BindExpr):** `value` provides a static val. `source` provides a BindExpr
 (dot-notation path into execution context) — resolved at runtime via `resolver.ts`.
@@ -372,9 +383,9 @@ full type safety, and serializes to `ComponentSource` at render time.
 #### MutateElementCommand — Vendor-Aware Mutations
 
 `MutateElementCommand` carries an optional `vendor` field. When present, the runtime
-resolves the vendor root (e.g., `ej2_instances[0]` for Fusion) before passing `el` to jsEmit.
-When absent (plain DOM mutations), `el` is the raw DOM element. This means jsEmit expressions
-like `el.value=Number(val)` work identically for both vendors — the root resolution is transparent.
+resolves the vendor root (e.g., `ej2_instances[0]` for Fusion) via `resolveRoot()`.
+When absent (plain DOM mutations), `root` is the raw DOM element. Bracket notation
+(`root[prop]=val` or `root[method](val)`) works identically for both vendors.
 
 #### walk.ts — Dot-Path Walking (Framework Fundamental)
 
@@ -390,7 +401,7 @@ Pure utility. Zero side effects, zero DOM, zero vendor knowledge.
 **Right side vs Left side:**
 - **Right side (source):** walk ANY object (event, response, etc.) — vendor-agnostic → `walk.ts`
 - **Left side (target):** component interaction — vendor-AWARE (resolveRoot) → `component.ts`
-- walk feeds `val` into jsEmit — works for property assignment AND method calls with arguments
+- walk feeds `val` into bracket notation — works for property assignment AND method calls with arguments
 
 #### component.ts — Vendor Root Resolution
 
@@ -414,17 +425,17 @@ Separate from component.ts — different root (ExecContext vs DOM element).
 | Interaction | C# vertical slice owns | Runtime module | Pattern |
 |-------------|----------------------|----------------|---------|
 | Property read | vendor + readExpr | component.ts | resolveRoot + walk(readExpr) |
-| Property write | jsEmit expression | element.ts | new Function("el","val",jsEmit) |
-| Method call (void) | jsEmit expression | element.ts | new Function("el","val",jsEmit) |
-| Method call (args) | jsEmit + source | element.ts + resolver.ts | walk(ctx, source) → val → jsEmit |
+| Property write | prop field | element.ts | root[prop] = val (bracket notation) |
+| Method call (void) | method field | element.ts | root[method]() (bracket notation) |
+| Method call (args) | method + source | element.ts + resolver.ts | walk(ctx, source) → val → root[method](val) |
 | Event wiring | vendor + jsEvent | trigger.ts | resolveRoot + .addEventListener() |
 | Source binding | BindSource (structured) | resolver.ts | EventSource or ComponentSource → val |
 
 #### "Value" is a singular concept
 
 Read and write are two sides of the same property:
-- NativeCheckBox: reads `el.checked` (readExpr), writes `el.checked=val` (jsEmit)
-- FusionNumericTextBox: reads `ej2.value` (readExpr), writes `ej2.value=val; dataBind()` (jsEmit)
+- NativeCheckBox: reads `el.checked` (readExpr), writes `{ prop: "checked", coerce: "boolean" }`
+- FusionNumericTextBox: reads `ej2.value` (readExpr), writes `{ prop: "value", coerce: "number" }`
 
 #### The Cardinal Rule: Plan carries ALL behavior. Runtime NEVER invents.
 
@@ -439,14 +450,14 @@ Read and write are two sides of the same property:
 1. C# sealed class implementing `IComponent` + `IInputComponent` (declares Vendor + ReadExpr as instance properties)
 2. Event args class (typed payload properties)
 3. Events singleton (TypedEventDescriptor registry)
-4. Extensions (jsEmit expressions for property writes, method calls, read expressions)
+4. Extensions (structured prop/method fields for property writes, method calls, read expressions)
 5. Builder (IHtmlContent, renders HTML, registers component in ComponentsMap)
 6. Reactive extension (.Reactive() creates ComponentEventTrigger)
 7. Gather extension (uses TComponent.ReadExpr via `new()` constraint)
 8. Tests at all 3 layers
 
-The runtime does NOT change. The plan JSON carries vendor, readExpr, jsEmit, jsEvent.
-The runtime resolves root, walks paths, and executes jsEmit. That's it.
+The runtime does NOT change. The plan JSON carries vendor, readExpr, prop/method, jsEvent.
+The runtime resolves root, walks paths, and executes via bracket notation. That's it.
 
 #### Architecture Regression Test
 
@@ -498,26 +509,26 @@ Every change goes through all three test layers before it's done. No exceptions.
 # Full test suite — run all from the repo root:
 cd /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive
 
-# 1. TS unit tests (vitest + jsdom) — 362 tests
+# 1. TS unit tests (vitest + jsdom) — 409 tests
 npm test
 
-# 2. C# unit + schema tests — 110 tests
+# 2. C# unit + schema tests — 150 tests
 dotnet test tests/Alis.Reactive.UnitTests
 
-# 3. Native component unit tests — 31 tests
+# 3. Native component unit tests — 35 tests
 dotnet test tests/Alis.Reactive.Native.UnitTests
 
 # 4. Fusion component unit tests — 61 tests
 dotnet test tests/Alis.Reactive.Fusion.UnitTests
 
-# 5. FluentValidator unit tests — 28 tests
+# 5. FluentValidator unit tests — 43 tests
 dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 
-# 6. Playwright browser tests (browser behavior) — 154 tests
+# 6. Playwright browser tests (browser behavior) — 186 tests
 dotnet test tests/Alis.Reactive.PlaywrightTests
 ```
 
-**Total: 746 tests (362 TS + 230 C# unit + 154 Playwright)**
+**Total: 884 tests (409 TS + 289 C# unit + 186 Playwright)**
 
 If any test fails, fix the issue and re-run ALL tests before committing.
 Never commit with failing tests. Never skip Playwright.

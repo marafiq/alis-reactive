@@ -184,10 +184,16 @@ export interface DispatchCommand {
   when?: Guard;
 }
 
+export type CoercionType = "string" | "number" | "boolean" | "date" | "raw";
+
 export interface MutateElementCommand {
   kind: "mutate-element";
   target: string;
-  jsEmit: string;
+  prop?: string;
+  method?: string;
+  chain?: string;
+  coerce?: CoercionType;
+  args?: unknown[];
   value?: string;
   source?: BindSource;
   vendor?: Vendor;

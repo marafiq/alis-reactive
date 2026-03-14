@@ -12,10 +12,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Vertical slice extension methods for FusionNumericTextBox.
     ///
-    /// Fusion jsEmit convention (el = vendor-resolved root, i.e. the ej2 instance):
-    ///   Prop write → el.value=Number(val)
+    /// Structured mutation convention (root = vendor-resolved ej2 instance):
+    ///   Prop write → { prop: "value", coerce: "number" }
     ///   Prop read  → ReadProperty&lt;decimal&gt;("value") → TypedComponentSource
-    ///   Call        → el.focusIn()
+    ///   Call        → { method: "focusIn" }
     /// </summary>
     public static class FusionNumericTextBoxExtensions
     {
@@ -54,8 +54,9 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             return self.Emit(
-                "el.value=Number(val)",
-                value.ToString(CultureInfo.InvariantCulture));
+                prop: "value",
+                value: value.ToString(CultureInfo.InvariantCulture),
+                coerce: "number");
         }
 
         /// <summary>Sets the minimum allowed value on the SF instance.</summary>
@@ -64,8 +65,9 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             return self.Emit(
-                "el.min=Number(val)",
-                min.ToString(CultureInfo.InvariantCulture));
+                prop: "min",
+                value: min.ToString(CultureInfo.InvariantCulture),
+                coerce: "number");
         }
 
         // ── Method calls (void, no args) ──
@@ -75,7 +77,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.focusIn()");
+            return self.Emit(method: "focusIn");
         }
 
         /// <summary>Invokes focusOut() on the SF instance.</summary>
@@ -83,7 +85,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.focusOut()");
+            return self.Emit(method: "focusOut");
         }
 
         /// <summary>Increments the numeric value by the step amount.</summary>
@@ -91,7 +93,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.increment()");
+            return self.Emit(method: "increment");
         }
 
         /// <summary>Decrements the numeric value by the step amount.</summary>
@@ -99,7 +101,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.decrement()");
+            return self.Emit(method: "decrement");
         }
 
         // ── Prop reads (return TypedComponentSource for use in conditions/bindings) ──

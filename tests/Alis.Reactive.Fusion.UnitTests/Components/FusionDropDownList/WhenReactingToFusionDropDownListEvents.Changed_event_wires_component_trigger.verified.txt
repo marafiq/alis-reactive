@@ -12,7 +12,7 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-            jsEmit: el.value=val,
+            prop: value,
             value: US,
             vendor: fusion
           }

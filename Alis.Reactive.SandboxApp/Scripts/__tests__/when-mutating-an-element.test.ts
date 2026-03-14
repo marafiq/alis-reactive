@@ -15,7 +15,6 @@ beforeEach(async () => {
 
   (globalThis as any).document = dom.window.document;
   (globalThis as any).CustomEvent = dom.window.CustomEvent;
-  (globalThis as any).Function = dom.window.Function;
 
   // Re-import to get fresh module with new document
   const mod = await import("../boot");
@@ -31,7 +30,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "status", jsEmit: "el.classList.add(val)", value: "active" }],
+          commands: [{ kind: "mutate-element", target: "status", method: "add", chain: "classList", value: "active" }],
         },
       }],
     });
@@ -47,7 +46,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "status", jsEmit: "el.classList.remove(val)", value: "text-muted" }],
+          commands: [{ kind: "mutate-element", target: "status", method: "remove", chain: "classList", value: "text-muted" }],
         },
       }],
     });
@@ -63,7 +62,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "panel", jsEmit: "el.textContent = val", value: "done" }],
+          commands: [{ kind: "mutate-element", target: "panel", prop: "textContent", value: "done" }],
         },
       }],
     });
@@ -79,7 +78,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "panel", jsEmit: "el.innerHTML = val", value: "<strong>ok</strong>" }],
+          commands: [{ kind: "mutate-element", target: "panel", prop: "innerHTML", value: "<strong>ok</strong>" }],
         },
       }],
     });
@@ -95,7 +94,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "loader", jsEmit: "el.removeAttribute('hidden')" }],
+          commands: [{ kind: "mutate-element", target: "loader", method: "removeAttribute", args: ["hidden"] }],
         },
       }],
     });
@@ -111,7 +110,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "content", jsEmit: "el.setAttribute('hidden','')" }],
+          commands: [{ kind: "mutate-element", target: "content", method: "setAttribute", args: ["hidden", ""] }],
         },
       }],
     });
@@ -127,7 +126,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "status", jsEmit: "el.classList.toggle(val)", value: "text-muted" }],
+          commands: [{ kind: "mutate-element", target: "status", method: "toggle", chain: "classList", value: "text-muted" }],
         },
       }],
     });
@@ -148,9 +147,9 @@ describe("mutate-element command", () => {
         reaction: {
           kind: "sequential",
           commands: [
-            { kind: "mutate-element", target: "status", jsEmit: "el.classList.add(val)", value: "complete" },
+            { kind: "mutate-element", target: "status", method: "add", chain: "classList", value: "complete" },
             { kind: "dispatch", event: "step-done" },
-            { kind: "mutate-element", target: "panel", jsEmit: "el.textContent = val", value: "next" },
+            { kind: "mutate-element", target: "panel", prop: "textContent", value: "next" },
           ],
         },
       }],

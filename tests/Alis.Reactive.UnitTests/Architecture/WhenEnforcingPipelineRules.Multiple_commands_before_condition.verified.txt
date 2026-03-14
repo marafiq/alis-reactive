@@ -12,7 +12,10 @@
           {
             kind: mutate-element,
             target: confirmation,
-            jsEmit: el.removeAttribute('hidden')
+            method: removeAttribute,
+            args: [
+              hidden
+            ]
           },
           {
             kind: dispatch,
@@ -21,7 +24,11 @@
           {
             kind: mutate-element,
             target: spinner,
-            jsEmit: el.setAttribute('hidden','')
+            method: setAttribute,
+            args: [
+              hidden,
+              
+            ]
           }
         ],
         branches: [
@@ -42,7 +49,10 @@
                 {
                   kind: mutate-element,
                   target: express,
-                  jsEmit: el.removeAttribute('hidden')
+                  method: removeAttribute,
+                  args: [
+                    hidden
+                  ]
                 }
               ]
             }
@@ -54,7 +64,10 @@
                 {
                   kind: mutate-element,
                   target: standard,
-                  jsEmit: el.removeAttribute('hidden')
+                  method: removeAttribute,
+                  args: [
+                    hidden
+                  ]
                 }
               ]
             }

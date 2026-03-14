@@ -62,7 +62,7 @@ describe("when failing fast on missing targets", () => {
       expect(() => mutateElement({
         kind: "mutate-element",
         target: "missing-el",
-        jsEmit: "el.textContent = val",
+        prop: "textContent",
         value: "hello",
       })).toThrow("target not found: missing-el");
     });

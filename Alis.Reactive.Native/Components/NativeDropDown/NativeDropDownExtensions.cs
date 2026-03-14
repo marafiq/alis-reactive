@@ -5,9 +5,9 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Vertical slice extension methods for NativeDropDown.
     ///
-    /// Native jsEmit convention (direct DOM — no ej2_instances, no dataBind):
-    ///   Prop  → el.value=val
-    ///   Call  → el.focus()
+    /// Structured mutation convention (direct DOM — no ej2_instances, no dataBind):
+    ///   Prop  → { prop: "value" }
+    ///   Call  → { method: "focus" }
     ///   Read  → ref:{id}.value
     /// </summary>
     public static class NativeDropDownExtensions
@@ -18,7 +18,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeDropDown, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit("el.value=val", value);
+            return self.Emit(prop: "value", value: value);
         }
 
         // ── Call: gives the select element focus ──
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeDropDown, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.focus()");
+            return self.Emit(method: "focus");
         }
 
         // ── Read: returns the select element's current value ──

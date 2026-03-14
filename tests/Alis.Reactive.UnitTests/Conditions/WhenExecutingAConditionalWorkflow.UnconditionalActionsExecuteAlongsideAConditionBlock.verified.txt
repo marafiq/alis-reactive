@@ -12,7 +12,7 @@
           {
             kind: mutate-element,
             target: status,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: Processing...
           },
           {
@@ -38,7 +38,10 @@
                 {
                   kind: mutate-element,
                   target: admin-panel,
-                  jsEmit: el.removeAttribute('hidden')
+                  method: removeAttribute,
+                  args: [
+                    hidden
+                  ]
                 }
               ]
             }
@@ -50,7 +53,11 @@
                 {
                   kind: mutate-element,
                   target: admin-panel,
-                  jsEmit: el.setAttribute('hidden','')
+                  method: setAttribute,
+                  args: [
+                    hidden,
+                    
+                  ]
                 }
               ]
             }

@@ -31,7 +31,7 @@
                 {
                   kind: mutate-element,
                   target: status,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Cancelled
                 }
               ]

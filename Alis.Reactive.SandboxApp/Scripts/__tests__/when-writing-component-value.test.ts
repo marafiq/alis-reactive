@@ -2,11 +2,11 @@ import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../boot";
 import { TestWidget } from "../test-widget";
 
-describe("when writing component value via jsEmit", () => {
+describe("when writing component value", () => {
   afterEach(() => { document.body.innerHTML = ""; });
 
   describe("native vendor", () => {
-    it("sets el.value via jsEmit", () => {
+    it("sets el.value via structured prop", () => {
       const input = document.createElement("input");
       input.id = "native-write";
       document.body.appendChild(input);
@@ -15,7 +15,7 @@ describe("when writing component value via jsEmit", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "native-write",
-          jsEmit: "el.value=val", value: "written",
+          prop: "value", value: "written",
         }] },
       }] });
 
@@ -24,7 +24,7 @@ describe("when writing component value via jsEmit", () => {
   });
 
   describe("fusion vendor", () => {
-    it("sets real TestWidget.value via jsEmit", () => {
+    it("sets real TestWidget.value via structured prop", () => {
       const el = document.createElement("div");
       el.id = "fusion-write";
       const widget = new TestWidget(el);
@@ -35,7 +35,7 @@ describe("when writing component value via jsEmit", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-write",
-          jsEmit: "var c=el.ej2_instances[0]; c.value=val", value: "written",
+          prop: "value", vendor: "fusion", value: "written",
         }] },
       }] });
 

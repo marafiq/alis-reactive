@@ -31,7 +31,7 @@ describe("when following a native action link", () => {
             commands: [{
               kind: "mutate-element",
               target: "result",
-              jsEmit: "el.textContent = val",
+              prop: "textContent",
               value: "Deleted row 42",
             }],
           }],

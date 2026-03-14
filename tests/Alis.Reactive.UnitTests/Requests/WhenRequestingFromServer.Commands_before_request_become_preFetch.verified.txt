@@ -11,7 +11,10 @@
           {
             kind: mutate-element,
             target: spinner,
-            jsEmit: el.removeAttribute('hidden')
+            method: removeAttribute,
+            args: [
+              hidden
+            ]
           }
         ],
         request: {
@@ -23,7 +26,11 @@
                 {
                   kind: mutate-element,
                   target: spinner,
-                  jsEmit: el.setAttribute('hidden','')
+                  method: setAttribute,
+                  args: [
+                    hidden,
+                    
+                  ]
                 }
               ]
             }

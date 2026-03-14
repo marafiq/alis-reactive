@@ -20,12 +20,16 @@
                 {
                   kind: mutate-element,
                   target: item,
-                  jsEmit: el.setAttribute('hidden','')
+                  method: setAttribute,
+                  args: [
+                    hidden,
+                    
+                  ]
                 },
                 {
                   kind: mutate-element,
                   target: status,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Deleted
                 },
                 {
@@ -42,7 +46,7 @@
                 {
                   kind: mutate-element,
                   target: status,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Cancelled
                 }
               ]

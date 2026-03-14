@@ -16,14 +16,15 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            jsEmit: el.value=Number(val),
+            prop: value,
+            coerce: number,
             value: 0,
             vendor: fusion
           },
           {
             kind: mutate-element,
             target: echo,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: Reset
           }
         ]

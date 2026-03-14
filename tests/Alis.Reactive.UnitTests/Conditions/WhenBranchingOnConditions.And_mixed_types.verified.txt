@@ -41,7 +41,7 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Pass
                 }
               ]
@@ -54,7 +54,7 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Fail
                 }
               ]

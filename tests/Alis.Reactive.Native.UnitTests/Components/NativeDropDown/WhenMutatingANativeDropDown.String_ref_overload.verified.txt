@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: filterDropdown,
-            jsEmit: el.value=val,
+            prop: value,
             value: B,
             vendor: native
           }

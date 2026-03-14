@@ -12,13 +12,13 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-            jsEmit: el.value=val,
+            prop: value,
             vendor: fusion
           },
           {
             kind: mutate-element,
             target: status,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: Reset via DropDown event
           }
         ]

@@ -23,7 +23,7 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: ok
                 }
               ]
@@ -36,7 +36,7 @@
                 {
                   kind: mutate-element,
                   target: error,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: bad request
                 }
               ]
@@ -47,7 +47,7 @@
                 {
                   kind: mutate-element,
                   target: error,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: server error
                 }
               ]

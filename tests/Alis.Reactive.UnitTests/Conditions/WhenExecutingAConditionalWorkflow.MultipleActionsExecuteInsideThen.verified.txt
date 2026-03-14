@@ -26,12 +26,18 @@
                 {
                   kind: mutate-element,
                   target: admin-panel,
-                  jsEmit: el.removeAttribute('hidden')
+                  method: removeAttribute,
+                  args: [
+                    hidden
+                  ]
                 },
                 {
                   kind: mutate-element,
                   target: delete-btn,
-                  jsEmit: el.removeAttribute('hidden')
+                  method: removeAttribute,
+                  args: [
+                    hidden
+                  ]
                 },
                 {
                   kind: dispatch,
@@ -47,7 +53,11 @@
                 {
                   kind: mutate-element,
                   target: admin-panel,
-                  jsEmit: el.setAttribute('hidden','')
+                  method: setAttribute,
+                  args: [
+                    hidden,
+                    
+                  ]
                 }
               ]
             }

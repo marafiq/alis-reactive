@@ -7,9 +7,9 @@ namespace Alis.Reactive.Fusion.AppLevel
     /// <summary>
     /// Vertical slice for FusionConfirm — SF Dialog used as a halting confirm.
     ///
-    /// Three jsEmit patterns (el = vendor-resolved root, i.e. the ej2 instance):
-    ///   Prop  → el.content=val; el.dataBind()
-    ///   Call  → el.show()
+    /// Structured mutation convention (root = vendor-resolved ej2 instance):
+    ///   Prop  → { prop: "content" } + { method: "dataBind" }
+    ///   Call  → { method: "show" }
     ///   Read  → ref:alisConfirmDialog.visible
     ///
     /// Infrastructure: Html.FusionConfirmDialog() renders the bare element.
@@ -24,9 +24,8 @@ namespace Alis.Reactive.Fusion.AppLevel
             this ComponentRef<FusionConfirm, TModel> self, string message)
             where TModel : class
         {
-            return self.Emit(
-                "el.content=val; el.dataBind()",
-                message);
+            return self.Emit(prop: "content", value: message)
+                       .Emit(method: "dataBind");
         }
 
         // ── Call: show / hide the dialog ──
@@ -35,14 +34,14 @@ namespace Alis.Reactive.Fusion.AppLevel
             this ComponentRef<FusionConfirm, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.show()");
+            return self.Emit(method: "show");
         }
 
         public static ComponentRef<FusionConfirm, TModel> Hide<TModel>(
             this ComponentRef<FusionConfirm, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.hide()");
+            return self.Emit(method: "hide");
         }
 
         // ── Read: dialog visibility state ──

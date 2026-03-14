@@ -11,10 +11,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Vertical slice extension methods for FusionDropDownList.
     ///
-    /// Fusion jsEmit convention (el = vendor-resolved root, i.e. the ej2 instance):
-    ///   Prop write → el.value=val
+    /// Structured mutation convention (root = vendor-resolved ej2 instance):
+    ///   Prop write → { prop: "value" }
     ///   Prop read  → ReadProperty&lt;string&gt;("value") → TypedComponentSource
-    ///   Call        → el.focusIn()
+    ///   Call        → { method: "focusIn" }
     /// </summary>
     public static class FusionDropDownListExtensions
     {
@@ -52,7 +52,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionDropDownList, TModel> self, string? value)
             where TModel : class
         {
-            return self.Emit("el.value=val", value);
+            return self.Emit(prop: "value", value: value);
         }
 
         /// <summary>Sets the display text on the SF instance.</summary>
@@ -60,7 +60,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionDropDownList, TModel> self, string text)
             where TModel : class
         {
-            return self.Emit("el.text=val", text);
+            return self.Emit(prop: "text", value: text);
         }
 
         // ── Method calls (void, no args) ──
@@ -70,7 +70,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.focusIn()");
+            return self.Emit(method: "focusIn");
         }
 
         /// <summary>Invokes focusOut() on the SF instance.</summary>
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.focusOut()");
+            return self.Emit(method: "focusOut");
         }
 
         /// <summary>Shows the popup list.</summary>
@@ -86,7 +86,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.showPopup()");
+            return self.Emit(method: "showPopup");
         }
 
         /// <summary>Hides the popup list.</summary>
@@ -94,7 +94,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.hidePopup()");
+            return self.Emit(method: "hidePopup");
         }
 
         // ── Prop reads (return TypedComponentSource for use in conditions/bindings) ──

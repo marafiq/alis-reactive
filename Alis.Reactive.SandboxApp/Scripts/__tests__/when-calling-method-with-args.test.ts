@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../boot";
 import { TestWidget } from "../test-widget";
 
-describe("when calling component method with args (source walk → val → jsEmit)", () => {
+describe("when calling component method with args (source walk → val)", () => {
   afterEach(() => { document.body.innerHTML = ""; });
 
   function mountWidget(id: string): { el: HTMLElement; widget: TestWidget } {
@@ -30,7 +30,7 @@ describe("when calling component method with args (source walk → val → jsEmi
           trigger: { kind: "custom-event", event: "load-data" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fusion-args",
-            jsEmit: "var c=el.ej2_instances[0]; c.setItems(val)",
+            method: "setItems", vendor: "fusion",
             source: { kind: "event", path: "evt.data.items" },
           }] },
         },
@@ -54,7 +54,7 @@ describe("when calling component method with args (source walk → val → jsEmi
           trigger: { kind: "custom-event", event: "set-val" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fusion-set",
-            jsEmit: "var c=el.ej2_instances[0]; c.value=val",
+            prop: "value", vendor: "fusion",
             source: { kind: "event", path: "evt.result.detail.newValue" },
           }] },
         },
@@ -65,7 +65,7 @@ describe("when calling component method with args (source walk → val → jsEmi
   });
 
   describe("native vendor", () => {
-    it("walks source path and passes val to native element attribute", () => {
+    it("walks source path and passes val to native element property", () => {
       const input = document.createElement("input");
       input.id = "native-args";
       document.body.appendChild(input);
@@ -82,13 +82,13 @@ describe("when calling component method with args (source walk → val → jsEmi
           trigger: { kind: "custom-event", event: "set-attr" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "native-args",
-            jsEmit: "el.setAttribute('data-status', val)",
+            prop: "value",
             source: { kind: "event", path: "evt.attr.val" },
           }] },
         },
       ] });
 
-      expect(input.getAttribute("data-status")).toBe("active");
+      expect(input.value).toBe("active");
     });
 
     it("walks source path and passes val to native element value setter", () => {
@@ -108,7 +108,7 @@ describe("when calling component method with args (source walk → val → jsEmi
           trigger: { kind: "custom-event", event: "fill" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "native-set",
-            jsEmit: "el.value=val",
+            prop: "value",
             source: { kind: "event", path: "evt.form.username" },
           }] },
         },

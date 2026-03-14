@@ -12,21 +12,21 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
-            jsEmit: el.value=val,
+            prop: value,
             value: active,
             vendor: native
           },
           {
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Category,
-            jsEmit: el.value=val,
+            prop: value,
             value: A,
             vendor: native
           },
           {
             kind: mutate-element,
             target: echo,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: Both updated
           }
         ]

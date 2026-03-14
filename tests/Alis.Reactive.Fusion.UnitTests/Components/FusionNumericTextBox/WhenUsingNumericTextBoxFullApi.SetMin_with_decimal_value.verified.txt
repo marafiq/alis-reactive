@@ -11,7 +11,8 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            jsEmit: el.min=Number(val),
+            prop: min,
+            coerce: number,
             value: 0.5,
             vendor: fusion
           }

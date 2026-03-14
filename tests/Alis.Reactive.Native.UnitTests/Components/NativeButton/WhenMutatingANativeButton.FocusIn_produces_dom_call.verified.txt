@@ -11,7 +11,7 @@
           {
             kind: mutate-element,
             target: submitBtn,
-            jsEmit: el.focus(),
+            method: focus,
             vendor: native
           }
         ]

@@ -7,10 +7,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 /// Page under test: /Sandbox/CheckBox
 ///
 /// BUG-001 REPRODUCTION:
-/// SetChecked(false) passes the string "false" as val to jsEmit "el.checked=val".
-/// In JavaScript, el.checked = "false" sets checked to TRUE because any non-empty
-/// string is truthy. Only SetChecked(false) is broken — SetChecked(true) works
-/// by accident because "true" is also truthy (correct result, wrong mechanism).
+/// SetChecked(false) passes the string "false" as val with coerce: "boolean".
+/// The runtime coerces "false" to boolean false before assigning to el.checked.
+/// This fixes the original bug where raw string assignment caused truthy coercion.
 /// </summary>
 [TestFixture]
 public class WhenUsingNativeCheckBox : PlaywrightTestBase
@@ -40,8 +39,8 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("mutate-element"),
             "Plan must contain mutate-element commands");
-        Assert.That(planJson, Does.Contain("el.checked=(val==="),
-            "Plan must contain checkbox jsEmit with boolean coercion");
+        Assert.That(planJson, Does.Contain("\"prop\""),
+            "Plan must contain structured prop field");
         AssertNoConsoleErrors();
     }
 
@@ -60,11 +59,9 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
     public async Task SetChecked_false_unchecks_the_checkbox()
     {
         // BUG-001: This test reproduces the bug.
-        // SetChecked(false) emits jsEmit "el.checked=val" with value "false".
-        // In JavaScript, el.checked = "false" sets checked to TRUE
-        // because the string "false" is truthy.
+        // SetChecked(false) emits { prop: "checked", coerce: "boolean" } with value "false".
+        // The runtime coerces "false" to boolean false via coerce().
         // Expected: checkbox unchecked after clicking button.
-        // Actual (BUG): checkbox remains checked.
 
         await NavigateAndBoot();
 
@@ -76,7 +73,6 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
         await Page.Locator("#btn-uncheck").ClickAsync();
 
         // Assert: checkbox should now be unchecked
-        // THIS WILL FAIL — proving the bug
         await Expect(cb).Not.ToBeCheckedAsync(new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
@@ -96,10 +92,8 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
     [Test]
     public async Task SetChecked_true_checks_the_checkbox()
     {
-        // Control case: SetChecked(true) works by accident.
-        // jsEmit "el.checked=val" with value "true" — the string "true"
-        // is truthy, so el.checked = "true" sets checked to true.
-        // Correct result, but for the wrong reason.
+        // SetChecked(true) emits { prop: "checked", coerce: "boolean" } with value "true".
+        // The runtime coerces "true" to boolean true.
 
         await NavigateAndBoot();
 
@@ -111,7 +105,6 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
         await Page.Locator("#btn-check").ClickAsync();
 
         // Assert: checkbox should now be checked
-        // This PASSES — but only because string "true" is truthy
         await Expect(cb).ToBeCheckedAsync(new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

@@ -26,7 +26,7 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Long enough
                 }
               ]
@@ -39,7 +39,7 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Too short
                 }
               ]

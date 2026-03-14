@@ -30,7 +30,10 @@
                 {
                   kind: mutate-element,
                   target: panel,
-                  jsEmit: el.removeAttribute('hidden')
+                  method: removeAttribute,
+                  args: [
+                    hidden
+                  ]
                 }
               ]
             }
@@ -42,7 +45,11 @@
                 {
                   kind: mutate-element,
                   target: panel,
-                  jsEmit: el.setAttribute('hidden','')
+                  method: setAttribute,
+                  args: [
+                    hidden,
+                    
+                  ]
                 }
               ]
             }

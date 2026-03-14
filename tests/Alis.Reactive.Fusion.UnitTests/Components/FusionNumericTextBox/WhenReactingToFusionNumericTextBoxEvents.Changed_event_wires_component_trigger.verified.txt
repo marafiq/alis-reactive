@@ -12,7 +12,8 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            jsEmit: el.value=Number(val),
+            prop: value,
+            coerce: number,
             value: 999,
             vendor: fusion
           }

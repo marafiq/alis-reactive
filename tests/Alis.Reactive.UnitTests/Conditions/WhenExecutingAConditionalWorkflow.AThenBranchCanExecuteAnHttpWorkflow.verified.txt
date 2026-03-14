@@ -45,7 +45,7 @@
                 {
                   kind: mutate-element,
                   target: error,
-                  jsEmit: el.textContent = val,
+                  prop: textContent,
                   value: Unauthorized
                 }
               ]

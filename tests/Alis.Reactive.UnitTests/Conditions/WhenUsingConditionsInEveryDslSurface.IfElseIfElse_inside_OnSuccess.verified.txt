@@ -19,7 +19,7 @@
                   {
                     kind: mutate-element,
                     target: status,
-                    jsEmit: el.textContent = val,
+                    prop: textContent,
                     value: Done
                   }
                 ],
@@ -41,7 +41,7 @@
                         {
                           kind: mutate-element,
                           target: tier,
-                          jsEmit: el.textContent = val,
+                          prop: textContent,
                           value: Gold
                         }
                       ]
@@ -64,7 +64,7 @@
                         {
                           kind: mutate-element,
                           target: tier,
-                          jsEmit: el.textContent = val,
+                          prop: textContent,
                           value: Silver
                         }
                       ]
@@ -77,7 +77,7 @@
                         {
                           kind: mutate-element,
                           target: tier,
-                          jsEmit: el.textContent = val,
+                          prop: textContent,
                           value: Bronze
                         }
                       ]

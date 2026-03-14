@@ -16,7 +16,7 @@
           {
             kind: mutate-element,
             target: echo,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: changed
           }
         ]

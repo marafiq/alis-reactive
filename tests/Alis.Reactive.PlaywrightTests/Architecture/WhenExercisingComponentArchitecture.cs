@@ -31,10 +31,10 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Property Write (jsEmit) — both vendors ──
+    // ── Property Write — both vendors ──
 
     [Test]
-    public async Task NativePropertyWriteViaJsEmit()
+    public async Task NativePropertyWrite()
     {
         await NavigateAndBoot();
         await Expect(Page.Locator("#native-write")).ToHaveValueAsync("written-native");
@@ -42,7 +42,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FusionPropertyWriteViaJsEmit()
+    public async Task FusionPropertyWrite()
     {
         await NavigateAndBoot();
         // TestWidget syncs inner input when value is set
@@ -50,10 +50,10 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Void Method Call (jsEmit) — fusion ──
+    // ── Void Method Call — fusion ──
 
     [Test]
-    public async Task FusionVoidMethodViaJsEmit()
+    public async Task FusionVoidMethodCall()
     {
         await NavigateAndBoot();
         // dom-ready called ej2_instances[0].focus() — inner input gets focus

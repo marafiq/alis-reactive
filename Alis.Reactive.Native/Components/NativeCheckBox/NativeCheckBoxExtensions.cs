@@ -5,9 +5,9 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Vertical slice extension methods for NativeCheckBox.
     ///
-    /// Native jsEmit convention (direct DOM):
-    ///   Prop  → el.checked=val
-    ///   Call  → el.focus()
+    /// Structured mutation convention (direct DOM):
+    ///   Prop  → { prop: "checked", coerce: "boolean" }
+    ///   Call  → { method: "focus" }
     ///   Read  → ref:{id}.checked
     /// </summary>
     public static class NativeCheckBoxExtensions
@@ -16,14 +16,14 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.Emit("el.checked=(val==='true')", isChecked ? "true" : "false");
+            return self.Emit(prop: "checked", value: isChecked ? "true" : "false", coerce: "boolean");
         }
 
         public static ComponentRef<NativeCheckBox, TModel> FocusIn<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.focus()");
+            return self.Emit(method: "focus");
         }
 
         /// <summary>

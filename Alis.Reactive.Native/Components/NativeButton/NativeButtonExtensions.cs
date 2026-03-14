@@ -5,9 +5,9 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Vertical slice extension methods for NativeButton.
     ///
-    /// Native jsEmit convention (direct DOM):
-    ///   Prop  → el.textContent=val
-    ///   Call  → el.focus()
+    /// Structured mutation convention (direct DOM):
+    ///   Prop  → { prop: "textContent" }
+    ///   Call  → { method: "focus" }
     ///   Read  → ref:{id}.textContent
     /// </summary>
     public static class NativeButtonExtensions
@@ -18,7 +18,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeButton, TModel> self, string text)
             where TModel : class
         {
-            return self.Emit("el.textContent=val", text);
+            return self.Emit(prop: "textContent", value: text);
         }
 
         // ── Call: gives the button focus ──
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeButton, TModel> self)
             where TModel : class
         {
-            return self.Emit("el.focus()");
+            return self.Emit(method: "focus");
         }
 
         // ── Read: returns the button's current text ──

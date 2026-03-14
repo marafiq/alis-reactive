@@ -12,13 +12,13 @@
           {
             kind: mutate-element,
             target: result,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: Always runs
           },
           {
             kind: mutate-element,
             target: bonus,
-            jsEmit: el.textContent = val,
+            prop: textContent,
             value: Bonus!,
             when: {
               kind: value,
