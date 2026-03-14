@@ -1,0 +1,222 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.TestWidgetModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Conditions
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    ViewData["Title"] = "TestWidget";
+
+    var plan = Html.ReactivePlan<TestWidgetModel>();
+
+    // ── 1: Property Write (static) ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<TestWidgetSyncFusion>("tw-write").SetValue("initialized");
+    }));
+
+    // ── 5: Component Read → Element ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var comp = p.Component<TestWidgetSyncFusion>("tw-read");
+        p.Element("read-echo").SetText(comp.Value());
+    }));
+
+    // ── 7: SetItems from event payload expression ──
+
+    Html.On(plan, t => t.CustomEvent<DataSourceResponse>("load-items", (payload, p) =>
+    {
+        p.Component<TestWidgetSyncFusion>("tw-items")
+         .SetItems(payload, x => x.Items); // make sure ts doe show array somewhere
+    }));
+
+    // ── 9: Gather → HTTP Echo ──
+
+    Html.On(plan, t => t.CustomEvent("do-gather", p =>
+    {
+        p.Post("/Sandbox/TestWidget/Echo", g =>
+            g.Include<TestWidgetSyncFusion, TestWidgetModel>("tw-gather", "widgetVal"))
+         .Response(r => r
+            .OnSuccess(s => { s.Element("gather-result").SetText("gathered"); }));
+    }));
+
+    // ── 10-11: DataSource — wired directly on button click, no dispatch ──
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">TestWidget — jsEmit API Surface</h1>
+    </div>
+
+    <!-- 1: Property Write (static) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Property Write (Static)</h2>
+        @(Html.TestWidget("tw-write")
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
+    </section>
+
+    <!-- 2: Void Method — Clear -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Void Method — Clear</h2>
+        @(Html.TestWidget("tw-clear")
+            .InitialValue("clear-me")
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full"))
+        <div class="mt-3">
+            @(Html.NativeButton("btn-clear", "Clear")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<TestWidgetSyncFusion>("tw-clear").Clear().Focus();
+                }))
+        </div>
+    </section>
+
+    <!-- 3: Void Method — Focus -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Void Method — Focus</h2>
+        @(Html.TestWidget("tw-focus")
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full"))
+        <div class="mt-3">
+            @(Html.NativeButton("btn-focus", "Focus")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<TestWidgetSyncFusion>("tw-focus").Focus();
+                }))
+        </div>
+    </section>
+
+    <!-- 4: Event Payload → Component (SetValue from args) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Event Payload → Component SetValue</h2>
+        @(Html.TestWidget("tw-event-write")
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+            .Reactive(plan, evt => evt.Changed, (args, p) =>
+            {
+                p.Component<TestWidgetSyncFusion>("tw-event-mirror")
+                 .SetValue(args, a => a.NewValue);
+            }))
+        <div class="mt-3">
+            <label class="block text-sm font-medium mb-1">Mirror (receives value)</label>
+            @(Html.TestWidget("tw-event-mirror")
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
+        </div>
+    </section>
+
+    <!-- 5: Component Read → Display -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">5. Component Read → Display</h2>
+        @(Html.TestWidget("tw-read")
+            .InitialValue("read-me")
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
+        <p class="mt-3 font-mono text-sm">Read: <span id="read-echo" class="text-text-muted">&mdash;</span></p>
+    </section>
+
+    <!-- 6: Component Value Condition -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">6. Component Value Condition</h2>
+        @(Html.TestWidget("tw-comp-cond")
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+            .Reactive(plan, evt => evt.Changed, (args, p) =>
+            {
+                var comp = p.Component<TestWidgetSyncFusion>("tw-comp-cond");
+                p.When(comp.Value()).NotEmpty()
+                    .Then(t => { t.Element("comp-cond-ind").Show(); t.Element("comp-cond-ind").SetText("has value"); })
+                    .Else(e => { e.Element("comp-cond-ind").Hide(); });
+            }))
+        <div id="comp-cond-ind" hidden class="mt-3 rounded-md bg-blue-50 border border-blue-200 p-4 text-sm">&mdash;</div>
+    </section>
+
+    <!-- 7: Method + Arg (SetItems from event) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">7. Method + Arg (SetItems)</h2>
+        @(Html.TestWidget("tw-items")
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
+        <div class="mt-3">
+            @(Html.NativeButton("btn-load-items", "Load Items")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Dispatch("load-items", new DataSourceResponse { Items = new[] { "x", "y", "z" } });
+                }))
+        </div>
+    </section>
+
+    <!-- 8: Cross-Component Read → Write -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">8. Cross-Component Read → Write</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Source</label>
+                @(Html.TestWidget("tw-source")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        var source = p.Component<TestWidgetSyncFusion>("tw-source");
+                        p.Component<TestWidgetSyncFusion>("tw-target").SetValue(source.Value());
+                    }))
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Target</label>
+                @(Html.TestWidget("tw-target")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
+            </div>
+        </div>
+    </section>
+
+    <!-- 9: Gather → HTTP Echo -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">9. Gather → HTTP Echo</h2>
+        @(Html.TestWidget("tw-gather")
+            .InitialValue("gather-me")
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full"))
+        <div class="mt-3">
+            @(Html.NativeButton("btn-gather", "Gather & POST")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) => { p.Dispatch("do-gather"); }))
+        </div>
+        <p class="mt-3 font-mono text-sm">Result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
+    </section>
+
+    <!-- 10-11: DataSource — Response Body → Component -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">10–11. Response Body → Component</h2>
+        @(Html.TestWidget("tw-ds-target")
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
+        <div class="mt-3">
+            @(Html.NativeButton("btn-datasource", "Fetch DataSource")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get("/Sandbox/TestWidget/DataSource")
+                     .Response(r => r
+                        .OnSuccess<DataSourceResponse>((json, s) =>
+                        {
+                            s.Component<TestWidgetSyncFusion>("tw-ds-target")
+                             .SetValue(json, x => x.Selected);
+                            s.Component<TestWidgetSyncFusion>("tw-ds-target")
+                             .SetItems(json, x => x.Items); // make sure ts doe show array somewhere
+                            
+                            
+                        }));
+                }))
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/test-widget.js" asp-append-version="true"></script>
+}
+
+@Html.RenderPlan(plan)

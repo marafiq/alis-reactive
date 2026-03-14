@@ -73,14 +73,34 @@ export class TestWidget {
     this._value = "";
     this._items = [];
     this._input.value = "";
+    this._renderItems();
   }
 
-  // -- Methods with Params --
+  // -- Methods with Params (single arg) --
 
   setItems(items: unknown[]): void {
     this._items = Array.isArray(items) ? items : [];
     this._el.dataset.itemsCount = String(this._items.length);
+    this._renderItems();
     this._fire("items-changed", { items: this._items, count: this._items.length });
+  }
+
+  // -- DOM rendering (like real SF components render their state) --
+
+  private _renderItems(): void {
+    let list = this._el.querySelector(".test-widget-items");
+    if (!list) {
+      list = document.createElement("ul");
+      list.className = "test-widget-items";
+      this._el.appendChild(list);
+    }
+    list.innerHTML = "";
+    for (const item of this._items) {
+      const li = document.createElement("li");
+      li.className = "test-widget-item";
+      li.textContent = String(item);
+      list.appendChild(li);
+    }
   }
 
   // -- Event API (Syncfusion-compatible) --
