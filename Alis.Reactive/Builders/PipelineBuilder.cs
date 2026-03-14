@@ -164,7 +164,7 @@ namespace Alis.Reactive.Builders
         /// Starts a conditional branch on a component property.
         /// TProp is inferred from the TypedSource — operators on the returned builder
         /// demand TProp operands (e.g. decimal property → Gt(0m)).
-        /// Usage: p.When(comp.ReadProperty&lt;decimal&gt;("value")).Gt(0m).Then(...)
+        /// Usage: p.When(comp.Value()).Gt(0m).Then(...)
         /// </summary>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {

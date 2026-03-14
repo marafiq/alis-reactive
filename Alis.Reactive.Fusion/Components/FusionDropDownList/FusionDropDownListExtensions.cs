@@ -65,11 +65,11 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.ReadProperty<string>("value");
+            => new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
 
         public static TypedComponentSource<string> Text<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.ReadProperty<string>("text");
+            => new TypedComponentSource<string>(self.TargetId, _component.Vendor, "text");
     }
 }

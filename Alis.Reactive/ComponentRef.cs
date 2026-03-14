@@ -43,11 +43,5 @@ namespace Alis.Reactive
             return this;
         }
 
-        /// <summary>
-        /// Creates a TypedComponentSource for reading a property from this component.
-        /// Used as a BindSource in SetText/SetHtml or guard conditions.
-        /// </summary>
-        public TypedComponentSource<TProp> ReadProperty<TProp>(string property)
-            => new TypedComponentSource<TProp>(TargetId, _instance.Vendor, property);
     }
 }

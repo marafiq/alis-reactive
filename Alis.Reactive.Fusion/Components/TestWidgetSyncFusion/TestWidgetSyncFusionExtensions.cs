@@ -8,6 +8,8 @@ namespace Alis.Reactive.Fusion.Components
 {
     public static class TestWidgetSyncFusionExtensions
     {
+        private static readonly TestWidgetSyncFusion _component = new TestWidgetSyncFusion();
+
         // ── Property Write (static) ──
 
         public static ComponentRef<TestWidgetSyncFusion, TModel> SetValue<TModel>(
@@ -48,11 +50,11 @@ namespace Alis.Reactive.Fusion.Components
 
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => self.ReadProperty<string>("value");
+            where TModel : class => new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
 
         public static TypedComponentSource<bool> Focused<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => self.ReadProperty<bool>("focused");
+            where TModel : class => new TypedComponentSource<bool>(self.TargetId, _component.Vendor, "focused");
 
         // ── Void Method (no args) ──
 

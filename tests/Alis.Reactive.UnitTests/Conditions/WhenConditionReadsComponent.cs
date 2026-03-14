@@ -1,3 +1,4 @@
+using Alis.Reactive.Builders.Conditions;
 using static VerifyNUnit.Verifier;
 
 namespace Alis.Reactive.UnitTests;
@@ -11,6 +12,19 @@ public sealed class StubFusionNumericTextBox : IComponent, IInputComponent
 {
     public string Vendor => "fusion";
     public string ReadExpr => "value";
+}
+
+/// <summary>
+/// Vertical slice extension for the stub — typed read, same pattern as real components.
+/// </summary>
+public static class StubFusionNumericTextBoxExtensions
+{
+    private static readonly StubFusionNumericTextBox _component = new();
+
+    public static TypedComponentSource<decimal> Value<TModel>(
+        this ComponentRef<StubFusionNumericTextBox, TModel> self)
+        where TModel : class
+        => new TypedComponentSource<decimal>(self.TargetId, _component.Vendor, _component.ReadExpr);
 }
 
 public class AmountModel
@@ -30,7 +44,7 @@ public class WhenConditionReadsComponent : PlanTestBase
         trigger.DomReady(p =>
         {
             var comp = p.Component<StubFusionNumericTextBox>(m => m.Amount);
-            p.When(comp.ReadProperty<decimal>("value")).Gt(0m)
+            p.When(comp.Value()).Gt(0m)
                 .Then(then => then.Element("status").SetText("positive"))
                 .Else(else_ => else_.Element("status").SetText("zero or negative"));
         });
@@ -49,7 +63,7 @@ public class WhenConditionReadsComponent : PlanTestBase
         trigger.DomReady(p =>
         {
             var comp = p.Component<StubFusionNumericTextBox>("my-numeric");
-            p.When(comp.ReadProperty<decimal>("value")).Eq(100m)
+            p.When(comp.Value()).Eq(100m)
                 .Then(then => then.Element("result").SetText("exact match"));
         });
 
