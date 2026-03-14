@@ -96,22 +96,4 @@ public class WhenMutatingAFusionDropDownList : FusionTestBase
         });
     }
 
-    [Test]
-    public void Text_returns_typed_component_source()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).DomReady(p =>
-        {
-            var source = p.Component<FusionDropDownList>(m => m.Status).Text();
-            Assert.That(source, Is.TypeOf<TypedComponentSource<string>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("text"));
-        });
-    }
 }

@@ -12,7 +12,7 @@ namespace Alis.Reactive.Fusion.UnitTests;
 /// Tests the full JS API surface of FusionNumericTextBox:
 ///   Events:   Focus, Blur (void payload)
 ///   Methods:  FocusOut, Increment, Decrement (void, no args)
-///   Prop reads:  Value(), Min() → TypedComponentSource&lt;decimal&gt;
+///   Prop reads:  Value() → TypedComponentSource&lt;decimal&gt;
 ///   Prop writes: SetMin(decimal)
 /// </summary>
 [TestFixture]
@@ -95,25 +95,6 @@ public class WhenUsingNumericTextBoxFullApi : FusionTestBase
             Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount"));
             Assert.That(cs.Vendor, Is.EqualTo("fusion"));
             Assert.That(cs.ReadExpr, Is.EqualTo("value"));
-        });
-    }
-
-    [Test]
-    public void Min_returns_typed_component_source()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).DomReady(p =>
-        {
-            var source = p.Component<FusionNumericTextBox>(m => m.Amount).Min();
-            Assert.That(source, Is.TypeOf<TypedComponentSource<decimal>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("min"));
         });
     }
 

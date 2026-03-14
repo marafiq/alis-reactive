@@ -73,10 +73,5 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
             => new TypedComponentSource<decimal>(self.TargetId, _component.Vendor, _component.ReadExpr);
-
-        public static TypedComponentSource<decimal> Min<TModel>(
-            this ComponentRef<FusionNumericTextBox, TModel> self)
-            where TModel : class
-            => new TypedComponentSource<decimal>(self.TargetId, _component.Vendor, "min");
     }
 }

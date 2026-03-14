@@ -12,7 +12,7 @@ namespace Alis.Reactive.Fusion.UnitTests;
 /// Tests the full JS API surface of FusionDropDownList:
 ///   Events:   Focus, Blur (void payload)
 ///   Methods:  FocusOut, ShowPopup, HidePopup (void, no args)
-///   Prop reads:  Value(), Text() → TypedComponentSource&lt;string&gt;
+///   Prop reads:  Value() → TypedComponentSource&lt;string&gt;
 ///   Prop writes: SetValue(string?), SetText(string)
 /// </summary>
 [TestFixture]
@@ -49,25 +49,6 @@ public class WhenUsingDropDownListFullApi : FusionTestBase
             Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status"));
             Assert.That(cs.Vendor, Is.EqualTo("fusion"));
             Assert.That(cs.ReadExpr, Is.EqualTo("value"));
-        });
-    }
-
-    [Test]
-    public void Text_returns_typed_component_source()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).DomReady(p =>
-        {
-            var source = p.Component<FusionDropDownList>(m => m.Status).Text();
-            Assert.That(source, Is.TypeOf<TypedComponentSource<string>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("text"));
         });
     }
 

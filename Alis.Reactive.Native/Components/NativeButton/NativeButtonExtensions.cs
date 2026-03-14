@@ -18,12 +18,5 @@ namespace Alis.Reactive.Native.Components
         {
             return self.Emit(new CallVoidMutation("focus"));
         }
-
-        public static string Text<TModel>(
-            this ComponentRef<NativeButton, TModel> self)
-            where TModel : class
-        {
-            return $"ref:{self.TargetId}.textContent";
-        }
     }
 }

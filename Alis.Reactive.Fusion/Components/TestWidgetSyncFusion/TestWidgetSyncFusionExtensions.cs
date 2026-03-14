@@ -52,10 +52,6 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
             where TModel : class => new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
 
-        public static TypedComponentSource<bool> Focused<TModel>(
-            this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => new TypedComponentSource<bool>(self.TargetId, _component.Vendor, "focused");
-
         // ── Void Method (no args) ──
 
         public static ComponentRef<TestWidgetSyncFusion, TModel> Focus<TModel>(

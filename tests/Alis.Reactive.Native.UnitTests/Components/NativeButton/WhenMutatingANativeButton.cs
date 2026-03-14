@@ -30,17 +30,6 @@ public class WhenMutatingANativeButton : NativeTestBase
     }
 
     [Test]
-    public void Text_returns_bind_expr()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).DomReady(p =>
-        {
-            var expr = p.Component<NativeButton>("submitBtn").Text();
-            Assert.That(expr, Is.EqualTo("ref:submitBtn.textContent"));
-        });
-    }
-
-    [Test]
     public Task SetText_chained_with_dropdown()
     {
         var plan = CreatePlan();
