@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { boot } from "../boot";
 import { initNativeActionLinks } from "../native-action-link";
 
 describe("when following a native action link", () => {
@@ -26,7 +25,7 @@ describe("when following a native action link", () => {
         kind: "http",
         request: {
           verb: "POST",
-          url: "/orders/delete/42",
+          url: "",
           onSuccess: [{
             commands: [{
               kind: "mutate-element",
@@ -44,38 +43,47 @@ describe("when following a native action link", () => {
     await new Promise(resolve => setTimeout(resolve, 25));
 
     expect(fetchSpy).toHaveBeenCalledOnce();
+    expect(String(fetchSpy.mock.calls[0][0])).toContain("/orders/delete/42");
     expect(document.getElementById("result")!.textContent).toBe("Deleted row 42");
   });
 
-  it("reuses the booted component registry for IncludeAll gather", async () => {
+  it("delegates a click into a confirm wrapped http pipeline", async () => {
     document.body.innerHTML = `
-      <input id="filter-name" value="Adnan" />
-      <a id="search-link" href="/orders/search"></a>
+      <a id="delete-link" href="/orders/delete/42"></a>
+      <div id="result"></div>
     `;
 
-    boot({
-      planId: "Search.Model",
-      components: {
-        Name: { id: "filter-name", vendor: "native", readExpr: "value" },
-      },
-      entries: [],
-    });
+    (window as unknown as { alis: { confirm: (message: string) => Promise<boolean> } }).alis = {
+      confirm: vi.fn().mockResolvedValue(true),
+    };
 
-    const fetchSpy = vi.fn(async (url: string | URL | Request) =>
+    const fetchSpy = vi.fn(async () =>
       new Response(JSON.stringify({ ok: true }), { status: 200, headers: { "Content-Type": "application/json" } })
     );
     globalThis.fetch = fetchSpy as typeof fetch;
 
-    const anchor = document.getElementById("search-link") as HTMLAnchorElement;
+    const anchor = document.getElementById("delete-link") as HTMLAnchorElement;
     anchor.setAttribute("data-reactive-link", JSON.stringify({
-      planId: "Search.Model",
       reaction: {
-        kind: "http",
-        request: {
-          verb: "GET",
-          url: "/orders/search",
-          gather: [{ kind: "all" }],
-        },
+        kind: "conditional",
+        branches: [{
+          guard: { kind: "confirm", message: "Delete row?" },
+          reaction: {
+            kind: "http",
+            request: {
+              verb: "POST",
+              url: "",
+              onSuccess: [{
+                commands: [{
+                  kind: "mutate-element",
+                  target: "result",
+                  mutation: { kind: "set-prop", prop: "textContent" },
+                  value: "Deleted row 42",
+                }],
+              }],
+            },
+          },
+        }],
       },
     }));
 
@@ -84,47 +92,37 @@ describe("when following a native action link", () => {
     await new Promise(resolve => setTimeout(resolve, 25));
 
     expect(fetchSpy).toHaveBeenCalledOnce();
-    expect(String(fetchSpy.mock.calls[0][0])).toContain("Name=Adnan");
+    expect(document.getElementById("result")!.textContent).toBe("Deleted row 42");
   });
 
-  it("enriches validation fields from the booted plan before validating", async () => {
+  it("does not execute the request when confirm is cancelled", async () => {
     document.body.innerHTML = `
-      <form id="search-form">
-        <input id="filter-name" value="" />
-        <span data-valmsg-for="Name"></span>
-      </form>
-      <a id="validate-link" href="/orders/search"></a>
+      <a id="delete-link" href="/orders/delete/42"></a>
     `;
 
-    boot({
-      planId: "Validation.Model",
-      components: {
-        Name: { id: "filter-name", vendor: "native", readExpr: "value" },
-      },
-      entries: [],
-    });
+    (window as unknown as { alis: { confirm: (message: string) => Promise<boolean> } }).alis = {
+      confirm: vi.fn().mockResolvedValue(false),
+    };
 
     const fetchSpy = vi.fn(async () =>
       new Response(JSON.stringify({ ok: true }), { status: 200, headers: { "Content-Type": "application/json" } })
     );
     globalThis.fetch = fetchSpy as typeof fetch;
 
-    const anchor = document.getElementById("validate-link") as HTMLAnchorElement;
+    const anchor = document.getElementById("delete-link") as HTMLAnchorElement;
     anchor.setAttribute("data-reactive-link", JSON.stringify({
-      planId: "Validation.Model",
       reaction: {
-        kind: "http",
-        request: {
-          verb: "POST",
-          url: "/orders/search",
-          validation: {
-            formId: "search-form",
-            fields: [{
-              fieldName: "Name",
-              rules: [{ rule: "required", message: "Name is required" }],
-            }],
+        kind: "conditional",
+        branches: [{
+          guard: { kind: "confirm", message: "Delete row?" },
+          reaction: {
+            kind: "http",
+            request: {
+              verb: "POST",
+              url: "",
+            },
           },
-        },
+        }],
       },
     }));
 
@@ -133,6 +131,106 @@ describe("when following a native action link", () => {
     await new Promise(resolve => setTimeout(resolve, 25));
 
     expect(fetchSpy).not.toHaveBeenCalled();
-    expect(document.querySelector("[data-valmsg-for='Name']")!.textContent).toBe("Name is required");
+  });
+
+  it("throws when native action link uses include all gather", () => {
+    document.body.innerHTML = `<a id="search-link" href="/orders/search"></a>`;
+    const errors: string[] = [];
+    const onError = (event: ErrorEvent) => {
+      errors.push(String(event.error ?? event.message));
+      event.preventDefault();
+    };
+    window.addEventListener("error", onError);
+
+    const anchor = document.getElementById("search-link") as HTMLAnchorElement;
+    anchor.setAttribute("data-reactive-link", JSON.stringify({
+      reaction: {
+        kind: "http",
+        request: {
+          verb: "GET",
+          url: "",
+          gather: [{ kind: "all" }],
+        },
+      },
+    }));
+
+    initNativeActionLinks();
+    anchor.click();
+    window.removeEventListener("error", onError);
+
+    expect(errors[0]).toMatch(/IncludeAll|include all|all gather/i);
+  });
+
+  it("throws when native action link uses validation", () => {
+    document.body.innerHTML = `<a id="save-link" href="/orders/save"></a>`;
+    const errors: string[] = [];
+    const onError = (event: ErrorEvent) => {
+      errors.push(String(event.error ?? event.message));
+      event.preventDefault();
+    };
+    window.addEventListener("error", onError);
+
+    const anchor = document.getElementById("save-link") as HTMLAnchorElement;
+    anchor.setAttribute("data-reactive-link", JSON.stringify({
+      reaction: {
+        kind: "http",
+        request: {
+          verb: "POST",
+          url: "",
+          validation: {
+            formId: "orders-form",
+            fields: [],
+          },
+        },
+      },
+    }));
+
+    initNativeActionLinks();
+    anchor.click();
+    window.removeEventListener("error", onError);
+
+    expect(errors[0]).toMatch(/validation/i);
+  });
+
+  it("throws when a native action link reaction tree contains more than one request", () => {
+    document.body.innerHTML = `<a id="delete-link" href="/orders/delete/42"></a>`;
+    const errors: string[] = [];
+    const onError = (event: ErrorEvent) => {
+      errors.push(String(event.error ?? event.message));
+      event.preventDefault();
+    };
+    window.addEventListener("error", onError);
+
+    const anchor = document.getElementById("delete-link") as HTMLAnchorElement;
+    anchor.setAttribute("data-reactive-link", JSON.stringify({
+      reaction: {
+        kind: "conditional",
+        branches: [{
+          guard: { kind: "confirm", message: "Delete row?" },
+          reaction: {
+            kind: "http",
+            request: {
+              verb: "POST",
+              url: "",
+              onSuccess: [{
+                reaction: {
+                  kind: "http",
+                  request: {
+                    verb: "POST",
+                    url: "",
+                  },
+                },
+              }],
+            },
+          },
+        }],
+      },
+    }));
+
+    initNativeActionLinks();
+    anchor.click();
+    window.removeEventListener("error", onError);
+
+    expect(errors[0]).toMatch(/exactly one request|nested http|second http/i);
   });
 });

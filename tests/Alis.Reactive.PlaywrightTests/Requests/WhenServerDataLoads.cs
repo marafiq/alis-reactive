@@ -175,7 +175,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task NativeActionLinkDeletesARowViaDelegatedClickHandling()
+    public async Task NativeActionLinkDeleteWithConfirmDoesNotDeleteWhenCancelled()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -183,6 +183,30 @@ public class WhenServerDataLoads : PlaywrightTestBase
             .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
 
         await Page.GetByTestId("native-action-link-42").ClickAsync();
+
+        var cancelButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "Cancel" });
+        await Expect(cancelButton).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await cancelButton.ClickAsync();
+
+        await Expect(Page.GetByTestId("native-action-link-row-42"))
+            .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task NativeActionLinkDeleteWithConfirmDeletesAndRefreshesGridWhenConfirmed()
+    {
+        await NavigateTo("/Sandbox/Http");
+
+        await Expect(Page.GetByTestId("native-action-link-row-42"))
+            .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
+
+        await Page.GetByTestId("native-action-link-42").ClickAsync();
+
+        var okButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "OK" });
+        await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await okButton.ClickAsync();
 
         await Expect(Page.Locator("#native-action-link-status"))
             .ToContainTextAsync("Deleted resident #42", new() { Timeout = 5000 });

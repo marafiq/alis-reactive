@@ -1,13 +1,9 @@
-import { enrichReaction, getBootedPlan } from "./boot";
-import { executeHttpReaction } from "./pipeline";
+import { executeReaction } from "./execute";
 import { scope } from "./trace";
 import type {
-  ComponentEntry,
-  HttpReaction,
   Reaction,
   RequestDescriptor,
   StatusHandler,
-  ValidationDescriptor,
 } from "./types";
 
 const log = scope("native-action-link");
@@ -16,8 +12,7 @@ const SELECTOR = "a[data-reactive-link]";
 let initialized = false;
 
 interface NativeActionLinkPayload {
-  planId: string;
-  reaction: HttpReaction;
+  reaction: Reaction;
 }
 
 export function initNativeActionLinks(): void {
@@ -40,24 +35,12 @@ function handleClick(event: MouseEvent): void {
   const anchor = target?.closest<HTMLAnchorElement>(SELECTOR);
   if (!anchor) return;
 
-  const payload = decodePayload(anchor);
-  assertSupportedReaction(payload.reaction);
-
-  const components = resolveComponents(payload.planId);
-  enrichReaction(payload.reaction, components);
-
-  if (requiresPlanContext(payload.reaction.request) && Object.keys(components).length === 0) {
-    throw new Error(
-      `NativeActionLink requires a booted plan context for planId '${payload.planId}' ` +
-      "when using IncludeAll() or unresolved validation fields."
-    );
-  }
-
-  assertValidationIsEnriched(payload.reaction.request.validation);
-
   event.preventDefault();
-  log.debug("activate", { id: anchor.id, href: anchor.href, planId: payload.planId });
-  void executeHttpReaction(payload.reaction, { components });
+
+  const payload = decodePayload(anchor);
+  bindHrefToSingleRequest(payload.reaction, anchor.getAttribute("href") ?? anchor.href);
+  log.debug("activate", { id: anchor.id, href: anchor.href });
+  executeReaction(payload.reaction);
 }
 
 function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
@@ -73,67 +56,79 @@ function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
   }
 }
 
-function resolveComponents(planId: string): Record<string, ComponentEntry> {
-  return getBootedPlan(planId)?.components ?? {};
-}
+function bindHrefToSingleRequest(reaction: Reaction, href: string): void {
+  const state = { count: 0, request: undefined as RequestDescriptor | undefined };
+  resolveSingleRequest(reaction, state);
 
-function requiresPlanContext(request: RequestDescriptor): boolean {
-  if (request.gather?.some(item => item.kind === "all")) {
-    return true;
+  if (state.count !== 1 || !state.request) {
+    throw new Error("NativeActionLink requires exactly one request.");
   }
 
-  return hasIncompleteValidation(request.validation);
+  state.request.url = href;
 }
 
-function hasIncompleteValidation(desc?: ValidationDescriptor): boolean {
-  if (!desc) return false;
-  return desc.fields.some(field => !field.fieldId || !field.vendor || !field.readExpr);
-}
-
-function assertValidationIsEnriched(desc?: ValidationDescriptor): void {
-  if (!desc) return;
-
-  const invalidField = desc.fields.find(field => !field.fieldId || !field.vendor || !field.readExpr);
-  if (invalidField) {
-    throw new Error(
-      `NativeActionLink validation field '${invalidField.fieldName}' is missing component metadata.`
-    );
-  }
-}
-
-function assertSupportedReaction(reaction: Reaction): void {
-  if (reaction.kind !== "http") {
-    throw new Error("NativeActionLink supports exactly one HTTP reaction.");
-  }
-
-  if (reaction.request.chained) {
-    throw new Error("NativeActionLink does not support chained requests.");
-  }
-
-  assertHandlersContainNoNestedHttp(reaction.request.onSuccess);
-  assertHandlersContainNoNestedHttp(reaction.request.onError);
-}
-
-function assertHandlersContainNoNestedHttp(handlers?: StatusHandler[]): void {
-  if (!handlers) return;
-  for (const handler of handlers) {
-    if (handler.reaction) {
-      assertReactionContainsNoHttp(handler.reaction);
-    }
-  }
-}
-
-function assertReactionContainsNoHttp(reaction: Reaction): void {
+function resolveSingleRequest(
+  reaction: Reaction,
+  state: { count: number; request?: RequestDescriptor }
+): void {
   switch (reaction.kind) {
     case "sequential":
       return;
     case "conditional":
       for (const branch of reaction.branches) {
-        assertReactionContainsNoHttp(branch.reaction);
+        resolveSingleRequest(branch.reaction, state);
+      }
+      return;
+    case "http":
+      state.count++;
+      if (state.count > 1) {
+        throw new Error("NativeActionLink supports exactly one request.");
+      }
+      assertRequestSupported(reaction.request);
+      state.request = reaction.request;
+      return;
+    case "parallel-http":
+      throw new Error("NativeActionLink does not support Parallel().");
+  }
+}
+
+function assertRequestSupported(request: RequestDescriptor): void {
+  if (request.chained) {
+    throw new Error("NativeActionLink does not support chained requests.");
+  }
+
+  if (request.validation) {
+    throw new Error("NativeActionLink does not support validation.");
+  }
+
+  if (request.gather?.some(item => item.kind === "all")) {
+    throw new Error("NativeActionLink does not support IncludeAll(). Use explicit gather instead.");
+  }
+
+  assertHandlersContainNoRequest(request.onSuccess);
+  assertHandlersContainNoRequest(request.onError);
+}
+
+function assertHandlersContainNoRequest(handlers?: StatusHandler[]): void {
+  if (!handlers) return;
+  for (const handler of handlers) {
+    if (handler.reaction) {
+      assertNestedReactionContainsNoRequest(handler.reaction);
+    }
+  }
+}
+
+function assertNestedReactionContainsNoRequest(reaction: Reaction): void {
+  switch (reaction.kind) {
+    case "sequential":
+      return;
+    case "conditional":
+      for (const branch of reaction.branches) {
+        assertNestedReactionContainsNoRequest(branch.reaction);
       }
       return;
     case "http":
     case "parallel-http":
-      throw new Error("NativeActionLink response handlers cannot start nested HTTP requests.");
+      throw new Error("NativeActionLink response handlers cannot start a second HTTP request.");
   }
 }
