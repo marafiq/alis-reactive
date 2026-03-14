@@ -15,7 +15,7 @@ describe("when resetting boot state", () => {
           commands: [{
             kind: "mutate-element",
             target: "status",
-            prop: "textContent",
+            mutation: { kind: "set-prop", prop: "textContent" },
             value: "stale",
           }],
         },

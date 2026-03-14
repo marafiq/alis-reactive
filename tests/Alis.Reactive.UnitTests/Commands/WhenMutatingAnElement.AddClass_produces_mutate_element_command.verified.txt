@@ -11,8 +11,11 @@
           {
             kind: mutate-element,
             target: status,
-            method: add,
-            chain: classList,
+            mutation: {
+              kind: call-val,
+              method: add,
+              chain: classList
+            },
             value: active
           }
         ]

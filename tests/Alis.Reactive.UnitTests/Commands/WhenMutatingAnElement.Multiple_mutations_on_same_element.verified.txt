@@ -11,21 +11,30 @@
           {
             kind: mutate-element,
             target: panel,
-            method: remove,
-            chain: classList,
+            mutation: {
+              kind: call-val,
+              method: remove,
+              chain: classList
+            },
             value: text-muted
           },
           {
             kind: mutate-element,
             target: panel,
-            method: add,
-            chain: classList,
+            mutation: {
+              kind: call-val,
+              method: add,
+              chain: classList
+            },
             value: text-green
           },
           {
             kind: mutate-element,
             target: panel,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             value: done
           }
         ]

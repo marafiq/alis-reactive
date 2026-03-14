@@ -32,10 +32,13 @@
                 {
                   kind: mutate-element,
                   target: express,
-                  method: removeAttribute,
-                  args: [
-                    hidden
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: removeAttribute,
+                    args: [
+                      hidden
+                    ]
+                  }
                 }
               ]
             }

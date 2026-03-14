@@ -14,10 +14,13 @@
             {
               kind: mutate-element,
               target: spinner,
-              method: removeAttribute,
-              args: [
-                hidden
-              ]
+              mutation: {
+                kind: call-args,
+                method: removeAttribute,
+                args: [
+                  hidden
+                ]
+              }
             }
           ],
           onSuccess: [
@@ -26,11 +29,14 @@
                 {
                   kind: mutate-element,
                   target: spinner,
-                  method: setAttribute,
-                  args: [
-                    hidden,
-                    
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: setAttribute,
+                    args: [
+                      hidden,
+                      
+                    ]
+                  }
                 }
               ]
             }

@@ -51,7 +51,7 @@ describe("PUT verb", () => {
         { kind: "static", param: "facilityId", value: "1" },
       ],
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "updated" }],
+        commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "updated" }],
       }],
     };
 
@@ -73,7 +73,7 @@ describe("DELETE verb", () => {
       verb: "DELETE",
       url: "/api/delete/42",
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "deleted" }],
+        commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "deleted" }],
       }],
     };
 
@@ -109,10 +109,10 @@ describe("multi-status error routing", () => {
       verb: "POST",
       url: "/api/validate",
       onError: [
-        { statusCode: 400, commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "400 error" }] },
-        { statusCode: 422, commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "422 validation" }] },
-        { statusCode: 500, commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "500 server" }] },
-        { commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "catch-all" }] },
+        { statusCode: 400, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "400 error" }] },
+        { statusCode: 422, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "422 validation" }] },
+        { statusCode: 500, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "500 server" }] },
+        { commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "catch-all" }] },
       ],
     };
 
@@ -128,8 +128,8 @@ describe("multi-status error routing", () => {
       verb: "POST",
       url: "/api/validate",
       onError: [
-        { statusCode: 422, commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "422" }] },
-        { statusCode: 500, commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "500 server" }] },
+        { statusCode: 422, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "422" }] },
+        { statusCode: 500, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "500 server" }] },
       ],
     };
 
@@ -145,9 +145,9 @@ describe("multi-status error routing", () => {
       verb: "GET",
       url: "/api/test",
       onError: [
-        { statusCode: 422, commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "422" }] },
-        { statusCode: 500, commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "500" }] },
-        { commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "unknown error" }] },
+        { statusCode: 422, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "422" }] },
+        { statusCode: 500, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "500" }] },
+        { commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "unknown error" }] },
       ],
     };
 
@@ -168,7 +168,7 @@ describe("GET with gather items as URL params", () => {
         { kind: "static", param: "q", value: "John" },
       ],
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "found" }],
+        commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "found" }],
       }],
     };
 
@@ -215,7 +215,7 @@ describe("component gather sends nested JSON body", () => {
         { kind: "component", componentId: "test-name", vendor: "native", name: "Name", readExpr: "value" },
       ],
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "submitted" }],
+        commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "submitted" }],
       }],
     };
 
@@ -249,7 +249,7 @@ describe("confirm guard triggers async HTTP reaction", () => {
               verb: "DELETE",
               url: "/api/delete/42",
               onSuccess: [{
-                commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "deleted" }],
+                commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "deleted" }],
               }],
             },
           },
@@ -287,7 +287,7 @@ describe("confirm guard triggers async HTTP reaction", () => {
               verb: "DELETE",
               url: "/api/delete/42",
               onSuccess: [{
-                commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "deleted" }],
+                commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "deleted" }],
               }],
             },
           },

@@ -272,27 +272,68 @@
         }
       }
     },
+    "Mutation": {
+      "oneOf": [
+        { "$ref": "#/$defs/SetPropMutation" },
+        { "$ref": "#/$defs/CallVoidMutation" },
+        { "$ref": "#/$defs/CallValMutation" },
+        { "$ref": "#/$defs/CallArgsMutation" }
+      ]
+    },
+    "SetPropMutation": {
+      "type": "object",
+      "required": ["kind", "prop"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "set-prop" },
+        "prop": { "type": "string", "minLength": 1, "description": "Property name to set: root[prop] = val" },
+        "coerce": { "$ref": "#/$defs/CoercionType" }
+      }
+    },
+    "CallVoidMutation": {
+      "type": "object",
+      "required": ["kind", "method"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "call-void" },
+        "method": { "type": "string", "minLength": 1, "description": "Void method to call: root[method]()" },
+        "chain": { "type": "string", "minLength": 1 }
+      }
+    },
+    "CallValMutation": {
+      "type": "object",
+      "required": ["kind", "method"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "call-val" },
+        "method": { "type": "string", "minLength": 1, "description": "Method to call with resolved val: root[method](val)" },
+        "chain": { "type": "string", "minLength": 1 }
+      }
+    },
+    "CallArgsMutation": {
+      "type": "object",
+      "required": ["kind", "method", "args"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "call-args" },
+        "method": { "type": "string", "minLength": 1, "description": "Method to call with literal args: root[method](...args)" },
+        "args": { "type": "array", "items": {}, "description": "Literal arguments array" },
+        "chain": { "type": "string", "minLength": 1 }
+      }
+    },
     "MutateElementCommand": {
       "type": "object",
-      "required": ["kind", "target"],
+      "required": ["kind", "target", "mutation"],
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "mutate-element" },
         "target": { "type": "string", "minLength": 1 },
-        "prop": { "type": "string", "minLength": 1, "description": "Property name to set on the resolved root: root[prop] = val" },
-        "method": { "type": "string", "minLength": 1, "description": "Method name to call on the resolved root (or chain): root[method](val)" },
-        "chain": { "type": "string", "minLength": 1, "description": "Intermediate object on root before calling method: root[chain][method](val)" },
-        "coerce": { "$ref": "#/$defs/CoercionType" },
-        "args": { "type": "array", "items": {}, "description": "Literal arguments passed to method: root[method](...args)" },
+        "mutation": { "$ref": "#/$defs/Mutation" },
         "value": { "type": "string" },
         "source": { "$ref": "#/$defs/BindSource" },
         "vendor": { "$ref": "#/$defs/Vendor" },
         "when": { "$ref": "#/$defs/Guard" }
-      },
-      "oneOf": [
-        { "required": ["prop"] },
-        { "required": ["method"] }
-      ]
+      }
     },
 
     "GatherItem": {

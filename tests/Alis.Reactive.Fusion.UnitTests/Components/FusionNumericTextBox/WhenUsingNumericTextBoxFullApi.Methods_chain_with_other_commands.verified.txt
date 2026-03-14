@@ -11,29 +11,41 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            prop: min,
-            coerce: number,
+            mutation: {
+              kind: set-prop,
+              prop: min,
+              coerce: number
+            },
             value: 0,
             vendor: fusion
           },
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            prop: value,
-            coerce: number,
+            mutation: {
+              kind: set-prop,
+              prop: value,
+              coerce: number
+            },
             value: 50,
             vendor: fusion
           },
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            method: increment,
+            mutation: {
+              kind: call-void,
+              method: increment
+            },
             vendor: fusion
           },
           {
             kind: mutate-element,
             target: echo,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             value: Initialized
           }
         ]

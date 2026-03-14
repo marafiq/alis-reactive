@@ -12,15 +12,21 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            prop: value,
-            coerce: number,
+            mutation: {
+              kind: set-prop,
+              prop: value,
+              coerce: number
+            },
             value: 0,
             vendor: fusion
           },
           {
             kind: mutate-element,
             target: status,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             value: Reset via Fusion event
           }
         ]

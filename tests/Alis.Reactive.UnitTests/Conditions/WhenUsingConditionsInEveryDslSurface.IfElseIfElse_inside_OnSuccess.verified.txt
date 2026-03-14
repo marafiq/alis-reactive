@@ -19,7 +19,10 @@
                   {
                     kind: mutate-element,
                     target: status,
-                    prop: textContent,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
                     value: Done
                   }
                 ],
@@ -41,7 +44,10 @@
                         {
                           kind: mutate-element,
                           target: tier,
-                          prop: textContent,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
                           value: Gold
                         }
                       ]
@@ -64,7 +70,10 @@
                         {
                           kind: mutate-element,
                           target: tier,
-                          prop: textContent,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
                           value: Silver
                         }
                       ]
@@ -77,7 +86,10 @@
                         {
                           kind: mutate-element,
                           target: tier,
-                          prop: textContent,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
                           value: Bronze
                         }
                       ]

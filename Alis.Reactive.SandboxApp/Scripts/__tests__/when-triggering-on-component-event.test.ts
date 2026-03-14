@@ -32,7 +32,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo",
-              prop: "textContent",
+              mutation: { kind: "set-prop", prop: "textContent" },
               value: "changed!",
             }],
           },
@@ -65,7 +65,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-idle",
-              prop: "textContent",
+              mutation: { kind: "set-prop", prop: "textContent" },
               value: "fired",
             }],
           },
@@ -105,7 +105,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-nested",
-              prop: "textContent",
+              mutation: { kind: "set-prop", prop: "textContent" },
               value: "nested works",
             }],
           },
@@ -158,7 +158,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-fusion",
-              prop: "textContent",
+              mutation: { kind: "set-prop", prop: "textContent" },
               value: "fusion changed",
             }],
           },
@@ -192,7 +192,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-args",
-              prop: "textContent",
+              mutation: { kind: "set-prop", prop: "textContent" },
               source: { kind: "event", path: "evt.value" },
             }],
           },

@@ -11,27 +11,32 @@ export function mutateElement(cmd: MutateElementCommand, ctx?: ExecContext): voi
 
   const root = cmd.vendor ? resolveRoot(domEl, cmd.vendor) : domEl;
   const val = cmd.source ? resolveSource(cmd.source, ctx) : cmd.value;
+  const m = cmd.mutation;
 
-  if (cmd.prop) {
-    const coerced = cmd.coerce ? coerce(val, cmd.coerce) : val;
-    log.trace("prop", { target: cmd.target, prop: cmd.prop, val: coerced });
-    (root as any)[cmd.prop] = coerced;
-    return;
-  }
-
-  if (cmd.method) {
-    const target = cmd.chain ? (root as any)[cmd.chain] : root;
-    const fn = (target as any)[cmd.method];
-    if (cmd.args) {
-      log.trace("method", { target: cmd.target, method: cmd.method, args: cmd.args });
-      fn.apply(target, cmd.args);
-    } else if (val !== undefined) {
-      log.trace("method", { target: cmd.target, method: cmd.method, val });
-      fn.call(target, val);
-    } else {
-      log.trace("method", { target: cmd.target, method: cmd.method });
-      fn.call(target);
+  switch (m.kind) {
+    case "set-prop": {
+      const coerced = m.coerce ? coerce(val, m.coerce) : val;
+      log.trace("set-prop", { target: cmd.target, prop: m.prop, val: coerced });
+      (root as any)[m.prop] = coerced;
+      break;
     }
-    return;
+    case "call-void": {
+      const target = m.chain ? (root as any)[m.chain] : root;
+      log.trace("call-void", { target: cmd.target, method: m.method });
+      (target as any)[m.method].call(target);
+      break;
+    }
+    case "call-val": {
+      const target = m.chain ? (root as any)[m.chain] : root;
+      log.trace("call-val", { target: cmd.target, method: m.method, val });
+      (target as any)[m.method].call(target, val);
+      break;
+    }
+    case "call-args": {
+      const target = m.chain ? (root as any)[m.chain] : root;
+      log.trace("call-args", { target: cmd.target, method: m.method, args: m.args });
+      (target as any)[m.method].apply(target, m.args);
+      break;
+    }
   }
 }

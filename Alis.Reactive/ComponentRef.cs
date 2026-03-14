@@ -9,10 +9,9 @@ namespace Alis.Reactive
     /// Returned by p.Component&lt;T&gt;(). Vendor-specific extension methods
     /// constrain TComponent to add mutation methods (SetValue, Show, etc.).
     ///
-    /// The ref itself is vendor-agnostic — structured prop/method fields in each
-    /// extension method carry the vendor-specific behavior.
-    /// Runtime resolves vendor root via resolveRoot, then uses bracket notation:
-    ///   root[prop]=val or root[method](val)
+    /// The ref itself is vendor-agnostic — each extension method creates a
+    /// discriminated Mutation (set-prop, call-void, call-val, call-args).
+    /// Runtime resolves vendor root via resolveRoot, then switches on mutation.kind.
     /// </summary>
     public class ComponentRef<TComponent, TModel>
         where TComponent : IComponent, new()
@@ -30,29 +29,17 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Emits a MutateElementCommand with structured prop/method fields.
+        /// Emits a MutateElementCommand with a discriminated Mutation.
         /// Called by vendor extension methods — not by DSL users directly.
         /// Vendor is resolved from the cached TComponent instance.
         /// </summary>
         internal ComponentRef<TComponent, TModel> Emit(
-            string? prop = null,
-            string? method = null,
-            string? chain = null,
+            Mutation mutation,
             string? value = null,
-            BindSource? source = null,
-            string? coerce = null,
-            object[]? args = null)
+            BindSource? source = null)
         {
             Pipeline.AddCommand(new MutateElementCommand(
-                TargetId,
-                prop: prop,
-                method: method,
-                chain: chain,
-                coerce: coerce,
-                args: args,
-                value: value,
-                source: source,
-                vendor: _instance.Vendor));
+                TargetId, mutation, value, source, vendor: _instance.Vendor));
             return this;
         }
 

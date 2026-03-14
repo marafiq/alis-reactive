@@ -11,7 +11,10 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-            method: showPopup,
+            mutation: {
+              kind: call-void,
+              method: showPopup
+            },
             vendor: fusion
           }
         ]

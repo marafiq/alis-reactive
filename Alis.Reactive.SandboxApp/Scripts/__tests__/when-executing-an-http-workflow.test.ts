@@ -3,15 +3,15 @@ import { boot } from "../boot";
 import type { Command } from "../types";
 
 function setText(target: string, value: string): Command {
-  return { kind: "mutate-element", target, prop: "textContent", value };
+  return { kind: "mutate-element", target, mutation: { kind: "set-prop", prop: "textContent" }, value };
 }
 
 function show(target: string): Command {
-  return { kind: "mutate-element", target, method: "removeAttribute", args: ["hidden"], value: "" };
+  return { kind: "mutate-element", target, mutation: { kind: "call-args", method: "removeAttribute", args: ["hidden"] }, value: "" };
 }
 
 function hide(target: string): Command {
-  return { kind: "mutate-element", target, method: "setAttribute", args: ["hidden", ""], value: "" };
+  return { kind: "mutate-element", target, mutation: { kind: "call-args", method: "setAttribute", args: ["hidden", ""] }, value: "" };
 }
 
 function dispatch(event: string, payload?: Record<string, unknown>): Command {

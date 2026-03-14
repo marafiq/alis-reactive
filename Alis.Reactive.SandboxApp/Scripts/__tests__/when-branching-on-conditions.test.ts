@@ -45,14 +45,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Pass" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Pass" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Fail" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Fail" }],
                 },
               },
             ],
@@ -85,14 +85,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Pass" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Pass" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Fail" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Fail" }],
                 },
               },
             ],
@@ -125,21 +125,21 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "A" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "A" }],
                 },
               },
               {
                 guard: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 80 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "B" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "B" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "C" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "C" }],
                 },
               },
             ],
@@ -178,14 +178,14 @@ describe("when branching on conditions", () => {
                 },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Active High Scorer" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Active High Scorer" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Nope" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Nope" }],
                 },
               },
             ],
@@ -218,14 +218,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "not", inner: { kind: "value", source: es("evt.role"), coerceAs: "string", op: "eq", operand: "admin" } },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Not Admin" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Not Admin" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Is Admin" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Is Admin" }],
                 },
               },
             ],
@@ -258,14 +258,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.category"), coerceAs: "string", op: "in", operand: ["A", "B", "C"] },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "In Group" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "In Group" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Not In Group" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Not In Group" }],
                 },
               },
             ],
@@ -298,14 +298,14 @@ describe("when branching on conditions", () => {
                 guard: { kind: "value", source: es("evt.age"), coerceAs: "number", op: "between", operand: [18, 65] },
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Working Age" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Working Age" }],
                 },
               },
               {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "Outside Range" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Outside Range" }],
                 },
               },
             ],
@@ -334,9 +334,9 @@ describe("when branching on conditions", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "result", prop: "textContent", value: "Always" },
+              { kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Always" },
               {
-                kind: "mutate-element", target: "result", prop: "textContent", value: "Bonus",
+                kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Bonus",
                 when: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
               },
             ],
@@ -366,9 +366,9 @@ describe("when branching on conditions", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "result", prop: "textContent", value: "Always" },
+              { kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Always" },
               {
-                kind: "mutate-element", target: "result", prop: "textContent", value: "Bonus",
+                kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Bonus",
                 when: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
               },
             ],

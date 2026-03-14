@@ -41,10 +41,13 @@
                 {
                   kind: mutate-element,
                   target: panel,
-                  method: removeAttribute,
-                  args: [
-                    hidden
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: removeAttribute,
+                    args: [
+                      hidden
+                    ]
+                  }
                 }
               ]
             }
@@ -56,11 +59,14 @@
                 {
                   kind: mutate-element,
                   target: panel,
-                  method: setAttribute,
-                  args: [
-                    hidden,
-                    
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: setAttribute,
+                    args: [
+                      hidden,
+                      
+                    ]
+                  }
                 }
               ]
             }

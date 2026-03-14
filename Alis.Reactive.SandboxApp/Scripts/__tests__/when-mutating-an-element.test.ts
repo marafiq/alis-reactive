@@ -30,7 +30,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "status", method: "add", chain: "classList", value: "active" }],
+          commands: [{ kind: "mutate-element", target: "status", mutation: { kind: "call-val", method: "add", chain: "classList" }, value: "active" }],
         },
       }],
     });
@@ -46,7 +46,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "status", method: "remove", chain: "classList", value: "text-muted" }],
+          commands: [{ kind: "mutate-element", target: "status", mutation: { kind: "call-val", method: "remove", chain: "classList" }, value: "text-muted" }],
         },
       }],
     });
@@ -62,7 +62,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "panel", prop: "textContent", value: "done" }],
+          commands: [{ kind: "mutate-element", target: "panel", mutation: { kind: "set-prop", prop: "textContent" }, value: "done" }],
         },
       }],
     });
@@ -78,7 +78,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "panel", prop: "innerHTML", value: "<strong>ok</strong>" }],
+          commands: [{ kind: "mutate-element", target: "panel", mutation: { kind: "set-prop", prop: "innerHTML" }, value: "<strong>ok</strong>" }],
         },
       }],
     });
@@ -94,7 +94,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "loader", method: "removeAttribute", args: ["hidden"] }],
+          commands: [{ kind: "mutate-element", target: "loader", mutation: { kind: "call-args", method: "removeAttribute", args: ["hidden"] } }],
         },
       }],
     });
@@ -110,7 +110,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "content", method: "setAttribute", args: ["hidden", ""] }],
+          commands: [{ kind: "mutate-element", target: "content", mutation: { kind: "call-args", method: "setAttribute", args: ["hidden", ""] } }],
         },
       }],
     });
@@ -126,7 +126,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "status", method: "toggle", chain: "classList", value: "text-muted" }],
+          commands: [{ kind: "mutate-element", target: "status", mutation: { kind: "call-val", method: "toggle", chain: "classList" }, value: "text-muted" }],
         },
       }],
     });
@@ -147,9 +147,9 @@ describe("mutate-element command", () => {
         reaction: {
           kind: "sequential",
           commands: [
-            { kind: "mutate-element", target: "status", method: "add", chain: "classList", value: "complete" },
+            { kind: "mutate-element", target: "status", mutation: { kind: "call-val", method: "add", chain: "classList" }, value: "complete" },
             { kind: "dispatch", event: "step-done" },
-            { kind: "mutate-element", target: "panel", prop: "textContent", value: "next" },
+            { kind: "mutate-element", target: "panel", mutation: { kind: "set-prop", prop: "textContent" }, value: "next" },
           ],
         },
       }],

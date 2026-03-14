@@ -12,7 +12,10 @@
           {
             kind: mutate-element,
             target: content,
-            prop: innerHTML,
+            mutation: {
+              kind: set-prop,
+              prop: innerHTML
+            },
             source: {
               kind: event,
               path: evt.stringValue

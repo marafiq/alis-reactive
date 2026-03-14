@@ -186,14 +186,39 @@ export interface DispatchCommand {
 
 export type CoercionType = "string" | "number" | "boolean" | "date" | "raw";
 
+// ── Mutation (discriminated by kind) ──
+
+export type Mutation = SetPropMutation | CallVoidMutation | CallValMutation | CallArgsMutation;
+
+export interface SetPropMutation {
+  kind: "set-prop";
+  prop: string;
+  coerce?: CoercionType;
+}
+
+export interface CallVoidMutation {
+  kind: "call-void";
+  method: string;
+  chain?: string;
+}
+
+export interface CallValMutation {
+  kind: "call-val";
+  method: string;
+  chain?: string;
+}
+
+export interface CallArgsMutation {
+  kind: "call-args";
+  method: string;
+  args: unknown[];
+  chain?: string;
+}
+
 export interface MutateElementCommand {
   kind: "mutate-element";
   target: string;
-  prop?: string;
-  method?: string;
-  chain?: string;
-  coerce?: CoercionType;
-  args?: unknown[];
+  mutation: Mutation;
   value?: string;
   source?: BindSource;
   vendor?: Vendor;

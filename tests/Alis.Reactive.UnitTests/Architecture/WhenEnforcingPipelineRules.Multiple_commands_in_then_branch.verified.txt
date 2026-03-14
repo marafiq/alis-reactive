@@ -12,11 +12,14 @@
           {
             kind: mutate-element,
             target: loading,
-            method: setAttribute,
-            args: [
-              hidden,
-              
-            ]
+            mutation: {
+              kind: call-args,
+              method: setAttribute,
+              args: [
+                hidden,
+                
+              ]
+            }
           }
         ],
         branches: [
@@ -37,18 +40,24 @@
                 {
                   kind: mutate-element,
                   target: admin-panel,
-                  method: removeAttribute,
-                  args: [
-                    hidden
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: removeAttribute,
+                    args: [
+                      hidden
+                    ]
+                  }
                 },
                 {
                   kind: mutate-element,
                   target: delete-btn,
-                  method: removeAttribute,
-                  args: [
-                    hidden
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: removeAttribute,
+                    args: [
+                      hidden
+                    ]
+                  }
                 },
                 {
                   kind: dispatch,
@@ -64,20 +73,26 @@
                 {
                   kind: mutate-element,
                   target: admin-panel,
-                  method: setAttribute,
-                  args: [
-                    hidden,
-                    
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: setAttribute,
+                    args: [
+                      hidden,
+                      
+                    ]
+                  }
                 },
                 {
                   kind: mutate-element,
                   target: delete-btn,
-                  method: setAttribute,
-                  args: [
-                    hidden,
-                    
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: setAttribute,
+                    args: [
+                      hidden,
+                      
+                    ]
+                  }
                 }
               ]
             }

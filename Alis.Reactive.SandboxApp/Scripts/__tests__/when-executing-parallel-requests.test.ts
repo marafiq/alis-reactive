@@ -49,14 +49,14 @@ describe("parallel http reactions", () => {
       requests: [
         {
           verb: "GET", url: "/api/residents",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", prop: "textContent", value: "loaded" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" }] }],
         },
         {
           verb: "GET", url: "/api/facilities",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "facilities", prop: "textContent", value: "loaded" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "facilities", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" }] }],
         },
       ],
-      onAllSettled: [{ kind: "mutate-element", target: "result", prop: "textContent", value: "all done" }],
+      onAllSettled: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "all done" }],
     };
 
     await executeParallelHttpReaction(reaction);
@@ -77,11 +77,11 @@ describe("parallel http reactions", () => {
       requests: [
         {
           verb: "GET", url: "/api/residents",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", prop: "textContent", value: "loaded" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" }] }],
         },
         {
           verb: "GET", url: "/api/facilities",
-          onError: [{ commands: [{ kind: "mutate-element", target: "error", prop: "textContent", value: "failed" }] }],
+          onError: [{ commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "failed" }] }],
         },
       ],
     };
@@ -100,11 +100,11 @@ describe("http reaction with preFetch", () => {
     const reaction: HttpReaction = {
       kind: "http",
       preFetch: [
-        { kind: "mutate-element", target: "spinner", method: "removeAttribute", args: ["hidden"] },
+        { kind: "mutate-element", target: "spinner", mutation: { kind: "call-args", method: "removeAttribute", args: ["hidden"] } },
       ],
       request: {
         verb: "GET", url: "/api/test",
-        onSuccess: [{ commands: [{ kind: "mutate-element", target: "spinner", method: "setAttribute", args: ["hidden", ""] }] }],
+        onSuccess: [{ commands: [{ kind: "mutate-element", target: "spinner", mutation: { kind: "call-args", method: "setAttribute", args: ["hidden", ""] } }] }],
       },
     };
 

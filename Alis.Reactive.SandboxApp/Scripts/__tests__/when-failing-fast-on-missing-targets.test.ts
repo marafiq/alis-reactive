@@ -62,7 +62,7 @@ describe("when failing fast on missing targets", () => {
       expect(() => mutateElement({
         kind: "mutate-element",
         target: "missing-el",
-        prop: "textContent",
+        mutation: { kind: "set-prop", prop: "textContent" },
         value: "hello",
       })).toThrow("target not found: missing-el");
     });

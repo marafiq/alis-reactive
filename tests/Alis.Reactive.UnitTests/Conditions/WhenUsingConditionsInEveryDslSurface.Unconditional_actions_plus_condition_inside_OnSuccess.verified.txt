@@ -19,19 +19,25 @@
                   {
                     kind: mutate-element,
                     target: spinner,
-                    method: setAttribute,
-                    args: [
-                      hidden,
-                      
-                    ]
+                    mutation: {
+                      kind: call-args,
+                      method: setAttribute,
+                      args: [
+                        hidden,
+                        
+                      ]
+                    }
                   },
                   {
                     kind: mutate-element,
                     target: content,
-                    method: removeAttribute,
-                    args: [
-                      hidden
-                    ]
+                    mutation: {
+                      kind: call-args,
+                      method: removeAttribute,
+                      args: [
+                        hidden
+                      ]
+                    }
                   },
                   {
                     kind: dispatch,
@@ -56,10 +62,13 @@
                         {
                           kind: mutate-element,
                           target: admin-tools,
-                          method: removeAttribute,
-                          args: [
-                            hidden
-                          ]
+                          mutation: {
+                            kind: call-args,
+                            method: removeAttribute,
+                            args: [
+                              hidden
+                            ]
+                          }
                         }
                       ]
                     }
@@ -71,11 +80,14 @@
                         {
                           kind: mutate-element,
                           target: admin-tools,
-                          method: setAttribute,
-                          args: [
-                            hidden,
-                            
-                          ]
+                          mutation: {
+                            kind: call-args,
+                            method: setAttribute,
+                            args: [
+                              hidden,
+                              
+                            ]
+                          }
                         }
                       ]
                     }

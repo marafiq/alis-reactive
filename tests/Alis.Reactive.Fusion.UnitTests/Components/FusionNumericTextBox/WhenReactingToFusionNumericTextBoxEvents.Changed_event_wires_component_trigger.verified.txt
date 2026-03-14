@@ -12,8 +12,11 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            prop: value,
-            coerce: number,
+            mutation: {
+              kind: set-prop,
+              prop: value,
+              coerce: number
+            },
             value: 999,
             vendor: fusion
           }

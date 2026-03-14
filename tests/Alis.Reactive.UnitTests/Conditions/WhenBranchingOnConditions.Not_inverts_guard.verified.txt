@@ -29,7 +29,10 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: Not admin
                 }
               ]
@@ -42,7 +45,10 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: Is admin
                 }
               ]

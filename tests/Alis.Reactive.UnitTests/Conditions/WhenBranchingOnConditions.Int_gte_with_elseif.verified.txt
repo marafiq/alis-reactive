@@ -26,7 +26,10 @@
                 {
                   kind: mutate-element,
                   target: grade,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: A
                 }
               ]
@@ -49,7 +52,10 @@
                 {
                   kind: mutate-element,
                   target: grade,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: B
                 }
               ]
@@ -62,7 +68,10 @@
                 {
                   kind: mutate-element,
                   target: grade,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: F
                 }
               ]

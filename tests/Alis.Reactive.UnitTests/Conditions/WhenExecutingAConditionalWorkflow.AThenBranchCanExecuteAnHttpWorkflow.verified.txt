@@ -45,7 +45,10 @@
                 {
                   kind: mutate-element,
                   target: error,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: Unauthorized
                 }
               ]

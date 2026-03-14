@@ -12,7 +12,10 @@
           {
             kind: mutate-element,
             target: int-value,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             source: {
               kind: event,
               path: evt.intValue
@@ -21,7 +24,10 @@
           {
             kind: mutate-element,
             target: long-value,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             source: {
               kind: event,
               path: evt.longValue
@@ -30,7 +36,10 @@
           {
             kind: mutate-element,
             target: double-value,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             source: {
               kind: event,
               path: evt.doubleValue
@@ -39,7 +48,10 @@
           {
             kind: mutate-element,
             target: string-value,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             source: {
               kind: event,
               path: evt.stringValue
@@ -48,7 +60,10 @@
           {
             kind: mutate-element,
             target: bool-value,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             source: {
               kind: event,
               path: evt.boolValue

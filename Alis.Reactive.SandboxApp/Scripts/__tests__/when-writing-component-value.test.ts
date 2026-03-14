@@ -15,7 +15,7 @@ describe("when writing component value", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "native-write",
-          prop: "value", value: "written",
+          mutation: { kind: "set-prop", prop: "value" }, value: "written",
         }] },
       }] });
 
@@ -35,7 +35,7 @@ describe("when writing component value", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-write",
-          prop: "value", vendor: "fusion", value: "written",
+          mutation: { kind: "set-prop", prop: "value" }, vendor: "fusion", value: "written",
         }] },
       }] });
 

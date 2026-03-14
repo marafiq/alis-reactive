@@ -20,16 +20,22 @@
                 {
                   kind: mutate-element,
                   target: item,
-                  method: setAttribute,
-                  args: [
-                    hidden,
-                    
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: setAttribute,
+                    args: [
+                      hidden,
+                      
+                    ]
+                  }
                 },
                 {
                   kind: mutate-element,
                   target: status,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: Deleted
                 },
                 {
@@ -46,7 +52,10 @@
                 {
                   kind: mutate-element,
                   target: status,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: Cancelled
                 }
               ]

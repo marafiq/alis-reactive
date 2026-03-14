@@ -11,8 +11,11 @@
           {
             kind: mutate-element,
             target: step-1,
-            method: add,
-            chain: classList,
+            mutation: {
+              kind: call-val,
+              method: add,
+              chain: classList
+            },
             value: complete
           },
           {
@@ -22,7 +25,10 @@
           {
             kind: mutate-element,
             target: step-2,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             value: next
           }
         ]

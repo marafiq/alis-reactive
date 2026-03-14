@@ -29,24 +29,79 @@ namespace Alis.Reactive.Descriptors.Commands
         }
     }
 
-    public sealed class MutateElementCommand : Command
+    // ── Mutation (discriminated by kind) ──
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
+    [JsonDerivedType(typeof(SetPropMutation), "set-prop")]
+    [JsonDerivedType(typeof(CallVoidMutation), "call-void")]
+    [JsonDerivedType(typeof(CallValMutation), "call-val")]
+    [JsonDerivedType(typeof(CallArgsMutation), "call-args")]
+    public abstract class Mutation { }
+
+    public sealed class SetPropMutation : Mutation
     {
-        public string Target { get; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Prop { get; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Method { get; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Chain { get; }
+        public string Prop { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Coerce { get; }
 
+        public SetPropMutation(string prop, string? coerce = null)
+        {
+            Prop = prop;
+            Coerce = coerce;
+        }
+    }
+
+    public sealed class CallVoidMutation : Mutation
+    {
+        public string Method { get; }
+
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public object[]? Args { get; }
+        public string? Chain { get; }
+
+        public CallVoidMutation(string method, string? chain = null)
+        {
+            Method = method;
+            Chain = chain;
+        }
+    }
+
+    public sealed class CallValMutation : Mutation
+    {
+        public string Method { get; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Chain { get; }
+
+        public CallValMutation(string method, string? chain = null)
+        {
+            Method = method;
+            Chain = chain;
+        }
+    }
+
+    public sealed class CallArgsMutation : Mutation
+    {
+        public string Method { get; }
+        public object[] Args { get; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Chain { get; }
+
+        public CallArgsMutation(string method, object[] args, string? chain = null)
+        {
+            Method = method;
+            Args = args;
+            Chain = chain;
+        }
+    }
+
+    // ── MutateElementCommand ──
+
+    public sealed class MutateElementCommand : Command
+    {
+        public string Target { get; }
+        public Mutation Mutation { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Value { get; }
@@ -59,21 +114,13 @@ namespace Alis.Reactive.Descriptors.Commands
 
         public MutateElementCommand(
             string target,
-            string? prop = null,
-            string? method = null,
-            string? chain = null,
-            string? coerce = null,
-            object[]? args = null,
+            Mutation mutation,
             string? value = null,
             BindSource? source = null,
             string? vendor = null)
         {
             Target = target;
-            Prop = prop;
-            Method = method;
-            Chain = chain;
-            Coerce = coerce;
-            Args = args;
+            Mutation = mutation;
             Value = value;
             Source = source;
             Vendor = vendor;

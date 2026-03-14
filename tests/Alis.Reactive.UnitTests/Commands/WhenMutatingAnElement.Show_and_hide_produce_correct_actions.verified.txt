@@ -11,19 +11,25 @@
           {
             kind: mutate-element,
             target: loader,
-            method: removeAttribute,
-            args: [
-              hidden
-            ]
+            mutation: {
+              kind: call-args,
+              method: removeAttribute,
+              args: [
+                hidden
+              ]
+            }
           },
           {
             kind: mutate-element,
             target: content,
-            method: setAttribute,
-            args: [
-              hidden,
-              
-            ]
+            mutation: {
+              kind: call-args,
+              method: setAttribute,
+              args: [
+                hidden,
+                
+              ]
+            }
           }
         ]
       }

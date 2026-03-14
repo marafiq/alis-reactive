@@ -11,7 +11,10 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-            prop: text,
+            mutation: {
+              kind: set-prop,
+              prop: text
+            },
             value: United States,
             vendor: fusion
           }

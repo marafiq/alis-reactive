@@ -11,7 +11,10 @@
           {
             kind: mutate-element,
             target: container,
-            prop: innerHTML,
+            mutation: {
+              kind: set-prop,
+              prop: innerHTML
+            },
             value: <strong>done</strong>
           }
         ]

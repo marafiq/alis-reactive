@@ -16,7 +16,10 @@
           {
             kind: mutate-element,
             target: echo,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             value: Status changed
           }
         ]

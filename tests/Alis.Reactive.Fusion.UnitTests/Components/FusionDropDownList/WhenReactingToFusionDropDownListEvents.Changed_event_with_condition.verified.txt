@@ -26,7 +26,10 @@
                 {
                   kind: mutate-element,
                   target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-                  prop: value,
+                  mutation: {
+                    kind: set-prop,
+                    prop: value
+                  },
                   value: US,
                   vendor: fusion
                 }
@@ -40,7 +43,10 @@
                 {
                   kind: mutate-element,
                   target: echo,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: Not US
                 }
               ]

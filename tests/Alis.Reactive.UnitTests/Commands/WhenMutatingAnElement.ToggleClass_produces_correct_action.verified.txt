@@ -11,8 +11,11 @@
           {
             kind: mutate-element,
             target: menu,
-            method: toggle,
-            chain: classList,
+            mutation: {
+              kind: call-val,
+              method: toggle,
+              chain: classList
+            },
             value: expanded
           }
         ]

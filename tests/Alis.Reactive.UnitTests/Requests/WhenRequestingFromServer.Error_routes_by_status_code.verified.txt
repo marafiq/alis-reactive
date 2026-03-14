@@ -23,7 +23,10 @@
                 {
                   kind: mutate-element,
                   target: result,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: ok
                 }
               ]
@@ -36,7 +39,10 @@
                 {
                   kind: mutate-element,
                   target: error,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: bad request
                 }
               ]
@@ -47,7 +53,10 @@
                 {
                   kind: mutate-element,
                   target: error,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: server error
                 }
               ]

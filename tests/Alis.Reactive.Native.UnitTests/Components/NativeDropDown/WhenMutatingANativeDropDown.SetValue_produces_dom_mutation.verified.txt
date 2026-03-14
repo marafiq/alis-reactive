@@ -11,7 +11,10 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
-            prop: value,
+            mutation: {
+              kind: set-prop,
+              prop: value
+            },
             value: active,
             vendor: native
           }

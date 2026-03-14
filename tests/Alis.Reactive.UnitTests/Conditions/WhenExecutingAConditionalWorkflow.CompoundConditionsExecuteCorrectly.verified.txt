@@ -39,10 +39,13 @@
                 {
                   kind: mutate-element,
                   target: admin-panel,
-                  method: removeAttribute,
-                  args: [
-                    hidden
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: removeAttribute,
+                    args: [
+                      hidden
+                    ]
+                  }
                 }
               ]
             }
@@ -54,11 +57,14 @@
                 {
                   kind: mutate-element,
                   target: admin-panel,
-                  method: setAttribute,
-                  args: [
-                    hidden,
-                    
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: setAttribute,
+                    args: [
+                      hidden,
+                      
+                    ]
+                  }
                 }
               ]
             }

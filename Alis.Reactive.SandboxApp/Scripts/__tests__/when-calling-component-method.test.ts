@@ -17,7 +17,7 @@ describe("when calling component method (void)", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "native-method",
-          method: "focus",
+          mutation: { kind: "call-void", method: "focus" },
         }] },
       }] });
 
@@ -37,7 +37,7 @@ describe("when calling component method (void)", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-method",
-          method: "focus", vendor: "fusion",
+          mutation: { kind: "call-void", method: "focus" }, vendor: "fusion",
         }] },
       }] });
 

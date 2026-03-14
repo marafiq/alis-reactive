@@ -11,7 +11,10 @@
           {
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            method: increment,
+            mutation: {
+              kind: call-void,
+              method: increment
+            },
             vendor: fusion
           }
         ]

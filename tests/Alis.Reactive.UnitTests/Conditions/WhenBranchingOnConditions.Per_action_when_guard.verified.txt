@@ -12,13 +12,19 @@
           {
             kind: mutate-element,
             target: result,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             value: Always runs
           },
           {
             kind: mutate-element,
             target: bonus,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             value: Bonus!,
             when: {
               kind: value,

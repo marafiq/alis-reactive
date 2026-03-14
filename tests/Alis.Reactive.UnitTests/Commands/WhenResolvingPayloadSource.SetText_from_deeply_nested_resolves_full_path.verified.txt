@@ -12,7 +12,10 @@
           {
             kind: mutate-element,
             target: street,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             source: {
               kind: event,
               path: evt.address.street
@@ -21,7 +24,10 @@
           {
             kind: mutate-element,
             target: city,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             source: {
               kind: event,
               path: evt.address.city
@@ -30,7 +36,10 @@
           {
             kind: mutate-element,
             target: zip,
-            prop: textContent,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
             source: {
               kind: event,
               path: evt.address.zip

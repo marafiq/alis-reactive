@@ -30,7 +30,7 @@ describe("when calling component method with args (source walk → val)", () => 
           trigger: { kind: "custom-event", event: "load-data" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fusion-args",
-            method: "setItems", vendor: "fusion",
+            mutation: { kind: "call-val", method: "setItems" }, vendor: "fusion",
             source: { kind: "event", path: "evt.data.items" },
           }] },
         },
@@ -54,7 +54,7 @@ describe("when calling component method with args (source walk → val)", () => 
           trigger: { kind: "custom-event", event: "set-val" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fusion-set",
-            prop: "value", vendor: "fusion",
+            mutation: { kind: "set-prop", prop: "value" }, vendor: "fusion",
             source: { kind: "event", path: "evt.result.detail.newValue" },
           }] },
         },
@@ -82,7 +82,7 @@ describe("when calling component method with args (source walk → val)", () => 
           trigger: { kind: "custom-event", event: "set-attr" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "native-args",
-            prop: "value",
+            mutation: { kind: "set-prop", prop: "value" },
             source: { kind: "event", path: "evt.attr.val" },
           }] },
         },
@@ -108,7 +108,7 @@ describe("when calling component method with args (source walk → val)", () => 
           trigger: { kind: "custom-event", event: "fill" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "native-set",
-            prop: "value",
+            mutation: { kind: "set-prop", prop: "value" },
             source: { kind: "event", path: "evt.form.username" },
           }] },
         },

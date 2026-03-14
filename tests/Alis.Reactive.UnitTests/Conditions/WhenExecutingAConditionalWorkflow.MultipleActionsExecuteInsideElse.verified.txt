@@ -26,10 +26,13 @@
                 {
                   kind: mutate-element,
                   target: panel,
-                  method: removeAttribute,
-                  args: [
-                    hidden
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: removeAttribute,
+                    args: [
+                      hidden
+                    ]
+                  }
                 }
               ]
             }
@@ -41,16 +44,22 @@
                 {
                   kind: mutate-element,
                   target: panel,
-                  method: setAttribute,
-                  args: [
-                    hidden,
-                    
-                  ]
+                  mutation: {
+                    kind: call-args,
+                    method: setAttribute,
+                    args: [
+                      hidden,
+                      
+                    ]
+                  }
                 },
                 {
                   kind: mutate-element,
                   target: notice,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: Contact admin for access
                 },
                 {

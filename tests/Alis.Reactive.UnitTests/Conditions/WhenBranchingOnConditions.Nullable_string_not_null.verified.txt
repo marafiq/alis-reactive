@@ -25,7 +25,10 @@
                 {
                   kind: mutate-element,
                   target: greeting,
-                  prop: textContent,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
                   value: Welcome
                 }
               ]

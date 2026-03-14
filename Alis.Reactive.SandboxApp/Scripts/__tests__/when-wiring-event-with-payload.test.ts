@@ -18,7 +18,7 @@ describe("when wiring component event with payload", () => {
           jsEvent: "change", vendor: "native" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "native-evt-result",
-          prop: "textContent", source: { kind: "event", path: "evt.value" },
+          mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.value" },
         }] },
       }] });
 
@@ -42,7 +42,7 @@ describe("when wiring component event with payload", () => {
           jsEvent: "change", vendor: "fusion" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-evt-result",
-          prop: "textContent", source: { kind: "event", path: "evt.newValue" },
+          mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.newValue" },
         }] },
       }] });
 
@@ -68,7 +68,7 @@ describe("when wiring component event with payload", () => {
           jsEvent: "items-changed", vendor: "fusion" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-items-evt-result",
-          prop: "textContent", source: { kind: "event", path: "evt.count" },
+          mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.count" },
         }] },
       }] });
 
