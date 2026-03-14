@@ -59,10 +59,13 @@
                   kind: mutate-element,
                   target: retry-btn,
                   mutation: {
-                    kind: call-args,
+                    kind: call,
                     method: removeAttribute,
                     args: [
-                      hidden
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
                     ]
                   }
                 }

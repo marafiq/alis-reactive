@@ -12,10 +12,13 @@
             kind: mutate-element,
             target: loader,
             mutation: {
-              kind: call-args,
+              kind: call,
               method: removeAttribute,
               args: [
-                hidden
+                {
+                  kind: literal,
+                  value: hidden
+                }
               ]
             }
           },
@@ -23,11 +26,17 @@
             kind: mutate-element,
             target: content,
             mutation: {
-              kind: call-args,
+              kind: call,
               method: setAttribute,
               args: [
-                hidden,
-                
+                {
+                  kind: literal,
+                  value: hidden
+                },
+                {
+                  kind: literal,
+                  value: 
+                }
               ]
             }
           }

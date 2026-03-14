@@ -85,6 +85,23 @@ export class TestWidget {
     this._fire("items-changed", { items: this._items, count: this._items.length });
   }
 
+  // -- Methods with Params (multi-arg) --
+
+  addItem(item: unknown, index: number): void {
+    this._items.splice(index, 0, item);
+    this._el.dataset.itemsCount = String(this._items.length);
+    this._renderItems();
+  }
+
+  setProperty(name: string, value: unknown): void {
+    (this as any)["_prop_" + name] = value;
+    this._el.dataset[name] = String(value);
+  }
+
+  getProperty(name: string): unknown {
+    return (this as any)["_prop_" + name];
+  }
+
   // -- DOM rendering (like real SF components render their state) --
 
   private _renderItems(): void {

@@ -12,21 +12,31 @@
             kind: mutate-element,
             target: panel,
             mutation: {
-              kind: call-val,
+              kind: call,
               method: remove,
-              chain: classList
-            },
-            value: text-muted
+              chain: classList,
+              args: [
+                {
+                  kind: literal,
+                  value: text-muted
+                }
+              ]
+            }
           },
           {
             kind: mutate-element,
             target: panel,
             mutation: {
-              kind: call-val,
+              kind: call,
               method: add,
-              chain: classList
-            },
-            value: text-green
+              chain: classList,
+              args: [
+                {
+                  kind: literal,
+                  value: text-green
+                }
+              ]
+            }
           },
           {
             kind: mutate-element,

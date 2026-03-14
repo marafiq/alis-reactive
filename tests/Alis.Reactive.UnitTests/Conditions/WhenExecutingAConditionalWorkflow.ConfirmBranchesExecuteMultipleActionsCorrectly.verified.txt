@@ -21,11 +21,17 @@
                   kind: mutate-element,
                   target: item,
                   mutation: {
-                    kind: call-args,
+                    kind: call,
                     method: setAttribute,
                     args: [
-                      hidden,
-                      
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
                     ]
                   }
                 },

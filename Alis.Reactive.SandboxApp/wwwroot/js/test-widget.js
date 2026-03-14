@@ -59,6 +59,19 @@
       this._renderItems();
       this._fire("items-changed", { items: this._items, count: this._items.length });
     }
+    // -- Methods with Params (multi-arg) --
+    addItem(item, index) {
+      this._items.splice(index, 0, item);
+      this._el.dataset.itemsCount = String(this._items.length);
+      this._renderItems();
+    }
+    setProperty(name, value) {
+      this["_prop_" + name] = value;
+      this._el.dataset[name] = String(value);
+    }
+    getProperty(name) {
+      return this["_prop_" + name];
+    }
     // -- DOM rendering (like real SF components render their state) --
     _renderItems() {
       let list = this._el.querySelector(".test-widget-items");

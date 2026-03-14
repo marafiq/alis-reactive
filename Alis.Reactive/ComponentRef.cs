@@ -10,7 +10,7 @@ namespace Alis.Reactive
     /// constrain TComponent to add mutation methods (SetValue, Show, etc.).
     ///
     /// The ref itself is vendor-agnostic — each extension method creates a
-    /// discriminated Mutation (set-prop, call-void, call-val, call-args).
+    /// discriminated Mutation (set-prop, call).
     /// Runtime resolves vendor root via resolveRoot, then switches on mutation.kind.
     /// </summary>
     public class ComponentRef<TComponent, TModel>

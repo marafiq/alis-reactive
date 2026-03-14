@@ -11,18 +11,18 @@ namespace Alis.Reactive.Fusion.AppLevel
             where TModel : class
         {
             return self.Emit(new SetPropMutation("content"), value: message)
-                       .Emit(new CallVoidMutation("dataBind"));
+                       .Emit(new CallMutation("dataBind"));
         }
 
         public static ComponentRef<FusionConfirm, TModel> Show<TModel>(
             this ComponentRef<FusionConfirm, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("show"));
+            => self.Emit(new CallMutation("show"));
 
         public static ComponentRef<FusionConfirm, TModel> Hide<TModel>(
             this ComponentRef<FusionConfirm, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("hide"));
+            => self.Emit(new CallMutation("hide"));
 
         public static IHtmlContent FusionConfirmDialog(this IHtmlHelper html)
             => new HtmlString($"<div id=\"{FusionConfirm.ElementId}\"></div>\n");

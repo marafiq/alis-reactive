@@ -19,7 +19,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallVoidMutation("focus"));
+            return self.Emit(new CallMutation("focus"));
         }
 
         public static TypedComponentSource<bool> Value<TModel>(

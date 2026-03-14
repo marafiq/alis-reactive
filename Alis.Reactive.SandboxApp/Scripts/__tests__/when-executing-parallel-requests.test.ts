@@ -100,11 +100,11 @@ describe("http reaction with preFetch", () => {
     const reaction: HttpReaction = {
       kind: "http",
       preFetch: [
-        { kind: "mutate-element", target: "spinner", mutation: { kind: "call-args", method: "removeAttribute", args: ["hidden"] } },
+        { kind: "mutate-element", target: "spinner", mutation: { kind: "call", method: "removeAttribute", args: [{ kind: "literal", value: "hidden" }] } },
       ],
       request: {
         verb: "GET", url: "/api/test",
-        onSuccess: [{ commands: [{ kind: "mutate-element", target: "spinner", mutation: { kind: "call-args", method: "setAttribute", args: ["hidden", ""] } }] }],
+        onSuccess: [{ commands: [{ kind: "mutate-element", target: "spinner", mutation: { kind: "call", method: "setAttribute", args: [{ kind: "literal", value: "hidden" }, { kind: "literal", value: "" }] } }] }],
       },
     };
 

@@ -5,7 +5,7 @@ import { TestWidget } from "../test-widget";
 /**
  * Proves that source walk (dot-path resolution from event payload)
  * flows correctly into EVERY mutation kind: set-prop, set-prop+coerce,
- * call-val, call-val+chain.
+ * call (with SourceArg), call+chain.
  *
  * Each test dispatches an event with nested payload, then a custom-event
  * handler walks the path and applies the resolved value via a specific
@@ -161,9 +161,9 @@ describe("when walking source into each mutation kind", () => {
     });
   });
 
-  // ── call-val: walk source → method arg ──
+  // ── call: walk source → method arg (SourceArg) ──
 
-  describe("call-val", () => {
+  describe("call (with SourceArg)", () => {
     it("walks source into classList.add via chain", () => {
       document.body.innerHTML = '<div id="styled" class="base">text</div>';
 
@@ -179,8 +179,7 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "custom-event", event: "style" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "styled",
-            mutation: { kind: "call-val", method: "add", chain: "classList" },
-            source: { kind: "event", path: "evt.css.className" },
+            mutation: { kind: "call", method: "add", chain: "classList", args: [{ kind: "source", source: { kind: "event", path: "evt.css.className" } }] },
           }] },
         },
       ] });
@@ -204,8 +203,7 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "custom-event", event: "load-items" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "items-target",
-            mutation: { kind: "call-val", method: "setItems" }, vendor: "fusion",
-            source: { kind: "event", path: "evt.response.data.list" },
+            mutation: { kind: "call", method: "setItems", args: [{ kind: "source", source: { kind: "event", path: "evt.response.data.list" } }] }, vendor: "fusion",
           }] },
         },
       ] });
@@ -214,9 +212,9 @@ describe("when walking source into each mutation kind", () => {
     });
   });
 
-  // ── call-void + call-args: no source walk (static) — verify no val leaks ──
+  // ── call (no args) + call (literal args): no source walk (static) — verify no val leaks ──
 
-  describe("call-void (no source walk)", () => {
+  describe("call (no args, no source walk)", () => {
     it("calls focus() without any val argument", () => {
       const { widget } = mountWidget("focus-target");
 
@@ -224,7 +222,7 @@ describe("when walking source into each mutation kind", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "focus-target",
-          mutation: { kind: "call-void", method: "focus" }, vendor: "fusion",
+          mutation: { kind: "call", method: "focus" }, vendor: "fusion",
         }] },
       }] });
 
@@ -232,7 +230,7 @@ describe("when walking source into each mutation kind", () => {
     });
   });
 
-  describe("call-args (literal args, no source walk)", () => {
+  describe("call (literal args, no source walk)", () => {
     it("calls removeAttribute with single literal arg", () => {
       document.body.innerHTML = '<div id="show-me" hidden>content</div>';
 
@@ -240,7 +238,7 @@ describe("when walking source into each mutation kind", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "show-me",
-          mutation: { kind: "call-args", method: "removeAttribute", args: ["hidden"] },
+          mutation: { kind: "call", method: "removeAttribute", args: [{ kind: "literal", value: "hidden" }] },
         }] },
       }] });
 
@@ -254,7 +252,7 @@ describe("when walking source into each mutation kind", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "tag-me",
-          mutation: { kind: "call-args", method: "setAttribute", args: ["data-status", "active"] },
+          mutation: { kind: "call", method: "setAttribute", args: [{ kind: "literal", value: "data-status" }, { kind: "literal", value: "active" }] },
         }] },
       }] });
 

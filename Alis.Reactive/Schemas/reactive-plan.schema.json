@@ -275,9 +275,7 @@
     "Mutation": {
       "oneOf": [
         { "$ref": "#/$defs/SetPropMutation" },
-        { "$ref": "#/$defs/CallVoidMutation" },
-        { "$ref": "#/$defs/CallValMutation" },
-        { "$ref": "#/$defs/CallArgsMutation" }
+        { "$ref": "#/$defs/CallMutation" }
       ]
     },
     "SetPropMutation": {
@@ -290,35 +288,40 @@
         "coerce": { "$ref": "#/$defs/CoercionType" }
       }
     },
-    "CallVoidMutation": {
+    "MethodArg": {
+      "oneOf": [
+        { "$ref": "#/$defs/LiteralArg" },
+        { "$ref": "#/$defs/SourceArg" }
+      ]
+    },
+    "LiteralArg": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "literal" },
+        "value": { "description": "Literal argument value" }
+      }
+    },
+    "SourceArg": {
+      "type": "object",
+      "required": ["kind", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "source" },
+        "source": { "$ref": "#/$defs/BindSource" },
+        "coerce": { "$ref": "#/$defs/CoercionType" }
+      }
+    },
+    "CallMutation": {
       "type": "object",
       "required": ["kind", "method"],
       "additionalProperties": false,
       "properties": {
-        "kind": { "const": "call-void" },
-        "method": { "type": "string", "minLength": 1, "description": "Void method to call: root[method]()" },
-        "chain": { "type": "string", "minLength": 1 }
-      }
-    },
-    "CallValMutation": {
-      "type": "object",
-      "required": ["kind", "method"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "call-val" },
-        "method": { "type": "string", "minLength": 1, "description": "Method to call with resolved val: root[method](val)" },
-        "chain": { "type": "string", "minLength": 1 }
-      }
-    },
-    "CallArgsMutation": {
-      "type": "object",
-      "required": ["kind", "method", "args"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "call-args" },
-        "method": { "type": "string", "minLength": 1, "description": "Method to call with literal args: root[method](...args)" },
-        "args": { "type": "array", "items": {}, "description": "Literal arguments array" },
-        "chain": { "type": "string", "minLength": 1 }
+        "kind": { "const": "call" },
+        "method": { "type": "string", "minLength": 1, "description": "Method to call: root[method](...args)" },
+        "chain": { "type": "string", "minLength": 1 },
+        "args": { "type": "array", "items": { "$ref": "#/$defs/MethodArg" }, "description": "Per-arg resolution: each arg is literal or source-walked" }
       }
     },
     "MutateElementCommand": {

@@ -34,11 +34,16 @@
             kind: mutate-element,
             target: status,
             mutation: {
-              kind: call-val,
+              kind: call,
               method: add,
-              chain: classList
-            },
-            value: text-green
+              chain: classList,
+              args: [
+                {
+                  kind: literal,
+                  value: text-green
+                }
+              ]
+            }
           }
         ]
       }

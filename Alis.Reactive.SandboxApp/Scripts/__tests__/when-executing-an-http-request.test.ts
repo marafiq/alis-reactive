@@ -76,10 +76,10 @@ describe("http request execution", () => {
       verb: "GET",
       url: "/api/test",
       whileLoading: [
-        { kind: "mutate-element", target: "spinner", mutation: { kind: "call-args", method: "removeAttribute", args: ["hidden"] } },
+        { kind: "mutate-element", target: "spinner", mutation: { kind: "call", method: "removeAttribute", args: [{ kind: "literal", value: "hidden" }] } },
       ],
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "spinner", mutation: { kind: "call-args", method: "setAttribute", args: ["hidden", ""] } }],
+        commands: [{ kind: "mutate-element", target: "spinner", mutation: { kind: "call", method: "setAttribute", args: [{ kind: "literal", value: "hidden" }, { kind: "literal", value: "" }] } }],
       }],
     };
 

@@ -12,11 +12,16 @@
             kind: mutate-element,
             target: menu,
             mutation: {
-              kind: call-val,
+              kind: call,
               method: toggle,
-              chain: classList
-            },
-            value: expanded
+              chain: classList,
+              args: [
+                {
+                  kind: literal,
+                  value: expanded
+                }
+              ]
+            }
           }
         ]
       }

@@ -16,7 +16,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeButton, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallVoidMutation("focus"));
+            return self.Emit(new CallMutation("focus"));
         }
     }
 }

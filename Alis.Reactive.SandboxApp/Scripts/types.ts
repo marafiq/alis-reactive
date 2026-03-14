@@ -188,7 +188,7 @@ export type CoercionType = "string" | "number" | "boolean" | "date" | "raw";
 
 // ── Mutation (discriminated by kind) ──
 
-export type Mutation = SetPropMutation | CallVoidMutation | CallValMutation | CallArgsMutation;
+export type Mutation = SetPropMutation | CallMutation;
 
 export interface SetPropMutation {
   kind: "set-prop";
@@ -196,23 +196,24 @@ export interface SetPropMutation {
   coerce?: CoercionType;
 }
 
-export interface CallVoidMutation {
-  kind: "call-void";
-  method: string;
-  chain?: string;
+export type MethodArg = LiteralArg | SourceArg;
+
+export interface LiteralArg {
+  kind: "literal";
+  value: unknown;
 }
 
-export interface CallValMutation {
-  kind: "call-val";
-  method: string;
-  chain?: string;
+export interface SourceArg {
+  kind: "source";
+  source: BindSource;
+  coerce?: CoercionType;
 }
 
-export interface CallArgsMutation {
-  kind: "call-args";
+export interface CallMutation {
+  kind: "call";
   method: string;
-  args: unknown[];
   chain?: string;
+  args?: MethodArg[];
 }
 
 export interface MutateElementCommand {

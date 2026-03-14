@@ -13,10 +13,13 @@
             kind: mutate-element,
             target: confirmation,
             mutation: {
-              kind: call-args,
+              kind: call,
               method: removeAttribute,
               args: [
-                hidden
+                {
+                  kind: literal,
+                  value: hidden
+                }
               ]
             }
           },
@@ -28,11 +31,17 @@
             kind: mutate-element,
             target: spinner,
             mutation: {
-              kind: call-args,
+              kind: call,
               method: setAttribute,
               args: [
-                hidden,
-                
+                {
+                  kind: literal,
+                  value: hidden
+                },
+                {
+                  kind: literal,
+                  value: 
+                }
               ]
             }
           }
@@ -56,10 +65,13 @@
                   kind: mutate-element,
                   target: express,
                   mutation: {
-                    kind: call-args,
+                    kind: call,
                     method: removeAttribute,
                     args: [
-                      hidden
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
                     ]
                   }
                 }
@@ -74,10 +86,13 @@
                   kind: mutate-element,
                   target: standard,
                   mutation: {
-                    kind: call-args,
+                    kind: call,
                     method: removeAttribute,
                     args: [
-                      hidden
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
                     ]
                   }
                 }

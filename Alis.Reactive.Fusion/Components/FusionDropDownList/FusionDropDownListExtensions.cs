@@ -45,22 +45,22 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionDropDownList, TModel> FocusIn<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("focusIn"));
+            => self.Emit(new CallMutation("focusIn"));
 
         public static ComponentRef<FusionDropDownList, TModel> FocusOut<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("focusOut"));
+            => self.Emit(new CallMutation("focusOut"));
 
         public static ComponentRef<FusionDropDownList, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("showPopup"));
+            => self.Emit(new CallMutation("showPopup"));
 
         public static ComponentRef<FusionDropDownList, TModel> HidePopup<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("hidePopup"));
+            => self.Emit(new CallMutation("hidePopup"));
 
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)

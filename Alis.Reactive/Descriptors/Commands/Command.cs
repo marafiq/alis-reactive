@@ -33,9 +33,7 @@ namespace Alis.Reactive.Descriptors.Commands
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
     [JsonDerivedType(typeof(SetPropMutation), "set-prop")]
-    [JsonDerivedType(typeof(CallVoidMutation), "call-void")]
-    [JsonDerivedType(typeof(CallValMutation), "call-val")]
-    [JsonDerivedType(typeof(CallArgsMutation), "call-args")]
+    [JsonDerivedType(typeof(CallMutation), "call")]
     public abstract class Mutation { }
 
     public sealed class SetPropMutation : Mutation
@@ -52,47 +50,52 @@ namespace Alis.Reactive.Descriptors.Commands
         }
     }
 
-    public sealed class CallVoidMutation : Mutation
+    // ── MethodArg (discriminated, per-arg resolution) ──
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
+    [JsonDerivedType(typeof(LiteralArg), "literal")]
+    [JsonDerivedType(typeof(SourceArg), "source")]
+    public abstract class MethodArg { }
+
+    public sealed class LiteralArg : MethodArg
     {
-        public string Method { get; }
+        public object Value { get; }
 
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Chain { get; }
-
-        public CallVoidMutation(string method, string? chain = null)
+        public LiteralArg(object value)
         {
-            Method = method;
-            Chain = chain;
+            Value = value;
         }
     }
 
-    public sealed class CallValMutation : Mutation
+    public sealed class SourceArg : MethodArg
     {
-        public string Method { get; }
+        public BindSource Source { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Chain { get; }
+        public string? Coerce { get; }
 
-        public CallValMutation(string method, string? chain = null)
+        public SourceArg(BindSource source, string? coerce = null)
         {
-            Method = method;
-            Chain = chain;
+            Source = source;
+            Coerce = coerce;
         }
     }
 
-    public sealed class CallArgsMutation : Mutation
+    public sealed class CallMutation : Mutation
     {
         public string Method { get; }
-        public object[] Args { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Chain { get; }
 
-        public CallArgsMutation(string method, object[] args, string? chain = null)
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public MethodArg[]? Args { get; }
+
+        public CallMutation(string method, string? chain = null, MethodArg[]? args = null)
         {
             Method = method;
+            Chain = chain;
             Args = args;
-            Chain = chain;
         }
     }
 

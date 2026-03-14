@@ -56,11 +56,11 @@ namespace Alis.Reactive.Fusion.Components
 
         public static ComponentRef<TestWidgetSyncFusion, TModel> Focus<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => self.Emit(new CallVoidMutation("focus"));
+            where TModel : class => self.Emit(new CallMutation("focus"));
 
         public static ComponentRef<TestWidgetSyncFusion, TModel> Clear<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => self.Emit(new CallVoidMutation("clear"));
+            where TModel : class => self.Emit(new CallMutation("clear"));
 
         // ── Method + arg (event payload) ──
 
@@ -70,7 +70,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new CallValMutation("setItems"), source: new EventSource(sourcePath));
+            return self.Emit(new CallMutation("setItems", args: new MethodArg[] { new SourceArg(new EventSource(sourcePath)) }));
         }
 
         // ── Method + arg (response body) ──
@@ -82,7 +82,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new CallValMutation("setItems"), source: new EventSource(sourcePath));
+            return self.Emit(new CallMutation("setItems", args: new MethodArg[] { new SourceArg(new EventSource(sourcePath)) }));
         }
     }
 }

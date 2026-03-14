@@ -22,7 +22,7 @@
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
             mutation: {
-              kind: call-void,
+              kind: call,
               method: showPopup
             },
             vendor: fusion

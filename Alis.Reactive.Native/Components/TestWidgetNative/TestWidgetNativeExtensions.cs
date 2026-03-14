@@ -10,6 +10,6 @@ namespace Alis.Reactive.Native.Components
 
         public static ComponentRef<TestWidgetNative, TModel> Focus<TModel>(
             this ComponentRef<TestWidgetNative, TModel> self)
-            where TModel : class => self.Emit(new CallVoidMutation("focus"));
+            where TModel : class => self.Emit(new CallMutation("focus"));
     }
 }

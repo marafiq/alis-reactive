@@ -30,8 +30,7 @@ describe("when calling component method with args (source walk → val)", () => 
           trigger: { kind: "custom-event", event: "load-data" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fusion-args",
-            mutation: { kind: "call-val", method: "setItems" }, vendor: "fusion",
-            source: { kind: "event", path: "evt.data.items" },
+            mutation: { kind: "call", method: "setItems", args: [{ kind: "source", source: { kind: "event", path: "evt.data.items" } }] }, vendor: "fusion",
           }] },
         },
       ] });

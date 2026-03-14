@@ -19,7 +19,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeDropDown, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallVoidMutation("focus"));
+            return self.Emit(new CallMutation("focus"));
         }
 
         public static TypedComponentSource<string> Value<TModel>(

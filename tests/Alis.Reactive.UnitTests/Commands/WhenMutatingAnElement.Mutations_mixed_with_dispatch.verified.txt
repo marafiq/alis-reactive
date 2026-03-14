@@ -12,11 +12,16 @@
             kind: mutate-element,
             target: step-1,
             mutation: {
-              kind: call-val,
+              kind: call,
               method: add,
-              chain: classList
-            },
-            value: complete
+              chain: classList,
+              args: [
+                {
+                  kind: literal,
+                  value: complete
+                }
+              ]
+            }
           },
           {
             kind: dispatch,

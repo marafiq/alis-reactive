@@ -12,7 +12,7 @@
             kind: mutate-element,
             target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
             mutation: {
-              kind: call-void,
+              kind: call,
               method: focusIn
             },
             vendor: fusion

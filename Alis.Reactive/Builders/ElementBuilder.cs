@@ -18,19 +18,19 @@ namespace Alis.Reactive.Builders
 
         public PipelineBuilder<TModel> AddClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallValMutation("add", chain: "classList"), className));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("add", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
             return _pipeline;
         }
 
         public PipelineBuilder<TModel> RemoveClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallValMutation("remove", chain: "classList"), className));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("remove", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
             return _pipeline;
         }
 
         public PipelineBuilder<TModel> ToggleClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallValMutation("toggle", chain: "classList"), className));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("toggle", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
             return _pipeline;
         }
 
@@ -121,13 +121,13 @@ namespace Alis.Reactive.Builders
 
         public PipelineBuilder<TModel> Show()
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallArgsMutation("removeAttribute", new object[] { "hidden" })));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("removeAttribute", args: new MethodArg[] { new LiteralArg("hidden") })));
             return _pipeline;
         }
 
         public PipelineBuilder<TModel> Hide()
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallArgsMutation("setAttribute", new object[] { "hidden", "" })));
+            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("setAttribute", args: new MethodArg[] { new LiteralArg("hidden"), new LiteralArg("") })));
             return _pipeline;
         }
 

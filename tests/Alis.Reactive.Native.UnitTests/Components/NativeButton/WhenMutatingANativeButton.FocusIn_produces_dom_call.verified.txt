@@ -12,7 +12,7 @@
             kind: mutate-element,
             target: submitBtn,
             mutation: {
-              kind: call-void,
+              kind: call,
               method: focus
             },
             vendor: native

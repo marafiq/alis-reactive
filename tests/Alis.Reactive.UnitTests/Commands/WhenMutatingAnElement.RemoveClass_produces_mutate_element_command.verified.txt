@@ -12,11 +12,16 @@
             kind: mutate-element,
             target: status,
             mutation: {
-              kind: call-val,
+              kind: call,
               method: remove,
-              chain: classList
-            },
-            value: hidden
+              chain: classList,
+              args: [
+                {
+                  kind: literal,
+                  value: hidden
+                }
+              ]
+            }
           }
         ]
       }

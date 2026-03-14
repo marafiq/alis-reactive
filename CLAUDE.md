@@ -92,26 +92,32 @@ The runtime resolves the vendor root via `resolveRoot(domEl, vendor)`, then uses
 `root[prop] = val` for property sets, `root[method](val)` for method calls. Zero `new Function()`,
 zero `eval`, CSP-compatible. No switch statements, no action enums.
 
-**Six mutation patterns:**
+**Two mutation kinds:** `set-prop` and `call`.
 
-| C# DSL method | Plan JSON | Runtime execution |
-|----------------|-----------|-------------------|
-| `AddClass("x")` | `{ method: "add", chain: "classList", value: "x" }` | `root.classList.add("x")` |
-| `RemoveClass("x")` | `{ method: "remove", chain: "classList", value: "x" }` | `root.classList.remove("x")` |
-| `ToggleClass("x")` | `{ method: "toggle", chain: "classList", value: "x" }` | `root.classList.toggle("x")` |
-| `SetText("x")` | `{ prop: "textContent", value: "x" }` | `root.textContent = "x"` |
-| `SetHtml("x")` | `{ prop: "innerHTML", value: "x" }` | `root.innerHTML = "x"` |
-| `Show()` | `{ method: "removeAttribute", args: ["hidden"] }` | `root.removeAttribute("hidden")` |
-| `Hide()` | `{ method: "setAttribute", args: ["hidden", ""] }` | `root.setAttribute("hidden", "")` |
+| C# DSL method | Mutation kind | Plan JSON | Runtime execution |
+|----------------|--------------|-----------|-------------------|
+| `SetText("x")` | `set-prop` | `{ kind: "set-prop", prop: "textContent" }, value: "x"` | `root.textContent = "x"` |
+| `SetHtml("x")` | `set-prop` | `{ kind: "set-prop", prop: "innerHTML" }, value: "x"` | `root.innerHTML = "x"` |
+| `AddClass("x")` | `call` | `{ kind: "call", method: "add", chain: "classList", args: [{ kind: "literal", value: "x" }] }` | `root.classList.add("x")` |
+| `RemoveClass("x")` | `call` | `{ kind: "call", method: "remove", chain: "classList", args: [{ kind: "literal", value: "x" }] }` | `root.classList.remove("x")` |
+| `ToggleClass("x")` | `call` | `{ kind: "call", method: "toggle", chain: "classList", args: [{ kind: "literal", value: "x" }] }` | `root.classList.toggle("x")` |
+| `Show()` | `call` | `{ kind: "call", method: "removeAttribute", args: [{ kind: "literal", value: "hidden" }] }` | `root.removeAttribute("hidden")` |
+| `Hide()` | `call` | `{ kind: "call", method: "setAttribute", args: [{ kind: "literal", value: "hidden" }, { kind: "literal", value: "" }] }` | `root.setAttribute("hidden", "")` |
 
-**Component mutations use the same patterns:**
+**Component mutations use the same two kinds:**
 
-| Pattern | Example | Plan JSON |
-|---------|---------|-----------|
-| Prop set | `SetValue("x")` | `{ prop: "value", value: "x", vendor: "fusion" }` |
-| Prop set + coerce | `SetValue(42m)` | `{ prop: "value", value: "42", coerce: "number", vendor: "fusion" }` |
-| Void method | `Focus()` | `{ method: "focus", vendor: "fusion" }` |
-| Method + arg | `SetItems(source)` | `{ method: "setItems", source: {...}, vendor: "fusion" }` |
+| Pattern | Example | Mutation kind | Plan JSON |
+|---------|---------|--------------|-----------|
+| Prop set | `SetValue("x")` | `set-prop` | `{ kind: "set-prop", prop: "value" }, value: "x", vendor: "fusion"` |
+| Prop set + coerce | `SetValue(42m)` | `set-prop` | `{ kind: "set-prop", prop: "value", coerce: "number" }, value: "42", vendor: "fusion"` |
+| Void method | `Focus()` | `call` | `{ kind: "call", method: "focus" }, vendor: "fusion"` |
+| Method + source | `SetItems(source)` | `call` | `{ kind: "call", method: "setItems", args: [{ kind: "source", source: {...} }] }, vendor: "fusion"` |
+| Multi-arg | `AddItem(item, idx)` | `call` | `{ kind: "call", method: "addItem", args: [{ kind: "source", ... }, { kind: "source", ..., coerce: "number" }] }` |
+| Mixed args | `SetProperty(name, val)` | `call` | `{ kind: "call", method: "setProperty", args: [{ kind: "literal", value: "name" }, { kind: "source", ... }] }` |
+
+**MethodArg — per-arg resolution:** Each arg in `CallMutation.args` is a discriminated `MethodArg`:
+- `LiteralArg` (`kind: "literal"`) — pass-through value
+- `SourceArg` (`kind: "source"`) — resolved via `resolveSource()` + optional `coerce`
 
 Adding a new component = just a `prop` name or `method` name in the C# extension.
 Zero runtime changes. `resolveRoot` is the vendor-neutral execution layer.
@@ -240,6 +246,7 @@ resolver functions and test every edge case in isolation.
 | `when-resolving-payload-source.test.ts` | Source dot-path resolution via boot(): flat int/string/bool, nested, missing path fallback |
 | `when-resolving-bind-expr.test.ts` | Direct resolve()/resolveAs()/resolveToString() tests: flat/nested/edge cases, condition-ready patterns (numeric, presence, truthiness, emptiness, text, range) |
 | `when-coercing-resolved-values.test.ts` | Direct coerce() tests: all 4 types (string, number, boolean, raw) with every boundary value |
+| `when-using-unified-call-mutations.test.ts` | Unified call mutation: void, literal, source, multi-arg, mixed, component source, per-arg coerce |
 
 **Run:** `npm test`
 
@@ -510,7 +517,7 @@ Every change goes through all three test layers before it's done. No exceptions.
 # Full test suite — run all from the repo root:
 cd /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive
 
-# 1. TS unit tests (vitest + jsdom) — 409 tests
+# 1. TS unit tests (vitest + jsdom) — 432 tests
 npm test
 
 # 2. C# unit + schema tests — 150 tests
@@ -529,7 +536,7 @@ dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 dotnet test tests/Alis.Reactive.PlaywrightTests
 ```
 
-**Total: 884 tests (409 TS + 289 C# unit + 186 Playwright)**
+**Total: 907 tests (432 TS + 289 C# unit + 186 Playwright)**
 
 If any test fails, fix the issue and re-run ALL tests before committing.
 Never commit with failing tests. Never skip Playwright.

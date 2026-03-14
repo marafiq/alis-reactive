@@ -52,22 +52,22 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionNumericTextBox, TModel> FocusIn<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("focusIn"));
+            => self.Emit(new CallMutation("focusIn"));
 
         public static ComponentRef<FusionNumericTextBox, TModel> FocusOut<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("focusOut"));
+            => self.Emit(new CallMutation("focusOut"));
 
         public static ComponentRef<FusionNumericTextBox, TModel> Increment<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("increment"));
+            => self.Emit(new CallMutation("increment"));
 
         public static ComponentRef<FusionNumericTextBox, TModel> Decrement<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Emit(new CallVoidMutation("decrement"));
+            => self.Emit(new CallMutation("decrement"));
 
         public static TypedComponentSource<decimal> Value<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)

@@ -13,11 +13,17 @@
             kind: mutate-element,
             target: loading,
             mutation: {
-              kind: call-args,
+              kind: call,
               method: setAttribute,
               args: [
-                hidden,
-                
+                {
+                  kind: literal,
+                  value: hidden
+                },
+                {
+                  kind: literal,
+                  value: 
+                }
               ]
             }
           }
@@ -41,10 +47,13 @@
                   kind: mutate-element,
                   target: admin-panel,
                   mutation: {
-                    kind: call-args,
+                    kind: call,
                     method: removeAttribute,
                     args: [
-                      hidden
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
                     ]
                   }
                 },
@@ -52,10 +61,13 @@
                   kind: mutate-element,
                   target: delete-btn,
                   mutation: {
-                    kind: call-args,
+                    kind: call,
                     method: removeAttribute,
                     args: [
-                      hidden
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
                     ]
                   }
                 },
@@ -74,11 +86,17 @@
                   kind: mutate-element,
                   target: admin-panel,
                   mutation: {
-                    kind: call-args,
+                    kind: call,
                     method: setAttribute,
                     args: [
-                      hidden,
-                      
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
                     ]
                   }
                 },
@@ -86,11 +104,17 @@
                   kind: mutate-element,
                   target: delete-btn,
                   mutation: {
-                    kind: call-args,
+                    kind: call,
                     method: setAttribute,
                     args: [
-                      hidden,
-                      
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
                     ]
                   }
                 }
