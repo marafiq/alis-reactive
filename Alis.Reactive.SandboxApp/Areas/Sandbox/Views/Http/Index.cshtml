@@ -20,14 +20,19 @@
             })
          )
     ));
+
+    Html.On(plan, t => t.CustomEvent("native-action-link-grid-refresh", p =>
+        p.Get("/Sandbox/Http/NativeActionLinkGrid")
+         .Response(r => r.OnSuccess(s => s.Into("native-action-link-grid")))
+    ));
 }
 
 <div class="space-y-8">
     <div>
         <h1 class="text-2xl font-bold tracking-tight">HTTP Requests</h1>
         <p class="mt-2 text-text-secondary">
-            Nine HTTP patterns: DomReady GET, POST with gather, chained, parallel, PUT, DELETE with Confirm,
-            FormData, GET with search params, and multi-status error handling.
+            Ten HTTP patterns: DomReady GET, POST with gather, chained, parallel, PUT, DELETE with Confirm,
+            FormData, GET with search params, multi-status error handling, and NativeActionLink row actions.
         </p>
     </div>
 
@@ -310,6 +315,41 @@
         <div class="mt-3 space-y-2 font-mono text-sm">
             <p id="multi-err-spinner" hidden class="text-amber-600">Validating...</p>
             <p id="multi-err-result" class="text-text-muted">Not validated yet</p>
+        </div>
+    </section>
+
+    <!-- Section 10: NativeActionLink -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">10. NativeActionLink &rarr; Repeated Row Actions</h2>
+        <p class="text-sm text-text-secondary mb-3">Each row renders a normal anchor with a single serialized request chain. On success the delete action dispatches a refresh event, and the page-level listener reloads the same grid route back into the container.</p>
+        <div id="native-action-link-grid">
+            @await Html.PartialAsync("_NativeActionLinkGrid", Model.ActionRows)
+        </div>
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="native-action-link-status" class="text-text-muted">No row action yet</p>
+        </div>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">11. NativeActionLink &rarr; Standalone Single Action</h2>
+        <p class="text-sm text-text-secondary mb-3">A single native action link can also execute one request chain on its own and load a success fragment directly into a local target.</p>
+        <div class="flex items-center gap-4">
+            @(Html.NativeActionLink("Run Standalone NativeActionLink", "/Sandbox/Http/StandaloneNativeActionLink", p => p
+                .Post("/Sandbox/Http/StandaloneNativeActionLink", g => g.Static("command", "run"))
+                .WhileLoading(x => x.Element("standalone-native-action-link-status").SetText("Running standalone NativeActionLink..."))
+                .Response(r => r
+                    .OnSuccess(x =>
+                    {
+                        x.Into("standalone-native-action-link-result");
+                        x.Element("standalone-native-action-link-status").SetText("Standalone NativeActionLink succeeded");
+                    })
+                    .OnError(400, x => x.Element("standalone-native-action-link-status").SetText("Standalone NativeActionLink failed"))))
+                .CssClass("text-sm font-medium text-blue-600 hover:text-blue-700")
+                .Attr("data-testid", "standalone-native-action-link"))
+        </div>
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="standalone-native-action-link-status" class="text-text-muted">Standalone link has not run yet</p>
+            <div id="standalone-native-action-link-result" class="text-text-muted">No standalone response yet</div>
         </div>
     </section>
 

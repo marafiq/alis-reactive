@@ -1,0 +1,1021 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="575e88ba-5256-4957-afc3-f29e65ce3345" name="@M2 2026-03-12 17:59:18" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-03-12T17:59:18.8280300-04:00" queuing="2026-03-12T17:59:18.8280300-04:00" start="2026-03-12T17:59:14.3304250-04:00" finish="2026-03-12T18:10:29.2909160-04:00" />
+  <TestSettings name="default" id="1a8480bb-5b1a-47fa-b481-c3ffe455d0d7">
+    <Deployment runDeploymentRoot="_M2_2026-03-12_17_59_18" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="0e17e722-9fb2-4e75-97cc-c4e5ba748ab4" testId="fcf0c9f7-48d1-3a25-23bf-c0276f83b06b" testName="DbValidationClientBlocksEmptyFields" computerName="M2" duration="00:00:30.1660580" startTime="2026-03-12T18:01:21.0290570-04:00" endTime="2026-03-12T18:01:51.1951130-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0e17e722-9fb2-4e75-97cc-c4e5ba748ab4">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.DbValidationClientBlocksEmptyFields() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 388
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.DbValidationClientBlocksEmptyFields() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 388
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="02e1e84a-0910-483d-aaa0-573f532b7b0a" testId="728734ed-7fec-41a2-7578-b95b5f449c78" testName="ServerErrorsDisplayAtFields" computerName="M2" duration="00:00:30.1665770" startTime="2026-03-12T18:09:28.8217070-04:00" endTime="2026-03-12T18:09:58.9882830-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="02e1e84a-0910-483d-aaa0-573f532b7b0a">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Save (Server Validate)" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.ServerErrorsDisplayAtFields() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 103
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.ServerErrorsDisplayAtFields() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 103
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2bf82d1b-2626-4c20-a3b5-655bd9c9da86" testId="b7a9e2a8-4d65-64d4-b4d2-aa215a8e9282" testName="DbValidationRejectsDuplicateEmail" computerName="M2" duration="00:00:30.1579420" startTime="2026-03-12T18:02:21.3608560-04:00" endTime="2026-03-12T18:02:51.5187960-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2bf82d1b-2626-4c20-a3b5-655bd9c9da86">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__Db_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.DbValidationRejectsDuplicateEmail() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 327
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.DbValidationRejectsDuplicateEmail() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 327
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5b53f6d4-253c-4eb6-b20e-41683ed52f4c" testId="5800cfe9-7429-59dc-24fe-f2d4e312e238" testName="ValidationErrorRoutesTo422Handler" computerName="M2" duration="00:00:00.7153790" startTime="2026-03-12T17:59:19.6258840-04:00" endTime="2026-03-12T17:59:20.3412630-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5b53f6d4-253c-4eb6-b20e-41683ed52f4c" />
+    <UnitTestResult executionId="34a039f7-c3a8-4b63-aecf-8622f73db1cc" testId="92a46d49-4f0d-8861-5400-9ed7935da484" testName="ValidationEqualToComparesAcrossVendors" computerName="M2" duration="00:00:01.1688210" startTime="2026-03-12T17:59:17.2763490-04:00" endTime="2026-03-12T17:59:18.4451380-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="34a039f7-c3a8-4b63-aecf-8622f73db1cc" />
+    <UnitTestResult executionId="8ee907fd-c51f-4626-89c2-6b5bd2869933" testId="0d1e4f8f-4fac-afe1-da17-6c24a5963d16" testName="PageLoadsWithNoErrors" computerName="M2" duration="00:00:05.1676630" startTime="2026-03-12T18:05:52.4948580-04:00" endTime="2026-03-12T18:05:57.6625210-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8ee907fd-c51f-4626-89c2-6b5bd2869933">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>Microsoft.Playwright.PlaywrightException : Page title expected to be 'Validation — Alis.Reactive Sandbox'
+But was: 'Internal Server Error' 
+Call log:
+  - PageAssertions.ToHaveTitleAsync with timeout 5000ms
+  - waiting for Locator(":root")
+    9 × locator resolved to &lt;html lang="en" xmlns="http://www.w3.org/1999/xhtml"&gt;…&lt;/html&gt;
+      - unexpected value "Internal Server Error"</Message>
+          <StackTrace>   at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, FrameExpectOptions expectOptions, Object expected, String message) in /_/src/Playwright/Core/AssertionsBase.cs:line 87
+   at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, ExpectedTextValue[] expectedText, Object expected, String message, FrameExpectOptions options) in /_/src/Playwright/Core/AssertionsBase.cs:line 65
+   at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, ExpectedTextValue textValue, Object expected, String message, FrameExpectOptions options) in /_/src/Playwright/Core/AssertionsBase.cs:line 57
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.PageLoadsWithNoErrors() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 13
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, FrameExpectOptions expectOptions, Object expected, String message) in /_/src/Playwright/Core/AssertionsBase.cs:line 87
+   at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, ExpectedTextValue[] expectedText, Object expected, String message, FrameExpectOptions options) in /_/src/Playwright/Core/AssertionsBase.cs:line 65
+   at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, ExpectedTextValue textValue, Object expected, String message, FrameExpectOptions options) in /_/src/Playwright/Core/AssertionsBase.cs:line 57
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.PageLoadsWithNoErrors() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 13
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="be70db5b-8abe-4c85-81db-1602595962fa" testId="68045825-749d-e6dc-1e28-e5ccda7aa16b" testName="HiddenFieldsSkippedDuringValidation" computerName="M2" duration="00:00:30.1610120" startTime="2026-03-12T18:04:22.0075940-04:00" endTime="2026-03-12T18:04:52.1686040-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="be70db5b-8abe-4c85-81db-1602595962fa">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__Hidden_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.HiddenFieldsSkippedDuringValidation() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 243
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.HiddenFieldsSkippedDuringValidation() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 243
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d3d3f9a1-d3e5-4025-9172-fbee93ef49e4" testId="c9591ff8-b8b8-5c0e-191c-7dd6a33cb98f" testName="RevealedFieldsValidateAfterToggle" computerName="M2" duration="00:00:30.1623430" startTime="2026-03-12T18:08:58.6593290-04:00" endTime="2026-03-12T18:09:28.8216710-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d3d3f9a1-d3e5-4025-9172-fbee93ef49e4">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__Hidden_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.RevealedFieldsValidateAfterToggle() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 263
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.RevealedFieldsValidateAfterToggle() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 263
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="e472081a-5f94-4aa8-a116-c23ff1b8f289" testId="ca0271a7-5384-d4a9-e344-b9745e241deb" testName="PartialViewLoadsAddressForm" computerName="M2" duration="00:00:30.1666600" startTime="2026-03-12T18:06:57.9962550-04:00" endTime="2026-03-12T18:07:28.1629130-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e472081a-5f94-4aa8-a116-c23ff1b8f289">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Load Address Form" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.PartialViewLoadsAddressForm() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 410
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.PartialViewLoadsAddressForm() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 410
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="44b31c1c-ca36-4d11-b94d-74d320214600" testId="4ab4484a-32f7-1c8d-658c-6b96bb107d53" testName="DbValidationPassesWithCleanData" computerName="M2" duration="00:00:30.1656630" startTime="2026-03-12T18:01:51.1951570-04:00" endTime="2026-03-12T18:02:21.3608180-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="44b31c1c-ca36-4d11-b94d-74d320214600">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__Db_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.DbValidationPassesWithCleanData() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 371
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.DbValidationPassesWithCleanData() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 371
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="1ca079a0-2120-4ec5-bc24-98bb05420cf7" testId="58ec290f-18c0-edf5-22af-15f49fe2c964" testName="PartialServerValidationShowsErrors" computerName="M2" duration="00:00:30.1657810" startTime="2026-03-12T18:05:57.6625890-04:00" endTime="2026-03-12T18:06:27.8283680-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1ca079a0-2120-4ec5-bc24-98bb05420cf7">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Load Address Form" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.PartialServerValidationShowsErrors() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 430
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.PartialServerValidationShowsErrors() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 430
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="104b1536-da99-4eeb-83d3-57fe0ff2ad48" testId="7b4f084a-f44f-2f8c-3c83-ade48b4d50bb" testName="EmailFieldShowsError" computerName="M2" duration="00:00:30.1658350" startTime="2026-03-12T18:03:21.6808070-04:00" endTime="2026-03-12T18:03:51.8466400-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="104b1536-da99-4eeb-83d3-57fe0ff2ad48">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__AllRules_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.EmailFieldShowsError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 45
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.EmailFieldShowsError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 45
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c09553ee-9714-4ae6-b4bc-84a2e239b12e" testId="b3d6a6b1-eda0-fe52-4645-ab24f40ab2f4" testName="ConditionalRuleAppliesWhenMet" computerName="M2" duration="00:00:30.1698730" startTime="2026-03-12T18:00:20.6891710-04:00" endTime="2026-03-12T18:00:50.8590410-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c09553ee-9714-4ae6-b4bc-84a2e239b12e">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__Conditional_IsEmployed")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.ConditionalRuleAppliesWhenMet() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 138
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.ConditionalRuleAppliesWhenMet() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 138
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="86009244-ccf9-4471-a57d-ce02169e2ab8" testId="5911e40b-a66f-2769-0849-68dcdaa1fd3b" testName="HiddenFieldsClientBlocksEmptyName" computerName="M2" duration="00:00:30.1608500" startTime="2026-03-12T18:03:51.8466710-04:00" endTime="2026-03-12T18:04:22.0075200-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="86009244-ccf9-4471-a57d-ce02169e2ab8">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Submit Profile" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.HiddenFieldsClientBlocksEmptyName() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 305
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.HiddenFieldsClientBlocksEmptyName() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 305
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="72248a2e-ca77-4453-b537-f66c438f0551" testId="97380316-53c3-203e-f053-7de92148f18d" testName="HiddenFieldsSubmitToServerSuccessfully" computerName="M2" duration="00:00:30.1643320" startTime="2026-03-12T18:04:52.1686560-04:00" endTime="2026-03-12T18:05:22.3329870-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="72248a2e-ca77-4453-b537-f66c438f0551">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__Hidden_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.HiddenFieldsSubmitToServerSuccessfully() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 290
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.HiddenFieldsSubmitToServerSuccessfully() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 290
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="46d5471d-394e-4055-bb22-b34a67f874d6" testId="4da8bbca-d33e-c665-91ec-1a821daf0597" testName="ClientValidationBlocksSubmit" computerName="M2" duration="00:00:30.1341050" startTime="2026-03-12T17:59:20.3415510-04:00" endTime="2026-03-12T17:59:50.4756540-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="46d5471d-394e-4055-bb22-b34a67f874d6">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Validate + Save" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.ClientValidationBlocksSubmit() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 198
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.ClientValidationBlocksSubmit() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 198
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8b7d1aac-6904-4b51-ba68-31238a240a4b" testId="06867383-f1fa-684e-c67b-441cde1beaec" testName="DbValidationRejectsReservedUsername" computerName="M2" duration="00:00:30.1618760" startTime="2026-03-12T18:02:51.5188500-04:00" endTime="2026-03-12T18:03:21.6807250-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8b7d1aac-6904-4b51-ba68-31238a240a4b">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__Db_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.DbValidationRejectsReservedUsername() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 350
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.DbValidationRejectsReservedUsername() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 350
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0080ed20-3e33-4e3e-9754-13eaf79dfbf4" testId="a2fb48c4-2bb7-9961-57c7-80b00de747df" testName="ValidationFailsForEmptyNativeAndFusionFields" computerName="M2" duration="00:00:00.5812940" startTime="2026-03-12T17:59:18.4458230-04:00" endTime="2026-03-12T17:59:19.0271160-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0080ed20-3e33-4e3e-9754-13eaf79dfbf4" />
+    <UnitTestResult executionId="49720496-c8ad-45b5-85ff-8ee0c748c62e" testId="b1a42c5c-3e12-bda4-e04a-d99e52bf2c57" testName="CombinedFlowPassesClientThenHitsServer" computerName="M2" duration="00:00:30.2133320" startTime="2026-03-12T17:59:50.4757980-04:00" endTime="2026-03-12T18:00:20.6891280-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="49720496-c8ad-45b5-85ff-8ee0c748c62e">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__Combined_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.CombinedFlowPassesClientThenHitsServer() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 221
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.CombinedFlowPassesClientThenHitsServer() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 221
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="cfac7e0e-fdba-4737-93cc-144620e30185" testId="40fafb09-7eda-032b-edfc-634e39593bcb" testName="PartialValidDataSavesSuccessfully" computerName="M2" duration="00:00:30.1677510" startTime="2026-03-12T18:06:27.8284260-04:00" endTime="2026-03-12T18:06:57.9961760-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cfac7e0e-fdba-4737-93cc-144620e30185">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Load Address Form" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.PartialValidDataSavesSuccessfully() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 454
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.PartialValidDataSavesSuccessfully() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 454
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d55d1730-3376-440a-84c8-4c33fa1a0e90" testId="84e3f27e-33c6-0626-1fb2-4328f2e0f40c" testName="ConditionalRuleSkipsWhenNotMet" computerName="M2" duration="00:00:30.1699330" startTime="2026-03-12T18:00:50.8590750-04:00" endTime="2026-03-12T18:01:21.0290050-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d55d1730-3376-440a-84c8-4c33fa1a0e90">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.ConditionalRuleSkipsWhenNotMet() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 158
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.ConditionalRuleSkipsWhenNotMet() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 158
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="da973e55-445f-405a-bffc-71d2e5aeb37d" testId="6086188c-2b07-53df-15f9-8461bfbf0f53" testName="ValidationPassesWhenBothFieldsFilled" computerName="M2" duration="00:00:00.5972130" startTime="2026-03-12T17:59:19.0272360-04:00" endTime="2026-03-12T17:59:19.6244490-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="da973e55-445f-405a-bffc-71d2e5aeb37d" />
+    <UnitTestResult executionId="cce3de7b-a3a4-4de7-b29d-d5f05f8148b0" testId="d5a3d24a-adfb-04c5-a4d1-ea188ddeafef" testName="TypingClearsFieldError" computerName="M2" duration="00:00:30.1693590" startTime="2026-03-12T18:09:58.9883380-04:00" endTime="2026-03-12T18:10:29.1576940-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cce3de7b-a3a4-4de7-b29d-d5f05f8148b0">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Show Errors First" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.TypingClearsFieldError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 177
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.TypingClearsFieldError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 177
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="663aa698-79ee-459e-8a2d-9f68d99c0608" testId="5443da6e-d2f1-79fa-a578-785dd2f44ec1" testName="RangeFieldShowsError" computerName="M2" duration="00:00:30.1682180" startTime="2026-03-12T18:07:28.1629570-04:00" endTime="2026-03-12T18:07:58.3311730-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="663aa698-79ee-459e-8a2d-9f68d99c0608">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__AllRules_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.RangeFieldShowsError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 82
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.RangeFieldShowsError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 82
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="749986cd-2c1e-44b4-bd49-f2771a279081" testId="d1f6a390-5379-9754-ac76-03c0185c5c70" testName="RegexFieldShowsError" computerName="M2" duration="00:00:30.1657990" startTime="2026-03-12T18:07:58.3312530-04:00" endTime="2026-03-12T18:08:28.4970500-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="749986cd-2c1e-44b4-bd49-f2771a279081">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for Locator("#Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__AllRules_Name")</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.RegexFieldShowsError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 63
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.RegexFieldShowsError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 63
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="6808bb3e-0d27-4cbe-93d3-80ac613884b3" testId="5feaf5c3-5c09-193a-7da8-4af547b53f6d" testName="NestedFieldErrorsDisplay" computerName="M2" duration="00:00:30.1616270" startTime="2026-03-12T18:05:22.3330330-04:00" endTime="2026-03-12T18:05:52.4946580-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6808bb3e-0d27-4cbe-93d3-80ac613884b3">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Save Address (Server)" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.NestedFieldErrorsDisplay() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 121
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.NestedFieldErrorsDisplay() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 121
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="eb91324b-7204-4838-a801-0dd509008b29" testId="1bbf3bb0-4afc-e106-a8c8-581f5777321a" testName="RequiredFieldShowsError" computerName="M2" duration="00:00:30.1621960" startTime="2026-03-12T18:08:28.4970970-04:00" endTime="2026-03-12T18:08:58.6592910-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eb91324b-7204-4838-a801-0dd509008b29">
+      <Output>
+        <StdOut>=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===</StdOut>
+        <ErrorInfo>
+          <Message>System.TimeoutException : Timeout 30000ms exceeded.
+Call log:
+  - waiting for GetByRole(AriaRole.Button, new() { Name = "Validate All" })</Message>
+          <StackTrace>   at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.RequiredFieldShowsError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 25
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Transport.Connection.InnerSendMessageToServerAsync[T](ChannelOwner object, String method, Dictionary`2 dictionary, Boolean keepNulls) in /_/src/Playwright/Transport/Connection.cs:line 206
+   at Microsoft.Playwright.Transport.Connection.WrapApiCallAsync[T](Func`1 action, Boolean isInternal) in /_/src/Playwright/Transport/Connection.cs:line 535
+   at Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields.RequiredFieldShowsError() in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/Validation/WhenValidatingFormFields.cs:line 25
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.&lt;&gt;c__DisplayClass1_0.&lt;Execute&gt;b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="RegexFieldShowsError" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="d1f6a390-5379-9754-ac76-03c0185c5c70">
+      <Execution id="749986cd-2c1e-44b4-bd49-f2771a279081" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="RegexFieldShowsError" />
+    </UnitTest>
+    <UnitTest name="PageLoadsWithNoErrors" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="0d1e4f8f-4fac-afe1-da17-6c24a5963d16">
+      <Execution id="8ee907fd-c51f-4626-89c2-6b5bd2869933" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="PageLoadsWithNoErrors" />
+    </UnitTest>
+    <UnitTest name="HiddenFieldsClientBlocksEmptyName" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="5911e40b-a66f-2769-0849-68dcdaa1fd3b">
+      <Execution id="86009244-ccf9-4471-a57d-ce02169e2ab8" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="HiddenFieldsClientBlocksEmptyName" />
+    </UnitTest>
+    <UnitTest name="RevealedFieldsValidateAfterToggle" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="c9591ff8-b8b8-5c0e-191c-7dd6a33cb98f">
+      <Execution id="d3d3f9a1-d3e5-4025-9172-fbee93ef49e4" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="RevealedFieldsValidateAfterToggle" />
+    </UnitTest>
+    <UnitTest name="TypingClearsFieldError" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="d5a3d24a-adfb-04c5-a4d1-ea188ddeafef">
+      <Execution id="cce3de7b-a3a4-4de7-b29d-d5f05f8148b0" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="TypingClearsFieldError" />
+    </UnitTest>
+    <UnitTest name="DbValidationPassesWithCleanData" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="4ab4484a-32f7-1c8d-658c-6b96bb107d53">
+      <Execution id="44b31c1c-ca36-4d11-b94d-74d320214600" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="DbValidationPassesWithCleanData" />
+    </UnitTest>
+    <UnitTest name="DbValidationRejectsDuplicateEmail" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="b7a9e2a8-4d65-64d4-b4d2-aa215a8e9282">
+      <Execution id="2bf82d1b-2626-4c20-a3b5-655bd9c9da86" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="DbValidationRejectsDuplicateEmail" />
+    </UnitTest>
+    <UnitTest name="CombinedFlowPassesClientThenHitsServer" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="b1a42c5c-3e12-bda4-e04a-d99e52bf2c57">
+      <Execution id="49720496-c8ad-45b5-85ff-8ee0c748c62e" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="CombinedFlowPassesClientThenHitsServer" />
+    </UnitTest>
+    <UnitTest name="ConditionalRuleSkipsWhenNotMet" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="84e3f27e-33c6-0626-1fb2-4328f2e0f40c">
+      <Execution id="d55d1730-3376-440a-84c8-4c33fa1a0e90" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="ConditionalRuleSkipsWhenNotMet" />
+    </UnitTest>
+    <UnitTest name="PartialValidDataSavesSuccessfully" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="40fafb09-7eda-032b-edfc-634e39593bcb">
+      <Execution id="cfac7e0e-fdba-4737-93cc-144620e30185" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="PartialValidDataSavesSuccessfully" />
+    </UnitTest>
+    <UnitTest name="ValidationErrorRoutesTo422Handler" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="5800cfe9-7429-59dc-24fe-f2d4e312e238">
+      <Execution id="5b53f6d4-253c-4eb6-b20e-41683ed52f4c" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Requests.WhenServerDataLoads" name="ValidationErrorRoutesTo422Handler" />
+    </UnitTest>
+    <UnitTest name="DbValidationClientBlocksEmptyFields" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="fcf0c9f7-48d1-3a25-23bf-c0276f83b06b">
+      <Execution id="0e17e722-9fb2-4e75-97cc-c4e5ba748ab4" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="DbValidationClientBlocksEmptyFields" />
+    </UnitTest>
+    <UnitTest name="ValidationFailsForEmptyNativeAndFusionFields" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="a2fb48c4-2bb7-9961-57c7-80b00de747df">
+      <Execution id="0080ed20-3e33-4e3e-9754-13eaf79dfbf4" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Architecture.WhenExercisingComponentArchitecture" name="ValidationFailsForEmptyNativeAndFusionFields" />
+    </UnitTest>
+    <UnitTest name="PartialServerValidationShowsErrors" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="58ec290f-18c0-edf5-22af-15f49fe2c964">
+      <Execution id="1ca079a0-2120-4ec5-bc24-98bb05420cf7" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="PartialServerValidationShowsErrors" />
+    </UnitTest>
+    <UnitTest name="ValidationPassesWhenBothFieldsFilled" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="6086188c-2b07-53df-15f9-8461bfbf0f53">
+      <Execution id="da973e55-445f-405a-bffc-71d2e5aeb37d" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Architecture.WhenExercisingComponentArchitecture" name="ValidationPassesWhenBothFieldsFilled" />
+    </UnitTest>
+    <UnitTest name="ServerErrorsDisplayAtFields" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="728734ed-7fec-41a2-7578-b95b5f449c78">
+      <Execution id="02e1e84a-0910-483d-aaa0-573f532b7b0a" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="ServerErrorsDisplayAtFields" />
+    </UnitTest>
+    <UnitTest name="EmailFieldShowsError" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="7b4f084a-f44f-2f8c-3c83-ade48b4d50bb">
+      <Execution id="104b1536-da99-4eeb-83d3-57fe0ff2ad48" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="EmailFieldShowsError" />
+    </UnitTest>
+    <UnitTest name="ClientValidationBlocksSubmit" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="4da8bbca-d33e-c665-91ec-1a821daf0597">
+      <Execution id="46d5471d-394e-4055-bb22-b34a67f874d6" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="ClientValidationBlocksSubmit" />
+    </UnitTest>
+    <UnitTest name="RangeFieldShowsError" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="5443da6e-d2f1-79fa-a578-785dd2f44ec1">
+      <Execution id="663aa698-79ee-459e-8a2d-9f68d99c0608" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="RangeFieldShowsError" />
+    </UnitTest>
+    <UnitTest name="ValidationEqualToComparesAcrossVendors" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="92a46d49-4f0d-8861-5400-9ed7935da484">
+      <Execution id="34a039f7-c3a8-4b63-aecf-8622f73db1cc" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Architecture.WhenExercisingComponentArchitecture" name="ValidationEqualToComparesAcrossVendors" />
+    </UnitTest>
+    <UnitTest name="NestedFieldErrorsDisplay" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="5feaf5c3-5c09-193a-7da8-4af547b53f6d">
+      <Execution id="6808bb3e-0d27-4cbe-93d3-80ac613884b3" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="NestedFieldErrorsDisplay" />
+    </UnitTest>
+    <UnitTest name="HiddenFieldsSkippedDuringValidation" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="68045825-749d-e6dc-1e28-e5ccda7aa16b">
+      <Execution id="be70db5b-8abe-4c85-81db-1602595962fa" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="HiddenFieldsSkippedDuringValidation" />
+    </UnitTest>
+    <UnitTest name="PartialViewLoadsAddressForm" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="ca0271a7-5384-d4a9-e344-b9745e241deb">
+      <Execution id="e472081a-5f94-4aa8-a116-c23ff1b8f289" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="PartialViewLoadsAddressForm" />
+    </UnitTest>
+    <UnitTest name="ConditionalRuleAppliesWhenMet" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="b3d6a6b1-eda0-fe52-4645-ab24f40ab2f4">
+      <Execution id="c09553ee-9714-4ae6-b4bc-84a2e239b12e" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="ConditionalRuleAppliesWhenMet" />
+    </UnitTest>
+    <UnitTest name="RequiredFieldShowsError" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="1bbf3bb0-4afc-e106-a8c8-581f5777321a">
+      <Execution id="eb91324b-7204-4838-a801-0dd509008b29" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="RequiredFieldShowsError" />
+    </UnitTest>
+    <UnitTest name="HiddenFieldsSubmitToServerSuccessfully" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="97380316-53c3-203e-f053-7de92148f18d">
+      <Execution id="72248a2e-ca77-4453-b537-f66c438f0551" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="HiddenFieldsSubmitToServerSuccessfully" />
+    </UnitTest>
+    <UnitTest name="DbValidationRejectsReservedUsername" storage="/users/muhammadadnanrafiq/documents/alis-reactive-framework-1-0/alis.reactive/tests/alis.reactive.playwrighttests/bin/debug/net10.0/alis.reactive.playwrighttests.dll" id="06867383-f1fa-684e-c67b-441cde1beaec">
+      <Execution id="8b7d1aac-6904-4b51-ba68-31238a240a4b" />
+      <TestMethod codeBase="/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Alis.Reactive.PlaywrightTests.Validation.WhenValidatingFormFields" name="DbValidationRejectsReservedUsername" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="fcf0c9f7-48d1-3a25-23bf-c0276f83b06b" executionId="0e17e722-9fb2-4e75-97cc-c4e5ba748ab4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="728734ed-7fec-41a2-7578-b95b5f449c78" executionId="02e1e84a-0910-483d-aaa0-573f532b7b0a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b7a9e2a8-4d65-64d4-b4d2-aa215a8e9282" executionId="2bf82d1b-2626-4c20-a3b5-655bd9c9da86" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5800cfe9-7429-59dc-24fe-f2d4e312e238" executionId="5b53f6d4-253c-4eb6-b20e-41683ed52f4c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="92a46d49-4f0d-8861-5400-9ed7935da484" executionId="34a039f7-c3a8-4b63-aecf-8622f73db1cc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0d1e4f8f-4fac-afe1-da17-6c24a5963d16" executionId="8ee907fd-c51f-4626-89c2-6b5bd2869933" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="68045825-749d-e6dc-1e28-e5ccda7aa16b" executionId="be70db5b-8abe-4c85-81db-1602595962fa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c9591ff8-b8b8-5c0e-191c-7dd6a33cb98f" executionId="d3d3f9a1-d3e5-4025-9172-fbee93ef49e4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ca0271a7-5384-d4a9-e344-b9745e241deb" executionId="e472081a-5f94-4aa8-a116-c23ff1b8f289" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4ab4484a-32f7-1c8d-658c-6b96bb107d53" executionId="44b31c1c-ca36-4d11-b94d-74d320214600" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="58ec290f-18c0-edf5-22af-15f49fe2c964" executionId="1ca079a0-2120-4ec5-bc24-98bb05420cf7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7b4f084a-f44f-2f8c-3c83-ade48b4d50bb" executionId="104b1536-da99-4eeb-83d3-57fe0ff2ad48" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b3d6a6b1-eda0-fe52-4645-ab24f40ab2f4" executionId="c09553ee-9714-4ae6-b4bc-84a2e239b12e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5911e40b-a66f-2769-0849-68dcdaa1fd3b" executionId="86009244-ccf9-4471-a57d-ce02169e2ab8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="97380316-53c3-203e-f053-7de92148f18d" executionId="72248a2e-ca77-4453-b537-f66c438f0551" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4da8bbca-d33e-c665-91ec-1a821daf0597" executionId="46d5471d-394e-4055-bb22-b34a67f874d6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="06867383-f1fa-684e-c67b-441cde1beaec" executionId="8b7d1aac-6904-4b51-ba68-31238a240a4b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a2fb48c4-2bb7-9961-57c7-80b00de747df" executionId="0080ed20-3e33-4e3e-9754-13eaf79dfbf4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b1a42c5c-3e12-bda4-e04a-d99e52bf2c57" executionId="49720496-c8ad-45b5-85ff-8ee0c748c62e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="40fafb09-7eda-032b-edfc-634e39593bcb" executionId="cfac7e0e-fdba-4737-93cc-144620e30185" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="84e3f27e-33c6-0626-1fb2-4328f2e0f40c" executionId="d55d1730-3376-440a-84c8-4c33fa1a0e90" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6086188c-2b07-53df-15f9-8461bfbf0f53" executionId="da973e55-445f-405a-bffc-71d2e5aeb37d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d5a3d24a-adfb-04c5-a4d1-ea188ddeafef" executionId="cce3de7b-a3a4-4de7-b29d-d5f05f8148b0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5443da6e-d2f1-79fa-a578-785dd2f44ec1" executionId="663aa698-79ee-459e-8a2d-9f68d99c0608" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d1f6a390-5379-9754-ac76-03c0185c5c70" executionId="749986cd-2c1e-44b4-bd49-f2771a279081" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5feaf5c3-5c09-193a-7da8-4af547b53f6d" executionId="6808bb3e-0d27-4cbe-93d3-80ac613884b3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1bbf3bb0-4afc-e106-a8c8-581f5777321a" executionId="eb91324b-7204-4838-a801-0dd509008b29" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="27" executed="27" passed="4" failed="23" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>NUnit Adapter 5.0.0.0: Test execution started
+Running selected tests in /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/Alis.Reactive.PlaywrightTests.dll
+   NUnit3TestExecutor discovered 27 of 27 NUnit test cases using Current Discovery mode, Non-Explicit run
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+=== Browser Console Output ===
+[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+=== End Console Output ===
+
+NUnit Adapter 5.0.0.0: Test execution complete
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

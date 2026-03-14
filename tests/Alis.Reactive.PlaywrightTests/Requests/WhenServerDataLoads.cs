@@ -173,4 +173,41 @@ public class WhenServerDataLoads : PlaywrightTestBase
         // 422 is expected — browser logs it as a network error
         AssertNoConsoleErrorsExcept("422");
     }
+
+    [Test]
+    public async Task NativeActionLinkDeletesARowViaDelegatedClickHandling()
+    {
+        await NavigateTo("/Sandbox/Http");
+
+        await Expect(Page.GetByTestId("native-action-link-row-42"))
+            .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
+
+        await Page.GetByTestId("native-action-link-42").ClickAsync();
+
+        await Expect(Page.Locator("#native-action-link-status"))
+            .ToContainTextAsync("Deleted resident #42", new() { Timeout = 5000 });
+        await Expect(Page.GetByTestId("native-action-link-row-42"))
+            .ToHaveCountAsync(0, new() { Timeout = 5000 });
+        await Expect(Page.GetByTestId("native-action-link-row-41"))
+            .ToContainTextAsync("Resident #41", new() { Timeout = 5000 });
+        await Expect(Page.GetByTestId("native-action-link-row-43"))
+            .ToContainTextAsync("Resident #43", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task StandaloneNativeActionLinkLoadsItsOwnSuccessTarget()
+    {
+        await NavigateTo("/Sandbox/Http");
+
+        await Page.GetByTestId("standalone-native-action-link").ClickAsync();
+
+        await Expect(Page.Locator("#standalone-native-action-link-status"))
+            .ToContainTextAsync("Standalone NativeActionLink succeeded", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#standalone-native-action-link-result"))
+            .ToContainTextAsync("Standalone NativeActionLink response loaded.", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }

@@ -5,13 +5,25 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
     [Area("Sandbox")]
     public class HttpController : Controller
     {
+        private static readonly object NativeActionLinkLock = new object();
+        private static readonly Models.HttpActionLinkRow[] NativeActionLinkSeedRows =
+        {
+            new Models.HttpActionLinkRow { Id = 41, Name = "John Doe" },
+            new Models.HttpActionLinkRow { Id = 42, Name = "Jane Smith" },
+            new Models.HttpActionLinkRow { Id = 43, Name = "Bob Johnson" }
+        };
+        private static HashSet<int> _deletedNativeActionLinkRows = new HashSet<int>();
+
         public IActionResult Index()
         {
+            ResetNativeActionLinkRows();
+
             var model = new Models.HttpShowcaseModel
             {
                 FirstName = "John",
                 LastName = "Doe",
-                Email = "john@example.com"
+                Email = "john@example.com",
+                ActionRows = GetNativeActionLinkRows()
             };
             return View(model);
         }
@@ -119,6 +131,66 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
             return Ok(new { valid = true });
         }
 
+        [HttpGet]
+        public IActionResult NativeActionLinkGrid()
+        {
+            return PartialView("_NativeActionLinkGrid", GetNativeActionLinkRows());
+        }
+
+        // ── Section 10: NativeActionLink row action ───────────
+
+        [HttpPost]
+        public IActionResult ActionLinkDelete(int id, [FromBody] ActionLinkDeleteRequest? request)
+        {
+            if (request?.Id != id)
+            {
+                return BadRequest(new { errors = new { Id = new[] { "Route id and payload id must match." } } });
+            }
+
+            lock (NativeActionLinkLock)
+            {
+                _deletedNativeActionLinkRows.Add(id);
+            }
+
+            return Ok(new { deleted = true, id });
+        }
+
+        [HttpPost]
+        public IActionResult StandaloneNativeActionLink([FromBody] StandaloneNativeActionLinkRequest? request)
+        {
+            if (!string.Equals(request?.Command, "run", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { errors = new { Command = new[] { "Command must be 'run'." } } });
+            }
+
+            return Content(
+                "<div class=\"rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700\">Standalone NativeActionLink response loaded.</div>",
+                "text/html");
+        }
+
+        private static IReadOnlyList<Models.HttpActionLinkRow> GetNativeActionLinkRows()
+        {
+            lock (NativeActionLinkLock)
+            {
+                return NativeActionLinkSeedRows
+                    .Where(row => !_deletedNativeActionLinkRows.Contains(row.Id))
+                    .Select(row => new Models.HttpActionLinkRow
+                    {
+                        Id = row.Id,
+                        Name = row.Name
+                    })
+                    .ToArray();
+            }
+        }
+
+        private static void ResetNativeActionLinkRows()
+        {
+            lock (NativeActionLinkLock)
+            {
+                _deletedNativeActionLinkRows = new HashSet<int>();
+            }
+        }
+
         // ── DTOs ─────────────────────────────────────────────
 
         public class SaveRequest
@@ -143,6 +215,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         {
             public string? Name { get; set; }
             public int? FacilityId { get; set; }
+        }
+
+        public class ActionLinkDeleteRequest
+        {
+            public int Id { get; set; }
+        }
+
+        public class StandaloneNativeActionLinkRequest
+        {
+            public string? Command { get; set; }
         }
     }
 }

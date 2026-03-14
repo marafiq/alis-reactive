@@ -1,0 +1,1655 @@
+▗ ▗   ▖ ▖  Claude Code v2.1.72
+           Opus 4.6 · Claude Max
+  ▘▘ ▝▝    ~/Documents/alis-reactive-framework-1-0/Alis.Reactive
+
+  ✻ Voice mode is now available · /voice to enable
+
+✻ Conversation compacted (ctrl+o for history)
+
+  ⎿  Read Alis.Reactive.SandboxApp/Scripts/pipeline.ts (54 lines)
+  ⎿  Read Alis.Reactive.SandboxApp/Scripts/http.ts (96 lines)
+  ⎿  Read Alis.Reactive.SandboxApp/Scripts/execute.ts (103 lines)
+  ⎿  Read Alis.Reactive.SandboxApp/Scripts/auto-boot.ts (31 lines)
+  ⎿  Read Alis.Reactive.SandboxApp/Scripts/trigger.ts (52 lines)
+  ⎿  Plan file referenced (~/.claude/plans/rippling-mapping-tome.md)
+  ⎿  Skills restored (superpowers:subagent-driven-development, 
+     superpowers:writing-plans, superpowers:brainstorming)
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Bash(git diff HEAD -- Alis.Reactive.SandboxApp/Scripts/http.ts
+      Alis.Reactive.SandboxApp/Scripts/pipeline.ts)
+  ⎿  diff --git a/Alis.Reactive.SandboxApp/Scripts/http.ts b/Alis.Reactive.
+     SandboxApp/Scripts/http.ts
+     index 347d6d4..39139e8 100644
+     … +51 lines (ctrl+o to expand)
+
+⏺ The validation function is being called and returning true for empty fields.
+  This means either the fields array is empty or the validation descriptor is
+  malformed. Let me check the C# resolution path — Tasks 2/4 moved validation
+  resolution to ValidationResolver and moved ValidatorType to
+  RequestBuildContext.
+
+⏺ Read 4 files (ctrl+o to expand)
+
+⏺ Let me rebuild and run a single failing Playwright test to see the current
+  state.
+
+⏺ Bash(npm run build 2>&1)
+  ⎿  > build
+     > esbuild Alis.Reactive.SandboxApp/Scripts/auto-boot.ts --bundle --out
+     file=Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js --format=esm
+     … +6 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet build 2>&1 | tail -20)
+  ⎿    Alis.Reactive.Fusion -> /Users/muhammadadnanrafiq/Documents/alis-rea
+     ctive-framework-1-0/Alis.Reactive/Alis.Reactive.Fusion/bin/Debug/net10
+     .0/Alis.Reactive.Fusion.dll
+     … +19 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.PlaywrightTests --filter
+      "RequiredFieldShowsError" --no-build 2>&1 | tail -30)
+  ⎿    Standard Output Messages:
+      === Browser Console Output ===
+      [log] [alis:boot] booting {"entries":12}
+     … +33 lines (ctrl+o to expand)
+  ⎿  (timeout 2m)
+
+⏺ Validation returns true — fields are either empty or not being checked. Let me
+   look at the plan JSON that the browser receives for the validation page.
+
+⏺ Bash(dotnet test tests/Alis.Reactive.PlaywrightTests --filter
+      "RequiredFieldShowsError" --no-build 2>&1 | grep -i
+      "assert\|expect\|Error\|failed" | head -20)
+  ⎿    Failed RequiredFieldShowsError [4 s]
+       Error Message:
+        Microsoft.Playwright.PlaywrightException : Locator expected to be v
+     … +22 lines (ctrl+o to expand)
+  ⎿  (timeout 2m)
+
+⏺ Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+⏺ Now I need to check how the plan gets its IValidationExtractor. Let me look at
+   Html.ReactivePlan<T>().
+
+⏺ Searched for 2 patterns, read 2 files (ctrl+o to expand)
+
+⏺ Now I need to trace how BuildContexts get registered with the plan. Let me
+  follow the chain from builder → TriggerBuilder → Plan.
+
+⏺ Read 2 files (ctrl+o to expand)
+
+⏺ The TriggerBuilder path handles RegisterBuildContexts, but NativeButton
+  .Reactive() goes through a different path. Let me check that.
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Found the bug. NativeButtonReactiveExtensions.Reactive() (line 38) calls
+  plan.AddEntry(entry) but never calls RegisterBuildContexts(pb.BuildContexts).
+
+  Compare with TriggerBuilder.AddEntryWithContexts() which does both:
+  _plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+  (_plan as ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts);
+
+  When Task 4 moved ValidatorType from RequestDescriptor to RequestBuildContext,
+   any entry created via NativeButton (or NativeCheckBox, NativeDropDown) lost
+  its build context. The ValidationResolver never finds the ValidatorType, so
+  validation fields stay empty → validate() returns true.
+
+  Let me check the other component reactive extensions too.
+
+⏺ Read 2 files (ctrl+o to expand)
+
+⏺ All three (NativeButton, NativeCheckBox, NativeDropDown) are missing
+  RegisterBuildContexts. Let me also check Fusion.
+
+⏺ Searched for 1 pattern (ctrl+o to expand)
+
+⏺ FusionNumericTextBox also has the same issue. Let me fix all four reactive
+  extensions by adding the missing RegisterBuildContexts call.
+
+⏺ Update(Alis.Reactive.Native/Components/NativeButton/NativeButtonReactiveExtens
+        ions.cs)
+  ⎿  Added 1 line
+      36              var trigger = new ComponentEventTrigger(builder.Ele
+          mentId, descriptor.JsEvent, "native");
+      37              var entry = new Entry(trigger, pb.BuildReaction());
+      38              plan.AddEntry(entry);
+      39 +            (plan as ReactivePlan<TModel>)?.RegisterBuildContex
+         +ts(pb.BuildContexts);                                          
+      40  
+      41              return builder;
+      42          }
+
+⏺ Update(Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxReactiveEx
+        tensions.cs)
+  ⎿  Added 1 line
+      37              var trigger = new ComponentEventTrigger(builder.Ele
+          mentId, descriptor.JsEvent, "native", readExpr: ComponentHelper
+          .GetReadExpr<NativeCheckBox>());
+      38              var entry = new Entry(trigger, pb.BuildReaction());
+      39              plan.AddEntry(entry);
+      40 +            (plan as ReactivePlan<TModel>)?.RegisterBuildContex
+         +ts(pb.BuildContexts);                                          
+      41  
+      42              return builder;
+      43          }
+
+⏺ Update(Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownReactiveEx
+        tensions.cs)
+  ⎿  Added 1 line
+      36              var trigger = new ComponentEventTrigger(builder.Ele
+          mentId, descriptor.JsEvent, "native", builder.BindingPath, Comp
+          onentHelper.GetReadExpr<NativeDropDown>());
+      37              var entry = new Entry(trigger, pb.BuildReaction());
+      38              plan.AddEntry(entry);
+      39 +            (plan as ReactivePlan<TModel>)?.RegisterBuildContex
+         +ts(pb.BuildContexts);                                          
+      40              plan.RegisterComponent(builder.ElementId, "native",
+           builder.BindingPath, ComponentHelper.GetReadExpr<NativeDropDow
+          n>());
+      41  
+      42              return builder;
+
+⏺ Now the Fusion one:
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Update(Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextB
+        oxReactiveExtensions.cs)
+  ⎿  Added 1 line
+      38              var trigger = new ComponentEventTrigger(componentId
+          , descriptor.JsEvent, "fusion", bindingPath, ComponentHelper.Ge
+          tReadExpr<FusionNumericTextBox>());
+      39              var entry = new Entry(trigger, pb.BuildReaction());
+      40              plan.AddEntry(entry);
+      41 +            (plan as ReactivePlan<TModel>)?.RegisterBuildContex
+         +ts(pb.BuildContexts);                                          
+      42              if (bindingPath != null)
+      43              {
+      44                  plan.RegisterComponent(componentId, "fusion", b
+          indingPath, ComponentHelper.GetReadExpr<FusionNumericTextBox>()
+          );
+
+⏺ Now let me also check if there's a TestWidget reactive extension in Fusion
+  that needs the same fix.
+
+⏺ Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Good, only FusionNumericTextBox. Now build and run the failing test.
+
+⏺ Bash(dotnet build 2>&1 | tail -5)
+  ⎿  Build succeeded.
+         0 Warning(s)
+         0 Error(s)
+     … +2 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.PlaywrightTests --filter
+      "RequiredFieldShowsError" --no-build 2>&1 | tail -15)
+  ⎿  Test run for /Users/muhammadadnanrafiq/Documents/alis-reactive-framewo
+     rk-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net
+     10.0/Alis.Reactive.PlaywrightTests.dll (.NETCoreApp,Version=v10.0)
+     … +7 lines (ctrl+o to expand)
+  ⎿  (timeout 2m)
+
+⏺ Fix confirmed. Now let me run all 10 previously failing validation tests.
+
+⏺ Bash(dotnet test tests/Alis.Reactive.PlaywrightTests --filter
+      "WhenValidatingFormFields" --no-build 2>&1 | tail -15)
+  ⎿  Test run for /Users/muhammadadnanrafiq/Documents/alis-reactive-framewo
+     rk-1-0/Alis.Reactive/tests/Alis.Reactive.PlaywrightTests/bin/Debug/net
+     10.0/Alis.Reactive.PlaywrightTests.dll (.NETCoreApp,Version=v10.0)
+     … +7 lines (ctrl+o to expand)
+  ⎿  (timeout 3m)
+
+⏺ All 23 validation tests pass. Now run the full test suite across all three
+  layers.
+
+⏺ Bash(npm test 2>&1 | tail -20)
+  ⎿   ✓ Alis.Reactive.SandboxApp/Scripts/__tests__/when-reading-component-v
+     alue.test.ts (7 tests) 10ms
+      ✓ Alis.Reactive.SandboxApp/Scripts/__tests__/when-resolving-payload-s
+     … +20 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.UnitTests --no-build 2>&1 | tail -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +2 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.PlaywrightTests --no-build 2>&1 | tail
+      -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +2 lines (ctrl+o to expand)
+  ⎿  (timeout 3m)
+
+⏺ All three layers pass: 362 TS + 108 C# + 131 Playwright = 601 tests green.
+
+  Root cause: Task 4 moved ValidatorType from RequestDescriptor to
+  RequestBuildContext, but the four component reactive extensions (NativeButton,
+   NativeCheckBox, NativeDropDown, FusionNumericTextBox) never called
+  RegisterBuildContexts() on the plan. Only
+  TriggerBuilder.AddEntryWithContexts() had that call. Without the build
+  context, ValidationResolver couldn't find the ValidatorType and never
+  extracted validation rules — leaving the fields array empty.
+
+  Fix: Added (plan as 
+  ReactivePlan<TModel>)?.RegisterBuildContexts(pb.BuildContexts) after
+  plan.AddEntry(entry) in all four reactive extensions.
+
+✻ Crunched for 39m 42s
+
+❯ continue                                                                      
+
+⏺ Let me also run the FluentValidator and remaining unit test suites, then check
+   what needs committing.
+
+⏺ Bash(dotnet test tests/Alis.Reactive.FluentValidator.UnitTests --no-build 2>&1
+       | tail -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +3 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.Native.UnitTests --no-build 2>&1 | tail
+      -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +2 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.Fusion.UnitTests --no-build 2>&1 | tail
+      -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +2 lines (ctrl+o to expand)
+
+⏺ All 677 tests pass (362 TS + 108 C# core + 28 FluentValidator + 31 Native + 17
+   Fusion + 131 Playwright).
+
+  Now let me check git status to see the full picture of uncommitted changes.
+
+⏺ Bash(git status)
+  ⎿  On branch master
+     Changes not staged for commit:
+       (use "git add <file>..." to update what will be committed)
+     … +61 lines (ctrl+o to expand)
+
+⏺ Bash(git diff --stat)
+  ⎿   .../FluentValidationAdapter.cs                     |  31 ++++--
+      .../FusionNumericTextBoxReactiveExtensions.cs      |   3 +-
+      .../NativeButton/NativeButtonReactiveExtensions.cs |   1 +
+     … +34 lines (ctrl+o to expand)
+
+⏺ Bash(git log --oneline -5)
+  ⎿  b679680 refactor: Phase A SOLID quick wins — walk.ts purity, resolver
+     @deprecated, Command.When internal set
+     12753eb fix: clean up IdGenerator integration — remove IncludeAll(form
+     … +5 lines (ctrl+o to expand)
+
+⏺ All 677 tests pass across all test suites. This is the complete SOLID cleanup
+  — 12 tasks plus the validation regression fix. Let me commit.
+
+⏺ Bash(git add \
+        Alis.Reactive/Resolvers/ \…)
+  ⎿  (No output)
+
+⏺ Bash(git status --short)
+  ⎿  M  Alis.Reactive.FluentValidator/FluentValidationAdapter.cs
+     M  Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericT
+     extBoxReactiveExtensions.cs
+     … +51 lines (ctrl+o to expand)
+
+⏺ Bash(git commit -m "$(cat <<'EOF'
+      refactor: SOLID cleanup Phase B+C — extract resolvers,
+      RequestBuildContext, plan-driven trigger, unified dispatch…)
+  ⎿  [master d0ff657] refactor: SOLID cleanup Phase B+C — extract resolvers
+     , RequestBuildContext, plan-driven trigger, unified dispatch
+      44 files changed, 1156 insertions(+), 246 deletions(-)
+     … +5 lines (ctrl+o to expand)
+
+⏺ Bash(git status --short)
+  ⎿  (No output)
+
+⏺ Committed as d0ff657. Working tree is clean. All 12 SOLID cleanup tasks
+  complete with the validation regression fixed.
+
+  Summary of the full SOLID cleanup:
+
+  Phase A (already committed): walk.ts purity, resolver @deprecated,
+  Command.When internal set
+
+  Phase B (TS runtime):
+  - trigger.ts — plan-driven walk(el, readExpr) replaces hardcoded properties
+  - execute.ts — needsAsync() check unifies sync/async with zero sync-path
+  overhead
+  - commands.ts — ej.base.append moved to component.ts
+  - pipeline.ts — validation gate extracted from http.ts
+
+  Phase C (C# framework):
+  - GatherResolver + ValidationResolver extracted from ReactivePlan (SRP)
+  - RequestBuildContext separates builder metadata from serialized descriptors
+  - PipelineMode enum with transition validation
+  - FluentValidationAdapter factory + typed catch
+  - All 4 component reactive extensions fixed with RegisterBuildContexts
+
+✻ Cooked for 56s
+
+❯ continue                                                                      
+
+⏺ All tasks marked complete. Everything is committed and clean — the full
+  12-task SOLID cleanup plan is done. What's next?
+
+❯ really does all test pass - any hacks u done....                              
+
+⏺ Let me run everything fresh right now, no --no-build.
+
+⏺ Bash(npm run build:all 2>&1)
+  ⎿  > build:all
+     > npm run build && npm run build:test-widget && npm run build:css
+     … +28 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet build 2>&1 | tail -5)
+  ⎿  /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.R
+     eactive/Alis.Reactive.SandboxApp/Models/HomeModel.cs(5,19): warning CS
+     8618: Non-nullable property 'Id' must contain a non-null value when ex
+     … +8 lines (ctrl+o to expand)
+
+⏺ Bash(npm test 2>&1)
+  ⎿  > test
+     > vitest run
+     … +37 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.UnitTests 2>&1 | tail -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +2 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.FluentValidator.UnitTests 2>&1 | tail -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +3 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.Native.UnitTests 2>&1 | tail -5)
+  ⎿    Determining projects to restore...
+     /usr/local/share/dotnet/sdk/10.0.101/NuGet.targets(196,5): error : Met
+     hod not found: '!!0 System.Text.Json.Reflection.ReflectionExtensions.G
+     … +4 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.Fusion.UnitTests 2>&1 | tail -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +2 lines (ctrl+o to expand)
+
+⏺ Native tests hit a transient NuGet restore error. Let me retry.
+
+⏺ Bash(dotnet test tests/Alis.Reactive.Native.UnitTests 2>&1 | tail -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +2 lines (ctrl+o to expand)
+
+⏺ Now Playwright — the real test.
+
+⏺ Bash(dotnet test tests/Alis.Reactive.PlaywrightTests 2>&1 | tail -10)
+  ⎿    Determining projects to restore...
+       All projects are up-to-date for restore.
+       Alis.Reactive.PlaywrightTests -> /Users/muhammadadnanrafiq/Documents
+     … +12 lines (ctrl+o to expand)
+  ⎿  (timeout 5m)
+
+❯ any dsl changes u done? well lets wait for all tests to pass                  
+
+⏺ All clean. No hacks. Here's the full count:
+
+  ┌──────────────────────┬───────┬───────────┐
+  │        Layer         │ Tests │  Status   │
+  ├──────────────────────┼───────┼───────────┤
+  │ TS vitest            │ 362   │ Passed    │
+  ├──────────────────────┼───────┼───────────┤
+  │ C# Core UnitTests    │ 108   │ Passed    │
+  ├──────────────────────┼───────┼───────────┤
+  │ FluentValidator      │ 28    │ Passed    │
+  ├──────────────────────┼───────┼───────────┤
+  │ Native UnitTests     │ 31    │ Passed    │
+  ├──────────────────────┼───────┼───────────┤
+  │ Fusion UnitTests     │ 17    │ Passed    │
+  ├──────────────────────┼───────┼───────────┤
+  │ Playwright (browser) │ 131   │ Passed    │
+  ├──────────────────────┼───────┼───────────┤
+  │ Total                │ 677   │ All green │
+  └──────────────────────┴───────┴───────────┘
+
+  To your question about DSL changes — yes, but they're all internal/structural,
+   not behavioral:
+
+  1. RequestDescriptor — removed ValidatorType and ReadExprOverrides properties
+  (moved to internal RequestBuildContext)
+  2. PipelineBuilder — added PipelineMode enum + SetMode() transition guard,
+  BuildContexts collection, MergeBuildContexts()
+  3. HttpRequestBuilder — BuildContexts dictionary + CollectBuildContext() /
+  MergeChainedContexts()
+  4. TriggerBuilder — AddEntryWithContexts() replaces inline AddEntry
+  5. ReactivePlan — _buildContexts dictionary, RegisterBuildContexts(),
+  delegates to GatherResolver + ValidationResolver
+  6. ComponentEventTrigger — added optional readExpr parameter (already existed
+  in schema, now wired through C#)
+  7. StatusHandler — added default constructor StatusHandler(List<Command>) (no
+  null statusCode)
+
+  The public DSL surface (what views call) is unchanged — .Post(),
+  .Validate<T>(), .Response(), .Element(), etc. all work identically. The JSON
+  plan output is the same. All changes are behind the builder/resolver
+  internals.
+
+✻ Baked for 2m 20s
+
+❯ ok, isee onAllSuccess but when i reeatldy said each request its own complete  
+chain - just tell me what this does how dsl express it                          
+
+⏺ Searched for 1 pattern, read 2 files (ctrl+o to expand)
+
+⏺ Here's what onAllSuccess does:
+
+  Runtime (pipeline.ts:46-51): After Promise.allSettled completes for ALL
+  parallel requests, it runs onAllSuccess handlers. It fires regardless of
+  whether individual requests succeeded or failed — it's a "when all are done"
+  callback, not truly "all succeeded" (the name is misleading).
+
+  DSL (ParallelBuilder.Response()):
+  p.Parallel(
+      r => r.Post("/api/save-a").Response(...),   // each branch has its own 
+  chain
+      r => r.Post("/api/save-b").Response(...)
+  ).Response(r => r.OnSuccess(s =>                // ← this becomes onAllSuccess
+  {
+      s.Element("status").SetText("All done");
+  }));
+
+  Each branch already has its own complete request chain (gather, validate,
+  onSuccess, onError, chained). onAllSuccess is the parallel-level response —
+  commands that run after every branch finishes.
+
+  Honestly though — looking at the runtime, it always fires (even if branches
+  failed), so it's more like onAllSettled. And each branch already has its own
+  onSuccess/onError via its RequestDescriptor. If you don't need a
+  parallel-level "all done" signal, onAllSuccess is unnecessary.
+
+❯ hmmm that is good if DSL look like this, we can keep it                       
+
+⏺ Got it. The DSL reads well — each branch owns its chain, and .Response() on
+  the parallel builder is the "after all" signal. Keeping it.
+
+❯ but what will be in 2 then..as each unit has its own response. please say     
+something like that response data is not available if its is not - if it is     
+...show me sandbox sample anyway first                                          
+
+⏺ Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+⏺ Here's the sandbox sample (Http page, Section 4):
+
+  p.Parallel(
+      a => a.Get("/Sandbox/Http/Residents")
+            .Response(ra => ra.OnSuccess(sa =>          // ← branch A's own 
+  response
+            {
+                sa.Element("parallel-residents").SetText("Residents loaded");
+            })),
+      b => b.Get("/Sandbox/Http/Facilities")
+            .Response(rb => rb.OnSuccess(sb =>          // ← branch B's own 
+  response
+            {
+                sb.Element("parallel-facilities").SetText("Facilities loaded");
+            }))
+  ).Response(r => r                                     // ← onAllSuccess 
+  (parallel-level)
+      .OnSuccess(s =>
+      {
+          s.Element("parallel-spinner").Hide();
+          s.Element("parallel-all").SetText("All parallel requests completed!");
+      })
+  );
+
+  What's available in the parallel-level .Response(): No response data. It only
+  gets commands (DOM mutations, dispatch). The individual response bodies are
+  available in each branch's own .OnSuccess() — but by the time onAllSuccess
+  fires, those bodies are gone.
+
+  So the parallel-level .Response() is purely for coordination — "hide the
+  spinner, show a summary message, dispatch an event" — not for accessing
+  response data. Each branch handles its own data independently.
+
+❯ ok make sense                                                                 
+
+⏺ Good. Clean architecture, each branch owns its data, parallel-level is just
+  coordination. Moving on — anything else you want to tackle?
+
+❯ no, but lets commit and have a clean tree. But i am not sure architecrally    
+clean up is done?                                                               
+
+⏺ Bash(git status --short)
+  ⎿  (No output)
+
+⏺ Tree is already clean — everything was committed in d0ff657. Nothing pending.
+
+  As for whether the architectural cleanup is done — the 12-task SOLID plan is
+  complete, but here's an honest assessment of what's left:
+
+  Done:
+  - GatherResolver + ValidationResolver extracted (SRP)
+  - RequestBuildContext separates builder metadata from serialized descriptors
+  - PipelineMode enum with transition guards
+  - Plan-driven trigger payload (walk + readExpr)
+  - Unified sync/async dispatch
+  - ej.base.append consolidated in component.ts
+  - Validation moved to pipeline layer
+  - FluentValidationAdapter factory + typed catch
+  - walk.ts pure, resolver @deprecated, Command.When internal
+
+  Potentially still worth reviewing:
+  - onAllSuccess fires after allSettled (even on failures) — name is misleading,
+   but you said keep it
+  - Any dead code or unused abstractions left behind from the refactors
+  - Whether IReactivePlan interface surface is minimal enough
+  - Test coverage for edge cases in the new resolvers
+
+  Want me to do a quick audit of the codebase for loose ends, or are you
+  satisfied with where things stand?
+
+❯ i think we should remove onallsucess - say more like OnAllSettled with no     
+payload and one handler no distinction between error or success - yeah do audit 
+ - SOLID - quality, i see code base is littered with comments when not          
+necessar, not using proper xml formatted comments for .net                      
+
+⏺ Let me audit the full codebase. I'll run parallel agents to cover C# and TS
+  thoroughly.
+
+⏺ 2 Explore agents finished (ctrl+o to expand)
+   ├─ Audit C# code quality · 53 tool uses · 89.2k tokens
+   │  ⎿  Done
+   └─ Audit TS code quality · 20 tool uses · 55.5k tokens
+      ⎿  Done
+
+⏺ Good audit. Here's what I found across both C# and TS:
+
+  Rename: onAllSuccess → onAllSettled
+
+  - C#: ParallelHttpReaction.OnAllSuccess → OnAllSettled with List<Command> (not
+   StatusHandler — no status codes needed)
+  - C#: ParallelBuilder.Response() → OnAllSettled(Action<PipelineBuilder>)
+  - TS: types.ts, pipeline.ts — matching rename, just Command[]
+  - Schema, tests, snapshot files
+
+  C# Comment Cleanup
+
+  - PipelineBuilder.cs:194 — duplicate /// <summary> tag
+  - TriggerBuilder.cs — public class + 3 methods missing XML docs
+  - Scan all public API for missing/malformed XML docs
+
+  TS Comment Cleanup (10 removals)
+
+  - auto-boot.ts:5,8,12,21 — obvious code comments
+  - trigger.ts:13,16,22,40 — redundant with log messages
+  - pipeline.ts:46 — obvious from context
+  - validation.ts:48 — obvious from break
+
+  TS Quality Fixes
+
+  - trigger.ts:3 — unused walk import (readExpr change removed usage)
+  - resolver.ts:69-81 — resolveAs() + resolveToString() are dead code
+  (deprecated, zero callers)
+  - types.ts:30 — bindingPath on trigger type (verify if used in runtime)
+
+  C# Quality
+
+  - No SOLID violations, no dead code, naming consistent
+
+  Want me to execute this as a single cleanup pass, or brainstorm further?
+
+✻ Worked for 2m 26s
+
+❯ yes                                                                           
+
+⏺ Let me start by checking bindingPath usage, then execute all changes.
+
+⏺ Searched for 4 patterns (ctrl+o to expand)
+
+⏺ bindingPath is serialized in the plan JSON from C# but never read by the TS
+  runtime. It's metadata that travels in the plan but serves no runtime purpose.
+   I'll keep it — it's in the schema contract and removing it would be a schema
+  change for no functional gain. Not worth the churn.
+
+  Now let me execute all changes. I'll work through them systematically.
+
+⏺ Searched for 2 patterns, read 4 files (ctrl+o to expand)
+
+⏺ Now I have the full picture. Let me execute all changes in parallel batches.
+
+  Batch 1: TS cleanup — comments, dead code, element.ts migration, onAllSettled
+  rename
+
+⏺ Write(Alis.Reactive.SandboxApp/Scripts/auto-boot.ts)
+  ⎿  Removed 4 lines
+       2  import { init as initConfirm } from "./confirm";
+       3  import type { TraceLevel } from "./trace";
+       4  
+       5 -// Initialize app-level infrastructure before processing plans 
+       5  initConfirm();
+       6  
+       8 -// Discover all plan elements: [data-alis-plan] (new) or fallba
+         -ck to #alis-plan (legacy)                                      
+       7  const planEls = document.querySelectorAll<HTMLElement>("[data-a
+          lis-plan]");
+       8  
+       9  if (planEls.length > 0) {
+      12 -  // New: multiple plans per page                              
+      10    for (const el of planEls) {
+      11      const traceLevel = el.getAttribute("data-trace") as TraceLe
+          vel | null;
+      12      if (traceLevel) {
+     ...
+      15      boot(JSON.parse(el.textContent!));
+      16    }
+      17  } else {
+      21 -  // Legacy fallback: single #alis-plan element                
+      18    const planEl = document.getElementById("alis-plan");
+      19    if (planEl) {
+      20      const traceLevel = planEl.getAttribute("data-trace") as Tra
+          ceLevel | null;
+
+⏺ Update(Alis.Reactive.SandboxApp/Scripts/element.ts)
+  ⎿  Added 1 line, removed 1 line
+      1  import type { MutateElementCommand, ExecContext } from "./types"
+         ;
+      2  import { scope } from "./trace";
+      3 -import { resolve } from "./resolver";                           
+      3 +import { resolveEventPath } from "./resolver";                  
+      4  
+      5  const log = scope("element");
+      6  
+
+⏺ Update(Alis.Reactive.SandboxApp/Scripts/element.ts)
+  ⎿  Added 1 line, removed 1 line
+      11      return;
+      12    }
+      13  
+      14 -  const val = cmd.source ? resolve(cmd.source, ctx) : cmd.value
+         -;                                                              
+      14 +  const val = cmd.source ? resolveEventPath(cmd.source, ctx) : 
+         +cmd.value;                                                     
+      15    log.trace("exec", { target: cmd.target, jsEmit: cmd.jsEmit, v
+          al });
+      16    new Function("el", "val", cmd.jsEmit).call(null, el, val);
+      17  }
+
+⏺ Now remove the 3 deprecated functions from resolver.ts and clean up trigger.ts
+   comments + unused import.
+
+⏺ Update(Alis.Reactive.SandboxApp/Scripts/resolver.ts)
+  ⎿  Removed 28 lines
+      45  }
+      46  
+      47  /**
+      48 - * Resolves a BindExpr (plain string path) against the executio
+         -n context.                                                     
+      49 - * Kept for backward compatibility with MutateElementCommand.so
+         -urce (string).                                                 
+      50 - * @deprecated Use {@link resolveSource} with a typed BindSourc
+         -e instead.                                                     
+      51 - */                                                            
+      52 -export function resolve(expr: BindExpr, ctx?: ExecContext): unk
+         -nown {                                                         
+      53 -  return resolveEventPath(expr, ctx);                          
+      54 -}                                                              
+      55 -                                                               
+      56 -/**                                                            
+      48   * Resolves a BindSource and coerces the result to a specific t
+          ype.
+      49   */
+      50  export function resolveSourceAs(source: BindSource, coerceAs: C
+          oercionType, ctx?: ExecContext): unknown {
+     ...
+      53  }
+      54  
+      55  /**
+      65 - * Resolves a BindExpr and coerces the result to a specific typ
+         -e.                                                             
+      66 - * Kept for backward compatibility.                            
+      67 - * @deprecated Use {@link resolveSourceAs} with a typed BindSou
+         -rce instead.                                                   
+      68 - */                                                            
+      69 -export function resolveAs(expr: BindExpr, coerceAs: CoercionTyp
+         -e, ctx?: ExecContext): unknown {                               
+      70 -  const raw = resolve(expr, ctx);                              
+      71 -  return coerce(raw, coerceAs);                                
+      72 -}                                                              
+      73 -                                                               
+      74 -/**                                                            
+      75 - * Resolves a BindExpr and coerces to string for DOM rendering.
+      76 - * @deprecated Use {@link resolveSourceAs} with coercion type "
+         -string" instead.                                               
+      77 - */                                                            
+      78 -export function resolveToString(expr: BindExpr, ctx?: ExecConte
+         -xt): string {                                                  
+      79 -  const raw = resolve(expr, ctx);                              
+      80 -  return String(raw ?? "");                                    
+      81 -}                                                              
+      82 -                                                               
+      83 -/**                                                            
+      56   * Coerces a raw value to the specified type.
+      57   *
+      58   * | CoercionType | Behavior |
+
+⏺ Now trigger.ts — remove unnecessary comments and unused walk import:
+
+⏺ Write(Alis.Reactive.SandboxApp/Scripts/trigger.ts)
+  ⎿  Removed 2 lines
+      10    switch (trigger.kind) {
+      11      case "dom-ready":
+      12        if (document.readyState === "complete" || document.readyS
+          tate === "interactive") {
+      13 -        log.debug("dom-ready: immediate");                     
+      13          executeReaction(reaction);
+      14        } else {
+      16 -        log.debug("dom-ready: deferred");                      
+      15          document.addEventListener("DOMContentLoaded", () => exe
+          cuteReaction(reaction));
+      16        }
+      17        break;
+
+⏺ Now pipeline.ts — rename onAllSuccess → onAllSettled and remove obvious
+  comment:
+
+⏺ Update(Alis.Reactive.SandboxApp/Scripts/pipeline.ts)
+  ⎿  Added 2 lines, removed 5 lines
+      43      if (r.status === "rejected") log.error("parallel branch err
+          or", { reason: String(r.reason) });
+      44    }
+      45  
+      46 -  // After ALL complete, fire onAllSuccess handlers            
+      47 -  if (reaction.onAllSuccess) {                                 
+      48 -    for (const handler of reaction.onAllSuccess) {             
+      49 -      executeCommands(handler.commands, ctx);                  
+      50 -    }                                                          
+      46 +  if (reaction.onAllSettled) {                                 
+      47 +    executeCommands(reaction.onAllSettled, ctx);               
+      48    }
+      49  }
+      50  
+
+⏺ Now types.ts — rename and simplify to Command[]:
+
+⏺ Update(Alis.Reactive.SandboxApp/Scripts/types.ts)
+  ⎿  Added 1 line, removed 1 line
+      55    kind: "parallel-http";
+      56    preFetch?: Command[];
+      57    requests: RequestDescriptor[];
+      58 -  onAllSuccess?: StatusHandler[];                              
+      58 +  onAllSettled?: Command[];                                    
+      59  }
+      60  
+      61  // -- HTTP Request Types --------------------------------------
+          --
+
+⏺ Remove the comment in validation.ts:
+
+⏺ Update(Alis.Reactive.SandboxApp/Scripts/validation.ts)
+  ⎿  Added 1 line, removed 1 line
+      45        if (ruleFails(rule, value, byName)) {
+      46          showError(desc.formId, f, rule.message);
+      47          valid = false;
+      48 -        break; // first failing rule wins                      
+      48 +        break;                                                 
+      49        }
+      50      }
+      51    }
+
+⏺ Batch 2: C# — rename onAllSuccess → onAllSettled, fix XML docs
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Update(Alis.Reactive/Descriptors/Reactions/Reaction.cs)
+  ⎿  Added 3 lines, removed 3 lines
+      56          public List<RequestDescriptor> Requests { get; }
+      57  
+      58          [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting
+          Null)]
+      59 -        public List<StatusHandler>? OnAllSuccess { get; }      
+      59 +        public List<Command>? OnAllSettled { get; }            
+      60  
+      61          public ParallelHttpReaction(
+      62              List<Command>? preFetch,
+      63              List<RequestDescriptor> requests,
+      64 -            List<StatusHandler>? onAllSuccess = null)          
+      64 +            List<Command>? onAllSettled = null)                
+      65          {
+      66              PreFetch = preFetch;
+      67              Requests = requests;
+      68 -            OnAllSuccess = onAllSuccess;                       
+      68 +            OnAllSettled = onAllSettled;                       
+      69          }
+      70      }
+      71  }
+
+⏺ Now update ParallelBuilder to use OnAllSettled with List<Command>:
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Write(Alis.Reactive/Builders/Requests/ParallelBuilder.cs)
+  ⎿  Added 11 lines, removed 10 lines
+       6  
+       7  namespace Alis.Reactive.Builders.Requests
+       8  {
+       9 +    /// <summary>                                              
+      10 +    /// Builds a parallel HTTP reaction — multiple requests fir
+         +e concurrently.                                                
+      11 +    /// Each branch owns its own response chain. OnAllSettled f
+         +ires after all branches complete.                              
+      12 +    /// </summary>                                             
+      13      public class ParallelBuilder<TModel> where TModel : class
+      14      {
+      15          private readonly List<RequestDescriptor> _branches = ne
+          w List<RequestDescriptor>();
+      12 -        private ResponseBuilder<TModel>? _response;            
+      16 +        private PipelineBuilder<TModel>? _onAllSettled;        
+      17  
+      14 -        /// <summary>                                          
+      15 -        /// Build contexts collected from all branch builders. 
+      16 -        /// </summary>                                         
+      18          internal Dictionary<RequestDescriptor, RequestBuildCont
+          ext>? BuildContexts { get; private set; }
+      19  
+      20          internal void AddBranch(Action<HttpRequestBuilder<TMode
+          l>> configure)
+     ...
+      32          }
+      33  
+      34          /// <summary>
+      34 -        /// Configures handlers that fire after ALL parallel re
+         -quests complete successfully.                                  
+      35 +        /// Commands to execute after all parallel requests com
+         +plete, regardless of individual success or failure.            
+      36          /// </summary>
+      36 -        public ParallelBuilder<TModel> Response(Action<Response
+         -Builder<TModel>> configure)                                    
+      37 +        public ParallelBuilder<TModel> OnAllSettled(Action<Pipe
+         +lineBuilder<TModel>> configure)                                
+      38          {
+      38 -            var builder = new ResponseBuilder<TModel>();       
+      39 -            configure(builder);                                
+      40 -            _response = builder;                               
+      39 +            var pb = new PipelineBuilder<TModel>();            
+      40 +            configure(pb);                                     
+      41 +            _onAllSettled = pb;                                
+      42              return this;
+      43          }
+      44  
+     ...
+      47              return new ParallelHttpReaction(
+      48                  preFetch,
+      49                  _branches,
+      49 -                _response?.SuccessHandlers.Count > 0 ? _respons
+         -e.SuccessHandlers : null);                                     
+      50 +                _onAllSettled?.Commands.Count > 0 ? _onAllSettl
+         +ed.Commands : null);                                           
+      51          }
+      52      }
+      53  }
+
+⏺ Now update the sandbox view that uses .Response() on Parallel:
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Update(Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Http/Index.cshtml)
+  ⎿  Added 6 lines, removed 8 lines
+      132                                sb.Element("parallel-facilities"
+           ).SetText("Facilities loaded");
+      133                                sb.Element("parallel-facilities"
+           ).AddClass("text-green-600");
+      134                            }))
+      135 -                ).Response(r => r                             
+      136 -                    .OnSuccess(s =>                           
+      137 -                    {                                         
+      138 -                        s.Element("parallel-spinner").Hide(); 
+      139 -                        s.Element("parallel-all").SetText("All
+          - parallel requests completed!");                              
+      140 -                        s.Element("parallel-all").AddClass("te
+          -xt-green-600");                                               
+      141 -                    })                                        
+      142 -                );                                            
+      135 +                ).OnAllSettled(s =>                           
+      136 +                {                                             
+      137 +                    s.Element("parallel-spinner").Hide();     
+      138 +                    s.Element("parallel-all").SetText("All par
+          +allel requests completed!");                                  
+      139 +                    s.Element("parallel-all").AddClass("text-g
+          +reen-600");                                                   
+      140 +                });                                           
+      141              }))
+      142          <div class="mt-3 space-y-2 font-mono text-sm">
+      143              <p id="parallel-spinner" hidden class="text-amber-
+           600">Loading both...</p>
+
+⏺ Now fix the duplicate /// <summary> in PipelineBuilder.cs and add missing XML
+  docs to TriggerBuilder.cs:
+
+⏺ Update(Alis.Reactive/Builders/PipelineBuilder.cs)
+  ⎿  Removed 1 line
+      192          }
+      193  
+      194          /// <summary>
+      195 -        /// <summary>                                         
+      195          /// Build contexts collected after BuildReaction() — c
+           ontains metadata for
+      196          /// all RequestDescriptors built within this pipeline 
+           (including chained/parallel/conditional).
+      197          /// </summary>
+
+⏺ Now add XML docs to TriggerBuilder:
+
+⏺ Update(Alis.Reactive/Builders/TriggerBuilder.cs)
+  ⎿  Added 6 lines
+       5  
+       6  namespace Alis.Reactive.Builders
+       7  {
+       8 +    /// <summary>                                              
+       9 +    /// Builds trigger–reaction entries and adds them to the pl
+         +an.                                                            
+      10 +    /// Entry point for wiring DomReady and CustomEvent trigger
+         +s via <c>Html.On()</c>.                                        
+      11 +    /// </summary>                                             
+      12      public sealed class TriggerBuilder<TModel> where TModel : c
+          lass
+      13      {
+      14          private readonly IReactivePlan<TModel> _plan;
+      15  
+      16 +        /// <summary>Creates a trigger builder that adds entrie
+         +s to the given plan.</summary>                                 
+      17          public TriggerBuilder(IReactivePlan<TModel> plan)
+      18          {
+      19              _plan = plan;
+      20          }
+      21  
+      22 +        /// <summary>Wires a reaction that executes when the DO
+         +M is ready.</summary>                                          
+      23          public TriggerBuilder<TModel> DomReady(Action<PipelineB
+          uilder<TModel>> configure)
+      24          {
+      25              var pb = new PipelineBuilder<TModel>();
+
+⏺ Update(Alis.Reactive/Builders/TriggerBuilder.cs)
+  ⎿  Added 1 line
+      28              return this;
+      29          }
+      30  
+      31 +        /// <summary>Wires a reaction that executes when the na
+         +med custom event fires.</summary>                              
+      32          public TriggerBuilder<TModel> CustomEvent(string eventN
+          ame, Action<PipelineBuilder<TModel>> configure)
+      33          {
+      34              var pb = new PipelineBuilder<TModel>();
+
+⏺ Update(Alis.Reactive/Builders/TriggerBuilder.cs)
+  ⎿  Added 1 line
+      37              return this;
+      38          }
+      39  
+      40 +        /// <summary>Wires a reaction with a typed payload that
+         + executes when the named custom event fires.</summary>         
+      41          public TriggerBuilder<TModel> CustomEvent<TPayload>(str
+          ing eventName,
+      42              Action<TPayload, PipelineBuilder<TModel>> configure
+          )
+      43              where TPayload : new()
+
+⏺ Now update the JSON schema:
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Update(Alis.Reactive/Schemas/reactive-plan.schema.json)
+  ⎿  Added 2 lines, removed 2 lines
+      355            "items": { "$ref": "#/$defs/RequestDescriptor" },
+      356            "minItems": 2
+      357          },
+      358 -        "onAllSuccess": {                                     
+      358 +        "onAllSettled": {                                     
+      359            "type": "array",
+      360 -          "items": { "$ref": "#/$defs/StatusHandler" }        
+      360 +          "items": { "$ref": "#/$defs/Command" }              
+      361          }
+      362        }
+      363      },
+
+⏺ Now update tests. Let me find all test references to onAllSuccess:
+
+⏺ Searched for 2 patterns, read 2 files (ctrl+o to expand)
+
+⏺ Update the TS test — change onAllSuccess to onAllSettled with flat Command[]:
+
+⏺ Update(Alis.Reactive.SandboxApp/Scripts/__tests__/when-executing-parallel-requ
+        ests.test.ts)
+  ⎿  Added 1 line, removed 1 line
+      57            onSuccess: [{ commands: [{ kind: "mutate-element", ta
+          rget: "facilities", jsEmit: "el.textContent = val", value: "loa
+          ded" }] }],
+      58          },
+      59        ],
+      60 -      onAllSuccess: [{ commands: [{ kind: "mutate-element", tar
+         -get: "result", jsEmit: "el.textContent = val", value: "all done
+         -" }] }],                                                       
+      60 +      onAllSettled: [{ kind: "mutate-element", target: "result"
+         +, jsEmit: "el.textContent = val", value: "all done" }],        
+      61      };
+      62  
+      63      await executeParallelHttpReaction(reaction);
+
+⏺ Now update the C# unit test and its snapshot. Let me find the C# test:
+
+⏺ Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+⏺ Update the C# test to use .OnAllSettled():
+
+⏺ Update(tests/Alis.Reactive.UnitTests/Requests/WhenRequestingFromServer.cs)
+  ⎿  Added 1 line, removed 3 lines
+      65              p.Parallel(
+      66                  a => a.Get("/api/residents"),
+      67                  b => b.Get("/api/facilities")
+      68 -            ).Response(r => r                                  
+      69 -                .OnSuccess(s => s.Element("result").SetText("al
+         -l loaded"))                                                    
+      70 -            )                                                  
+      68 +            ).OnAllSettled(s => s.Element("result").SetText("al
+         +l loaded"))                                                    
+      69          ).Render());
+      70  
+      71      [Test]
+
+⏺ Update(tests/Alis.Reactive.UnitTests/Requests/WhenRequestingFromServer.cs)
+  ⎿  Added 1 line, removed 1 line
+      125              p.Parallel(
+      126                  a => a.Get("/api/a"),
+      127                  b => b.Get("/api/b")
+      128 -            ).Response(r => r.OnSuccess(s => s.Dispatch("all-d
+          -one"))));                                                     
+      128 +            ).OnAllSettled(s => s.Dispatch("all-done")));     
+      129          AssertSchemaValid(plan.Render());
+      130      }
+      131  
+
+⏺ Now update the verified snapshot — it changes from onAllSuccess: [{ commands: 
+  [...] }] to onAllSettled: [...]:
+
+⏺ Write(tests/Alis.Reactive.UnitTests/Requests/WhenRequestingFromServer.Parallel
+       _requests_fire_concurrently.verified.txt)
+  ⎿  Added 6 lines, removed 10 lines
+      1 -{                                                               
+      1 +{                                                               
+      2    entries: [
+      3      {
+      4        trigger: {
+     ...
+      16              url: /api/facilities
+      17            }
+      18          ],
+      19 -        onAllSuccess: [                                        
+      19 +        onAllSettled: [                                        
+      20            {
+      21 -            commands: [                                        
+      22 -              {                                                
+      23 -                kind: mutate-element,                          
+      24 -                target: result,                                
+      25 -                jsEmit: el.textContent = val,                  
+      26 -                value: all loaded                              
+      27 -              }                                                
+      28 -            ]                                                  
+      21 +            kind: mutate-element,                              
+      22 +            target: result,                                    
+      23 +            jsEmit: el.textContent = val,                      
+      24 +            value: all loaded                                  
+      25            }
+      26          ]
+      27        }
+
+⏺ Now update the resolver test to remove tests for deleted deprecated functions.
+   Let me also check what the Playwright parallel test looks like:
+
+⏺ Searched for 2 patterns (ctrl+o to expand)
+
+⏺ Good — the Playwright test just checks DOM text, not the plan JSON field name.
+   It'll pass without changes.
+
+  Now update the resolver test to remove deprecated function tests:
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Write(Alis.Reactive.SandboxApp/Scripts/__tests__/when-resolving-bind-expr.test
+       .ts)
+  ⎿  Added 59 lines, removed 72 lines
+        1  import { describe, it, expect } from "vitest";
+        2 -import { resolve, resolveToString, resolveAs, coerce } from ".
+          -./resolver";                                                  
+        2 +import { resolveEventPath, coerce } from "../resolver";       
+        3  import type { ExecContext } from "../types";
+        4  
+        5  describe("when resolving a BindExpr against execution context"
+           , () => {
+        6 -  // --- resolve(): flat property access ---                  
+        7 -                                                              
+        6    describe("flat property access", () => {
+        7      it("resolves a string property", () => {
+        8        const ctx: ExecContext = { evt: { name: "Alice" } };
+       11 -      expect(resolve("evt.name", ctx)).toBe("Alice");         
+        9 +      expect(resolveEventPath("evt.name", ctx)).toBe("Alice");
+       10      });
+       11  
+       12      it("resolves a number property", () => {
+       13        const ctx: ExecContext = { evt: { age: 30 } };
+       16 -      expect(resolve("evt.age", ctx)).toBe(30);               
+       14 +      expect(resolveEventPath("evt.age", ctx)).toBe(30);      
+       15      });
+       16  
+       17      it("resolves a boolean property", () => {
+       18        const ctx: ExecContext = { evt: { active: true } };
+       21 -      expect(resolve("evt.active", ctx)).toBe(true);          
+       19 +      expect(resolveEventPath("evt.active", ctx)).toBe(true); 
+       20      });
+       21  
+       22      it("resolves a null property as null", () => {
+       23        const ctx: ExecContext = { evt: { value: null } };
+       26 -      expect(resolve("evt.value", ctx)).toBeNull();           
+       24 +      expect(resolveEventPath("evt.value", ctx)).toBeNull();  
+       25      });
+       26  
+       27      it("resolves a missing property as undefined", () => {
+       28        const ctx: ExecContext = { evt: { name: "Alice" } };
+       31 -      expect(resolve("evt.missing", ctx)).toBeUndefined();    
+       29 +      expect(resolveEventPath("evt.missing", ctx)).toBeUndefin
+          +ed();                                                         
+       30      });
+       31  
+       32      it("resolves zero as zero (not falsy undefined)", () => {
+       33        const ctx: ExecContext = { evt: { count: 0 } };
+       36 -      expect(resolve("evt.count", ctx)).toBe(0);              
+       34 +      expect(resolveEventPath("evt.count", ctx)).toBe(0);     
+       35      });
+       36  
+       37      it("resolves empty string as empty string", () => {
+       38        const ctx: ExecContext = { evt: { text: "" } };
+       41 -      expect(resolve("evt.text", ctx)).toBe("");              
+       39 +      expect(resolveEventPath("evt.text", ctx)).toBe("");     
+       40      });
+       41  
+       42      it("resolves false as false (not undefined)", () => {
+       43        const ctx: ExecContext = { evt: { enabled: false } };
+       46 -      expect(resolve("evt.enabled", ctx)).toBe(false);        
+       44 +      expect(resolveEventPath("evt.enabled", ctx)).toBe(false)
+          +;                                                             
+       45      });
+       46    });
+       47  
+       50 -  // --- resolve(): nested property access ---                
+       51 -                                                              
+       48    describe("nested property access", () => {
+       49      it("resolves 2-level nested property", () => {
+       50        const ctx: ExecContext = { evt: { address: { city: "Seat
+           tle" } } };
+       55 -      expect(resolve("evt.address.city", ctx)).toBe("Seattle")
+          -;                                                             
+       51 +      expect(resolveEventPath("evt.address.city", ctx)).toBe("
+          +Seattle");                                                    
+       52      });
+       53  
+       54      it("resolves 3-level nested property", () => {
+       55        const ctx: ExecContext = {
+       56          evt: { user: { address: { zip: "98101" } } },
+       57        };
+       62 -      expect(resolve("evt.user.address.zip", ctx)).toBe("98101
+          -");                                                           
+       58 +      expect(resolveEventPath("evt.user.address.zip", ctx)).to
+          +Be("98101");                                                  
+       59      });
+       60  
+       61      it("resolves 4-level nested property", () => {
+       62        const ctx: ExecContext = {
+       63          evt: { a: { b: { c: { d: 42 } } } },
+       64        };
+       69 -      expect(resolve("evt.a.b.c.d", ctx)).toBe(42);           
+       65 +      expect(resolveEventPath("evt.a.b.c.d", ctx)).toBe(42);  
+       66      });
+       67  
+       68      it("returns undefined when intermediate is null", () => {
+       69        const ctx: ExecContext = { evt: { address: null } };
+       74 -      expect(resolve("evt.address.city", ctx)).toBeUndefined()
+          -;                                                             
+       70 +      expect(resolveEventPath("evt.address.city", ctx)).toBeUn
+          +defined();                                                    
+       71      });
+       72  
+       73      it("returns undefined when intermediate is undefined", () 
+           => {
+       74        const ctx: ExecContext = { evt: {} };
+       79 -      expect(resolve("evt.address.city", ctx)).toBeUndefined()
+          -;                                                             
+       75 +      expect(resolveEventPath("evt.address.city", ctx)).toBeUn
+          +defined();                                                    
+       76      });
+       77  
+       78      it("walks through primitive properties (JS semantics)", ()
+            => {
+       79        const ctx: ExecContext = { evt: { name: "Alice" } };
+       84 -      // walk follows JS property access: "Alice".length === 5
+       85 -      expect(resolve("evt.name.length", ctx)).toBe(5);        
+       80 +      expect(resolveEventPath("evt.name.length", ctx)).toBe(5)
+          +;                                                             
+       81      });
+       82  
+       83      it("returns the nested object itself when path ends at obj
+           ect", () => {
+       84        const address = { city: "Seattle", zip: "98101" };
+       85        const ctx: ExecContext = { evt: { address } };
+       91 -      expect(resolve("evt.address", ctx)).toEqual(address);   
+       86 +      expect(resolveEventPath("evt.address", ctx)).toEqual(add
+          +ress);                                                        
+       87      });
+       88    });
+       89  
+       95 -  // --- resolve(): edge cases ---                            
+       96 -                                                              
+       90    describe("edge cases", () => {
+       91      it("returns undefined when context is undefined", () => {
+       99 -      expect(resolve("evt.name", undefined)).toBeUndefined(); 
+       92 +      expect(resolveEventPath("evt.name", undefined)).toBeUnde
+          +fined();                                                      
+       93      });
+       94  
+       95      it("returns undefined when context is empty object", () =>
+            {
+      103 -      expect(resolve("evt.name", {})).toBeUndefined();        
+       96 +      expect(resolveEventPath("evt.name", {})).toBeUndefined()
+          +;                                                             
+       97      });
+       98  
+       99      it("returns undefined when evt root is missing", () => {
+      100        const ctx: ExecContext = {};
+      108 -      expect(resolve("evt.name", ctx)).toBeUndefined();       
+      101 +      expect(resolveEventPath("evt.name", ctx)).toBeUndefined(
+          +);                                                            
+      102      });
+      103  
+      104      it("resolves the evt root itself", () => {
+      105        const evt = { name: "Alice" };
+      106        const ctx: ExecContext = { evt };
+      114 -      expect(resolve("evt", ctx)).toEqual(evt);               
+      107 +      expect(resolveEventPath("evt", ctx)).toEqual(evt);      
+      108      });
+      109  
+      110      it("handles array values at leaf", () => {
+      111        const ctx: ExecContext = { evt: { items: [1, 2, 3] } };
+      119 -      expect(resolve("evt.items", ctx)).toEqual([1, 2, 3]);   
+      112 +      expect(resolveEventPath("evt.items", ctx)).toEqual([1, 2
+          +, 3]);                                                        
+      113      });
+      114    });
+      115  
+      123 -  // --- resolveToString(): string coercion for DOM rendering 
+          ----                                                           
+      124 -                                                              
+      125 -  describe("resolveToString for DOM rendering", () => {       
+      116 +  describe("resolution with string coercion", () => {         
+      117      it("coerces number to string", () => {
+      118        const ctx: ExecContext = { evt: { count: 42 } };
+      128 -      expect(resolveToString("evt.count", ctx)).toBe("42");   
+      119 +      expect(String(resolveEventPath("evt.count", ctx) ?? ""))
+          +.toBe("42");                                                  
+      120      });
+      121  
+      122      it("coerces boolean true to 'true'", () => {
+      123        const ctx: ExecContext = { evt: { active: true } };
+      133 -      expect(resolveToString("evt.active", ctx)).toBe("true");
+      124 +      expect(String(resolveEventPath("evt.active", ctx) ?? "")
+          +).toBe("true");                                               
+      125      });
+      126  
+      127      it("coerces boolean false to 'false'", () => {
+      128        const ctx: ExecContext = { evt: { active: false } };
+      138 -      expect(resolveToString("evt.active", ctx)).toBe("false")
+          -;                                                             
+      129 +      expect(String(resolveEventPath("evt.active", ctx) ?? "")
+          +).toBe("false");                                              
+      130      });
+      131  
+      132      it("coerces null to empty string", () => {
+      133        const ctx: ExecContext = { evt: { value: null } };
+      143 -      expect(resolveToString("evt.value", ctx)).toBe("");     
+      134 +      expect(String(resolveEventPath("evt.value", ctx) ?? ""))
+          +.toBe("");                                                    
+      135      });
+      136  
+      137      it("returns empty string for missing path", () => {
+      138        const ctx: ExecContext = { evt: {} };
+      148 -      expect(resolveToString("evt.nonexistent", ctx)).toBe("")
+          -;                                                             
+      139 +      expect(String(resolveEventPath("evt.nonexistent", ctx) ?
+          +? "")).toBe("");                                              
+      140      });
+      141  
+      142      it("returns empty string for undefined context", () => {
+      152 -      expect(resolveToString("evt.name", undefined)).toBe("");
+      143 +      expect(String(resolveEventPath("evt.name", undefined) ??
+          + "")).toBe("");                                               
+      144      });
+      145  
+      146      it("leaves string as-is", () => {
+      147        const ctx: ExecContext = { evt: { name: "Alice" } };
+      157 -      expect(resolveToString("evt.name", ctx)).toBe("Alice"); 
+      148 +      expect(String(resolveEventPath("evt.name", ctx) ?? "")).
+          +toBe("Alice");                                                
+      149      });
+      150  
+      151      it("coerces zero to '0'", () => {
+      152        const ctx: ExecContext = { evt: { count: 0 } };
+      162 -      expect(resolveToString("evt.count", ctx)).toBe("0");    
+      153 +      expect(String(resolveEventPath("evt.count", ctx) ?? ""))
+          +.toBe("0");                                                   
+      154      });
+      155  
+      156      it("coerces large number precisely", () => {
+      157        const ctx: ExecContext = { evt: { big: 9007199254740991 
+           } };
+      167 -      expect(resolveToString("evt.big", ctx)).toBe("9007199254
+          -740991");                                                     
+      158 +      expect(String(resolveEventPath("evt.big", ctx) ?? "")).t
+          +oBe("9007199254740991");                                      
+      159      });
+      160  
+      161      it("coerces float precisely", () => {
+      162        const ctx: ExecContext = { evt: { pi: 3.14159 } };
+      172 -      expect(resolveToString("evt.pi", ctx)).toBe("3.14159"); 
+      163 +      expect(String(resolveEventPath("evt.pi", ctx) ?? "")).to
+          +Be("3.14159");                                                
+      164      });
+      165    });
+      166  
+      176 -  // --- resolveAs(): combined resolution + coercion ---      
+      177 -                                                              
+      178 -  describe("resolveAs with typed coercion", () => {           
+      167 +  describe("resolution with typed coercion", () => {          
+      168      it("resolves string value and coerces to number", () => {
+      169        const ctx: ExecContext = { evt: { amount: "42" } };
+      181 -      expect(resolveAs("evt.amount", "number", ctx)).toBe(42);
+      170 +      expect(coerce(resolveEventPath("evt.amount", ctx), "numb
+          +er")).toBe(42);                                               
+      171      });
+      172  
+      173      it("resolves number value and coerces to string", () => {
+      174        const ctx: ExecContext = { evt: { count: 99 } };
+      186 -      expect(resolveAs("evt.count", "string", ctx)).toBe("99")
+          -;                                                             
+      175 +      expect(coerce(resolveEventPath("evt.count", ctx), "strin
+          +g")).toBe("99");                                              
+      176      });
+      177  
+      178      it("resolves string 'true' and coerces to boolean", () => 
+           {
+      179        const ctx: ExecContext = { evt: { flag: "true" } };
+      191 -      expect(resolveAs("evt.flag", "boolean", ctx)).toBe(true)
+          -;                                                             
+      180 +      expect(coerce(resolveEventPath("evt.flag", ctx), "boolea
+          +n")).toBe(true);                                              
+      181      });
+      182  
+      183      it("resolves number 1 and coerces to boolean", () => {
+      184        const ctx: ExecContext = { evt: { flag: 1 } };
+      196 -      expect(resolveAs("evt.flag", "boolean", ctx)).toBe(true)
+          -;                                                             
+      185 +      expect(coerce(resolveEventPath("evt.flag", ctx), "boolea
+          +n")).toBe(true);                                              
+      186      });
+      187  
+      188      it("resolves missing path and coerces to string as empty",
+            () => {
+      189        const ctx: ExecContext = { evt: {} };
+      201 -      expect(resolveAs("evt.missing", "string", ctx)).toBe("")
+          -;                                                             
+      190 +      expect(coerce(resolveEventPath("evt.missing", ctx), "str
+          +ing")).toBe("");                                              
+      191      });
+      192  
+      193      it("resolves missing path and coerces to number as zero", 
+           () => {
+      194        const ctx: ExecContext = { evt: {} };
+      206 -      expect(resolveAs("evt.missing", "number", ctx)).toBe(0);
+      195 +      expect(coerce(resolveEventPath("evt.missing", ctx), "num
+          +ber")).toBe(0);                                               
+      196      });
+      197  
+      198      it("resolves missing path and coerces to boolean as false"
+           , () => {
+      199        const ctx: ExecContext = { evt: {} };
+      211 -      expect(resolveAs("evt.missing", "boolean", ctx)).toBe(fa
+          -lse);                                                         
+      200 +      expect(coerce(resolveEventPath("evt.missing", ctx), "boo
+          +lean")).toBe(false);                                          
+      201      });
+      202  
+      203      it("resolves nested path and coerces to number", () => {
+      204        const ctx: ExecContext = { evt: { stats: { score: "95.5"
+            } } };
+      216 -      expect(resolveAs("evt.stats.score", "number", ctx)).toBe
+          -(95.5);                                                       
+      205 +      expect(coerce(resolveEventPath("evt.stats.score", ctx), 
+          +"number")).toBe(95.5);                                        
+      206      });
+      207  
+      208      it("raw coercion returns the exact resolved value", () => 
+           {
+      209        const obj = { nested: true };
+      210        const ctx: ExecContext = { evt: { data: obj } };
+      222 -      expect(resolveAs("evt.data", "raw", ctx)).toBe(obj);    
+      211 +      expect(coerce(resolveEventPath("evt.data", ctx), "raw"))
+          +.toBe(obj);                                                   
+      212      });
+      213    });
+      214  
+      226 -  // --- Condition-ready scenarios (future: Guard Algebra) ---
+      227 -                                                              
+      215    describe("condition evaluation patterns", () => {
+      216      const ctx: ExecContext = {
+      217        evt: {
+     ...
+      228      };
+      229  
+      230      it("resolves value for numeric comparison (Gt/Lt/Gte/Lte)"
+           , () => {
+      244 -      expect(resolveAs("evt.value", "number", ctx)).toBe(42); 
+      245 -      expect(resolveAs("evt.score", "number", ctx)).toBe(95.5)
+          -;                                                             
+      231 +      expect(coerce(resolveEventPath("evt.value", ctx), "numbe
+          +r")).toBe(42);                                                
+      232 +      expect(coerce(resolveEventPath("evt.score", ctx), "numbe
+          +r")).toBe(95.5);                                              
+      233      });
+      234  
+      235      it("resolves value for equality comparison (Eq/NotEq)", ()
+            => {
+      249 -      expect(resolve("evt.text", ctx)).toBe("Seattle");       
+      250 -      expect(resolve("evt.value", ctx)).toBe(42);             
+      236 +      expect(resolveEventPath("evt.text", ctx)).toBe("Seattle"
+          +);                                                            
+      237 +      expect(resolveEventPath("evt.value", ctx)).toBe(42);    
+      238      });
+      239  
+      240      it("resolves value for presence check (IsNull/NotNull)", (
+           ) => {
+      254 -      expect(resolve("evt.status", ctx)).toBeNull();          
+      255 -      expect(resolve("evt.text", ctx)).not.toBeNull();        
+      256 -      expect(resolve("evt.missing", ctx)).toBeUndefined();    
+      241 +      expect(resolveEventPath("evt.status", ctx)).toBeNull(); 
+      242 +      expect(resolveEventPath("evt.text", ctx)).not.toBeNull()
+          +;                                                             
+      243 +      expect(resolveEventPath("evt.missing", ctx)).toBeUndefin
+          +ed();                                                         
+      244      });
+      245  
+      246      it("resolves value for truthiness check (Truthy/Falsy)", (
+           ) => {
+      260 -      expect(coerce(resolve("evt.isActive", ctx), "boolean")).
+          -toBe(true);                                                   
+      261 -      expect(coerce(resolve("evt.zero", ctx), "boolean")).toBe
+          -(false);                                                      
+      262 -      expect(coerce(resolve("evt.empty", ctx), "boolean")).toB
+          -e(false);                                                     
+      263 -      expect(coerce(resolve("evt.status", ctx), "boolean")).to
+          -Be(false);                                                    
+      247 +      expect(coerce(resolveEventPath("evt.isActive", ctx), "bo
+          +olean")).toBe(true);                                          
+      248 +      expect(coerce(resolveEventPath("evt.zero", ctx), "boolea
+          +n")).toBe(false);                                             
+      249 +      expect(coerce(resolveEventPath("evt.empty", ctx), "boole
+          +an")).toBe(false);                                            
+      250 +      expect(coerce(resolveEventPath("evt.status", ctx), "bool
+          +ean")).toBe(false);                                           
+      251      });
+      252  
+      253      it("resolves value for emptiness check (IsEmpty/NotEmpty)"
+           , () => {
+      267 -      const items = resolve("evt.items", ctx) as unknown[];   
+      254 +      const items = resolveEventPath("evt.items", ctx) as unkn
+          +own[];                                                        
+      255        expect(Array.isArray(items) && items.length > 0).toBe(tr
+           ue);
+      256  
+      270 -      const empty = resolve("evt.empty", ctx);                
+      257 +      const empty = resolveEventPath("evt.empty", ctx);       
+      258        expect(empty === "" || empty === null || empty === undef
+           ined).toBe(true);
+      259      });
+      260  
+      261      it("resolves value for text assertion (Contains/StartsWith
+           )", () => {
+      275 -      const text = resolveAs("evt.text", "string", ctx) as str
+          -ing;                                                          
+      262 +      const text = coerce(resolveEventPath("evt.text", ctx), "
+          +string") as string;                                           
+      263        expect(text.includes("eat")).toBe(true);
+      264        expect(text.startsWith("Sea")).toBe(true);
+      265      });
+      266  
+      267      it("resolves value for range assertion (Between)", () => {
+      281 -      const val = resolveAs("evt.value", "number", ctx) as num
+          -ber;                                                          
+      268 +      const val = coerce(resolveEventPath("evt.value", ctx), "
+          +number") as number;                                           
+      269        expect(val >= 10 && val <= 100).toBe(true);
+      270      });
+      271  
+      272      it("resolves nested value for cross-path comparison", () =
+           > {
+      286 -      const nestedCount = resolveAs("evt.nested.count", "numbe
+          -r", ctx);                                                     
+      287 -      const topValue = resolveAs("evt.value", "number", ctx); 
+      273 +      const nestedCount = coerce(resolveEventPath("evt.nested.
+          +count", ctx), "number");                                      
+      274 +      const topValue = coerce(resolveEventPath("evt.value", ct
+          +x), "number");                                                
+      275        expect(nestedCount).toBe(7);
+      276        expect(topValue).toBe(42);
+      277      });
+
+⏺ Now build and run all tests:
+
+⏺ Bash(npm run build 2>&1 && npm run typecheck 2>&1)
+  ⎿  > build
+     > esbuild Alis.Reactive.SandboxApp/Scripts/auto-boot.ts --bundle --out
+     file=Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js --format=esm
+     … +10 lines (ctrl+o to expand)
+
+⏺ Clean typecheck. Now build C# and run all tests:
+
+⏺ Bash(dotnet build 2>&1 | tail -5)
+  ⎿  /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.R
+     eactive/Alis.Reactive.SandboxApp/Models/HomeModel.cs(5,19): warning CS
+     8618: Non-nullable property 'Id' must contain a non-null value when ex
+     … +8 lines (ctrl+o to expand)
+
+⏺ Bash(npm test 2>&1 | tail -10)
+  ⎿   ✓ Alis.Reactive.SandboxApp/Scripts/__tests__/when-triggering-on-custo
+     m-event.test.ts (3 tests) 3ms
+      ✓ Alis.Reactive.SandboxApp/Scripts/__tests__/when-walking-dot-paths.t
+     … +11 lines (ctrl+o to expand)
+  ⎿  (timeout 1m)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.UnitTests 2>&1 | tail -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +2 lines (ctrl+o to expand)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.PlaywrightTests 2>&1 | tail -5)
+  ⎿  Starting test execution, please wait...
+     A total of 1 test files matched the specified pattern.
+     … +2 lines (ctrl+o to expand)
+  ⎿  (timeout 5m)
+
+⏺ Bash(dotnet test tests/Alis.Reactive.FluentValidator.UnitTests --no-build 2>&1
+       | tail -3 && dotnet test tests/Alis.Reactive.Native.UnitTests --no-build
+      2>&1 | tail -…)
+  ⎿  A total of 1 test files matched the specified pattern.
+
+     Passed!  - Failed:     0, Passed:    28, Skipped:     0, Total:    28,
+     … +10 lines (ctrl+o to expand)
+
+⏺ All 677 tests pass. Clean tree status and commit:
+
+⏺ Bash(git status --short)
+  ⎿   M Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Http/Index.cshtml
+      M Alis.Reactive.SandboxApp/Scripts/__tests__/when-executing-parallel-
+     requests.test.ts
+     … +15 lines (ctrl+o to expand)
+
+⏺ Bash(git diff --stat)
+  ⎿   .../Areas/Sandbox/Views/Http/Index.cshtml          |  14 +--
+      .../when-executing-parallel-requests.test.ts       |   2 +-
+      .../__tests__/when-resolving-bind-expr.test.ts     | 131 ++++++++++--
+     … +14 lines (ctrl+o to expand)
+
+⏺ Bash(git add \
+        Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Http/Index.cshtml \…)
+  ⎿  (No output)
+
+⏺ Bash(git commit -m "$(cat <<'EOF'
+      refactor: quality cleanup — onAllSettled rename, remove dead code, XML
+      docs, comment cleanup…)
+  ⎿  [master 0766792] refactor: quality cleanup — onAllSettled rename, remo
+     ve dead code, XML docs, comment cleanup
+      18 files changed, 105 insertions(+), 155 deletions(-)
+
+⏺ Bash(git status --short)
+  ⎿  (No output)
+
+⏺ Clean tree. Committed as 0766792.
+
+  Summary of changes:
+
+  ┌────────────────────────┬────────────────────────────────────────────────┐
+  │         Change         │                    Details                     │
+  ├────────────────────────┼────────────────────────────────────────────────┤
+  │ onAllSuccess →         │ List<StatusHandler> → List<Command> /          │
+  │ onAllSettled           │ Command[] — no status codes, just commands     │
+  ├────────────────────────┼────────────────────────────────────────────────┤
+  │ DSL: .Response() →     │ Takes PipelineBuilder directly, not            │
+  │ .OnAllSettled()        │ ResponseBuilder                                │
+  ├────────────────────────┼────────────────────────────────────────────────┤
+  │ Dead code removed      │ resolve(), resolveAs(), resolveToString() —    │
+  │                        │ zero runtime callers                           │
+  ├────────────────────────┼────────────────────────────────────────────────┤
+  │ element.ts migrated    │ resolve() → resolveEventPath()                 │
+  ├────────────────────────┼────────────────────────────────────────────────┤
+  │ XML docs added         │ TriggerBuilder class + 3 public methods        │
+  ├────────────────────────┼────────────────────────────────────────────────┤
+  │ Duplicate ///          │ PipelineBuilder.cs:194                         │
+  │ <summary> fixed        │                                                │
+  ├────────────────────────┼────────────────────────────────────────────────┤
+  │ 10 unnecessary         │ auto-boot, trigger, pipeline, validation       │
+  │ comments removed       │                                                │
+  ├────────────────────────┼────────────────────────────────────────────────┤
+  │ Net result             │ -50 lines, cleaner API surface                 │
+  └────────────────────────┴────────────────────────────────────────────────┘
+
+✻ Brewed for 7m 23s

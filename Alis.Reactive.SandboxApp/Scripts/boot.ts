@@ -7,6 +7,7 @@ const log = scope("boot");
 
 /** Booted plans keyed by planId — used by mergePlan for AJAX partial injection. */
 const bootedPlans = new Map<string, Plan>();
+let bootAbort = new AbortController();
 
 /** AbortControllers for merged partials — keyed by sourceId. Aborted on re-merge to remove old listeners. */
 const mergedAbort = new Map<string, AbortController>();
@@ -21,7 +22,7 @@ export function boot(plan: Plan): void {
   log.info("booting", { entries: plan.entries.length });
 
   enrichEntries(plan.entries, plan.components);
-  wireEntries(plan.entries, plan.components);
+  wireEntries(plan.entries, plan.components, bootAbort.signal);
 
   bootedPlans.set(plan.planId, plan);
   log.info("booted");
@@ -123,18 +124,33 @@ export function getBootedPlan(planId: string): Plan | undefined {
   return bootedPlans.get(planId);
 }
 
+/** Test-only: abort all wired listeners and clear boot/merge state between Vitest runs. */
+export function resetBootStateForTests(): void {
+  bootAbort.abort();
+  bootAbort = new AbortController();
+
+  for (const abort of mergedAbort.values()) {
+    abort.abort();
+  }
+
+  bootedPlans.clear();
+  mergedAbort.clear();
+  mergedEntries.clear();
+  mergedComponentKeys.clear();
+}
+
 export const trace = { setLevel };
 
 // -- Validation enrichment -----------------------------------------------
 
 /** Walk entries and enrich validation fields from plan.components. */
-function enrichEntries(entries: Entry[], components: Record<string, ComponentEntry>): void {
+export function enrichEntries(entries: Entry[], components: Record<string, ComponentEntry>): void {
   for (const entry of entries) {
     enrichReaction(entry.reaction, components);
   }
 }
 
-function enrichReaction(reaction: Reaction, components: Record<string, ComponentEntry>): void {
+export function enrichReaction(reaction: Reaction, components: Record<string, ComponentEntry>): void {
   switch (reaction.kind) {
     case "http":
       enrichRequest(reaction.request, components);
@@ -152,7 +168,7 @@ function enrichReaction(reaction: Reaction, components: Record<string, Component
   }
 }
 
-function enrichRequest(
+export function enrichRequest(
   req: { validation?: ValidationDescriptor; chained?: typeof req },
   components: Record<string, ComponentEntry>
 ): void {
@@ -164,7 +180,7 @@ function enrichRequest(
   }
 }
 
-function enrichValidationFields(
+export function enrichValidationFields(
   desc: ValidationDescriptor,
   components: Record<string, ComponentEntry>
 ): void {

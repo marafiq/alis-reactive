@@ -1,9 +1,11 @@
 import { boot, trace } from "./boot";
 import { init as initConfirm } from "./confirm";
+import { initNativeActionLinks } from "./native-action-link";
 import type { Plan } from "./types";
 import type { TraceLevel } from "./trace";
 
 initConfirm();
+initNativeActionLinks();
 
 const planEls = document.querySelectorAll<HTMLElement>("[data-alis-plan]");
 const byPlanId = new Map<string, Plan>();
