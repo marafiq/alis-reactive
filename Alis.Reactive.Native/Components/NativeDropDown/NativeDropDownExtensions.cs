@@ -1,10 +1,13 @@
 using Alis.Reactive;
+using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Commands;
 
 namespace Alis.Reactive.Native.Components
 {
     public static class NativeDropDownExtensions
     {
+        private static readonly NativeDropDown _component = new NativeDropDown();
+
         public static ComponentRef<NativeDropDown, TModel> SetValue<TModel>(
             this ComponentRef<NativeDropDown, TModel> self, string value)
             where TModel : class
@@ -19,11 +22,11 @@ namespace Alis.Reactive.Native.Components
             return self.Emit(new CallVoidMutation("focus"));
         }
 
-        public static string Value<TModel>(
+        public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeDropDown, TModel> self)
             where TModel : class
         {
-            return $"ref:{self.TargetId}.value";
+            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
         }
     }
 }

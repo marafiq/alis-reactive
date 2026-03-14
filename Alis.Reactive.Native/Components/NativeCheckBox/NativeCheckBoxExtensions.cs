@@ -1,10 +1,13 @@
 using Alis.Reactive;
+using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Commands;
 
 namespace Alis.Reactive.Native.Components
 {
     public static class NativeCheckBoxExtensions
     {
+        private static readonly NativeCheckBox _component = new NativeCheckBox();
+
         public static ComponentRef<NativeCheckBox, TModel> SetChecked<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
             where TModel : class
@@ -19,11 +22,11 @@ namespace Alis.Reactive.Native.Components
             return self.Emit(new CallVoidMutation("focus"));
         }
 
-        public static string Checked<TModel>(
+        public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return $"ref:{self.TargetId}.checked";
+            return new TypedComponentSource<bool>(self.TargetId, _component.Vendor, _component.ReadExpr);
         }
     }
 }

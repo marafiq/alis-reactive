@@ -44,13 +44,13 @@ public class WhenMutatingANativeDropDown : NativeTestBase
     }
 
     [Test]
-    public void Value_returns_bind_expr()
+    public void Value_returns_typed_component_source()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            var expr = p.Component<NativeDropDown>(m => m.Status).Value();
-            Assert.That(expr, Is.EqualTo("ref:Alis_Reactive_Native_UnitTests_NativeTestModel__Status.value"));
+            var source = p.Component<NativeDropDown>(m => m.Status).Value();
+            Assert.That(source, Is.InstanceOf<Alis.Reactive.Builders.Conditions.TypedComponentSource<string>>());
         });
     }
 

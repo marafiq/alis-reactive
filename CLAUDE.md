@@ -377,8 +377,9 @@ Used by:
 | `"component"` | `ComponentSource` | `componentId`, `vendor`, `readExpr` | Component value reading |
 
 `TypedComponentSource<TProp>` preserves the typed condition pipeline — created by
-`ComponentRef.ReadProperty<TProp>()`, flows through `When()` guard conditions with
-full type safety, and serializes to `ComponentSource` at render time.
+each vertical slice's `Value()` extension using `IInputComponent.ReadExpr`, flows
+through `When()` guard conditions with full type safety, and serializes to
+`ComponentSource` at render time.
 
 #### MutateElementCommand — Vendor-Aware Mutations
 

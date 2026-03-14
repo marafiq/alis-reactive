@@ -24,11 +24,6 @@ namespace Alis.Reactive.Fusion.AppLevel
             where TModel : class
             => self.Emit(new CallVoidMutation("hide"));
 
-        public static string IsVisible<TModel>(
-            this ComponentRef<FusionConfirm, TModel> self)
-            where TModel : class
-            => $"ref:{self.TargetId}.visible";
-
         public static IHtmlContent FusionConfirmDialog(this IHtmlHelper html)
             => new HtmlString($"<div id=\"{FusionConfirm.ElementId}\"></div>\n");
     }
