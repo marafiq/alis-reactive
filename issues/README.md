@@ -7,6 +7,7 @@ This folder now reflects the current open architecture issues against the latest
 - `005-incomplete-conditional-pipelines-fail-with-internal-null-state.md`
 - `006-validation-contract-still-fails-open-and-loses-fidelity.md`
 - `007-request-payload-format-is-modeled-on-the-wrong-surface.md`
+- `008-actionlink-one-request-chain-needs-an-explicit-semantic-contract.md`
 
 ## Closed Since The Earlier Review
 

@@ -1,0 +1,127 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CheckBoxModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "NativeCheckBox";
+
+    var plan = Html.ReactivePlan<CheckBoxModel>();
+
+    // ── Section 1: SetChecked(false) — BUG REPRODUCTION ──
+    // Checkbox starts checked. Button calls SetChecked(false).
+    // Expected: checkbox becomes unchecked.
+    // Actual (BUG): checkbox stays checked because string "false" is truthy in JS.
+
+    // ── Section 2: SetChecked(true) — control case ──
+    // Checkbox starts unchecked. Button calls SetChecked(true).
+    // Expected and Actual: checkbox becomes checked (string "true" is truthy — correct by accident).
+
+    // ── Section 3: Reactive — change event fires conditional show/hide ──
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">NativeCheckBox — Full API</h1>
+        <p class="mt-2 text-text-secondary">
+            Exercises NativeCheckBox API: property writes (SetChecked), events (Changed),
+            conditions (When checked), and reactive wiring.
+        </p>
+    </div>
+
+    <!-- Section 1: SetChecked(false) — Bug Reproduction -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. SetChecked(false) — Uncheck a Checked Checkbox</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            The checkbox starts checked. Clicking the button calls
+            <code>SetChecked(false)</code> which should uncheck it.
+        </p>
+        <div class="flex items-center gap-4 mb-4">
+            <label class="flex items-center gap-2 text-sm">
+                @Html.NativeCheckBox("cb-test-uncheck").Checked(true).CssClass("h-4 w-4 rounded border-border text-accent")
+                <span>IsActive (starts checked)</span>
+            </label>
+        </div>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("btn-uncheck", "SetChecked(false)")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<NativeCheckBox>("cb-test-uncheck").SetChecked(false);
+                }))
+        </div>
+        <div class="font-mono text-sm">
+            <p>Expected: unchecked | Actual: <span id="uncheck-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 2: SetChecked(true) — Control Case -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. SetChecked(true) — Check an Unchecked Checkbox</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            The checkbox starts unchecked. Clicking the button calls
+            <code>SetChecked(true)</code> which should check it.
+        </p>
+        <div class="flex items-center gap-4 mb-4">
+            <label class="flex items-center gap-2 text-sm">
+                @Html.NativeCheckBox("cb-test-check").CssClass("h-4 w-4 rounded border-border text-accent")
+                <span>IsOptIn (starts unchecked)</span>
+            </label>
+        </div>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("btn-check", "SetChecked(true)")
+                .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<NativeCheckBox>("cb-test-check").SetChecked(true);
+                }))
+        </div>
+        <div class="font-mono text-sm">
+            <p>Expected: checked | Actual: <span id="check-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 3: Reactive — Change Event -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Reactive Event (Changed)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            The checkbox wires a <code>Changed</code> event. When toggled, it shows/hides
+            an extras panel via <code>When(args.Checked).Truthy()</code>.
+        </p>
+        <div class="flex items-center gap-4 mb-4">
+            <label class="flex items-center gap-2 text-sm">
+                @(Html.NativeCheckBox("cb-reactive")
+                    .CssClass("h-4 w-4 rounded border-border text-accent")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.When(args, a => a.Checked).Truthy()
+                            .Then(t =>
+                            {
+                                t.Element("reactive-extras").Show();
+                                t.Element("reactive-status").SetText("checked");
+                            })
+                            .Else(e =>
+                            {
+                                e.Element("reactive-extras").Hide();
+                                e.Element("reactive-status").SetText("unchecked");
+                            });
+                    }))
+                <span>Show extras</span>
+            </label>
+        </div>
+        <div class="font-mono text-sm mb-2">
+            <p>Status: <span id="reactive-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+        <div id="reactive-extras" hidden class="rounded-md bg-slate-100 p-4 text-sm">
+            These extras are visible when the checkbox is checked.
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

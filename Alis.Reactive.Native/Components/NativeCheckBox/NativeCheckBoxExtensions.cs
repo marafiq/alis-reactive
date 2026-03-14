@@ -16,7 +16,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.Emit("el.checked=val", isChecked ? "true" : "false");
+            return self.Emit("el.checked=(val==='true')", isChecked ? "true" : "false");
         }
 
         public static ComponentRef<NativeCheckBox, TModel> FocusIn<TModel>(
