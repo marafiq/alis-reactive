@@ -6,7 +6,7 @@ namespace Alis.Reactive.Fusion.Components
     /// p.Component&lt;FusionDropDownList&gt;(m => m.Country) to unlock
     /// the DropDownList-specific extension methods.
     /// </summary>
-    public sealed class FusionDropDownList : FusionComponent, IFusionInputComponent, IInputComponent
+    public sealed class FusionDropDownList : FusionComponent, IInputComponent
     {
         /// <inheritdoc />
         public string ReadExpr => "value";

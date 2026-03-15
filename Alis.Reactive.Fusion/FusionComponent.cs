@@ -11,10 +11,4 @@ namespace Alis.Reactive.Fusion
         /// <inheritdoc />
         public string Vendor => "fusion";
     }
-
-    /// <summary>
-    /// Marker interface for SF input components that bind to a model property.
-    /// Components implementing this support SetValue, Enable, Disable, etc.
-    /// </summary>
-    public interface IFusionInputComponent { }
 }

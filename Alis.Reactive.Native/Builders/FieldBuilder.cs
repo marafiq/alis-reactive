@@ -8,7 +8,7 @@ namespace Alis.Reactive.Native.Builders
     /// the child control (provided by the caller), and a validation error placeholder.
     /// Label and required are always explicit — no model metadata inspection.
     /// </summary>
-    public class FieldBuilder
+    internal class FieldBuilder
     {
         private readonly TextWriter _writer;
         private readonly string? _name;
@@ -16,20 +16,17 @@ namespace Alis.Reactive.Native.Builders
         private bool _isRequired;
         private string? _forId;
 
-        public FieldBuilder(TextWriter writer, string? name)
+        internal FieldBuilder(TextWriter writer, string? name)
         {
             _writer = writer;
             _name = name;
         }
 
-        /// <summary>Sets the label text displayed above the control.</summary>
-        public FieldBuilder Label(string label) { _labelText = label; return this; }
+        internal FieldBuilder Label(string label) { _labelText = label; return this; }
 
-        /// <summary>Marks the field as required (red asterisk after label).</summary>
-        public FieldBuilder Required() { _isRequired = true; return this; }
+        internal FieldBuilder Required() { _isRequired = true; return this; }
 
-        /// <summary>Sets the <c>for</c> attribute on the label element.</summary>
-        public FieldBuilder ForId(string? forId) { _forId = forId; return this; }
+        internal FieldBuilder ForId(string? forId) { _forId = forId; return this; }
 
         /// <summary>
         /// Opens the field wrapper div and returns an <see cref="HtmlRenderScope"/> whose

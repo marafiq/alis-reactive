@@ -57,12 +57,10 @@
             On DomReady, sets value=42 and min=0 via structured prop on the Syncfusion ej2 instance.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Amount (SF NumericTextBox)</label>
-                @(Html.NumericTextBoxFor(plan, m => m.Amount)
+            @{ Html.Field("Amount (SF NumericTextBox)", false, m => m.Amount, expr =>
+                Html.NumericTextBoxFor(plan, expr)
                     .Min(-100).Max(99999).Step(1)
-                    .Render())
-            </div>
+                    .Render()); }
         </div>
     </section>
 
@@ -111,9 +109,8 @@
             Focus/Blur show focus state.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Temperature (SF NumericTextBox)</label>
-                @(Html.NumericTextBoxFor(plan, m => m.Temperature)
+            @{ Html.Field("Temperature (SF NumericTextBox)", false, m => m.Temperature, expr =>
+                Html.NumericTextBoxFor(plan, expr)
                     .Min(-50).Max(150).Step(1)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -141,8 +138,7 @@
                     {
                         p.Element("focus-state").SetText("blurred");
                     })
-                    .Render())
-            </div>
+                    .Render()); }
         </div>
         <div class="font-mono text-sm space-y-1">
             <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
@@ -187,17 +183,15 @@
             Increment and decrement buttons update the value and the echo tracks changes.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Quantity (SF NumericTextBox)</label>
-                @(Html.NumericTextBoxFor(plan, m => m.Quantity)
+            @{ Html.Field("Quantity (SF NumericTextBox)", false, m => m.Quantity, expr =>
+                Html.NumericTextBoxFor(plan, expr)
                     .Min(0).Max(100).Step(1).Value(1)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("method-result").SetText(args, x => x.Value);
                         p.Element("qty-echo").SetText(args, x => x.Value);
                     })
-                    .Render())
-            </div>
+                    .Render()); }
         </div>
         <div class="flex gap-2 mb-3">
             @(Html.NativeButton("qty-inc-btn", "Qty +1")

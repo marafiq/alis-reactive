@@ -54,9 +54,8 @@
             On DomReady, sets value="Books" via structured prop on the Syncfusion ej2 instance.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Category (SF DropDownList)</label>
-                @(Html.DropDownListFor(plan, m => m.Category)
+            @{ Html.Field("Category (SF DropDownList)", false, m => m.Category, expr =>
+                Html.DropDownListFor(plan, expr)
                     .DataSource(categories)
                     .Placeholder("Select a category")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -85,8 +84,7 @@
                     {
                         p.Element("focus-state").SetText("blurred");
                     })
-                    .Render())
-            </div>
+                    .Render()); }
         </div>
     </section>
 

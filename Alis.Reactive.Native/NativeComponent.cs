@@ -10,9 +10,4 @@ namespace Alis.Reactive.Native
         /// <inheritdoc />
         public string Vendor => "native";
     }
-
-    /// <summary>
-    /// Marker interface for native input components that can be bound to model properties.
-    /// </summary>
-    public interface INativeInputComponent { }
 }

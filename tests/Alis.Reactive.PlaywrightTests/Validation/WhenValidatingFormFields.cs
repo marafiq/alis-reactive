@@ -272,7 +272,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
 
         // Fill Name, check toggle to reveal extra fields
         await Page.FillAsync($"#{S}Hidden_Name", "Visible User");
-        await Page.CheckAsync("#hf_toggle");
+        await Page.CheckAsync($"#{S}Hidden_ShowExtras");
 
         // Put invalid data in revealed fields
         await Page.FillAsync($"#{S}Hidden_Phone", "bad");
