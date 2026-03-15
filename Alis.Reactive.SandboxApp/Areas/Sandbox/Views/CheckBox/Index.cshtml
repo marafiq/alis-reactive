@@ -6,109 +6,109 @@
 
     var plan = Html.ReactivePlan<CheckBoxModel>();
 
-    // ── Section 1: SetChecked(false) — BUG REPRODUCTION ──
-    // Checkbox starts checked. Button calls SetChecked(false).
-    // Expected: checkbox becomes unchecked.
-    // Actual (BUG): checkbox stays checked because string "false" is truthy in JS.
+    // Section 1: Property write — DomReady sets ReceivesMedication to false (unchecks it)
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<NativeCheckBox>(m => m.ReceivesMedication).SetChecked(false);
+    }));
 
-    // ── Section 2: SetChecked(true) — control case ──
-    // Checkbox starts unchecked. Button calls SetChecked(true).
-    // Expected and Actual: checkbox becomes checked (string "true" is truthy — correct by accident).
-
-    // ── Section 3: Reactive — change event fires conditional show/hide ──
+    // Section 2: Property read — DomReady reads AllowsVisitors value into echo
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var comp = p.Component<NativeCheckBox>(m => m.AllowsVisitors);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
 }
 
 <div class="space-y-8">
     <div>
         <h1 class="text-2xl font-bold tracking-tight">NativeCheckBox — Full API</h1>
         <p class="mt-2 text-text-secondary">
-            Exercises NativeCheckBox API: property writes (SetChecked), events (Changed),
-            conditions (When checked), and reactive wiring.
+            Exercises NativeCheckBox vertical slice: property writes (SetChecked),
+            property reads (Value), events (Changed with typed condition), and component-read conditions.
+            Senior living domain: resident medication, visitors, and dietary restrictions.
         </p>
     </div>
 
-    <!-- Section 1: SetChecked(false) — Bug Reproduction -->
+    <!-- Section 1: Property Write -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. SetChecked(false) — Uncheck a Checked Checkbox</h2>
+        <h2 class="text-base font-semibold mb-4">1. Property Write (SetChecked)</h2>
         <p class="text-sm text-text-secondary mb-4">
-            The checkbox starts checked. Clicking the button calls
-            <code>SetChecked(false)</code> which should uncheck it.
+            Checkbox starts checked. On DomReady, <code>SetChecked(false)</code> unchecks it.
         </p>
-        <div class="mb-4 max-w-sm">
-            @{ Html.Field("IsActive (starts checked)", false, m => m.IsActive, expr =>
-                Html.NativeCheckBoxFor(plan, expr).CssClass("h-4 w-4 rounded border-border text-accent")
-            ); }
-        </div>
-        <div class="flex gap-2 mb-3">
-            @(Html.NativeButton("btn-uncheck", "SetChecked(false)")
-                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<NativeCheckBox>(m => m.IsActive).SetChecked(false);
-                }))
-        </div>
-        <div class="font-mono text-sm">
-            <p>Expected: unchecked | Actual: <span id="uncheck-status" class="text-text-muted">&mdash;</span></p>
+        @{ Html.Field("Receives Medication", false, m => m.ReceivesMedication, expr =>
+            Html.NativeCheckBoxFor(plan, expr).CssClass("h-4 w-4 rounded border-border text-accent")
+        ); }
+    </section>
+
+    <!-- Section 2: Property Read -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Property Read (Value as Source)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the AllowsVisitors checkbox value and echoes it.
+        </p>
+        @{ Html.Field("Allows Visitors", false, m => m.AllowsVisitors, expr =>
+            Html.NativeCheckBoxFor(plan, expr).CssClass("h-4 w-4 rounded border-border text-accent")
+        ); }
+        <div class="font-mono text-sm mt-2">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
         </div>
     </section>
 
-    <!-- Section 2: SetChecked(true) — Control Case -->
+    <!-- Section 3: Event + Event-Args Condition -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. SetChecked(true) — Check an Unchecked Checkbox</h2>
+        <h2 class="text-base font-semibold mb-4">3. Changed Event with Typed Condition</h2>
         <p class="text-sm text-text-secondary mb-4">
-            The checkbox starts unchecked. Clicking the button calls
-            <code>SetChecked(true)</code> which should check it.
+            Dietary restrictions checkbox wires a Changed event with typed condition:
+            <code>When(args, x =&gt; x.Checked).Truthy()</code> shows/hides the restrictions panel.
         </p>
-        <div class="mb-4 max-w-sm">
-            @{ Html.Field("IsOptIn (starts unchecked)", false, m => m.IsOptIn, expr =>
-                Html.NativeCheckBoxFor(plan, expr).CssClass("h-4 w-4 rounded border-border text-accent")
-            ); }
-        </div>
-        <div class="flex gap-2 mb-3">
-            @(Html.NativeButton("btn-check", "SetChecked(true)")
-                .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
+        @{ Html.Field("Has Dietary Restrictions", false, m => m.HasDietaryRestrictions, expr =>
+            Html.NativeCheckBoxFor(plan, expr)
+                .CssClass("h-4 w-4 rounded border-border text-accent")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
-                    p.Component<NativeCheckBox>(m => m.IsOptIn).SetChecked(true);
-                }))
+                    p.When(args, a => a.Checked).Truthy()
+                        .Then(t =>
+                        {
+                            t.Element("restrictions-panel").Show();
+                            t.Element("restrictions-status").SetText("checked");
+                            t.Element("restrictions-status").AddClass("text-green-600");
+                            t.Element("restrictions-status").RemoveClass("text-text-muted");
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("restrictions-panel").Hide();
+                            e.Element("restrictions-status").SetText("unchecked");
+                            e.Element("restrictions-status").RemoveClass("text-green-600");
+                        });
+                })
+        ); }
+        <div class="font-mono text-sm mt-2">
+            <p>Status: <span id="restrictions-status" class="text-text-muted">&mdash;</span></p>
         </div>
-        <div class="font-mono text-sm">
-            <p>Expected: checked | Actual: <span id="check-status" class="text-text-muted">&mdash;</span></p>
+        <div id="restrictions-panel" hidden class="rounded-md bg-slate-100 p-4 text-sm mt-2">
+            Resident has dietary restrictions on file. Review care plan.
         </div>
     </section>
 
-    <!-- Section 3: Reactive — Change Event -->
+    <!-- Section 4: Component-Read Condition -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. Reactive Event (Changed)</h2>
+        <h2 class="text-base font-semibold mb-4">4. Component Value Condition</h2>
         <p class="text-sm text-text-secondary mb-4">
-            The checkbox wires a <code>Changed</code> event. When toggled, it shows/hides
-            an extras panel via <code>When(args.Checked).Truthy()</code>.
+            Button reads medication checkbox via <code>When(comp.Value()).Truthy()</code>
+            and shows a confirmation or warning.
         </p>
-        <div class="mb-4 max-w-sm">
-            @{ Html.Field("Show extras", false, m => m.ShowExtras, expr =>
-                Html.NativeCheckBoxFor(plan, expr)
-                    .CssClass("h-4 w-4 rounded border-border text-accent")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.When(args, a => a.Checked).Truthy()
-                            .Then(t =>
-                            {
-                                t.Element("reactive-extras").Show();
-                                t.Element("reactive-status").SetText("checked");
-                            })
-                            .Else(e =>
-                            {
-                                e.Element("reactive-extras").Hide();
-                                e.Element("reactive-status").SetText("unchecked");
-                            });
-                    })
-            ); }
-        </div>
-        <div class="font-mono text-sm mb-2">
-            <p>Status: <span id="reactive-status" class="text-text-muted">&mdash;</span></p>
-        </div>
-        <div id="reactive-extras" hidden class="rounded-md bg-slate-100 p-4 text-sm">
-            These extras are visible when the checkbox is checked.
+        @(Html.NativeButton("check-medication-btn", "Check Medication Status")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var comp = p.Component<NativeCheckBox>(m => m.ReceivesMedication);
+                p.When(comp.Value()).Truthy()
+                    .Then(t => t.Element("medication-warning").SetText("resident receives medication"))
+                    .Else(e => e.Element("medication-warning").SetText("no medication on record"));
+            }))
+        <div class="font-mono text-sm mt-2">
+            <p>Status: <span id="medication-warning" class="text-text-muted">&mdash;</span></p>
         </div>
     </section>
 

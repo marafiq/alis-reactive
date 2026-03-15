@@ -2,14 +2,10 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
 /// Exercises NativeCheckBox API end-to-end in the browser:
-/// property writes (SetChecked), reactive events (Changed), and conditions.
+/// property writes (SetChecked), property reads (Value as source),
+/// reactive events (Changed with typed condition), and component-read conditions.
 ///
 /// Page under test: /Sandbox/CheckBox
-///
-/// BUG-001 REPRODUCTION:
-/// SetChecked(false) passes the string "false" as val with coerce: "boolean".
-/// The runtime coerces "false" to boolean false before assigning to el.checked.
-/// This fixes the original bug where raw string assignment caused truthy coercion.
 /// </summary>
 [TestFixture]
 public class WhenUsingNativeCheckBox : PlaywrightTestBase
@@ -26,7 +22,7 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task Page_loads_with_no_errors()
+    public async Task Page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("NativeCheckBox — Alis.Reactive Sandbox");
@@ -45,112 +41,101 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 1: SetChecked(false) — BUG REPRODUCTION ──
+    // ── Section 1: Property Write — DomReady unchecks medication checkbox ──
 
     [Test]
-    public async Task Checkbox_starts_checked()
+    public async Task DomReady_unchecks_medication_checkbox()
     {
-        await NavigateAndBoot();
-        var cb = Page.Locator($"#{Scope}IsActive");
-        await Expect(cb).ToBeCheckedAsync();
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task SetChecked_false_unchecks_the_checkbox()
-    {
-        // BUG-001: This test reproduces the bug.
-        // SetChecked(false) emits { prop: "checked", coerce: "boolean" } with value "false".
-        // The runtime coerces "false" to boolean false via coerce().
-        // Expected: checkbox unchecked after clicking button.
-
+        // ReceivesMedication starts checked in the model, but DomReady calls SetChecked(false).
+        // Expected: checkbox is unchecked after boot.
         await NavigateAndBoot();
 
-        // Verify the checkbox starts checked
-        var cb = Page.Locator($"#{Scope}IsActive");
-        await Expect(cb).ToBeCheckedAsync();
-
-        // Click the button that triggers SetChecked(false)
-        await Page.Locator("#btn-uncheck").ClickAsync();
-
-        // Assert: checkbox should now be unchecked
+        var cb = Page.Locator($"#{Scope}ReceivesMedication");
         await Expect(cb).Not.ToBeCheckedAsync(new() { Timeout = 3000 });
-
         AssertNoConsoleErrors();
     }
 
-    // ── Section 2: SetChecked(true) — control case ──
+    // ── Section 2: Property Read — DomReady reads AllowsVisitors value into echo ──
 
     [Test]
-    public async Task Checkbox_starts_unchecked()
+    public async Task Value_echoed_from_component_read()
     {
         await NavigateAndBoot();
-        var cb = Page.Locator($"#{Scope}IsOptIn");
-        await Expect(cb).Not.ToBeCheckedAsync();
+
+        var echo = Page.Locator("#value-echo");
+        await Expect(echo).ToHaveTextAsync("false", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
 
-    [Test]
-    public async Task SetChecked_true_checks_the_checkbox()
-    {
-        // SetChecked(true) emits { prop: "checked", coerce: "boolean" } with value "true".
-        // The runtime coerces "true" to boolean true.
-
-        await NavigateAndBoot();
-
-        // Verify the checkbox starts unchecked
-        var cb = Page.Locator($"#{Scope}IsOptIn");
-        await Expect(cb).Not.ToBeCheckedAsync();
-
-        // Click the button that triggers SetChecked(true)
-        await Page.Locator("#btn-check").ClickAsync();
-
-        // Assert: checkbox should now be checked
-        await Expect(cb).ToBeCheckedAsync(new() { Timeout = 3000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    // ── Section 3: Reactive event — change toggles show/hide ──
+    // ── Section 3: Changed event with typed condition ──
 
     [Test]
-    public async Task Change_event_shows_extras_when_checked()
+    public async Task Changed_event_shows_restrictions_when_checked()
     {
         await NavigateAndBoot();
 
-        // Extras panel starts hidden
-        await Expect(Page.Locator("#reactive-extras")).ToBeHiddenAsync();
+        // Restrictions panel starts hidden
+        await Expect(Page.Locator("#restrictions-panel")).ToBeHiddenAsync();
 
-        // Check the reactive checkbox
-        await Page.Locator($"#{Scope}ShowExtras").CheckAsync();
+        // Check the dietary restrictions checkbox
+        await Page.Locator($"#{Scope}HasDietaryRestrictions").CheckAsync();
 
-        // Extras should appear and status should say "checked"
-        await Expect(Page.Locator("#reactive-extras"))
+        // Restrictions panel should appear and status should say "checked"
+        await Expect(Page.Locator("#restrictions-panel"))
             .ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(Page.Locator("#reactive-status"))
+        await Expect(Page.Locator("#restrictions-status"))
             .ToHaveTextAsync("checked", new() { Timeout = 3000 });
-
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task Change_event_hides_extras_when_unchecked()
+    public async Task Changed_event_hides_restrictions_when_unchecked()
     {
         await NavigateAndBoot();
 
-        // Check then uncheck the reactive checkbox
-        await Page.Locator($"#{Scope}ShowExtras").CheckAsync();
-        await Expect(Page.Locator("#reactive-extras"))
+        // Check then uncheck the dietary restrictions checkbox
+        await Page.Locator($"#{Scope}HasDietaryRestrictions").CheckAsync();
+        await Expect(Page.Locator("#restrictions-panel"))
             .ToBeVisibleAsync(new() { Timeout = 3000 });
 
-        await Page.Locator($"#{Scope}ShowExtras").UncheckAsync();
+        await Page.Locator($"#{Scope}HasDietaryRestrictions").UncheckAsync();
 
-        // Extras should hide and status should say "unchecked"
-        await Expect(Page.Locator("#reactive-extras"))
+        // Restrictions panel should hide and status should say "unchecked"
+        await Expect(Page.Locator("#restrictions-panel"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
-        await Expect(Page.Locator("#reactive-status"))
+        await Expect(Page.Locator("#restrictions-status"))
             .ToHaveTextAsync("unchecked", new() { Timeout = 3000 });
+        AssertNoConsoleErrors();
+    }
 
+    // ── Section 4: Component value condition ──
+
+    [Test]
+    public async Task Component_value_condition_confirms_when_checked()
+    {
+        await NavigateAndBoot();
+
+        // DomReady unchecked the medication checkbox — re-check it first
+        await Page.Locator($"#{Scope}ReceivesMedication").CheckAsync();
+
+        // Click the button that checks medication status
+        await Page.Locator("#check-medication-btn").ClickAsync();
+
+        var warning = Page.Locator("#medication-warning");
+        await Expect(warning).ToHaveTextAsync("resident receives medication", new() { Timeout = 3000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task Component_value_condition_warns_when_unchecked()
+    {
+        await NavigateAndBoot();
+
+        // DomReady already unchecked the medication checkbox — just click check
+        await Page.Locator("#check-medication-btn").ClickAsync();
+
+        var warning = Page.Locator("#medication-warning");
+        await Expect(warning).ToHaveTextAsync("no medication on record", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
 }

@@ -8,7 +8,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
     {
         public IActionResult Index()
         {
-            return View(new CheckBoxModel { IsActive = true, IsOptIn = false, ShowExtras = false });
+            return View(new CheckBoxModel
+            {
+                ReceivesMedication = true,
+                AllowsVisitors = false,
+                HasDietaryRestrictions = false
+            });
         }
     }
 }
