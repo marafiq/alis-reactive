@@ -17,6 +17,52 @@ public class WhenValidatingAcrossSameModelPartials : PlaywrightTestBase
         await Expect(Page.Locator($"#{S}Nested_Delivery_Instructions")).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
+    // ── Scenario: Filling all fields first time and submitting succeeds ──
+
+    [Test]
+    public async Task submitting_with_all_partials_filled_correctly_succeeds()
+    {
+        // WHY: proves the complete happy path — load both partials, fill every
+        // field correctly on the first attempt, submit, and get success. This
+        // exercises the merged validation surface without ever triggering an
+        // error state, confirming that a clean-sheet submission through the
+        // merged plan works end-to-end.
+
+        await LoadBothPartials();
+
+        // Fill root fields
+        await Page.FillAsync($"#{S}Root_Name", "Happy Path User");
+        await Page.FillAsync($"#{S}Root_Email", "happy@example.com");
+        await Page.Locator($"#{S}Root_Amount").ClickAsync();
+        await Page.Locator($"#{S}Root_Amount").FillAsync("999");
+        await Page.Locator($"#{S}Root_Amount").PressAsync("Tab");
+
+        // Fill address partial fields
+        await Page.FillAsync($"#{S}Nested_Address_Street", "1 Infinite Loop");
+        await Page.FillAsync($"#{S}Nested_Address_City", "Cupertino");
+        await Page.FillAsync($"#{S}Nested_Address_ZipCode", "95014");
+
+        // Fill delivery partial fields
+        await Page.FillAsync($"#{S}Nested_Delivery_Instructions", "Leave with security");
+        await Page.FillAsync($"#{S}Nested_Delivery_ContactPhone", "408-996-1010");
+
+        // Submit — should succeed on first attempt, no validation errors
+        await Page.Locator("#same-merge-save-btn").ClickAsync();
+
+        await Expect(Page.Locator("#same-merge-result"))
+            .ToContainTextAsync("Merged root saved", new() { Timeout = 5000 });
+
+        // No validation error messages should be visible anywhere
+        await Expect(Page.Locator("#same-merge-form [data-valmsg-for='Root.Name']"))
+            .ToBeEmptyAsync();
+        await Expect(Page.Locator("#same-merge-form [data-valmsg-for='Nested.Address.Street']"))
+            .ToBeEmptyAsync();
+        await Expect(Page.Locator("#same-merge-form [data-valmsg-for='Nested.Delivery.Instructions']"))
+            .ToBeEmptyAsync();
+
+        AssertNoConsoleErrors();
+    }
+
     // ── Scenario 1: Same-model partials merge validation into single surface ──
 
     [Test]

@@ -20,6 +20,37 @@ public class WhenMultipleValidationPartialsInteract : PlaywrightTestBase
         await Expect(Page.Locator($"#{C}Name")).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
+    // ── Scenario: Loading all partials produces zero console errors ──
+
+    [Test]
+    public async Task loading_all_partials_does_not_produce_console_errors()
+    {
+        // WHY: proves that merging three partial plans (two same-model + one
+        // standalone) into the page at runtime does not cause any JS errors.
+        // Plan merge, component registration, and validation wiring must all
+        // complete cleanly — a single console error here means the merge
+        // pipeline has a structural defect.
+
+        await LoadAllThreePartials();
+
+        // All three status labels must reflect successful load
+        await Expect(Page.Locator("#workflow-address-status"))
+            .ToContainTextAsync("Address partial loaded", new() { Timeout = 3000 });
+        await Expect(Page.Locator("#workflow-delivery-status"))
+            .ToContainTextAsync("Delivery partial loaded", new() { Timeout = 3000 });
+        await Expect(Page.Locator("#workflow-contact-status"))
+            .ToContainTextAsync("Standalone contact loaded", new() { Timeout = 3000 });
+
+        // Neither form should show any result text yet — no submissions happened
+        await Expect(Page.Locator("#workflow-root-result"))
+            .ToContainTextAsync("Not submitted yet");
+        await Expect(Page.Locator("#workflow-contact-result"))
+            .ToContainTextAsync("Not submitted yet");
+
+        // The critical assertion: zero console errors after all three partial loads
+        AssertNoConsoleErrors();
+    }
+
     // ── Scenario: Root + same-model + standalone all coexist without interference ─
 
     [Test]
