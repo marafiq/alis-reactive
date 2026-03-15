@@ -1,166 +1,290 @@
-# FluentValidation Extraction Is Too Coupled To Internals For The Supported Client Subset
+# Validation Contract Still Fails Open And Loses Fidelity
 
 ## Verdict
 
 This is a legitimate open issue.
 
-## Actual Contract
+The problem is not that validation exists. The problem is that the intended validation architecture is stronger than the current implementation.
 
-The DSL is frozen. Validation is request-chained through `HttpRequestBuilder.Validate(...)`, not a standalone subsystem. Partials are a supported path when they flow through `Html.ResolvePlan()` and runtime merge enrichment correctly.
+## Intended Architecture
 
-The supported client-validation subset is narrower than full FluentValidation:
+### Root View Validation
 
-- simple local client rules
+```mermaid
+flowchart LR
+  RootView[RootView] --> RootPlan[ReactivePlan_TModel]
+  RootPlan --> Extract[ExtractValidationRules]
+  RootPlan --> Components[RegisterComponents]
+  Extract --> PlanJson[PlanJson]
+  Components --> PlanJson
+  PlanJson --> Boot[boot]
+  Boot --> Enrich[EnrichValidationFromComponents]
+  Enrich --> Validate[validation.ts]
+```
+
+- `Html.ReactivePlan<TModel>()` is the root logical plan boundary.
+- `.Validate<TValidator>(formId)` is request-chained.
+- Validation becomes executable after runtime enrichment binds extracted fields to controlled component ids.
+
+### Same-Model Partial Through `ResolvePlan<TModel>()`
+
+```mermaid
+flowchart LR
+  ParentView[ReactivePlan_TModel] --> ParentScript[ParentPlanScript]
+  PartialView[ResolvePlan_TModel] --> PartialScript[PartialPlanScript]
+  ParentScript --> SamePlanId[Same planId]
+  PartialScript --> SamePlanId
+  SamePlanId --> OnePlan[OneLogicalPlan]
+  OnePlan --> Validate[SharedValidationSurface]
+```
+
+- `Html.ResolvePlan<TModel>()` is the architectural marker that the partial belongs to the parent logical plan.
+- Parent and partial are authored separately, but runtime treats them as one logical validation surface because `planId` matches.
+
+### AJAX-Loaded Same-Model Partial
+
+```mermaid
+flowchart LR
+  ParentRequest[Into_container] --> PartialHtml[HtmlPlusPlanScript]
+  PartialHtml --> Inject[inject.ts]
+  Inject --> SourceId[sourceId_from_container]
+  SourceId --> Merge[mergePlan]
+  Merge --> ReEnrich[ReEnrichValidation]
+  ReEnrich --> Validate[ValidationNowWorksForPartialFields]
+```
+
+- `inject.ts` extracts the partial plan and stamps `sourceId` from the target container.
+- `mergePlan()` replaces the previous contribution from that source and re-enriches validation.
+- This is how parent-authored validation is supposed to become truthful for fields that arrive later from a same-model partial.
+
+### Standalone Partial With Its Own `TModel`
+
+```mermaid
+flowchart LR
+  ParentPlan[ReactivePlan_ParentModel] --> ParentId[planId_parent]
+  ChildPlan[ReactivePlan_ChildModel] --> ChildId[planId_child]
+  ParentId --> ParentRuntime[ParentBootedPlan]
+  ChildId --> ChildRuntime[ChildBootedPlan]
+```
+
+- A partial using `Html.ReactivePlan<TOtherModel>()` is its own logical plan.
+- Different `planId` means separate runtime validation lifecycles.
+
+### Validation Lifecycle
+
+```mermaid
+flowchart LR
+  ValidateCall[Validate_TValidator_formId] --> Extracted[ExtractedRules fieldName_plus_rules]
+  Extracted --> PlanJson[PlanJson]
+  PlanJson --> BootOrMerge[boot_or_mergePlan]
+  BootOrMerge --> Resolved[ResolvedBindings fieldId_vendor_readExpr]
+  Resolved --> Run[validation.ts]
+```
+
+- C# extraction produces symbolic validation fields.
+- Runtime enrichment binds those fields to controlled ids, vendors, and read expressions.
+
+## Current Contract
+
+The DSL is frozen.
+
+Validation is request-chained through `HttpRequestBuilder.Validate(...)`, not a standalone subsystem.
+
+`ResolvePlan<TModel>()` exists to express that a partial belongs to the same logical plan as the parent for the same model.
+
+The supported client-validation subset is:
+
+- request-chained validation
+- local client rules
 - explicit client conditional rules
-- no server-only or db-backed rules
+- partial participation through `ResolvePlan<TModel>()`
+- separate standalone partial plans through their own `ReactivePlan<TOtherModel>()`
 
-Generic FluentValidation `.When()` and `.Unless()` are already intentionally skipped for client extraction. Explicit client conditions currently come from `IConditionalRuleProvider`.
+The framework should not reduce MVC capability as the fix strategy. It should give developers stronger framework-owned tools so correct MVC composition is the easiest path.
 
-## Why This Is Legit
+## Evidence Of Where It Breaks
 
-The problem is not that FluentValidation does not expose a perfect client-export model. Upstream explicitly does not treat client-rule generation as a primary goal.
+### 1. Declared validation still fails open
 
-The problem is that the current extraction path still depends on brittle internals and fallback behavior for a much smaller supported subset than the implementation shape suggests.
+Evidence:
 
-Today the repo references `FluentValidation` as `11.*`, while upstream latest is `12.1.1`. The adapter is therefore coupling a frozen framework contract to:
+- `HttpRequestBuilder.Validate<TValidator>(formId)` creates a placeholder validation descriptor.
+- `ValidationResolver` only replaces it if extraction succeeds.
+- `validation.ts` returns `true` when the form container is missing and skips unresolved fields.
 
-- `Activator.CreateInstance`
-- `FluentValidation.Internal`
-- traversal of `IValidationRule`
-- traversal of `IRuleComponent`
+Relevant files:
 
-That is the wrong long-term architecture for a supported subset that is intentionally small.
+- `Alis.Reactive/Builders/Requests/HttpRequestBuilder.cs`
+- `Alis.Reactive/Resolvers/ValidationResolver.cs`
+- `Alis.Reactive.SandboxApp/Scripts/validation.ts`
 
-## The Real Gaps
+Why this matters:
 
-### 1. Supported equality still disappears during extraction
+- a request can explicitly opt into validation
+- extraction or binding can still degrade
+- runtime can still behave as if validation passed
 
-The runtime already supports `equalTo`, but the adapter still only lowers comparison rules for `min` and `max`.
+### 2. Validation is still only half-bound until runtime enrichment
 
-That means a supported simple local rule can exist in the runtime contract and still be lost at the extraction boundary.
+Evidence:
 
-### 2. Nested supported rules can still degrade silently
+- extracted fields carry `fieldName + rules`
+- runtime later mutates them with `fieldId`, `vendor`, and `readExpr`
 
-Nested validator instantiation failures are swallowed and skipped.
+Relevant files:
 
-That means supported local rules inside nested validators can disappear without a precise extraction failure.
+- `Alis.Reactive/Validation/ValidationField.cs`
+- `Alis.Reactive/Resolvers/ValidationResolver.cs`
+- `Alis.Reactive.SandboxApp/Scripts/boot.ts`
 
-### 3. Declared request validation can still fail open at runtime
+Why this matters:
 
-Once extraction has produced declared validation fields, runtime enrichment still only warns on missing component bindings, and runtime validation still skips unresolved fields.
+- the executable validation contract does not fully exist on the C# side
+- runtime enrichment is therefore part of correctness, not just convenience
 
-That means a request can opt into supported client validation and still quietly weaken enforcement if the declared fields cannot be resolved in the active request validation path.
+### 3. Same-model partial merge can weaken validation truth
 
-## Why Upstream Matters
+Evidence:
 
-This is not just an implementation taste issue.
+- `mergePlan()` re-enriches entries after partial merge
+- `enrichValidationFields()` only warns when a field is missing from `components`
+- `validation.ts` skips unresolved fields
 
-FluentValidation’s own docs and GitHub guidance make the direction clear:
+Relevant files:
 
-- generating client rules from server validators is not a primary FluentValidation goal
-- condition handling is delegate-based and not designed as export-friendly public metadata
-- deeper condition introspection leads to more maintenance burden, not less
+- `Alis.Reactive.SandboxApp/Scripts/boot.ts`
+- `Alis.Reactive.SandboxApp/Scripts/inject.ts`
+- `Alis.Reactive.SandboxApp/Scripts/validation.ts`
 
-That means extending inference further into FluentValidation internals is the wrong direction, especially if this framework wants a stable and truthful client-validation contract.
+Why this matters:
 
-## Minimal Fix Direction
+- the architecture says `ResolvePlan<TModel>()` partials participate in the same logical validation surface
+- current runtime behavior still tolerates incomplete rebinding instead of treating it as a contract problem
 
-Do not deepen reflection or internal-rule traversal.
+### 4. Conditional and equality rules are not truthful when peer bindings are missing
 
-Instead:
+Evidence:
+
+- `evalCondition()` returns truthy when condition source metadata or element is missing
+- `equalTo` silently stops enforcing when peer binding metadata is missing
+
+Relevant files:
+
+- `Alis.Reactive.SandboxApp/Scripts/validation.ts`
+- `Alis.Reactive.FluentValidator/FluentValidationAdapter.cs`
+
+Why this matters:
+
+- rules extracted for client use can drift from their authored meaning
+- this gets worse under partial load and re-merge scenarios
+
+### 5. Server error mapping and message placement are not fully framework-owned
+
+Evidence:
+
+- error spans are still discovered with `data-valmsg-for`
+- `FieldBuilder` renders message placeholders by field name convention
+- server-side error mapping still depends on consistent field-name shaping rather than one explicit shared contract
+
+Relevant files:
+
+- `Alis.Reactive.SandboxApp/Scripts/validation.ts`
+- `Alis.Reactive.Native/Builders/FieldBuilder.cs`
+- validation controllers that shape error dictionaries
+
+Why this matters:
+
+- the input/value lane is id-driven
+- the message lane still depends on markup convention
+- this is weaker than the rest of the architecture
+
+### 6. “Conditional rules extracted from FluentValidation” is only partially true
+
+Evidence:
+
+- generic FluentValidation `.When()` / `.Unless()` are skipped
+- explicit client conditions come through the custom Reactive path
+
+Relevant files:
+
+- `Alis.Reactive.FluentValidator/FluentValidationAdapter.cs`
+
+Why this matters:
+
+- the supported subset must be described truthfully
+- the architecture should not imply that arbitrary FV delegate conditions are exportable
+
+## Why This Breaks The Architecture
+
+The intended architecture is:
+
+```mermaid
+flowchart LR
+  Intended[ExtractedValidationPlusResolvedBindings]
+  Intended --> Truthful[TruthfulValidation]
+```
+
+The current implementation is closer to:
+
+```mermaid
+flowchart LR
+  Current[ExtractedValidationPlusWarningAndSkip]
+  Current --> FailOpen[FailOpenUnderMissingBindingsOrPartialChurn]
+```
+
+That breaks the architecture because:
+
+- the authored validation contract is not authoritative enough
+- same-model partial participation through `ResolvePlan<TModel>()` is not enforced strongly enough at runtime
+- missing bindings degrade into warning-and-skip behavior instead of explicit contract failure
+
+## Better Architecture
+
+```mermaid
+flowchart LR
+  Extracted[ExtractedValidationContract]
+  Merge[boot_or_merge]
+  Resolve[ResolveAllRequiredBindings]
+  Bound[ResolvedValidationContract]
+  Bound --> Validate[RunValidation]
+  Resolve --> FailFast[FailFastIfBindingMissing]
+```
+
+The better architecture is:
 
 - keep the DSL frozen
 - keep validation request-chained
-- treat explicit client-validation metadata as the authoritative contract for the supported subset
-
-The best direction is to evolve the existing explicit metadata path (`IConditionalRuleProvider` + `ConditionalRuleMetadata`) into a broader explicit client-rule provider, rather than trying to infer more from FluentValidation internals.
-
-Automatic extraction can remain only for the smallest stable subset if desired, but it should stop being the primary source of truth.
-
-Upgrading to the latest FluentValidation version should be treated as a separate compatibility decision, not as the fix by itself.
+- preserve `ResolvePlan<TModel>()` as the same-logical-plan authoring marker
+- separate:
+  - extracted validation contract
+  - resolved executable validation contract
+- re-resolve bindings authoritatively on every boot and merge
+- fail fast when declared bindings cannot be satisfied
+- unify server and client field mapping from the same canonical field path model
+- move message targets toward explicit framework-owned identifiers
+- do not move back to DOM scanning for field/value resolution
+- do not reduce MVC capability to make validation easier
 
 ## Required Proof
 
-This needs explicit proof at the correct boundaries:
+### Playwright proof
 
-- the FluentValidation version strategy is made explicit: either intentionally remain on `11.x` or prove compatibility with current latest upstream
-- supported simple rules, including `Equal(x => x.OtherField)`, are emitted truthfully into the existing runtime rule set
-- nested supported rules do not silently disappear
-- unresolved declared fields in the active request validation path fail fast instead of warning and skipping
-- explicit client conditional rules remain truthful for both parent and `ResolvePlan()` partial flows
-- unsupported server/db rules and generic `.When()` introspection stay clearly out of scope
+- root view validation works through the id-driven contract
+- same-model partial loaded later via `ResolvePlan<TModel>()` becomes part of the same validation surface
+- reloading the same partial by `sourceId` does not weaken validation truth
+- standalone partial with its own `TModel` remains isolated
+- explicit client conditional rules remain truthful after partial load and reload
+- server validation errors map back to the correct rendered fields
 
----
+### TS runtime proof
 
-## Response — Claude
+- missing active bindings do not silently pass
+- boot/merge re-resolution is authoritative
+- missing peer bindings for conditional/equality rules do not silently alter meaning
+- same-model partial churn does not leave stale validation state behind
 
-### Verdict: Fixed (gaps 1 and 2). Gap 3 deferred.
+### C# proof
 
-### FluentValidation version: upgraded to 12.1.1
-
-Adapter compiles cleanly against FV 12.1.1 with zero breaking changes. All 31 tests pass on 12.x. The `12.*` floating version spec ensures future 12.x patches are picked up automatically.
-
-### Gap 1: `equalTo` extraction — Fixed
-
-`IComparisonValidator` with `Comparison.Equal` and a non-null `MemberToCompare` now emits `"equalTo"` with the other field's name as constraint.
-
-```csharp
-case IComparisonValidator cv:
-    if (cv.Comparison == Comparison.Equal && cv.MemberToCompare != null)
-        result.Add(new ExtractedRule("equalTo", ..., cv.MemberToCompare.Name));
-```
-
-**Tests:**
-- `Equal_to_other_field_extracts_equalTo_rule` — `Equal(x => x.Email)` → `"equalTo"` with constraint `"Email"`
-- `Equal_to_with_custom_message_uses_custom_message` — custom message flows through
-
-### Gap 2: Nested validator failures — Fixed (fail fast)
-
-`ResolveNestedValidator()` replaces both try/catch + `Debug.WriteLine` sites. Throws `InvalidOperationException` if factory returns null or throws.
-
-**Tests:**
-- `Throws_when_nested_validator_cannot_be_created` — factory returns null → throw
-- `Throws_when_factory_throws_for_nested_validator` — factory throws → wrap in InvalidOperationException
-
-### `Activator.CreateInstance` default — Removed
-
-Parameterless constructor removed. Factory is now required:
-
-```csharp
-public FluentValidationAdapter(Func<Type, IValidator?> factory)
-```
-
-Null factory throws `ArgumentException`. Callers must provide an explicit factory (e.g. DI container resolution or `Activator.CreateInstance` if they choose).
-
-**Tests:**
-- `Null_factory_throws` — null factory → ArgumentException
-- `Explicit_factory_works` — explicit factory resolves validators correctly
-
-### Gap 3: Unresolved declared fields fail fast at runtime — Deferred
-
-This is a TS runtime concern (validation enrichment warns instead of throwing when component bindings are missing). Not an adapter-level fix. Should be addressed as a separate TS runtime issue.
-
-### What stays out of scope
-
-- Generic `.When()` / `.Unless()` conditions — opaque delegates, cannot safely introspect
-- Server-only or DB-backed rules — not extractable for client-side use
-- `IConditionalRuleProvider` — unchanged, remains the explicit path for client conditional rules
-
-### Test coverage: 31 tests (was 25)
-
-| Test class | Tests | What it covers |
-|------------|-------|----------------|
-| WhenExtractingRequiredRules | 3 | NotEmpty, NotNull, custom message |
-| WhenExtractingLengthRules | 3 | MinimumLength, MaximumLength, both |
-| WhenExtractingEmailRule | 2 | EmailAddress, custom message |
-| WhenExtractingRegexRule | 1 | Matches with pattern |
-| WhenExtractingRangeRule | 1 | InclusiveBetween |
-| WhenExtractingComparisonRules | 2 | GreaterThanOrEqual, LessThanOrEqual |
-| WhenExtractingEqualToRules | 2 | Equal(x => x.Other), custom message |
-| WhenExtractingMultipleRulesPerField | 1 | Multiple rules on single field |
-| WhenExtractingNestedValidators | 2 | Dotted paths, deeply nested |
-| WhenExtractingConditionalRules | 2 | .When() skipped, IConditionalRuleProvider merges |
-| WhenExtractingAllRuleTypes | 6 | All rule kinds in one validator |
-| WhenFormIsEmpty | 2 | Empty validator → null, FormId threading |
-| WhenFailingFastOnBrokenNestedValidators | 2 | Factory null → throw, factory throws → throw |
-| WhenRequiringExplicitFactory | 2 | Null factory → throw, explicit factory works |
+- `.Validate<TValidator>()` cannot degrade to a false-success contract
+- extracted conditional rules preserve canonical field paths
+- server and client field mapping use the same field identity model
