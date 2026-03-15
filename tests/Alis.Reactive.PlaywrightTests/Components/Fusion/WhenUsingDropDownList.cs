@@ -245,4 +245,60 @@ public class WhenUsingDropDownList : PlaywrightTestBase
             .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
+
+    // ── Multi-step state-cycle scenarios ──
+
+    [Test]
+    public async Task selecting_then_clearing_selection_toggles_indicator()
+    {
+        // Proves When(comp.Value()).NotNull() evaluates correctly across
+        // select → clear → re-select transitions.
+        // DomReady SetValue("Books") fires the change event, so the indicator
+        // is already visible after boot.
+        await NavigateAndBoot();
+
+        // Indicator is visible after boot (DomReady SetValue triggers change → NotNull → show)
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToHaveTextAsync("selected", new() { Timeout = 3000 });
+
+        // Select "Electronics" → indicator stays visible (still not null)
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Electronics" }).ClickAsync();
+
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToHaveTextAsync("selected", new() { Timeout = 3000 });
+
+        // Clear selection via SF ej2 API → indicator hides
+        // SF ej2 trigger('change', ...) fires the handler registered by the framework
+        await Page.EvaluateAsync(@$"() => {{
+            const el = document.getElementById('{CategoryId}');
+            const ej2 = el.ej2_instances[0];
+            ej2.value = null;
+            ej2.text = null;
+            ej2.dataBind();
+            ej2.trigger('change', {{ value: null, itemData: null, isInteracted: false }});
+        }}");
+
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToBeHiddenAsync(new() { Timeout = 5000 });
+
+        // Select "Books" → indicator shows again
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Books" }).ClickAsync();
+
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToHaveTextAsync("selected", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
 }

@@ -274,4 +274,80 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
             .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
+
+    // ── Multi-step state-cycle scenarios ──
+
+    [Test]
+    public async Task increment_then_decrement_cycle_updates_echo_each_time()
+    {
+        // Proves method calls fire change events and DOM updates on every click
+        await NavigateAndBoot();
+
+        // Quantity starts at 1 — click increment 3 times: 1→2→3→4
+        await Page.Locator("#qty-inc-btn").ClickAsync();
+        await Expect(Page.Locator("#qty-echo"))
+            .ToHaveTextAsync("2", new() { Timeout = 5000 });
+
+        await Page.Locator("#qty-inc-btn").ClickAsync();
+        await Expect(Page.Locator("#qty-echo"))
+            .ToHaveTextAsync("3", new() { Timeout = 5000 });
+
+        await Page.Locator("#qty-inc-btn").ClickAsync();
+        await Expect(Page.Locator("#qty-echo"))
+            .ToHaveTextAsync("4", new() { Timeout = 5000 });
+
+        // Click decrement 2 times: 4→3→2
+        await Page.Locator("#qty-dec-btn").ClickAsync();
+        await Expect(Page.Locator("#qty-echo"))
+            .ToHaveTextAsync("3", new() { Timeout = 5000 });
+
+        await Page.Locator("#qty-dec-btn").ClickAsync();
+        await Expect(Page.Locator("#qty-echo"))
+            .ToHaveTextAsync("2", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task changing_temperature_toggles_positive_indicator_across_zero_boundary()
+    {
+        // Proves When(comp.Value()).Gt(0m) condition re-evaluates correctly
+        // across positive → negative → positive transitions
+        await NavigateAndBoot();
+
+        var tempInput = Page.Locator($"#{TemperatureId}");
+
+        // Positive indicator starts hidden
+        await Expect(Page.Locator("#positive-indicator")).ToBeHiddenAsync();
+
+        // Set temp to 50 → positive shows
+        await tempInput.ClickAsync();
+        await tempInput.FillAsync("50");
+        await tempInput.PressAsync("Tab");
+
+        await Expect(Page.Locator("#positive-indicator"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#positive-indicator"))
+            .ToHaveTextAsync("positive", new() { Timeout = 3000 });
+
+        // Set temp to -10 → positive hides
+        await tempInput.ClickAsync();
+        await tempInput.FillAsync("-10");
+        await tempInput.PressAsync("Tab");
+
+        await Expect(Page.Locator("#positive-indicator"))
+            .ToBeHiddenAsync(new() { Timeout = 5000 });
+
+        // Set temp to 1 → positive shows again
+        await tempInput.ClickAsync();
+        await tempInput.FillAsync("1");
+        await tempInput.PressAsync("Tab");
+
+        await Expect(Page.Locator("#positive-indicator"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#positive-indicator"))
+            .ToHaveTextAsync("positive", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
 }
