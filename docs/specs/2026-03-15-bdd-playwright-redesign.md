@@ -33,26 +33,77 @@ CareNoteModel        // ResidentName, Date, Notes, Severity
 AdmissionModel       // ResidentName, FacilityName, AdmissionDate, CareLevel, Notes, IsEmergency
 ```
 
-## New Component: NativeDatePicker
+## Component Roadmap
 
-Onboard as a complete vertical slice following the canonical pattern:
+All components: value + change event only. Onboarded one at a time. Duplication is intentional —
+each vertical slice is self-contained. Each follows the canonical file pattern established in the
+codebase (sealed phantom type, internal-ctor builder, separate HtmlExtensions/Extensions/Events/
+ReactiveExtensions files).
+
+### Native Components (HTML elements)
+
+| Component | HTML Element | ReadExpr | Value Type | Status |
+|-----------|-------------|----------|------------|--------|
+| `NativeTextBox` | `<input type="text">` | `"value"` | `string` | Exists |
+| `NativeDropDown` | `<select>` | `"value"` | `string` | Exists |
+| `NativeCheckBox` | `<input type="checkbox">` | `"checked"` | `bool` | Exists |
+| `NativeButton` | `<button>` | N/A (non-input) | N/A | Exists |
+| `NativeDatePicker` | `<input type="date">` | `"value"` | `string` | New |
+| `NativeTimePicker` | `<input type="time">` | `"value"` | `string` | New |
+| `NativeNumericInput` | `<input type="number">` | `"value"` | `string` | New |
+| `NativeTextArea` | `<textarea>` | `"value"` | `string` | New |
+| `NativeRadioButton` | `<input type="radio">` | `"value"` | `string` | New |
+
+### Fusion Components (Syncfusion EJ2)
+
+| Component | SF Builder | ReadExpr | Value Type | Status |
+|-----------|-----------|----------|------------|--------|
+| `FusionNumericTextBox` | `NumericTextBoxBuilder` | `"value"` | `decimal` | Exists |
+| `FusionDropDownList` | `DropDownListBuilder` | `"value"` | `string` | Exists |
+| `FusionDatePicker` | `DatePickerBuilder` | `"value"` | `string` | New |
+| `FusionDateRangePicker` | `DateRangePickerBuilder` | `"value"` | `string` | New |
+| `FusionDateTimePicker` | `DateTimePickerBuilder` | `"value"` | `string` | New |
+| `FusionTimePicker` | `TimePickerBuilder` | `"value"` | `string` | New |
+| `FusionMultiSelectDropdown` | `MultiSelectBuilder` | `"value"` | `string` | New |
+| `FusionComboBox` | `ComboBoxBuilder` | `"value"` | `string` | New |
+| `FusionInputMask` | `MaskedTextBoxBuilder` | `"value"` | `string` | New |
+| `FusionColorPicker` | `ColorPickerBuilder` | `"value"` | `string` | New |
+| `FusionRichTextEditor` | `RichTextEditorBuilder` | `"value"` | `string` | New |
+
+### Vertical Slice File Pattern (per component)
+
+Each new component produces exactly these files:
 
 ```
-NativeDatePicker/
-  NativeDatePicker.cs                  — sealed : NativeComponent, IInputComponent (ReadExpr => "value")
-  NativeDatePickerBuilder.cs           — internal ctor, wraps <input type="date">
-  NativeDatePickerHtmlExtensions.cs    — Html.NativeDatePickerFor(plan, expr)
-  NativeDatePickerExtensions.cs        — SetValue(string), FocusIn(), Value()
-  NativeDatePickerEvents.cs            — Singleton: Changed event ("change")
-  NativeDatePickerReactiveExtensions.cs — Single .Reactive<TModel, TProp, TArgs>()
+{Component}/
+  {Component}.cs                    — sealed : {Base}Component, IInputComponent (ReadExpr)
+  {Component}Builder.cs             — internal ctor, IHtmlContent (native) or returns SF builder (fusion)
+  {Component}HtmlExtensions.cs      — Html.{Component}For(plan, expr) — registers in ComponentsMap
+  {Component}Extensions.cs          — SetValue(...), Value() — mutations on ComponentRef<T>
+  {Component}Events.cs              — Singleton: Changed event
+  {Component}ReactiveExtensions.cs  — Single .Reactive<TModel, TProp, TArgs>()
   Events/
-    NativeDatePickerOnChanged.cs       — NativeDatePickerChangeArgs { Value }
+    {Component}OnChanged.cs         — {Component}ChangeArgs { Value }
 ```
 
-- `ReadExpr => "value"` (HTML date input stores ISO string in `.value`)
-- `SetValue(string)` — ISO date string (e.g., "2026-03-15")
-- `Value()` — `TypedComponentSource<string>` for condition guards
-- One `Changed` event, one `Reactive` overload. Duplication from NativeTextBox is intentional.
+### Onboarding Order
+
+One component per implementation cycle. Native first, then Fusion counterpart.
+
+1. NativeDatePicker
+2. NativeTimePicker
+3. NativeNumericInput
+4. NativeTextArea
+5. NativeRadioButton
+6. FusionDatePicker
+7. FusionTimePicker
+8. FusionDateTimePicker
+9. FusionDateRangePicker
+10. FusionComboBox
+11. FusionMultiSelectDropdown
+12. FusionInputMask
+13. FusionColorPicker
+14. FusionRichTextEditor
 
 ## Route Map
 
@@ -70,7 +121,8 @@ a typed payload through the plan — zero inline JS.
 
 ### Group 2: Native Components
 
-Each page exercises: property write, property read, event, event-args condition (typed), component-read condition (typed), reactive wiring.
+Each page exercises the mandatory surface: property write, property read, event,
+event-args condition (typed), component-read condition (typed), reactive wiring.
 
 | Route | View | Slice Surface Tested |
 |-------|------|---------------------|
@@ -79,6 +131,10 @@ Each page exercises: property write, property read, event, event-args condition 
 | `/Sandbox/NativeTextBox` | TextBox full API | SetValue, Changed, When(args, x => x.Value).Eq(), When(comp.Value()).IsEmpty(), FocusIn |
 | `/Sandbox/NativeDropDown` | DropDown full API | SetValue, Changed, When(args, x => x.Value).Eq(), When(comp.Value()).NotNull(), FocusIn |
 | `/Sandbox/NativeDatePicker` | DatePicker full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
+| `/Sandbox/NativeTimePicker` | TimePicker full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
+| `/Sandbox/NativeNumericInput` | NumericInput full API | SetValue, Changed, When(args, x => x.Value).Gt(), When(comp.Value()).Gt() |
+| `/Sandbox/NativeTextArea` | TextArea full API | SetValue, Changed, When(args, x => x.Value).IsEmpty(), When(comp.Value()).MinLength() |
+| `/Sandbox/NativeRadioButton` | RadioButton full API | SetValue, Changed, When(args, x => x.Value).Eq(), When(comp.Value()).Eq() |
 
 ### Group 3: Fusion Components
 
@@ -88,6 +144,15 @@ Same mandatory surface: property write, property read, event, typed conditions, 
 |-------|------|---------------------|
 | `/Sandbox/FusionNumericTextBox` | NumericTextBox full API | SetValue, SetMin, Increment, Decrement, Changed/Focus/Blur, When(args, x => x.Value).Gt(), When(comp.Value()).Gt() |
 | `/Sandbox/FusionDropDownList` | DropDownList full API | SetValue, SetText, ShowPopup, HidePopup, Changed/Focus/Blur, When(args, x => x.Value).Eq(), When(comp.Value()).NotNull() |
+| `/Sandbox/FusionDatePicker` | DatePicker full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
+| `/Sandbox/FusionTimePicker` | TimePicker full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
+| `/Sandbox/FusionDateTimePicker` | DateTimePicker full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
+| `/Sandbox/FusionDateRangePicker` | DateRangePicker full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
+| `/Sandbox/FusionComboBox` | ComboBox full API | SetValue, Changed, When(args, x => x.Value).Eq(), When(comp.Value()).NotNull() |
+| `/Sandbox/FusionMultiSelectDropdown` | MultiSelect full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
+| `/Sandbox/FusionInputMask` | InputMask full API | SetValue, Changed, When(args, x => x.Value).Matches(), When(comp.Value()).IsEmpty() |
+| `/Sandbox/FusionColorPicker` | ColorPicker full API | SetValue, Changed, When(args, x => x.Value).Eq(), When(comp.Value()).NotNull() |
+| `/Sandbox/FusionRichTextEditor` | RichTextEditor full API | SetValue, Changed, When(args, x => x.Value).IsEmpty(), When(comp.Value()).MinLength() |
 
 ### Group 4: HTTP & Data
 
@@ -195,22 +260,28 @@ Cards grouped with headers matching the 6 groups above. Each card links to its r
 with a short description of what behavior it exercises.
 
 ```
-Core Primitives          | Native Components       | Fusion Components
-- Events & Dispatch      | - NativeButton          | - FusionNumericTextBox
-- Payload Resolution     | - NativeCheckBox        | - FusionDropDownList
-- Conditions & Guards    | - NativeTextBox         |
-                         | - NativeDropDown        |
-                         | - NativeDatePicker      |
+Core Primitives           | Native Components        | Fusion Components
+- Events & Dispatch       | - NativeButton           | - FusionNumericTextBox
+- Payload Resolution      | - NativeCheckBox         | - FusionDropDownList
+- Conditions & Guards     | - NativeTextBox          | - FusionDatePicker
+                          | - NativeDropDown         | - FusionTimePicker
+                          | - NativeDatePicker       | - FusionDateTimePicker
+                          | - NativeTimePicker       | - FusionDateRangePicker
+                          | - NativeNumericInput     | - FusionComboBox
+                          | - NativeTextArea         | - FusionMultiSelectDropdown
+                          | - NativeRadioButton      | - FusionInputMask
+                          |                          | - FusionColorPicker
+                          |                          | - FusionRichTextEditor
 
-HTTP & Data              | Validation              | Framework Infrastructure
-- HTTP Verbs             | - Client Rules          | - IdGenerator
-- Content Types          | - Server Errors         | - Architecture Regression
-- Gather                 | - Conditional Rules     | - Reactive Wiring
-                         | - Hidden Fields         | - Reactive Conditions
-                         | - Live Clearing         |
-                         | - Partial Merge         |
-                         | - Isolation             |
-                         | - Multi-Partial         |
+HTTP & Data               | Validation               | Framework Infrastructure
+- HTTP Verbs              | - Client Rules           | - IdGenerator
+- Content Types           | - Server Errors          | - Architecture Regression
+- Gather                  | - Conditional Rules      | - Reactive Wiring
+                          | - Hidden Fields          | - Reactive Conditions
+                          | - Live Clearing          |
+                          | - Partial Merge          |
+                          | - Isolation              |
+                          | - Multi-Partial          |
 ```
 
 ## Implementation Order
