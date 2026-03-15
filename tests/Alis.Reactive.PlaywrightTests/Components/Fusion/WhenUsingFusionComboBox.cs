@@ -207,4 +207,81 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
             .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
+
+    // ── Deep BDD: state-cycle scenarios ──
+
+    [Test]
+    public async Task selecting_multiple_different_values_fires_change_each_time()
+    {
+        await NavigateAndBoot();
+
+        var changeValue = Page.Locator("#change-value");
+        var argsCondition = Page.Locator("#args-condition");
+
+        // Cycle 1: select Dr. Johnson → change fires, args says "other physician"
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Johnson" }).ClickAsync();
+        var text1 = await changeValue.TextContentAsync();
+        Assert.That(text1, Does.Contain("Dr. Johnson"),
+            $"Cycle 1: change value should contain Dr. Johnson but was '{text1}'");
+        await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
+
+        // Cycle 2: select Dr. Williams → change fires again with new value
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Williams" }).ClickAsync();
+        var text2 = await changeValue.TextContentAsync();
+        Assert.That(text2, Does.Contain("Dr. Williams"),
+            $"Cycle 2: change value should contain Dr. Williams but was '{text2}'");
+        await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
+
+        // Cycle 3: select Dr. Smith → change fires, args condition flips to "dr smith selected"
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Smith" }).ClickAsync();
+        var text3 = await changeValue.TextContentAsync();
+        Assert.That(text3, Does.Contain("Dr. Smith"),
+            $"Cycle 3: change value should contain Dr. Smith but was '{text3}'");
+        await Expect(argsCondition).ToHaveTextAsync("dr smith selected", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task clearing_selection_then_reselecting_toggles_indicator()
+    {
+        await NavigateAndBoot();
+
+        var selectedIndicator = Page.Locator("#selected-indicator");
+        var argsCondition = Page.Locator("#args-condition");
+
+        // Step 1: select Dr. Johnson → indicator shows "selected", args says "other physician"
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Johnson" }).ClickAsync();
+        await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(selectedIndicator).ToHaveTextAsync("selected", new() { Timeout = 3000 });
+        await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
+
+        // Step 2: clear the selection via ej2 instance → fires change with null value → indicator hides
+        await Page.EvaluateAsync(
+            $"() => {{ const el = document.getElementById('{PhysicianId}'); const ej2 = el.ej2_instances[0]; ej2.value = null; ej2.text = null; ej2.dataBind(); }}");
+        await Expect(selectedIndicator).ToBeHiddenAsync(new() { Timeout = 5000 });
+
+        // Step 3: reselect Dr. Smith → indicator shows again, args says "dr smith selected"
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Smith" }).ClickAsync();
+        await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(selectedIndicator).ToHaveTextAsync("selected", new() { Timeout = 3000 });
+        await Expect(argsCondition).ToHaveTextAsync("dr smith selected", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
 }

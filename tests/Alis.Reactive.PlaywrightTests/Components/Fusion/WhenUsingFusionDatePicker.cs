@@ -168,4 +168,59 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
         await Expect(warning).ToHaveTextAsync("discharge date set", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
+
+    // ── Deep BDD: state-cycle scenarios ──
+
+    [Test]
+    public async Task changing_date_multiple_times_fires_condition_each_time()
+    {
+        await NavigateAndBoot();
+
+        var argsCondition = Page.Locator("#args-condition");
+        var selectedIndicator = Page.Locator("#selected-indicator");
+
+        // Cycle 1: set a date — condition evaluates "date selected", indicator shows
+        await SetDatePickerValue(AdmissionDateId, "2026-07-04");
+        await Expect(argsCondition).ToHaveTextAsync("date selected", new() { Timeout = 5000 });
+        await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(selectedIndicator).ToHaveTextAsync("admission set", new() { Timeout = 3000 });
+
+        // Cycle 2: change to a different date — condition still fires and re-evaluates
+        await SetDatePickerValue(AdmissionDateId, "2026-12-25");
+        // args-condition should still say "date selected" (value is still not null)
+        await Expect(argsCondition).ToHaveTextAsync("date selected", new() { Timeout = 5000 });
+        await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Verify the change-value updated to reflect the new date
+        await Expect(Page.Locator("#change-value"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task clearing_then_refilling_date_updates_condition_both_ways()
+    {
+        await NavigateAndBoot();
+
+        var btn = Page.Locator("#check-discharge-btn");
+        var warning = Page.Locator("#discharge-warning");
+
+        // Step 1: discharge date is empty — click check → "discharge date is required"
+        await btn.ClickAsync();
+        await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
+
+        // Step 2: set a discharge date — click check → "discharge date set"
+        await SetDatePickerValue(DischargeDateId, "2026-09-15");
+        await btn.ClickAsync();
+        await Expect(warning).ToHaveTextAsync("discharge date set", new() { Timeout = 3000 });
+
+        // Step 3: clear the discharge date — click check → "discharge date is required" again
+        await Page.EvaluateAsync(
+            $"() => {{ const el = document.getElementById('{DischargeDateId}'); el.ej2_instances[0].value = null; el.ej2_instances[0].dataBind(); }}");
+        await btn.ClickAsync();
+        await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
 }

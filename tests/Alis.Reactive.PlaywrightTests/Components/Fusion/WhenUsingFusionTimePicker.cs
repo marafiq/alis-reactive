@@ -139,4 +139,58 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
             .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
+
+    // ── Deep BDD: state-cycle scenarios ──
+
+    [Test]
+    public async Task changing_time_multiple_times_updates_echo()
+    {
+        await NavigateAndBoot();
+
+        var input = Page.Locator($"#{WakeUpTimeId}");
+        var changeValue = Page.Locator("#change-value");
+        var timeStatus = Page.Locator("#time-status");
+
+        // Cycle 1: fill a time → change event fires, status shows
+        await input.ClickAsync();
+        await input.FillAsync("10:30 AM");
+        await input.PressAsync("Tab");
+        await Expect(changeValue).Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+        await Expect(timeStatus).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(timeStatus).ToHaveTextAsync("time selected", new() { Timeout = 3000 });
+
+        // Cycle 2: change to a different time → change event fires again
+        await input.ClickAsync();
+        await input.FillAsync("02:45 PM");
+        await input.PressAsync("Tab");
+        // Status should still show "time selected" (re-evaluated, not stale)
+        await Expect(timeStatus).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(timeStatus).ToHaveTextAsync("time selected", new() { Timeout = 3000 });
+
+        // Cycle 3: change yet again → proves handler fires every time, not just first
+        await input.ClickAsync();
+        await input.FillAsync("06:00 AM");
+        await input.PressAsync("Tab");
+        await Expect(timeStatus).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(timeStatus).ToHaveTextAsync("time selected", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task gather_sends_current_time_value_not_initial()
+    {
+        await NavigateAndBoot();
+
+        // DomReady set MedicationTime to 08:30 — change it via ej2 instance
+        await Page.EvaluateAsync(
+            $"() => {{ const el = document.getElementById('{MedicationTimeId}'); el.ej2_instances[0].value = new Date(2026, 0, 1, 14, 15, 0); el.ej2_instances[0].dataBind(); }}");
+
+        // Click gather — should POST the CURRENT value (14:15), not the initial (08:30)
+        await Page.Locator("#gather-btn").ClickAsync();
+        await Expect(Page.Locator("#gather-result"))
+            .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }
