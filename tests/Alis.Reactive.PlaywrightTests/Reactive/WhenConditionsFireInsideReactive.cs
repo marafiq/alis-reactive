@@ -180,4 +180,124 @@ public class WhenConditionsFireInsideReactive : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Scenario: Full ElseIf lifecycle — all branches fire in sequence ──
+
+    /// <summary>
+    /// Exercises every ElseIf branch of the Status dropdown in sequence:
+    ///   1. "active"   → Amount=100, City=seattle, address visible, green text
+    ///   2. "inactive" → Amount=0, address hidden, amber text
+    ///   3. "pending"  → Else branch fires: "Pending or empty", address shows again, slate text
+    ///
+    /// This catches state leaks: if a previous branch's AddClass or Show/Hide
+    /// lingers when a later branch fires, the assertions will fail. Each branch
+    /// must correctly add its own color class AND remove the other two.
+    ///
+    /// WHY: proves the complete ElseIf chain works for ALL branches in chronological
+    /// sequence, not just each branch in isolation (which the single-branch tests cover)
+    /// </summary>
+    [Test]
+    public async Task full_status_lifecycle_active_then_inactive_then_pending()
+    {
+        await NavigateAndBoot();
+
+        var statusSelect = Page.Locator($"#{S}__Status");
+        var result = Page.Locator("#status-result");
+        var amountInput = Page.Locator($"#{S}__Amount").First;
+        var citySelect = Page.Locator($"#{S}__Address_City");
+        var addressSection = Page.Locator("#address-section");
+
+        // ── Phase 1: Active ──
+        await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "active" });
+
+        await Expect(result).ToContainTextAsync("Active", new() { Timeout = 3000 });
+        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
+        await Expect(amountInput).ToHaveValueAsync(
+            new System.Text.RegularExpressions.Regex(@"^100(\.00)?$"), new() { Timeout = 3000 });
+        await Expect(citySelect).ToHaveValueAsync("seattle", new() { Timeout = 3000 });
+        await Expect(addressSection).ToBeVisibleAsync();
+
+        // ── Phase 2: Inactive ──
+        await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "inactive" });
+
+        await Expect(result).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
+        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
+        // Must NOT still have the green class from active phase (state leak check)
+        await Expect(result).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
+        await Expect(amountInput).ToHaveValueAsync(
+            new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
+        await Expect(addressSection).ToBeHiddenAsync();
+
+        // ── Phase 3: Pending (Else branch) ──
+        await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "pending" });
+
+        await Expect(result).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
+        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
+        // Must NOT still have amber from inactive phase (state leak check)
+        await Expect(result).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
+        await Expect(result).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
+        // Else branch shows address section (was hidden by inactive)
+        await Expect(addressSection).ToBeVisibleAsync();
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario: City autofill state survives address hide/show cycle ──
+
+    /// <summary>
+    /// Exercises a cross-vendor workflow spanning two reactive pipelines:
+    ///   1. Status → "active": sets City=seattle, shows address, Amount=100
+    ///   2. User manually selects City → "portland": auto-fills State=OR, PostalCode=97201
+    ///   3. Status → "inactive": hides address section, sets Amount=0
+    ///   4. Status → "active" again: shows address, sets City=seattle (overwritten),
+    ///      but State and PostalCode retain their portland values (OR, 97201)
+    ///      because programmatic SetValue on City does NOT fire City's change event
+    ///
+    /// WHY: proves that (a) hiding an element preserves its descendant component values,
+    /// (b) the active branch's SetValue("seattle") on City is a value-only write that
+    /// does not cascade through City's reactive pipeline, and (c) sibling fields (State,
+    /// PostalCode) are only updated by explicit user interaction, not by side effects
+    /// </summary>
+    [Test]
+    public async Task city_autofill_then_status_inactive_hides_address_preserving_filled_values()
+    {
+        await NavigateAndBoot();
+
+        var statusSelect = Page.Locator($"#{S}__Status");
+        var citySelect = Page.Locator($"#{S}__Address_City");
+        var stateSelect = Page.Locator($"#{S}__Address_State");
+        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
+        var addressSection = Page.Locator("#address-section");
+
+        // Step 1: Select active — City set to "seattle" by the active branch, address visible
+        await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "active" });
+        await Expect(citySelect).ToHaveValueAsync("seattle", new() { Timeout = 3000 });
+        await Expect(addressSection).ToBeVisibleAsync();
+
+        // Step 2: User manually selects portland — triggers City's reactive pipeline
+        // Auto-fills: State=OR, PostalCode=97201
+        await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "portland" });
+        await Expect(stateSelect).ToHaveValueAsync("OR", new() { Timeout = 3000 });
+        await Expect(postalInput).ToHaveValueAsync(
+            new System.Text.RegularExpressions.Regex("97.?201"), new() { Timeout = 3000 });
+
+        // Step 3: Select inactive — address section hides, Amount zeroed
+        await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "inactive" });
+        await Expect(addressSection).ToBeHiddenAsync();
+
+        // Step 4: Select active again — address shows, City overwritten to "seattle"
+        await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "active" });
+        await Expect(addressSection).ToBeVisibleAsync();
+        await Expect(citySelect).ToHaveValueAsync("seattle", new() { Timeout = 3000 });
+
+        // State and PostalCode retain their portland-autofilled values because:
+        // - The active branch only sets City (not State/PostalCode)
+        // - Programmatic SetValue("seattle") does NOT fire City's change event,
+        //   so City's reactive pipeline does NOT re-autofill State and PostalCode
+        await Expect(stateSelect).ToHaveValueAsync("OR", new() { Timeout = 3000 });
+        await Expect(postalInput).ToHaveValueAsync(
+            new System.Text.RegularExpressions.Regex("97.?201"), new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
 }

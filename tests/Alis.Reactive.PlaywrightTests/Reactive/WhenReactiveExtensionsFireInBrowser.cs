@@ -182,4 +182,53 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Scenario: Components remain reactive after a cross-vendor reset ──
+
+    /// <summary>
+    /// After "Reset All Fields" clears both vendors, interacting with a component must
+    /// still fire its .Reactive() pipeline. The reset dispatch only mutates values — it
+    /// does not unwire event listeners.
+    ///
+    /// Flow:
+    ///   1. Change Status dropdown → echo shows "Status changed" (reactive works)
+    ///   2. Click "Reset All Fields" → Status cleared, Amount zeroed, echo shows "All fields reset"
+    ///   3. Change Status dropdown again → echo must update to "Status changed" (proves re-fire)
+    ///   4. Change Amount again → echo must update to "Amount changed" (proves Fusion re-fire too)
+    ///
+    /// WHY: proves reactive event listeners survive a cross-vendor reset dispatch,
+    /// catching regressions where a reset accidentally unwires component-event triggers
+    /// </summary>
+    [Test]
+    public async Task reset_then_interact_proves_components_still_reactive_after_reset()
+    {
+        await NavigateAndBoot();
+
+        var statusEcho = Page.Locator("#status-echo");
+        var amountEcho = Page.Locator("#amount-echo");
+
+        // Step 1: Interact — native dropdown fires its reactive pipeline
+        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
+        await Expect(statusEcho).ToHaveTextAsync("Status changed", new() { Timeout = 3000 });
+
+        // Step 2: Reset All — cross-vendor reset clears values and overwrites echo
+        await Page.Locator("button:has-text('Reset All Fields')").ClickAsync();
+        await Expect(statusEcho).ToHaveTextAsync("All fields reset", new() { Timeout = 3000 });
+        await Expect(Page.Locator($"#{S}__Status")).ToHaveValueAsync("");
+        await Expect(Page.Locator($"#{S}__Amount").First).ToHaveValueAsync(
+            new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
+
+        // Step 3: Interact again — native dropdown must still be reactive after reset
+        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "inactive" });
+        await Expect(statusEcho).ToHaveTextAsync("Status changed", new() { Timeout = 3000 });
+
+        // Step 4: Fusion component must also still be reactive after reset
+        var numericInput = Page.Locator($"#{S}__Amount").First;
+        await numericInput.ClickAsync();
+        await numericInput.FillAsync("77");
+        await numericInput.PressAsync("Tab");
+        await Expect(amountEcho).ToHaveTextAsync("Amount changed", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
 }
