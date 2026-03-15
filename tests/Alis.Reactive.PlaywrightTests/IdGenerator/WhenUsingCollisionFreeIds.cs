@@ -6,7 +6,7 @@ public class WhenUsingCollisionFreeIds : PlaywrightTestBase
     private const string Path = "/Sandbox/IdGenerator";
 
     [Test]
-    public async Task PageLoadsWithUniqueIds()
+    public async Task page_loads_with_unique_ids()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
@@ -22,7 +22,7 @@ public class WhenUsingCollisionFreeIds : PlaywrightTestBase
     }
 
     [Test]
-    public async Task UniqueIdsExistInDom()
+    public async Task unique_ids_exist_in_dom()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
@@ -38,7 +38,7 @@ public class WhenUsingCollisionFreeIds : PlaywrightTestBase
     }
 
     [Test]
-    public async Task JsonPostReceivesCorrectFieldValues()
+    public async Task json_post_receives_correct_field_values()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
@@ -56,7 +56,7 @@ public class WhenUsingCollisionFreeIds : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FormDataPostReceivesCorrectFieldValues()
+    public async Task form_data_post_receives_correct_field_values()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
@@ -72,7 +72,7 @@ public class WhenUsingCollisionFreeIds : PlaywrightTestBase
     }
 
     [Test]
-    public async Task NameAttributesPreservedForModelBinding()
+    public async Task name_attributes_preserved_for_model_binding()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
@@ -88,7 +88,7 @@ public class WhenUsingCollisionFreeIds : PlaywrightTestBase
     }
 
     [Test]
-    public async Task IdContainsDoubleUnderscoreDelimiter()
+    public async Task id_contains_double_underscore_delimiter()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);

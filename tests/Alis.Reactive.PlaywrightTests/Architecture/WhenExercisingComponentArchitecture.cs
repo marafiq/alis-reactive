@@ -24,7 +24,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task PageLoadsWithNoErrors()
+    public async Task page_loads_with_no_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("Architecture — Alis.Reactive Sandbox");
@@ -34,7 +34,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     // ── Property Write — both vendors ──
 
     [Test]
-    public async Task NativePropertyWrite()
+    public async Task native_property_write_sets_value()
     {
         await NavigateAndBoot();
         await Expect(Page.Locator("#native-write")).ToHaveValueAsync("written-native");
@@ -42,7 +42,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FusionPropertyWrite()
+    public async Task fusion_property_write_sets_value()
     {
         await NavigateAndBoot();
         // TestWidget syncs inner input when value is set
@@ -53,7 +53,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     // ── Void Method Call — fusion ──
 
     [Test]
-    public async Task FusionVoidMethodCall()
+    public async Task fusion_void_method_call_focuses_input()
     {
         await NavigateAndBoot();
         // dom-ready called ej2_instances[0].focus() — inner input gets focus
@@ -64,7 +64,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     // ── Property Read via Gather — both vendors ──
 
     [Test]
-    public async Task NativePropertyReadViaGather()
+    public async Task native_property_read_via_gather()
     {
         await NavigateAndBoot();
         await Page.Locator("#gather-native-btn").ClickAsync();
@@ -74,7 +74,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FusionPropertyReadViaGather()
+    public async Task fusion_property_read_via_gather()
     {
         await NavigateAndBoot();
         await Page.Locator("#gather-fusion-btn").ClickAsync();
@@ -86,7 +86,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     // ── Event Wiring — both vendors ──
 
     [Test]
-    public async Task NativeEventWiringFiresOnUserInput()
+    public async Task native_event_wiring_fires_on_user_input()
     {
         await NavigateAndBoot();
         await Page.Locator("#native-event").FillAsync("user-typed");
@@ -97,7 +97,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FusionEventWiringFiresOnUserInput()
+    public async Task fusion_event_wiring_fires_on_user_input()
     {
         await NavigateAndBoot();
         // Type in TestWidget's INNER input — widget fires "change" with {newValue}
@@ -111,7 +111,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     // ── Deep Dot-Path Walk ──
 
     [Test]
-    public async Task DeepDotPathWalk()
+    public async Task deep_dot_path_walk_resolves_nested_values()
     {
         await NavigateAndBoot();
         await Page.Locator("#deep-walk-btn").ClickAsync();
@@ -123,7 +123,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     // ── Validation — cross-vendor ──
 
     [Test]
-    public async Task ValidationFailsForEmptyNativeAndFusionFields()
+    public async Task validation_fails_for_empty_native_and_fusion_fields()
     {
         await NavigateAndBoot();
         await Page.Locator("#validate-btn").ClickAsync();
@@ -135,7 +135,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ValidationPassesWhenBothFieldsFilled()
+    public async Task validation_passes_when_both_fields_filled()
     {
         await NavigateAndBoot();
         await Page.Locator("#native-val-field").FillAsync("hello");
@@ -147,7 +147,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ValidationEqualToComparesAcrossVendors()
+    public async Task validation_equal_to_compares_across_vendors()
     {
         await NavigateAndBoot();
         await Page.Locator("#native-password").FillAsync("secret");
@@ -167,7 +167,7 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
     // ── Both vendors gathered together ──
 
     [Test]
-    public async Task SameReadExprGathersBothVendors()
+    public async Task same_read_expr_gathers_both_vendors()
     {
         await NavigateAndBoot();
         await Page.Locator("#both-vendors-btn").ClickAsync();
