@@ -7,7 +7,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     private const string S = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__";
 
     [Test]
-    public async Task PageLoadsWithNoErrors()
+    public async Task Page_loads_with_no_errors()
     {
         await NavigateTo(Path);
         await Expect(Page).ToHaveTitleAsync("Validation — Alis.Reactive Sandbox");
@@ -17,7 +17,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 1: Client-Side Rule Types ────────────────────
 
     [Test]
-    public async Task RequiredFieldShowsError()
+    public async Task Required_field_shows_error()
     {
         await NavigateTo(Path);
 
@@ -37,7 +37,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task EmailFieldShowsError()
+    public async Task Email_field_shows_error()
     {
         await NavigateTo(Path);
 
@@ -55,7 +55,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task RegexFieldShowsError()
+    public async Task Regex_field_shows_error()
     {
         await NavigateTo(Path);
 
@@ -74,7 +74,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task RangeFieldShowsError()
+    public async Task Range_field_shows_error()
     {
         await NavigateTo(Path);
 
@@ -95,7 +95,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 2: Server-Side 400 Errors ────────────────────
 
     [Test]
-    public async Task ServerErrorsDisplayAtFields()
+    public async Task Server_errors_display_at_fields()
     {
         await NavigateTo(Path);
 
@@ -113,7 +113,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 3: Nested Properties ─────────────────────────
 
     [Test]
-    public async Task NestedFieldErrorsDisplay()
+    public async Task Nested_field_errors_display()
     {
         await NavigateTo(Path);
 
@@ -130,7 +130,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 4: Conditional Rules ─────────────────────────
 
     [Test]
-    public async Task ConditionalRuleAppliesWhenMet()
+    public async Task Conditional_rule_applies_when_met()
     {
         await NavigateTo(Path);
 
@@ -150,7 +150,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ModelBoundCheckboxUsesGeneratedIdAndMvcName()
+    public async Task Model_bound_checkbox_uses_generated_id_and_mvc_name()
     {
         await NavigateTo(Path);
 
@@ -161,7 +161,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ConditionalRuleSkipsWhenNotMet()
+    public async Task Conditional_rule_skips_when_not_met()
     {
         await NavigateTo(Path);
 
@@ -180,7 +180,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 5: Live Clearing ─────────────────────────────
 
     [Test]
-    public async Task TypingClearsFieldError()
+    public async Task Typing_clears_field_error()
     {
         await NavigateTo(Path);
 
@@ -201,7 +201,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 6: Combined Client + Server ──────────────────
 
     [Test]
-    public async Task ClientValidationBlocksSubmit()
+    public async Task Client_validation_blocks_submit()
     {
         await NavigateTo(Path);
 
@@ -224,7 +224,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task CombinedFlowPassesClientThenHitsServer()
+    public async Task Combined_flow_passes_client_then_hits_server()
     {
         await NavigateTo(Path);
 
@@ -245,7 +245,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 7: Hidden Fields — Validate with Hidden Sections ───
 
     [Test]
-    public async Task HiddenFieldsSkippedDuringValidation()
+    public async Task Hidden_fields_skipped_during_validation()
     {
         await NavigateTo(Path);
 
@@ -266,7 +266,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task RevealedFieldsValidateAfterToggle()
+    public async Task Revealed_fields_validate_after_toggle()
     {
         await NavigateTo(Path);
 
@@ -293,7 +293,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task HiddenFieldsSubmitToServerSuccessfully()
+    public async Task Hidden_fields_submit_to_server_successfully()
     {
         await NavigateTo(Path);
 
@@ -308,7 +308,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task HiddenFieldsClientBlocksEmptyName()
+    public async Task Hidden_fields_client_blocks_empty_name()
     {
         await NavigateTo(Path);
 
@@ -330,7 +330,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 8: Fake DB Validation (ProblemDetails 400) ─────
 
     [Test]
-    public async Task DbValidationRejectsDuplicateEmail()
+    public async Task Db_validation_rejects_duplicate_email()
     {
         await NavigateTo(Path);
 
@@ -353,7 +353,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DbValidationRejectsReservedUsername()
+    public async Task Db_validation_rejects_reserved_username()
     {
         await NavigateTo(Path);
 
@@ -374,7 +374,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DbValidationPassesWithCleanData()
+    public async Task Db_validation_passes_with_clean_data()
     {
         await NavigateTo(Path);
 
@@ -391,7 +391,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DbValidationClientBlocksEmptyFields()
+    public async Task Db_validation_client_blocks_empty_fields()
     {
         await NavigateTo(Path);
 
@@ -413,7 +413,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 9: Partial View + Client/Server Validation ────
 
     [Test]
-    public async Task PartialViewLoadsAddressForm()
+    public async Task Partial_view_loads_address_form()
     {
         await NavigateTo(Path);
 
@@ -433,7 +433,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PartialClientValidationBlocksSubmitWithEmptyFields()
+    public async Task Partial_client_validation_blocks_submit_with_empty_fields()
     {
         await NavigateTo(Path);
 
@@ -461,7 +461,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PartialClientValidationClearsOnInput()
+    public async Task Partial_client_validation_clears_on_input()
     {
         await NavigateTo(Path);
 
@@ -481,7 +481,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PartialValidDataSavesSuccessfully()
+    public async Task Partial_valid_data_saves_successfully()
     {
         await NavigateTo(Path);
 
@@ -506,7 +506,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     // ── Section 10: Delivery Note Partial (Same TModel) ─────
 
     [Test]
-    public async Task DeliveryPartialLoadsForm()
+    public async Task Delivery_partial_loads_form()
     {
         await NavigateTo(Path);
 
@@ -523,7 +523,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DeliveryPartialClientValidationBlocksSubmit()
+    public async Task Delivery_partial_client_validation_blocks_submit()
     {
         await NavigateTo(Path);
 
@@ -546,7 +546,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DeliveryPartialServerValidationOnBadPhone()
+    public async Task Delivery_partial_server_validation_on_bad_phone()
     {
         await NavigateTo(Path);
 
@@ -569,7 +569,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DeliveryPartialValidDataSaves()
+    public async Task Delivery_partial_valid_data_saves()
     {
         await NavigateTo(Path);
 
@@ -592,7 +592,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     private const string C = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ContactFormModel__";
 
     [Test]
-    public async Task ContactPartialLoadsForm()
+    public async Task Contact_partial_loads_form()
     {
         await NavigateTo(Path);
 
@@ -610,7 +610,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ContactPartialClientValidationBlocksSubmit()
+    public async Task Contact_partial_client_validation_blocks_submit()
     {
         await NavigateTo(Path);
 
@@ -633,7 +633,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ContactPartialValidDataSaves()
+    public async Task Contact_partial_valid_data_saves()
     {
         await NavigateTo(Path);
 
@@ -654,7 +654,7 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ContactPartialDoesNotImpactParentValidation()
+    public async Task Contact_partial_does_not_impact_parent_validation()
     {
         await NavigateTo(Path);
 
