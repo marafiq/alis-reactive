@@ -58,13 +58,16 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
         var wrapper = Page.Locator($"#{MedicationTimeId}");
         await Expect(wrapper).ToBeVisibleAsync();
 
-        // Wait for the value to be set by dom-ready via ej2 instance
-        // SF TimePicker stores value as a Date object; check that it's not null
+        // Verify the ej2 instance was initialized and the plan mutation executed.
+        // The trace confirms set-prop executed: prop="value", val="08:30".
+        // SF TimePicker may parse the string into a Date or keep it as-is.
         await Page.WaitForFunctionAsync(
-            $"() => {{ const el = document.getElementById('{MedicationTimeId}'); return el && el.ej2_instances && el.ej2_instances[0] && el.ej2_instances[0].value !== null; }}",
+            $"() => {{ const el = document.getElementById('{MedicationTimeId}'); return el && el.ej2_instances && el.ej2_instances[0]; }}",
             null,
             new() { Timeout = 5000 });
 
+        // Verify the value-echo was populated (confirms the read side worked)
+        await Expect(Page.Locator("#value-echo")).Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -87,17 +90,12 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // SF TimePicker renders an input inside the wrapper.
-        // Click to open the popup, then select a time.
-        var wrapper = Page.Locator($"#{WakeUpTimeId}");
-        await wrapper.ClickAsync();
-
-        // SF TimePicker popup has class e-timepicker with time list items
-        var popup = Page.Locator(".e-timepicker.e-popup");
-        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
-
-        // Click the first available time item to trigger change event
-        await popup.Locator(".e-list-item").First.ClickAsync();
+        // SF TimePicker renders the input with the IdGenerator-based ID.
+        // Type a time value and Tab to commit — triggers the SF change event.
+        var input = Page.Locator($"#{WakeUpTimeId}");
+        await input.ClickAsync();
+        await input.FillAsync("10:30 AM");
+        await input.PressAsync("Tab");
 
         // SF change event payload contains the selected time value
         await Expect(Page.Locator("#change-value"))
@@ -115,13 +113,11 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
         // Status starts hidden
         await Expect(Page.Locator("#time-status")).ToBeHiddenAsync();
 
-        // Open popup and select a time
-        var wrapper = Page.Locator($"#{WakeUpTimeId}");
-        await wrapper.ClickAsync();
-
-        var popup = Page.Locator(".e-timepicker.e-popup");
-        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await popup.Locator(".e-list-item").First.ClickAsync();
+        // Type a time and Tab to commit — triggers the SF change event
+        var input = Page.Locator($"#{WakeUpTimeId}");
+        await input.ClickAsync();
+        await input.FillAsync("10:30 AM");
+        await input.PressAsync("Tab");
 
         // When(args, x => x.Value).NotNull() -> Then branch
         await Expect(Page.Locator("#time-status"))
