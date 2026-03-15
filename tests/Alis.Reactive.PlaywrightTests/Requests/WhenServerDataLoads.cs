@@ -467,6 +467,101 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // ── Section 12: Error recovery — retry after error, spinner lifecycle, chain ordering ──
+
+    [Test]
+    public async Task save_error_then_retry_with_valid_data_shows_success()
+    {
+        await WaitForDomReadyGet();
+
+        // Intercept the first POST to /Save and return 400 (simulating validation failure)
+        var intercepted = false;
+        await Page.RouteAsync("**/Sandbox/Http/Save", async route =>
+        {
+            if (!intercepted)
+            {
+                intercepted = true;
+                await route.FulfillAsync(new()
+                {
+                    Status = 400,
+                    ContentType = "application/json",
+                    Body = "{\"errorSummary\":\"Validation failed: Name is required\"}"
+                });
+            }
+            else
+            {
+                await route.ContinueAsync();
+            }
+        });
+
+        // First POST — intercepted as 400 — error handler fires
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        await Expect(Page.Locator("#save-error")).ToHaveTextAsync(
+            "Validation failed: Name is required", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-red-600"));
+
+        // Second POST — passes through to real server — success handler fires
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync(
+            "John Doe", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+        // Success handler removes error class — proves error state is replaced
+        await Expect(Page.Locator("#save-result")).Not.ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-red-600"));
+
+        await Page.UnrouteAsync("**/Sandbox/Http/Save");
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    [Test]
+    public async Task while_loading_spinner_hides_after_both_success_and_error()
+    {
+        await WaitForDomReadyGet();
+
+        // POST valid data via Save — spinner shows during request, hides after success
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync(
+            "John Doe", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#save-spinner")).ToBeHiddenAsync();
+
+        // POST invalid data via Validate — spinner shows during request, hides after 422
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate (will fail)" }).ClickAsync();
+        await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
+            "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#multi-err-spinner")).ToBeHiddenAsync();
+
+        AssertNoConsoleErrorsExcept("422");
+    }
+
+    [Test]
+    public async Task chained_request_second_hop_only_fires_after_first_completes()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Chain" }).ClickAsync();
+
+        // First hop: wait for residents to arrive — proves first request completed
+        await Expect(Page.Locator("#chain-resident-first")).ToHaveTextAsync(
+            "John Doe", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#chain-resident-second")).ToHaveTextAsync("Jane Smith");
+        await Expect(Page.Locator("#chain-residents")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+
+        // Second hop: facilities only fire after residents complete
+        await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync(
+            "Main Campus", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#chain-facility-second")).ToHaveTextAsync("West Wing");
+        await Expect(Page.Locator("#chain-facilities")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+
+        // Both visible at end, spinner hidden — proves full chain completed
+        await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
+
+        AssertNoConsoleErrors();
+    }
+
     // ── Page-level checks ─────────────────────────────────────────────────
 
     [Test]
