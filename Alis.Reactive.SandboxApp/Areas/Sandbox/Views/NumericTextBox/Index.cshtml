@@ -24,8 +24,10 @@
         p.Element("value-echo").SetText(comp.Value());
     }));
 
-    // ── Section 4: Condition — When(comp.Value()).Gt(0) ──
-    // This is wired via the Changed event on the Temperature NumericTextBox
+    // ── Section 4: Conditions — both event-args and component-read ──
+    // Wired via the Changed event on the Temperature NumericTextBox:
+    //   When(args, x => x.Value).Gt(100m)  — event-args condition
+    //   When(comp.Value()).Gt(0m)           — component-read condition
 
     // ── Section 5: Gather — POST with Include ──
 
@@ -118,6 +120,21 @@
                     })
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
+                        // Event-args condition: When(args, x => x.Value).Gt(100m)
+                        p.When(args, x => x.Value).Gt(100m)
+                            .Then(then =>
+                            {
+                                then.Element("high-temp-warning").Show();
+                                then.Element("high-temp-warning").SetText("high");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("high-temp-warning").Hide();
+                            });
+                    })
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        // Component-read condition: When(comp.Value()).Gt(0m)
                         var comp = p.Component<FusionNumericTextBox>(m => m.Temperature);
                         p.When(comp.Value()).Gt(0m)
                             .Then(then =>
@@ -144,16 +161,18 @@
             <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
             <p>Focus state: <span id="focus-state" class="text-text-muted">&mdash;</span></p>
             <p>Positive: <span id="positive-indicator" hidden class="text-emerald-600">&mdash;</span></p>
+            <p>High temp: <span id="high-temp-warning" hidden class="text-rose-600">&mdash;</span></p>
         </div>
     </section>
 
     <!-- Section 5: Condition — Positive Indicator -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">5. Condition (Value > 0)</h2>
+        <h2 class="text-base font-semibold mb-4">5. Conditions (Both Patterns)</h2>
         <p class="text-sm text-text-secondary mb-4">
-            The positive indicator in Section 4 uses <code>p.When(comp.Value()).Gt(0m)</code>.
-            Enter a positive number in Temperature and tab out to see it appear.
-            Enter 0 or negative to hide it.
+            Section 4 exercises both typed condition patterns:
+            <code>When(args, x =&gt; x.Value).Gt(100m)</code> (event-args) shows a high-temp warning,
+            <code>When(comp.Value()).Gt(0m)</code> (component-read) shows a positive indicator.
+            Enter a value &gt; 100 to see both; enter 1–100 to see only the positive indicator.
         </p>
     </section>
 

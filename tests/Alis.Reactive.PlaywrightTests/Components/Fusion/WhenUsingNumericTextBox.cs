@@ -30,7 +30,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task PageLoadsWithNoErrors()
+    public async Task Page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("NumericTextBox — Alis.Reactive Sandbox");
@@ -38,7 +38,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PlanJsonIsRendered()
+    public async Task Plan_json_is_rendered()
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -52,7 +52,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 1: Property Write ──
 
     [Test]
-    public async Task DomReadySetsInitialValue()
+    public async Task DomReady_sets_initial_value()
     {
         await NavigateAndBoot();
         // SF NumericTextBox wrapper gets the IdGenerator-based ID
@@ -71,7 +71,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 2: Property Read ──
 
     [Test]
-    public async Task DomReadyReadsValueIntoEcho()
+    public async Task DomReady_reads_value_into_echo()
     {
         await NavigateAndBoot();
         // The value-echo should show "42" after dom-ready reads comp.Value()
@@ -86,7 +86,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 3: Method Calls (Increment/Decrement) ──
 
     [Test]
-    public async Task IncrementButtonIncreasesQuantity()
+    public async Task Increment_button_increases_quantity()
     {
         await NavigateAndBoot();
 
@@ -100,7 +100,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DecrementButtonDecreasesQuantity()
+    public async Task Decrement_button_decreases_quantity()
     {
         await NavigateAndBoot();
 
@@ -118,7 +118,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 4: Events ──
 
     [Test]
-    public async Task ChangeEventDisplaysNewValue()
+    public async Task Change_event_displays_new_value()
     {
         await NavigateAndBoot();
 
@@ -140,7 +140,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FocusEventShowsFocusState()
+    public async Task Focus_event_shows_focus_state()
     {
         await NavigateAndBoot();
 
@@ -154,7 +154,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task BlurEventShowsBlurState()
+    public async Task Blur_event_shows_blur_state()
     {
         await NavigateAndBoot();
 
@@ -170,10 +170,55 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 5: Condition (Positive Indicator) ──
+    // ── Section 5: Conditions ──
 
     [Test]
-    public async Task PositiveConditionShowsIndicatorWhenValueAboveZero()
+    public async Task Event_args_condition_shows_high_temp_warning_above_100()
+    {
+        await NavigateAndBoot();
+
+        // High-temp warning starts hidden
+        await Expect(Page.Locator("#high-temp-warning")).ToBeHiddenAsync();
+
+        // Type a value > 100 in Temperature
+        var tempInput = Page.Locator($"#{TemperatureId}");
+        await tempInput.ClickAsync();
+        await tempInput.FillAsync("120");
+        await tempInput.PressAsync("Tab");
+
+        // Warning should appear with text "high"
+        await Expect(Page.Locator("#high-temp-warning"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#high-temp-warning"))
+            .ToHaveTextAsync("high", new() { Timeout = 3000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task Event_args_condition_hides_high_temp_warning_at_100_or_below()
+    {
+        await NavigateAndBoot();
+
+        // First make warning visible
+        var tempInput = Page.Locator($"#{TemperatureId}");
+        await tempInput.ClickAsync();
+        await tempInput.FillAsync("120");
+        await tempInput.PressAsync("Tab");
+        await Expect(Page.Locator("#high-temp-warning"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Now set to 100 (not > 100)
+        await tempInput.ClickAsync();
+        await tempInput.FillAsync("100");
+        await tempInput.PressAsync("Tab");
+
+        await Expect(Page.Locator("#high-temp-warning"))
+            .ToBeHiddenAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task Component_read_condition_shows_positive_indicator_above_zero()
     {
         await NavigateAndBoot();
 
@@ -195,7 +240,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PositiveConditionHidesIndicatorWhenValueZeroOrNegative()
+    public async Task Component_read_condition_hides_positive_indicator_at_zero_or_negative()
     {
         await NavigateAndBoot();
 
@@ -220,7 +265,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 6: Gather ──
 
     [Test]
-    public async Task GatherButtonPostsComponentValue()
+    public async Task Gather_button_posts_component_value()
     {
         await NavigateAndBoot();
 
