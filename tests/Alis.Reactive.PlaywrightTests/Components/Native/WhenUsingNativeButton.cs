@@ -66,4 +66,54 @@ public class WhenUsingNativeButton : PlaywrightTestBase
         await Expect(status).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
+
+    // ── Multi-click stability ──
+
+    [Test]
+    public async Task clicking_multiple_buttons_in_sequence_updates_each_status()
+    {
+        await NavigateAndBoot();
+
+        // Click Admit → verify status updates
+        await Page.Locator("#btn-admit").ClickAsync();
+        var admitStatus = Page.Locator("#admit-status");
+        await Expect(admitStatus).ToHaveTextAsync("Admit Resident clicked", new() { Timeout = 3000 });
+
+        // Click Transfer → verify transfer chain fires
+        await Page.Locator("#btn-transfer").ClickAsync();
+        var transferStatus = Page.Locator("#transfer-status");
+        await Expect(transferStatus).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
+
+        // Click Admit again → verify status still updates (handlers not disconnected)
+        // First reset the text to confirm it actually changes on re-click
+        await admitStatus.EvaluateAsync("el => el.textContent = 'reset'");
+        await Page.Locator("#btn-admit").ClickAsync();
+        await Expect(admitStatus).ToHaveTextAsync("Admit Resident clicked", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Dispatch chain: button Click → Dispatch() → CustomEvent listener → DOM mutation ──
+
+    [Test]
+    public async Task dispatch_chain_from_button_reaches_custom_event_listener()
+    {
+        await NavigateAndBoot();
+
+        // Before click: transfer-status shows the initial dash
+        var transferStatus = Page.Locator("#transfer-status");
+        await Expect(transferStatus).Not.ToHaveTextAsync("transfer confirmed");
+
+        // Click Transfer button → dispatches "resident-transferred" →
+        // CustomEvent listener picks it up → sets text + swaps classes
+        await Page.Locator("#btn-transfer").ClickAsync();
+
+        // Verify text mutation from the custom-event listener
+        await Expect(transferStatus).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
+
+        // Verify class mutations from the custom-event listener
+        await Expect(transferStatus).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
+
+        AssertNoConsoleErrors();
+    }
 }
