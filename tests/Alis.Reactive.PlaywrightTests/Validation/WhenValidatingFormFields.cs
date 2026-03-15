@@ -461,7 +461,101 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Journey 14: Multiple rule types in single validation ───────────────
+    // ── Journey 14: Re-submission clears previous errors before showing new ─
+
+    [Test]
+    public async Task submitting_same_form_twice_clears_previous_errors_before_showing_new()
+    {
+        // Proves validation doesn't accumulate errors across submissions
+        await NavigateTo(Path);
+
+        // First submit — all errors appear
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+        var nameError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Name']");
+        var emailError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Email']");
+        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Fill name only, resubmit — name error should clear, email error still shows
+        await Page.FillAsync($"#{S}AllRules_Name", "Test User");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+        await Expect(nameError).ToBeHiddenAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Result should still be blocked — client validation prevented POST
+        var result = Page.Locator("#all-rules-result");
+        await Expect(result).ToContainTextAsync("Click to validate");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 15: Valid data clears all errors and shows success ───────────
+
+    [Test]
+    public async Task valid_data_clears_all_previous_errors_and_shows_success()
+    {
+        // Proves the full cycle: errors → fix all → all errors gone → success
+        await NavigateTo(Path);
+
+        // Submit empty → errors appear
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+        var nameError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Name']");
+        var emailError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Email']");
+        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Fill all required fields with valid data
+        await Page.FillAsync($"#{S}AllRules_Name", "Jane Doe");
+        await Page.FillAsync($"#{S}AllRules_Email", "jane@example.com");
+        await Page.FillAsync($"#{S}AllRules_Age", "30");
+        await Page.FillAsync($"#{S}AllRules_Phone", "123-456-7890");
+        await Page.FillAsync($"#{S}AllRules_Salary", "75000");
+        await Page.FillAsync($"#{S}AllRules_Password", "securepassword123");
+
+        // Resubmit — all errors should be gone
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+        await Expect(nameError).ToBeHiddenAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToBeHiddenAsync(new() { Timeout = 3000 });
+
+        // Success message shows
+        var result = Page.Locator("#all-rules-result");
+        await Expect(result).ToContainTextAsync("passed", new() { Timeout = 5000 });
+        await Expect(result).ToHaveClassAsync(new Regex("text-green-600"));
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 16: Conditional toggle back-and-forth maintains state ────────
+
+    [Test]
+    public async Task conditional_checkbox_toggle_back_and_forth_maintains_validation_state()
+    {
+        // Proves conditional rules re-evaluate correctly on every toggle
+        await NavigateTo(Path);
+
+        var jobError = Page.Locator("#conditional-form [data-valmsg-for='Conditional.JobTitle']");
+        var result = Page.Locator("#conditional-result");
+
+        // Check "Is Employed" → submit → JobTitle required
+        await Page.CheckAsync($"#{S}Conditional_IsEmployed");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
+        await Expect(jobError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Uncheck → submit → should pass (no JobTitle required)
+        await Page.UncheckAsync($"#{S}Conditional_IsEmployed");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
+        await Expect(result).ToContainTextAsync("passed", new() { Timeout = 3000 });
+        await Expect(jobError).ToBeHiddenAsync();
+
+        // Re-check → submit → should fail again
+        await Page.CheckAsync($"#{S}Conditional_IsEmployed");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
+        await Expect(jobError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 17: Multiple rule types in single validation ───────────────
 
     [Test]
     public async Task multiple_rule_types_fire_simultaneously_on_invalid_data()
