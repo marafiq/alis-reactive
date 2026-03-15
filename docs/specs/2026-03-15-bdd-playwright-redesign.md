@@ -362,12 +362,17 @@ Violation of this shape is a build-breaking defect. Treat it like a compilation 
 
 ## Constraints
 
-- **Never change the DSL shape** — public API stays identical
+- **Never change the DSL shape** — C# DSL public API stays identical. Never change it.
+- **Never change TS runtime shape** — TypeScript runtime stays identical. Never write manual JS. Ever.
+- **Never change descriptor or plan shape** — descriptors, JSON plan structure, and schema stay identical. Do not modify them manually or by cheating to pass tests. If a test fails, fix the component code — not the plan shape.
 - **Never violate vertical slice shape** — every component follows the exact file pattern above
 - **No usage without Html.Field()** — every input component in every view MUST be wrapped in `Html.Field()`. No bare `Html.XxxFor()` calls. `Html.Field()` provides label, `for` attribute, and validation error slot. This is not optional.
+- **Tests must understand the framework** — Playwright tests use framework-aware selectors. Use `p.Component<T>(expr)` for input components, `p.Element("id")` ONLY for non-input display elements (spans, divs, status text). Never use `p.Element()` to target an input component.
+- **Tests run in parallel at vertical slice level** — `[Parallelizable(ParallelScope.All)]` at assembly level. Each test class is independent. Each hits its own route. Zero shared state.
 - **Duplication over abstraction** — each slice is self-contained, no shared base
 - **No mocks** — real browser, real server, real components
-- **No raw HTML** — every `<input>`, `<select>`, `<button>` uses framework builders
+- **No raw HTML** — every `<input>`, `<select>`, `<button>` uses framework builders. No inline `<script>`. No `onclick`. No `document.addEventListener`. No `window.alis`.
+- **No manual JS** — zero inline JavaScript in views. All behavior flows through the plan. `auto-boot.ts` handles discovery. If a button needs to dispatch an event, use `NativeButton` + `.Reactive()` + `p.Dispatch()`.
 - **Schema tests stay** — C# unit tests with JSON schema validation unchanged
 - **One component at a time** — NativeDatePicker first, FusionDatePicker later
 - **Verify Syncfusion API docs** — for dropdown-type components, verify DataSource/DataBind against actual SF EJ2 API docs before onboarding
