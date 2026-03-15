@@ -3,176 +3,406 @@ namespace Alis.Reactive.PlaywrightTests.Requests;
 [TestFixture]
 public class WhenServerDataLoads : PlaywrightTestBase
 {
-    [Test]
-    public async Task page_shows_residents_after_load()
+    private async Task WaitForDomReadyGet()
     {
         await NavigateTo("/Sandbox/Http");
+        // DomReady GET fires automatically — wait for response data to arrive
+        await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 5000 });
+    }
 
-        // DomReady fires GET /Sandbox/Http/Residents → result text updates
-        var result = Page.Locator("#load-result");
-        await Expect(result).ToContainTextAsync("Loaded 2 residents", new() { Timeout = 5000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
+    // ── Section 1: DomReady GET — exact resident data round-trip ──────────
 
+    [Test]
+    public async Task domready_get_loads_first_resident_name()
+    {
+        await WaitForDomReadyGet();
+
+        await Expect(Page.Locator("#load-first")).ToHaveTextAsync("John Doe");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task success_message_appears_after_save()
+    public async Task domready_get_loads_second_resident_name()
     {
-        await NavigateTo("/Sandbox/Http");
+        await WaitForDomReadyGet();
 
-        // Wait for DomReady to finish
-        await Expect(Page.Locator("#load-result")).ToContainTextAsync("Loaded", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#load-second")).ToHaveTextAsync("Jane Smith");
+        AssertNoConsoleErrors();
+    }
 
-        // Click save button → POST with name "John Doe" → success
+    [Test]
+    public async Task domready_get_loads_resident_count()
+    {
+        await WaitForDomReadyGet();
+
+        await Expect(Page.Locator("#load-count")).ToHaveTextAsync("2");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task domready_get_applies_success_class()
+    {
+        await WaitForDomReadyGet();
+
+        await Expect(Page.Locator("#load-result")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task domready_get_hides_spinner_after_response()
+    {
+        await WaitForDomReadyGet();
+
+        await Expect(Page.Locator("#load-spinner")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 2: POST with gather — server echoes received name ─────────
+
+    [Test]
+    public async Task post_with_gather_echoes_received_name()
+    {
+        await WaitForDomReadyGet();
+
         await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
 
-        var result = Page.Locator("#save-result");
-        await Expect(result).ToContainTextAsync("Save succeeded", new() { Timeout = 5000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
-
+        // Server receives {name:"John Doe"} and echoes it back as receivedName
+        await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task both_data_sets_appear_after_chained_load()
+    public async Task post_with_gather_shows_server_message()
     {
-        await NavigateTo("/Sandbox/Http");
+        await WaitForDomReadyGet();
 
-        // Wait for DomReady to finish
-        await Expect(Page.Locator("#load-result")).ToContainTextAsync("Loaded", new() { Timeout = 5000 });
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
 
-        // Click chain button → GET Residents → Chained GET Facilities
+        // Server returns message:"Saved: John Doe" — verifies full round-trip
+        await Expect(Page.Locator("#save-message")).ToHaveTextAsync("Saved: John Doe", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task post_with_gather_applies_success_class()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+
+        await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 3: Chained requests — residents THEN facilities ───────────
+
+    [Test]
+    public async Task chained_get_loads_resident_names_first()
+    {
+        await WaitForDomReadyGet();
+
         await Page.GetByRole(AriaRole.Button, new() { Name = "Load Chain" }).ClickAsync();
 
-        await Expect(Page.Locator("#chain-residents")).ToContainTextAsync("Residents loaded", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#chain-facilities")).ToContainTextAsync("Facilities loaded", new() { Timeout = 5000 });
-
+        // First request: residents
+        await Expect(Page.Locator("#chain-resident-first")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#chain-resident-second")).ToHaveTextAsync("Jane Smith", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task all_data_appears_after_parallel_load()
+    public async Task chained_get_loads_facility_names_after_residents()
     {
-        await NavigateTo("/Sandbox/Http");
+        await WaitForDomReadyGet();
 
-        // Wait for DomReady to finish
-        await Expect(Page.Locator("#load-result")).ToContainTextAsync("Loaded", new() { Timeout = 5000 });
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Chain" }).ClickAsync();
 
-        // Click parallel button → both fire concurrently
+        // Second request: facilities (only fires after first completes)
+        await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#chain-facility-second")).ToHaveTextAsync("West Wing", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task chained_get_hides_spinner_only_after_second_request()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Chain" }).ClickAsync();
+
+        // Spinner hides in the chained (second) response handler
+        await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 4: Parallel requests — both datasets load concurrently ────
+
+    [Test]
+    public async Task parallel_get_loads_resident_names()
+    {
+        await WaitForDomReadyGet();
+
         await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
 
-        await Expect(Page.Locator("#parallel-residents")).ToContainTextAsync("Residents loaded", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#parallel-facilities")).ToContainTextAsync("Facilities loaded", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#parallel-all")).ToContainTextAsync("All parallel requests completed", new() { Timeout = 5000 });
-
+        await Expect(Page.Locator("#parallel-resident-first")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#parallel-resident-second")).ToHaveTextAsync("Jane Smith", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task http_page_renders_with_correct_title()
+    public async Task parallel_get_loads_facility_names()
     {
-        await NavigateTo("/Sandbox/Http");
-        await Expect(Page).ToHaveTitleAsync("HTTP Requests — Alis.Reactive Sandbox");
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
+
+        await Expect(Page.Locator("#parallel-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#parallel-facility-second")).ToHaveTextAsync("West Wing", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task put_update_shows_result()
+    public async Task parallel_get_fires_all_settled_after_both_complete()
     {
-        await NavigateTo("/Sandbox/Http");
+        await WaitForDomReadyGet();
 
-        // Wait for DomReady to finish
-        await Expect(Page.Locator("#load-result")).ToContainTextAsync("Loaded", new() { Timeout = 5000 });
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
 
-        // Click PUT button → sends PUT with JSON body → success
+        await Expect(Page.Locator("#parallel-all")).ToHaveTextAsync(
+            "All parallel requests completed!", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#parallel-all")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task parallel_get_hides_spinner_after_all_settled()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
+
+        await Expect(Page.Locator("#parallel-all")).ToHaveTextAsync(
+            "All parallel requests completed!", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#parallel-spinner")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 5: PUT — server echoes updated payload ────────────────────
+
+    [Test]
+    public async Task put_sends_updated_name_and_server_echoes_it()
+    {
+        await WaitForDomReadyGet();
+
         await Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }).ClickAsync();
 
-        var result = Page.Locator("#put-result");
-        await Expect(result).ToContainTextAsync("PUT succeeded", new() { Timeout = 5000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
-
+        // Server receives {name:"Updated Name",facilityId:"1"} and echoes receivedName
+        await Expect(Page.Locator("#put-received-name")).ToHaveTextAsync("Updated Name", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task delete_with_confirm_shows_result()
+    public async Task put_sends_facility_id_and_server_echoes_it()
     {
-        await NavigateTo("/Sandbox/Http");
+        await WaitForDomReadyGet();
 
-        // Wait for DomReady to finish
-        await Expect(Page.Locator("#load-result")).ToContainTextAsync("Loaded", new() { Timeout = 5000 });
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }).ClickAsync();
 
-        // Click DELETE button → confirm dialog appears
+        // Server receives facilityId:"1" and echoes it as receivedFacilityId
+        await Expect(Page.Locator("#put-received-facility")).ToHaveTextAsync("1", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task put_applies_success_class()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }).ClickAsync();
+
+        await Expect(Page.Locator("#put-received-name")).ToHaveTextAsync("Updated Name", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#put-result")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 6: DELETE with confirm — server echoes deleted ID ─────────
+
+    [Test]
+    public async Task delete_with_confirm_sends_correct_id()
+    {
+        await WaitForDomReadyGet();
+
         await Page.GetByRole(AriaRole.Button, new() { Name = "Delete Resident #42" }).ClickAsync();
 
-        // Wait for confirm dialog and click OK
         var okButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "OK" });
         await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 3000 });
         await okButton.ClickAsync();
 
-        // Verify DELETE result
-        var result = Page.Locator("#delete-result");
-        await Expect(result).ToContainTextAsync("DELETE succeeded", new() { Timeout = 5000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
-
+        // Server receives DELETE /DeleteResident/42 and echoes deletedId:42
+        await Expect(Page.Locator("#delete-id")).ToHaveTextAsync("42", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task form_data_post_shows_received_fields()
+    public async Task delete_with_confirm_applies_success_class()
     {
-        await NavigateTo("/Sandbox/Http");
+        await WaitForDomReadyGet();
 
-        // Wait for DomReady to finish
-        await Expect(Page.Locator("#load-result")).ToContainTextAsync("Loaded", new() { Timeout = 5000 });
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete Resident #42" }).ClickAsync();
 
-        // Click Submit Form button → POST FormData with IncludeAll → success
+        var okButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "OK" });
+        await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await okButton.ClickAsync();
+
+        await Expect(Page.Locator("#delete-id")).ToHaveTextAsync("42", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#delete-result")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task delete_with_confirm_hides_spinner_after_response()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete Resident #42" }).ClickAsync();
+
+        var okButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "OK" });
+        await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await okButton.ClickAsync();
+
+        await Expect(Page.Locator("#delete-id")).ToHaveTextAsync("42", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#delete-spinner")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 7: FormData POST — server echoes received field names ─────
+
+    [Test]
+    public async Task form_data_post_sends_three_fields()
+    {
+        await WaitForDomReadyGet();
+
         await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Form" }).ClickAsync();
 
-        var result = Page.Locator("#formdata-result");
-        await Expect(result).ToContainTextAsync("FormData sent", new() { Timeout = 5000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
-
+        // Server counts received fields: FirstName, LastName, Email = 3
+        await Expect(Page.Locator("#formdata-count")).ToHaveTextAsync("3", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task search_shows_results()
+    public async Task form_data_post_preserves_field_names()
     {
-        await NavigateTo("/Sandbox/Http");
+        await WaitForDomReadyGet();
 
-        // Wait for DomReady to finish
-        await Expect(Page.Locator("#load-result")).ToContainTextAsync("Loaded", new() { Timeout = 5000 });
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Form" }).ClickAsync();
 
-        // Click search button → GET with ?q=John → success
+        // Server echoes the exact field names it received — verifies model binding names
+        await Expect(Page.Locator("#formdata-fields")).ToHaveTextAsync(
+            "FirstName, LastName, Email", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task form_data_post_applies_success_class()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Form" }).ClickAsync();
+
+        await Expect(Page.Locator("#formdata-count")).ToHaveTextAsync("3", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#formdata-result")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 8: Search — server echoes query and match count ───────────
+
+    [Test]
+    public async Task search_query_param_arrives_at_server()
+    {
+        await WaitForDomReadyGet();
+
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search for 'John'" }).ClickAsync();
 
-        var result = Page.Locator("#search-result");
-        await Expect(result).ToContainTextAsync("Search results loaded", new() { Timeout = 5000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
-
+        // Server receives ?q=John and echoes it back as query
+        await Expect(Page.Locator("#search-query")).ToHaveTextAsync("John", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task validation_error_routes_to_422_handler()
+    public async Task search_returns_correct_match_count()
     {
-        await NavigateTo("/Sandbox/Http");
+        await WaitForDomReadyGet();
 
-        // Wait for DomReady to finish
-        await Expect(Page.Locator("#load-result")).ToContainTextAsync("Loaded", new() { Timeout = 5000 });
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Search for 'John'" }).ClickAsync();
 
-        // Click validate button → POST empty data → 422 validation errors
+        // "John" matches "John Doe" and "Bob Johnson" = 2 results
+        await Expect(Page.Locator("#search-match-count")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task search_applies_success_class()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Search for 'John'" }).ClickAsync();
+
+        await Expect(Page.Locator("#search-query")).ToHaveTextAsync("John", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#search-result")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-green-600"));
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 9: 422 error routing — correct handler fires ──────────────
+
+    [Test]
+    public async Task error_422_routes_to_correct_handler()
+    {
+        await WaitForDomReadyGet();
+
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate (will fail)" }).ClickAsync();
 
-        var result = Page.Locator("#multi-err-result");
-        await Expect(result).ToContainTextAsync("422", new() { Timeout = 5000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
-
-        // 422 is expected — browser logs it as a network error
+        // 422 handler sets specific text — verifies status-code routing works
+        await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
+            "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
         AssertNoConsoleErrorsExcept("422");
     }
+
+    [Test]
+    public async Task error_422_applies_warning_class()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate (will fail)" }).ClickAsync();
+
+        await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
+            "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#multi-err-result")).ToHaveClassAsync(
+            new System.Text.RegularExpressions.Regex("text-amber-600"));
+        AssertNoConsoleErrorsExcept("422");
+    }
+
+    [Test]
+    public async Task error_422_hides_spinner()
+    {
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate (will fail)" }).ClickAsync();
+
+        await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
+            "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#multi-err-spinner")).ToBeHiddenAsync();
+        AssertNoConsoleErrorsExcept("422");
+    }
+
+    // ── Section 10: NativeActionLink — row actions ────────────────────────
 
     [Test]
     public async Task native_action_link_delete_with_confirm_does_not_delete_when_cancelled()
@@ -220,6 +450,8 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // ── Section 11: Standalone NativeActionLink ───────────────────────────
+
     [Test]
     public async Task standalone_native_action_link_loads_its_own_success_target()
     {
@@ -232,6 +464,16 @@ public class WhenServerDataLoads : PlaywrightTestBase
         await Expect(Page.Locator("#standalone-native-action-link-result"))
             .ToContainTextAsync("Standalone NativeActionLink response loaded.", new() { Timeout = 5000 });
 
+        AssertNoConsoleErrors();
+    }
+
+    // ── Page-level checks ─────────────────────────────────────────────────
+
+    [Test]
+    public async Task http_page_renders_with_correct_title()
+    {
+        await NavigateTo("/Sandbox/Http");
+        await Expect(Page).ToHaveTitleAsync("HTTP Requests — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
     }
 }
