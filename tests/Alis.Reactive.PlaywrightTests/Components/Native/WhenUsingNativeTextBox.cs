@@ -121,4 +121,56 @@ public class WhenUsingNativeTextBox : PlaywrightTestBase
         await Expect(warning).ToHaveTextAsync("name set", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
+
+    // ── Deep BDD: reactive re-evaluation cycles ──
+
+    [Test]
+    public async Task typing_then_clearing_then_retyping_fires_condition_each_time()
+    {
+        await NavigateAndBoot();
+
+        var input = Page.Locator($"#{Scope}EmergencyContact");
+        var status = Page.Locator("#contact-status");
+
+        // Cycle 1: type a contact → "contact provided"
+        await input.FillAsync("Alice Johnson");
+        await input.BlurAsync();
+        await Expect(status).ToHaveTextAsync("contact provided", new() { Timeout = 3000 });
+
+        // Cycle 2: clear → "contact required"
+        await input.ClearAsync();
+        await input.BlurAsync();
+        await Expect(status).ToHaveTextAsync("contact required", new() { Timeout = 3000 });
+
+        // Cycle 3: retype → "contact provided" again
+        await input.FillAsync("Bob Martinez");
+        await input.BlurAsync();
+        await Expect(status).ToHaveTextAsync("contact provided", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task overwriting_domready_value_updates_component_read()
+    {
+        await NavigateAndBoot();
+
+        // DomReady set "Jane Doe" — verify echo shows it
+        var echo = Page.Locator("#value-echo");
+        await Expect(echo).ToHaveTextAsync("Jane Doe", new() { Timeout = 3000 });
+
+        // User overwrites with "John Smith"
+        var input = Page.Locator($"#{Scope}ResidentName");
+        await input.ClearAsync();
+        await input.FillAsync("John Smith");
+
+        // Click check button — component-read condition evaluates CURRENT DOM value
+        await Page.Locator("#check-name-btn").ClickAsync();
+
+        // Component reads "John Smith" (non-empty) → "name set"
+        var warning = Page.Locator("#name-warning");
+        await Expect(warning).ToHaveTextAsync("name set", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
 }
