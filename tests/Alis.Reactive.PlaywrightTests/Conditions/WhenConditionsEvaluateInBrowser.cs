@@ -520,4 +520,149 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Edge cases: branch exclusivity, null safety, composition semantics ──
+
+    [Test]
+    public async Task elseif_chain_only_executes_first_matching_branch()
+    {
+        // Score 95 satisfies BOTH Gte(90) AND Gte(80) — only the first matching branch should fire
+        await NavigateAndBoot();
+        var grade = Page.Locator("#grade");
+
+        // 95 matches Gte(90) first → must be "A", never "B"
+        await Page.Locator("#btn-score-95").ClickAsync();
+        await Expect(grade).ToHaveTextAsync("A");
+
+        // 85 does NOT match Gte(90), but DOES match Gte(80) → must be "B"
+        await Page.Locator("#btn-score-85").ClickAsync();
+        await Expect(grade).ToHaveTextAsync("B");
+
+        // 40 matches neither Gte(90) nor Gte(80) → falls through to Else → "F"
+        await Page.Locator("#btn-score-40").ClickAsync();
+        await Expect(grade).ToHaveTextAsync("F");
+
+        // Click 95 again to confirm branch exclusivity is stable across re-evaluations
+        await Page.Locator("#btn-score-95").ClickAsync();
+        await Expect(grade).ToHaveTextAsync("A");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task null_nested_object_does_not_crash_and_evaluates_to_null()
+    {
+        // Dispatch with address:null → When(address).IsNull() should be true
+        // Then dispatch with address:{city:"NYC"} → IsNull() should be false
+        // Proves null-safe dot-path walking doesn't throw
+        await NavigateAndBoot();
+        var result = Page.Locator("#nested-null-result");
+
+        // address explicitly null → IsNull() = true → "No Address"
+        await Page.Locator("#btn-nested-null").ClickAsync();
+        await Expect(result).ToHaveTextAsync("No Address");
+
+        // address present with city → IsNull() = false → "Has Address"
+        await Page.Locator("#btn-nested-present").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Has Address");
+
+        // Transition back to null — confirms re-evaluation works after non-null
+        await Page.Locator("#btn-nested-null").ClickAsync();
+        await Expect(result).ToHaveTextAsync("No Address");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task missing_key_in_payload_evaluates_as_null()
+    {
+        // Dispatch with {id:3} (no address key at all) → When(address).IsNull() should be true
+        // Proves walk.ts returns undefined for missing keys, and IsNull treats undefined as null
+        await NavigateAndBoot();
+        var result = Page.Locator("#nested-null-result");
+
+        // Missing key → walk returns undefined → IsNull treats as null → "No Address"
+        await Page.Locator("#btn-nested-missing").ClickAsync();
+        await Expect(result).ToHaveTextAsync("No Address");
+
+        // Contrast with present address → "Has Address"
+        await Page.Locator("#btn-nested-present").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Has Address");
+
+        // Missing key again to confirm idempotent
+        await Page.Locator("#btn-nested-missing").ClickAsync();
+        await Expect(result).ToHaveTextAsync("No Address");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task and_composition_short_circuits_on_first_false()
+    {
+        // Score 95 + status "inactive" → When(score).Gte(90).And(status).Eq("active") → false
+        // Score 95 + status "active" → true
+        // Proves AND evaluates both sides correctly
+        await NavigateAndBoot();
+        var result = Page.Locator("#and-result");
+
+        // First true, second false → compound is false → "Nope"
+        await Page.Locator("#btn-and-fail").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Nope");
+
+        // Both true → compound is true → "Active High Scorer"
+        await Page.Locator("#btn-and-pass").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Active High Scorer");
+
+        // Back to fail — confirms re-evaluation after success
+        await Page.Locator("#btn-and-fail").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Nope");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task or_composition_succeeds_on_second_match()
+    {
+        // role "superuser" → When(role).Eq("admin").Or(role).Eq("superuser") → true
+        // Proves OR evaluates second operand when first is false
+        await NavigateAndBoot();
+        var result = Page.Locator("#or-result");
+
+        // First operand false, second true → OR succeeds → "Authorized"
+        await Page.Locator("#btn-or-super").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Authorized");
+
+        // Neither matches → OR fails → "Denied"
+        await Page.Locator("#btn-or-viewer").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Denied");
+
+        // First operand true → OR succeeds without needing second → "Authorized"
+        await Page.Locator("#btn-or-admin").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Authorized");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task not_inverts_truthy_to_falsy_and_vice_versa()
+    {
+        // role "user" → When(role).Eq("admin").Not() → true (not admin)
+        // role "admin" → When(role).Eq("admin").Not() → false (is admin, NOT inverted)
+        await NavigateAndBoot();
+        var result = Page.Locator("#not-result");
+
+        // Eq("admin") is false, Not() inverts to true → Then branch → "Not admin"
+        await Page.Locator("#btn-not-user").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Not admin");
+
+        // Eq("admin") is true, Not() inverts to false → Else branch → "Is admin"
+        await Page.Locator("#btn-not-admin").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Is admin");
+
+        // Back to non-admin to confirm inversion is stable
+        await Page.Locator("#btn-not-user").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Not admin");
+
+        AssertNoConsoleErrors();
+    }
 }
