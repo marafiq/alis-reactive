@@ -155,4 +155,102 @@ public class WhenExercisingComponentArchitecture : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Scenario 7: Native gather sends CURRENT value, not cached ──
+    // WHY: proves gather reads the live DOM value at click time, not a stale cached value.
+    // If gather cached the initial value at boot, this test would fail — the server would
+    // receive "native-42" instead of the user-typed value.
+
+    [Test]
+    public async Task modifying_native_input_then_gathering_sends_updated_value()
+    {
+        await NavigateAndBoot();
+
+        // Overwrite the pre-filled "native-42" with a fresh value
+        await Page.Locator("#native-gather").FillAsync("fresh-native-99");
+
+        // Click gather and intercept the POST to verify the request body
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#gather-native-btn").ClickAsync(),
+            "**/Sandbox/Architecture/Echo");
+
+        // The POST body must contain the CURRENT value, not the original "native-42"
+        var body = request.PostData ?? "";
+        Assert.That(body, Does.Contain("fresh-native-99"),
+            "Gather must send the current native input value, not the original pre-filled value");
+        Assert.That(body, Does.Not.Contain("native-42"),
+            "Gather must NOT send the stale pre-filled value");
+
+        // Confirm the round-trip completes — response handler fires
+        await Expect(Page.Locator("#gather-native-result"))
+            .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 8: Fusion gather sends CURRENT value, not cached ──
+    // WHY: same as Scenario 7 but for the fusion vendor. Proves ej2_instances[0].value
+    // is read live at gather time. The TestWidget updates its internal _value when
+    // the inner input fires "input" — gather must pick up that live state.
+
+    [Test]
+    public async Task modifying_fusion_widget_then_gathering_sends_updated_value()
+    {
+        await NavigateAndBoot();
+
+        // Overwrite the pre-filled "fusion-42" by typing in the TestWidget's inner input
+        await Page.Locator("#fusion-gather input").FillAsync("fresh-fusion-77");
+
+        // Click gather and intercept the POST to verify the request body
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#gather-fusion-btn").ClickAsync(),
+            "**/Sandbox/Architecture/Echo");
+
+        // The POST body must contain the CURRENT widget value, not the original "fusion-42"
+        var body = request.PostData ?? "";
+        Assert.That(body, Does.Contain("fresh-fusion-77"),
+            "Gather must send the current fusion widget value, not the original pre-filled value");
+        Assert.That(body, Does.Not.Contain("fusion-42"),
+            "Gather must NOT send the stale pre-filled value");
+
+        // Confirm the round-trip completes — response handler fires
+        await Expect(Page.Locator("#gather-fusion-result"))
+            .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 9: Cross-vendor EqualTo validation is live, not cached ──
+    // WHY: proves validation re-reads CURRENT component values on every click.
+    // If validation cached values at boot or first click, the second validate would
+    // still pass after changing the confirm field — a dangerous silent bug.
+
+    [Test]
+    public async Task validation_passes_after_filling_both_vendor_fields()
+    {
+        await NavigateAndBoot();
+
+        // Step 1: Fill both fields with MATCHING values → validation must pass
+        await Page.Locator("#native-password").FillAsync("MySecret123");
+        await Page.Locator("#fusion-confirm input").FillAsync("MySecret123");
+        await Page.Locator("#cross-validate-btn").ClickAsync();
+        await Expect(Page.Locator("#equalto-result"))
+            .ToContainTextAsync("Passwords match", new() { Timeout = 5000 });
+
+        // Step 2: Change the fusion confirm to a DIFFERENT value → validation must FAIL
+        // This proves validation reads the CURRENT fusion widget value, not a cached one
+        await Page.Locator("#fusion-confirm input").FillAsync("Mismatch!");
+        await Page.Locator("#cross-validate-btn").ClickAsync();
+        await Expect(Page.Locator("[data-valmsg-for='fusion-confirm']"))
+            .ToContainTextAsync("Must match", new() { Timeout = 5000 });
+
+        // Step 3: Fix the fusion confirm back to matching → validation must pass AGAIN
+        // This proves the validation cycle is fully live — pass/fail/pass works
+        await Page.Locator("#fusion-confirm input").FillAsync("MySecret123");
+        await Page.Locator("#cross-validate-btn").ClickAsync();
+        await Expect(Page.Locator("#equalto-result"))
+            .ToContainTextAsync("Passwords match", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }
