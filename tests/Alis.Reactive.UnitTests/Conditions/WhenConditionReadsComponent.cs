@@ -1,5 +1,4 @@
 using Alis.Reactive.Builders.Conditions;
-using static VerifyNUnit.Verifier;
 
 namespace Alis.Reactive.UnitTests;
 

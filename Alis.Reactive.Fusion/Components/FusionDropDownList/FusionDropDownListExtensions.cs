@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Mutations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
@@ -12,7 +11,7 @@ namespace Alis.Reactive.Fusion.Components
 {
     public static class FusionDropDownListExtensions
     {
-        private static readonly FusionDropDownList _component = new FusionDropDownList();
+        private static readonly FusionDropDownList Component = new FusionDropDownList();
 
         public static DropDownListBuilder DropDownListFor<TModel, TProp>(
             this IHtmlHelper<TModel> html,
@@ -20,14 +19,14 @@ namespace Alis.Reactive.Fusion.Components
             Expression<Func<TModel, TProp>> expression)
             where TModel : class
         {
-            var uniqueId = IdGenerator.For<TModel, TProp>(expression);
-            var name = html.NameFor(expression).ToString();
+            var uniqueId = IdGenerator.For(expression);
+            var name = html.NameFor(expression);
 
             plan.AddToComponentsMap(name, new ComponentRegistration(
                 uniqueId,
-                _component.Vendor,
+                Component.Vendor,
                 name,
-                _component.ReadExpr));
+                Component.ReadExpr));
 
             return html.EJS().DropDownListFor(expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = uniqueId, ["name"] = name });
@@ -66,6 +65,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
     }
 }

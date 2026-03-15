@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
-using Alis.Reactive;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -41,7 +40,7 @@ namespace Alis.Reactive.Native.Components
             _html = html;
             _expression = expression;
             _elementId = IdGenerator.For<TModel, TProp>(expression);
-            _bindingPath = html.NameFor(expression).ToString();
+            _bindingPath = html.NameFor(expression);
         }
 
         /// <summary>The resolved element ID — used by .Reactive() to wire events.</summary>
@@ -110,7 +109,7 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var uniqueId = IdGenerator.For<TModel, TProp>(expression);
-            var name = html.NameFor(expression).ToString();
+            var name = html.NameFor(expression);
 
             plan.AddToComponentsMap(name, new ComponentRegistration(
                 uniqueId,

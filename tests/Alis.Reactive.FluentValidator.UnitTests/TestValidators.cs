@@ -1,5 +1,4 @@
 using FluentValidation;
-using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator.UnitTests;
 

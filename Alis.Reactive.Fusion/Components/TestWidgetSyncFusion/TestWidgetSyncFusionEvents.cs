@@ -1,5 +1,3 @@
-using Alis.Reactive;
-
 namespace Alis.Reactive.Fusion.Components
 {
     public sealed class TestWidgetSyncFusionEvents

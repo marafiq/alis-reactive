@@ -1,6 +1,3 @@
-using System;
-using static VerifyNUnit.Verifier;
-
 namespace Alis.Reactive.UnitTests;
 
 public class ScorePayload

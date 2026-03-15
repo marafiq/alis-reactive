@@ -1,5 +1,4 @@
 using System.Text.Json;
-using static VerifyNUnit.Verifier;
 
 namespace Alis.Reactive.UnitTests;
 

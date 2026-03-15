@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Mutations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
@@ -13,7 +12,7 @@ namespace Alis.Reactive.Fusion.Components
 {
     public static class FusionNumericTextBoxExtensions
     {
-        private static readonly FusionNumericTextBox _component = new FusionNumericTextBox();
+        private static readonly FusionNumericTextBox Component = new FusionNumericTextBox();
 
         public static NumericTextBoxBuilder NumericTextBoxFor<TModel, TProp>(
             this IHtmlHelper<TModel> html,
@@ -22,13 +21,13 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var uniqueId = IdGenerator.For<TModel, TProp>(expression);
-            var name = html.NameFor(expression).ToString();
+            var name = html.NameFor(expression);
 
             plan.AddToComponentsMap(name, new ComponentRegistration(
                 uniqueId,
-                _component.Vendor,
+                Component.Vendor,
                 name,
-                _component.ReadExpr));
+                Component.ReadExpr));
 
             return html.EJS().NumericTextBoxFor(expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = uniqueId, ["name"] = name });
@@ -73,6 +72,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<decimal> Value<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => new TypedComponentSource<decimal>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            => new TypedComponentSource<decimal>(self.TargetId, Component.Vendor, Component.ReadExpr);
     }
 }

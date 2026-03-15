@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class HttpShowcaseModel

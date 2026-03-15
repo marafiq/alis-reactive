@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Reactions;
 using Alis.Reactive.Descriptors.Requests;
 

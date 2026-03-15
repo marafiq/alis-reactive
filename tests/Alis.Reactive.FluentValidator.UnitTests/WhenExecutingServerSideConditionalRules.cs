@@ -1,5 +1,3 @@
-using FluentValidation;
-
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]

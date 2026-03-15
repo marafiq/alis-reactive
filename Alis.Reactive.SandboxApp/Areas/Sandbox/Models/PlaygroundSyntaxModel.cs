@@ -1,5 +1,3 @@
-using System;
-
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>

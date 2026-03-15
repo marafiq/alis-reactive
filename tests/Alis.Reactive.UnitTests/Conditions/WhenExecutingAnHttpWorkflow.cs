@@ -1,5 +1,3 @@
-using static VerifyNUnit.Verifier;
-
 namespace Alis.Reactive.UnitTests;
 
 [TestFixture]
