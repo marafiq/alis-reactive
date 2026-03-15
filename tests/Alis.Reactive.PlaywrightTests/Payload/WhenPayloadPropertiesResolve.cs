@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Payload;
 public class WhenPayloadPropertiesResolve : PlaywrightTestBase
 {
     [Test]
-    public async Task IntProperty_renders_in_DOM()
+    public async Task Int_property_renders_in_dom()
     {
         await NavigateTo("/Sandbox/Payload");
         await WaitForTraceMessage("booted", 5000);
@@ -14,7 +14,7 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task LongProperty_renders_in_DOM()
+    public async Task Long_property_renders_in_dom()
     {
         await NavigateTo("/Sandbox/Payload");
         await WaitForTraceMessage("booted", 5000);
@@ -24,7 +24,7 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DoubleProperty_renders_in_DOM()
+    public async Task Double_property_renders_in_dom()
     {
         await NavigateTo("/Sandbox/Payload");
         await WaitForTraceMessage("booted", 5000);
@@ -34,7 +34,7 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task StringProperty_renders_in_DOM()
+    public async Task String_property_renders_in_dom()
     {
         await NavigateTo("/Sandbox/Payload");
         await WaitForTraceMessage("booted", 5000);
@@ -44,7 +44,7 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task BoolProperty_renders_in_DOM()
+    public async Task Bool_property_renders_in_dom()
     {
         await NavigateTo("/Sandbox/Payload");
         await WaitForTraceMessage("booted", 5000);
@@ -54,7 +54,7 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task NestedAddress_Street_renders_in_DOM()
+    public async Task Nested_address_street_renders_in_dom()
     {
         await NavigateTo("/Sandbox/Payload");
         await WaitForTraceMessage("booted", 5000);
@@ -64,7 +64,7 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task NestedAddress_City_renders_in_DOM()
+    public async Task Nested_address_city_renders_in_dom()
     {
         await NavigateTo("/Sandbox/Payload");
         await WaitForTraceMessage("booted", 5000);
@@ -74,7 +74,7 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task NestedAddress_Zip_renders_in_DOM()
+    public async Task Nested_address_zip_renders_in_dom()
     {
         await NavigateTo("/Sandbox/Payload");
         await WaitForTraceMessage("booted", 5000);
@@ -84,7 +84,7 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task StatusMessage_confirms_all_resolved()
+    public async Task Status_message_confirms_all_resolved()
     {
         await NavigateTo("/Sandbox/Payload");
         await WaitForTraceMessage("booted", 5000);
@@ -96,7 +96,7 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PlanJson_contains_source_bindings()
+    public async Task Plan_json_contains_source_bindings()
     {
         await NavigateTo("/Sandbox/Payload");
 

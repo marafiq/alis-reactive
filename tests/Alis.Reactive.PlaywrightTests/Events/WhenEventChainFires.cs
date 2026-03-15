@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Events;
 public class WhenEventChainFires : PlaywrightTestBase
 {
     [Test]
-    public async Task ThreeHopChainCompletesWithAllDispatchesInTrace()
+    public async Task Three_hop_chain_completes_with_all_dispatches_in_trace()
     {
         await NavigateTo("/Sandbox/Events");
         await WaitForTraceMessage("booted", 5000);
@@ -16,7 +16,7 @@ public class WhenEventChainFires : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DispatchesOccurInChronologicalOrder()
+    public async Task Dispatches_occur_in_chronological_order()
     {
         await NavigateTo("/Sandbox/Events");
         await WaitForTraceMessage("booted", 5000);
@@ -35,7 +35,7 @@ public class WhenEventChainFires : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FinalEventCarriesPayload()
+    public async Task Final_event_carries_payload()
     {
         await NavigateTo("/Sandbox/Events");
         await WaitForTraceMessage("booted", 5000);
@@ -48,7 +48,7 @@ public class WhenEventChainFires : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PlanDrivesChainStatusDomMutations()
+    public async Task Plan_drives_chain_status_dom_mutations()
     {
         await NavigateTo("/Sandbox/Events");
         await WaitForTraceMessage("booted", 5000);

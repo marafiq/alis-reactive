@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Events;
 public class WhenPageLoads : PlaywrightTestBase
 {
     [Test]
-    public async Task EventsPageRendersWithCorrectTitle()
+    public async Task Events_page_renders_with_correct_title()
     {
         await NavigateTo("/Sandbox/Events");
         await Expect(Page).ToHaveTitleAsync("Events & Dispatch — Alis.Reactive Sandbox");
@@ -12,7 +12,7 @@ public class WhenPageLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task EventsPageShowsAllContentSections()
+    public async Task Events_page_shows_all_content_sections()
     {
         await NavigateTo("/Sandbox/Events");
 
@@ -23,7 +23,7 @@ public class WhenPageLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PlanJsonSectionShowsValidPlan()
+    public async Task Plan_json_section_shows_valid_plan()
     {
         await NavigateTo("/Sandbox/Events");
 
@@ -37,7 +37,7 @@ public class WhenPageLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task HomePageRendersAndLinksToEvents()
+    public async Task Home_page_renders_and_links_to_events()
     {
         await NavigateTo("/");
 

@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Events;
 public class WhenTraceIsEnabled : PlaywrightTestBase
 {
     [Test]
-    public async Task BootModuleLoadsAndCompletesSuccessfully()
+    public async Task Boot_module_loads_and_completes_successfully()
     {
         await NavigateTo("/Sandbox/Events");
         await WaitForTraceMessage("booted", 5000);
@@ -15,7 +15,7 @@ public class WhenTraceIsEnabled : PlaywrightTestBase
     }
 
     [Test]
-    public async Task TraceOutputAppearsInConsoleDuringBoot()
+    public async Task Trace_output_appears_in_console_during_boot()
     {
         await NavigateTo("/Sandbox/Events");
         await WaitForTraceMessage("booted", 5000);
