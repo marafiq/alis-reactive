@@ -14,6 +14,7 @@ public class NativeTestModel
 {
     public string? Status { get; set; }
     public string? Category { get; set; }
+    public string? AdmissionDate { get; set; }
     public NativeTestAddress? Address { get; set; }
 }
 
