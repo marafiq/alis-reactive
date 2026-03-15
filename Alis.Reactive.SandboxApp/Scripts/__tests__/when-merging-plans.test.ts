@@ -161,4 +161,120 @@ describe("when merging plans", () => {
     // Should fire once, not twice
     expect(fireCount).toBe(1);
   });
+
+  it("removes source-owned listeners and components when the same sourceId moves to a different planId", () => {
+    document.body.innerHTML = '<div id="status-a"></div><div id="status-b"></div>';
+
+    mergePlan({
+      planId: "Plan.A",
+      sourceId: "shared-slot",
+      components: {
+        "Root.Name": { id: "name-a", vendor: "native", readExpr: "value" },
+      },
+      entries: [{
+        trigger: { kind: "custom-event", event: "fire-a" },
+        reaction: {
+          kind: "sequential",
+          commands: [{
+            kind: "mutate-element",
+            target: "status-a",
+            mutation: { kind: "set-prop", prop: "textContent" },
+            value: "A",
+          }],
+        },
+      }],
+    });
+
+    document.dispatchEvent(new CustomEvent("fire-a"));
+    expect(document.getElementById("status-a")?.textContent).toBe("A");
+
+    document.getElementById("status-a")!.textContent = "";
+
+    mergePlan({
+      planId: "Plan.B",
+      sourceId: "shared-slot",
+      components: {
+        "Root.Email": { id: "email-b", vendor: "native", readExpr: "value" },
+      },
+      entries: [{
+        trigger: { kind: "custom-event", event: "fire-b" },
+        reaction: {
+          kind: "sequential",
+          commands: [{
+            kind: "mutate-element",
+            target: "status-b",
+            mutation: { kind: "set-prop", prop: "textContent" },
+            value: "B",
+          }],
+        },
+      }],
+    });
+
+    document.dispatchEvent(new CustomEvent("fire-a"));
+    document.dispatchEvent(new CustomEvent("fire-b"));
+
+    expect(document.getElementById("status-a")?.textContent).toBe("");
+    expect(document.getElementById("status-b")?.textContent).toBe("B");
+    expect(getBootedPlan("Plan.A")).toBeUndefined();
+    expect(getBootedPlan("Plan.B")?.components["Root.Email"]).toBeDefined();
+  });
+
+  it("clears stale validation bindings when a merged source removes its component", () => {
+    boot({
+      planId: "Test.Model",
+      components: {},
+      entries: [{
+        trigger: { kind: "custom-event", event: "submit" },
+        reaction: {
+          kind: "http",
+          request: {
+            verb: "POST",
+            url: "/save",
+            validation: {
+              formId: "test-form",
+              fields: [{
+                fieldName: "Address.City",
+                rules: [{ rule: "required", message: "City is required." }],
+              }],
+            },
+          },
+        },
+      }],
+    });
+
+    const plan = getBootedPlan("Test.Model")!;
+    const reaction = plan.entries[0].reaction;
+    if (reaction.kind !== "http" || !reaction.request.validation) {
+      throw new Error("Expected http reaction with validation.");
+    }
+
+    const field = reaction.request.validation.fields[0];
+    expect(field.fieldId).toBeUndefined();
+    expect(field.vendor).toBeUndefined();
+    expect(field.readExpr).toBeUndefined();
+
+    mergePlan({
+      planId: "Test.Model",
+      sourceId: "address-slot",
+      components: {
+        "Address.City": { id: "city-input", vendor: "native", readExpr: "value" },
+      },
+      entries: [],
+    });
+
+    expect(field.fieldId).toBe("city-input");
+    expect(field.vendor).toBe("native");
+    expect(field.readExpr).toBe("value");
+
+    mergePlan({
+      planId: "Test.Model",
+      sourceId: "address-slot",
+      components: {},
+      entries: [],
+    });
+
+    expect(field.fieldId).toBeUndefined();
+    expect(field.vendor).toBeUndefined();
+    expect(field.readExpr).toBeUndefined();
+  });
 });

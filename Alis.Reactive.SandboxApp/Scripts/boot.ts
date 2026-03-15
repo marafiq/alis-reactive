@@ -2,21 +2,16 @@ import type { Plan, Entry, ComponentEntry, Reaction, ValidationDescriptor } from
 import { setLevel } from "./trace";
 import { scope } from "./trace";
 import { wireTrigger } from "./trigger";
+import {
+  applyMergedPlan,
+  getBootedPlan as getTrackedBootedPlan,
+  registerBootedPlan,
+  resetMergePlanState,
+} from "./merge-plan";
 
 const log = scope("boot");
 
-/** Booted plans keyed by planId — used by mergePlan for AJAX partial injection. */
-const bootedPlans = new Map<string, Plan>();
 let bootAbort = new AbortController();
-
-/** AbortControllers for merged partials — keyed by sourceId. Aborted on re-merge to remove old listeners. */
-const mergedAbort = new Map<string, AbortController>();
-
-/** Entries added via mergePlan — keyed by sourceId. Removed on re-merge before adding new ones. */
-const mergedEntries = new Map<string, Entry[]>();
-
-/** Component keys added via mergePlan — keyed by sourceId. Removed on re-merge before adding new ones. */
-const mergedComponentKeys = new Map<string, string[]>();
 
 export function boot(plan: Plan): void {
   log.info("booting", { entries: plan.entries.length });
@@ -24,7 +19,7 @@ export function boot(plan: Plan): void {
   enrichEntries(plan.entries, plan.components);
   wireEntries(plan.entries, plan.components, bootAbort.signal);
 
-  bootedPlans.set(plan.planId, plan);
+  registerBootedPlan(plan);
   log.info("booted");
 }
 
@@ -55,88 +50,20 @@ function wireEntries(entries: Entry[], components: Record<string, ComponentEntry
  * preventing accumulation on partial reload.
  */
 export function mergePlan(incoming: Plan): void {
-  const existing = bootedPlans.get(incoming.planId);
-
-  // Clean up previous merge from same source (prevents listener/entry/component accumulation)
-  const sourceId = incoming.sourceId;
-  if (sourceId) {
-    const oldAbort = mergedAbort.get(sourceId);
-    if (oldAbort) {
-      oldAbort.abort();
-      log.info("re-merge: aborted old listeners", { sourceId });
-    }
-
-    const oldEntries = mergedEntries.get(sourceId);
-    if (oldEntries && existing) {
-      for (const old of oldEntries) {
-        const idx = existing.entries.indexOf(old);
-        if (idx >= 0) existing.entries.splice(idx, 1);
-      }
-    }
-
-    // Remove stale component registrations from previous merge of this source
-    const oldKeys = mergedComponentKeys.get(sourceId);
-    if (oldKeys && existing) {
-      for (const key of oldKeys) {
-        delete existing.components[key];
-      }
-    }
-  }
-
-  // Merge incoming components AFTER stale cleanup
-  if (existing) {
-    Object.assign(existing.components, incoming.components);
-    log.info("merge", { planId: incoming.planId, newComponents: Object.keys(incoming.components).length });
-  }
-
-  // Use merged components for enrichment and wiring
-  const components = existing?.components ?? incoming.components;
-
-  // Create new abort controller for this merge
-  const abort = sourceId ? new AbortController() : undefined;
-  if (sourceId && abort) {
-    mergedAbort.set(sourceId, abort);
-  }
-
-  // Re-enrich existing entries — parent plan may have validation descriptors
-  // that reference components only now available from the merged partial.
-  if (existing) {
-    enrichEntries(existing.entries, components);
-  }
-  enrichEntries(incoming.entries, components);
-  wireEntries(incoming.entries, components, abort?.signal);
-
-  if (existing) {
-    existing.entries.push(...incoming.entries);
-  } else {
-    bootedPlans.set(incoming.planId, incoming);
-  }
-
-  // Track merged entries and component keys for cleanup on re-merge
-  if (sourceId) {
-    mergedEntries.set(sourceId, [...incoming.entries]);
-    mergedComponentKeys.set(sourceId, Object.keys(incoming.components));
-  }
+  const merged = applyMergedPlan(incoming, { enrichEntries, wireEntries });
+  log.info("merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
 }
 
 /** Returns the booted plan for a given planId (used by tests and runtime inspection). */
 export function getBootedPlan(planId: string): Plan | undefined {
-  return bootedPlans.get(planId);
+  return getTrackedBootedPlan(planId);
 }
 
 /** Test-only: abort all wired listeners and clear boot/merge state between Vitest runs. */
 export function resetBootStateForTests(): void {
   bootAbort.abort();
   bootAbort = new AbortController();
-
-  for (const abort of mergedAbort.values()) {
-    abort.abort();
-  }
-
-  bootedPlans.clear();
-  mergedAbort.clear();
-  mergedEntries.clear();
-  mergedComponentKeys.clear();
+  resetMergePlanState();
 }
 
 export const trace = { setLevel };
@@ -191,6 +118,9 @@ export function enrichValidationFields(
       f.vendor = comp.vendor;
       f.readExpr = comp.readExpr;
     } else {
+      f.fieldId = undefined;
+      f.vendor = undefined;
+      f.readExpr = undefined;
       log.warn("validation field not in components", { fieldName: f.fieldName });
     }
   }
