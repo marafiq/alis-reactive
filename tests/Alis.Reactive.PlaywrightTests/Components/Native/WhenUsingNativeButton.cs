@@ -20,7 +20,7 @@ public class WhenUsingNativeButton : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task Page_loads_without_errors()
+    public async Task page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("NativeButton — Alis.Reactive Sandbox");
@@ -30,7 +30,7 @@ public class WhenUsingNativeButton : PlaywrightTestBase
     // ── Section 1: Click event updates status text ──
 
     [Test]
-    public async Task Click_event_updates_status_text()
+    public async Task click_event_updates_status_text()
     {
         await NavigateAndBoot();
 
@@ -44,7 +44,7 @@ public class WhenUsingNativeButton : PlaywrightTestBase
     // ── Section 2: DomReady sets button text ──
 
     [Test]
-    public async Task DomReady_sets_button_text()
+    public async Task domready_sets_button_text()
     {
         await NavigateAndBoot();
 
@@ -56,7 +56,7 @@ public class WhenUsingNativeButton : PlaywrightTestBase
     // ── Section 4: Click dispatches event to another listener ──
 
     [Test]
-    public async Task Click_dispatches_event_to_another_listener()
+    public async Task click_dispatches_event_to_another_listener()
     {
         await NavigateAndBoot();
 

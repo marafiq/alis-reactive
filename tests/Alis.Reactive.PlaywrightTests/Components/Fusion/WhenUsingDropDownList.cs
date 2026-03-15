@@ -28,7 +28,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task Page_loads_without_errors()
+    public async Task page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("DropDownList — Alis.Reactive Sandbox");
@@ -36,7 +36,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Plan_json_is_rendered()
+    public async Task plan_json_is_rendered()
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -50,7 +50,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 1: Property Write ──
 
     [Test]
-    public async Task DomReady_sets_initial_value()
+    public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
         // SF DropDownList wrapper gets the IdGenerator-based ID
@@ -69,7 +69,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 2: Property Read ──
 
     [Test]
-    public async Task DomReady_reads_value_into_echo()
+    public async Task domready_reads_value_into_echo()
     {
         await NavigateAndBoot();
         // The value-echo should show "Books" after dom-ready reads comp.Value()
@@ -84,7 +84,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 3: Method Calls (ShowPopup/HidePopup) ──
 
     [Test]
-    public async Task ShowPopup_button_opens_dropdown()
+    public async Task showpopup_button_opens_dropdown()
     {
         await NavigateAndBoot();
 
@@ -98,7 +98,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task HidePopup_button_closes_dropdown()
+    public async Task hidepopup_button_closes_dropdown()
     {
         await NavigateAndBoot();
 
@@ -119,7 +119,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 4: Events ──
 
     [Test]
-    public async Task Changed_event_displays_new_value()
+    public async Task changed_event_displays_new_value()
     {
         await NavigateAndBoot();
 
@@ -141,7 +141,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Focus_event_shows_focus_state()
+    public async Task focus_event_shows_focus_state()
     {
         await NavigateAndBoot();
 
@@ -156,7 +156,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Blur_event_shows_blur_state()
+    public async Task blur_event_shows_blur_state()
     {
         await NavigateAndBoot();
 
@@ -177,7 +177,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 5: Conditions — Typed Event-Args + Component-Read ──
 
     [Test]
-    public async Task Event_args_condition_matches_when_value_equals_electronics()
+    public async Task event_args_condition_matches_when_value_equals_electronics()
     {
         await NavigateAndBoot();
 
@@ -194,7 +194,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Event_args_condition_falls_to_else_for_other_values()
+    public async Task event_args_condition_falls_to_else_for_other_values()
     {
         await NavigateAndBoot();
 
@@ -211,7 +211,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Component_condition_shows_indicator_when_value_not_null()
+    public async Task component_condition_shows_indicator_when_value_not_null()
     {
         await NavigateAndBoot();
 
@@ -236,7 +236,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 6: Gather ──
 
     [Test]
-    public async Task Gather_button_posts_component_value()
+    public async Task gather_button_posts_component_value()
     {
         await NavigateAndBoot();
 

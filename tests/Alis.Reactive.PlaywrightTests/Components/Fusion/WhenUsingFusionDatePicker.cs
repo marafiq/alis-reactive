@@ -42,7 +42,7 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task Page_loads_without_errors()
+    public async Task page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("FusionDatePicker — Alis.Reactive Sandbox");
@@ -50,7 +50,7 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Plan_json_is_rendered()
+    public async Task plan_json_is_rendered()
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -64,7 +64,7 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
     // ── Section 1: Property Write ──
 
     [Test]
-    public async Task DomReady_sets_initial_date_value()
+    public async Task domready_sets_initial_date_value()
     {
         await NavigateAndBoot();
         var wrapper = Page.Locator($"#{AdmissionDateId}");
@@ -84,7 +84,7 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
     // ── Section 2: Property Read ──
 
     [Test]
-    public async Task DomReady_reads_value_into_echo()
+    public async Task domready_reads_value_into_echo()
     {
         await NavigateAndBoot();
         var echo = Page.Locator("#value-echo");
@@ -95,7 +95,7 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
     // ── Section 3: Events — Changed with typed condition ──
 
     [Test]
-    public async Task Changed_event_displays_new_value()
+    public async Task changed_event_displays_new_value()
     {
         await NavigateAndBoot();
 
@@ -109,7 +109,7 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Event_args_condition_matches_when_value_not_null()
+    public async Task event_args_condition_matches_when_value_not_null()
     {
         await NavigateAndBoot();
 
@@ -123,7 +123,7 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Component_condition_shows_indicator_when_value_not_null()
+    public async Task component_condition_shows_indicator_when_value_not_null()
     {
         await NavigateAndBoot();
 
@@ -141,7 +141,7 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
     // ── Section 4: Component-Read Condition (Discharge Date) ──
 
     [Test]
-    public async Task Component_value_condition_shows_warning_when_empty()
+    public async Task component_value_condition_shows_warning_when_empty()
     {
         await NavigateAndBoot();
 
@@ -154,7 +154,7 @@ public class WhenUsingFusionDatePicker : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Component_value_condition_confirms_when_filled()
+    public async Task component_value_condition_confirms_when_filled()
     {
         await NavigateAndBoot();
 

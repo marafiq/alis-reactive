@@ -29,7 +29,7 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task Page_loads_without_errors()
+    public async Task page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("TimePicker — Alis.Reactive Sandbox");
@@ -37,7 +37,7 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Plan_json_is_rendered()
+    public async Task plan_json_is_rendered()
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -51,7 +51,7 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
     // ── Section 1: Property Write ──
 
     [Test]
-    public async Task DomReady_sets_initial_value()
+    public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
         // SF TimePicker wrapper gets the IdGenerator-based ID
@@ -74,7 +74,7 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
     // ── Section 2: Property Read ──
 
     [Test]
-    public async Task DomReady_reads_value_into_echo()
+    public async Task domready_reads_value_into_echo()
     {
         await NavigateAndBoot();
         // The value-echo should show a time value after dom-ready reads comp.Value()
@@ -86,7 +86,7 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
     // ── Section 3: Events ──
 
     [Test]
-    public async Task Change_event_displays_new_value()
+    public async Task change_event_displays_new_value()
     {
         await NavigateAndBoot();
 
@@ -106,7 +106,7 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
     // ── Section 4: Conditions — Event-Args ──
 
     [Test]
-    public async Task Event_args_condition_shows_status_when_time_selected()
+    public async Task event_args_condition_shows_status_when_time_selected()
     {
         await NavigateAndBoot();
 
@@ -130,7 +130,7 @@ public class WhenUsingFusionTimePicker : PlaywrightTestBase
     // ── Section 5: Gather ──
 
     [Test]
-    public async Task Gather_button_posts_component_value()
+    public async Task gather_button_posts_component_value()
     {
         await NavigateAndBoot();
 

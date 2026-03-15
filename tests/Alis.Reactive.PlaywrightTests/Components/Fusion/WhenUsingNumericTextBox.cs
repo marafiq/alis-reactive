@@ -30,7 +30,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task Page_loads_without_errors()
+    public async Task page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("NumericTextBox — Alis.Reactive Sandbox");
@@ -38,7 +38,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Plan_json_is_rendered()
+    public async Task plan_json_is_rendered()
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -52,7 +52,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 1: Property Write ──
 
     [Test]
-    public async Task DomReady_sets_initial_value()
+    public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
         // SF NumericTextBox wrapper gets the IdGenerator-based ID
@@ -71,7 +71,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 2: Property Read ──
 
     [Test]
-    public async Task DomReady_reads_value_into_echo()
+    public async Task domready_reads_value_into_echo()
     {
         await NavigateAndBoot();
         // The value-echo should show "42" after dom-ready reads comp.Value()
@@ -86,7 +86,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 3: Method Calls (Increment/Decrement) ──
 
     [Test]
-    public async Task Increment_button_increases_quantity()
+    public async Task increment_button_increases_quantity()
     {
         await NavigateAndBoot();
 
@@ -100,7 +100,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Decrement_button_decreases_quantity()
+    public async Task decrement_button_decreases_quantity()
     {
         await NavigateAndBoot();
 
@@ -118,7 +118,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 4: Events ──
 
     [Test]
-    public async Task Change_event_displays_new_value()
+    public async Task change_event_displays_new_value()
     {
         await NavigateAndBoot();
 
@@ -140,7 +140,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Focus_event_shows_focus_state()
+    public async Task focus_event_shows_focus_state()
     {
         await NavigateAndBoot();
 
@@ -154,7 +154,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Blur_event_shows_blur_state()
+    public async Task blur_event_shows_blur_state()
     {
         await NavigateAndBoot();
 
@@ -173,7 +173,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 5: Conditions ──
 
     [Test]
-    public async Task Event_args_condition_shows_high_temp_warning_above_100()
+    public async Task event_args_condition_shows_high_temp_warning_above_100()
     {
         await NavigateAndBoot();
 
@@ -195,7 +195,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Event_args_condition_hides_high_temp_warning_at_100_or_below()
+    public async Task event_args_condition_hides_high_temp_warning_at_100_or_below()
     {
         await NavigateAndBoot();
 
@@ -218,7 +218,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Component_read_condition_shows_positive_indicator_above_zero()
+    public async Task component_read_condition_shows_positive_indicator_above_zero()
     {
         await NavigateAndBoot();
 
@@ -240,7 +240,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Component_read_condition_hides_positive_indicator_at_zero_or_negative()
+    public async Task component_read_condition_hides_positive_indicator_at_zero_or_negative()
     {
         await NavigateAndBoot();
 
@@ -265,7 +265,7 @@ public class WhenUsingNumericTextBox : PlaywrightTestBase
     // ── Section 6: Gather ──
 
     [Test]
-    public async Task Gather_button_posts_component_value()
+    public async Task gather_button_posts_component_value()
     {
         await NavigateAndBoot();
 

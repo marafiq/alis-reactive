@@ -22,7 +22,7 @@ public class WhenUsingNativeTextBox : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task Page_loads_without_errors()
+    public async Task page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("NativeTextBox — Alis.Reactive Sandbox");
@@ -32,7 +32,7 @@ public class WhenUsingNativeTextBox : PlaywrightTestBase
     // ── Section 1: Property Write — DomReady sets resident name ──
 
     [Test]
-    public async Task DomReady_sets_initial_resident_name()
+    public async Task domready_sets_initial_resident_name()
     {
         await NavigateAndBoot();
 
@@ -44,7 +44,7 @@ public class WhenUsingNativeTextBox : PlaywrightTestBase
     // ── Section 2: Property Read — DomReady reads resident name into echo ──
 
     [Test]
-    public async Task Value_echoed_from_component_read()
+    public async Task value_echoed_from_component_read()
     {
         await NavigateAndBoot();
 
@@ -56,7 +56,7 @@ public class WhenUsingNativeTextBox : PlaywrightTestBase
     // ── Section 3: Changed event with typed condition ──
 
     [Test]
-    public async Task Changed_event_with_condition_shows_contact_status()
+    public async Task changed_event_with_condition_shows_contact_status()
     {
         await NavigateAndBoot();
 
@@ -73,7 +73,7 @@ public class WhenUsingNativeTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Changed_event_with_condition_shows_warning_when_cleared()
+    public async Task changed_event_with_condition_shows_warning_when_cleared()
     {
         await NavigateAndBoot();
 
@@ -93,7 +93,7 @@ public class WhenUsingNativeTextBox : PlaywrightTestBase
     // ── Section 4: Component value condition ──
 
     [Test]
-    public async Task Component_value_condition_warns_when_empty()
+    public async Task component_value_condition_warns_when_empty()
     {
         await NavigateAndBoot();
 
@@ -110,7 +110,7 @@ public class WhenUsingNativeTextBox : PlaywrightTestBase
     }
 
     [Test]
-    public async Task Component_value_condition_confirms_when_filled()
+    public async Task component_value_condition_confirms_when_filled()
     {
         await NavigateAndBoot();
 
