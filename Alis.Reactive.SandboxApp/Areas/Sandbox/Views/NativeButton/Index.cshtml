@@ -1,0 +1,107 @@
+@model NativeButtonModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "NativeButton";
+
+    var plan = Html.ReactivePlan<NativeButtonModel>();
+
+    // Section 2: DomReady sets button text from "Loading..." to "Admit Resident"
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<NativeButton>("btn-admit-text").SetText("Admit Resident");
+    }));
+
+    // Section 4: Dispatch chain — transfer-btn dispatches "resident-transferred",
+    // a custom-event listener picks it up and updates transfer-status
+    Html.On(plan, t => t.CustomEvent("resident-transferred", p =>
+    {
+        p.Element("transfer-status").SetText("transfer confirmed");
+        p.Element("transfer-status").AddClass("text-green-600");
+        p.Element("transfer-status").RemoveClass("text-text-muted");
+    }));
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">NativeButton — Full API</h1>
+        <p class="mt-2 text-text-secondary">
+            Exercises NativeButton vertical slice: click events, SetText mutations,
+            FocusIn calls, and dispatch chains.
+            Senior living domain: resident admit, discharge, and transfer actions.
+        </p>
+    </div>
+
+    <!-- Section 1: Click Event -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Click Event (Updates Status Text)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Clicking "Admit Resident" updates the status span below.
+        </p>
+        @(Html.NativeButton("btn-admit", "Admit Resident")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Element("admit-status").SetText("Admit Resident clicked");
+                p.Element("admit-status").AddClass("text-green-600");
+                p.Element("admit-status").RemoveClass("text-text-muted");
+            }))
+        <div class="font-mono text-sm mt-2">
+            <p>Status: <span id="admit-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 2: SetText on DomReady -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. SetText (DomReady Changes Button Label)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, the button text changes from "Loading..." to "Admit Resident".
+        </p>
+        @(Html.NativeButton("btn-admit-text", "Loading...")
+            .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors"))
+    </section>
+
+    <!-- Section 3: FocusIn -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. FocusIn (Click Focuses Another Button)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Clicking "Focus Discharge" moves keyboard focus to the "Discharge Resident" button.
+        </p>
+        <div class="flex gap-4">
+            @(Html.NativeButton("btn-focus-trigger", "Focus Discharge")
+                .CssClass("rounded-md bg-slate-600 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<NativeButton>("btn-discharge").FocusIn();
+                }))
+            @(Html.NativeButton("btn-discharge", "Discharge Resident")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"))
+        </div>
+    </section>
+
+    <!-- Section 4: Dispatch Chain -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Dispatch Chain (Click Dispatches Event to Listener)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Clicking "Transfer Resident" dispatches a <code>resident-transferred</code> custom event.
+            A separate listener picks it up and updates the status text.
+        </p>
+        @(Html.NativeButton("btn-transfer", "Transfer Resident")
+            .CssClass("rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("resident-transferred");
+            }))
+        <div class="font-mono text-sm mt-2">
+            <p>Transfer: <span id="transfer-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)
