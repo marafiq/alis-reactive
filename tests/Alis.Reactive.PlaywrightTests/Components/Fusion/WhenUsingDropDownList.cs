@@ -28,7 +28,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task PageLoadsWithNoErrors()
+    public async Task Page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("DropDownList — Alis.Reactive Sandbox");
@@ -36,7 +36,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PlanJsonIsRendered()
+    public async Task Plan_json_is_rendered()
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -50,7 +50,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 1: Property Write ──
 
     [Test]
-    public async Task DomReadySetsInitialValue()
+    public async Task DomReady_sets_initial_value()
     {
         await NavigateAndBoot();
         // SF DropDownList wrapper gets the IdGenerator-based ID
@@ -69,7 +69,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 2: Property Read ──
 
     [Test]
-    public async Task DomReadyReadsValueIntoEcho()
+    public async Task DomReady_reads_value_into_echo()
     {
         await NavigateAndBoot();
         // The value-echo should show "Books" after dom-ready reads comp.Value()
@@ -84,7 +84,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 3: Method Calls (ShowPopup/HidePopup) ──
 
     [Test]
-    public async Task ShowPopupButtonOpensDropdown()
+    public async Task ShowPopup_button_opens_dropdown()
     {
         await NavigateAndBoot();
 
@@ -98,7 +98,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task HidePopupButtonClosesDropdown()
+    public async Task HidePopup_button_closes_dropdown()
     {
         await NavigateAndBoot();
 
@@ -119,7 +119,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 4: Events ──
 
     [Test]
-    public async Task ChangeEventDisplaysNewValue()
+    public async Task Changed_event_displays_new_value()
     {
         await NavigateAndBoot();
 
@@ -141,7 +141,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FocusEventShowsFocusState()
+    public async Task Focus_event_shows_focus_state()
     {
         await NavigateAndBoot();
 
@@ -156,7 +156,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task BlurEventShowsBlurState()
+    public async Task Blur_event_shows_blur_state()
     {
         await NavigateAndBoot();
 
@@ -174,10 +174,44 @@ public class WhenUsingDropDownList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 5: Condition (Selected Indicator) ──
+    // ── Section 5: Conditions — Typed Event-Args + Component-Read ──
 
     [Test]
-    public async Task SelectedConditionShowsIndicatorWhenValueNotNull()
+    public async Task Event_args_condition_matches_when_value_equals_electronics()
+    {
+        await NavigateAndBoot();
+
+        // Open popup and select Electronics
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Electronics" }).ClickAsync();
+
+        // When(args, x => x.Value).Eq("Electronics") → Then branch
+        await Expect(Page.Locator("#args-condition"))
+            .ToHaveTextAsync("electronics selected", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task Event_args_condition_falls_to_else_for_other_values()
+    {
+        await NavigateAndBoot();
+
+        // Open popup and select Clothing (not Electronics)
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Clothing" }).ClickAsync();
+
+        // When(args, x => x.Value).Eq("Electronics") → Else branch
+        await Expect(Page.Locator("#args-condition"))
+            .ToHaveTextAsync("other category", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task Component_condition_shows_indicator_when_value_not_null()
     {
         await NavigateAndBoot();
 
@@ -202,7 +236,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 6: Gather ──
 
     [Test]
-    public async Task GatherButtonPostsComponentValue()
+    public async Task Gather_button_posts_component_value()
     {
         await NavigateAndBoot();
 
