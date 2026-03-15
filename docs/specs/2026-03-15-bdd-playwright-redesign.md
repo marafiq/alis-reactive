@@ -325,9 +325,40 @@ HTTP & Data               | Validation               | Framework Infrastructure
 10. Run full suite — all tests green
 11. Post-task: verify vertical slice pattern compliance
 
+## Vertical Slice Shape — INVIOLABLE
+
+Every input component vertical slice MUST produce exactly this file set. No exceptions.
+No shortcuts. No "I'll add it later." If a file is missing, the slice is incomplete and
+must not be merged.
+
+```
+{Component}/
+  {Component}.cs                    — sealed : {Base}Component, IInputComponent
+  {Component}Builder.cs             — internal ctor, IHtmlContent
+  {Component}HtmlExtensions.cs      — Html.{Component}For(plan, expr) factory
+  {Component}Extensions.cs          — SetValue(), Value() mutations
+  {Component}Events.cs              — Singleton with private ctor
+  {Component}ReactiveExtensions.cs  — Single .Reactive<TModel, TProp, TArgs>()
+  Events/
+    {Component}OnChanged.cs         — {Component}ChangeArgs { Value }
+```
+
+Every input component sandbox page MUST exercise the full DSL chain:
+
+```
+View:        Html.Field() + Html.{Component}For() + .Reactive() + When() conditions
+Controller:  Own controller, own actions, no shared endpoints
+Model:       Senior living domain (not abstract test data)
+Test:        BDD Playwright — property write, read, event, typed conditions, reactive
+Unit Tests:  Mutation snapshot + schema validation + event descriptor + reactive wiring
+```
+
+Violation of this shape is a build-breaking defect. Treat it like a compilation error.
+
 ## Constraints
 
 - **Never change the DSL shape** — public API stays identical
+- **Never violate vertical slice shape** — every component follows the exact file pattern above
 - **Duplication over abstraction** — each slice is self-contained, no shared base
 - **No mocks** — real browser, real server, real components
 - **No raw HTML** — every `<input>`, `<select>`, `<button>` uses framework builders
