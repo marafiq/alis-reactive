@@ -555,7 +555,94 @@ public class WhenValidatingFormFields : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Journey 17: Multiple rule types in single validation ───────────────
+    // ── Journey 17: Partial load → interact with loaded fields ─────────────
+
+    [Test]
+    public async Task loading_partial_then_interacting_with_loaded_fields_works()
+    {
+        // Proves Into() partial injection creates functional form fields
+        await NavigateTo(Path);
+
+        // Step 1: Load address partial — fields render
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Address Form" }).ClickAsync();
+        var streetField = Page.Locator($"#{S}Nested_Address_Street");
+        var cityField = Page.Locator($"#{S}Nested_Address_City");
+        var zipField = Page.Locator($"#{S}Nested_Address_ZipCode");
+        await Expect(streetField).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(cityField).ToBeVisibleAsync();
+        await Expect(zipField).ToBeVisibleAsync();
+
+        // Step 2: Fill all fields — values stick (not cleared, not rejected)
+        await Page.FillAsync($"#{S}Nested_Address_Street", "742 Evergreen Terrace");
+        await Page.FillAsync($"#{S}Nested_Address_City", "Springfield");
+        await Page.FillAsync($"#{S}Nested_Address_ZipCode", "62704");
+
+        await Expect(streetField).ToHaveValueAsync("742 Evergreen Terrace");
+        await Expect(cityField).ToHaveValueAsync("Springfield");
+        await Expect(zipField).ToHaveValueAsync("62704");
+
+        // Step 3: Load delivery partial — fields render alongside address
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Delivery Note Form" }).ClickAsync();
+        var instrField = Page.Locator($"#{S}Nested_Delivery_Instructions");
+        var phoneField = Page.Locator($"#{S}Nested_Delivery_ContactPhone");
+        await Expect(instrField).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(phoneField).ToBeVisibleAsync();
+
+        // Step 4: Fill delivery fields — values stick
+        await Page.FillAsync($"#{S}Nested_Delivery_Instructions", "Ring the bell twice");
+        await Page.FillAsync($"#{S}Nested_Delivery_ContactPhone", "555-123-4567");
+
+        await Expect(instrField).ToHaveValueAsync("Ring the bell twice");
+        await Expect(phoneField).ToHaveValueAsync("555-123-4567");
+
+        // Step 5: Address fields still hold their values (not clobbered by second partial load)
+        await Expect(streetField).ToHaveValueAsync("742 Evergreen Terrace");
+        await Expect(cityField).ToHaveValueAsync("Springfield");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 18: Partial validation clears errors on valid resubmission ───
+
+    [Test]
+    public async Task partial_validation_clears_errors_on_subsequent_valid_submission()
+    {
+        // Proves dynamically loaded partials participate in validation lifecycle
+        await NavigateTo(Path);
+
+        // Step 1: Load address partial
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Address Form" }).ClickAsync();
+        await Expect(Page.Locator($"#{S}Nested_Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Step 2: Submit empty — validation errors appear on dynamically loaded fields
+        await Page.Locator("#save-partial-btn").ClickAsync();
+
+        var streetError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.Street']");
+        var cityError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.City']");
+        await Expect(streetError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(streetError).ToContainTextAsync("required");
+        await Expect(cityError).ToBeVisibleAsync();
+        await Expect(cityError).ToContainTextAsync("required");
+
+        var result = Page.Locator("#partial-save-result");
+        await Expect(result).ToContainTextAsync("Not submitted yet");
+
+        // Step 3: Fill all fields correctly
+        await Page.FillAsync($"#{S}Nested_Address_Street", "456 Oak Avenue");
+        await Page.FillAsync($"#{S}Nested_Address_City", "Portland");
+        await Page.FillAsync($"#{S}Nested_Address_ZipCode", "97201");
+
+        // Step 4: Resubmit — errors clear and success message shows
+        await Page.Locator("#save-partial-btn").ClickAsync();
+
+        await Expect(streetError).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(cityError).ToBeHiddenAsync();
+        await Expect(result).ToContainTextAsync("saved successfully", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 19: Multiple rule types in single validation ───────────────
 
     [Test]
     public async Task multiple_rule_types_fire_simultaneously_on_invalid_data()
