@@ -4,5 +4,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public bool IsActive { get; set; }
         public bool IsOptIn { get; set; }
+        public bool ShowExtras { get; set; }
     }
 }

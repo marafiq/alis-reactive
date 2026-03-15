@@ -1,0 +1,137 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ValidationMergeHarnessModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    ViewData["Title"] = "Validation Multi Partial Workflow";
+    var plan = Html.ReactivePlan<ValidationMergeHarnessModel>();
+}
+
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Validation BDD: Multi Partial Workflow</h1>
+        <p class="mt-2 text-text-secondary">
+            Root workflow with two same-model partials and one standalone contact plan living together on the same page.
+        </p>
+    </div>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
+        <div class="flex flex-wrap gap-3">
+            @(Html.NativeButton("workflow-load-address-btn", "Load Address Partial")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get("/Sandbox/Validation/WorkflowAddressPartial")
+                     .Response(r => r.OnSuccess(s =>
+                     {
+                         s.Into("workflow-address-container");
+                         s.Element("workflow-address-status").SetText("Address partial loaded");
+                     }));
+                }))
+
+            @(Html.NativeButton("workflow-reload-address-btn", "Reload Address Partial")
+                .CssClass("rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get("/Sandbox/Validation/WorkflowAddressPartialV2")
+                     .Response(r => r.OnSuccess(s =>
+                     {
+                         s.Into("workflow-address-container");
+                         s.Element("workflow-address-status").SetText("Address partial loaded");
+                     }));
+                }))
+
+            @(Html.NativeButton("workflow-load-delivery-btn", "Load Delivery Partial")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get("/Sandbox/Validation/WorkflowDeliveryPartial")
+                     .Response(r => r.OnSuccess(s =>
+                     {
+                         s.Into("workflow-delivery-container");
+                         s.Element("workflow-delivery-status").SetText("Delivery partial loaded");
+                     }));
+                }))
+
+            @(Html.NativeButton("workflow-load-contact-btn", "Load Standalone Contact")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get("/Sandbox/Validation/WorkflowContactPartial")
+                     .Response(r => r.OnSuccess(s =>
+                     {
+                         s.Into("workflow-contact-container");
+                         s.Element("workflow-contact-status").SetText("Standalone contact loaded");
+                     }));
+                }))
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 font-mono text-sm">
+            <p id="workflow-address-status" class="text-text-muted">Address partial not loaded</p>
+            <p id="workflow-delivery-status" class="text-text-muted">Delivery partial not loaded</p>
+            <p id="workflow-contact-status" class="text-text-muted">Standalone contact not loaded</p>
+        </div>
+
+        <form id="workflow-root-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @{ Html.Field("Name", true, m => m.Root.Name, expr =>
+                    Html.NativeTextBoxFor(plan, expr)
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("Workflow user")
+                ); }
+                @{ Html.Field("Email", true, m => m.Root.Email, expr =>
+                    Html.NativeTextBoxFor(plan, expr)
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("workflow@example.com")
+                ); }
+                @{ Html.Field("Amount", true, m => m.Root.Amount, expr =>
+                    Html.NativeTextBoxFor(plan, expr)
+                        .Type("number")
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("250")
+                ); }
+            </div>
+
+            <div id="workflow-address-container" class="space-y-4"></div>
+            <div id="workflow-delivery-container" class="space-y-4"></div>
+        </form>
+
+        @(Html.NativeButton("workflow-save-root-btn", "Save Workflow Root")
+            .CssClass("rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Validation/SaveWorkflowRoot", g => g
+                        .Include(m => m.Root.Name)
+                        .Include(m => m.Root.Email)
+                        .Include(m => m.Root.Amount)
+                        .Include(m => m.Nested.Address!.Street)
+                        .Include(m => m.Nested.Address!.City)
+                        .Include(m => m.Nested.Address!.ZipCode)
+                        .Include(m => m.Nested.Delivery!.Instructions)
+                        .Include(m => m.Nested.Delivery!.ContactPhone))
+                 .Validate<ValidationMergeHarnessValidator>("workflow-root-form")
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("workflow-root-result").SetText("Workflow root saved");
+                        s.Element("workflow-root-result").AddClass("text-green-600");
+                        s.Element("workflow-root-result").RemoveClass("text-red-600");
+                        s.Element("workflow-root-result").RemoveClass("text-text-muted");
+                    })
+                    .OnError(400, e =>
+                    {
+                        e.Element("workflow-root-result").SetText("Workflow validation errors");
+                        e.Element("workflow-root-result").AddClass("text-red-600");
+                        e.Element("workflow-root-result").RemoveClass("text-green-600");
+                        e.ValidationErrors("workflow-root-form");
+                    }));
+            }))
+
+        <p id="workflow-root-result" class="font-mono text-sm text-text-muted">Not submitted yet</p>
+
+        <div id="workflow-contact-container" class="space-y-4"></div>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

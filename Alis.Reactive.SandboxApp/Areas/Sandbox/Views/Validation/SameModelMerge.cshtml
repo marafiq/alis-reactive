@@ -1,0 +1,122 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ValidationMergeHarnessModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    ViewData["Title"] = "Validation Same Model Merge";
+    var plan = Html.ReactivePlan<ValidationMergeHarnessModel>();
+}
+
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Validation BDD: Same Model Merge</h1>
+        <p class="mt-2 text-text-secondary">
+            One root form, one logical plan, and two same-model partial contributions merged into the same validation surface.
+        </p>
+    </div>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
+        <div class="flex flex-wrap gap-3">
+            @(Html.NativeButton("same-merge-load-address-btn", "Load Address Partial")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get("/Sandbox/Validation/SameModelMergeAddressPartial")
+                     .Response(r => r.OnSuccess(s =>
+                     {
+                         s.Into("same-merge-address-container");
+                         s.Element("same-merge-address-status").SetText("Address partial loaded");
+                     }));
+                }))
+
+            @(Html.NativeButton("same-merge-reload-address-btn", "Reload Address Partial")
+                .CssClass("rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get("/Sandbox/Validation/SameModelMergeAddressPartialV2")
+                     .Response(r => r.OnSuccess(s =>
+                     {
+                         s.Into("same-merge-address-container");
+                         s.Element("same-merge-address-status").SetText("Address partial loaded");
+                     }));
+                }))
+
+            @(Html.NativeButton("same-merge-load-delivery-btn", "Load Delivery Partial")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get("/Sandbox/Validation/SameModelMergeDeliveryPartial")
+                     .Response(r => r.OnSuccess(s =>
+                     {
+                         s.Into("same-merge-delivery-container");
+                         s.Element("same-merge-delivery-status").SetText("Delivery partial loaded");
+                     }));
+                }))
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 font-mono text-sm">
+            <p id="same-merge-address-status" class="text-text-muted">Address partial not loaded</p>
+            <p id="same-merge-delivery-status" class="text-text-muted">Delivery partial not loaded</p>
+        </div>
+
+        <form id="same-merge-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @{ Html.Field("Name", true, m => m.Root.Name, expr =>
+                    Html.NativeTextBoxFor(plan, expr)
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("Merged user")
+                ); }
+                @{ Html.Field("Email", true, m => m.Root.Email, expr =>
+                    Html.NativeTextBoxFor(plan, expr)
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("merged@example.com")
+                ); }
+                @{ Html.Field("Amount", true, m => m.Root.Amount, expr =>
+                    Html.NativeTextBoxFor(plan, expr)
+                        .Type("number")
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("150")
+                ); }
+            </div>
+
+            <div id="same-merge-address-container" class="space-y-4"></div>
+            <div id="same-merge-delivery-container" class="space-y-4"></div>
+        </form>
+
+        @(Html.NativeButton("same-merge-save-btn", "Save Merged Root")
+            .CssClass("rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Validation/SaveSameModelMerge", g => g
+                        .Include(m => m.Root.Name)
+                        .Include(m => m.Root.Email)
+                        .Include(m => m.Root.Amount)
+                        .Include(m => m.Nested.Address!.Street)
+                        .Include(m => m.Nested.Address!.City)
+                        .Include(m => m.Nested.Address!.ZipCode)
+                        .Include(m => m.Nested.Delivery!.Instructions)
+                        .Include(m => m.Nested.Delivery!.ContactPhone))
+                 .Validate<ValidationMergeHarnessValidator>("same-merge-form")
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("same-merge-result").SetText("Merged root saved");
+                        s.Element("same-merge-result").AddClass("text-green-600");
+                        s.Element("same-merge-result").RemoveClass("text-red-600");
+                        s.Element("same-merge-result").RemoveClass("text-text-muted");
+                    })
+                    .OnError(400, e =>
+                    {
+                        e.Element("same-merge-result").SetText("Server validation errors");
+                        e.Element("same-merge-result").AddClass("text-red-600");
+                        e.Element("same-merge-result").RemoveClass("text-green-600");
+                        e.ValidationErrors("same-merge-form");
+                    }));
+            }))
+
+        <p id="same-merge-result" class="font-mono text-sm text-text-muted">Not submitted yet</p>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

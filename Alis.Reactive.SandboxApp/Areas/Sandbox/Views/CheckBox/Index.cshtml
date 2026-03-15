@@ -36,18 +36,17 @@
             The checkbox starts checked. Clicking the button calls
             <code>SetChecked(false)</code> which should uncheck it.
         </p>
-        <div class="flex items-center gap-4 mb-4">
-            <label class="flex items-center gap-2 text-sm">
-                @Html.NativeCheckBox("cb-test-uncheck").Checked(true).CssClass("h-4 w-4 rounded border-border text-accent")
-                <span>IsActive (starts checked)</span>
-            </label>
+        <div class="mb-4 max-w-sm">
+            @{ Html.Field("IsActive (starts checked)", false, m => m.IsActive, expr =>
+                Html.NativeCheckBoxFor(plan, expr).CssClass("h-4 w-4 rounded border-border text-accent")
+            ); }
         </div>
         <div class="flex gap-2 mb-3">
             @(Html.NativeButton("btn-uncheck", "SetChecked(false)")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<NativeCheckBox>("cb-test-uncheck").SetChecked(false);
+                    p.Component<NativeCheckBox>(m => m.IsActive).SetChecked(false);
                 }))
         </div>
         <div class="font-mono text-sm">
@@ -62,18 +61,17 @@
             The checkbox starts unchecked. Clicking the button calls
             <code>SetChecked(true)</code> which should check it.
         </p>
-        <div class="flex items-center gap-4 mb-4">
-            <label class="flex items-center gap-2 text-sm">
-                @Html.NativeCheckBox("cb-test-check").CssClass("h-4 w-4 rounded border-border text-accent")
-                <span>IsOptIn (starts unchecked)</span>
-            </label>
+        <div class="mb-4 max-w-sm">
+            @{ Html.Field("IsOptIn (starts unchecked)", false, m => m.IsOptIn, expr =>
+                Html.NativeCheckBoxFor(plan, expr).CssClass("h-4 w-4 rounded border-border text-accent")
+            ); }
         </div>
         <div class="flex gap-2 mb-3">
             @(Html.NativeButton("btn-check", "SetChecked(true)")
                 .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<NativeCheckBox>("cb-test-check").SetChecked(true);
+                    p.Component<NativeCheckBox>(m => m.IsOptIn).SetChecked(true);
                 }))
         </div>
         <div class="font-mono text-sm">
@@ -88,9 +86,9 @@
             The checkbox wires a <code>Changed</code> event. When toggled, it shows/hides
             an extras panel via <code>When(args.Checked).Truthy()</code>.
         </p>
-        <div class="flex items-center gap-4 mb-4">
-            <label class="flex items-center gap-2 text-sm">
-                @(Html.NativeCheckBox("cb-reactive")
+        <div class="mb-4 max-w-sm">
+            @{ Html.Field("Show extras", false, m => m.ShowExtras, expr =>
+                Html.NativeCheckBoxFor(plan, expr)
                     .CssClass("h-4 w-4 rounded border-border text-accent")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -105,9 +103,8 @@
                                 e.Element("reactive-extras").Hide();
                                 e.Element("reactive-status").SetText("unchecked");
                             });
-                    }))
-                <span>Show extras</span>
-            </label>
+                    })
+            ); }
         </div>
         <div class="font-mono text-sm mb-2">
             <p>Status: <span id="reactive-status" class="text-text-muted">&mdash;</span></p>

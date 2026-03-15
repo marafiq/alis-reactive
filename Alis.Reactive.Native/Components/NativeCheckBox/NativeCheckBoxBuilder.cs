@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
@@ -66,19 +67,20 @@ namespace Alis.Reactive.Native.Components
     /// Uses IdGenerator for element ID and MVC NameFor for the name attribute.
     /// </summary>
     public class NativeCheckBoxBuilder<TModel, TProp> : IHtmlContent
+        where TModel : class
     {
         private readonly IHtmlHelper<TModel> _html;
-        private readonly Expression<Func<TModel, TProp>> _expression;
+        private readonly Expression<Func<TModel, bool>> _expression;
         private readonly string _elementId;
         private readonly string _bindingPath;
 
         private string? _cssClass;
 
-        public NativeCheckBoxBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+        public NativeCheckBoxBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, bool>> expression)
         {
             _html = html;
             _expression = expression;
-            _elementId = IdGenerator.For<TModel, TProp>(expression);
+            _elementId = IdGenerator.For<TModel, bool>(expression);
             _bindingPath = html.NameFor(expression).ToString();
         }
 
@@ -93,38 +95,14 @@ namespace Alis.Reactive.Native.Components
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
-            writer.Write("<input type=\"checkbox\"");
-            writer.Write(" id=\"");
-            writer.Write(encoder.Encode(_elementId));
-            writer.Write("\"");
-            writer.Write(" name=\"");
-            writer.Write(encoder.Encode(_bindingPath));
-            writer.Write("\"");
-            if (_cssClass != null)
+            var attrs = new Dictionary<string, object>
             {
-                writer.Write(" class=\"");
-                writer.Write(encoder.Encode(_cssClass));
-                writer.Write("\"");
-            }
-            // Resolve checked state from model
-            try
-            {
-                var compiled = _expression.Compile();
-                var model = _html.ViewData.Model;
-                if (model != null)
-                {
-                    var value = compiled(model);
-                    if (value is true)
-                    {
-                        writer.Write(" checked");
-                    }
-                }
-            }
-            catch
-            {
-                // Model not available
-            }
-            writer.Write(" />");
+                ["id"] = _elementId
+            };
+            if (_cssClass != null) attrs["class"] = _cssClass;
+
+            var result = _html.CheckBoxFor(_expression, attrs);
+            result.WriteTo(writer, HtmlEncoder.Default);
         }
     }
 
@@ -136,32 +114,32 @@ namespace Alis.Reactive.Native.Components
         private static readonly NativeCheckBox _component = new NativeCheckBox();
 
         // ── Non-model-bound (UI toggles) ──
-
-        public static NativeCheckBoxBuilder<TModel> NativeCheckBox<TModel>(
-            this IHtmlHelper<TModel> html, string elementId)
-            where TModel : class
-        {
-            return new NativeCheckBoxBuilder<TModel>(elementId);
-        }
+            public static NativeCheckBoxBuilder<TModel> NativeCheckBox<TModel>(
+                this IHtmlHelper<TModel> html,
+                string elementId)
+                where TModel : class
+            {
+                return new NativeCheckBoxBuilder<TModel>(elementId);
+            }
 
         // ── Model-bound ──
 
-        public static NativeCheckBoxBuilder<TModel, TProp> NativeCheckBoxFor<TModel, TProp>(
-            this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
-            Expression<Func<TModel, TProp>> expression)
-            where TModel : class
-        {
-            var uniqueId = IdGenerator.For<TModel, TProp>(expression);
-            var name = html.NameFor(expression).ToString();
+            public static NativeCheckBoxBuilder<TModel, bool> NativeCheckBoxFor<TModel>(
+                this IHtmlHelper<TModel> html,
+                IReactivePlan<TModel> plan,
+                Expression<Func<TModel, bool>> expression)
+                where TModel : class
+            {
+                var uniqueId = IdGenerator.For<TModel, bool>(expression);
+                var name = html.NameFor(expression).ToString();
 
-            plan.AddToComponentsMap(name, new ComponentRegistration(
-                uniqueId,
-                _component.Vendor,
-                name,
-                _component.ReadExpr));
+                plan.AddToComponentsMap(name, new ComponentRegistration(
+                    uniqueId,
+                    _component.Vendor,
+                    name,
+                    _component.ReadExpr));
 
-            return new NativeCheckBoxBuilder<TModel, TProp>(html, expression);
+                return new NativeCheckBoxBuilder<TModel, bool>(html, expression);
+            }
         }
-    }
 }

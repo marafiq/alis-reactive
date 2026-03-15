@@ -150,6 +150,17 @@ public class WhenValidatingFormFields : PlaywrightTestBase
     }
 
     [Test]
+    public async Task ModelBoundCheckboxUsesGeneratedIdAndMvcName()
+    {
+        await NavigateTo(Path);
+
+        var checkbox = Page.Locator($"#{S}Conditional_IsEmployed");
+        await Expect(checkbox).ToHaveAttributeAsync("name", "Conditional.IsEmployed");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task ConditionalRuleSkipsWhenNotMet()
     {
         await NavigateTo(Path);

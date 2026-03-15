@@ -8,7 +8,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
     {
         public IActionResult Index()
         {
-            return View(new CheckBoxModel { IsActive = true, IsOptIn = false });
+            return View(new CheckBoxModel { IsActive = true, IsOptIn = false, ShowExtras = false });
         }
     }
 }

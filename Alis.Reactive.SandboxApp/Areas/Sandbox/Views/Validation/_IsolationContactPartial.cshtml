@@ -1,0 +1,59 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ContactFormModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    var plan = Html.ReactivePlan<ContactFormModel>();
+}
+
+<form id="isolation-contact-form" class="space-y-4 rounded-md border border-border p-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @{ Html.Field("Name", true, m => m.Name, expr =>
+            Html.NativeTextBoxFor(plan, expr)
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                .Placeholder("Contact user")
+        ); }
+        @{ Html.Field("Email", true, m => m.Email, expr =>
+            Html.NativeTextBoxFor(plan, expr)
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                .Placeholder("contact@example.com")
+        ); }
+    </div>
+
+    @{ Html.Field("Message", true, m => m.Message, expr =>
+        Html.NativeTextBoxFor(plan, expr)
+            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+            .Placeholder("This message is long enough.")
+    ); }
+
+    @(Html.NativeButton("isolation-send-contact-btn", "Send Standalone Contact")
+        .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post("/Sandbox/Validation/SendIsolationContact", g => g
+                    .Include(m => m.Name)
+                    .Include(m => m.Email)
+                    .Include(m => m.Message))
+             .Validate<ContactFormValidator>("isolation-contact-form")
+             .Response(r => r
+                .OnSuccess(s =>
+                {
+                    s.Element("isolation-contact-result").SetText("Standalone contact sent");
+                    s.Element("isolation-contact-result").AddClass("text-green-600");
+                    s.Element("isolation-contact-result").RemoveClass("text-red-600");
+                    s.Element("isolation-contact-result").RemoveClass("text-text-muted");
+                })
+                .OnError(400, e =>
+                {
+                    e.Element("isolation-contact-result").SetText("Standalone contact validation errors");
+                    e.Element("isolation-contact-result").AddClass("text-red-600");
+                    e.Element("isolation-contact-result").RemoveClass("text-green-600");
+                    e.ValidationErrors("isolation-contact-form");
+                }));
+        }))
+
+    <p id="isolation-contact-result" class="font-mono text-sm text-text-muted">Not submitted yet</p>
+</form>
+
+@Html.RenderPlan(plan)

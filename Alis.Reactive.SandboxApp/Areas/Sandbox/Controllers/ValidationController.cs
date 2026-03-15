@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using FluentValidation.Results;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
 {
@@ -9,6 +10,24 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         public IActionResult Index()
         {
             return View(new ValidationShowcaseModel());
+        }
+
+        [HttpGet]
+        public IActionResult SameModelMerge()
+        {
+            return View(new ValidationMergeHarnessModel());
+        }
+
+        [HttpGet]
+        public IActionResult StandaloneIsolation()
+        {
+            return View(new ValidationMergeHarnessModel());
+        }
+
+        [HttpGet]
+        public IActionResult MultiPartialWorkflow()
+        {
+            return View(new ValidationMergeHarnessModel());
         }
 
         [HttpPost]
@@ -119,6 +138,175 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         public IActionResult ValidateClient() => Ok(new { message = "Client validation passed!" });
 
         [HttpGet]
+        public IActionResult SameModelMergeAddressPartial()
+        {
+            return PartialView("_SameModelMergeAddressPartial", new ValidationMergeHarnessModel());
+        }
+
+        [HttpGet]
+        public IActionResult SameModelMergeAddressPartialV2()
+        {
+            return PartialView("_SameModelMergeAddressPartialV2", new ValidationMergeHarnessModel());
+        }
+
+        [HttpGet]
+        public IActionResult SameModelMergeDeliveryPartial()
+        {
+            return PartialView("_SameModelMergeDeliveryPartial", new ValidationMergeHarnessModel());
+        }
+
+        [HttpGet]
+        public IActionResult IsolationAddressPartial()
+        {
+            return PartialView("_IsolationAddressPartial", new ValidationMergeHarnessModel());
+        }
+
+        [HttpGet]
+        public IActionResult IsolationContactPartial()
+        {
+            return PartialView("_IsolationContactPartial", new ContactFormModel());
+        }
+
+        [HttpGet]
+        public IActionResult WorkflowAddressPartial()
+        {
+            return PartialView("_WorkflowAddressPartial", new ValidationMergeHarnessModel());
+        }
+
+        [HttpGet]
+        public IActionResult WorkflowAddressPartialV2()
+        {
+            return PartialView("_WorkflowAddressPartialV2", new ValidationMergeHarnessModel());
+        }
+
+        [HttpGet]
+        public IActionResult WorkflowDeliveryPartial()
+        {
+            return PartialView("_WorkflowDeliveryPartial", new ValidationMergeHarnessModel());
+        }
+
+        [HttpGet]
+        public IActionResult WorkflowContactPartial()
+        {
+            return PartialView("_WorkflowContactPartial", new ContactFormModel());
+        }
+
+        [HttpPost]
+        public IActionResult SaveSameModelMerge([FromBody] ValidationMergeHarnessModel? model)
+        {
+            if (model == null)
+            {
+                return BadRequest(new
+                {
+                    errors = new Dictionary<string, string[]>
+                    {
+                        ["Root.Name"] = new[] { "Request body is required." }
+                    }
+                });
+            }
+
+            var result = new ValidationMergeHarnessValidator().Validate(model);
+            if (!result.IsValid)
+            {
+                return BuildValidationBadRequest(result);
+            }
+
+            return Ok(new { message = "Merged root saved" });
+        }
+
+        [HttpPost]
+        public IActionResult SaveIsolationParent([FromBody] ValidationMergeHarnessModel? model)
+        {
+            if (model == null)
+            {
+                return BadRequest(new
+                {
+                    errors = new Dictionary<string, string[]>
+                    {
+                        ["Root.Name"] = new[] { "Request body is required." }
+                    }
+                });
+            }
+
+            var result = new ValidationIsolationValidator().Validate(model);
+            if (!result.IsValid)
+            {
+                return BuildValidationBadRequest(result);
+            }
+
+            return Ok(new { message = "Parent root saved" });
+        }
+
+        [HttpPost]
+        public IActionResult SendIsolationContact([FromBody] ContactFormModel? model)
+        {
+            if (model == null)
+            {
+                return BadRequest(new
+                {
+                    errors = new Dictionary<string, string[]>
+                    {
+                        ["Name"] = new[] { "Request body is required." }
+                    }
+                });
+            }
+
+            var result = new ContactFormValidator().Validate(model);
+            if (!result.IsValid)
+            {
+                return BuildValidationBadRequest(result);
+            }
+
+            return Ok(new { message = "Standalone contact sent" });
+        }
+
+        [HttpPost]
+        public IActionResult SaveWorkflowRoot([FromBody] ValidationMergeHarnessModel? model)
+        {
+            if (model == null)
+            {
+                return BadRequest(new
+                {
+                    errors = new Dictionary<string, string[]>
+                    {
+                        ["Root.Name"] = new[] { "Request body is required." }
+                    }
+                });
+            }
+
+            var result = new ValidationMergeHarnessValidator().Validate(model);
+            if (!result.IsValid)
+            {
+                return BuildValidationBadRequest(result);
+            }
+
+            return Ok(new { message = "Workflow root saved" });
+        }
+
+        [HttpPost]
+        public IActionResult SendWorkflowContact([FromBody] ContactFormModel? model)
+        {
+            if (model == null)
+            {
+                return BadRequest(new
+                {
+                    errors = new Dictionary<string, string[]>
+                    {
+                        ["Name"] = new[] { "Request body is required." }
+                    }
+                });
+            }
+
+            var result = new ContactFormValidator().Validate(model);
+            if (!result.IsValid)
+            {
+                return BuildValidationBadRequest(result);
+            }
+
+            return Ok(new { message = "Workflow contact sent" });
+        }
+
+        [HttpGet]
         public IActionResult ContactFormPartial()
         {
             return PartialView("_ContactFormPartial", new ContactFormModel());
@@ -226,6 +414,31 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
             }
 
             return Ok(new { message = "Address saved successfully!" });
+        }
+
+        private IActionResult BuildValidationBadRequest(ValidationResult result)
+        {
+            var errors = new Dictionary<string, string[]>();
+            foreach (var failure in result.Errors)
+            {
+                AppendError(errors, failure.PropertyName, failure.ErrorMessage);
+            }
+
+            return BadRequest(new { errors });
+        }
+
+        private static void AppendError(Dictionary<string, string[]> errors, string key, string message)
+        {
+            if (!errors.TryGetValue(key, out var existing))
+            {
+                errors[key] = new[] { message };
+                return;
+            }
+
+            var extended = new string[existing.Length + 1];
+            existing.CopyTo(extended, 0);
+            extended[existing.Length] = message;
+            errors[key] = extended;
         }
     }
 }

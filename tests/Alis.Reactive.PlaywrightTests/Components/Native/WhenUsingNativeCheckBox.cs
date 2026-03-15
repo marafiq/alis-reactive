@@ -15,6 +15,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 public class WhenUsingNativeCheckBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/CheckBox";
+    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_CheckBoxModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -50,7 +51,7 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
     public async Task Checkbox_starts_checked()
     {
         await NavigateAndBoot();
-        var cb = Page.Locator("#cb-test-uncheck");
+        var cb = Page.Locator($"#{Scope}IsActive");
         await Expect(cb).ToBeCheckedAsync();
         AssertNoConsoleErrors();
     }
@@ -66,7 +67,7 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Verify the checkbox starts checked
-        var cb = Page.Locator("#cb-test-uncheck");
+        var cb = Page.Locator($"#{Scope}IsActive");
         await Expect(cb).ToBeCheckedAsync();
 
         // Click the button that triggers SetChecked(false)
@@ -84,7 +85,7 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
     public async Task Checkbox_starts_unchecked()
     {
         await NavigateAndBoot();
-        var cb = Page.Locator("#cb-test-check");
+        var cb = Page.Locator($"#{Scope}IsOptIn");
         await Expect(cb).Not.ToBeCheckedAsync();
         AssertNoConsoleErrors();
     }
@@ -98,7 +99,7 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Verify the checkbox starts unchecked
-        var cb = Page.Locator("#cb-test-check");
+        var cb = Page.Locator($"#{Scope}IsOptIn");
         await Expect(cb).Not.ToBeCheckedAsync();
 
         // Click the button that triggers SetChecked(true)
@@ -121,7 +122,7 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
         await Expect(Page.Locator("#reactive-extras")).ToBeHiddenAsync();
 
         // Check the reactive checkbox
-        await Page.Locator("#cb-reactive").CheckAsync();
+        await Page.Locator($"#{Scope}ShowExtras").CheckAsync();
 
         // Extras should appear and status should say "checked"
         await Expect(Page.Locator("#reactive-extras"))
@@ -138,11 +139,11 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Check then uncheck the reactive checkbox
-        await Page.Locator("#cb-reactive").CheckAsync();
+        await Page.Locator($"#{Scope}ShowExtras").CheckAsync();
         await Expect(Page.Locator("#reactive-extras"))
             .ToBeVisibleAsync(new() { Timeout = 3000 });
 
-        await Page.Locator("#cb-reactive").UncheckAsync();
+        await Page.Locator($"#{Scope}ShowExtras").UncheckAsync();
 
         // Extras should hide and status should say "unchecked"
         await Expect(Page.Locator("#reactive-extras"))
