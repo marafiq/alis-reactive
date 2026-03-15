@@ -618,6 +618,58 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // ── Section 13: WhileLoading spinner regression — stuck spinner detection ──
+
+    [Test]
+    public async Task all_spinners_are_hidden_after_page_fully_loads()
+    {
+        // After DomReady GET completes, verify ALL spinner elements on the page are hidden.
+        // This catches "stuck spinner" bugs where a WhileLoading show fires but hide doesn't.
+        await WaitForDomReadyGet();
+
+        // DomReady GET spinner — fires WhileLoading show, OnSuccess hides it
+        await Expect(Page.Locator("#load-spinner")).ToBeHiddenAsync();
+
+        // All remaining spinners start with hidden attribute and should remain hidden
+        // since no user action has triggered their WhileLoading show
+        await Expect(Page.Locator("#save-spinner")).ToBeHiddenAsync();
+        await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
+        await Expect(Page.Locator("#parallel-spinner")).ToBeHiddenAsync();
+        await Expect(Page.Locator("#put-spinner")).ToBeHiddenAsync();
+        await Expect(Page.Locator("#delete-spinner")).ToBeHiddenAsync();
+        await Expect(Page.Locator("#formdata-spinner")).ToBeHiddenAsync();
+        await Expect(Page.Locator("#search-spinner")).ToBeHiddenAsync();
+        await Expect(Page.Locator("#multi-err-spinner")).ToBeHiddenAsync();
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task parallel_request_spinner_hides_only_after_both_complete()
+    {
+        // Click parallel load — both requests fire — spinner should stay visible until BOTH complete.
+        // After OnAllSettled fires — spinner hidden.
+        // This catches bugs where spinner hides after first response instead of waiting for all.
+        await WaitForDomReadyGet();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
+
+        // Wait for BOTH datasets to arrive — proves both requests completed
+        await Expect(Page.Locator("#parallel-resident-first")).ToHaveTextAsync(
+            "John Doe", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#parallel-facility-first")).ToHaveTextAsync(
+            "Main Campus", new() { Timeout = 5000 });
+
+        // OnAllSettled sets completion text — this is the signal that both settled
+        await Expect(Page.Locator("#parallel-all")).ToHaveTextAsync(
+            "All parallel requests completed!", new() { Timeout = 5000 });
+
+        // NOW the spinner must be hidden — not after the first response, only after OnAllSettled
+        await Expect(Page.Locator("#parallel-spinner")).ToBeHiddenAsync();
+
+        AssertNoConsoleErrors();
+    }
+
     // ── Page-level checks ─────────────────────────────────────────────────
 
     [Test]
