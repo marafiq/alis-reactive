@@ -113,4 +113,63 @@ public class WhenValidatingAcrossSameModelPartials : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Scenario 3: One partial filled, other empty — errors only on empty partial ──
+
+    [Test]
+    public async Task filling_one_partial_and_leaving_other_empty_shows_errors_only_on_empty()
+    {
+        // WHY: proves merged validation evaluates each partial's fields independently —
+        // filling all address fields completely, leaving all delivery fields empty,
+        // and submitting shows errors ONLY on delivery fields. Address fields pass
+        // validation cleanly within the same merged surface.
+
+        await LoadBothPartials();
+
+        // Step 1: Fill ALL root fields and ALL address fields — leave delivery empty
+        await Page.FillAsync($"#{S}Root_Name", "Complete User");
+        await Page.FillAsync($"#{S}Root_Email", "complete@example.com");
+        await Page.Locator($"#{S}Root_Amount").ClickAsync();
+        await Page.Locator($"#{S}Root_Amount").FillAsync("200");
+        await Page.Locator($"#{S}Root_Amount").PressAsync("Tab");
+        await Page.FillAsync($"#{S}Nested_Address_Street", "456 Oak Avenue");
+        await Page.FillAsync($"#{S}Nested_Address_City", "Portland");
+        await Page.FillAsync($"#{S}Nested_Address_ZipCode", "97201");
+
+        // Delivery fields intentionally left empty
+
+        // Step 2: Submit — errors only on delivery, not on address or root
+        await Page.Locator("#same-merge-save-btn").ClickAsync();
+
+        // Delivery error must appear (it's required and empty)
+        await Expect(Page.Locator("#same-merge-form [data-valmsg-for='Nested.Delivery.Instructions']"))
+            .ToContainTextAsync("Delivery instructions are required.", new() { Timeout = 3000 });
+
+        // Root fields must NOT have errors — they were filled correctly
+        await Expect(Page.Locator("#same-merge-form [data-valmsg-for='Root.Name']"))
+            .ToBeEmptyAsync();
+        await Expect(Page.Locator("#same-merge-form [data-valmsg-for='Root.Email']"))
+            .ToBeEmptyAsync();
+
+        // Address fields must NOT have errors — they were filled correctly
+        await Expect(Page.Locator("#same-merge-form [data-valmsg-for='Nested.Address.Street']"))
+            .ToBeEmptyAsync();
+        await Expect(Page.Locator("#same-merge-form [data-valmsg-for='Nested.Address.City']"))
+            .ToBeEmptyAsync();
+
+        // Result should show validation errors (server-side rejected due to delivery)
+        await Expect(Page.Locator("#same-merge-result"))
+            .Not.ToContainTextAsync("Merged root saved");
+
+        // Step 3: Fill delivery and resubmit — now everything passes
+        await Page.FillAsync($"#{S}Nested_Delivery_Instructions", "Leave at reception");
+        await Page.FillAsync($"#{S}Nested_Delivery_ContactPhone", "555-123-4567");
+
+        await Page.Locator("#same-merge-save-btn").ClickAsync();
+
+        await Expect(Page.Locator("#same-merge-result"))
+            .ToContainTextAsync("Merged root saved", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }

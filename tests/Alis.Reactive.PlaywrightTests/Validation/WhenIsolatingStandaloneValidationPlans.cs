@@ -107,4 +107,54 @@ public class WhenIsolatingStandaloneValidationPlans : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Scenario 3: Bidirectional isolation — errors never cross plan boundaries ──
+
+    [Test]
+    public async Task standalone_errors_do_not_appear_in_parent_form_and_vice_versa()
+    {
+        // WHY: proves complete bidirectional isolation — submitting the parent
+        // form empty shows errors ONLY inside the parent form area, never in
+        // the standalone contact area. Then submitting the standalone contact
+        // form empty shows errors ONLY inside the contact area, never in the
+        // parent area. Neither plan's error state leaks into the other.
+
+        await LoadBothPartials();
+
+        // Step 1: Submit parent form empty — parent errors appear
+        await Page.Locator("#isolation-save-parent-btn").ClickAsync();
+
+        await Expect(Page.Locator("#isolation-parent-form [data-valmsg-for='Root.Name']"))
+            .ToContainTextAsync("Name is required.", new() { Timeout = 3000 });
+        await Expect(Page.Locator("#isolation-parent-form [data-valmsg-for='Nested.Address.Street']"))
+            .ToContainTextAsync("Street is required.", new() { Timeout = 3000 });
+
+        // Standalone contact form must be completely clean — no parent errors leaked
+        await Expect(Page.Locator("#isolation-contact-form [data-valmsg-for='Name']"))
+            .ToBeEmptyAsync();
+        await Expect(Page.Locator("#isolation-contact-form [data-valmsg-for='Message']"))
+            .ToBeEmptyAsync();
+        await Expect(Page.Locator("#isolation-contact-result"))
+            .ToContainTextAsync("Not submitted yet");
+
+        // Step 2: Submit standalone contact form empty — contact errors appear
+        await Page.Locator("#isolation-send-contact-btn").ClickAsync();
+
+        await Expect(Page.Locator("#isolation-contact-form [data-valmsg-for='Name']"))
+            .ToContainTextAsync("Name is required.", new() { Timeout = 3000 });
+        await Expect(Page.Locator("#isolation-contact-form [data-valmsg-for='Message']"))
+            .ToContainTextAsync("Message is required.", new() { Timeout = 3000 });
+
+        // Parent form errors must still be scoped to parent — not cleared or changed
+        await Expect(Page.Locator("#isolation-parent-form [data-valmsg-for='Root.Name']"))
+            .ToContainTextAsync("Name is required.");
+        await Expect(Page.Locator("#isolation-parent-form [data-valmsg-for='Nested.Address.Street']"))
+            .ToContainTextAsync("Street is required.");
+
+        // Parent result was NOT affected by the standalone contact submission
+        await Expect(Page.Locator("#isolation-parent-result"))
+            .Not.ToContainTextAsync("Standalone contact");
+
+        AssertNoConsoleErrors();
+    }
 }
