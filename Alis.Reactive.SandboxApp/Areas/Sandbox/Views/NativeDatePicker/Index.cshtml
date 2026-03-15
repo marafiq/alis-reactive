@@ -9,7 +9,7 @@
     // Section 1: Property write — DomReady sets admission date
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<NativeDatePicker>(m => m.AdmissionDate).SetValue("2026-03-15");
+        p.Component<NativeDatePicker>(m => m.AdmissionDate).SetValue(new DateTime(2026, 3, 15));
     }));
 
     // Section 2: Property read — DomReady reads admission date into echo

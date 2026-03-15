@@ -12,7 +12,7 @@ public class WhenReactingToNativeDatePickerEvents : NativeTestBase
         Trigger(plan).CustomEvent<NativeDatePickerChangeArgs>("date-changed",
             (args, p) =>
                 p.Component<Native.Components.NativeDatePicker>(m => m.AdmissionDate)
-                    .SetValue("2026-01-01"));
+                    .SetValue(new DateTime(2026, 1, 1)));
         var json = plan.Render();
         AssertSchemaValid(json);
         return VerifyJson(json);

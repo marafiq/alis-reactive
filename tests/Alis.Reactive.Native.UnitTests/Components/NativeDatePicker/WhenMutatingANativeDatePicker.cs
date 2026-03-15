@@ -11,7 +11,7 @@ public class WhenMutatingANativeDatePicker : NativeTestBase
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
             p.Component<Native.Components.NativeDatePicker>(m => m.AdmissionDate)
-                .SetValue("2026-03-15"));
+                .SetValue(new DateTime(2026, 3, 15)));
         var json = plan.Render();
         AssertSchemaValid(json);
         return VerifyJson(json);
