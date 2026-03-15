@@ -122,4 +122,53 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task all_primitive_types_display_without_type_coercion_errors()
+    {
+        // Single pass across all 5 primitive types: int, long, double, string, bool.
+        // Each type exercises a different serialization path in System.Text.Json and a
+        // different coercion path in resolveToString(). If any type breaks, the assertion
+        // identifies WHICH one failed — not just that "something" failed.
+        // This proves the entire resolver pipeline handles type diversity end-to-end.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await Expect(Page.Locator("#int-value")).ToHaveTextAsync("42");
+        await Expect(Page.Locator("#long-value")).ToHaveTextAsync("9007199254740991");
+        await Expect(Page.Locator("#double-value")).ToHaveTextAsync("3.14159");
+        await Expect(Page.Locator("#string-value")).ToHaveTextAsync("hello world");
+        await Expect(Page.Locator("#bool-value")).ToHaveTextAsync("true");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task status_element_has_correct_css_classes_after_all_resolved()
+    {
+        // The reaction chain on #payload-status is a 3-mutation sequence:
+        //   1. RemoveClass("text-text-muted")  — removes initial gray styling
+        //   2. AddClass("text-green-600")      — adds success color
+        //   3. AddClass("font-semibold")       — adds emphasis
+        //
+        // This test verifies all three mutations executed correctly as a unit.
+        // If RemoveClass fails: muted class remains (conflicting styles).
+        // If either AddClass fails: visual cue is incomplete.
+        // All three together prove the multi-class mutation chain works correctly.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var status = Page.Locator("#payload-status");
+        var classAttr = await status.GetAttributeAsync("class") ?? "";
+
+        Assert.That(classAttr, Does.Contain("text-green-600"),
+            "AddClass('text-green-600') must have applied — success color");
+        Assert.That(classAttr, Does.Contain("font-semibold"),
+            "AddClass('font-semibold') must have applied — emphasis styling");
+        Assert.That(classAttr, Does.Not.Contain("text-text-muted"),
+            "RemoveClass('text-text-muted') must have removed the initial muted class — " +
+            "proves the remove+add+add mutation chain executed in correct order");
+
+        AssertNoConsoleErrors();
+    }
 }

@@ -119,4 +119,46 @@ public class WhenEventChainFires : PlaywrightTestBase
         Assert.That(finalIdx, Is.GreaterThan(receivedIdx),
             "final must dispatch after test-received");
     }
+
+    [Test]
+    public async Task all_three_steps_have_green_class_after_chain_completes()
+    {
+        // Each hop in the chain calls AddClass("text-green-600") on its step element.
+        // If any hop fails to execute its mutation (broken dispatch wiring, missing element,
+        // or reaction abort), that step's element will NOT have text-green-600.
+        // Verifying all three proves every hop executed its AddClass mutation.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var step1 = Page.Locator("#step-1");
+        var step2 = Page.Locator("#step-2");
+        var step3 = Page.Locator("#step-3");
+
+        await Expect(step1).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
+        await Expect(step2).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
+        await Expect(step3).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task chain_status_has_no_muted_class_after_chain_completes()
+    {
+        // Entry 4 (on "final") calls RemoveClass("text-text-muted") on #chain-status
+        // before calling AddClass("text-green-600"). If RemoveClass fails silently,
+        // #chain-status would have BOTH muted and green — conflicting visual states.
+        // This test, combined with chain_status_turns_green_on_completion, proves
+        // the full remove+add mutation pair executed correctly across the entire chain.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var chainStatus = Page.Locator("#chain-status");
+        var classAttr = await chainStatus.GetAttributeAsync("class") ?? "";
+
+        Assert.That(classAttr, Does.Not.Contain("text-text-muted"),
+            "RemoveClass('text-text-muted') must have executed on #chain-status — " +
+            "proves the 'final' event arrived AND the mutation pipeline ran in order");
+
+        AssertNoConsoleErrors();
+    }
 }
