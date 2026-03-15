@@ -405,6 +405,32 @@ public class WhenServerDataLoads : PlaywrightTestBase
     // ── Section 10: NativeActionLink — row actions ────────────────────────
 
     [Test]
+    public async Task native_action_link_grid_loads_initial_rows()
+    {
+        await NavigateTo("/Sandbox/Http");
+
+        // All three seed rows must be present — proves Into() partial injection rendered the grid
+        await Expect(Page.GetByTestId("native-action-link-row-41"))
+            .ToContainTextAsync("Resident #41", new() { Timeout = 5000 });
+        await Expect(Page.GetByTestId("native-action-link-row-42"))
+            .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
+        await Expect(Page.GetByTestId("native-action-link-row-43"))
+            .ToContainTextAsync("Resident #43", new() { Timeout = 5000 });
+
+        // Each row shows the resident name alongside the ID
+        await Expect(Page.GetByTestId("native-action-link-row-41")).ToContainTextAsync("John Doe");
+        await Expect(Page.GetByTestId("native-action-link-row-42")).ToContainTextAsync("Jane Smith");
+        await Expect(Page.GetByTestId("native-action-link-row-43")).ToContainTextAsync("Bob Johnson");
+
+        // Each row has a Delete action link
+        await Expect(Page.GetByTestId("native-action-link-41")).ToHaveTextAsync("Delete");
+        await Expect(Page.GetByTestId("native-action-link-42")).ToHaveTextAsync("Delete");
+        await Expect(Page.GetByTestId("native-action-link-43")).ToHaveTextAsync("Delete");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task native_action_link_delete_with_confirm_does_not_delete_when_cancelled()
     {
         await NavigateTo("/Sandbox/Http");
@@ -463,6 +489,36 @@ public class WhenServerDataLoads : PlaywrightTestBase
             .ToContainTextAsync("Standalone NativeActionLink succeeded", new() { Timeout = 5000 });
         await Expect(Page.Locator("#standalone-native-action-link-result"))
             .ToContainTextAsync("Standalone NativeActionLink response loaded.", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task standalone_action_link_fires_post_and_shows_result()
+    {
+        await NavigateTo("/Sandbox/Http");
+
+        // Before click — status shows default text, result container has no server content
+        await Expect(Page.Locator("#standalone-native-action-link-status"))
+            .ToHaveTextAsync("Standalone link has not run yet");
+        await Expect(Page.Locator("#standalone-native-action-link-result"))
+            .ToHaveTextAsync("No standalone response yet");
+
+        // Click the standalone action link — fires POST with {command:"run"}
+        await Page.GetByTestId("standalone-native-action-link").ClickAsync();
+
+        // POST response HTML is injected Into() the result container
+        await Expect(Page.Locator("#standalone-native-action-link-result"))
+            .ToContainTextAsync("Standalone NativeActionLink response loaded.", new() { Timeout = 5000 });
+
+        // Status element is updated by the OnSuccess handler
+        await Expect(Page.Locator("#standalone-native-action-link-status"))
+            .ToHaveTextAsync("Standalone NativeActionLink succeeded");
+
+        // The injected HTML contains the server-rendered styled div
+        var injectedDiv = Page.Locator("#standalone-native-action-link-result div.text-blue-700");
+        await Expect(injectedDiv).ToBeVisibleAsync();
+        await Expect(injectedDiv).ToHaveTextAsync("Standalone NativeActionLink response loaded.");
 
         AssertNoConsoleErrors();
     }
