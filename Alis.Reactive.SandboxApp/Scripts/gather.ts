@@ -51,6 +51,11 @@ export function resolveGather(
       }
 
       case "all": {
+        if (Object.keys(components).length === 0) {
+          throw new Error(
+            "[alis] IncludeAll() executed but plan.components is empty. " +
+            "No components registered — check that builders call plan.AddToComponentsMap().");
+        }
         for (const [bindingPath, comp] of Object.entries(components)) {
           const raw = evalRead(comp.id, comp.vendor, comp.readExpr);
           const value = raw === "" ? null : raw;

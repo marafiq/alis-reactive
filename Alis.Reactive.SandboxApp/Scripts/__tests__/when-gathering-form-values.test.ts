@@ -110,4 +110,9 @@ describe("gather", () => {
     expect(result.body).toEqual({});
     expect(result.urlParams).toEqual([]);
   });
+
+  it("throws when IncludeAll fires with no registered components", () => {
+    const items: GatherItem[] = [{ kind: "all" }];
+    expect(() => resolveGather(items, "POST", {})).toThrow(/IncludeAll/);
+  });
 });

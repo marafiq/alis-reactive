@@ -1,0 +1,20 @@
+using System;
+using System.Collections.Generic;
+
+namespace Alis.Reactive.Descriptors.Guards
+{
+    public sealed class AnyGuard : Guard
+    {
+        [System.Text.Json.Serialization.JsonPropertyOrder(-1)]
+        public string Kind => "any";
+
+        public IReadOnlyList<Guard> Guards { get; }
+
+        public AnyGuard(IReadOnlyList<Guard> guards)
+        {
+            if (guards == null || guards.Count == 0)
+                throw new ArgumentException("AnyGuard requires at least one guard.", nameof(guards));
+            Guards = guards;
+        }
+    }
+}

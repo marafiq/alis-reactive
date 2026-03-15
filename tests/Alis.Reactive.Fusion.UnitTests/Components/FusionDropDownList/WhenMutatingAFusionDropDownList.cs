@@ -1,5 +1,6 @@
 using Alis.Reactive;
 using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.Descriptors.Sources;
 using Alis.Reactive.Fusion.Components;
 using static VerifyNUnit.Verifier;
 
