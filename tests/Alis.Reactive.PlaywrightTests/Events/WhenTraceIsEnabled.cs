@@ -82,4 +82,57 @@ public class WhenTraceIsEnabled : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task trace_captures_dispatch_event_names()
+    {
+        // Verify each dispatched event name appears in trace.
+        // "test", "test-received", "final" should all be in console messages.
+        // Proves trace.ts captures dispatch metadata correctly — if the trace
+        // format changes or the dispatch scope stops emitting, this catches it.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var dispatchMessages = _consoleMessages
+            .Where(m => m.Contains("[alis:command]") && m.Contains("dispatch"))
+            .ToList();
+
+        Assert.That(dispatchMessages, Has.Count.EqualTo(3),
+            "Exactly 3 dispatch traces expected (test, test-received, final)");
+
+        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"test\"")), Is.True,
+            "Dispatch trace must include event name 'test'");
+        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"test-received\"")), Is.True,
+            "Dispatch trace must include event name 'test-received'");
+        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"final\"")), Is.True,
+            "Dispatch trace must include event name 'final'");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task trace_captures_mutate_element_targets()
+    {
+        // Verify mutation targets appear in trace (step-1, step-2, step-3, chain-status).
+        // Proves trace.ts captures element mutation details — if mutateElement stops
+        // logging the target field, we lose the ability to diagnose which element
+        // a mutation acted on in production traces.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var mutateMessages = _consoleMessages
+            .Where(m => m.Contains("[alis:command]") && m.Contains("mutate-element"))
+            .ToList();
+
+        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-1\"")), Is.True,
+            "Mutation trace must include target 'step-1'");
+        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-2\"")), Is.True,
+            "Mutation trace must include target 'step-2'");
+        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-3\"")), Is.True,
+            "Mutation trace must include target 'step-3'");
+        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"chain-status\"")), Is.True,
+            "Mutation trace must include target 'chain-status'");
+
+        AssertNoConsoleErrors();
+    }
 }

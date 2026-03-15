@@ -70,4 +70,25 @@ public class WhenPageLoads : PlaywrightTestBase
         await Expect(Page).ToHaveTitleAsync("Events & Dispatch — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task plan_json_has_correct_entry_count()
+    {
+        // Parse the plan JSON from #plan-json element and verify it has exactly 4 entries,
+        // matching the 4 Html.On() calls in the view (dom-ready, test, test-received, final).
+        // Proves plan serialization includes all entries — if an entry silently drops,
+        // the chain breaks and this test catches it before Playwright chain tests run.
+        await NavigateTo("/Sandbox/Events");
+
+        var planJson = Page.Locator("#plan-json");
+        var text = await planJson.TextContentAsync();
+        Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
+
+        var doc = System.Text.Json.JsonDocument.Parse(text!);
+        var entries = doc.RootElement.GetProperty("entries");
+        Assert.That(entries.GetArrayLength(), Is.EqualTo(4),
+            "Plan must have exactly 4 entries (1 dom-ready + 3 custom-event)");
+
+        AssertNoConsoleErrors();
+    }
 }
