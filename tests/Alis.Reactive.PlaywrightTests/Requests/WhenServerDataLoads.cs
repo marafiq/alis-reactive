@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Requests;
 public class WhenServerDataLoads : PlaywrightTestBase
 {
     [Test]
-    public async Task PageShowsResidentsAfterLoad()
+    public async Task page_shows_residents_after_load()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -17,7 +17,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task SuccessMessageAppearsAfterSave()
+    public async Task success_message_appears_after_save()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -35,7 +35,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task BothDataSetsAppearAfterChainedLoad()
+    public async Task both_data_sets_appear_after_chained_load()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -52,7 +52,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task AllDataAppearsAfterParallelLoad()
+    public async Task all_data_appears_after_parallel_load()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -70,7 +70,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task HttpPageRendersWithCorrectTitle()
+    public async Task http_page_renders_with_correct_title()
     {
         await NavigateTo("/Sandbox/Http");
         await Expect(Page).ToHaveTitleAsync("HTTP Requests — Alis.Reactive Sandbox");
@@ -78,7 +78,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PutUpdateShowsResult()
+    public async Task put_update_shows_result()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -96,7 +96,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task DeleteWithConfirmShowsResult()
+    public async Task delete_with_confirm_shows_result()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -120,7 +120,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FormDataPostShowsReceivedFields()
+    public async Task form_data_post_shows_received_fields()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -138,7 +138,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task SearchShowsResults()
+    public async Task search_shows_results()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -156,7 +156,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ValidationErrorRoutesTo422Handler()
+    public async Task validation_error_routes_to_422_handler()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -175,7 +175,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task NativeActionLinkDeleteWithConfirmDoesNotDeleteWhenCancelled()
+    public async Task native_action_link_delete_with_confirm_does_not_delete_when_cancelled()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -195,7 +195,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task NativeActionLinkDeleteWithConfirmDeletesAndRefreshesGridWhenConfirmed()
+    public async Task native_action_link_delete_with_confirm_deletes_and_refreshes_grid_when_confirmed()
     {
         await NavigateTo("/Sandbox/Http");
 
@@ -221,7 +221,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     }
 
     [Test]
-    public async Task StandaloneNativeActionLinkLoadsItsOwnSuccessTarget()
+    public async Task standalone_native_action_link_loads_its_own_success_target()
     {
         await NavigateTo("/Sandbox/Http");
 
