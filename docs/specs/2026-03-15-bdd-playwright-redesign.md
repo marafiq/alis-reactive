@@ -156,11 +156,38 @@ Same mandatory surface: property write, property read, event, typed conditions, 
 
 ### Group 4: HTTP & Data
 
+Each HTTP test verifies both the **request payload sent to server** and the **response handling
+in DOM**. The server controller echoes back the received payload so the test can assert the
+exact fields, types, and structure that arrived. Both JSON (`application/json`) and form data
+(`application/x-www-form-urlencoded`) content types are tested.
+
 | Route | View | Behavior Tested |
 |-------|------|-----------------|
 | `/Sandbox/Http` | HTTP verbs | GET/POST/PUT/DELETE, chained, parallel, response routing |
 | `/Sandbox/ContentType` | Response handling | JSON flat/nested, HTML partial via Into() |
 | `/Sandbox/Gather` | Form gathering | Include per component, IncludeAll, static params |
+
+**HTTP test surface (BDD):**
+
+| Behavior | Request Assertion | Response Assertion |
+|----------|-------------------|-------------------|
+| POST JSON sends gathered values | Server echoes `{ "field": "value" }` — test verifies exact payload | DOM shows success message |
+| POST form data sends gathered values | Server echoes received form fields — test verifies exact field names and values | DOM shows confirmation |
+| GET loads data on DomReady | N/A (no payload) | DOM populated with response data |
+| PUT sends updated payload | Server echoes updated fields — test verifies changed values | DOM shows update confirmation |
+| DELETE sends identifier | Server echoes deleted ID — test verifies correct ID sent | DOM removes element |
+| Chained requests pass data forward | Second request receives first response's data | DOM shows final chain result |
+| Parallel requests fire concurrently | Both endpoints receive correct payloads independently | Both DOM targets populated |
+| JSON content type | Server receives `application/json` body with correct structure | Echo confirms field types preserved |
+| Form data content type | Server receives `application/x-www-form-urlencoded` with correct key=value pairs | Echo confirms field names match model binding |
+| Gather Include sends component value | Server echoes `{ "PropertyName": "componentValue" }` — matches component's current value | DOM confirms gathered |
+| Gather IncludeAll sends all registered | Server echoes all registered component values by binding path | DOM confirms all gathered |
+| Gather Static sends literal param | Server echoes `{ "paramName": "literalValue" }` | DOM confirms static value |
+
+**Server echo pattern:** Each controller action deserializes the request body, wraps it in a
+response that includes the raw received fields, and returns it. The Playwright test reads the
+echoed payload from the DOM (rendered by the response handler) and asserts exact field match.
+No shared `Echo()` endpoint — each view's controller has its own echo action.
 
 ### Group 5: Validation
 
