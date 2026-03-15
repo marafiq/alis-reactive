@@ -171,4 +171,38 @@ public class WhenPayloadPropertiesResolve : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task success_status_has_green_and_semibold_without_muted()
+    {
+        // The payload-status element receives a 3-mutation sequence after ALL source bindings resolve:
+        //   1. RemoveClass("text-text-muted")  — strip initial gray
+        //   2. AddClass("text-green-600")      — apply success color
+        //   3. AddClass("font-semibold")       — apply emphasis
+        //
+        // This is a CSS class mutation COHERENCE test — it verifies the final class state
+        // as a single atomic assertion block. If mutations execute out of order or any
+        // mutation is skipped, the final class list will be wrong:
+        //   - Missing RemoveClass → "text-text-muted" still present (green + muted conflict)
+        //   - Missing AddClass → no green or no semibold (incomplete visual state)
+        //   - Aborted reaction → none of the mutations apply (element stays gray)
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var status = Page.Locator("#payload-status");
+        var classAttr = await status.GetAttributeAsync("class") ?? "";
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(classAttr, Does.Contain("text-green-600"),
+                "AddClass('text-green-600') must have applied — success color after payload resolution");
+            Assert.That(classAttr, Does.Contain("font-semibold"),
+                "AddClass('font-semibold') must have applied — emphasis after payload resolution");
+            Assert.That(classAttr, Does.Not.Contain("text-text-muted"),
+                "RemoveClass('text-text-muted') must have stripped the initial muted class — " +
+                "stale class would cause conflicting green+muted styles");
+        });
+
+        AssertNoConsoleErrors();
+    }
 }

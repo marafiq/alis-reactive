@@ -161,4 +161,37 @@ public class WhenEventChainFires : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task chain_status_has_semibold_and_green_and_no_muted_class()
+    {
+        // The chain-status element receives a 3-mutation sequence from Entry 4 (on "final"):
+        //   1. RemoveClass("text-text-muted")  — strip initial gray
+        //   2. AddClass("text-green-600")      — apply success color
+        //   3. AddClass("font-semibold")       — apply emphasis
+        //
+        // This test verifies the COMPLETE final class state in a single assertion block.
+        // A missed RemoveClass leaves stale "text-text-muted" (conflicting styles).
+        // A missed AddClass leaves the element without visual success cues.
+        // Wrong ordering (e.g., AddClass before RemoveClass) could theoretically work,
+        // but if the runtime reorders or skips mutations, this catches it.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var status = Page.Locator("#chain-status");
+        var classAttr = await status.GetAttributeAsync("class") ?? "";
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(classAttr, Does.Contain("text-green-600"),
+                "AddClass('text-green-600') must have applied — success color after full 3-hop chain");
+            Assert.That(classAttr, Does.Contain("font-semibold"),
+                "AddClass('font-semibold') must have applied — emphasis after full 3-hop chain");
+            Assert.That(classAttr, Does.Not.Contain("text-text-muted"),
+                "RemoveClass('text-text-muted') must have stripped the initial muted class — " +
+                "stale class would cause conflicting green+muted styles");
+        });
+
+        AssertNoConsoleErrors();
+    }
 }
