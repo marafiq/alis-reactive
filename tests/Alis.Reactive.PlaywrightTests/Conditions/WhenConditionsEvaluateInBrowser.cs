@@ -12,7 +12,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── int (ElseIf grade ladder) ──
 
     [Test]
-    public async Task Int_elseif_takes_correct_branch()
+    public async Task int_elseif_takes_correct_branch()
     {
         await NavigateAndBoot();
         var grade = Page.Locator("#grade");
@@ -32,7 +32,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── long ──
 
     [Test]
-    public async Task Long_gt_threshold()
+    public async Task long_gt_threshold()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#long-result");
@@ -49,7 +49,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── double ──
 
     [Test]
-    public async Task Double_gt_comparison()
+    public async Task double_gt_comparison()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#double-result");
@@ -66,7 +66,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── bool ──
 
     [Test]
-    public async Task Bool_truthy_falsy()
+    public async Task bool_truthy_falsy()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#bool-result");
@@ -83,7 +83,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── string ──
 
     [Test]
-    public async Task String_eq_comparison()
+    public async Task string_eq_comparison()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#string-result");
@@ -100,7 +100,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── DateTime ──
 
     [Test]
-    public async Task DateTime_gt_comparison()
+    public async Task datetime_gt_comparison()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#date-result");
@@ -117,7 +117,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── int? (nullable) ──
 
     [Test]
-    public async Task Nullable_int_is_null()
+    public async Task nullable_int_is_null()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#nullable-result");
@@ -134,7 +134,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── AND (int + string) ──
 
     [Test]
-    public async Task And_mixed_types()
+    public async Task and_mixed_types()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#and-result");
@@ -151,7 +151,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── OR (string alternatives) ──
 
     [Test]
-    public async Task Or_string_alternatives()
+    public async Task or_string_alternatives()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#or-result");
@@ -171,7 +171,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Nested payload — deep dot-path ──
 
     [Test]
-    public async Task Nested_payload_deep_path_eq()
+    public async Task nested_payload_deep_path_eq()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#nested-result");
@@ -188,7 +188,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Null nested object ──
 
     [Test]
-    public async Task Null_nested_object_is_null()
+    public async Task null_nested_object_is_null()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#nested-null-result");
@@ -209,7 +209,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Mixed nested + flat AND ──
 
     [Test]
-    public async Task Mixed_nested_and_flat_in_and()
+    public async Task mixed_nested_and_flat_in_and()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#nested-and-result");
@@ -231,7 +231,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Null leaf in comparison ──
 
     [Test]
-    public async Task Null_leaf_in_comparison_takes_else_no_crash()
+    public async Task null_leaf_in_comparison_takes_else_no_crash()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#null-leaf-result");
@@ -254,7 +254,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── In membership ──
 
     [Test]
-    public async Task In_membership()
+    public async Task in_membership()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#in-result");
@@ -271,7 +271,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── NotIn membership ──
 
     [Test]
-    public async Task NotIn_membership()
+    public async Task notin_membership()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#notin-result");
@@ -288,7 +288,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Between range ──
 
     [Test]
-    public async Task Between_range()
+    public async Task between_range()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#between-result");
@@ -308,7 +308,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Contains text ──
 
     [Test]
-    public async Task Contains_text()
+    public async Task contains_text()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#contains-result");
@@ -325,7 +325,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── StartsWith text ──
 
     [Test]
-    public async Task StartsWith_text()
+    public async Task starts_with_text()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#startswith-result");
@@ -342,7 +342,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Matches regex ──
 
     [Test]
-    public async Task Matches_regex()
+    public async Task matches_regex()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#matches-result");
@@ -359,7 +359,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── MinLength text ──
 
     [Test]
-    public async Task MinLength_text()
+    public async Task min_length_text()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#minlength-result");
@@ -376,7 +376,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── IsEmpty presence ──
 
     [Test]
-    public async Task IsEmpty_presence()
+    public async Task is_empty_presence()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#isempty-result");
@@ -396,7 +396,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── NOT (InvertGuard) ──
 
     [Test]
-    public async Task Not_inverts_guard()
+    public async Task not_inverts_guard()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#not-result");
@@ -413,7 +413,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Per-action When guard ──
 
     [Test]
-    public async Task Per_action_when_guard()
+    public async Task per_action_when_guard()
     {
         await NavigateAndBoot();
         var always = Page.Locator("#per-action-result");
@@ -437,7 +437,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Direct And syntax ──
 
     [Test]
-    public async Task Direct_and_syntax()
+    public async Task direct_and_syntax()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#direct-and-result");
@@ -454,7 +454,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Direct Or syntax ──
 
     [Test]
-    public async Task Direct_or_syntax()
+    public async Task direct_or_syntax()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#direct-or-result");
@@ -474,7 +474,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Confirm dialog — OK path ──
 
     [Test]
-    public async Task Confirm_ok_path()
+    public async Task confirm_ok_path()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#confirm-result");
@@ -499,7 +499,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Confirm dialog — Cancel path ──
 
     [Test]
-    public async Task Confirm_cancel_path()
+    public async Task confirm_cancel_path()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#confirm-result");
