@@ -70,6 +70,11 @@ ReactiveExtensions files).
 | `FusionColorPicker` | `ColorPickerBuilder` | `"value"` | `string` | New |
 | `FusionRichTextEditor` | `RichTextEditorBuilder` | `"value"` | `string` | New |
 
+**Dropdown-type components** (DropDownList, ComboBox, MultiSelectDropdown) must onboard
+`DataSource` and `DataBind` properly. Verify against actual Syncfusion EJ2 API docs —
+do not guess the API surface. Each dropdown sandbox page must demonstrate data-bound
+selection with real domain data (e.g., facilities list, care levels, medication categories).
+
 ### Vertical Slice File Pattern (per component)
 
 Each new component produces exactly these files:
@@ -359,8 +364,10 @@ Violation of this shape is a build-breaking defect. Treat it like a compilation 
 
 - **Never change the DSL shape** — public API stays identical
 - **Never violate vertical slice shape** — every component follows the exact file pattern above
+- **No usage without Html.Field()** — every input component in every view MUST be wrapped in `Html.Field()`. No bare `Html.XxxFor()` calls. `Html.Field()` provides label, `for` attribute, and validation error slot. This is not optional.
 - **Duplication over abstraction** — each slice is self-contained, no shared base
 - **No mocks** — real browser, real server, real components
 - **No raw HTML** — every `<input>`, `<select>`, `<button>` uses framework builders
 - **Schema tests stay** — C# unit tests with JSON schema validation unchanged
 - **One component at a time** — NativeDatePicker first, FusionDatePicker later
+- **Verify Syncfusion API docs** — for dropdown-type components, verify DataSource/DataBind against actual SF EJ2 API docs before onboarding
