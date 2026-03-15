@@ -665,4 +665,84 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Per-action When guard — low score on fresh page (skip path) ──
+
+    [Test]
+    public async Task per_action_when_guard_skips_guarded_command_on_fresh_page()
+    {
+        // Fresh navigation — bonus starts as "—" (em dash default)
+        await NavigateAndBoot();
+        var always = Page.Locator("#per-action-result");
+        var bonus = Page.Locator("#per-action-bonus");
+
+        // score=50 → guard fails → first command fires, second is SKIPPED
+        await Page.Locator("#btn-peraction-low").ClickAsync();
+        await Expect(always).ToHaveTextAsync("Always runs");
+        // Bonus was never set — remains at default em dash
+        await Expect(bonus).ToHaveTextAsync("\u2014");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Direct And — first condition fails ──
+
+    [Test]
+    public async Task direct_and_fails_when_first_condition_fails()
+    {
+        // Score 70 < 90 → first condition Gte(90) is false → AND short-circuits → Else
+        await NavigateAndBoot();
+        var result = Page.Locator("#direct-and-result");
+
+        await Page.EvaluateAsync(
+            "document.dispatchEvent(new CustomEvent('check-direct-and',{detail:{score:70,status:'active'}}))");
+        await Expect(result).ToHaveTextAsync("Fail");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Direct Or — both conditions match (first wins) ──
+
+    [Test]
+    public async Task direct_or_succeeds_when_first_condition_matches()
+    {
+        // role "admin" matches first Eq("admin") → OR succeeds immediately
+        await NavigateAndBoot();
+        var result = Page.Locator("#direct-or-result");
+
+        await Page.Locator("#btn-direct-or-admin").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Authorized");
+
+        // Confirm re-evaluation: neither matches → Denied
+        await Page.Locator("#btn-direct-or-viewer").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Denied");
+
+        // Second condition matches → OR succeeds via second operand
+        await Page.Locator("#btn-direct-or-super").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Authorized");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Null leaf — missing address key entirely (not just city=null) ──
+
+    [Test]
+    public async Task null_leaf_with_missing_address_key_takes_else_no_crash()
+    {
+        // Dispatch check-null-leaf with NO address key at all → walk returns undefined
+        // → coerced to "" → != "Seattle" → else branch, no crash
+        await NavigateAndBoot();
+        var result = Page.Locator("#null-leaf-result");
+
+        // address key entirely missing → walk.ts returns undefined → else
+        await Page.EvaluateAsync(
+            "document.dispatchEvent(new CustomEvent('check-null-leaf',{detail:{id:99}}))");
+        await Expect(result).ToHaveTextAsync("Not Seattle");
+
+        // Confirm recovery: city=Seattle still matches after missing-key dispatch
+        await Page.Locator("#btn-null-leaf-match").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Seattle");
+
+        AssertNoConsoleErrors();
+    }
 }
