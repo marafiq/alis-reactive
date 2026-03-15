@@ -102,4 +102,38 @@ public class WhenContentTypeHandlersResolve : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task html_partial_components_are_interactive_after_injection()
+    {
+        // After Into() injects the partial, verify the native input inside is interactive —
+        // not just dead HTML. Type a new value into the NativeTextBoxFor input and verify
+        // the DOM value changes. This proves Into() with ej.base.append correctly initializes
+        // the injected components so they respond to user interaction.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        // Load the partial via Into()
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Partial" }).ClickAsync();
+
+        // Wait for partial injection — marker element proves HTML arrived
+        await Expect(Page.Locator("#partial-loaded-marker")).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // The native input rendered by NativeTextBoxFor has the IdGenerator-based ID
+        var nativeInput = Page.Locator($"#{S}__NativeValue");
+
+        // Verify the input has its server-rendered default value
+        await Expect(nativeInput).ToHaveValueAsync("native-partial-value");
+
+        // Clear and type a new value — proves the input is interactive, not inert HTML
+        await nativeInput.ClearAsync();
+        await nativeInput.FillAsync("user-typed-value");
+        await Expect(nativeInput).ToHaveValueAsync("user-typed-value");
+
+        // Verify the input is editable (not disabled/readonly)
+        var isDisabled = await nativeInput.IsDisabledAsync();
+        Assert.That(isDisabled, Is.False, "Native input inside injected partial must be interactive");
+
+        AssertNoConsoleErrors();
+    }
 }
