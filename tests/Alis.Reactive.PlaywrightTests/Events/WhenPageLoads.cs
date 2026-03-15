@@ -1,52 +1,73 @@
 namespace Alis.Reactive.PlaywrightTests.Events;
 
+/// <summary>
+/// Verifies the Events page renders correctly: navigation works, plan JSON is valid,
+/// and all step sections are present in the DOM before the chain fires.
+/// These are precondition tests — if these fail, chain tests are meaningless.
+/// </summary>
 [TestFixture]
 public class WhenPageLoads : PlaywrightTestBase
 {
     [Test]
-    public async Task Events_page_renders_with_correct_title()
+    public async Task home_page_links_to_sandbox_events()
     {
-        await NavigateTo("/Sandbox/Events");
-        await Expect(Page).ToHaveTitleAsync("Events & Dispatch — Alis.Reactive Sandbox");
+        // The home page must have a working navigation path to the Events page.
+        // If routing or area registration breaks, this link disappears or 404s.
+        await NavigateTo("/");
+        await Expect(Page).ToHaveTitleAsync("Home — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
+
+        // Click the "Events & Dispatch" card link on the home page
+        var link = Page.GetByRole(AriaRole.Link, new() { Name = "Events & Dispatch" });
+        await Expect(link).ToBeVisibleAsync();
+        await link.ClickAsync();
+        await Page.WaitForURLAsync("**/Sandbox/Events");
+        await Expect(Page).ToHaveTitleAsync("Events & Dispatch — Alis.Reactive Sandbox");
     }
 
     [Test]
-    public async Task Events_page_shows_all_content_sections()
+    public async Task events_page_renders_plan_json()
     {
-        await NavigateTo("/Sandbox/Events");
-
-        await Expect(Page.Locator("h1")).ToHaveTextAsync("Events & Dispatch");
-        await Expect(Page.GetByText("Plan JSON")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("C# DSL")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("Runtime Boot (TypeScript)")).ToBeVisibleAsync();
-    }
-
-    [Test]
-    public async Task Plan_json_section_shows_valid_plan()
-    {
+        // The plan JSON section must contain valid JSON with an entries array.
+        // If plan.Render() or plan.RenderFormatted() breaks, this section is empty or malformed.
         await NavigateTo("/Sandbox/Events");
 
         var planJson = Page.Locator("#plan-json");
         await Expect(planJson).Not.ToBeEmptyAsync();
 
         var text = await planJson.TextContentAsync();
-        Assert.That(text, Does.Contain("\"entries\""), "Plan has entries");
-        Assert.That(text, Does.Contain("\"dom-ready\""), "Plan has dom-ready trigger");
-        Assert.That(text, Does.Contain("\"custom-event\""), "Plan has custom-event trigger");
+        Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
+
+        // Validate it's actual JSON with expected structure
+        Assert.That(text, Does.Contain("\"entries\""), "Plan must have entries array");
+        Assert.That(text, Does.Contain("\"dom-ready\""), "Plan must contain dom-ready trigger");
+        Assert.That(text, Does.Contain("\"custom-event\""), "Plan must contain custom-event triggers");
+        Assert.That(text, Does.Contain("\"dispatch\""), "Plan must contain dispatch commands");
+        Assert.That(text, Does.Contain("\"mutate-element\""), "Plan must contain mutate-element commands");
+
+        AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task Home_page_renders_and_links_to_events()
+    public async Task events_page_shows_all_three_steps()
     {
-        await NavigateTo("/");
+        // The three step elements must exist in the DOM — they are the mutation targets.
+        // If the view removes or renames an element ID, the chain will throw at runtime.
+        await NavigateTo("/Sandbox/Events");
 
-        await Expect(Page).ToHaveTitleAsync("Home — Alis.Reactive Sandbox");
+        await Expect(Page.Locator("#step-1")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#step-2")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#step-3")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#chain-status")).ToBeVisibleAsync();
+
         AssertNoConsoleErrors();
+    }
 
-        var link = Page.GetByRole(AriaRole.Link, new() { Name = "Events", Exact = true });
-        await Expect(link).ToBeVisibleAsync();
-        await link.ClickAsync();
-        await Page.WaitForURLAsync("**/Sandbox/Events");
+    [Test]
+    public async Task events_page_renders_with_correct_title()
+    {
+        await NavigateTo("/Sandbox/Events");
+        await Expect(Page).ToHaveTitleAsync("Events & Dispatch — Alis.Reactive Sandbox");
+        AssertNoConsoleErrors();
     }
 }

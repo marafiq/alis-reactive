@@ -1,72 +1,122 @@
 namespace Alis.Reactive.PlaywrightTests.Events;
 
+/// <summary>
+/// Verifies the three-hop dispatch chain: dom-ready -> "test" -> "test-received" -> "final".
+/// If two-phase boot breaks, the chain silently stops. If dispatch breaks, DOM never updates.
+/// If expression path resolution breaks, payload data never reaches the DOM.
+/// These tests catch all three failure modes via DOM assertions.
+/// </summary>
 [TestFixture]
 public class WhenEventChainFires : PlaywrightTestBase
 {
-    [Test]
-    public async Task Three_hop_chain_completes_with_all_dispatches_in_trace()
-    {
-        await NavigateTo("/Sandbox/Events");
-        await WaitForTraceMessage("booted", 5000);
-
-        AssertTraceContains("command", "\"event\":\"test\"");
-        AssertTraceContains("command", "\"event\":\"test-received\"");
-        AssertTraceContains("command", "\"event\":\"final\"");
-        AssertNoConsoleErrors();
-    }
+    private const string Path = "/Sandbox/Events";
 
     [Test]
-    public async Task Dispatches_occur_in_chronological_order()
+    public async Task three_hop_chain_completes_in_order()
     {
-        await NavigateTo("/Sandbox/Events");
+        // If any hop in the chain breaks (boot ordering, dispatch wiring, reaction execution),
+        // one or more steps will still show "waiting..." text instead of completion text.
+        await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var dispatches = _consoleMessages
-            .Where(m => m.Contains("dispatch"))
-            .ToList();
-
-        var testIdx = dispatches.FindIndex(m => m.Contains("\"event\":\"test\"") && !m.Contains("test-received"));
-        var receivedIdx = dispatches.FindIndex(m => m.Contains("\"event\":\"test-received\""));
-        var finalIdx = dispatches.FindIndex(m => m.Contains("\"event\":\"final\""));
-
-        Assert.That(testIdx, Is.GreaterThanOrEqualTo(0), "test dispatch traced");
-        Assert.That(receivedIdx, Is.GreaterThan(testIdx), "test-received dispatched after test");
-        Assert.That(finalIdx, Is.GreaterThan(receivedIdx), "final dispatched after test-received");
-    }
-
-    [Test]
-    public async Task Final_event_carries_payload()
-    {
-        await NavigateTo("/Sandbox/Events");
-        await WaitForTraceMessage("booted", 5000);
-
-        var finalDispatch = _consoleMessages
-            .FirstOrDefault(m => m.Contains("dispatch") && m.Contains("\"event\":\"final\""));
-
-        Assert.That(finalDispatch, Is.Not.Null, "final dispatch traced");
-        Assert.That(finalDispatch, Does.Contain("eventName"), "Payload field present in trace");
-    }
-
-    [Test]
-    public async Task Plan_drives_chain_status_dom_mutations()
-    {
-        await NavigateTo("/Sandbox/Events");
-        await WaitForTraceMessage("booted", 5000);
-
-        // All steps should have text-green-600 class added by plan mutate-element commands
         var step1 = Page.Locator("#step-1");
         var step2 = Page.Locator("#step-2");
         var step3 = Page.Locator("#step-3");
+
+        // Each step's text proves the PREVIOUS dispatch arrived and the reaction executed
+        await Expect(step1).ToContainTextAsync("dom-ready fired");
+        await Expect(step2).ToContainTextAsync("\"test\" received");
+        await Expect(step3).ToContainTextAsync("\"test-received\" received");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task payload_survives_dispatch_chain()
+    {
+        // Entry 3 dispatches "final" with payload { eventName: "done" }.
+        // The trace must carry that payload — if expression path serialization or
+        // dispatch payload propagation breaks, this field disappears from the trace.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var finalDispatch = _consoleMessages
+            .FirstOrDefault(m => m.Contains("[alis:command]")
+                                 && m.Contains("dispatch")
+                                 && m.Contains("\"event\":\"final\""));
+
+        Assert.That(finalDispatch, Is.Not.Null,
+            "final dispatch must be traced");
+        Assert.That(finalDispatch, Does.Contain("eventName"),
+            "payload.eventName must survive the dispatch chain");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task chain_status_turns_green_on_completion()
+    {
+        // Entry 4 listens for "final" and mutates chain-status:
+        //   RemoveClass("text-text-muted") + AddClass("text-green-600") + AddClass("font-semibold") + SetText(...)
+        // If the final event never fires (broken chain) OR mutations fail, this element stays gray.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
         var status = Page.Locator("#chain-status");
 
-        await Expect(step1).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
-        await Expect(step2).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
-        await Expect(step3).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
         await Expect(status).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
-
-        // Chain status text updated by plan
+        await Expect(status).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("font-semibold"));
         await Expect(status).ToContainTextAsync("Chain complete");
 
         AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task dom_mutations_preserve_class_coherence()
+    {
+        // Entry 4 does RemoveClass("text-text-muted") then AddClass("text-green-600").
+        // If RemoveClass fails silently, the element would have BOTH classes — conflicting styles.
+        // If AddClass fails, it would have neither green class.
+        // This test verifies the mutation pair works atomically.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var status = Page.Locator("#chain-status");
+        var classAttr = await status.GetAttributeAsync("class") ?? "";
+
+        Assert.That(classAttr, Does.Contain("text-green-600"),
+            "AddClass('text-green-600') must have applied");
+        Assert.That(classAttr, Does.Not.Contain("text-text-muted"),
+            "RemoveClass('text-text-muted') must have removed the initial muted class");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task dispatches_occur_in_chronological_order_in_trace()
+    {
+        // The three dispatches must appear in trace in causal order:
+        // test -> test-received -> final.
+        // If boot executes dom-ready before wiring listeners, the chain may partially fire
+        // or fire out of order. This test catches ordering regressions.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        var dispatches = _consoleMessages
+            .Where(m => m.Contains("[alis:command]") && m.Contains("dispatch"))
+            .ToList();
+
+        var testIdx = dispatches.FindIndex(m =>
+            m.Contains("\"event\":\"test\"") && !m.Contains("test-received"));
+        var receivedIdx = dispatches.FindIndex(m =>
+            m.Contains("\"event\":\"test-received\""));
+        var finalIdx = dispatches.FindIndex(m =>
+            m.Contains("\"event\":\"final\""));
+
+        Assert.That(testIdx, Is.GreaterThanOrEqualTo(0), "test dispatch must be traced");
+        Assert.That(receivedIdx, Is.GreaterThan(testIdx),
+            "test-received must dispatch after test");
+        Assert.That(finalIdx, Is.GreaterThan(receivedIdx),
+            "final must dispatch after test-received");
     }
 }
