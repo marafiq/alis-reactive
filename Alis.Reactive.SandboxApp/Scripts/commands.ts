@@ -32,12 +32,13 @@ export function executeCommand(cmd: Command, ctx?: ExecContext): void {
       break;
 
     case "validation-errors": {
-      if (ctx?.responseBody) {
-        // Server-only validation: formId from command, no client fields needed.
-        // showServerErrors uses data-valmsg-for spans, not the field list.
-        const desc = ctx.validationDesc ?? { formId: cmd.formId, fields: [] };
-        showServerErrors(desc, ctx.responseBody);
+      if (!ctx?.responseBody) break;
+      if (!ctx.validationDesc) {
+        throw new Error(
+          `[alis] ValidationErrors("${cmd.formId}") requires a validation descriptor. ` +
+          `Use .Validate<TValidator>(formId) on the request to attach one.`);
       }
+      showServerErrors(ctx.validationDesc, ctx.responseBody);
       break;
     }
 

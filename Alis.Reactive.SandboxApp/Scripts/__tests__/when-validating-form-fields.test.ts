@@ -28,23 +28,12 @@ function errSpan(fieldName: string): string {
 beforeEach(async () => {
   const dom = new JSDOM(`<!DOCTYPE html><html><body>
     <form id="testForm">
-      <input id="Name" name="Name" value="" />
-      ${errSpan("Name")}
-
-      <input id="Email" name="Email" value="" />
-      ${errSpan("Email")}
-
-      <input id="Phone" name="Phone" value="" />
-      ${errSpan("Phone")}
-
-      <input id="Age" name="Age" type="number" value="" />
-      ${errSpan("Age")}
-
-      <input id="Website" name="Website" value="" />
-      ${errSpan("Website")}
-
-      <input id="Salary" name="Salary" type="number" value="" />
-      ${errSpan("Salary")}
+      <div><input id="Name" name="Name" value="" />${errSpan("Name")}</div>
+      <div><input id="Email" name="Email" value="" />${errSpan("Email")}</div>
+      <div><input id="Phone" name="Phone" value="" />${errSpan("Phone")}</div>
+      <div><input id="Age" name="Age" type="number" value="" />${errSpan("Age")}</div>
+      <div><input id="Website" name="Website" value="" />${errSpan("Website")}</div>
+      <div><input id="Salary" name="Salary" type="number" value="" />${errSpan("Salary")}</div>
 
       <input id="Password" name="Password" type="password" value="" />
       ${errSpan("Password")}
@@ -55,23 +44,13 @@ beforeEach(async () => {
       <input id="Tags" name="Tags" value="" />
       ${errSpan("Tags")}
 
-      <input id="IsEmployed" name="IsEmployed" type="checkbox" />
-
-      <input id="JobTitle" name="JobTitle" value="" />
-      ${errSpan("JobTitle")}
-
-      <input id="Address_Street" name="Address.Street" value="" />
-      ${errSpan("Address.Street")}
-
-      <input id="Address_City" name="Address.City" value="" />
-      ${errSpan("Address.City")}
-
-      <div id="FusionDrop"></div>
-      ${errSpan("FusionDrop")}
-
+      <div><input id="IsEmployed" name="IsEmployed" type="checkbox" /></div>
+      <div><input id="JobTitle" name="JobTitle" value="" />${errSpan("JobTitle")}</div>
+      <div><input id="Address_Street" name="Address.Street" value="" />${errSpan("Address.Street")}</div>
+      <div><input id="Address_City" name="Address.City" value="" />${errSpan("Address.City")}</div>
+      <div><div id="FusionDrop"></div>${errSpan("FusionDrop")}</div>
       <div id="hiddenField" style="display:none">
-        <input id="HiddenInput" name="HiddenInput" value="" />
-        ${errSpan("HiddenInput")}
+        <div><input id="HiddenInput" name="HiddenInput" value="" />${errSpan("HiddenInput")}</div>
       </div>
     </form>
     <div data-alis-validation-summary hidden></div>
