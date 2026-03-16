@@ -283,7 +283,12 @@ public class WhenCascadingDropDownsInteract : PlaywrightTestBase
         Assert.That(cityValue, Is.Null.Or.Empty,
             $"City value should be cleared after switching country but was '{cityValue}'");
 
-        // Verify UK cities are available — select London
+        // Verify UK cities are available — wait for DataBind to complete then select London
+        await Page.WaitForFunctionAsync($@"() => {{
+            const el = document.getElementById('{CityId}');
+            return el && el.ej2_instances && el.ej2_instances[0] &&
+                   el.ej2_instances[0].dataSource && el.ej2_instances[0].dataSource.length === 2;
+        }}", null, new() { Timeout = 10000 });
         await SelectCity("London");
         await Expect(Page.Locator("#selected-city"))
             .ToHaveTextAsync("LON", new() { Timeout = 5000 });
