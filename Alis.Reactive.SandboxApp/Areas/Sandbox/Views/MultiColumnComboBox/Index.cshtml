@@ -3,6 +3,7 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "MultiColumnComboBox";
 
@@ -57,7 +58,7 @@
             @{ Html.Field("Facility (SF MultiColumnComboBox)", false, m => m.Facility, expr =>
                 Html.MultiColumnComboBoxFor(plan, expr)
                     .DataSource(facilities)
-                    .Fields(f => f.Text("text").Value("value"))
+                    .Fields<FacilityItem>(t => t.Text, v => v.Value)
                     .Columns(col =>
                     {
                         col.Field("text").Header("Name").Width("160").Add();
