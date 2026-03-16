@@ -50,6 +50,20 @@ namespace Alis.Reactive.Fusion.Components
             });
         }
 
+        public static MultiColumnComboBoxBuilder Fields<TItem>(
+            this MultiColumnComboBoxBuilder builder,
+            Expression<Func<TItem, object?>> text,
+            Expression<Func<TItem, object?>> value,
+            Expression<Func<TItem, object?>> groupBy)
+        {
+            return builder.Fields(new MultiColumnComboBoxFieldSettings
+            {
+                Text = ToCamelCase(GetMemberName(text)),
+                Value = ToCamelCase(GetMemberName(value)),
+                GroupBy = ToCamelCase(GetMemberName(groupBy))
+            });
+        }
+
         private static string GetMemberName<T>(Expression<Func<T, object?>> expr)
         {
             var body = expr.Body;

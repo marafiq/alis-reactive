@@ -51,6 +51,20 @@ namespace Alis.Reactive.Fusion.Components
             });
         }
 
+        public static AutoCompleteBuilder Fields<TItem>(
+            this AutoCompleteBuilder builder,
+            Expression<Func<TItem, object?>> text,
+            Expression<Func<TItem, object?>> value,
+            Expression<Func<TItem, object?>> groupBy)
+        {
+            return builder.Fields(new AutoCompleteFieldSettings
+            {
+                Text = ToCamelCase(GetMemberName(text)),
+                Value = ToCamelCase(GetMemberName(value)),
+                GroupBy = ToCamelCase(GetMemberName(groupBy))
+            });
+        }
+
         private static string GetMemberName<T>(Expression<Func<T, object?>> expr)
         {
             var body = expr.Body;

@@ -50,6 +50,24 @@ namespace Alis.Reactive.Fusion.Components
             });
         }
 
+        /// <summary>
+        /// Typed Fields with GroupBy — groups items in the dropdown popup.
+        /// Usage: .Fields&lt;CountryItem&gt;(t =&gt; t.Text, v =&gt; v.Value, g =&gt; g.Continent)
+        /// </summary>
+        public static DropDownListBuilder Fields<TItem>(
+            this DropDownListBuilder builder,
+            Expression<Func<TItem, object?>> text,
+            Expression<Func<TItem, object?>> value,
+            Expression<Func<TItem, object?>> groupBy)
+        {
+            return builder.Fields(new DropDownListFieldSettings
+            {
+                Text = ToCamelCase(GetMemberName(text)),
+                Value = ToCamelCase(GetMemberName(value)),
+                GroupBy = ToCamelCase(GetMemberName(groupBy))
+            });
+        }
+
         private static string GetMemberName<T>(Expression<Func<T, object?>> expr)
         {
             var body = expr.Body;
