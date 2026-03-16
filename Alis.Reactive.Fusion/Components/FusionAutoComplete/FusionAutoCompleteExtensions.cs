@@ -1,10 +1,13 @@
+using System;
+using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Mutation extensions for FusionAutoComplete (SetValue, FocusIn, ShowPopup, etc.).
+    /// Mutation extensions for FusionAutoComplete (SetValue, SetDataSource, DataBind, FocusIn, ShowPopup, etc.).
     /// </summary>
     public static class FusionAutoCompleteExtensions
     {
@@ -19,6 +22,36 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionAutoComplete, TModel> self, string text)
             where TModel : class
             => self.Emit(new SetPropMutation("text"), value: text);
+
+        // ── SetDataSource (event payload) ──
+
+        public static ComponentRef<FusionAutoComplete, TModel> SetDataSource<TModel, TSource>(
+            this ComponentRef<FusionAutoComplete, TModel> self,
+            TSource source, Expression<Func<TSource, object?>> path)
+            where TModel : class
+        {
+            var sourcePath = ExpressionPathHelper.ToEventPath(path);
+            return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+        }
+
+        // ── SetDataSource (response body) ──
+
+        public static ComponentRef<FusionAutoComplete, TModel> SetDataSource<TModel, TResponse>(
+            this ComponentRef<FusionAutoComplete, TModel> self,
+            ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
+            where TModel : class
+            where TResponse : class
+        {
+            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
+            return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+        }
+
+        // ── DataBind (trigger binding after source change) ──
+
+        public static ComponentRef<FusionAutoComplete, TModel> DataBind<TModel>(
+            this ComponentRef<FusionAutoComplete, TModel> self)
+            where TModel : class
+            => self.Emit(new CallMutation("dataBind"));
 
         public static ComponentRef<FusionAutoComplete, TModel> FocusIn<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
