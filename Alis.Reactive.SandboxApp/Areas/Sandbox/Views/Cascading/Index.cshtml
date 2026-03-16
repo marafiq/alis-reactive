@@ -3,7 +3,7 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Extensions
-@using Syncfusion.EJ2.DropDowns
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "Cascading DropDownList";
 
@@ -49,7 +49,7 @@
         @{ Html.Field("Country", true, m => m.Country, expr =>
             Html.DropDownListFor(plan, expr)
                 .DataSource(countries)
-                .Fields(new DropDownListFieldSettings { Text = "text", Value = "value" })
+                .Fields<CountryItem>(t => t.Text, v => v.Value)
                 .Placeholder("Select a country")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
@@ -81,7 +81,7 @@
         </p>
         @{ Html.Field("City", false, m => m.City, expr =>
             Html.DropDownListFor(plan, expr)
-                .Fields(new DropDownListFieldSettings { Text = "text", Value = "value" })
+                .Fields<CityItem>(t => t.Text, v => v.Value)
                 .Placeholder("Select a city (choose country first)")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {

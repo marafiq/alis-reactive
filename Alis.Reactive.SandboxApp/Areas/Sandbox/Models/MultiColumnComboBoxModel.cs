@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class MultiColumnComboBoxModel
@@ -10,21 +8,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     /// <summary>
     /// Typed DataSource item for the facility multi-column combo box.
-    /// JsonProperty ensures Syncfusion (Newtonsoft) serializes PascalCase to camelCase.
+    /// PascalCase C# -> camelCase JSON via global JsonConvert.DefaultSettings in Program.cs.
     /// Fields reference the camelCase names: text, value, city, capacity.
     /// </summary>
     public class FacilityItem
     {
-        [JsonProperty("value")]
         public string Value { get; set; } = "";
-
-        [JsonProperty("text")]
         public string Text { get; set; } = "";
-
-        [JsonProperty("city")]
         public string City { get; set; } = "";
-
-        [JsonProperty("capacity")]
         public int Capacity { get; set; }
     }
 }
