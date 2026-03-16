@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Validation
 {
@@ -9,6 +10,11 @@ namespace Alis.Reactive.Validation
     public sealed class ValidationDescriptor
     {
         public string FormId { get; }
+
+        /// <summary>Plan identity — used by runtime to scope summary div lookup.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? PlanId { get; internal set; }
+
         public List<ValidationField> Fields { get; }
 
         public ValidationDescriptor(string formId, List<ValidationField> fields)

@@ -265,9 +265,11 @@ public class WhenUsingDropDownList : PlaywrightTestBase
 
         // Select "Electronics" → indicator stays visible (still not null)
         await Page.Locator("#show-popup-btn").ClickAsync();
-        await Expect(Page.Locator(".e-ddl.e-popup"))
-            .ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Electronics" }).ClickAsync();
+        var popup = Page.Locator(".e-ddl.e-popup");
+        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await popup.Locator(".e-list-item").Filter(new() { HasText = "Electronics" }).ClickAsync();
+        // Wait for popup to close after selection before asserting
+        await Expect(popup).ToBeHiddenAsync(new() { Timeout = 3000 });
 
         await Expect(Page.Locator("#selected-indicator"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
@@ -275,7 +277,6 @@ public class WhenUsingDropDownList : PlaywrightTestBase
             .ToHaveTextAsync("selected", new() { Timeout = 3000 });
 
         // Clear selection via SF ej2 API → indicator hides
-        // SF ej2 trigger('change', ...) fires the handler registered by the framework
         await Page.EvaluateAsync(@$"() => {{
             const el = document.getElementById('{CategoryId}');
             const ej2 = el.ej2_instances[0];
@@ -290,9 +291,9 @@ public class WhenUsingDropDownList : PlaywrightTestBase
 
         // Select "Books" → indicator shows again
         await Page.Locator("#show-popup-btn").ClickAsync();
-        await Expect(Page.Locator(".e-ddl.e-popup"))
-            .ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Books" }).ClickAsync();
+        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await popup.Locator(".e-list-item").Filter(new() { HasText = "Books" }).ClickAsync();
+        await Expect(popup).ToBeHiddenAsync(new() { Timeout = 3000 });
 
         await Expect(Page.Locator("#selected-indicator"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });

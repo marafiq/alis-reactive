@@ -150,5 +150,36 @@ namespace Alis.Reactive.Resolvers
                 }
             }
         }
+        internal static void StampPlanId(List<Entry> entries, string planId)
+        {
+            foreach (var entry in entries)
+                StampReaction(entry.Reaction, planId);
+        }
+
+        private static void StampReaction(Reaction reaction, string planId)
+        {
+            switch (reaction)
+            {
+                case HttpReaction hr:
+                    StampRequest(hr.Request, planId);
+                    break;
+                case ParallelHttpReaction phr:
+                    foreach (var req in phr.Requests)
+                        StampRequest(req, planId);
+                    break;
+                case ConditionalReaction cr:
+                    foreach (var branch in cr.Branches)
+                        StampReaction(branch.Reaction, planId);
+                    break;
+            }
+        }
+
+        private static void StampRequest(RequestDescriptor req, string planId)
+        {
+            if (req.Validation != null)
+                req.Validation.PlanId = planId;
+            if (req.Chained != null)
+                StampRequest(req.Chained, planId);
+        }
     }
 }

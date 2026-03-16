@@ -26,7 +26,7 @@ const log = scope("validation");
 
 export function validate(desc: ValidationDescriptor): boolean {
   clearAllInline(desc.formId, desc.fields);
-  const summaryEl = findSummaryElement();
+  const summaryEl = findSummaryElement(desc.planId);
   if (summaryEl) {
     clearSummary(summaryEl);
     hideSummaryDiv(summaryEl);
@@ -118,7 +118,7 @@ export function validate(desc: ValidationDescriptor): boolean {
 
 export function showServerErrors(desc: ValidationDescriptor, data: unknown): void {
   clearAllInline(desc.formId, desc.fields);
-  const summaryEl = findSummaryElement();
+  const summaryEl = findSummaryElement(desc.planId);
   if (summaryEl) {
     clearSummary(summaryEl);
     hideSummaryDiv(summaryEl);
@@ -148,7 +148,7 @@ export function showServerErrors(desc: ValidationDescriptor, data: unknown): voi
 
 export function clearAll(desc: ValidationDescriptor): void {
   clearAllInline(desc.formId, desc.fields);
-  const summaryEl = findSummaryElement();
+  const summaryEl = findSummaryElement(desc.planId);
   if (summaryEl) {
     clearSummary(summaryEl);
     hideSummaryDiv(summaryEl);

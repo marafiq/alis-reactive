@@ -109,6 +109,9 @@ namespace Alis.Reactive
             {
                 ValidationResolver.EnrichFromComponents(_entries, _componentsMap);
             }
+
+            // Stamp planId on all validation descriptors for summary div scoping
+            ValidationResolver.StampPlanId(_entries, PlanId);
         }
     }
 }

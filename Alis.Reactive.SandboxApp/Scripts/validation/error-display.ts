@@ -62,7 +62,10 @@ export function hideSummaryDiv(summaryEl: HTMLElement): void {
   summaryEl.setAttribute("hidden", "");
 }
 
-export function findSummaryElement(): HTMLElement | null {
+export function findSummaryElement(planId?: string): HTMLElement | null {
+  if (planId) {
+    return document.querySelector(`[data-alis-validation-summary="${planId}"]`);
+  }
   return document.querySelector("[data-alis-validation-summary]");
 }
 

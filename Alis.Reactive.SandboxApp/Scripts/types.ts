@@ -252,6 +252,7 @@ export interface ExecContext {
 
 export interface ValidationDescriptor {
   formId: string;
+  planId?: string;
   fields: ValidationField[];
 }
 
