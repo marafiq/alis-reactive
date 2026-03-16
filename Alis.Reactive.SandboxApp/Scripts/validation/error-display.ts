@@ -50,6 +50,11 @@ export function addToSummary(summaryEl: HTMLElement, fieldName: string, message:
   summaryEl.appendChild(item);
 }
 
+export function removeSummaryEntry(summaryEl: HTMLElement, fieldName: string): void {
+  const entry = summaryEl.querySelector(`[data-valmsg-summary-for="${fieldName}"]`);
+  if (entry) entry.remove();
+}
+
 export function clearSummary(summaryEl: HTMLElement): void {
   summaryEl.innerHTML = "";
 }

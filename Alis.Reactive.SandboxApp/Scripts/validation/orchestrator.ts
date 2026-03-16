@@ -16,7 +16,7 @@ import { ruleFails, type PeerReader } from "./rule-engine";
 import { evalCondition, type ConditionReader } from "./condition";
 import {
   showInline, clearAllInline,
-  addToSummary, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
+  addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
   showServerErrorInline,
 } from "./error-display";
 
@@ -103,6 +103,8 @@ export function validate(desc: ValidationDescriptor): boolean {
           // No summary element → hidden field error has no destination, skip
         } else {
           showInline(desc.formId, f, rule.message);
+          // Field is visible and inline — remove any stale summary entry for this field
+          if (summaryEl) removeSummaryEntry(summaryEl, f.fieldName);
           valid = false;
         }
         break;

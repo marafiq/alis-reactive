@@ -8,6 +8,7 @@ import { setLevel } from "./trace";
 import { scope } from "./trace";
 import { wireTrigger } from "./trigger";
 import { enrichEntries } from "./enrichment";
+import { findSummaryElement, clearSummary, hideSummaryDiv } from "./validation/error-display";
 import {
   applyMergedPlan,
   getBootedPlan as getTrackedBootedPlan,
@@ -49,6 +50,11 @@ function wireEntries(entries: Entry[], components: Record<string, ComponentEntry
 
 export function mergePlan(incoming: Plan): void {
   const merged = applyMergedPlan(incoming, { enrichEntries, wireEntries });
+
+  // Clear stale summary entries — partial merge changes enrichment state,
+  // so previous validation results are invalid
+  clearSummaryForPlan(merged.planId);
+
   log.info("merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
 }
 
@@ -63,3 +69,11 @@ export function resetBootStateForTests(): void {
 }
 
 export const trace = { setLevel };
+
+function clearSummaryForPlan(planId: string): void {
+  const el = findSummaryElement(planId);
+  if (el) {
+    clearSummary(el);
+    hideSummaryDiv(el);
+  }
+}
