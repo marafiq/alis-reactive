@@ -87,8 +87,13 @@ namespace Alis.Reactive.Resolvers
             {
                 var formId = req.Validation.FormId;
                 var extracted = extractor.ExtractRules(req.ValidatorType, formId);
-                if (extracted != null)
-                    req.EnrichValidation(extracted);
+                if (extracted == null)
+                {
+                    throw new System.InvalidOperationException(
+                        $"Validator '{req.ValidatorType.Name}' produced no client rules for form '{formId}'. " +
+                        "Ensure the validator is registered in the factory and has extractable rules.");
+                }
+                req.EnrichValidation(extracted);
             }
 
             if (req.Validation != null && componentsMap != null)
