@@ -473,7 +473,26 @@ The runtime resolves root, walks paths, and executes via bracket notation. That'
 to exercise ALL interaction types end-to-end. Playwright tests verify every module path.
 If any module breaks vendor-agnostic architecture, these tests catch it immediately.
 
-### 8. No Fallbacks — Fail Fast
+### 8. Fixing Bugs — Root Cause, Not Patch
+
+When a behavior is wrong:
+1. **STOP.** Do not apply the first fix that comes to mind.
+2. **Trace the full code path** from trigger to outcome. Read every module involved.
+3. **Identify the exact line** that produces the wrong result.
+4. **Understand WHY** the current code does what it does — it may be correct for a
+   different scenario. Changing it will break that scenario.
+5. **Fix the root cause.** If the wrong validator is used, fix the validator scope —
+   don't change the validation engine. If a condition fires incorrectly, fix the
+   condition semantics — don't disable the validation pipeline.
+6. **Verify in the actual browser** — fill the form, click submit, see the result
+   with your own eyes. Playwright passing is necessary but NOT sufficient.
+7. **Run ALL tests** — not just the module you touched.
+
+**Never revert agreed-upon architecture to fix a symptom.** If the architecture says
+"unenriched fields block with summary" and you see phantom errors, the problem is
+upstream (wrong validator scope, wrong condition semantics) — not the blocking behavior.
+
+### 9. No Fallbacks — Fail Fast
 
 Never use fallback defaults for missing data. If a component is not registered in the plan,
 if a vendor string is unknown, if a readExpr is missing — **throw immediately** with a clear
@@ -481,7 +500,7 @@ error message telling the developer what they forgot to register. Fallbacks hide
 In UI code, a silent fallback means the wrong component gets read, the wrong vendor gets
 resolved, or the wrong field gets validated — all silently. Throw, don't guess.
 
-### 9. ESM Only + Cache Busting
+### 10. ESM Only + Cache Busting
 
 The runtime is bundled as ESM (`--format=esm`). The layout loads it via
 `<script type="module" src="~/js/alis-reactive.js" asp-append-version="true">`.
