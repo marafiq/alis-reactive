@@ -208,6 +208,89 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    [Test]
+    public async Task gather_sends_initial_physician_value_to_server()
+    {
+        await NavigateAndBoot();
+
+        // DomReady sets Physician to "Dr. Smith" — gather must POST that value
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#gather-btn").ClickAsync(),
+            "**/Sandbox/ComboBox/Echo");
+
+        var body = request.PostData ?? "";
+        Assert.That(body, Does.Contain("Dr. Smith"),
+            $"Gather POST body must contain the initial value 'Dr. Smith' but was '{body}'");
+
+        // Confirm the round-trip completes — response handler fires
+        await Expect(Page.Locator("#gather-result"))
+            .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task changing_physician_then_gathering_sends_new_value()
+    {
+        await NavigateAndBoot();
+
+        // Change the value from "Dr. Smith" to "Dr. Johnson" via popup selection
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Johnson" }).ClickAsync();
+
+        // Wait for change event to confirm the value took effect
+        await Expect(Page.Locator("#change-value"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+
+        // Gather must POST the CURRENT value "Dr. Johnson", not the initial "Dr. Smith"
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#gather-btn").ClickAsync(),
+            "**/Sandbox/ComboBox/Echo");
+
+        var body = request.PostData ?? "";
+        Assert.That(body, Does.Contain("Dr. Johnson"),
+            $"Gather must send the current value 'Dr. Johnson' but body was '{body}'");
+        Assert.That(body, Does.Not.Contain("Dr. Smith"),
+            "Gather must NOT send the stale initial value 'Dr. Smith'");
+
+        await Expect(Page.Locator("#gather-result"))
+            .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task server_echoes_back_exact_gathered_physician_value()
+    {
+        await NavigateAndBoot();
+
+        // Change to "Dr. Williams" so the test is distinct from the initial "Dr. Smith"
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Williams" }).ClickAsync();
+        await Expect(Page.Locator("#change-value"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+
+        // Intercept the response to verify the server echoes back the gathered value
+        var response = await Page.RunAndWaitForResponseAsync(
+            async () => await Page.Locator("#gather-btn").ClickAsync(),
+            "**/Sandbox/ComboBox/Echo");
+
+        var responseBody = await response.TextAsync();
+        Assert.That(responseBody, Does.Contain("Dr. Williams"),
+            $"Server response must echo back the gathered value 'Dr. Williams' but was '{responseBody}'");
+        Assert.That((int)response.Status, Is.EqualTo(200),
+            "Echo endpoint must return 200 OK");
+
+        await Expect(Page.Locator("#gather-result"))
+            .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
     // ── Deep BDD: state-cycle scenarios ──
 
     [Test]
