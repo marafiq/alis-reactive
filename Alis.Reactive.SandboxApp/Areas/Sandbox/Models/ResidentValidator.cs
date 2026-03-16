@@ -50,10 +50,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             });
 
             // Address (unconditional)
-            RuleFor(x => x.Address.Street).NotEmpty().WithMessage("'Street' is required.");
-            RuleFor(x => x.Address.City).NotEmpty().WithMessage("'City' is required.");
-            RuleFor(x => x.Address.ZipCode).NotEmpty().WithMessage("'Zip Code' is required.")
-                .Matches(@"^\d{5}$").WithMessage("'Zip Code' must be 5 digits.");
+            RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
         }
     }
 
@@ -90,10 +87,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 RuleFor(x => x.ReasonForNoContact).NotEmpty().WithMessage("'Reason' is required when no emergency contact.");
             });
 
-            RuleFor(x => x.Address.Street).NotEmpty().WithMessage("'Street' is required.");
-            RuleFor(x => x.Address.City).NotEmpty().WithMessage("'City' is required.");
-            RuleFor(x => x.Address.ZipCode).NotEmpty().WithMessage("'Zip Code' is required.")
-                .Matches(@"^\d{5}$").WithMessage("'Zip Code' must be 5 digits.");
+            RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
         }
     }
 
@@ -101,9 +95,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// Scoped validator for the AjaxPartial page — only Name, Email, ConfirmEmail + Address.
     /// </summary>
     /// <summary>
-    /// Scoped validator for the AjaxPartial page — parent fields only.
-    /// Address rules are NOT here — they validate after the partial loads
-    /// and the address components merge into the plan.
+    /// Scoped validator for the AjaxPartial page.
+    /// Address rules included — they're unenriched before partial loads,
+    /// but allRulesConditionallySkipped handles that gracefully.
+    /// After partial merges, address fields enrich and validate inline.
     /// </summary>
     public class AjaxPartialValidator : ReactiveValidator<ResidentModel>
     {
@@ -116,6 +111,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
             RuleFor(x => x.ConfirmEmail).NotEmpty().WithMessage("'Confirm Email' is required.")
                 .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.");
+
+            RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
+        }
+    }
+
+    public class ResidentAddressValidator : AbstractValidator<ResidentAddress>
+    {
+        public ResidentAddressValidator()
+        {
+            RuleFor(x => x.Street).NotEmpty().WithMessage("'Street' is required.");
+            RuleFor(x => x.City).NotEmpty().WithMessage("'City' is required.");
+            RuleFor(x => x.ZipCode).NotEmpty().WithMessage("'Zip Code' is required.")
+                .Matches(@"^\d{5}$").WithMessage("'Zip Code' must be 5 digits.");
         }
     }
 }

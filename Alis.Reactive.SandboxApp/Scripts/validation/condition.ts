@@ -30,8 +30,8 @@ export function evalCondition(
   switch (cond.op) {
     case "truthy": return !empty;
     case "falsy": return empty;
-    case "eq": return str === String(cond.value ?? "");
-    case "neq": return str !== String(cond.value ?? "");
+    case "eq": return empty ? false : str === String(cond.value ?? "");
+    case "neq": return empty ? false : str !== String(cond.value ?? "");
     default: return true;
   }
 }

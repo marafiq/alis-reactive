@@ -145,17 +145,22 @@ describe("condition: falsy", () => {
 describe("condition: eq", () => {
   it("true when values match", () => expect(evalCondition({ field: "f", op: "eq", value: "Memory Care" }, readerWith({ f: "Memory Care" }))).toBe(true));
   it("false when values differ", () => expect(evalCondition({ field: "f", op: "eq", value: "Memory Care" }, readerWith({ f: "Assisted" }))).toBe(false));
+  it("false when source is empty (no intent expressed)", () => expect(evalCondition({ field: "f", op: "eq", value: "Memory Care" }, readerWith({ f: "" }))).toBe(false));
   it("null when source unavailable", () => expect(evalCondition({ field: "f", op: "eq", value: "x" }, noSource)).toBeNull());
 });
 
 describe("condition: neq", () => {
   it("true when values differ", () => expect(evalCondition({ field: "f", op: "neq", value: "Independent" }, readerWith({ f: "Assisted" }))).toBe(true));
   it("false when values match", () => expect(evalCondition({ field: "f", op: "neq", value: "Independent" }, readerWith({ f: "Independent" }))).toBe(false));
+  it("false when source is empty (no intent expressed)", () => expect(evalCondition({ field: "f", op: "neq", value: "Independent" }, readerWith({ f: "" }))).toBe(false));
   it("null when source unavailable", () => expect(evalCondition({ field: "f", op: "neq", value: "x" }, noSource)).toBeNull());
 });
 
-describe("condition: null handling", () => {
+describe("condition: empty source handling", () => {
   it("truthy treats empty as falsy", () => expect(evalCondition({ field: "f", op: "truthy" }, readerWith({ f: "" }))).toBe(false));
-  it("eq compares stringified values", () => expect(evalCondition({ field: "f", op: "eq", value: 42 }, readerWith({ f: "42" }))).toBe(true));
-  it("neq compares stringified values", () => expect(evalCondition({ field: "f", op: "neq", value: 42 }, readerWith({ f: "42" }))).toBe(false));
+  it("falsy treats empty as true", () => expect(evalCondition({ field: "f", op: "falsy" }, readerWith({ f: "" }))).toBe(true));
+  it("eq with empty source returns false (not yet determined)", () => expect(evalCondition({ field: "f", op: "eq", value: "x" }, readerWith({ f: "" }))).toBe(false));
+  it("neq with empty source returns false (not yet determined)", () => expect(evalCondition({ field: "f", op: "neq", value: "x" }, readerWith({ f: "" }))).toBe(false));
+  it("eq with non-empty source compares normally", () => expect(evalCondition({ field: "f", op: "eq", value: 42 }, readerWith({ f: "42" }))).toBe(true));
+  it("neq with non-empty source compares normally", () => expect(evalCondition({ field: "f", op: "neq", value: 42 }, readerWith({ f: "42" }))).toBe(false));
 });
