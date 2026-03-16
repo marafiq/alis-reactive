@@ -100,6 +100,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// but allRulesConditionallySkipped handles that gracefully.
     /// After partial merges, address fields enrich and validate inline.
     /// </summary>
+    /// <summary>
+    /// Scoped validator for AjaxPartial — parent fields + address.
+    /// Address fields are unenriched at boot (partial not loaded yet) → skipped.
+    /// After partial loads and merges components, enrichment activates address fields.
+    /// </summary>
     public class AjaxPartialValidator : ReactiveValidator<ResidentModel>
     {
         public AjaxPartialValidator()

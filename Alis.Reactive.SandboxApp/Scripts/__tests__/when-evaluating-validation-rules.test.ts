@@ -85,11 +85,11 @@ function errorSpan(fieldName: string): HTMLSpanElement | null {
 // ── Form container contract ─────────────────────────────
 
 describe("When form container does not exist", () => {
-  it("returns false when fields are declared (fail-closed)", () => {
+  it("returns true when form missing (fields can't be found in DOM)", () => {
     const desc = makeDesc("nonexistent-form", [
       field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
     ]);
-    expect(validate(desc)).toBe(false);
+    expect(validate(desc)).toBe(true);
   });
 
   it("does not evaluate any field rules", () => {

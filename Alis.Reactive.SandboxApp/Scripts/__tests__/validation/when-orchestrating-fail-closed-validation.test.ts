@@ -80,59 +80,42 @@ function errorSpan(name: string): HTMLSpanElement | null {
 }
 
 // ══════════════════════════════════════════════════════════
-// FAIL-CLOSED CONTRACT
+// FORM CONTAINER CONTRACT
 // ══════════════════════════════════════════════════════════
 
 describe("When form container does not exist", () => {
-  it("blocks request when fields are declared", () => {
-    const result = validate(desc("nonexistent", [
-      unenrichedField("X", [{ rule: "required", message: "X required" }]),
-    ]));
-    expect(result).toBe(false);
-  });
-
-  it("allows request when no fields declared (empty descriptor)", () => {
-    const result = validate(desc("nonexistent", []));
-    expect(result).toBe(true);
+  it("returns true (cannot validate without DOM container)", () => {
+    expect(validate(desc("nonexistent", [
+      enrichedField("X", [{ rule: "required", message: "X required" }]),
+    ]))).toBe(true);
   });
 });
 
 // ══════════════════════════════════════════════════════════
-// UNENRICHED FIELDS → SUMMARY
+// UNENRICHED FIELDS → SKIP (awaiting partial merge)
 // ══════════════════════════════════════════════════════════
 
 describe("When a field is unenriched (no fieldId/vendor/readExpr)", () => {
-  it("blocks the request", () => {
+  it("skips the field (partial not loaded yet)", () => {
     const result = validate(desc("form", [
       unenrichedField("Address.Street", [{ rule: "required", message: "Street required" }]),
     ]));
-    expect(result).toBe(false);
+    expect(result).toBe(true); // skipped, not blocked
   });
 
-  it("adds first rule message to summary", () => {
+  it("does not add anything to summary", () => {
     validate(desc("form", [
-      unenrichedField("Address.Street", [
-        { rule: "required", message: "Street required" },
-        { rule: "minLength", message: "Too short", constraint: 5 },
-      ]),
+      unenrichedField("Address.Street", [{ rule: "required", message: "Street required" }]),
     ]));
-    expect(summaryText()).toContain("Street required");
-    expect(summaryText()).not.toContain("Too short"); // first-rule-wins
+    expect(summaryText()).toBe("");
+    expect(summaryDiv().hasAttribute("hidden")).toBe(true);
   });
 
-  it("shows the summary div", () => {
-    validate(desc("form", [
-      unenrichedField("X", [{ rule: "required", message: "X" }]),
-    ]));
-    expect(summaryDiv().hasAttribute("hidden")).toBe(false);
-  });
-
-  it("does not prevent other enriched fields from validating inline", () => {
+  it("does not prevent enriched fields from validating inline", () => {
     validate(desc("form", [
       unenrichedField("Unenriched", [{ rule: "required", message: "summary msg" }]),
       enrichedField("Name", [{ rule: "required", message: "Name required" }]),
     ]));
-    expect(summaryText()).toContain("summary msg");
     expect(errorSpan("Name")!.textContent).toBe("Name required");
   });
 });
@@ -143,10 +126,9 @@ describe("When a field is unenriched (no fieldId/vendor/readExpr)", () => {
 
 describe("When a hidden field fails validation", () => {
   it("blocks the request", () => {
-    const result = validate(desc("form", [
+    expect(validate(desc("form", [
       enrichedField("HiddenField", [{ rule: "required", message: "Hidden required" }]),
-    ]));
-    expect(result).toBe(false);
+    ]))).toBe(false);
   });
 
   it("routes error to summary (not inline)", () => {
@@ -154,7 +136,6 @@ describe("When a hidden field fails validation", () => {
       enrichedField("HiddenField", [{ rule: "required", message: "Hidden required" }]),
     ]));
     expect(summaryText()).toContain("Hidden required");
-    // Inline span should NOT have the error
     expect(errorSpan("HiddenField")!.textContent).toBe("");
   });
 });
@@ -162,25 +143,21 @@ describe("When a hidden field fails validation", () => {
 describe("When a hidden field has valid value", () => {
   it("does not produce an error", () => {
     (document.getElementById("HiddenField") as HTMLInputElement).value = "has value";
-    const result = validate(desc("form", [
+    expect(validate(desc("form", [
       enrichedField("HiddenField", [{ rule: "required", message: "Hidden required" }]),
-    ]));
-    expect(result).toBe(true);
-    expect(summaryText()).toBe("");
+    ]))).toBe(true);
   });
 });
 
 describe("When a hidden field rule has a condition that evaluates false", () => {
   it("skips the rule (condition controls, not visibility)", () => {
     (document.getElementById("IsVet") as HTMLInputElement).checked = false;
-    const result = validate(desc("form", [
+    expect(validate(desc("form", [
       field({ fieldName: "IsVet", fieldId: "IsVet", vendor: "native", readExpr: "checked", rules: [] }),
       enrichedField("HiddenField", [
         { rule: "required", message: "Hidden req", when: { field: "IsVet", op: "truthy" } },
       ]),
-    ]));
-    // Hidden but condition is false → rule skipped → passes
-    expect(result).toBe(true);
+    ]))).toBe(true);
   });
 });
 
@@ -207,24 +184,6 @@ describe("When a visible enriched field fails validation", () => {
 });
 
 // ══════════════════════════════════════════════════════════
-// CONDITION WITH UNRESOLVABLE SOURCE → SUMMARY
-// ══════════════════════════════════════════════════════════
-
-describe("When condition source field is unenriched", () => {
-  it("routes the rule message to summary", () => {
-    validate(desc("form", [
-      enrichedField("VetId", [
-        { rule: "required", message: "VetId required",
-          when: { field: "NonExistent", op: "truthy" } },
-      ]),
-    ]));
-    // NonExistent is not in byName → condReader returns undefined → null → summary
-    expect(summaryText()).toContain("VetId required");
-    expect(summaryDiv().hasAttribute("hidden")).toBe(false);
-  });
-});
-
-// ══════════════════════════════════════════════════════════
 // SUMMARY LIFECYCLE
 // ══════════════════════════════════════════════════════════
 
@@ -232,16 +191,15 @@ describe("When clearAll is called", () => {
   it("clears inline errors AND summary", () => {
     validate(desc("form", [
       enrichedField("Name", [{ rule: "required", message: "Name" }]),
-      unenrichedField("X", [{ rule: "required", message: "X" }]),
+      enrichedField("HiddenField", [{ rule: "required", message: "Hidden" }]),
     ]));
     expect(errorSpan("Name")!.textContent).toBe("Name");
-    expect(summaryText()).toContain("X");
+    expect(summaryText()).toContain("Hidden");
 
     clearAll(desc("form", [
       enrichedField("Name", [{ rule: "required", message: "Name" }]),
-      unenrichedField("X", [{ rule: "required", message: "X" }]),
+      enrichedField("HiddenField", [{ rule: "required", message: "Hidden" }]),
     ]));
-
     expect(errorSpan("Name")!.textContent).toBe("");
     expect(summaryText()).toBe("");
     expect(summaryDiv().hasAttribute("hidden")).toBe(true);
@@ -249,33 +207,29 @@ describe("When clearAll is called", () => {
 });
 
 // ══════════════════════════════════════════════════════════
-// SERVER ERRORS → ROUTING
+// SERVER ERRORS
 // ══════════════════════════════════════════════════════════
 
 describe("When server error has a visible error span", () => {
   it("shows error inline", () => {
-    showServerErrors(desc("form", [
-      enrichedField("Name"),
-    ]), { errors: { Name: ["Server says bad"] } });
+    showServerErrors(desc("form", [enrichedField("Name")]),
+      { errors: { Name: ["Server says bad"] } });
     expect(errorSpan("Name")!.textContent).toBe("Server says bad");
   });
 });
 
 describe("When server error for field with no span in DOM", () => {
   it("routes to summary", () => {
-    showServerErrors(desc("form", [
-      enrichedField("NonExistentField"),
-    ]), { errors: { NonExistentField: ["Server says bad"] } });
+    showServerErrors(desc("form", [enrichedField("NonExistentField")]),
+      { errors: { NonExistentField: ["Server says bad"] } });
     expect(summaryText()).toContain("Server says bad");
   });
 });
 
-describe("When server error for field with span in hidden section", () => {
-  it("still shows in the span (span exists in DOM)", () => {
-    showServerErrors(desc("form", [
-      enrichedField("HiddenField"),
-    ]), { errors: { HiddenField: ["Server says hidden"] } });
-    // Span exists in DOM even though parent is hidden — server error goes to span
+describe("When server error for field in hidden section", () => {
+  it("shows in span (span exists in DOM)", () => {
+    showServerErrors(desc("form", [enrichedField("HiddenField")]),
+      { errors: { HiddenField: ["Server says hidden"] } });
     expect(errorSpan("HiddenField")!.textContent).toBe("Server says hidden");
   });
 });

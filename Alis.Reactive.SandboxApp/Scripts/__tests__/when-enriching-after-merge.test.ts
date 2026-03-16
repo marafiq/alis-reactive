@@ -396,9 +396,9 @@ describe("When validate() is called after partial merge", () => {
 
     const { validate } = await import("../validation");
 
-    // Before merge: field unenriched → fail-closed (blocks request)
+    // Before merge: field unenriched → skipped (awaiting partial merge)
     const descBefore = (getBootedPlan("Resident.Model")!.entries[0].reaction as any).request.validation;
-    expect(validate(descBefore)).toBe(false); // unenriched fields block the form
+    expect(validate(descBefore)).toBe(true); // unenriched fields skip, not block
 
     // Merge partial with component
     mergePlan({
