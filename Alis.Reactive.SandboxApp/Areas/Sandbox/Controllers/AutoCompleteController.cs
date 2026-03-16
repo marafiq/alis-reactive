@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -8,13 +9,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
     {
         public IActionResult Index()
         {
-            ViewBag.Physicians = new List<string> { "Dr. Smith", "Dr. Johnson", "Dr. Williams", "Dr. Brown" };
-            ViewBag.MedicationTypes = new List<string> { "Analgesic", "Antibiotic", "Antiviral", "Steroid" };
-            return View(new AutoCompleteModel
+            ViewBag.Physicians = new List<PhysicianItem>
             {
-                Physician = null,
-                MedicationType = null
-            });
+                new() { Value = "smith", Text = "Dr. Smith", Specialty = "Cardiology" },
+                new() { Value = "johnson", Text = "Dr. Johnson", Specialty = "Neurology" },
+                new() { Value = "williams", Text = "Dr. Williams", Specialty = "Geriatrics" },
+                new() { Value = "brown", Text = "Dr. Brown", Specialty = "Internal Medicine" }
+            };
+            ViewBag.MedicationTypes = new List<MedicationTypeItem>
+            {
+                new() { Value = "analgesic", Text = "Analgesic", Category = "Pain" },
+                new() { Value = "antibiotic", Text = "Antibiotic", Category = "Infection" },
+                new() { Value = "antiviral", Text = "Antiviral", Category = "Infection" },
+                new() { Value = "steroid", Text = "Steroid", Category = "Inflammation" }
+            };
+            return View(new AutoCompleteModel());
         }
 
         [HttpPost]

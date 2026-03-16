@@ -3,17 +3,18 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "AutoComplete";
 
     var plan = Html.ReactivePlan<AutoCompleteModel>();
-    var physicians = (List<string>)ViewBag.Physicians;
+    var physicians = (List<PhysicianItem>)ViewBag.Physicians;
 
     // ── Section 1: Property Write (SetValue) from DomReady ──
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionAutoComplete>(m => m.Physician).SetValue("Dr. Smith");
+        p.Component<FusionAutoComplete>(m => m.Physician).SetValue("smith");
     }));
 
     // ── Section 2: Property Read — display current value in echo text ──
@@ -57,6 +58,7 @@
             @{ Html.Field("Physician (SF AutoComplete)", false, m => m.Physician, expr =>
                 Html.AutoCompleteFor(plan, expr)
                     .DataSource(physicians)
+                    .Fields<PhysicianItem>(t => t.Text, v => v.Value)
                     .Placeholder("Select a physician")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -64,7 +66,7 @@
                     })
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
-                        p.When(args, x => x.Value).Eq("Dr. Smith")
+                        p.When(args, x => x.Value).Eq("smith")
                             .Then(t => t.Element("args-condition").SetText("dr smith selected"))
                             .Else(e => e.Element("args-condition").SetText("other physician"));
                     })
@@ -137,7 +139,7 @@
         <h2 class="text-base font-semibold mb-4">5. Conditions (Both Types)</h2>
         <p class="text-sm text-text-secondary mb-4">
             Two condition types are exercised:
-            <code>When(args, x =&gt; x.Value).Eq("Dr. Smith")</code> (typed event-args condition)
+            <code>When(args, x =&gt; x.Value).Eq("smith")</code> (typed event-args condition)
             and <code>When(comp.Value()).NotNull()</code> (component-read condition).
         </p>
     </section>

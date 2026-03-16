@@ -59,7 +59,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
 
         // Wait for the value to be set by dom-ready via ej2 instance
         await Page.WaitForFunctionAsync(
-            $"() => {{ const el = document.getElementById('{PhysicianId}'); return el && el.ej2_instances && el.ej2_instances[0] && el.ej2_instances[0].value === 'Dr. Smith'; }}",
+            $"() => {{ const el = document.getElementById('{PhysicianId}'); return el && el.ej2_instances && el.ej2_instances[0] && el.ej2_instances[0].value === 'smith'; }}",
             null,
             new() { Timeout = 5000 });
 
@@ -76,7 +76,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         var echo = Page.Locator("#value-echo");
         await Expect(echo).Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         var text = await echo.TextContentAsync();
-        Assert.That(text, Does.Contain("Dr. Smith"),
+        Assert.That(text, Does.Contain("smith"),
             "Value echo should contain Dr. Smith after dom-ready property read");
         AssertNoConsoleErrors();
     }
@@ -135,7 +135,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         await Expect(Page.Locator("#change-value"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         var changeText = await Page.Locator("#change-value").TextContentAsync();
-        Assert.That(changeText, Does.Contain("Dr. Johnson"),
+        Assert.That(changeText, Does.Contain("johnson"),
             $"Change value should contain Dr. Johnson but was '{changeText}'");
         AssertNoConsoleErrors();
     }
@@ -219,7 +219,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
             "**/Sandbox/AutoComplete/Echo");
 
         var body = request.PostData ?? "";
-        Assert.That(body, Does.Contain("Dr. Smith"),
+        Assert.That(body, Does.Contain("smith"),
             $"Gather POST body must contain the initial value 'Dr. Smith' but was '{body}'");
 
         // Confirm the round-trip completes — response handler fires
@@ -250,9 +250,9 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
             "**/Sandbox/AutoComplete/Echo");
 
         var body = request.PostData ?? "";
-        Assert.That(body, Does.Contain("Dr. Johnson"),
+        Assert.That(body, Does.Contain("johnson"),
             $"Gather must send the current value 'Dr. Johnson' but body was '{body}'");
-        Assert.That(body, Does.Not.Contain("Dr. Smith"),
+        Assert.That(body, Does.Not.Contain("smith"),
             "Gather must NOT send the stale initial value 'Dr. Smith'");
 
         await Expect(Page.Locator("#gather-result"))
@@ -280,7 +280,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
             "**/Sandbox/AutoComplete/Echo");
 
         var responseBody = await response.TextAsync();
-        Assert.That(responseBody, Does.Contain("Dr. Williams"),
+        Assert.That(responseBody, Does.Contain("williams"),
             $"Server response must echo back the gathered value 'Dr. Williams' but was '{responseBody}'");
         Assert.That((int)response.Status, Is.EqualTo(200),
             "Echo endpoint must return 200 OK");
@@ -307,7 +307,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Johnson" }).ClickAsync();
         var text1 = await changeValue.TextContentAsync();
-        Assert.That(text1, Does.Contain("Dr. Johnson"),
+        Assert.That(text1, Does.Contain("johnson"),
             $"Cycle 1: change value should contain Dr. Johnson but was '{text1}'");
         await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
 
@@ -317,7 +317,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Williams" }).ClickAsync();
         var text2 = await changeValue.TextContentAsync();
-        Assert.That(text2, Does.Contain("Dr. Williams"),
+        Assert.That(text2, Does.Contain("williams"),
             $"Cycle 2: change value should contain Dr. Williams but was '{text2}'");
         await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
 
@@ -327,7 +327,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Smith" }).ClickAsync();
         var text3 = await changeValue.TextContentAsync();
-        Assert.That(text3, Does.Contain("Dr. Smith"),
+        Assert.That(text3, Does.Contain("smith"),
             $"Cycle 3: change value should contain Dr. Smith but was '{text3}'");
         await Expect(argsCondition).ToHaveTextAsync("dr smith selected", new() { Timeout = 3000 });
 
