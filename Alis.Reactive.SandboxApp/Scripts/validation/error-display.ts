@@ -1,7 +1,7 @@
-// Error Display — Single responsibility: all DOM error manipulation
+// Error Display — Single responsibility: DOM error manipulation
 //
 // Two destinations: inline (next to field) and summary (aggregated div).
-// Orchestrator decides WHERE to route — this module executes.
+// Orchestrator decides WHERE to route — this module only executes display.
 // Vendor-agnostic: never touches ej2_instances or vendor-specific APIs.
 
 import type { ValidationField } from "../types";
@@ -66,7 +66,7 @@ export function findSummaryElement(): HTMLElement | null {
   return document.querySelector("[data-alis-validation-summary]");
 }
 
-// ── Server error routing ────────────────────────────────
+// ── Server error inline display ─────────────────────────
 
 export function showServerErrorInline(formId: string, fieldName: string, message: string, fields: ValidationField[]): void {
   const span = findErrorSpan(formId, fieldName);
@@ -81,17 +81,6 @@ export function showServerErrorInline(formId: string, fieldName: string, message
     const el = document.getElementById(field.fieldId);
     if (el) el.classList.add(ERR_CLASS);
   }
-}
-
-// ── Visibility check ────────────────────────────────────
-
-export function isHidden(el: HTMLElement): boolean {
-  let node: HTMLElement | null = el;
-  while (node) {
-    if (node.hasAttribute("hidden") || node.style?.display === "none") return true;
-    node = node.parentElement;
-  }
-  return false;
 }
 
 // ── Shared ──────────────────────────────────────────────

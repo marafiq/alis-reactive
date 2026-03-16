@@ -21,24 +21,25 @@ export function resolveGather(
   const formData = useFormData ? new FormData() : null;
   const body: Record<string, unknown> = {};
 
+  function addValue(name: string, raw: unknown): void {
+    const value = raw === "" ? null : raw;
+    if (isGet) {
+      urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(String(raw))}`);
+    } else if (formData) {
+      formData.append(name, String(raw ?? ""));
+    } else {
+      setNested(body, name, value);
+    }
+    log.trace("component", { name, value });
+  }
+
   for (const g of items) {
     switch (g.kind) {
-      case "component": {
-        const raw = evalRead(g.componentId, g.vendor, g.readExpr);
-        // Normalize: empty string -> null for JSON body (avoids deserialization errors on numeric types)
-        const value = raw === "" ? null : raw;
-        if (isGet) {
-          urlParams.push(`${encodeURIComponent(g.name)}=${encodeURIComponent(String(raw))}`);
-        } else if (formData) {
-          formData.append(g.name, String(raw ?? ""));
-        } else {
-          setNested(body, g.name, value);
-        }
-        log.trace("component", { name: g.name, value });
+      case "component":
+        addValue(g.name, evalRead(g.componentId, g.vendor, g.readExpr));
         break;
-      }
 
-      case "static": {
+      case "static":
         if (isGet) {
           urlParams.push(`${encodeURIComponent(g.param)}=${encodeURIComponent(String(g.value))}`);
         } else if (formData) {
@@ -48,35 +49,23 @@ export function resolveGather(
         }
         log.trace("static", { param: g.param, value: g.value });
         break;
-      }
 
-      case "all": {
+      case "all":
         if (Object.keys(components).length === 0) {
           throw new Error(
             "[alis] IncludeAll() executed but plan.components is empty. " +
             "No components registered — check that builders call plan.AddToComponentsMap().");
         }
         for (const [bindingPath, comp] of Object.entries(components)) {
-          const raw = evalRead(comp.id, comp.vendor, comp.readExpr);
-          const value = raw === "" ? null : raw;
-          if (isGet) {
-            urlParams.push(`${encodeURIComponent(bindingPath)}=${encodeURIComponent(String(raw))}`);
-          } else if (formData) {
-            formData.append(bindingPath, String(raw ?? ""));
-          } else {
-            setNested(body, bindingPath, value);
-          }
-          log.trace("component", { name: bindingPath, value });
+          addValue(bindingPath, evalRead(comp.id, comp.vendor, comp.readExpr));
         }
         break;
-      }
     }
   }
 
   return { urlParams, body: formData ?? body };
 }
 
-/** Convert dotted key "Address.Street" into nested object { Address: { Street: val } } */
 function setNested(obj: Record<string, unknown>, key: string, value: unknown): void {
   const parts = key.split(".");
   if (parts.length === 1) {

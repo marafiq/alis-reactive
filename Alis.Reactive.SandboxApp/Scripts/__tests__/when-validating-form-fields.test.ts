@@ -476,12 +476,13 @@ describe("showServerErrors", () => {
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
   });
 
-  it("shows errors from flat format", () => {
+  it("rejects non-ProblemDetails flat format (fail-closed)", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "Email", fieldName: "Email", rules: [] }),
     ]);
+    // Flat format { Email: [...] } is NOT ProblemDetails — must be rejected
     showServerErrors(desc, { Email: ["Invalid email"] });
-    expect(errorSpan("Email")!.textContent).toBe("Invalid email");
+    expect(errorSpan("Email")!.textContent).toBe("");
   });
 
   it("handles dotted nested property names", () => {

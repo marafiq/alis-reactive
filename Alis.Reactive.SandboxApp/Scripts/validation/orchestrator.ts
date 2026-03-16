@@ -17,7 +17,7 @@ import { evalCondition, type ConditionReader } from "./condition";
 import {
   showInline, clearAllInline,
   addToSummary, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
-  showServerErrorInline, isHidden,
+  showServerErrorInline,
 } from "./error-display";
 
 const log = scope("validation");
@@ -34,7 +34,6 @@ export function validate(desc: ValidationDescriptor): boolean {
 
   const container = document.getElementById(desc.formId);
   if (!container) {
-    // Fail closed: declared validation with no form container → block request
     if (desc.fields.length > 0) {
       log.warn("validate: form container missing, blocking", { formId: desc.formId });
       return false;
@@ -49,7 +48,6 @@ export function validate(desc: ValidationDescriptor): boolean {
   let summaryHasErrors = false;
 
   for (const f of desc.fields) {
-    // ── Unenriched: cannot read value → first rule message to summary ──
     if (!f.fieldId || !f.vendor || !f.readExpr) {
       if (f.rules.length > 0 && summaryEl) {
         addToSummary(summaryEl, f.fieldName, f.rules[0].message);
@@ -61,7 +59,6 @@ export function validate(desc: ValidationDescriptor): boolean {
 
     const el = document.getElementById(f.fieldId);
 
-    // ── Element not in DOM → first rule message to summary ──
     if (!el) {
       if (f.rules.length > 0 && summaryEl) {
         addToSummary(summaryEl, f.fieldName, f.rules[0].message);
@@ -71,21 +68,16 @@ export function validate(desc: ValidationDescriptor): boolean {
       continue;
     }
 
-    // ── Element outside this form → skip (belongs to different form) ──
     if (!container.contains(el)) continue;
 
     const hidden = isHidden(el);
-
-    // ── Read value (hidden or visible — value is still in DOM) ──
     const root = resolveRoot(el, f.vendor);
     const value = walk(root, f.readExpr);
 
-    // ── Evaluate rules ──
     for (const rule of f.rules) {
       if (rule.when) {
         const condResult = evalCondition(rule.when, condReader);
-        if (condResult === false) continue; // condition not met → skip rule
-        // condResult === null (source unresolvable) → route to summary
+        if (condResult === false) continue;
         if (condResult === null) {
           if (summaryEl) {
             addToSummary(summaryEl, f.fieldName, rule.message);
@@ -98,13 +90,11 @@ export function validate(desc: ValidationDescriptor): boolean {
 
       if (ruleFails(rule, value, peerReader)) {
         if (hidden) {
-          // Hidden field error → summary (can't show inline)
           if (summaryEl) {
             addToSummary(summaryEl, f.fieldName, rule.message);
             summaryHasErrors = true;
           }
         } else {
-          // Visible field error → inline
           showInline(desc.formId, f, rule.message);
         }
         valid = false;
@@ -113,9 +103,7 @@ export function validate(desc: ValidationDescriptor): boolean {
     }
   }
 
-  if (summaryHasErrors && summaryEl) {
-    showSummaryDiv(summaryEl);
-  }
+  if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
 
   log.debug("validate", { formId: desc.formId, valid });
   return valid;
@@ -137,21 +125,16 @@ export function showServerErrors(desc: ValidationDescriptor, data: unknown): voi
   for (const [name, msgs] of Object.entries(errors)) {
     const msg = Array.isArray(msgs) ? msgs.join(", ") : String(msgs);
 
-    // Try inline — if a span exists for the field (in any state), display there
     const spanExists = findErrorSpanExists(desc.formId, name);
-
     if (spanExists) {
       showServerErrorInline(desc.formId, name, msg, desc.fields);
     } else if (summaryEl) {
-      // No span at all → route to summary
       addToSummary(summaryEl, name, msg);
       summaryHasErrors = true;
     }
   }
 
-  if (summaryHasErrors && summaryEl) {
-    showSummaryDiv(summaryEl);
-  }
+  if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
 
   log.debug("showServerErrors", { formId: desc.formId, fieldCount: Object.keys(errors).length });
 }
@@ -209,10 +192,27 @@ function findErrorSpanExists(containerId: string, fieldName: string): boolean {
   return container.querySelector(`span[data-valmsg-for="${fieldName}"]`) !== null;
 }
 
+/** Visibility check — owned by orchestrator (routing decision), not error-display. */
+function isHidden(el: HTMLElement): boolean {
+  let node: HTMLElement | null = el;
+  while (node) {
+    if (node.hasAttribute("hidden") || node.style?.display === "none") return true;
+    node = node.parentElement;
+  }
+  return false;
+}
+
+/**
+ * Extracts field errors from server response.
+ * Accepts only ProblemDetails shape: { errors: Record<string, string[]> }.
+ * Rejects arbitrary objects — validation lane should not reinterpret random payloads.
+ */
 function extractErrors(data: unknown): Record<string, unknown> | null {
   if (!data || typeof data !== "object") return null;
-  if ("errors" in data && typeof (data as Record<string, unknown>).errors === "object") {
-    return (data as Record<string, Record<string, unknown>>).errors;
+  const obj = data as Record<string, unknown>;
+  if ("errors" in obj && typeof obj.errors === "object" && obj.errors !== null) {
+    return obj.errors as Record<string, unknown>;
   }
-  return data as Record<string, unknown>;
+  log.warn("showServerErrors: response is not ProblemDetails shape, ignoring", {});
+  return null;
 }
