@@ -62,6 +62,20 @@ namespace Alis.Reactive.Builders.Conditions
                 source, CompositionMode.Any, Guard, _pipeline, _branchBuilder);
         }
 
+        // --- Direct And/Or with TypedSource (source-vs-source) ---
+
+        public ConditionSourceBuilder<TModel, TProp> And<TProp>(TypedSource<TProp> source)
+        {
+            return new ConditionSourceBuilder<TModel, TProp>(
+                source, CompositionMode.All, Guard, _pipeline, _branchBuilder);
+        }
+
+        public ConditionSourceBuilder<TModel, TProp> Or<TProp>(TypedSource<TProp> source)
+        {
+            return new ConditionSourceBuilder<TModel, TProp>(
+                source, CompositionMode.Any, Guard, _pipeline, _branchBuilder);
+        }
+
         // --- Lambda And/Or (for complex nesting) ---
 
         /// <summary>

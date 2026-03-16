@@ -1,0 +1,77 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TwoSourceModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: invoice
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.amount
+              },
+              coerceAs: number,
+              op: gt,
+              rightSource: {
+                kind: component,
+                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+                vendor: fusion,
+                readExpr: value
+              }
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: warn,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: warn,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

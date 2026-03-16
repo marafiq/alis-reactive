@@ -1,0 +1,97 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TwoSourceModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: component,
+                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+                vendor: fusion,
+                readExpr: value
+              },
+              coerceAs: number,
+              op: lt,
+              rightSource: {
+                kind: component,
+                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Budget,
+                vendor: fusion,
+                readExpr: value
+              }
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: s,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: Under
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: component,
+                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+                vendor: fusion,
+                readExpr: value
+              },
+              coerceAs: number,
+              op: eq,
+              rightSource: {
+                kind: component,
+                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Budget,
+                vendor: fusion,
+                readExpr: value
+              }
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: s,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: Exact
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: s,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: Over
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -144,6 +144,7 @@ export interface ValueGuard {
   coerceAs: "string" | "number" | "boolean" | "date" | "raw";
   op: GuardOp;
   operand?: unknown;
+  rightSource?: BindSource;
 }
 
 export interface AllGuard {

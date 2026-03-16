@@ -26,6 +26,14 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>
+        /// Begins a condition on a component source (source-vs-source in lambda composition).
+        /// </summary>
+        public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
+        {
+            return new ConditionSourceBuilder<TModel, TProp>(source);
+        }
+
+        /// <summary>
         /// Creates a ConfirmGuard — an async halting condition that pauses the pipeline
         /// and shows a dialog to the user.
         /// </summary>

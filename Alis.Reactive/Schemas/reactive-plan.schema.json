@@ -194,6 +194,10 @@
         "op": { "$ref": "#/$defs/GuardOp" },
         "operand": {
           "description": "Comparison value for binary operators (eq, neq, gt, etc.)"
+        },
+        "rightSource": {
+          "$ref": "#/$defs/BindSource",
+          "description": "When present, the right-hand side is a source (component or event), not a literal operand. Enables source-vs-source comparisons."
         }
       }
     },

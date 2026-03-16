@@ -125,6 +125,44 @@ namespace Alis.Reactive.Builders.Conditions
         public GuardBuilder<TModel> MinLength(int length) =>
             Build(GuardOp.MinLength, length);
 
+        // --- Source-vs-source comparison (right side is a TypedSource, not a literal) ---
+
+        public GuardBuilder<TModel> Eq(TypedSource<TProp> right) => BuildVsSource(GuardOp.Eq, right);
+        public GuardBuilder<TModel> NotEq(TypedSource<TProp> right) => BuildVsSource(GuardOp.Neq, right);
+        public GuardBuilder<TModel> Gt(TypedSource<TProp> right) => BuildVsSource(GuardOp.Gt, right);
+        public GuardBuilder<TModel> Gte(TypedSource<TProp> right) => BuildVsSource(GuardOp.Gte, right);
+        public GuardBuilder<TModel> Lt(TypedSource<TProp> right) => BuildVsSource(GuardOp.Lt, right);
+        public GuardBuilder<TModel> Lte(TypedSource<TProp> right) => BuildVsSource(GuardOp.Lte, right);
+
+        private GuardBuilder<TModel> BuildVsSource(string op, TypedSource<TProp> right)
+        {
+            var leftSource = _typedSource.ToBindSource();
+            var rightSource = right.ToBindSource();
+            var guard = new ValueGuard(leftSource, _coerceAs, op, rightSource);
+
+            if (_mode != CompositionMode.None && _existingGuard != null)
+            {
+                Guard combined;
+                if (_mode == CompositionMode.All)
+                {
+                    var guards = new System.Collections.Generic.List<Guard>();
+                    GuardBuilder<TModel>.FlattenAllStatic(_existingGuard, guards);
+                    guards.Add(guard);
+                    combined = new AllGuard(guards);
+                }
+                else
+                {
+                    var guards = new System.Collections.Generic.List<Guard>();
+                    GuardBuilder<TModel>.FlattenAnyStatic(_existingGuard, guards);
+                    guards.Add(guard);
+                    combined = new AnyGuard(guards);
+                }
+                return WrapGuard(combined);
+            }
+
+            return WrapGuard(guard);
+        }
+
         // --- Internal ---
 
         private GuardBuilder<TModel> Build(string op, object? operand = null)

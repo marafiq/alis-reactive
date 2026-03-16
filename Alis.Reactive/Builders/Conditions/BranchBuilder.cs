@@ -39,6 +39,18 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>
+        /// Adds a new conditional branch with a component source (source-vs-source in ElseIf).
+        /// </summary>
+        public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
+        {
+            if (_elseCalled)
+                throw new InvalidOperationException(
+                    "Cannot add ElseIf after Else. Else must be the last branch.");
+
+            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+        }
+
+        /// <summary>
         /// Adds a fallback branch with no guard (always matches if reached).
         /// This must be the last branch.
         /// </summary>

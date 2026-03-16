@@ -86,10 +86,13 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
   // comparisons are type-consistent (e.g. both sides are numbers).
   const resolved = resolveSourceAs(guard.source, guard.coerceAs, ctx);
 
+  // Source-vs-source: if rightSource present, resolve it instead of literal operand.
   // For array operands (in, not-in, between), coerce each element individually.
   // For scalar operands, coerce the whole value.
-  const rawOp = guard.operand;
-  const operand = rawOp != null
+  const rawOp = guard.rightSource
+    ? resolveSourceAs(guard.rightSource, guard.coerceAs, ctx)
+    : guard.operand;
+  const operand = rawOp != null && !guard.rightSource
     ? (Array.isArray(rawOp) ? rawOp.map(v => coerce(v, guard.coerceAs)) : coerce(rawOp, guard.coerceAs))
     : rawOp;
 

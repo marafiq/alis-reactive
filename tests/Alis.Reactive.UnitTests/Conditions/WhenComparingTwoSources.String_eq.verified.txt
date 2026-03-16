@@ -1,0 +1,78 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TwoSourceModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: component,
+                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Primary,
+                vendor: fusion,
+                readExpr: value
+              },
+              coerceAs: string,
+              op: eq,
+              rightSource: {
+                kind: component,
+                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Secondary,
+                vendor: fusion,
+                readExpr: value
+              }
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: match,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: match,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
