@@ -219,33 +219,43 @@
                 </p>
             </a>
 
-            <a asp-area="Sandbox" asp-controller="Validation" asp-action="StandaloneIsolation"
+            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="Index"
                class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
                 <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Standalone Isolation
+                    Scenario 1 — All Fields
                 </h3>
                 <p class="mt-1 text-sm text-text-secondary">
-                    Single-form validation with isolated scope and independent error clearing.
+                    Single page with all field types, conditional rules, and equalTo validation.
                 </p>
             </a>
 
-            <a asp-area="Sandbox" asp-controller="Validation" asp-action="SameModelMerge"
+            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="ConditionalHide"
                class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
                 <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Same-Model Merge
+                    Scenario 2 — Show/Hide
                 </h3>
                 <p class="mt-1 text-sm text-text-secondary">
-                    Multiple partials sharing the same model with merged validation results.
+                    Conditional visibility aligned with validation conditions.
                 </p>
             </a>
 
-            <a asp-area="Sandbox" asp-controller="Validation" asp-action="MultiPartialWorkflow"
+            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="ServerPartial"
                class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
                 <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Multi-Partial Workflow
+                    Scenario 3a — Server Partials
                 </h3>
                 <p class="mt-1 text-sm text-text-secondary">
-                    Step-by-step form workflow with per-partial validation and progression.
+                    Server-rendered partials with merged plans and own reactive behavior.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="AjaxPartial"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Scenario 3b — AJAX Partials
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Dynamic partial loading with enrichment lifecycle and summary routing.
                 </p>
             </a>
         </div>
