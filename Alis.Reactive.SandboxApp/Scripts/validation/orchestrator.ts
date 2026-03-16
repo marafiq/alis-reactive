@@ -102,15 +102,12 @@ export function validate(desc: ValidationDescriptor): boolean {
           if (summaryEl) {
             addToSummary(summaryEl, f.fieldName, rule.message);
             summaryHasErrors = true;
-            valid = false;
           }
-          // No summary element → hidden field error has no destination, skip
         } else {
           showInline(desc.formId, f, rule.message);
-          // Field is visible and inline — remove any stale summary entry for this field
           if (summaryEl) removeSummaryEntry(summaryEl, f.fieldName);
-          valid = false;
         }
+        valid = false;
         break;
       }
     }
