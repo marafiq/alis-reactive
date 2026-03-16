@@ -44,7 +44,7 @@ export function ruleFails(
     }
     case "equalTo": {
       const peerVal = peerReader.readPeer(String(rule.constraint));
-      if (peerVal === undefined) return false;
+      if (peerVal === undefined) return true; // Fail-closed: peer unresolvable → block
       return String(value ?? "") !== peerVal;
     }
     case "atLeastOne":

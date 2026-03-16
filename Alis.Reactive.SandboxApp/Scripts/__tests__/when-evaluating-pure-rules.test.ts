@@ -105,9 +105,9 @@ describe("rule-engine: equalTo", () => {
     expect(ruleFails(rule, "secret", reader)).toBe(false);
   });
 
-  it("does not fail when peer is unavailable", () => {
+  it("fails closed when peer is unavailable (blocks, does not pass)", () => {
     const rule = { rule: "equalTo" as const, message: "must match", constraint: "Missing" };
-    expect(ruleFails(rule, "anything", noPeers)).toBe(false);
+    expect(ruleFails(rule, "anything", noPeers)).toBe(true);
   });
 });
 

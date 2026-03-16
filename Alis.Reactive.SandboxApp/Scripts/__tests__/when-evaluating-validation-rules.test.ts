@@ -257,7 +257,7 @@ describe("When equalTo peer is enriched and in DOM", () => {
 });
 
 describe("When equalTo peer is not enriched", () => {
-  it("does not fail the rule when peer has no enrichment", () => {
+  it("fails closed when peer is unresolvable (blocks the form)", () => {
     (document.getElementById("Email") as HTMLInputElement).value = "test@test.com";
     const desc = makeDesc("testForm", [
       // Name not in field list — peer not enriched
@@ -265,8 +265,8 @@ describe("When equalTo peer is not enriched", () => {
         { rule: "equalTo", message: "must match", constraint: "NonExistent" },
       ] }),
     ]);
-    // equalTo with missing peer returns false (does not fail) — graceful
-    expect(validate(desc)).toBe(true);
+    // Fail-closed: peer unresolvable → rule fails → form blocked
+    expect(validate(desc)).toBe(false);
   });
 });
 
