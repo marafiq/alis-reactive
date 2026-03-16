@@ -2,6 +2,8 @@ using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Commands;
+using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive.Builders
 {
@@ -144,7 +146,7 @@ namespace Alis.Reactive.Builders
             var csb = new ConditionSourceBuilder<TModel, TProp>(source);
             var gb = configure(csb);
             if (_pipeline.Commands.Count > 0)
-                _pipeline.Commands[_pipeline.Commands.Count - 1].When = gb.Guard;
+                _pipeline.Commands[_pipeline.Commands.Count - 1].GuardWith(gb.Guard);
             return this;
         }
     }

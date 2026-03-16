@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive;
 using Alis.Reactive.Builders;
 using Alis.Reactive.Descriptors;
 using Alis.Reactive.Descriptors.Triggers;
@@ -21,7 +20,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class FusionDropDownListReactiveExtensions
     {
-        private static readonly FusionDropDownList _component = new FusionDropDownList();
+        private static readonly FusionDropDownList Component = new FusionDropDownList();
 
         public static DropDownListBuilder Reactive<TModel, TArgs>(
             this DropDownListBuilder builder,
@@ -38,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
             var componentId = (string)attrs["id"];
             var bindingPath = (string)attrs["name"];
 
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, _component.Vendor, bindingPath, _component.ReadExpr);
+            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, Component.Vendor, bindingPath, Component.ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
 

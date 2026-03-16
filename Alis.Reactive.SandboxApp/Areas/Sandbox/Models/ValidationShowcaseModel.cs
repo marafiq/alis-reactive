@@ -34,6 +34,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     public class HiddenFieldsSection
     {
+        public bool ShowExtras { get; set; }
         public string? Name { get; set; }
         public string? Phone { get; set; }
         public decimal? Salary { get; set; }

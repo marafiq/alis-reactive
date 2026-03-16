@@ -1,0 +1,20 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace Alis.Reactive.Fusion.Components
+{
+    /// <summary>
+    /// Factory extension for creating TestWidgetSyncFusionBuilder.
+    /// </summary>
+    public static class TestWidgetSyncFusionHtmlExtensions
+    {
+        /// <summary>
+        /// Creates a TestWidget builder that renders &lt;div data-test-widget&gt;.
+        /// </summary>
+        public static TestWidgetSyncFusionBuilder<TModel> TestWidget<TModel>(
+            this IHtmlHelper<TModel> html, string elementId)
+            where TModel : class
+        {
+            return new TestWidgetSyncFusionBuilder<TModel>(elementId);
+        }
+    }
+}

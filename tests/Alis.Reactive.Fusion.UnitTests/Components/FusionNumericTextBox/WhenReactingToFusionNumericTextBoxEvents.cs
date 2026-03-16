@@ -1,6 +1,4 @@
-using Alis.Reactive;
 using Alis.Reactive.Fusion.Components;
-using static VerifyNUnit.Verifier;
 
 namespace Alis.Reactive.Fusion.UnitTests;
 

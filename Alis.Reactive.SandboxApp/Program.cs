@@ -1,5 +1,15 @@
 using Alis.Reactive;
 using Alis.Reactive.FluentValidator;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+
+// Global: Newtonsoft serializes PascalCase C# → camelCase JSON.
+// SF EJ2 uses Newtonsoft internally for DataSource rendering —
+// JsonConvert.DefaultSettings merges into SF's explicit settings.
+JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+{
+    ContractResolver = new CamelCasePropertyNamesContractResolver()
+};
 
 var builder = WebApplication.CreateBuilder(args);
 

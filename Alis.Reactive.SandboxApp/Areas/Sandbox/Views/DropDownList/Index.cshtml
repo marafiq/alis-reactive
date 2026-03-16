@@ -1,6 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.DropDownListModel
-@using Alis.Reactive
-@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -56,14 +54,19 @@
             On DomReady, sets value="Books" via structured prop on the Syncfusion ej2 instance.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Category (SF DropDownList)</label>
-                @(Html.DropDownListFor(plan, m => m.Category)
+            @{ Html.Field("Category (SF DropDownList)", false, m => m.Category, expr =>
+                Html.DropDownListFor(plan, expr)
                     .DataSource(categories)
                     .Placeholder("Select a category")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
+                    })
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.When(args, x => x.Value).Eq("Electronics")
+                            .Then(t => t.Element("args-condition").SetText("electronics selected"))
+                            .Else(e => e.Element("args-condition").SetText("other category"));
                     })
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -87,8 +90,7 @@
                     {
                         p.Element("focus-state").SetText("blurred");
                     })
-                    .Render())
-            </div>
+                    .Render()); }
         </div>
     </section>
 
@@ -134,17 +136,19 @@
         </p>
         <div class="font-mono text-sm space-y-1">
             <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
+            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
             <p>Focus state: <span id="focus-state" class="text-text-muted">&mdash;</span></p>
             <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
         </div>
     </section>
 
-    <!-- Section 5: Condition — NotNull Indicator -->
+    <!-- Section 5: Conditions — Typed Event-Args + Component-Read -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">5. Condition (Value NotNull)</h2>
+        <h2 class="text-base font-semibold mb-4">5. Conditions (Both Types)</h2>
         <p class="text-sm text-text-secondary mb-4">
-            The selected indicator in Section 4 uses <code>p.When(comp.Value()).NotNull()</code>.
-            Select any category to see it appear. Clear the selection to hide it.
+            Two condition types are exercised:
+            <code>When(args, x =&gt; x.Value).Eq("Electronics")</code> (typed event-args condition)
+            and <code>When(comp.Value()).NotNull()</code> (component-read condition).
         </p>
     </section>
 

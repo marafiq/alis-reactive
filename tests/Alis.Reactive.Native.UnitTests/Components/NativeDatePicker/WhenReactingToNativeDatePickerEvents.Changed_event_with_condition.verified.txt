@@ -1,0 +1,57 @@
+﻿{
+  planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: date-guarded
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: date,
+              op: not-null
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: date selected
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: no date
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

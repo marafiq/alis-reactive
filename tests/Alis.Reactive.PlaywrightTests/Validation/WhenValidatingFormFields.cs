@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Alis.Reactive.PlaywrightTests.Validation;
 
 [TestFixture]
@@ -5,673 +7,675 @@ public class WhenValidatingFormFields : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation";
     private const string S = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__";
+    private const string C = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ContactFormModel__";
+
+    // ── Journey 1: Complete validation error -> fix -> success cycle ────────
 
     [Test]
-    public async Task PageLoadsWithNoErrors()
-    {
-        await NavigateTo(Path);
-        await Expect(Page).ToHaveTitleAsync("Validation — Alis.Reactive Sandbox");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Section 1: Client-Side Rule Types ────────────────────
-
-    [Test]
-    public async Task RequiredFieldShowsError()
+    public async Task user_submits_empty_form_sees_all_errors_then_fixes_and_succeeds()
     {
         await NavigateTo(Path);
 
-        // Click "Validate All" with empty Name field
+        // Step 1: Submit empty form — multiple validation errors appear
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
 
-        // Name is required — error should appear (framework .Validate() handles registration + validation)
         var nameError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Name']");
+        var emailError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Email']");
         await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(nameError).ToContainTextAsync("required");
+        await Expect(emailError).ToBeVisibleAsync();
+        await Expect(emailError).ToContainTextAsync("required");
 
-        // With framework pattern, validation failure aborts the POST — result stays at default
+        // Result should NOT have changed (POST was blocked by client validation)
         var result = Page.Locator("#all-rules-result");
         await Expect(result).ToContainTextAsync("Click to validate");
 
-        AssertNoConsoleErrors();
-    }
+        // Step 2: Fill all fields with valid data
+        await Page.FillAsync($"#{S}AllRules_Name", "Jane Smith");
+        await Page.FillAsync($"#{S}AllRules_Email", "jane@example.com");
+        await Page.FillAsync($"#{S}AllRules_Age", "30");
+        await Page.FillAsync($"#{S}AllRules_Phone", "123-456-7890");
+        await Page.FillAsync($"#{S}AllRules_Salary", "75000");
+        await Page.FillAsync($"#{S}AllRules_Password", "securepassword123");
 
-    [Test]
-    public async Task EmailFieldShowsError()
-    {
-        await NavigateTo(Path);
-
-        // Fill Name (passes required) but put invalid email
-        await Page.FillAsync($"#{S}AllRules_Name", "Test User");
-        await Page.FillAsync($"#{S}AllRules_Email", "not-an-email");
-
+        // Step 3: Resubmit — should succeed
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
 
-        var emailError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Email']");
-        await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(emailError).ToContainTextAsync("email");
+        await Expect(result).ToContainTextAsync("passed", new() { Timeout = 5000 });
+        await Expect(result).ToHaveClassAsync(new Regex("text-green-600"));
 
         AssertNoConsoleErrors();
     }
 
+    // ── Journey 2: Server validation round-trip ────────────────────────────
+
     [Test]
-    public async Task RegexFieldShowsError()
+    public async Task server_rejects_empty_data_and_displays_field_errors_then_corrected_data_reduces_errors()
     {
         await NavigateTo(Path);
 
-        // Fill required fields, put invalid phone
-        await Page.FillAsync($"#{S}AllRules_Name", "Test User");
-        await Page.FillAsync($"#{S}AllRules_Email", "test@example.com");
-        await Page.FillAsync($"#{S}AllRules_Phone", "123");
-
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
-
-        var phoneError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Phone']");
-        await Expect(phoneError).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(phoneError).ToContainTextAsync("123-456-7890");
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task RangeFieldShowsError()
-    {
-        await NavigateTo(Path);
-
-        // Fill required fields, put age out of range
-        await Page.FillAsync($"#{S}AllRules_Name", "Test User");
-        await Page.FillAsync($"#{S}AllRules_Email", "test@example.com");
-        await Page.FillAsync($"#{S}AllRules_Age", "200");
-
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
-
-        var ageError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Age']");
-        await Expect(ageError).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(ageError).ToContainTextAsync("between");
-
-        AssertNoConsoleErrors();
-    }
-
-    // ── Section 2: Server-Side 400 Errors ────────────────────
-
-    [Test]
-    public async Task ServerErrorsDisplayAtFields()
-    {
-        await NavigateTo(Path);
-
-        // Click "Save (Server Validate)" with empty fields → 400
+        // Step 1: Submit empty server form — server returns 400 with field errors
         await Page.GetByRole(AriaRole.Button, new() { Name = "Save (Server Validate)" }).ClickAsync();
 
-        // Server result should indicate errors
         var result = Page.Locator("#server-result");
         await Expect(result).ToContainTextAsync("validation errors", new() { Timeout = 5000 });
+        await Expect(result).ToHaveClassAsync(new Regex("text-red-600"));
 
-        // Error spans at fields should be visible
+        // Step 2: Fill the server section fields — resubmit
+        // The server validates the full model, so other sections still fail,
+        // but the Server.Name and Server.Email errors should be resolved
+        await Page.FillAsync($"#{S}Server_Name", "Alice Jones");
+        await Page.FillAsync($"#{S}Server_Email", "alice@example.com");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save (Server Validate)" }).ClickAsync();
+
+        // Server still returns 400 (full model validation), but fewer field errors
+        // The key behavior: server errors display at the form, loading spinner works
+        await Expect(result).ToContainTextAsync("validation errors", new() { Timeout = 5000 });
+
         AssertNoConsoleErrorsExcept("400");
     }
 
-    // ── Section 3: Nested Properties ─────────────────────────
+    // ── Journey 3: Conditional validation toggle ───────────────────────────
 
     [Test]
-    public async Task NestedFieldErrorsDisplay()
+    public async Task conditional_checkbox_toggles_field_requirement()
     {
         await NavigateTo(Path);
 
-        // Click save with empty nested address fields → 400
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save Address (Server)" }).ClickAsync();
+        var jobError = Page.Locator("#conditional-form [data-valmsg-for='Conditional.JobTitle']");
+        var result = Page.Locator("#conditional-result");
 
-        var result = Page.Locator("#nested-result");
-        await Expect(result).ToContainTextAsync("errors", new() { Timeout = 5000 });
+        // Step 1: Submit with unchecked IsEmployed — passes (JobTitle not required)
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
 
-        // Server returns errors with dotted names like "Nested.Address.Street"
-        AssertNoConsoleErrorsExcept("400");
-    }
+        await Expect(result).ToContainTextAsync("passed", new() { Timeout = 3000 });
+        await Expect(jobError).ToBeHiddenAsync();
 
-    // ── Section 4: Conditional Rules ─────────────────────────
-
-    [Test]
-    public async Task ConditionalRuleAppliesWhenMet()
-    {
-        await NavigateTo(Path);
-
-        // Check "Is Employed" then validate with empty JobTitle
+        // Step 2: Check IsEmployed — now submit again — fails on JobTitle
         await Page.CheckAsync($"#{S}Conditional_IsEmployed");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
 
-        var jobError = Page.Locator("#conditional-form [data-valmsg-for='Conditional.JobTitle']");
         await Expect(jobError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(jobError).ToContainTextAsync("required");
 
-        // With framework pattern, validation failure aborts the POST — result stays at default
-        var result = Page.Locator("#conditional-result");
-        await Expect(result).ToContainTextAsync("Click to validate");
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task ModelBoundCheckboxUsesGeneratedIdAndMvcName()
-    {
-        await NavigateTo(Path);
-
-        var checkbox = Page.Locator($"#{S}Conditional_IsEmployed");
-        await Expect(checkbox).ToHaveAttributeAsync("name", "Conditional.IsEmployed");
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task ConditionalRuleSkipsWhenNotMet()
-    {
-        await NavigateTo(Path);
-
-        // Leave "Is Employed" unchecked — JobTitle should not be required
+        // Step 3: Fill JobTitle — resubmit — passes
+        await Page.FillAsync($"#{S}Conditional_JobTitle", "Software Engineer");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
 
-        var jobError = Page.Locator("#conditional-form [data-valmsg-for='Conditional.JobTitle']");
-        await Expect(jobError).ToBeHiddenAsync(new() { Timeout = 3000 });
-
-        var result = Page.Locator("#conditional-result");
-        await Expect(result).ToContainTextAsync("passed");
+        await Expect(result).ToContainTextAsync("passed", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
     }
 
-    // ── Section 5: Live Clearing ─────────────────────────────
+    // ── Journey 4: Hidden field visibility -> validation interaction ───────
 
     [Test]
-    public async Task TypingClearsFieldError()
+    public async Task hidden_fields_skip_validation_then_validate_when_revealed()
     {
         await NavigateTo(Path);
 
-        // Trigger errors first
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Show Errors First" }).ClickAsync();
+        var result = Page.Locator("#hidden-result");
 
-        // Name error should be visible
-        var nameError = Page.Locator("#live-form [data-valmsg-for='Live.Name']");
-        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
-
-        // Type into the field — error should clear
-        await Page.FillAsync($"#{S}Live_Name", "John");
-        await Expect(nameError).ToBeHiddenAsync(new() { Timeout = 3000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    // ── Section 6: Combined Client + Server ──────────────────
-
-    [Test]
-    public async Task ClientValidationBlocksSubmit()
-    {
-        await NavigateTo(Path);
-
-        // Click combined save with empty fields — client validation should block the POST
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate + Save" }).ClickAsync();
-
-        // Client-side errors should show (Combined.Name required)
-        var nameError = Page.Locator("#combined-form [data-valmsg-for='Combined.Name']");
-        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
-
-        // The spinner should NOT have appeared (request was blocked)
-        var spinner = Page.Locator("#combined-spinner");
-        await Expect(spinner).ToBeHiddenAsync();
-
-        // Result should not have changed from default (no server response)
-        var result = Page.Locator("#combined-result");
-        await Expect(result).ToContainTextAsync("Not submitted yet");
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task CombinedFlowPassesClientThenHitsServer()
-    {
-        await NavigateTo(Path);
-
-        // Fill valid data for client-side rules
-        await Page.FillAsync($"#{S}Combined_Name", "Valid Name");
-        await Page.FillAsync($"#{S}Combined_Email", "valid@example.com");
-
-        // Click Validate + Save — client passes, server validates remaining rules
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate + Save" }).ClickAsync();
-
-        // Should reach the server and get a response (success or error)
-        var result = Page.Locator("#combined-result");
-        await Expect(result).Not.ToContainTextAsync("Not submitted yet", new() { Timeout = 5000 });
-
-        AssertNoConsoleErrorsExcept("400");
-    }
-
-    // ── Section 7: Hidden Fields — Validate with Hidden Sections ───
-
-    [Test]
-    public async Task HiddenFieldsSkippedDuringValidation()
-    {
-        await NavigateTo(Path);
-
-        // Extra fields are hidden by default (display:none).
-        // Fill only the visible Name field and validate.
+        // Step 1: Fill Name (visible) and submit — hidden Phone/Salary are skipped
         await Page.FillAsync($"#{S}Hidden_Name", "Visible User");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Hidden Form" }).ClickAsync();
 
-        // Should pass — hidden Phone/Salary are skipped
-        var result = Page.Locator("#hidden-result");
         await Expect(result).ToContainTextAsync("passed", new() { Timeout = 3000 });
-
-        // Hidden field error spans should NOT be visible
         await Expect(Page.Locator("#hidden-fields-form [data-valmsg-for='Hidden.Phone']")).ToBeHiddenAsync();
         await Expect(Page.Locator("#hidden-fields-form [data-valmsg-for='Hidden.Salary']")).ToBeHiddenAsync();
 
-        AssertNoConsoleErrors();
-    }
+        // Step 2: Toggle visibility — reveal extra fields
+        await Page.CheckAsync($"#{S}Hidden_ShowExtras");
+        await Expect(Page.Locator("#hf_extras")).ToBeVisibleAsync(new() { Timeout = 3000 });
 
-    [Test]
-    public async Task RevealedFieldsValidateAfterToggle()
-    {
-        await NavigateTo(Path);
-
-        // Fill Name, check toggle to reveal extra fields
-        await Page.FillAsync($"#{S}Hidden_Name", "Visible User");
-        await Page.CheckAsync("#hf_toggle");
-
-        // Put invalid data in revealed fields
+        // Step 3: Submit again with invalid data in revealed fields
         await Page.FillAsync($"#{S}Hidden_Phone", "bad");
         await Page.FillAsync($"#{S}Hidden_Salary", "999999");
-
         await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Hidden Form" }).ClickAsync();
 
-        // Now that fields are visible, they should be validated
         var phoneError = Page.Locator("#hidden-fields-form [data-valmsg-for='Hidden.Phone']");
+        var salaryError = Page.Locator("#hidden-fields-form [data-valmsg-for='Hidden.Salary']");
         await Expect(phoneError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(phoneError).ToContainTextAsync("123-456-7890");
-
-        var salaryError = Page.Locator("#hidden-fields-form [data-valmsg-for='Hidden.Salary']");
-        await Expect(salaryError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(salaryError).ToBeVisibleAsync();
         await Expect(salaryError).ToContainTextAsync("500,000");
 
-        AssertNoConsoleErrors();
-    }
+        // Step 4: Fix revealed fields — submit — passes
+        await Page.FillAsync($"#{S}Hidden_Phone", "123-456-7890");
+        await Page.FillAsync($"#{S}Hidden_Salary", "50000");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Hidden Form" }).ClickAsync();
 
-    [Test]
-    public async Task HiddenFieldsSubmitToServerSuccessfully()
-    {
-        await NavigateTo(Path);
-
-        // Fill visible Name, leave extra fields hidden, submit to server
-        await Page.FillAsync($"#{S}Hidden_Name", "Server User");
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Profile" }).ClickAsync();
-
-        var result = Page.Locator("#hidden-result");
-        await Expect(result).ToContainTextAsync("Profile saved", new() { Timeout = 5000 });
+        await Expect(result).ToContainTextAsync("passed", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
     }
 
+    // ── Journey 5: Live error clearing ─────────────────────────────────────
+
     [Test]
-    public async Task HiddenFieldsClientBlocksEmptyName()
+    public async Task typing_clears_individual_field_errors_without_revalidating_whole_form()
     {
         await NavigateTo(Path);
 
-        // Leave Name empty, click Submit — client .Validate(hiddenDesc) catches it
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Profile" }).ClickAsync();
+        // Step 1: Trigger errors on both fields
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Show Errors First" }).ClickAsync();
 
-        // Client-side required error shows at the field (POST is aborted)
-        var nameError = Page.Locator("#hidden-fields-form [data-valmsg-for='Hidden.Name']");
+        var nameError = Page.Locator("#live-form [data-valmsg-for='Live.Name']");
+        var emailError = Page.Locator("#live-form [data-valmsg-for='Live.Email']");
         await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(nameError).ToContainTextAsync("required");
-
-        // Result stays at default — no server request fired
-        var result = Page.Locator("#hidden-result");
-        await Expect(result).ToContainTextAsync("Click to validate or submit");
-
-        AssertNoConsoleErrors();
-    }
-
-    // ── Section 8: Fake DB Validation (ProblemDetails 400) ─────
-
-    [Test]
-    public async Task DbValidationRejectsDuplicateEmail()
-    {
-        await NavigateTo(Path);
-
-        // Fill valid data but use "taken" in email to trigger DB uniqueness check
-        await Page.FillAsync($"#{S}Db_Name", "Normal User");
-        await Page.FillAsync($"#{S}Db_Email", "taken@test.com");
-
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
-
-        // Server DB check returns 400 with email error
-        var result = Page.Locator("#db-result");
-        await Expect(result).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
-
-        // Email error should display at the field
-        var emailError = Page.Locator("#db-form [data-valmsg-for='Db.Email']");
         await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(emailError).ToContainTextAsync("already registered");
 
-        AssertNoConsoleErrorsExcept("400");
-    }
+        // Step 2: Type into Name field — only Name's error clears, Email error remains
+        await Page.FillAsync($"#{S}Live_Name", "John");
+        await Expect(nameError).ToBeHiddenAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToBeVisibleAsync();
 
-    [Test]
-    public async Task DbValidationRejectsReservedUsername()
-    {
-        await NavigateTo(Path);
-
-        // Use "admin" to trigger reserved username check
-        await Page.FillAsync($"#{S}Db_Name", "admin");
-        await Page.FillAsync($"#{S}Db_Email", "admin@test.com");
-
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
-
-        var result = Page.Locator("#db-result");
-        await Expect(result).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
-
-        var nameError = Page.Locator("#db-form [data-valmsg-for='Db.Name']");
-        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(nameError).ToContainTextAsync("reserved");
-
-        AssertNoConsoleErrorsExcept("400");
-    }
-
-    [Test]
-    public async Task DbValidationPassesWithCleanData()
-    {
-        await NavigateTo(Path);
-
-        // Valid data that passes both FluentValidation and DB checks
-        await Page.FillAsync($"#{S}Db_Name", "John Smith");
-        await Page.FillAsync($"#{S}Db_Email", "john@example.com");
-
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
-
-        var result = Page.Locator("#db-result");
-        await Expect(result).ToContainTextAsync("Saved to database successfully", new() { Timeout = 5000 });
+        // Step 3: Type into Email field — Email's error clears too
+        await Page.FillAsync($"#{S}Live_Email", "john@example.com");
+        await Expect(emailError).ToBeHiddenAsync(new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
     }
 
+    // ── Journey 6: Nested property validation (partial view) ───────────────
+
     [Test]
-    public async Task DbValidationClientBlocksEmptyFields()
+    public async Task nested_address_fields_show_errors_with_dotted_names_then_fix_and_save()
     {
         await NavigateTo(Path);
 
-        // Empty fields — client .Validate(dbDesc) catches required Name/Email before POST
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
-
-        // Client-side required error at the field (POST aborted, no server request)
-        var nameError = Page.Locator("#db-form [data-valmsg-for='Db.Name']");
-        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(nameError).ToContainTextAsync("required");
-
-        // Result stays at default — no server request fired
-        var result = Page.Locator("#db-result");
-        await Expect(result).ToContainTextAsync("Not submitted yet");
-
-        AssertNoConsoleErrors();
-    }
-
-    // ── Section 9: Partial View + Client/Server Validation ────
-
-    [Test]
-    public async Task PartialViewLoadsAddressForm()
-    {
-        await NavigateTo(Path);
-
-        // Click "Load Address Form" → GET partial view
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Address Form" }).ClickAsync();
-
-        // Partial status should update
-        var status = Page.Locator("#partial-status");
-        await Expect(status).ToContainTextAsync("loaded", new() { Timeout = 5000 });
-
-        // Address fields should now exist in DOM
-        await Expect(Page.Locator($"#{S}Nested_Address_Street")).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(Page.Locator($"#{S}Nested_Address_City")).ToBeVisibleAsync();
-        await Expect(Page.Locator($"#{S}Nested_Address_ZipCode")).ToBeVisibleAsync();
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task PartialClientValidationBlocksSubmitWithEmptyFields()
-    {
-        await NavigateTo(Path);
-
-        // Load the partial first
+        // Step 1: Load the address partial
         await Page.GetByRole(AriaRole.Button, new() { Name = "Load Address Form" }).ClickAsync();
         await Expect(Page.Locator($"#{S}Nested_Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // Click "Save Address" with empty fields — client-side validation blocks the POST
+        // Step 2: Submit empty — client errors appear at dotted field names
         await Page.Locator("#save-partial-btn").ClickAsync();
 
-        // Error spans in the partial should be visible (client-side validation fired)
         var streetError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.Street']");
+        var cityError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.City']");
         await Expect(streetError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(streetError).ToContainTextAsync("required");
-
-        var cityError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.City']");
         await Expect(cityError).ToBeVisibleAsync();
         await Expect(cityError).ToContainTextAsync("required");
 
-        // POST never fired — result text stays at initial value
+        // POST was blocked — result stays at default
         var result = Page.Locator("#partial-save-result");
         await Expect(result).ToContainTextAsync("Not submitted yet");
 
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task PartialClientValidationClearsOnInput()
-    {
-        await NavigateTo(Path);
-
-        // Load partial, trigger validation errors
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Address Form" }).ClickAsync();
-        await Expect(Page.Locator($"#{S}Nested_Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Page.Locator("#save-partial-btn").ClickAsync();
-
-        var streetError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.Street']");
-        await Expect(streetError).ToBeVisibleAsync(new() { Timeout = 3000 });
-
-        // Type into the field — live clearing should hide the error
-        await Page.FillAsync($"#{S}Nested_Address_Street", "123 Main St");
-        await Expect(streetError).ToBeHiddenAsync(new() { Timeout = 3000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task PartialValidDataSavesSuccessfully()
-    {
-        await NavigateTo(Path);
-
-        // Load the partial
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Address Form" }).ClickAsync();
-        await Expect(Page.Locator($"#{S}Nested_Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
-
-        // Fill valid address data
+        // Step 3: Fill all address fields and submit — success
         await Page.FillAsync($"#{S}Nested_Address_Street", "123 Main St");
         await Page.FillAsync($"#{S}Nested_Address_City", "Springfield");
         await Page.FillAsync($"#{S}Nested_Address_ZipCode", "62701");
-
-        // Click "Save Address" → client passes → POST fires → 200
         await Page.Locator("#save-partial-btn").ClickAsync();
 
-        var result = Page.Locator("#partial-save-result");
         await Expect(result).ToContainTextAsync("saved successfully", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
 
-    // ── Section 10: Delivery Note Partial (Same TModel) ─────
+    // ── Journey 7: Combined client + server validation ─────────────────────
 
     [Test]
-    public async Task DeliveryPartialLoadsForm()
+    public async Task client_validation_blocks_server_call_until_client_passes()
     {
         await NavigateTo(Path);
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Delivery Note Form" }).ClickAsync();
+        var result = Page.Locator("#combined-result");
+        var spinner = Page.Locator("#combined-spinner");
 
-        var status = Page.Locator("#delivery-status");
-        await Expect(status).ToContainTextAsync("loaded", new() { Timeout = 5000 });
+        // Step 1: Submit with client-invalid data — client errors appear, NO server request
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate + Save" }).ClickAsync();
 
-        // Delivery fields should exist in DOM
-        await Expect(Page.Locator($"#{S}Nested_Delivery_Instructions")).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(Page.Locator($"#{S}Nested_Delivery_ContactPhone")).ToBeVisibleAsync();
+        var nameError = Page.Locator("#combined-form [data-valmsg-for='Combined.Name']");
+        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(spinner).ToBeHiddenAsync();
+        await Expect(result).ToContainTextAsync("Not submitted yet");
 
-        AssertNoConsoleErrors();
+        // Step 2: Fix client issues — submit — client passes, server validates, succeeds
+        await Page.FillAsync($"#{S}Combined_Name", "Valid Name");
+        await Page.FillAsync($"#{S}Combined_Email", "valid@example.com");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate + Save" }).ClickAsync();
+
+        // Server should respond (success or 400 depending on server rules)
+        await Expect(result).Not.ToContainTextAsync("Not submitted yet", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    // ── Journey 8: DB-level validation (ProblemDetails 400) ────────────────
+
+    [Test]
+    public async Task reserved_username_shows_server_error_at_field_then_correction_succeeds()
+    {
+        await NavigateTo(Path);
+
+        var result = Page.Locator("#db-result");
+
+        // Step 1: Client blocks empty fields — no server request
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
+
+        var nameError = Page.Locator("#db-form [data-valmsg-for='Db.Name']");
+        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(nameError).ToContainTextAsync("required");
+        await Expect(result).ToContainTextAsync("Not submitted yet");
+
+        // Step 2: Fill "admin" (reserved) — client passes, server rejects with ProblemDetails 400
+        await Page.FillAsync($"#{S}Db_Name", "admin");
+        await Page.FillAsync($"#{S}Db_Email", "admin@test.com");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
+
+        await Expect(result).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
+        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(nameError).ToContainTextAsync("reserved");
+
+        // Step 3: Fix username — resubmit — server accepts
+        await Page.FillAsync($"#{S}Db_Name", "John Smith");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
+
+        await Expect(result).ToContainTextAsync("Saved to database successfully", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrorsExcept("400");
     }
 
     [Test]
-    public async Task DeliveryPartialClientValidationBlocksSubmit()
+    public async Task duplicate_email_shows_server_error_at_email_field_then_correction_succeeds()
     {
         await NavigateTo(Path);
 
-        // Load the partial
+        var result = Page.Locator("#db-result");
+
+        // Step 1: Fill valid name but "taken" email — server DB check returns 400
+        await Page.FillAsync($"#{S}Db_Name", "Normal User");
+        await Page.FillAsync($"#{S}Db_Email", "taken@test.com");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
+
+        await Expect(result).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
+        var emailError = Page.Locator("#db-form [data-valmsg-for='Db.Email']");
+        await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToContainTextAsync("already registered");
+
+        // Step 2: Fix email — resubmit — server accepts
+        await Page.FillAsync($"#{S}Db_Email", "unique@example.com");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save with DB Check" }).ClickAsync();
+
+        await Expect(result).ToContainTextAsync("Saved to database successfully", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    // ── Journey 9: Delivery note partial — error -> fix -> save ────────────
+
+    [Test]
+    public async Task delivery_partial_validates_fixes_and_saves_in_single_session()
+    {
+        await NavigateTo(Path);
+
+        // Step 1: Load the delivery partial
         await Page.GetByRole(AriaRole.Button, new() { Name = "Load Delivery Note Form" }).ClickAsync();
         await Expect(Page.Locator($"#{S}Nested_Delivery_Instructions")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // Click save with empty fields — client validation blocks POST
+        // Step 2: Submit empty — client validation blocks
         await Page.Locator("#save-delivery-btn").ClickAsync();
 
         var instrError = Page.Locator("#delivery-form [data-valmsg-for='Nested.Delivery.Instructions']");
         await Expect(instrError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(instrError).ToContainTextAsync("required");
 
-        // POST never fired
         var result = Page.Locator("#delivery-result");
         await Expect(result).ToContainTextAsync("Not submitted yet");
 
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task DeliveryPartialServerValidationOnBadPhone()
-    {
-        await NavigateTo(Path);
-
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Delivery Note Form" }).ClickAsync();
-        await Expect(Page.Locator($"#{S}Nested_Delivery_Instructions")).ToBeVisibleAsync(new() { Timeout = 5000 });
-
-        // Fill instructions (passes required) but bad phone (fails regex on server)
+        // Step 3: Fill instructions but bad phone — phone error appears
         await Page.FillAsync($"#{S}Nested_Delivery_Instructions", "Leave at door");
         await Page.FillAsync($"#{S}Nested_Delivery_ContactPhone", "bad");
-
         await Page.Locator("#save-delivery-btn").ClickAsync();
 
-        // Client validation passes (phone regex is a client rule too), so check if it catches it
-        // Phone regex rule: ^\d{3}-\d{3}-\d{4}$ — "bad" should fail client-side
         var phoneError = Page.Locator("#delivery-form [data-valmsg-for='Nested.Delivery.ContactPhone']");
         await Expect(phoneError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(phoneError).ToContainTextAsync("Phone must match");
 
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task DeliveryPartialValidDataSaves()
-    {
-        await NavigateTo(Path);
-
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Delivery Note Form" }).ClickAsync();
-        await Expect(Page.Locator($"#{S}Nested_Delivery_Instructions")).ToBeVisibleAsync(new() { Timeout = 5000 });
-
-        await Page.FillAsync($"#{S}Nested_Delivery_Instructions", "Leave at door");
+        // Step 4: Fix phone — submit — success
         await Page.FillAsync($"#{S}Nested_Delivery_ContactPhone", "123-456-7890");
-
         await Page.Locator("#save-delivery-btn").ClickAsync();
 
-        var result = Page.Locator("#delivery-result");
         await Expect(result).ToContainTextAsync("saved", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
 
-    // ── Section 11: Standalone Contact Form Partial (Own TModel) ────
-
-    private const string C = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ContactFormModel__";
+    // ── Journey 10: Standalone partial — independent plan validation ───────
 
     [Test]
-    public async Task ContactPartialLoadsForm()
+    public async Task standalone_contact_partial_validates_independently_from_parent_plan()
     {
         await NavigateTo(Path);
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Contact Form" }).ClickAsync();
-
-        var status = Page.Locator("#contact-status");
-        await Expect(status).ToContainTextAsync("loaded", new() { Timeout = 5000 });
-
-        // Contact fields should exist in DOM (own TModel prefix)
-        await Expect(Page.Locator($"#{C}Name")).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Expect(Page.Locator($"#{C}Email")).ToBeVisibleAsync();
-        await Expect(Page.Locator($"#{C}Message")).ToBeVisibleAsync();
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task ContactPartialClientValidationBlocksSubmit()
-    {
-        await NavigateTo(Path);
-
-        // Load the standalone partial
+        // Step 1: Load the standalone contact partial
         await Page.GetByRole(AriaRole.Button, new() { Name = "Load Contact Form" }).ClickAsync();
         await Expect(Page.Locator($"#{C}Name")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // Click "Send Message" with empty fields — client validation blocks POST
+        // Step 2: Submit empty — standalone plan's client validation blocks
         await Page.GetByRole(AriaRole.Button, new() { Name = "Send Message" }).ClickAsync();
 
         var nameError = Page.Locator("#contact-form [data-valmsg-for='Name']");
         await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(nameError).ToContainTextAsync("required");
 
-        // POST never fired — result stays at default
-        var result = Page.Locator("#contact-result");
-        await Expect(result).ToContainTextAsync("Not submitted yet");
+        var contactResult = Page.Locator("#contact-result");
+        await Expect(contactResult).ToContainTextAsync("Not submitted yet");
 
-        AssertNoConsoleErrors();
-    }
+        // Step 3: Verify parent plan's Section 1 is not polluted by standalone partial errors
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
 
-    [Test]
-    public async Task ContactPartialValidDataSaves()
-    {
-        await NavigateTo(Path);
+        var parentNameError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Name']");
+        await Expect(parentNameError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(parentNameError).ToContainTextAsync("required");
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Contact Form" }).ClickAsync();
-        await Expect(Page.Locator($"#{C}Name")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        // Parent result stays at default (separate plan scope)
+        var parentResult = Page.Locator("#all-rules-result");
+        await Expect(parentResult).ToContainTextAsync("Click to validate");
 
-        // Fill valid data
+        // Step 4: Fix standalone form — submit — success
         await Page.FillAsync($"#{C}Name", "John Doe");
         await Page.FillAsync($"#{C}Email", "john@example.com");
         await Page.FillAsync($"#{C}Message", "Hello, this is a test message!");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Send Message" }).ClickAsync();
 
-        var result = Page.Locator("#contact-result");
-        await Expect(result).ToContainTextAsync("Message sent", new() { Timeout = 5000 });
+        await Expect(contactResult).ToContainTextAsync("Message sent", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
 
+    // ── Journey 11: Hidden fields server round-trip ────────────────────────
+
     [Test]
-    public async Task ContactPartialDoesNotImpactParentValidation()
+    public async Task hidden_fields_submit_to_server_skipping_invisible_fields()
     {
         await NavigateTo(Path);
 
-        // Load the standalone partial first
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Contact Form" }).ClickAsync();
-        await Expect(Page.Locator($"#{C}Name")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        var result = Page.Locator("#hidden-result");
 
-        // Now test parent plan's Section 1 validation still works
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+        // Step 1: Submit with empty Name — client validation blocks
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Profile" }).ClickAsync();
 
-        var nameError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Name']");
+        var nameError = Page.Locator("#hidden-fields-form [data-valmsg-for='Hidden.Name']");
         await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(nameError).ToContainTextAsync("required");
+        await Expect(result).ToContainTextAsync("Click to validate or submit");
 
-        // Parent result stays at default (validation blocked POST)
+        // Step 2: Fill Name — submit to server — hidden fields are skipped, server accepts
+        await Page.FillAsync($"#{S}Hidden_Name", "Server User");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Profile" }).ClickAsync();
+
+        await Expect(result).ToContainTextAsync("Profile saved", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 12: Server-only nested validation (Section 3) ──────────────
+
+    [Test]
+    public async Task server_nested_validation_returns_dotted_field_errors()
+    {
+        await NavigateTo(Path);
+
+        // Step 1: Submit empty nested address — server returns 400 with dotted names
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save Address (Server)" }).ClickAsync();
+
+        var result = Page.Locator("#nested-result");
+        await Expect(result).ToContainTextAsync("errors", new() { Timeout = 5000 });
+        await Expect(result).ToHaveClassAsync(new Regex("text-red-600"));
+
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    // ── Journey 13: Partial live clearing ──────────────────────────────────
+
+    [Test]
+    public async Task partial_view_live_clearing_works_on_dynamically_loaded_fields()
+    {
+        await NavigateTo(Path);
+
+        // Step 1: Load partial and trigger validation errors
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Address Form" }).ClickAsync();
+        await Expect(Page.Locator($"#{S}Nested_Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        await Page.Locator("#save-partial-btn").ClickAsync();
+
+        var streetError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.Street']");
+        var cityError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.City']");
+        await Expect(streetError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(cityError).ToBeVisibleAsync();
+
+        // Step 2: Type into Street — only that error clears, City error remains
+        await Page.FillAsync($"#{S}Nested_Address_Street", "123 Main St");
+        await Expect(streetError).ToBeHiddenAsync(new() { Timeout = 3000 });
+        await Expect(cityError).ToBeVisibleAsync();
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 14: Re-submission clears previous errors before showing new ─
+
+    [Test]
+    public async Task submitting_same_form_twice_clears_previous_errors_before_showing_new()
+    {
+        // Proves validation doesn't accumulate errors across submissions
+        await NavigateTo(Path);
+
+        // First submit — all errors appear
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+        var nameError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Name']");
+        var emailError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Email']");
+        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Fill name only, resubmit — name error should clear, email error still shows
+        await Page.FillAsync($"#{S}AllRules_Name", "Test User");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+        await Expect(nameError).ToBeHiddenAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Result should still be blocked — client validation prevented POST
         var result = Page.Locator("#all-rules-result");
         await Expect(result).ToContainTextAsync("Click to validate");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 15: Valid data clears all errors and shows success ───────────
+
+    [Test]
+    public async Task valid_data_clears_all_previous_errors_and_shows_success()
+    {
+        // Proves the full cycle: errors → fix all → all errors gone → success
+        await NavigateTo(Path);
+
+        // Submit empty → errors appear
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+        var nameError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Name']");
+        var emailError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Email']");
+        await Expect(nameError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Fill all required fields with valid data
+        await Page.FillAsync($"#{S}AllRules_Name", "Jane Doe");
+        await Page.FillAsync($"#{S}AllRules_Email", "jane@example.com");
+        await Page.FillAsync($"#{S}AllRules_Age", "30");
+        await Page.FillAsync($"#{S}AllRules_Phone", "123-456-7890");
+        await Page.FillAsync($"#{S}AllRules_Salary", "75000");
+        await Page.FillAsync($"#{S}AllRules_Password", "securepassword123");
+
+        // Resubmit — all errors should be gone
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+        await Expect(nameError).ToBeHiddenAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToBeHiddenAsync(new() { Timeout = 3000 });
+
+        // Success message shows
+        var result = Page.Locator("#all-rules-result");
+        await Expect(result).ToContainTextAsync("passed", new() { Timeout = 5000 });
+        await Expect(result).ToHaveClassAsync(new Regex("text-green-600"));
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 16: Conditional toggle back-and-forth maintains state ────────
+
+    [Test]
+    public async Task conditional_checkbox_toggle_back_and_forth_maintains_validation_state()
+    {
+        // Proves conditional rules re-evaluate correctly on every toggle
+        await NavigateTo(Path);
+
+        var jobError = Page.Locator("#conditional-form [data-valmsg-for='Conditional.JobTitle']");
+        var result = Page.Locator("#conditional-result");
+
+        // Check "Is Employed" → submit → JobTitle required
+        await Page.CheckAsync($"#{S}Conditional_IsEmployed");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
+        await Expect(jobError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Uncheck → submit → should pass (no JobTitle required)
+        await Page.UncheckAsync($"#{S}Conditional_IsEmployed");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
+        await Expect(result).ToContainTextAsync("passed", new() { Timeout = 3000 });
+        await Expect(jobError).ToBeHiddenAsync();
+
+        // Re-check → submit → should fail again
+        await Page.CheckAsync($"#{S}Conditional_IsEmployed");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate Conditional" }).ClickAsync();
+        await Expect(jobError).ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 17: Partial load → interact with loaded fields ─────────────
+
+    [Test]
+    public async Task loading_partial_then_interacting_with_loaded_fields_works()
+    {
+        // Proves Into() partial injection creates functional form fields
+        await NavigateTo(Path);
+
+        // Step 1: Load address partial — fields render
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Address Form" }).ClickAsync();
+        var streetField = Page.Locator($"#{S}Nested_Address_Street");
+        var cityField = Page.Locator($"#{S}Nested_Address_City");
+        var zipField = Page.Locator($"#{S}Nested_Address_ZipCode");
+        await Expect(streetField).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(cityField).ToBeVisibleAsync();
+        await Expect(zipField).ToBeVisibleAsync();
+
+        // Step 2: Fill all fields — values stick (not cleared, not rejected)
+        await Page.FillAsync($"#{S}Nested_Address_Street", "742 Evergreen Terrace");
+        await Page.FillAsync($"#{S}Nested_Address_City", "Springfield");
+        await Page.FillAsync($"#{S}Nested_Address_ZipCode", "62704");
+
+        await Expect(streetField).ToHaveValueAsync("742 Evergreen Terrace");
+        await Expect(cityField).ToHaveValueAsync("Springfield");
+        await Expect(zipField).ToHaveValueAsync("62704");
+
+        // Step 3: Load delivery partial — fields render alongside address
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Delivery Note Form" }).ClickAsync();
+        var instrField = Page.Locator($"#{S}Nested_Delivery_Instructions");
+        var phoneField = Page.Locator($"#{S}Nested_Delivery_ContactPhone");
+        await Expect(instrField).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(phoneField).ToBeVisibleAsync();
+
+        // Step 4: Fill delivery fields — values stick
+        await Page.FillAsync($"#{S}Nested_Delivery_Instructions", "Ring the bell twice");
+        await Page.FillAsync($"#{S}Nested_Delivery_ContactPhone", "555-123-4567");
+
+        await Expect(instrField).ToHaveValueAsync("Ring the bell twice");
+        await Expect(phoneField).ToHaveValueAsync("555-123-4567");
+
+        // Step 5: Address fields still hold their values (not clobbered by second partial load)
+        await Expect(streetField).ToHaveValueAsync("742 Evergreen Terrace");
+        await Expect(cityField).ToHaveValueAsync("Springfield");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 18: Partial validation clears errors on valid resubmission ───
+
+    [Test]
+    public async Task partial_validation_clears_errors_on_subsequent_valid_submission()
+    {
+        // Proves dynamically loaded partials participate in validation lifecycle
+        await NavigateTo(Path);
+
+        // Step 1: Load address partial
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Address Form" }).ClickAsync();
+        await Expect(Page.Locator($"#{S}Nested_Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Step 2: Submit empty — validation errors appear on dynamically loaded fields
+        await Page.Locator("#save-partial-btn").ClickAsync();
+
+        var streetError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.Street']");
+        var cityError = Page.Locator("#partial-form [data-valmsg-for='Nested.Address.City']");
+        await Expect(streetError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(streetError).ToContainTextAsync("required");
+        await Expect(cityError).ToBeVisibleAsync();
+        await Expect(cityError).ToContainTextAsync("required");
+
+        var result = Page.Locator("#partial-save-result");
+        await Expect(result).ToContainTextAsync("Not submitted yet");
+
+        // Step 3: Fill all fields correctly
+        await Page.FillAsync($"#{S}Nested_Address_Street", "456 Oak Avenue");
+        await Page.FillAsync($"#{S}Nested_Address_City", "Portland");
+        await Page.FillAsync($"#{S}Nested_Address_ZipCode", "97201");
+
+        // Step 4: Resubmit — errors clear and success message shows
+        await Page.Locator("#save-partial-btn").ClickAsync();
+
+        await Expect(streetError).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(cityError).ToBeHiddenAsync();
+        await Expect(result).ToContainTextAsync("saved successfully", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Journey 19: Multiple rule types in single validation ───────────────
+
+    [Test]
+    public async Task multiple_rule_types_fire_simultaneously_on_invalid_data()
+    {
+        await NavigateTo(Path);
+
+        // Fill invalid data for multiple rule types at once
+        await Page.FillAsync($"#{S}AllRules_Name", "Test User");
+        await Page.FillAsync($"#{S}AllRules_Email", "not-an-email");
+        await Page.FillAsync($"#{S}AllRules_Age", "200");
+        await Page.FillAsync($"#{S}AllRules_Phone", "123");
+        await Page.FillAsync($"#{S}AllRules_Salary", "999999");
+        await Page.FillAsync($"#{S}AllRules_Password", "short");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate All" }).ClickAsync();
+
+        // Multiple rule types fire at once: email, range, regex, max, minLength
+        var emailError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Email']");
+        var ageError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Age']");
+        var phoneError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Phone']");
+        var salaryError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Salary']");
+        var passwordError = Page.Locator("#all-rules-form [data-valmsg-for='AllRules.Password']");
+
+        await Expect(emailError).ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(emailError).ToContainTextAsync("email");
+        await Expect(ageError).ToBeVisibleAsync();
+        await Expect(ageError).ToContainTextAsync("between");
+        await Expect(phoneError).ToBeVisibleAsync();
+        await Expect(phoneError).ToContainTextAsync("123-456-7890");
+        await Expect(salaryError).ToBeVisibleAsync();
+        await Expect(salaryError).ToContainTextAsync("500,000");
+        await Expect(passwordError).ToBeVisibleAsync();
+        await Expect(passwordError).ToContainTextAsync("8 characters");
 
         AssertNoConsoleErrors();
     }

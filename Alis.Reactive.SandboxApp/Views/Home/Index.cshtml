@@ -11,65 +11,299 @@
         </p>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <a asp-area="Sandbox" asp-controller="Events" asp-action="Index"
-           class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-            <h2 class="text-base font-semibold group-hover:text-accent transition-colors">
-                Events &amp; Dispatch
-            </h2>
-            <p class="mt-1 text-sm text-text-secondary">
-                Custom event triggers, dispatch commands, payload flow, and event chaining.
-            </p>
-        </a>
+    <!-- Group 1: Core Primitives -->
+    <section>
+        <h2 class="text-lg font-semibold tracking-tight mb-3">Core Primitives</h2>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <a asp-area="Sandbox" asp-controller="Events" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Events &amp; Dispatch
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Custom event triggers, dispatch commands, payload flow, and event chaining.
+                </p>
+            </a>
 
-        <a asp-area="Sandbox" asp-controller="Payload" asp-action="Index"
-           class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-            <h2 class="text-base font-semibold group-hover:text-accent transition-colors">
-                Payload
-            </h2>
-            <p class="mt-1 text-sm text-text-secondary">
-                Event payload structure and typed field resolution across vendors.
-            </p>
-        </a>
+            <a asp-area="Sandbox" asp-controller="Payload" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Payload Resolution
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Event payload structure and typed field resolution across vendors.
+                </p>
+            </a>
 
-        <a asp-area="Sandbox" asp-controller="Conditions" asp-action="Index"
-           class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-            <h2 class="text-base font-semibold group-hover:text-accent transition-colors">
-                Conditions
-            </h2>
-            <p class="mt-1 text-sm text-text-secondary">
-                All 20 operators, AND/OR composition, NOT inversion, Confirm dialog, per-action When guards.
-            </p>
-        </a>
+            <a asp-area="Sandbox" asp-controller="Conditions" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Conditions &amp; Guards
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    All 20 operators, AND/OR composition, NOT inversion, Confirm dialog, per-action When guards.
+                </p>
+            </a>
+        </div>
+    </section>
 
-        <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="Index"
-           class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-            <h2 class="text-base font-semibold group-hover:text-accent transition-colors">
-                Playground Syntax
-            </h2>
-            <p class="mt-1 text-sm text-text-secondary">
-                Html.Field() wrapping, .Reactive() on Fusion and Native builders, cross-vendor custom events, nested properties.
-            </p>
-        </a>
+    <!-- Group 2: Native Components -->
+    <section>
+        <h2 class="text-lg font-semibold tracking-tight mb-3">Native Components</h2>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <a asp-area="Sandbox" asp-controller="NativeButton" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    NativeButton
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Native HTML button with click events and reactive wiring.
+                </p>
+            </a>
 
-        <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="ReactiveConditions"
-           class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-            <h2 class="text-base font-semibold group-hover:text-accent transition-colors">
-                Reactive Conditions
-            </h2>
-            <p class="mt-1 text-sm text-text-secondary">
-                Conditions inside .Reactive() with Html.Field(), cross-vendor mutations, nested Component&lt;T&gt;() targeting.
-            </p>
-        </a>
+            <a asp-area="Sandbox" asp-controller="CheckBox" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    NativeCheckBox
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Native checkbox with checked state binding and change events.
+                </p>
+            </a>
 
-        <a asp-area="Sandbox" asp-controller="Http" asp-action="Index"
-           class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-            <h2 class="text-base font-semibold group-hover:text-accent transition-colors">
-                HTTP Requests
-            </h2>
-            <p class="mt-1 text-sm text-text-secondary">
-                GET, POST with gather, chained sequential, and parallel concurrent requests with response routing.
-            </p>
-        </a>
-    </div>
+            <a asp-area="Sandbox" asp-controller="NativeTextBox" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    NativeTextBox
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Native text input with value binding and input events.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="NativeDropDown" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    NativeDropDown
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Native select element with option binding and change events.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="NativeDatePicker" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    NativeDatePicker
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Native date input with value binding and change events.
+                </p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Group 3: Fusion Components -->
+    <section>
+        <h2 class="text-lg font-semibold tracking-tight mb-3">Fusion Components</h2>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <a asp-area="Sandbox" asp-controller="NumericTextBox" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    FusionNumericTextBox
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Syncfusion numeric input with value coercion and change events.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="DropDownList" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    FusionDropDownList
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Syncfusion dropdown with item binding and selection events.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="AutoComplete" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    FusionAutoComplete
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Syncfusion autocomplete with filtering, selection, and source binding.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="FusionDatePicker" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    FusionDatePicker
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Syncfusion date picker with value binding and change events.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="TimePicker" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    FusionTimePicker
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Syncfusion time picker with value binding and change events.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="MultiColumnComboBox" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    FusionMultiColumnComboBox
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Syncfusion multi-column combo box with structured item display and selection.
+                </p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Group 4: HTTP & Data -->
+    <section>
+        <h2 class="text-lg font-semibold tracking-tight mb-3">HTTP &amp; Data</h2>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <a asp-area="Sandbox" asp-controller="Http" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    HTTP Requests
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    GET, POST with gather, chained sequential, and parallel concurrent requests with response routing.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="ContentType" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Content Types
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    JSON and HTML response handling with Into() content injection.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="Cascading" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Cascading DropDowns
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Dependent dropdown chains with server-side data filtering.
+                </p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Group 5: Validation -->
+    <section>
+        <h2 class="text-lg font-semibold tracking-tight mb-3">Validation</h2>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <a asp-area="Sandbox" asp-controller="Validation" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Validation Showcase
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Full validation pipeline with FluentValidation rules and error display.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="Validation" asp-action="StandaloneIsolation"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Standalone Isolation
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Single-form validation with isolated scope and independent error clearing.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="Validation" asp-action="SameModelMerge"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Same-Model Merge
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Multiple partials sharing the same model with merged validation results.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="Validation" asp-action="MultiPartialWorkflow"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Multi-Partial Workflow
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Step-by-step form workflow with per-partial validation and progression.
+                </p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Group 6: Framework Infrastructure -->
+    <section>
+        <h2 class="text-lg font-semibold tracking-tight mb-3">Framework Infrastructure</h2>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <a asp-area="Sandbox" asp-controller="IdGenerator" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    IdGenerator
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Automatic element ID generation from model expressions.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="Architecture" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Architecture Regression
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    End-to-end architecture test with TestWidget exercising all module paths.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Reactive Wiring
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Html.Field() wrapping, .Reactive() on builders, cross-vendor custom events.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="ReactiveConditions"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    Reactive Conditions
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Conditions inside .Reactive() with cross-vendor mutations and nested targeting.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="TestWidget" asp-action="Index"
+               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
+                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
+                    TestWidget
+                </h3>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Synthetic JS component with ej2_instances pattern for architecture verification.
+                </p>
+            </a>
+        </div>
+    </section>
 </div>

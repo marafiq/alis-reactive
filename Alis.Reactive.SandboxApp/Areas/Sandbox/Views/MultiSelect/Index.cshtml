@@ -1,0 +1,154 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.MultiSelectModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@using Syncfusion.EJ2.DropDowns
+@{
+    ViewData["Title"] = "MultiSelect";
+
+    var plan = Html.ReactivePlan<MultiSelectModel>();
+    var allergies = (List<AllergyItem>)ViewBag.Allergies;
+    var dietaryRestrictions = (List<DietaryItem>)ViewBag.DietaryRestrictions;
+
+    // ── Property Read — display current value in echo text on DomReady ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
+
+    // ── Gather — POST with Include ──
+
+    Html.On(plan, t => t.CustomEvent("do-gather", p =>
+    {
+        p.Post("/Sandbox/MultiSelect/Echo", g =>
+            g.Include<FusionMultiSelect, MultiSelectModel>(m => m.Allergies))
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("gather-result").SetText("gathered");
+            }));
+    }));
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">FusionMultiSelect — Full API</h1>
+        <p class="mt-2 text-text-secondary">
+            Exercises FusionMultiSelect API: events, conditions, gather, and typed Fields
+            with optional GroupBy. Senior living domain — resident allergies and dietary restrictions.
+        </p>
+    </div>
+
+    <!-- Section 1: Allergies with GroupBy -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Allergies (Fields with GroupBy)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Uses <code>Fields&lt;AllergyItem&gt;(t =&gt; t.Text, v =&gt; v.Value, g =&gt; g.Category)</code>
+            with GroupBy for categorized display. Pre-selects "peanuts" via SF builder Value().
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.Field("Allergies (SF MultiSelect)", false, m => m.Allergies, expr =>
+                Html.MultiSelectFor(plan, expr)
+                    .DataSource(allergies)
+                    .Fields<AllergyItem>(t => t.Text, v => v.Value, g => g.Category)
+                    .Placeholder("Select allergies")
+                    .Mode(VisualMode.Box)
+                    .Value(new string[] { "peanuts" })
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("change-value").SetText(args, x => x.Value);
+                    })
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
+                        p.When(comp.Value()).NotNull()
+                            .Then(then =>
+                            {
+                                then.Element("selected-indicator").Show();
+                                then.Element("selected-indicator").SetText("selected");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("selected-indicator").Hide();
+                            });
+                    })
+                    .Render()); }
+        </div>
+    </section>
+
+    <!-- Section 2: Dietary Restrictions (Fields without GroupBy) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Dietary Restrictions (Fields without GroupBy)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Uses <code>Fields&lt;DietaryItem&gt;(t =&gt; t.Text, v =&gt; v.Value)</code>
+            without GroupBy — flat list display.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.Field("Dietary Restrictions (SF MultiSelect)", false, m => m.DietaryRestrictions, expr =>
+                Html.MultiSelectFor(plan, expr)
+                    .DataSource(dietaryRestrictions)
+                    .Fields<DietaryItem>(t => t.Text, v => v.Value)
+                    .Placeholder("Select dietary restrictions")
+                    .Mode(VisualMode.Box)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("dietary-change-value").SetText(args, x => x.Value);
+                    })
+                    .Render()); }
+        </div>
+    </section>
+
+    <!-- Section 3: Property Read — Echo Value -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Property Read (Value as Source)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the Allergies component's <code>value</code> property and displays it in a text element.
+        </p>
+        <div class="font-mono text-sm">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 4: Events — Changed -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Events (Changed)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            The Allergies and Dietary Restrictions fields wire the Changed event. Change shows the new value.
+        </p>
+        <div class="font-mono text-sm space-y-1">
+            <p>Change value (allergies): <span id="change-value" class="text-text-muted">&mdash;</span></p>
+            <p>Change value (dietary): <span id="dietary-change-value" class="text-text-muted">&mdash;</span></p>
+            <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 5: Gather — Include in POST -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">5. Gather (Include in POST)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Click to POST the Allergies value gathered from the Syncfusion component via
+            <code>Include&lt;FusionMultiSelect&gt;</code>.
+        </p>
+        @(Html.NativeButton("gather-btn", "Gather Allergies")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-gather");
+            }))
+        <div class="font-mono text-sm">
+            <p>Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

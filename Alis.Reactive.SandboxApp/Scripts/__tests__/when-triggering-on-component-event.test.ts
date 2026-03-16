@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { boot } from "../boot";
+import { wireTrigger } from "../trigger";
 
 describe("when triggering on component event", () => {
   describe("native vendor", () => {
@@ -26,6 +27,7 @@ describe("when triggering on component event", () => {
             jsEvent: "change",
             vendor: "native",
             bindingPath: "Status",
+            readExpr: "value",
           },
           reaction: {
             kind: "sequential",
@@ -59,6 +61,7 @@ describe("when triggering on component event", () => {
             componentId: "Status",
             jsEvent: "change",
             vendor: "native",
+            readExpr: "value",
           },
           reaction: {
             kind: "sequential",
@@ -99,6 +102,7 @@ describe("when triggering on component event", () => {
             jsEvent: "change",
             vendor: "native",
             bindingPath: "Address.City",
+            readExpr: "value",
           },
           reaction: {
             kind: "sequential",
@@ -152,6 +156,7 @@ describe("when triggering on component event", () => {
             jsEvent: "change",
             vendor: "fusion",
             bindingPath: "Amount",
+            readExpr: "value",
           },
           reaction: {
             kind: "sequential",
@@ -186,6 +191,7 @@ describe("when triggering on component event", () => {
             componentId: "Amount",
             jsEvent: "change",
             vendor: "fusion",
+            readExpr: "value",
           },
           reaction: {
             kind: "sequential",
@@ -202,6 +208,39 @@ describe("when triggering on component event", () => {
       const comp = (document.getElementById("Amount") as any).ej2_instances[0];
       comp._fire("change", { value: 123 });
       expect(document.getElementById("echo-args")!.textContent).toBe("123");
+    });
+  });
+
+  describe("native without readExpr (non-readable component like button)", () => {
+    it("passes only event object when readExpr is absent", () => {
+      const btn = document.createElement("button");
+      btn.id = "NoReadExpr";
+      document.body.appendChild(btn);
+      let receivedEvt: any = null;
+
+      document.addEventListener("btn-clicked", (e) => {
+        receivedEvt = (e as CustomEvent).detail;
+      });
+
+      boot({
+        planId: "Test.Model",
+        components: {},
+        entries: [{
+          trigger: {
+            kind: "component-event",
+            componentId: "NoReadExpr",
+            jsEvent: "click",
+            vendor: "native",
+          },
+          reaction: {
+            kind: "sequential",
+            commands: [{ kind: "dispatch", event: "btn-clicked" }],
+          },
+        }],
+      });
+
+      btn.dispatchEvent(new Event("click"));
+      expect(receivedEvt).toBeDefined();
     });
   });
 
@@ -233,6 +272,7 @@ describe("when triggering on component event", () => {
               componentId: "WireOrder",
               jsEvent: "change",
               vendor: "native",
+              readExpr: "value",
             },
             reaction: {
               kind: "sequential",

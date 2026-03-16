@@ -1,0 +1,25 @@
+﻿{
+  planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Native_UnitTests_NativeTestModel__AdmissionDate,
+            mutation: {
+              kind: set-prop,
+              prop: value
+            },
+            value: 2026-03-15,
+            vendor: native
+          }
+        ]
+      }
+    }
+  ]
+}

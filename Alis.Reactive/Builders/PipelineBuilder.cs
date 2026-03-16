@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Guards;
 using Alis.Reactive.Descriptors.Reactions;
-using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders
 {
-    public class PipelineBuilder<TModel> where TModel : class
+    public partial class PipelineBuilder<TModel> where TModel : class
     {
         private enum PipelineMode { Sequential, Http, Parallel, Conditional }
 
@@ -74,113 +71,6 @@ namespace Alis.Reactive.Builders
         {
             var comp = new TComponent();
             return new ComponentRef<TComponent, TModel>(comp.DefaultId, this);
-        }
-
-        // ── HTTP Request Methods ──
-
-        /// <summary>Starts a GET request to the given URL.</summary>
-        public HttpRequestBuilder<TModel> Get(string url)
-        {
-            SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
-            _httpBuilder.SetVerb("GET").SetUrl(url);
-            return _httpBuilder;
-        }
-
-        /// <summary>Starts a POST request to the given URL.</summary>
-        public HttpRequestBuilder<TModel> Post(string url)
-        {
-            SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
-            _httpBuilder.SetVerb("POST").SetUrl(url);
-            return _httpBuilder;
-        }
-
-        /// <summary>Starts a POST request with a gather configuration.</summary>
-        public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
-        {
-            SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
-            _httpBuilder.SetVerb("POST").SetUrl(url);
-            _httpBuilder.Gather(gather);
-            return _httpBuilder;
-        }
-
-        /// <summary>Starts a PUT request with a gather configuration.</summary>
-        public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
-        {
-            SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
-            _httpBuilder.SetVerb("PUT").SetUrl(url);
-            _httpBuilder.Gather(gather);
-            return _httpBuilder;
-        }
-
-        /// <summary>Starts a DELETE request to the given URL.</summary>
-        public HttpRequestBuilder<TModel> Delete(string url)
-        {
-            SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
-            _httpBuilder.SetVerb("DELETE").SetUrl(url);
-            return _httpBuilder;
-        }
-
-        /// <summary>Starts parallel HTTP requests that fire concurrently.</summary>
-        public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
-        {
-            SetMode(PipelineMode.Parallel);
-            _parallelBuilder = new ParallelBuilder<TModel>();
-            foreach (var branch in branches)
-            {
-                _parallelBuilder.AddBranch(branch);
-            }
-            return _parallelBuilder;
-        }
-
-        private void SetMode(PipelineMode mode)
-        {
-            if (_mode != PipelineMode.Sequential && _mode != mode)
-                throw new InvalidOperationException(
-                    $"Cannot switch to {mode} — pipeline is already in {_mode} mode.");
-            _mode = mode;
-        }
-
-        /// <summary>
-        /// Starts a conditional branch on an event payload property.
-        /// TProp is inferred from the expression — operators on the returned builder
-        /// demand TProp operands (e.g. int property → Gte(int), string → Eq(string)).
-        /// </summary>
-        public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
-            TPayload payload,
-            Expression<Func<TPayload, TProp>> path)
-        {
-            SetMode(PipelineMode.Conditional);
-
-            var source = new EventArgSource<TPayload, TProp>(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
-        }
-
-        /// <summary>
-        /// Starts a conditional branch on a component property.
-        /// TProp is inferred from the TypedSource — operators on the returned builder
-        /// demand TProp operands (e.g. decimal property → Gt(0m)).
-        /// Usage: p.When(comp.Value()).Gt(0m).Then(...)
-        /// </summary>
-        public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
-        {
-            SetMode(PipelineMode.Conditional);
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
-        }
-
-        /// <summary>
-        /// Starts a Confirm guard — an async halting condition that pauses the pipeline
-        /// and shows a dialog to the user.
-        /// </summary>
-        public GuardBuilder<TModel> Confirm(string message)
-        {
-            SetMode(PipelineMode.Conditional);
-
-            return new GuardBuilder<TModel>(new ConfirmGuard(message), this);
         }
 
         /// <summary>

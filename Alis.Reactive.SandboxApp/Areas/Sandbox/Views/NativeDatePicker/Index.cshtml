@@ -1,0 +1,115 @@
+@model NativeDatePickerModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "NativeDatePicker";
+
+    var plan = Html.ReactivePlan<NativeDatePickerModel>();
+
+    // Section 1: Property write — DomReady sets admission date
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<NativeDatePicker>(m => m.AdmissionDate).SetValue(new DateTime(2026, 3, 15));
+    }));
+
+    // Section 2: Property read — DomReady reads admission date into echo
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var comp = p.Component<NativeDatePicker>(m => m.AdmissionDate);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">NativeDatePicker — Full API</h1>
+        <p class="mt-2 text-text-secondary">
+            Exercises NativeDatePicker vertical slice: property writes (SetValue),
+            property reads (Value), events (Changed), typed conditions (When), and reactive wiring.
+            Senior living domain: resident admission and birth dates.
+        </p>
+    </div>
+
+    <!-- Section 1: Property Write -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Property Write (SetValue)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, sets admission date to 2026-03-15.
+        </p>
+        @{ Html.Field("Admission Date", false, m => m.AdmissionDate, expr =>
+            Html.NativeDatePickerFor(plan, expr)
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+        ); }
+    </section>
+
+    <!-- Section 2: Property Read -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Property Read (Value as Source)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the admission date component value and echoes it.
+        </p>
+        <div class="font-mono text-sm">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 3: Event + Event-Args Condition -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Changed Event with Typed Condition</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Birth date wires a Changed event with typed condition:
+            <code>When(args, x =&gt; x.Value).NotNull()</code> shows status.
+        </p>
+        @{ Html.Field("Birth Date", false, m => m.BirthDate, expr =>
+            Html.NativeDatePickerFor(plan, expr)
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.When(args, x => x.Value).NotNull()
+                        .Then(t =>
+                        {
+                            t.Element("date-status").SetText("date selected");
+                            t.Element("date-status").AddClass("text-green-600");
+                            t.Element("date-status").RemoveClass("text-text-muted");
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("date-status").SetText("no date");
+                            e.Element("date-status").RemoveClass("text-green-600");
+                        });
+                })
+        ); }
+        <div class="font-mono text-sm mt-2">
+            <p>Status: <span id="date-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 4: Component-Read Condition -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Component Value Condition</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Button reads admission date via <code>When(comp.Value()).IsEmpty()</code>
+            and shows a warning or confirmation.
+        </p>
+        @(Html.NativeButton("check-date-btn", "Check Admission Date")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var comp = p.Component<NativeDatePicker>(m => m.AdmissionDate);
+                p.When(comp.Value()).IsEmpty()
+                    .Then(t => t.Element("admission-warning").SetText("admission date is required"))
+                    .Else(e => e.Element("admission-warning").SetText("admission date set"));
+            }))
+        <div class="font-mono text-sm mt-2">
+            <p>Warning: <span id="admission-warning" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

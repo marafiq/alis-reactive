@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Json.Schema;
-using static VerifyNUnit.Verifier;
 
 namespace Alis.Reactive.UnitTests;
 

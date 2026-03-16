@@ -79,7 +79,7 @@ namespace Alis.Reactive.Resolvers
                 var formId = req.Validation.FormId;
                 var extracted = extractor.ExtractRules(req.ValidatorType, formId);
                 if (extracted != null)
-                    req.Validation = extracted;
+                    req.EnrichValidation(extracted);
             }
 
             if (req.Chained != null)

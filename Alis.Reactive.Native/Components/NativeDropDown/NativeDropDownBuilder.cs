@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
-using Alis.Reactive;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -36,12 +35,12 @@ namespace Alis.Reactive.Native.Components
         private bool _enabled = true;
         private string? _cssClass;
 
-        public NativeDropDownBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+        internal NativeDropDownBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
         {
             _html = html;
             _expression = expression;
             _elementId = IdGenerator.For<TModel, TProp>(expression);
-            _bindingPath = html.NameFor(expression).ToString();
+            _bindingPath = html.NameFor(expression);
         }
 
         /// <summary>The resolved element ID — used by .Reactive() to wire events.</summary>
@@ -93,32 +92,4 @@ namespace Alis.Reactive.Native.Components
         }
     }
 
-    /// <summary>
-    /// Factory extension for creating NativeDropDownBuilder bound to a model property.
-    /// </summary>
-    public static class NativeDropDownHtmlExtensions
-    {
-        private static readonly NativeDropDown _component = new NativeDropDown();
-
-        /// <summary>
-        /// Creates a native &lt;select&gt; builder bound to a model property.
-        /// </summary>
-        public static NativeDropDownBuilder<TModel, TProp> NativeDropDownFor<TModel, TProp>(
-            this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
-            Expression<Func<TModel, TProp>> expression)
-            where TModel : class
-        {
-            var uniqueId = IdGenerator.For<TModel, TProp>(expression);
-            var name = html.NameFor(expression).ToString();
-
-            plan.AddToComponentsMap(name, new ComponentRegistration(
-                uniqueId,
-                _component.Vendor,
-                name,
-                _component.ReadExpr));
-
-            return new NativeDropDownBuilder<TModel, TProp>(html, expression);
-        }
-    }
 }

@@ -15,7 +15,7 @@ describe("when wiring component event with payload", () => {
 
       boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "component-event", componentId: "native-evt",
-          jsEvent: "change", vendor: "native" },
+          jsEvent: "change", vendor: "native", readExpr: "value" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "native-evt-result",
           mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.value" },
@@ -39,7 +39,7 @@ describe("when wiring component event with payload", () => {
 
       boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "component-event", componentId: "fusion-evt",
-          jsEvent: "change", vendor: "fusion" },
+          jsEvent: "change", vendor: "fusion", readExpr: "value" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-evt-result",
           mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.newValue" },
@@ -65,7 +65,7 @@ describe("when wiring component event with payload", () => {
 
       boot({ planId: "Test.Model", components: {}, entries: [{
         trigger: { kind: "component-event", componentId: "fusion-items-evt",
-          jsEvent: "items-changed", vendor: "fusion" },
+          jsEvent: "items-changed", vendor: "fusion", readExpr: "value" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-items-evt-result",
           mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.count" },

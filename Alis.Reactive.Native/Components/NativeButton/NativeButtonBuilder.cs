@@ -1,8 +1,6 @@
 using System.IO;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
-
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -28,7 +26,7 @@ namespace Alis.Reactive.Native.Components
         private string? _cssClass;
         private string _type = "button";
 
-        public NativeButtonBuilder(string elementId, string text)
+        internal NativeButtonBuilder(string elementId, string text)
         {
             _elementId = elementId;
             _text = text;
@@ -72,19 +70,4 @@ namespace Alis.Reactive.Native.Components
         }
     }
 
-    /// <summary>
-    /// Factory extension for creating NativeButtonBuilder.
-    /// </summary>
-    public static class NativeButtonHtmlExtensions
-    {
-        /// <summary>
-        /// Creates a native &lt;button&gt; builder with an explicit element ID.
-        /// </summary>
-        public static NativeButtonBuilder<TModel> NativeButton<TModel>(
-            this IHtmlHelper<TModel> html, string elementId, string text)
-            where TModel : class
-        {
-            return new NativeButtonBuilder<TModel>(elementId, text);
-        }
-    }
 }

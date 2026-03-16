@@ -1,4 +1,3 @@
-using System;
 using Alis.Reactive.Descriptors.Guards;
 
 namespace Alis.Reactive.Builders.Conditions

@@ -33,10 +33,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         [HttpGet]
         public IActionResult Residents()
         {
-            return Json(new[]
+            return Json(new
             {
-                new { name = "John Doe", age = 82 },
-                new { name = "Jane Smith", age = 75 }
+                first = "John Doe",
+                second = "Jane Smith",
+                count = 2
             });
         }
 
@@ -47,10 +48,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         {
             if (string.IsNullOrWhiteSpace(request?.Name))
             {
-                return BadRequest(new { errors = new { Name = new[] { "Name is required." } } });
+                return BadRequest(new { errorSummary = "Validation failed: Name is required" });
             }
 
-            return Ok(new { message = $"Saved: {request.Name}" });
+            return Ok(new { message = $"Saved: {request.Name}", receivedName = request.Name });
         }
 
         // ── Section 3: Chained GET ───────────────────────────
@@ -58,10 +59,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         [HttpGet]
         public IActionResult Facilities()
         {
-            return Json(new[]
+            return Json(new
             {
-                new { id = 1, name = "Main Campus" },
-                new { id = 2, name = "West Wing" }
+                first = "Main Campus",
+                second = "West Wing",
+                count = 2
             });
         }
 
@@ -75,7 +77,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
                 return BadRequest(new { errors = new { Name = new[] { "Name is required." } } });
             }
 
-            return Ok(new { name = request.Name, facilityId = request.FacilityId, updated = true });
+            return Ok(new { receivedName = request.Name, receivedFacilityId = request.FacilityId?.ToString() ?? "", updated = true });
         }
 
         // ── Section 6: DELETE ────────────────────────────────
@@ -83,7 +85,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         [HttpDelete]
         public IActionResult DeleteResident(int id)
         {
-            return Ok(new { deleted = true, id });
+            return Ok(new { deleted = true, deletedId = id });
         }
 
         // ── Section 7: POST FormData ─────────────────────────
@@ -95,7 +97,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
             if (!string.IsNullOrEmpty(request?.FirstName)) fields.Add("FirstName");
             if (!string.IsNullOrEmpty(request?.LastName)) fields.Add("LastName");
             if (!string.IsNullOrEmpty(request?.Email)) fields.Add("Email");
-            return Ok(new { receivedFields = fields, count = fields.Count });
+            return Ok(new { receivedFields = string.Join(", ", fields), count = fields.Count });
         }
 
         // ── Section 8: GET search ────────────────────────────
@@ -110,8 +112,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
                 new { name = "Bob Johnson", age = 68 }
             };
 
-            if (string.IsNullOrEmpty(q)) return Json(all);
-            return Json(all.Where(r => r.name.Contains(q, StringComparison.OrdinalIgnoreCase)));
+            var results = string.IsNullOrEmpty(q) ? all : all.Where(r => r.name.Contains(q, StringComparison.OrdinalIgnoreCase)).ToArray();
+            return Json(new { query = q ?? "", matchCount = results.Length });
         }
 
         // ── Section 9: Multi-status validation ───────────────
@@ -126,7 +128,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
                 errors["FacilityId"] = new[] { "Facility is required." };
 
             if (errors.Count > 0)
-                return UnprocessableEntity(new { errors });
+                return UnprocessableEntity(new { errorSummary = $"422 — {errors.Count} validation error(s): {string.Join(", ", errors.Keys)}" });
 
             return Ok(new { valid = true });
         }

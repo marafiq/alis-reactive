@@ -3,65 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
-using Alis.Reactive;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.Components
 {
-    // ── Non-model-bound: UI toggles with explicit string ID ──
-
-    /// <summary>
-    /// Renders a native HTML &lt;input type="checkbox"&gt; with an explicit id.
-    /// For UI toggles that don't carry model data.
-    /// </summary>
-    public class NativeCheckBoxBuilder<TModel> : IHtmlContent where TModel : class
-    {
-        private readonly string _elementId;
-        private string? _cssClass;
-        private bool _checked;
-
-        public NativeCheckBoxBuilder(string elementId)
-        {
-            _elementId = elementId;
-        }
-
-        internal string ElementId => _elementId;
-
-        public NativeCheckBoxBuilder<TModel> CssClass(string css)
-        {
-            _cssClass = css;
-            return this;
-        }
-
-        public NativeCheckBoxBuilder<TModel> Checked(bool isChecked)
-        {
-            _checked = isChecked;
-            return this;
-        }
-
-        public void WriteTo(TextWriter writer, HtmlEncoder encoder)
-        {
-            writer.Write("<input type=\"checkbox\"");
-            writer.Write(" id=\"");
-            writer.Write(encoder.Encode(_elementId));
-            writer.Write("\"");
-            if (_cssClass != null)
-            {
-                writer.Write(" class=\"");
-                writer.Write(encoder.Encode(_cssClass));
-                writer.Write("\"");
-            }
-            if (_checked)
-            {
-                writer.Write(" checked");
-            }
-            writer.Write(" />");
-        }
-    }
-
-    // ── Model-bound: form fields with IdGenerator id + MVC name ──
-
     /// <summary>
     /// Renders a native HTML &lt;input type="checkbox"&gt; bound to a model property.
     /// Uses IdGenerator for element ID and MVC NameFor for the name attribute.
@@ -76,12 +22,12 @@ namespace Alis.Reactive.Native.Components
 
         private string? _cssClass;
 
-        public NativeCheckBoxBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, bool>> expression)
+        internal NativeCheckBoxBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, bool>> expression)
         {
             _html = html;
             _expression = expression;
             _elementId = IdGenerator.For<TModel, bool>(expression);
-            _bindingPath = html.NameFor(expression).ToString();
+            _bindingPath = html.NameFor(expression);
         }
 
         internal string ElementId => _elementId;
@@ -105,41 +51,4 @@ namespace Alis.Reactive.Native.Components
             result.WriteTo(writer, HtmlEncoder.Default);
         }
     }
-
-    /// <summary>
-    /// Factory extensions for creating NativeCheckBoxBuilder.
-    /// </summary>
-    public static class NativeCheckBoxHtmlExtensions
-    {
-        private static readonly NativeCheckBox _component = new NativeCheckBox();
-
-        // ── Non-model-bound (UI toggles) ──
-            public static NativeCheckBoxBuilder<TModel> NativeCheckBox<TModel>(
-                this IHtmlHelper<TModel> html,
-                string elementId)
-                where TModel : class
-            {
-                return new NativeCheckBoxBuilder<TModel>(elementId);
-            }
-
-        // ── Model-bound ──
-
-            public static NativeCheckBoxBuilder<TModel, bool> NativeCheckBoxFor<TModel>(
-                this IHtmlHelper<TModel> html,
-                IReactivePlan<TModel> plan,
-                Expression<Func<TModel, bool>> expression)
-                where TModel : class
-            {
-                var uniqueId = IdGenerator.For<TModel, bool>(expression);
-                var name = html.NameFor(expression).ToString();
-
-                plan.AddToComponentsMap(name, new ComponentRegistration(
-                    uniqueId,
-                    _component.Vendor,
-                    name,
-                    _component.ReadExpr));
-
-                return new NativeCheckBoxBuilder<TModel, bool>(html, expression);
-            }
-        }
 }

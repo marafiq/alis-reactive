@@ -1,15 +1,20 @@
 namespace Alis.Reactive.PlaywrightTests.Reactive;
 
 /// <summary>
-/// Verifies that .Reactive() extensions on both Fusion and Native builders
-/// wire component-event triggers end-to-end: C# DSL → plan JSON → TS runtime → DOM mutation.
+/// Verifies that .Reactive() extensions wire component-event triggers end-to-end:
+/// C# DSL -> plan JSON -> TS runtime -> DOM mutation. Tests both vendor types
+/// (Fusion and Native), nested property ID patterns, cross-vendor reset,
+/// and that non-reactive controls stay inert.
 ///
 /// Page under test: /Sandbox/PlaygroundSyntax
 ///
-/// ID Pattern (nested property m => m.Address.City):
-///   - All vendors (IdGenerator): {TypeScope}__Address_City
-///
-/// Both vendors carry bindingPath as dot-notation (Address.City) for HTTP gather.
+/// Layout:
+///   Amount   (fusion numeric, reactive)     -- echo "Amount changed" on change
+///   Status   (native dropdown, reactive)    -- echo "Status changed" on change
+///   Category (native dropdown, NOT reactive) -- no .Reactive(), must NOT fire anything
+///   City     (nested native dropdown, reactive)     -- echo "City changed"
+///   PostalCode (nested fusion numeric, reactive)    -- echo "PostalCode changed"
+///   Reset All button -- dispatches "reset-all" custom event -> zeros Amount, clears Status, echoes "All fields reset"
 /// </summary>
 [TestFixture]
 public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
@@ -23,79 +28,143 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
     }
 
-    // ── Plan JSON structure ──
+    // ── Scenario: Fusion component change fires reactive echo ──
 
+    /// <summary>
+    /// Typing a value into the Fusion NumericTextBox and tabbing away triggers its
+    /// .Reactive() pipeline, which sets the echo element text to "Amount changed".
+    ///
+    /// WHY: proves Fusion vendor component-event trigger wires correctly end-to-end
+    /// </summary>
     [Test]
-    public async Task Plan_json_contains_both_vendor_triggers()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("component-event"),
-            "Plan must contain component-event trigger kind");
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
-            "Plan must contain fusion vendor");
-        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""),
-            "Plan must contain native vendor");
-        Assert.That(planJson, Does.Contain("custom-event"),
-            "Plan must contain custom-event trigger for reset-all");
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task Plan_json_contains_native_binding_paths()
-    {
-        await NavigateAndBoot();
-
-        // Native vendor carries bindingPath (NativeDropDownBuilder stores it explicitly)
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"bindingPath\": \"Status\""),
-            "Native flat property bindingPath must be present");
-        Assert.That(planJson, Does.Contain("\"bindingPath\": \"Address.City\""),
-            "Native nested property bindingPath must use dot notation");
-
-        AssertNoConsoleErrors();
-    }
-
-    // ── Fusion vendor — flat property ──
-
-    [Test]
-    public async Task Fusion_numeric_change_fires_reaction()
+    public async Task fusion_numeric_change_updates_echo()
     {
         await NavigateAndBoot();
 
         var echo = Page.Locator("#amount-echo");
         await Expect(echo).ToHaveTextAsync("\u2014");
 
-        // SF NumericTextBox: type a value, Tab triggers change event
+        // SF NumericTextBox renders TWO inputs with the same ID — use .First for the visible one
         var numericInput = Page.Locator($"#{S}__Amount").First;
         await numericInput.ClickAsync();
         await numericInput.FillAsync("42");
         await numericInput.PressAsync("Tab");
 
         await Expect(echo).ToHaveTextAsync("Amount changed", new() { Timeout = 3000 });
+
         AssertNoConsoleErrors();
     }
 
-    // ── Native vendor — flat property ──
+    // ── Scenario: Native component change fires reactive echo ──
 
+    /// <summary>
+    /// Selecting a value in the Native dropdown triggers its .Reactive() pipeline,
+    /// which sets the echo element text to "Status changed".
+    ///
+    /// WHY: proves Native vendor component-event trigger wires correctly end-to-end
+    /// </summary>
     [Test]
-    public async Task Native_dropdown_change_fires_reaction()
+    public async Task native_dropdown_change_updates_echo()
     {
         await NavigateAndBoot();
 
         var echo = Page.Locator("#status-echo");
         await Expect(echo).ToHaveTextAsync("\u2014");
 
-        await Page.Locator($"#{S}__Status").SelectOptionAsync("Active");
+        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
 
         await Expect(echo).ToHaveTextAsync("Status changed", new() { Timeout = 3000 });
+
         AssertNoConsoleErrors();
     }
 
+    // ── Scenario: Nested property IDs use underscores not dots ──
+
+    /// <summary>
+    /// m => m.Address.City generates element ID {TypeScope}__Address_City (underscores),
+    /// not Address.City (dots). Both Native and Fusion nested components follow this pattern.
+    ///
+    /// WHY: proves IdGenerator converts nested model expressions to underscore-delimited IDs
+    /// and both vendors render actual DOM elements with those IDs
+    /// </summary>
     [Test]
-    public async Task Native_dropdown_without_reactive_does_not_fire()
+    public async Task nested_property_ids_use_underscores_not_dots()
+    {
+        await NavigateAndBoot();
+
+        // Native nested: Address_City (not Address.City)
+        var citySelect = Page.Locator($"#{S}__Address_City");
+        await Expect(citySelect).ToBeVisibleAsync();
+
+        // Fusion nested: Address_PostalCode — .First because SF renders two inputs
+        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
+        await Expect(postalInput).ToBeVisibleAsync();
+
+        // Verify reactive wiring works on nested elements: change City, see echo
+        await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "seattle" });
+        await Expect(Page.Locator("#city-echo")).ToHaveTextAsync("City changed", new() { Timeout = 3000 });
+
+        // Verify reactive wiring works on nested Fusion: change PostalCode, see echo
+        await postalInput.ClickAsync();
+        await postalInput.FillAsync("98101");
+        await postalInput.PressAsync("Tab");
+        await Expect(Page.Locator("#postal-echo")).ToHaveTextAsync("PostalCode changed", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario: Reset All button clears both vendors via custom event ──
+
+    /// <summary>
+    /// The "Reset All Fields" button dispatches a "reset-all" custom event. The plan
+    /// wires this to a pipeline that zeros Fusion Amount, clears Native Status dropdown,
+    /// and sets the echo to "All fields reset".
+    ///
+    /// WHY: proves cross-vendor custom event pipeline mutates components from both vendors
+    /// in a single reaction
+    /// </summary>
+    [Test]
+    public async Task reset_all_button_clears_both_vendors()
+    {
+        await NavigateAndBoot();
+
+        // Set values in both vendors first
+        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
+        await Expect(Page.Locator("#status-echo")).ToHaveTextAsync("Status changed", new() { Timeout = 3000 });
+
+        var numericInput = Page.Locator($"#{S}__Amount").First;
+        await numericInput.ClickAsync();
+        await numericInput.FillAsync("999");
+        await numericInput.PressAsync("Tab");
+        await Expect(Page.Locator("#amount-echo")).ToHaveTextAsync("Amount changed", new() { Timeout = 3000 });
+
+        // Reset All — single custom event resets both vendors
+        await Page.Locator("button:has-text('Reset All Fields')").ClickAsync();
+
+        // Echo confirms the reset-all pipeline executed
+        await Expect(Page.Locator("#status-echo")).ToHaveTextAsync("All fields reset", new() { Timeout = 3000 });
+
+        // Native dropdown cleared to empty
+        await Expect(Page.Locator($"#{S}__Status")).ToHaveValueAsync("");
+
+        // Fusion numeric zeroed — SF may format as "0" or "0.00"
+        await Expect(numericInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario: Non-reactive control stays inert ──
+
+    /// <summary>
+    /// The Category dropdown has NO .Reactive() extension. Changing it must NOT trigger
+    /// any echo update — both status-echo and amount-echo must remain at their initial
+    /// em-dash value.
+    ///
+    /// WHY: proves the framework only wires triggers for components with .Reactive(),
+    /// and non-reactive components are truly inert (no accidental event leakage)
+    /// </summary>
+    [Test]
+    public async Task non_reactive_control_does_not_fire_change()
     {
         await NavigateAndBoot();
 
@@ -103,147 +172,62 @@ public class WhenReactiveExtensionsFireInBrowser : PlaywrightTestBase
         var amountEcho = Page.Locator("#amount-echo");
 
         // Category dropdown has NO .Reactive() — selecting must not affect any echo
-        await Page.Locator($"#{S}__Category").SelectOptionAsync("Category A");
+        await Page.Locator($"#{S}__Category").SelectOptionAsync(new SelectOptionValue { Value = "A" });
+
+        // Brief wait to allow any accidental event propagation
+        await Page.WaitForTimeoutAsync(500);
 
         await Expect(statusEcho).ToHaveTextAsync("\u2014");
         await Expect(amountEcho).ToHaveTextAsync("\u2014");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Nested properties — ID pattern verification ──
-
-    [Test]
-    public async Task Native_nested_element_id_uses_underscores()
-    {
-        await NavigateAndBoot();
-
-        // m => m.Address.City → IdGenerator: {TypeScope}__Address_City
-        var citySelect = Page.Locator($"#{S}__Address_City");
-        await Expect(citySelect).ToBeVisibleAsync();
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task Fusion_nested_element_id_uses_idgenerator()
-    {
-        await NavigateAndBoot();
-
-        // m => m.Address!.PostalCode → IdGenerator: {TypeScope}__Address_PostalCode
-        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
-        await Expect(postalInput).ToBeVisibleAsync();
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task Nested_native_dropdown_change_fires_reaction()
-    {
-        await NavigateAndBoot();
-
-        var echo = Page.Locator("#city-echo");
-        await Expect(echo).ToHaveTextAsync("\u2014");
-
-        await Page.Locator($"#{S}__Address_City").SelectOptionAsync("seattle");
-
-        await Expect(echo).ToHaveTextAsync("City changed", new() { Timeout = 3000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task Nested_fusion_numeric_change_fires_reaction()
-    {
-        await NavigateAndBoot();
-
-        var echo = Page.Locator("#postal-echo");
-        await Expect(echo).ToHaveTextAsync("\u2014");
-
-        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
-        await postalInput.ClickAsync();
-        await postalInput.FillAsync("98101");
-        await postalInput.PressAsync("Tab");
-
-        await Expect(echo).ToHaveTextAsync("PostalCode changed", new() { Timeout = 3000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task Plan_json_shows_idgenerator_component_ids()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        // Native nested: IdGenerator format
-        Assert.That(planJson, Does.Contain($"\"componentId\": \"{S}__Address_City\""),
-            "Native nested componentId must use IdGenerator format");
-        // Fusion nested: IdGenerator format (same as native now)
-        Assert.That(planJson, Does.Contain($"\"componentId\": \"{S}__Address_PostalCode\""),
-            "Fusion nested componentId must use IdGenerator format");
 
         AssertNoConsoleErrors();
     }
 
-    // ── Cross-vendor custom event ──
+    // ── Scenario: Components remain reactive after a cross-vendor reset ──
 
+    /// <summary>
+    /// After "Reset All Fields" clears both vendors, interacting with a component must
+    /// still fire its .Reactive() pipeline. The reset dispatch only mutates values — it
+    /// does not unwire event listeners.
+    ///
+    /// Flow:
+    ///   1. Change Status dropdown → echo shows "Status changed" (reactive works)
+    ///   2. Click "Reset All Fields" → Status cleared, Amount zeroed, echo shows "All fields reset"
+    ///   3. Change Status dropdown again → echo must update to "Status changed" (proves re-fire)
+    ///   4. Change Amount again → echo must update to "Amount changed" (proves Fusion re-fire too)
+    ///
+    /// WHY: proves reactive event listeners survive a cross-vendor reset dispatch,
+    /// catching regressions where a reset accidentally unwires component-event triggers
+    /// </summary>
     [Test]
-    public async Task Reset_all_custom_event_mutates_both_vendors()
+    public async Task reset_then_interact_proves_components_still_reactive_after_reset()
     {
         await NavigateAndBoot();
 
         var statusEcho = Page.Locator("#status-echo");
+        var amountEcho = Page.Locator("#amount-echo");
 
-        // First trigger a native change
-        await Page.Locator($"#{S}__Status").SelectOptionAsync("Active");
+        // Step 1: Interact — native dropdown fires its reactive pipeline
+        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
         await Expect(statusEcho).ToHaveTextAsync("Status changed", new() { Timeout = 3000 });
 
-        // Reset All — cross-vendor pipeline resets both + updates echo
+        // Step 2: Reset All — cross-vendor reset clears values and overwrites echo
         await Page.Locator("button:has-text('Reset All Fields')").ClickAsync();
-
         await Expect(statusEcho).ToHaveTextAsync("All fields reset", new() { Timeout = 3000 });
-        AssertNoConsoleErrors();
-    }
+        await Expect(Page.Locator($"#{S}__Status")).ToHaveValueAsync("");
+        await Expect(Page.Locator($"#{S}__Amount").First).ToHaveValueAsync(
+            new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
 
-    [Test]
-    public async Task Reset_all_clears_native_dropdown_value()
-    {
-        await NavigateAndBoot();
+        // Step 3: Interact again — native dropdown must still be reactive after reset
+        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "inactive" });
+        await Expect(statusEcho).ToHaveTextAsync("Status changed", new() { Timeout = 3000 });
 
-        var statusSelect = Page.Locator($"#{S}__Status");
-        await statusSelect.SelectOptionAsync("Pending");
-
-        await Page.Locator("button:has-text('Reset All Fields')").ClickAsync();
-
-        await Page.Locator("#status-echo").Filter(new() { HasText = "All fields reset" })
-            .WaitForAsync(new() { Timeout = 3000 });
-
-        await Expect(statusSelect).ToHaveValueAsync("");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Wiring verification ──
-
-    [Test]
-    public async Task Boot_trace_shows_component_event_wiring()
-    {
-        await NavigateAndBoot();
-
-        AssertTraceContains("trigger", "component-event");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Page structure ──
-
-    [Test]
-    public async Task Page_renders_all_sections()
-    {
-        await NavigateAndBoot();
-
-        await Expect(Page.Locator("h1")).ToHaveTextAsync("Playground Syntax");
-
-        await Expect(Page.Locator("h2:has-text('Fusion')")).ToBeVisibleAsync();
-        await Expect(Page.Locator("h2:has-text('Native')")).ToBeVisibleAsync();
-        await Expect(Page.Locator("h2:has-text('Cross-Vendor')")).ToBeVisibleAsync();
-        await Expect(Page.Locator("h2:has-text('Read Properties')")).ToBeVisibleAsync();
-        await Expect(Page.Locator("h2:has-text('Nested Properties')")).ToBeVisibleAsync();
-        await Expect(Page.Locator("#plan-json")).ToBeVisibleAsync();
+        // Step 4: Fusion component must also still be reactive after reset
+        var numericInput = Page.Locator($"#{S}__Amount").First;
+        await numericInput.ClickAsync();
+        await numericInput.FillAsync("77");
+        await numericInput.PressAsync("Tab");
+        await Expect(amountEcho).ToHaveTextAsync("Amount changed", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
     }

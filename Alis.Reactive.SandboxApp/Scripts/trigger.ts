@@ -35,11 +35,11 @@ export function wireTrigger(
       const el = document.getElementById(trigger.componentId);
       if (!el) throw new Error(`[alis] element not found: ${trigger.componentId}`);
       const root = resolveRoot(el, trigger.vendor);
+      const expr = trigger.readExpr;
       log.debug("component-event", { componentId: trigger.componentId, jsEvent: trigger.jsEvent, vendor: trigger.vendor });
       (root as EventTarget).addEventListener(trigger.jsEvent, (e: any) => {
-        const expr = trigger.readExpr ?? "value";
         const detail = trigger.vendor === "native"
-          ? { [expr]: walk(el, expr), event: e }
+          ? (expr ? { [expr]: walk(el, expr), event: e } : { event: e })
           : (e ?? {});
         executeReaction(reaction, { evt: detail, components });
       }, opts);

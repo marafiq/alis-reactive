@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive;
 using Alis.Reactive.Builders;
 using Alis.Reactive.Descriptors;
 using Alis.Reactive.Descriptors.Triggers;
@@ -21,7 +20,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class FusionNumericTextBoxReactiveExtensions
     {
-        private static readonly FusionNumericTextBox _component = new FusionNumericTextBox();
+        private static readonly FusionNumericTextBox Component = new FusionNumericTextBox();
 
         public static NumericTextBoxBuilder Reactive<TModel, TArgs>(
             this NumericTextBoxBuilder builder,
@@ -38,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
             var componentId = (string)attrs["id"];
             var bindingPath = (string)attrs["name"];
 
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, _component.Vendor, bindingPath, _component.ReadExpr);
+            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, Component.Vendor, bindingPath, Component.ReadExpr);
             var entry = new Entry(trigger, pb.BuildReaction());
             plan.AddEntry(entry);
 

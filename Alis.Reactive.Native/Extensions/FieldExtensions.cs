@@ -4,7 +4,6 @@ using System.Text.Encodings.Web;
 using Alis.Reactive.Native.Builders;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Alis.Reactive;
 
 namespace Alis.Reactive.Native.Extensions
 {
@@ -28,7 +27,7 @@ namespace Alis.Reactive.Native.Extensions
         {
             var writer = html.ViewContext.Writer;
             var id = IdGenerator.For<TModel, TProp>(expression);
-            var b = new FieldBuilder(writer, html.NameFor(expression).ToString())
+            var b = new FieldBuilder(writer, html.NameFor(expression))
                 .Label(label)
                 .ForId(id);
             if (isRequired) b.Required();

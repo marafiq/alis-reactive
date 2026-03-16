@@ -28,7 +28,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Page loads ──
 
     [Test]
-    public async Task PageLoadsWithNoErrors()
+    public async Task page_loads_without_errors()
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("DropDownList — Alis.Reactive Sandbox");
@@ -36,7 +36,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task PlanJsonIsRendered()
+    public async Task plan_json_is_rendered()
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -50,7 +50,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 1: Property Write ──
 
     [Test]
-    public async Task DomReadySetsInitialValue()
+    public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
         // SF DropDownList wrapper gets the IdGenerator-based ID
@@ -69,7 +69,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 2: Property Read ──
 
     [Test]
-    public async Task DomReadyReadsValueIntoEcho()
+    public async Task domready_reads_value_into_echo()
     {
         await NavigateAndBoot();
         // The value-echo should show "Books" after dom-ready reads comp.Value()
@@ -84,7 +84,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 3: Method Calls (ShowPopup/HidePopup) ──
 
     [Test]
-    public async Task ShowPopupButtonOpensDropdown()
+    public async Task showpopup_button_opens_dropdown()
     {
         await NavigateAndBoot();
 
@@ -98,7 +98,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task HidePopupButtonClosesDropdown()
+    public async Task hidepopup_button_closes_dropdown()
     {
         await NavigateAndBoot();
 
@@ -119,7 +119,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 4: Events ──
 
     [Test]
-    public async Task ChangeEventDisplaysNewValue()
+    public async Task changed_event_displays_new_value()
     {
         await NavigateAndBoot();
 
@@ -141,7 +141,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task FocusEventShowsFocusState()
+    public async Task focus_event_shows_focus_state()
     {
         await NavigateAndBoot();
 
@@ -156,7 +156,7 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     }
 
     [Test]
-    public async Task BlurEventShowsBlurState()
+    public async Task blur_event_shows_blur_state()
     {
         await NavigateAndBoot();
 
@@ -174,10 +174,44 @@ public class WhenUsingDropDownList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 5: Condition (Selected Indicator) ──
+    // ── Section 5: Conditions — Typed Event-Args + Component-Read ──
 
     [Test]
-    public async Task SelectedConditionShowsIndicatorWhenValueNotNull()
+    public async Task event_args_condition_matches_when_value_equals_electronics()
+    {
+        await NavigateAndBoot();
+
+        // Open popup and select Electronics
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Electronics" }).ClickAsync();
+
+        // When(args, x => x.Value).Eq("Electronics") → Then branch
+        await Expect(Page.Locator("#args-condition"))
+            .ToHaveTextAsync("electronics selected", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task event_args_condition_falls_to_else_for_other_values()
+    {
+        await NavigateAndBoot();
+
+        // Open popup and select Clothing (not Electronics)
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Clothing" }).ClickAsync();
+
+        // When(args, x => x.Value).Eq("Electronics") → Else branch
+        await Expect(Page.Locator("#args-condition"))
+            .ToHaveTextAsync("other category", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task component_condition_shows_indicator_when_value_not_null()
     {
         await NavigateAndBoot();
 
@@ -202,13 +236,69 @@ public class WhenUsingDropDownList : PlaywrightTestBase
     // ── Section 6: Gather ──
 
     [Test]
-    public async Task GatherButtonPostsComponentValue()
+    public async Task gather_button_posts_component_value()
     {
         await NavigateAndBoot();
 
         await Page.Locator("#gather-btn").ClickAsync();
         await Expect(Page.Locator("#gather-result"))
             .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ── Multi-step state-cycle scenarios ──
+
+    [Test]
+    public async Task selecting_then_clearing_selection_toggles_indicator()
+    {
+        // Proves When(comp.Value()).NotNull() evaluates correctly across
+        // select → clear → re-select transitions.
+        // DomReady SetValue("Books") fires the change event, so the indicator
+        // is already visible after boot.
+        await NavigateAndBoot();
+
+        // Indicator is visible after boot (DomReady SetValue triggers change → NotNull → show)
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToHaveTextAsync("selected", new() { Timeout = 3000 });
+
+        // Select "Electronics" → indicator stays visible (still not null)
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Electronics" }).ClickAsync();
+
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToHaveTextAsync("selected", new() { Timeout = 3000 });
+
+        // Clear selection via SF ej2 API → indicator hides
+        // SF ej2 trigger('change', ...) fires the handler registered by the framework
+        await Page.EvaluateAsync(@$"() => {{
+            const el = document.getElementById('{CategoryId}');
+            const ej2 = el.ej2_instances[0];
+            ej2.value = null;
+            ej2.text = null;
+            ej2.dataBind();
+            ej2.trigger('change', {{ value: null, itemData: null, isInteracted: false }});
+        }}");
+
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToBeHiddenAsync(new() { Timeout = 5000 });
+
+        // Select "Books" → indicator shows again
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Books" }).ClickAsync();
+
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToHaveTextAsync("selected", new() { Timeout = 3000 });
+
         AssertNoConsoleErrors();
     }
 }

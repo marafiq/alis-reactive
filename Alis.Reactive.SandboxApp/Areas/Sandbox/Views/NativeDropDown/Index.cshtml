@@ -1,0 +1,124 @@
+@model NativeDropDownModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "NativeDropDown";
+
+    var plan = Html.ReactivePlan<NativeDropDownModel>();
+
+    var careLevelItems = (SelectListItem[])ViewBag.CareLevelItems;
+    var facilityTypeItems = (SelectListItem[])ViewBag.FacilityTypeItems;
+
+    // Section 1: Property write — DomReady sets CareLevel to "Memory Care"
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<NativeDropDown>(m => m.CareLevel).SetValue("Memory Care");
+    }));
+
+    // Section 2: Property read — DomReady reads CareLevel value into echo span
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var comp = p.Component<NativeDropDown>(m => m.CareLevel);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">NativeDropDown — Full API</h1>
+        <p class="mt-2 text-text-secondary">
+            Exercises NativeDropDown vertical slice: property writes (SetValue),
+            property reads (Value), events (Changed), typed conditions (When), and reactive wiring.
+            Senior living domain: care levels and facility types.
+        </p>
+    </div>
+
+    <!-- Section 1: Property Write -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Property Write (SetValue)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, sets care level to "Memory Care".
+        </p>
+        @{ Html.Field("Care Level", false, m => m.CareLevel, expr =>
+            Html.NativeDropDownFor(plan, expr)
+                .Items(careLevelItems)
+                .Placeholder("-- Select Care Level --")
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+        ); }
+    </section>
+
+    <!-- Section 2: Property Read -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Property Read (Value as Source)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the care level component value and echoes it.
+        </p>
+        <div class="font-mono text-sm">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 3: Event + Event-Args Condition -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Changed Event with Typed Condition</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Facility type wires a Changed event with typed condition:
+            <code>When(args, x =&gt; x.Value).Eq("Medical")</code> shows medical notice.
+        </p>
+        @{ Html.Field("Facility Type", false, m => m.FacilityType, expr =>
+            Html.NativeDropDownFor(plan, expr)
+                .Items(facilityTypeItems)
+                .Placeholder("-- Select Facility Type --")
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.When(args, x => x.Value).Eq("Medical")
+                        .Then(t =>
+                        {
+                            t.Element("medical-notice").SetText("medical facility selected");
+                            t.Element("medical-notice").AddClass("text-green-600");
+                            t.Element("medical-notice").RemoveClass("text-text-muted");
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("medical-notice").SetText("not a medical facility");
+                            e.Element("medical-notice").RemoveClass("text-green-600");
+                            e.Element("medical-notice").AddClass("text-text-muted");
+                        });
+                })
+        ); }
+        <div class="font-mono text-sm mt-2">
+            <p>Notice: <span id="medical-notice" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 4: Component-Read Condition -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Component Value Condition</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Button reads care level via <code>When(comp.Value()).NotEmpty()</code>
+            and shows a confirmation or warning.
+        </p>
+        @(Html.NativeButton("check-care-btn", "Check Care Level")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var comp = p.Component<NativeDropDown>(m => m.CareLevel);
+                p.When(comp.Value()).NotEmpty()
+                    .Then(t => t.Element("care-confirmation").SetText("care level confirmed"))
+                    .Else(e => e.Element("care-confirmation").SetText("care level is required"));
+            }))
+        <div class="font-mono text-sm mt-2">
+            <p>Status: <span id="care-confirmation" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

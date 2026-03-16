@@ -1,3 +1,5 @@
+using Alis.Reactive.Descriptors.Sources;
+
 namespace Alis.Reactive.Builders.Conditions
 {
     public sealed class TypedComponentSource<TProp> : TypedSource<TProp>

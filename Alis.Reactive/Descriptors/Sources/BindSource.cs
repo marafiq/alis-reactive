@@ -1,14 +1,16 @@
 using System.Text.Json.Serialization;
+using Alis.Reactive.Serialization;
 
-namespace Alis.Reactive.Builders.Conditions
+namespace Alis.Reactive.Descriptors.Sources
 {
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
-    [JsonDerivedType(typeof(EventSource), "event")]
-    [JsonDerivedType(typeof(ComponentSource), "component")]
+    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<BindSource>))]
     public abstract class BindSource { }
 
     public sealed class EventSource : BindSource
     {
+        [JsonPropertyOrder(-1)]
+        public string Kind => "event";
+
         public string Path { get; }
 
         public EventSource(string path)
@@ -19,6 +21,9 @@ namespace Alis.Reactive.Builders.Conditions
 
     public sealed class ComponentSource : BindSource
     {
+        [JsonPropertyOrder(-1)]
+        public string Kind => "component";
+
         public string ComponentId { get; }
         public string Vendor { get; }
         public string ReadExpr { get; }

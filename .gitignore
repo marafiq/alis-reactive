@@ -7,3 +7,4 @@ riderModule.iml
 node_modules/
 *.DotSettings.user
 .worktrees/
+tools/

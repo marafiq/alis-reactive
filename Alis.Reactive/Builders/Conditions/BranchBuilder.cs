@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Descriptors.Guards;
 using Alis.Reactive.Descriptors.Reactions;
 
 namespace Alis.Reactive.Builders.Conditions

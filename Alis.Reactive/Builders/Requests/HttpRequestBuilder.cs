@@ -123,7 +123,8 @@ namespace Alis.Reactive.Builders.Requests
                 _response?.ChainedRequest,
                 _validation);
 
-            desc.ValidatorType = _validatorType;
+            if (_validatorType != null)
+                desc.AttachValidator(_validatorType);
 
             return desc;
         }

@@ -12,7 +12,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── int (ElseIf grade ladder) ──
 
     [Test]
-    public async Task Int_elseif_takes_correct_branch()
+    public async Task int_elseif_takes_correct_branch()
     {
         await NavigateAndBoot();
         var grade = Page.Locator("#grade");
@@ -32,7 +32,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── long ──
 
     [Test]
-    public async Task Long_gt_threshold()
+    public async Task long_gt_threshold()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#long-result");
@@ -49,7 +49,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── double ──
 
     [Test]
-    public async Task Double_gt_comparison()
+    public async Task double_gt_comparison()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#double-result");
@@ -66,7 +66,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── bool ──
 
     [Test]
-    public async Task Bool_truthy_falsy()
+    public async Task bool_truthy_falsy()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#bool-result");
@@ -83,7 +83,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── string ──
 
     [Test]
-    public async Task String_eq_comparison()
+    public async Task string_eq_comparison()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#string-result");
@@ -100,7 +100,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── DateTime ──
 
     [Test]
-    public async Task DateTime_gt_comparison()
+    public async Task datetime_gt_comparison()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#date-result");
@@ -117,7 +117,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── int? (nullable) ──
 
     [Test]
-    public async Task Nullable_int_is_null()
+    public async Task nullable_int_is_null()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#nullable-result");
@@ -134,7 +134,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── AND (int + string) ──
 
     [Test]
-    public async Task And_mixed_types()
+    public async Task and_mixed_types()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#and-result");
@@ -151,7 +151,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── OR (string alternatives) ──
 
     [Test]
-    public async Task Or_string_alternatives()
+    public async Task or_string_alternatives()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#or-result");
@@ -171,7 +171,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Nested payload — deep dot-path ──
 
     [Test]
-    public async Task Nested_payload_deep_path_eq()
+    public async Task nested_payload_deep_path_eq()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#nested-result");
@@ -188,7 +188,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Null nested object ──
 
     [Test]
-    public async Task Null_nested_object_is_null()
+    public async Task null_nested_object_is_null()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#nested-null-result");
@@ -209,7 +209,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Mixed nested + flat AND ──
 
     [Test]
-    public async Task Mixed_nested_and_flat_in_and()
+    public async Task mixed_nested_and_flat_in_and()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#nested-and-result");
@@ -231,7 +231,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Null leaf in comparison ──
 
     [Test]
-    public async Task Null_leaf_in_comparison_takes_else_no_crash()
+    public async Task null_leaf_in_comparison_takes_else_no_crash()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#null-leaf-result");
@@ -254,7 +254,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── In membership ──
 
     [Test]
-    public async Task In_membership()
+    public async Task in_membership()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#in-result");
@@ -271,7 +271,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── NotIn membership ──
 
     [Test]
-    public async Task NotIn_membership()
+    public async Task notin_membership()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#notin-result");
@@ -288,7 +288,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Between range ──
 
     [Test]
-    public async Task Between_range()
+    public async Task between_range()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#between-result");
@@ -308,7 +308,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Contains text ──
 
     [Test]
-    public async Task Contains_text()
+    public async Task contains_text()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#contains-result");
@@ -325,7 +325,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── StartsWith text ──
 
     [Test]
-    public async Task StartsWith_text()
+    public async Task starts_with_text()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#startswith-result");
@@ -342,7 +342,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Matches regex ──
 
     [Test]
-    public async Task Matches_regex()
+    public async Task matches_regex()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#matches-result");
@@ -359,7 +359,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── MinLength text ──
 
     [Test]
-    public async Task MinLength_text()
+    public async Task min_length_text()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#minlength-result");
@@ -376,7 +376,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── IsEmpty presence ──
 
     [Test]
-    public async Task IsEmpty_presence()
+    public async Task is_empty_presence()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#isempty-result");
@@ -396,7 +396,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── NOT (InvertGuard) ──
 
     [Test]
-    public async Task Not_inverts_guard()
+    public async Task not_inverts_guard()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#not-result");
@@ -413,7 +413,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Per-action When guard ──
 
     [Test]
-    public async Task Per_action_when_guard()
+    public async Task per_action_when_guard()
     {
         await NavigateAndBoot();
         var always = Page.Locator("#per-action-result");
@@ -437,7 +437,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Direct And syntax ──
 
     [Test]
-    public async Task Direct_and_syntax()
+    public async Task direct_and_syntax()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#direct-and-result");
@@ -454,7 +454,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Direct Or syntax ──
 
     [Test]
-    public async Task Direct_or_syntax()
+    public async Task direct_or_syntax()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#direct-or-result");
@@ -474,7 +474,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Confirm dialog — OK path ──
 
     [Test]
-    public async Task Confirm_ok_path()
+    public async Task confirm_ok_path()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#confirm-result");
@@ -499,7 +499,7 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
     // ── Confirm dialog — Cancel path ──
 
     [Test]
-    public async Task Confirm_cancel_path()
+    public async Task confirm_cancel_path()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#confirm-result");
@@ -517,6 +517,231 @@ public class WhenConditionsEvaluateInBrowser : PlaywrightTestBase
 
         // Result should be "Cancelled"
         await Expect(result).ToHaveTextAsync("Cancelled");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Edge cases: branch exclusivity, null safety, composition semantics ──
+
+    [Test]
+    public async Task elseif_chain_only_executes_first_matching_branch()
+    {
+        // Score 95 satisfies BOTH Gte(90) AND Gte(80) — only the first matching branch should fire
+        await NavigateAndBoot();
+        var grade = Page.Locator("#grade");
+
+        // 95 matches Gte(90) first → must be "A", never "B"
+        await Page.Locator("#btn-score-95").ClickAsync();
+        await Expect(grade).ToHaveTextAsync("A");
+
+        // 85 does NOT match Gte(90), but DOES match Gte(80) → must be "B"
+        await Page.Locator("#btn-score-85").ClickAsync();
+        await Expect(grade).ToHaveTextAsync("B");
+
+        // 40 matches neither Gte(90) nor Gte(80) → falls through to Else → "F"
+        await Page.Locator("#btn-score-40").ClickAsync();
+        await Expect(grade).ToHaveTextAsync("F");
+
+        // Click 95 again to confirm branch exclusivity is stable across re-evaluations
+        await Page.Locator("#btn-score-95").ClickAsync();
+        await Expect(grade).ToHaveTextAsync("A");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task null_nested_object_does_not_crash_and_evaluates_to_null()
+    {
+        // Dispatch with address:null → When(address).IsNull() should be true
+        // Then dispatch with address:{city:"NYC"} → IsNull() should be false
+        // Proves null-safe dot-path walking doesn't throw
+        await NavigateAndBoot();
+        var result = Page.Locator("#nested-null-result");
+
+        // address explicitly null → IsNull() = true → "No Address"
+        await Page.Locator("#btn-nested-null").ClickAsync();
+        await Expect(result).ToHaveTextAsync("No Address");
+
+        // address present with city → IsNull() = false → "Has Address"
+        await Page.Locator("#btn-nested-present").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Has Address");
+
+        // Transition back to null — confirms re-evaluation works after non-null
+        await Page.Locator("#btn-nested-null").ClickAsync();
+        await Expect(result).ToHaveTextAsync("No Address");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task missing_key_in_payload_evaluates_as_null()
+    {
+        // Dispatch with {id:3} (no address key at all) → When(address).IsNull() should be true
+        // Proves walk.ts returns undefined for missing keys, and IsNull treats undefined as null
+        await NavigateAndBoot();
+        var result = Page.Locator("#nested-null-result");
+
+        // Missing key → walk returns undefined → IsNull treats as null → "No Address"
+        await Page.Locator("#btn-nested-missing").ClickAsync();
+        await Expect(result).ToHaveTextAsync("No Address");
+
+        // Contrast with present address → "Has Address"
+        await Page.Locator("#btn-nested-present").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Has Address");
+
+        // Missing key again to confirm idempotent
+        await Page.Locator("#btn-nested-missing").ClickAsync();
+        await Expect(result).ToHaveTextAsync("No Address");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task and_composition_short_circuits_on_first_false()
+    {
+        // Score 95 + status "inactive" → When(score).Gte(90).And(status).Eq("active") → false
+        // Score 95 + status "active" → true
+        // Proves AND evaluates both sides correctly
+        await NavigateAndBoot();
+        var result = Page.Locator("#and-result");
+
+        // First true, second false → compound is false → "Nope"
+        await Page.Locator("#btn-and-fail").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Nope");
+
+        // Both true → compound is true → "Active High Scorer"
+        await Page.Locator("#btn-and-pass").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Active High Scorer");
+
+        // Back to fail — confirms re-evaluation after success
+        await Page.Locator("#btn-and-fail").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Nope");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task or_composition_succeeds_on_second_match()
+    {
+        // role "superuser" → When(role).Eq("admin").Or(role).Eq("superuser") → true
+        // Proves OR evaluates second operand when first is false
+        await NavigateAndBoot();
+        var result = Page.Locator("#or-result");
+
+        // First operand false, second true → OR succeeds → "Authorized"
+        await Page.Locator("#btn-or-super").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Authorized");
+
+        // Neither matches → OR fails → "Denied"
+        await Page.Locator("#btn-or-viewer").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Denied");
+
+        // First operand true → OR succeeds without needing second → "Authorized"
+        await Page.Locator("#btn-or-admin").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Authorized");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task not_inverts_truthy_to_falsy_and_vice_versa()
+    {
+        // role "user" → When(role).Eq("admin").Not() → true (not admin)
+        // role "admin" → When(role).Eq("admin").Not() → false (is admin, NOT inverted)
+        await NavigateAndBoot();
+        var result = Page.Locator("#not-result");
+
+        // Eq("admin") is false, Not() inverts to true → Then branch → "Not admin"
+        await Page.Locator("#btn-not-user").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Not admin");
+
+        // Eq("admin") is true, Not() inverts to false → Else branch → "Is admin"
+        await Page.Locator("#btn-not-admin").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Is admin");
+
+        // Back to non-admin to confirm inversion is stable
+        await Page.Locator("#btn-not-user").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Not admin");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Per-action When guard — low score on fresh page (skip path) ──
+
+    [Test]
+    public async Task per_action_when_guard_skips_guarded_command_on_fresh_page()
+    {
+        // Fresh navigation — bonus starts as "—" (em dash default)
+        await NavigateAndBoot();
+        var always = Page.Locator("#per-action-result");
+        var bonus = Page.Locator("#per-action-bonus");
+
+        // score=50 → guard fails → first command fires, second is SKIPPED
+        await Page.Locator("#btn-peraction-low").ClickAsync();
+        await Expect(always).ToHaveTextAsync("Always runs");
+        // Bonus was never set — remains at default em dash
+        await Expect(bonus).ToHaveTextAsync("\u2014");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Direct And — first condition fails ──
+
+    [Test]
+    public async Task direct_and_fails_when_first_condition_fails()
+    {
+        // Score 70 < 90 → first condition Gte(90) is false → AND short-circuits → Else
+        await NavigateAndBoot();
+        var result = Page.Locator("#direct-and-result");
+
+        await Page.EvaluateAsync(
+            "document.dispatchEvent(new CustomEvent('check-direct-and',{detail:{score:70,status:'active'}}))");
+        await Expect(result).ToHaveTextAsync("Fail");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Direct Or — both conditions match (first wins) ──
+
+    [Test]
+    public async Task direct_or_succeeds_when_first_condition_matches()
+    {
+        // role "admin" matches first Eq("admin") → OR succeeds immediately
+        await NavigateAndBoot();
+        var result = Page.Locator("#direct-or-result");
+
+        await Page.Locator("#btn-direct-or-admin").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Authorized");
+
+        // Confirm re-evaluation: neither matches → Denied
+        await Page.Locator("#btn-direct-or-viewer").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Denied");
+
+        // Second condition matches → OR succeeds via second operand
+        await Page.Locator("#btn-direct-or-super").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Authorized");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Null leaf — missing address key entirely (not just city=null) ──
+
+    [Test]
+    public async Task null_leaf_with_missing_address_key_takes_else_no_crash()
+    {
+        // Dispatch check-null-leaf with NO address key at all → walk returns undefined
+        // → coerced to "" → != "Seattle" → else branch, no crash
+        await NavigateAndBoot();
+        var result = Page.Locator("#null-leaf-result");
+
+        // address key entirely missing → walk.ts returns undefined → else
+        await Page.EvaluateAsync(
+            "document.dispatchEvent(new CustomEvent('check-null-leaf',{detail:{id:99}}))");
+        await Expect(result).ToHaveTextAsync("Not Seattle");
+
+        // Confirm recovery: city=Seattle still matches after missing-key dispatch
+        await Page.Locator("#btn-null-leaf-match").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Seattle");
 
         AssertNoConsoleErrors();
     }

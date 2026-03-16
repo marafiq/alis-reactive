@@ -1,8 +1,6 @@
 using System.Text.Json;
 using Json.Schema;
-using Alis.Reactive;
 using Alis.Reactive.Builders;
-using static VerifyNUnit.Verifier;
 
 namespace Alis.Reactive.Native.UnitTests;
 
@@ -16,6 +14,7 @@ public class NativeTestModel
 {
     public string? Status { get; set; }
     public string? Category { get; set; }
+    public DateTime? AdmissionDate { get; set; }
     public NativeTestAddress? Address { get; set; }
 }
 

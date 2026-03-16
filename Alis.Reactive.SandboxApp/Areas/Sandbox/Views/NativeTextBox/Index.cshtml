@@ -1,0 +1,118 @@
+@model NativeTextBoxModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "NativeTextBox";
+
+    var plan = Html.ReactivePlan<NativeTextBoxModel>();
+
+    // Section 1: Property write — DomReady sets resident name
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<NativeTextBox>(m => m.ResidentName).SetValue("Jane Doe");
+    }));
+
+    // Section 2: Property read — DomReady reads resident name into echo
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var comp = p.Component<NativeTextBox>(m => m.ResidentName);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">NativeTextBox — Full API</h1>
+        <p class="mt-2 text-text-secondary">
+            Exercises NativeTextBox vertical slice: property writes (SetValue),
+            property reads (Value), events (Changed), typed conditions (When), and reactive wiring.
+            Senior living domain: resident names and emergency contacts.
+        </p>
+    </div>
+
+    <!-- Section 1: Property Write -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Property Write (SetValue)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, sets resident name to "Jane Doe".
+        </p>
+        @{ Html.Field("Resident Name", false, m => m.ResidentName, expr =>
+            Html.NativeTextBoxFor(plan, expr)
+                .Placeholder("Enter resident name")
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+        ); }
+    </section>
+
+    <!-- Section 2: Property Read -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Property Read (Value as Source)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the resident name component value and echoes it.
+        </p>
+        <div class="font-mono text-sm">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 3: Event + Event-Args Condition -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Changed Event with Typed Condition</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Emergency contact wires a Changed event with typed condition:
+            <code>When(args, x =&gt; x.Value).IsEmpty()</code> shows contact status.
+        </p>
+        @{ Html.Field("Emergency Contact", false, m => m.EmergencyContact, expr =>
+            Html.NativeTextBoxFor(plan, expr)
+                .Placeholder("Enter emergency contact")
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.When(args, x => x.Value).IsEmpty()
+                        .Then(t =>
+                        {
+                            t.Element("contact-status").SetText("contact required");
+                            t.Element("contact-status").AddClass("text-red-600");
+                            t.Element("contact-status").RemoveClass("text-green-600");
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("contact-status").SetText("contact provided");
+                            e.Element("contact-status").AddClass("text-green-600");
+                            e.Element("contact-status").RemoveClass("text-red-600");
+                        });
+                })
+        ); }
+        <div class="font-mono text-sm mt-2">
+            <p>Status: <span id="contact-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 4: Component-Read Condition -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Component Value Condition</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Button reads resident name via <code>When(comp.Value()).IsEmpty()</code>
+            and shows a warning or confirmation.
+        </p>
+        @(Html.NativeButton("check-name-btn", "Check Resident Name")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var comp = p.Component<NativeTextBox>(m => m.ResidentName);
+                p.When(comp.Value()).IsEmpty()
+                    .Then(t => t.Element("name-warning").SetText("name is required"))
+                    .Else(e => e.Element("name-warning").SetText("name set"));
+            }))
+        <div class="font-mono text-sm mt-2">
+            <p>Warning: <span id="name-warning" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

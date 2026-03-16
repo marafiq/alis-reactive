@@ -49,7 +49,7 @@ describe("when failing fast on missing targets", () => {
       document.body.appendChild(el);
 
       expect(() => wireTrigger(
-        { kind: "component-event", componentId: "no-root-comp", jsEvent: "change", vendor: "fusion" },
+        { kind: "component-event", componentId: "no-root-comp", jsEvent: "change", vendor: "fusion", readExpr: "value" },
         { kind: "sequential", commands: [] },
       )).toThrow("no vendor root");
     });
