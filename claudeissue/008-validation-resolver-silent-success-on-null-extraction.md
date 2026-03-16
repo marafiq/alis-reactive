@@ -1,6 +1,8 @@
 # FAIL-FAST-008: ValidationResolver Silently Succeeds When Extractor Returns Null
 
-## Status: Fail-Fast Violation (Rule 8)
+## Status: Closed — Fixed
+
+ValidationResolver.ResolveRequest now throws when ExtractRules returns null.
 
 ## File
 `Alis.Reactive/Resolvers/ValidationResolver.cs:75-83`

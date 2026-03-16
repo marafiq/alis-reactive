@@ -1,6 +1,8 @@
 # BUG-002: validate() Returns true When Form Container Not Found
 
-## Status: Bug — Fail-Fast Violation (Rule 8)
+## Status: Closed — Fixed
+
+orchestrator.ts now returns false when container missing and fields.length > 0.
 
 ## File
 `Scripts/validation.ts:28`

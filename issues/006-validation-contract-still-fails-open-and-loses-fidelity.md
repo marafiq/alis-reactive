@@ -1,8 +1,10 @@
 # Validation Contract Still Fails Open And Loses Fidelity
 
+## Status: Closed (2025-03)
+
 ## Verdict
 
-This is a legitimate open issue.
+Resolved. Validation module is now fail-closed.
 
 The problem is not that validation exists. The problem is that the intended validation architecture is stronger than the current implementation.
 

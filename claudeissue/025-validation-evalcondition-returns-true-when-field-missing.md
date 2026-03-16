@@ -1,6 +1,8 @@
 # FAIL-FAST-025: validation.ts evalCondition Returns true When Source Field Not Found
 
-## Status: Fail-Fast Violation (Rule 8)
+## Status: Closed — Fixed
+
+evalCondition returns null when source unavailable; orchestrator blocks (adds to summary).
 
 ## File
 `Scripts/validation.ts:144-148`

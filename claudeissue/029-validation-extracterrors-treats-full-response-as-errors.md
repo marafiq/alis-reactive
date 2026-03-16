@@ -1,6 +1,8 @@
 # FAIL-FAST-029: validation.ts extractErrors Treats Entire Response as Error Map
 
-## Status: Fail-Fast Violation (Rule 8)
+## Status: Closed — Fixed
+
+extractErrors accepts only ProblemDetails { errors }; returns null and logs otherwise.
 
 ## File
 `Scripts/validation.ts:218-224`

@@ -45,6 +45,7 @@
           ],
           validation: {
             formId: testForm,
+            planId: Alis.Reactive.UnitTests.TestModel,
             fields: [
               {
                 fieldName: Name,
