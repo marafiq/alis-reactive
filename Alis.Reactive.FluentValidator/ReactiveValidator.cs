@@ -54,6 +54,38 @@ namespace Alis.Reactive.FluentValidator
                 defineRules);
         }
 
+        /// <summary>
+        /// Applies a "falsy" condition to all rules defined in the block.
+        /// Server: FV's When() runs !condition at validation time.
+        /// Client: Adapter extracts rules with ValidationCondition(field, "falsy").
+        /// </summary>
+        protected void WhenFieldNot(Expression<Func<T, bool>> conditionField, Action defineRules)
+        {
+            var fieldName = ExtractPropertyName(conditionField);
+            var compiled = conditionField.Compile();
+            var condition = new ValidationCondition(fieldName, "falsy");
+
+            ApplyClientCondition(x => !compiled(x), condition, defineRules);
+        }
+
+        /// <summary>
+        /// Applies a "neq" condition to all rules defined in the block.
+        /// Server: FV's When() checks field != value at validation time.
+        /// Client: Adapter extracts rules with ValidationCondition(field, "neq", value).
+        /// </summary>
+        protected void WhenFieldNot<TProp>(
+            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
+        {
+            var fieldName = ExtractPropertyName(field);
+            var fieldFunc = field.Compile();
+            var condition = new ValidationCondition(fieldName, "neq", value);
+
+            ApplyClientCondition(
+                x => !Equals(fieldFunc(x), value),
+                condition,
+                defineRules);
+        }
+
         private void ApplyClientCondition(
             Func<T, bool> serverPredicate,
             ValidationCondition clientCondition,

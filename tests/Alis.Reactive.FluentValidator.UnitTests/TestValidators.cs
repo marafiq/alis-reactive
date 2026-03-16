@@ -156,6 +156,32 @@ public class DeeplyNestedValidator : AbstractValidator<TestModel>
     }
 }
 
+// --- ReactiveValidator falsy/neq conditions (WhenFieldNot) ---
+
+public class ReactiveFalsyConditionValidator : ReactiveValidator<TestModel>
+{
+    public ReactiveFalsyConditionValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty();
+        WhenFieldNot(x => x.IsEmployed, () =>
+        {
+            RuleFor(x => x.JobTitle).NotEmpty().WithMessage("Explain why not employed");
+        });
+    }
+}
+
+public class ReactiveNeqConditionValidator : ReactiveValidator<TestModel>
+{
+    public ReactiveNeqConditionValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty();
+        WhenFieldNot(x => x.Name, "Independent", () =>
+        {
+            RuleFor(x => x.Email).NotEmpty().WithMessage("Email required unless independent");
+        });
+    }
+}
+
 // --- Conditional rules (skipped for client) ---
 
 public class ConditionalValidator : AbstractValidator<TestModel>

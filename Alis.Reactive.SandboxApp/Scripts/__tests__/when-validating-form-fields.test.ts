@@ -439,12 +439,13 @@ describe("validate — fusion vendor", () => {
 
 // ── validate — hidden fields ──────────────────────────────
 
-describe("validate — hidden fields", () => {
-  it("skips hidden fields", () => {
+describe("validate — hidden fields (fail-closed)", () => {
+  it("validates hidden fields and blocks the form", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "HiddenInput", rules: [{ rule: "required", message: "required" }] }),
     ]);
-    expect(validate(desc)).toBe(true);
+    // Fail-closed: hidden fields validate, errors route to summary
+    expect(validate(desc)).toBe(false);
   });
 });
 

@@ -1,0 +1,89 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Validation Contract — Scenario 3b: AJAX Partials";
+    var plan = Html.ReactivePlan<ResidentModel>();
+
+    var addressTypes = new[]
+    {
+        new SelectListItem("Facility Address", "Facility Address"),
+        new SelectListItem("Custom Address", "Custom Address"),
+    };
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Scenario 3b — AJAX-Loaded Partials</h1>
+        <p class="mt-2 text-text-secondary">
+            Address fields load dynamically when "Custom Address" is selected.
+            Before loading: unenriched validation fields. After loading: inline validation.
+        </p>
+    </div>
+
+    <form id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
+        <h2 class="text-base font-semibold mb-2">Basic Information (Parent)</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.Field("Name", true, m => m.Name, expr =>
+                Html.NativeTextBoxFor(plan, expr)
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("Resident name")
+            ); }
+
+            @{ Html.Field("Email", true, m => m.Email, expr =>
+                Html.NativeTextBoxFor(plan, expr)
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("resident@care.com")
+            ); }
+
+            @{ Html.Field("Confirm Email", true, m => m.ConfirmEmail, expr =>
+                Html.NativeTextBoxFor(plan, expr)
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("Confirm email")
+            ); }
+        </div>
+
+        <h2 class="text-base font-semibold mb-2 mt-6">Address Type</h2>
+
+        @{ Html.Field("Address Type", false, m => m.CareLevel, expr =>
+            Html.NativeDropDownFor(plan, expr)
+                .Items(addressTypes)
+                .Placeholder("-- Select Address Type --")
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.When(args, a => a.Value).Eq("Custom Address")
+                        .Then(t =>
+                            t.Get("/Sandbox/ValidationContract/AddressPartial")
+                             .Response(r => r.OnSuccess(s => s.Into("address-container"))))
+                        .Else(e =>
+                            e.Element("address-container").SetHtml(""));
+                })
+        ); }
+
+        <div id="address-container" class="mt-4"></div>
+
+        <div class="mt-6 flex items-center gap-4">
+            @(Html.NativeButton("submit-btn", "Submit Admission")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/ValidationContract/Submit", g => g.IncludeAll())
+                     .Validate<ResidentValidator>("resident-form")
+                     .Response(r => r
+                        .OnSuccess(s => s.Element("result").SetText("Admission saved"))
+                        .OnError(400, e =>
+                        {
+                            e.ValidationErrors("resident-form");
+                        }));
+                }))
+
+            <p id="result" class="text-sm text-text-muted"></p>
+        </div>
+    </form>
+</div>
+
+@Html.RenderPlan(plan)
