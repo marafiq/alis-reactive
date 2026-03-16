@@ -74,7 +74,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Post("/Sandbox/ValidationContract/Submit", g => g.IncludeAll())
-                     .Validate<ResidentValidator>("resident-form")
+                     .Validate<ServerPartialValidator>("resident-form")
                      .Response(r => r
                         .OnSuccess(s => s.Element("result").SetText("Admission saved"))
                         .OnError(400, e =>
