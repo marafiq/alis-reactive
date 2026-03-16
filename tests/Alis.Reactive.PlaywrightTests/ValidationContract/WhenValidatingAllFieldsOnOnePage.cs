@@ -207,6 +207,44 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // ── Mixed vendor: Fusion NumericTextBox validates inline ──
+
+    [Test]
+    public async Task memory_care_with_fusion_numeric_validates_and_succeeds()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        // Fill all required + select Memory Care
+        await FillAllRequired();
+        await Input("CareLevel").SelectOptionAsync("Memory Care");
+        await Input("PhysicianName").FillAsync("Dr. Smith");
+        await Input("ReasonForNoContact").FillAsync("No relatives");
+
+        // Submit without filling MemoryAssessment (Fusion NumericTextBox) → error inline
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("MemoryAssessmentScore")).ToContainTextAsync("required");
+        await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
+
+        // Fill the Fusion NumericTextBox — SF component has the IdGenerator ID
+        // Use EvaluateAsync to set the value via ej2 API (vendor-correct way)
+        await Page.EvaluateAsync($@"() => {{
+            const el = document.getElementById('{R}MemoryAssessmentScore');
+            const ej2 = el.ej2_instances[0];
+            ej2.value = 85;
+            ej2.dataBind();
+        }}");
+
+        // Submit → all pass → success
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        await Expect(SummaryDiv).ToBeHiddenAsync();
+
+        AssertNoConsoleErrors();
+    }
+
     // ── Condition: neq ───────────────────────────────────────
 
     [Test]
