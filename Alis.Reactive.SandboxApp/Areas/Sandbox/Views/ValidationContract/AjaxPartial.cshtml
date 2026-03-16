@@ -48,7 +48,7 @@
 
         <h2 class="text-base font-semibold mb-2 mt-6">Address Type</h2>
 
-        @{ Html.Field("Address Type", false, m => m.CareLevel, expr =>
+        @{ Html.Field("Address Type", false, m => m.AddressType, expr =>
             Html.NativeDropDownFor(plan, expr)
                 .Items(addressTypes)
                 .Placeholder("-- Select Address Type --")

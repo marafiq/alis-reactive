@@ -23,6 +23,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? ReasonForNoContact { get; set; }
 
         // Address
+        public string? AddressType { get; set; }
         public ResidentAddress Address { get; set; } = new();
     }
 

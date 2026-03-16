@@ -51,9 +51,9 @@ describe("rule-engine: regex", () => {
   it("fails for non-matching", () => expect(ruleFails(rule, "abc", noPeers)).toBe(true));
   it("passes for matching", () => expect(ruleFails(rule, "12345", noPeers)).toBe(false));
   it("skips empty", () => expect(ruleFails(rule, "", noPeers)).toBe(false));
-  it("handles invalid regex gracefully", () => {
+  it("fails closed on invalid regex (blocks, does not pass)", () => {
     const bad = { rule: "regex" as const, message: "bad", constraint: "[invalid" };
-    expect(ruleFails(bad, "test", noPeers)).toBe(false);
+    expect(ruleFails(bad, "test", noPeers)).toBe(true);
   });
 });
 

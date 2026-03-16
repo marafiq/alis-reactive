@@ -3,7 +3,7 @@
 // No DOM, no vendor, no side effects. Takes a value and rule → pass/fail.
 // Used by validation.ts orchestrator. Testable without jsdom.
 
-import type { ValidationRule, ValidationField } from "../types";
+import type { ValidationRule } from "../types";
 
 /** Represents the result of reading a peer field for equalTo comparison. */
 export interface PeerReader {
@@ -29,7 +29,7 @@ export function ruleFails(
       return !empty && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
     case "regex": {
       try { return !empty && !new RegExp(String(rule.constraint)).test(str); }
-      catch { return false; }
+      catch { return true; } // Broken regex → fail-closed (block, don't pass)
     }
     case "url":
       return !empty && !/^https?:\/\/.+/.test(str);

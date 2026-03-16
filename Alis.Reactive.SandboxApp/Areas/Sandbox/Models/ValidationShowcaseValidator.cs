@@ -131,4 +131,70 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .MinimumLength(5).WithMessage("Zip code must be at least 5 characters.");
         }
     }
+
+    // ── Form-scoped validators (one per form, validates only that form's fields) ──
+
+    public class AllRulesFormValidator : AbstractValidator<ValidationShowcaseModel>
+    {
+        public AllRulesFormValidator()
+        {
+            RuleFor(x => x.AllRules).SetValidator(new AllRulesSectionValidator());
+        }
+    }
+
+    public class ServerFormValidator : AbstractValidator<ValidationShowcaseModel>
+    {
+        public ServerFormValidator()
+        {
+            RuleFor(x => x.Server).SetValidator(new BasicSectionValidator());
+        }
+    }
+
+    public class LiveFormValidator : AbstractValidator<ValidationShowcaseModel>
+    {
+        public LiveFormValidator()
+        {
+            RuleFor(x => x.Live).SetValidator(new BasicSectionValidator());
+        }
+    }
+
+    public class CombinedFormValidator : AbstractValidator<ValidationShowcaseModel>
+    {
+        public CombinedFormValidator()
+        {
+            RuleFor(x => x.Combined).SetValidator(new CombinedSectionValidator());
+        }
+    }
+
+    public class HiddenFieldsFormValidator : AbstractValidator<ValidationShowcaseModel>
+    {
+        public HiddenFieldsFormValidator()
+        {
+            RuleFor(x => x.Hidden).SetValidator(new HiddenFieldsSectionValidator());
+        }
+    }
+
+    public class ConditionalFormValidator : ReactiveValidator<ValidationShowcaseModel>
+    {
+        public ConditionalFormValidator()
+        {
+            RuleFor(x => x.Conditional).SetValidator(new ConditionalSectionValidator());
+        }
+    }
+
+    public class DbFormValidator : AbstractValidator<ValidationShowcaseModel>
+    {
+        public DbFormValidator()
+        {
+            RuleFor(x => x.Db).SetValidator(new BasicSectionValidator());
+        }
+    }
+
+    public class NestedAddressFormValidator : AbstractValidator<ValidationShowcaseModel>
+    {
+        public NestedAddressFormValidator()
+        {
+            RuleFor(x => x.Nested!).SetValidator(new NestedSectionValidator());
+        }
+    }
 }

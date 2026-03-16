@@ -17,7 +17,7 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
 
     private async Task SelectCustomAddress()
     {
-        await Input("CareLevel").SelectOptionAsync("Custom Address");
+        await Input("AddressType").SelectOptionAsync("Custom Address");
         // Wait for partial to load and merge
         await Expect(Input("Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
         // Small delay for plan merge to complete
@@ -136,7 +136,7 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
         await Input("Address_Street").FillAsync("Old St");
 
         // Reload partial by re-selecting
-        await Input("CareLevel").SelectOptionAsync("Facility Address");
+        await Input("AddressType").SelectOptionAsync("Facility Address");
         await Page.WaitForTimeoutAsync(500);
         await SelectCustomAddress();
 

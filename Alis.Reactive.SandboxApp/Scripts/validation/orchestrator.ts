@@ -49,6 +49,7 @@ export function validate(desc: ValidationDescriptor): boolean {
 
   for (const f of desc.fields) {
     if (!f.fieldId || !f.vendor || !f.readExpr) {
+      if (allRulesConditionallySkipped(f, condReader)) continue;
       if (f.rules.length > 0 && summaryEl) {
         addToSummary(summaryEl, f.fieldName, f.rules[0].message);
         summaryHasErrors = true;
@@ -60,6 +61,7 @@ export function validate(desc: ValidationDescriptor): boolean {
     const el = document.getElementById(f.fieldId);
 
     if (!el) {
+      if (allRulesConditionallySkipped(f, condReader)) continue;
       if (f.rules.length > 0 && summaryEl) {
         addToSummary(summaryEl, f.fieldName, f.rules[0].message);
         summaryHasErrors = true;
@@ -68,7 +70,10 @@ export function validate(desc: ValidationDescriptor): boolean {
       continue;
     }
 
-    if (!container.contains(el)) continue;
+    if (!container.contains(el)) {
+      log.trace("field outside form, skipping", { fieldName: f.fieldName, formId: desc.formId });
+      continue;
+    }
 
     const hidden = isHidden(el);
     const root = resolveRoot(el, f.vendor);
@@ -93,11 +98,13 @@ export function validate(desc: ValidationDescriptor): boolean {
           if (summaryEl) {
             addToSummary(summaryEl, f.fieldName, rule.message);
             summaryHasErrors = true;
+            valid = false;
           }
+          // No summary element → hidden field error has no destination, skip
         } else {
           showInline(desc.formId, f, rule.message);
+          valid = false;
         }
-        valid = false;
         break;
       }
     }
@@ -184,6 +191,21 @@ function buildByName(desc: ValidationDescriptor): Map<string, ValidationField> {
   const map = new Map<string, ValidationField>();
   for (const f of desc.fields) map.set(f.fieldName, f);
   return map;
+}
+
+/**
+ * Returns true if every rule on this field has a condition AND that condition evaluates to false.
+ * Used for unenriched/missing fields: if all rules are conditionally suppressed,
+ * the field doesn't need a component and shouldn't block validation.
+ */
+function allRulesConditionallySkipped(f: ValidationField, condReader: ConditionReader): boolean {
+  if (f.rules.length === 0) return true;
+  for (const rule of f.rules) {
+    if (!rule.when) return false; // unconditional rule → can't skip
+    const result = evalCondition(rule.when, condReader);
+    if (result !== false) return false; // condition met or unresolvable → can't skip
+  }
+  return true;
 }
 
 function findErrorSpanExists(containerId: string, fieldName: string): boolean {

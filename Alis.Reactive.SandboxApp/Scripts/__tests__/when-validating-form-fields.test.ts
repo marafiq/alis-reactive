@@ -74,6 +74,7 @@ beforeEach(async () => {
         ${errSpan("HiddenInput")}
       </div>
     </form>
+    <div data-alis-validation-summary hidden></div>
   </body></html>`);
 
   (globalThis as any).document = dom.window.document;
@@ -207,12 +208,12 @@ describe("validate — regex", () => {
     expect(validate(desc)).toBe(true);
   });
 
-  it("handles invalid regex gracefully", () => {
+  it("fails closed on invalid regex (blocks the form)", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "Phone", rules: [{ rule: "regex", message: "bad", constraint: "[invalid" }] }),
     ]);
     (document.getElementById("Phone")! as HTMLInputElement).value = "test";
-    expect(validate(desc)).toBe(true);
+    expect(validate(desc)).toBe(false);
   });
 });
 

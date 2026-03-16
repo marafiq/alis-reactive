@@ -48,10 +48,14 @@ function enrichValidationFields(
       f.vendor = comp.vendor;
       f.readExpr = comp.readExpr;
     } else {
+      // Only warn when clearing a previously enriched field (partial removed)
+      // Not on initial boot where unenriched is expected for partial-owned fields
+      if (f.fieldId) {
+        log.warn("clearing enrichment — component removed", { fieldName: f.fieldName });
+      }
       f.fieldId = undefined;
       f.vendor = undefined;
       f.readExpr = undefined;
-      log.warn("validation field not in components", { fieldName: f.fieldName });
     }
   }
 }
