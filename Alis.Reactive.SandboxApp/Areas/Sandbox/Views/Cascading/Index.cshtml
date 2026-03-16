@@ -8,7 +8,7 @@
     ViewData["Title"] = "Cascading DropDownList";
 
     var plan = Html.ReactivePlan<CascadingModel>();
-    var countries = ViewBag.Countries as object[];
+    var countries = (List<CountryItem>)ViewBag.Countries;
 
     // ── Gather both for final submit ──
 

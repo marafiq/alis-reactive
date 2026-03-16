@@ -7,7 +7,7 @@
     ViewData["Title"] = "MultiColumnComboBox";
 
     var plan = Html.ReactivePlan<MultiColumnComboBoxModel>();
-    var facilities = (List<Dictionary<string, object>>)ViewBag.Facilities;
+    var facilities = (List<FacilityItem>)ViewBag.Facilities;
 
     // ── Section 1: Property Write (SetValue) from DomReady ──
 

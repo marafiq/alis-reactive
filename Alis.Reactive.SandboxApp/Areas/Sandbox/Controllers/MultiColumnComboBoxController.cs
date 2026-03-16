@@ -9,12 +9,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
     {
         public IActionResult Index()
         {
-            ViewBag.Facilities = new List<Dictionary<string, object>>
+            ViewBag.Facilities = new List<FacilityItem>
             {
-                new() { ["value"] = "1", ["text"] = "Sunrise Manor", ["city"] = "Seattle", ["capacity"] = 120 },
-                new() { ["value"] = "2", ["text"] = "Lakeside Care", ["city"] = "Portland", ["capacity"] = 85 },
-                new() { ["value"] = "3", ["text"] = "Meadow Ridge", ["city"] = "Bellevue", ["capacity"] = 150 },
-                new() { ["value"] = "4", ["text"] = "Harbor View", ["city"] = "Tacoma", ["capacity"] = 95 }
+                new() { Value = "1", Text = "Sunrise Manor", City = "Seattle", Capacity = 120 },
+                new() { Value = "2", Text = "Lakeside Care", City = "Portland", Capacity = 85 },
+                new() { Value = "3", Text = "Meadow Ridge", City = "Bellevue", Capacity = 150 },
+                new() { Value = "4", Text = "Harbor View", City = "Tacoma", Capacity = 95 }
             };
             return View(new MultiColumnComboBoxModel());
         }

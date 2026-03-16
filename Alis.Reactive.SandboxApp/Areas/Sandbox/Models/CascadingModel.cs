@@ -1,9 +1,48 @@
+using Newtonsoft.Json;
+
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class CascadingModel
     {
         public string? Country { get; set; }
         public string? City { get; set; }
+    }
+
+    /// <summary>
+    /// Typed DataSource item for the country dropdown.
+    /// JsonProperty ensures Syncfusion (Newtonsoft) serializes PascalCase to camelCase.
+    /// Fields reference the camelCase names: text, value, continent.
+    /// </summary>
+    public class CountryItem
+    {
+        [JsonProperty("value")]
+        public string Value { get; set; } = "";
+
+        [JsonProperty("text")]
+        public string Text { get; set; } = "";
+
+        [JsonProperty("continent")]
+        public string Continent { get; set; } = "";
+    }
+
+    /// <summary>
+    /// Typed DataSource item for the city dropdown.
+    /// JsonProperty ensures Syncfusion (Newtonsoft) serializes PascalCase to camelCase.
+    /// Fields reference the camelCase names: text, value, state, population.
+    /// </summary>
+    public class CityItem
+    {
+        [JsonProperty("value")]
+        public string Value { get; set; } = "";
+
+        [JsonProperty("text")]
+        public string Text { get; set; } = "";
+
+        [JsonProperty("state")]
+        public string State { get; set; } = "";
+
+        [JsonProperty("population")]
+        public int Population { get; set; }
     }
 
     /// <summary>

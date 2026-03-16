@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -9,13 +10,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
     {
         public IActionResult Index()
         {
-            // Complex objects with camelCase properties for SF DataSource
-            ViewBag.Countries = new object[]
+            ViewBag.Countries = new List<CountryItem>
             {
-                new { value = "US", text = "United States", continent = "North America" },
-                new { value = "UK", text = "United Kingdom", continent = "Europe" },
-                new { value = "CA", text = "Canada", continent = "North America" },
-                new { value = "AU", text = "Australia", continent = "Oceania" }
+                new() { Value = "US", Text = "United States", Continent = "North America" },
+                new() { Value = "UK", Text = "United Kingdom", Continent = "Europe" },
+                new() { Value = "CA", Text = "Canada", Continent = "North America" },
+                new() { Value = "AU", Text = "Australia", Continent = "Oceania" }
             };
             return View(new CascadingModel());
         }
@@ -23,43 +23,42 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         [HttpGet]
         public IActionResult Cities([FromQuery] string? Country)
         {
-            // Return cities for the selected country — camelCase JSON (ASP.NET Core default)
             var cities = (Country ?? "").ToUpperInvariant() switch
             {
-                "US" => new object[]
+                "US" => new List<CityItem>
                 {
-                    new { value = "SEA", text = "Seattle", state = "WA", population = 750000 },
-                    new { value = "NYC", text = "New York", state = "NY", population = 8300000 },
-                    new { value = "CHI", text = "Chicago", state = "IL", population = 2700000 }
+                    new() { Value = "SEA", Text = "Seattle", State = "WA", Population = 750000 },
+                    new() { Value = "NYC", Text = "New York", State = "NY", Population = 8300000 },
+                    new() { Value = "CHI", Text = "Chicago", State = "IL", Population = 2700000 }
                 },
-                "UK" => new object[]
+                "UK" => new List<CityItem>
                 {
-                    new { value = "LON", text = "London", state = "England", population = 9000000 },
-                    new { value = "MAN", text = "Manchester", state = "England", population = 550000 }
+                    new() { Value = "LON", Text = "London", State = "England", Population = 9000000 },
+                    new() { Value = "MAN", Text = "Manchester", State = "England", Population = 550000 }
                 },
-                "CA" => new object[]
+                "CA" => new List<CityItem>
                 {
-                    new { value = "TOR", text = "Toronto", state = "Ontario", population = 2800000 },
-                    new { value = "VAN", text = "Vancouver", state = "BC", population = 675000 }
+                    new() { Value = "TOR", Text = "Toronto", State = "Ontario", Population = 2800000 },
+                    new() { Value = "VAN", Text = "Vancouver", State = "BC", Population = 675000 }
                 },
-                "AU" => new object[]
+                "AU" => new List<CityItem>
                 {
-                    new { value = "SYD", text = "Sydney", state = "NSW", population = 5300000 },
-                    new { value = "MEL", text = "Melbourne", state = "VIC", population = 5100000 }
+                    new() { Value = "SYD", Text = "Sydney", State = "NSW", Population = 5300000 },
+                    new() { Value = "MEL", Text = "Melbourne", State = "VIC", Population = 5100000 }
                 },
-                _ => Array.Empty<object>()
+                _ => new List<CityItem>()
             };
-            return Ok(new { cities, country = Country, count = cities.Length });
+            return Ok(new { cities, country = Country, count = cities.Count });
         }
 
         [HttpPost]
         public IActionResult Save([FromBody] CascadingModel model)
         {
-            return Ok(new
+            return Ok(new CascadingSaveResponse
             {
-                receivedCountry = model.Country ?? "(empty)",
-                receivedCity = model.City ?? "(empty)",
-                message = $"Saved: {model.City} in {model.Country}"
+                ReceivedCountry = model.Country ?? "(empty)",
+                ReceivedCity = model.City ?? "(empty)",
+                Message = $"Saved: {model.City} in {model.Country}"
             });
         }
     }
