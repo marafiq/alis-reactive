@@ -4,13 +4,13 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
 {
     [Area("Sandbox")]
-    public class ComboBoxController : Controller
+    public class AutoCompleteController : Controller
     {
         public IActionResult Index()
         {
             ViewBag.Physicians = new List<string> { "Dr. Smith", "Dr. Johnson", "Dr. Williams", "Dr. Brown" };
             ViewBag.MedicationTypes = new List<string> { "Analgesic", "Antibiotic", "Antiviral", "Steroid" };
-            return View(new ComboBoxModel
+            return View(new AutoCompleteModel
             {
                 Physician = null,
                 MedicationType = null

@@ -65,12 +65,12 @@ ReactiveExtensions files).
 | `FusionDateTimePicker` | `DateTimePickerBuilder` | `"value"` | `string` | New |
 | `FusionTimePicker` | `TimePickerBuilder` | `"value"` | `string` | New |
 | `FusionMultiSelectDropdown` | `MultiSelectBuilder` | `"value"` | `string` | New |
-| `FusionComboBox` | `ComboBoxBuilder` | `"value"` | `string` | New |
+| `FusionAutoComplete` | `AutoCompleteBuilder` | `"value"` | `string` | New |
 | `FusionInputMask` | `MaskedTextBoxBuilder` | `"value"` | `string` | New |
 | `FusionColorPicker` | `ColorPickerBuilder` | `"value"` | `string` | New |
 | `FusionRichTextEditor` | `RichTextEditorBuilder` | `"value"` | `string` | New |
 
-**Dropdown-type components** (DropDownList, ComboBox, MultiSelectDropdown) must onboard
+**Dropdown-type components** (DropDownList, AutoComplete, MultiSelectDropdown) must onboard
 `DataSource` and `DataBind` properly. Verify against actual Syncfusion EJ2 API docs —
 do not guess the API surface. Each dropdown sandbox page must demonstrate data-bound
 selection with real domain data (e.g., facilities list, care levels, medication categories).
@@ -104,7 +104,7 @@ One component per implementation cycle. Native first, then Fusion counterpart.
 7. FusionTimePicker
 8. FusionDateTimePicker
 9. FusionDateRangePicker
-10. FusionComboBox
+10. FusionAutoComplete
 11. FusionMultiSelectDropdown
 12. FusionInputMask
 13. FusionColorPicker
@@ -153,7 +153,7 @@ Same mandatory surface: property write, property read, event, typed conditions, 
 | `/Sandbox/FusionTimePicker` | TimePicker full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
 | `/Sandbox/FusionDateTimePicker` | DateTimePicker full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
 | `/Sandbox/FusionDateRangePicker` | DateRangePicker full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
-| `/Sandbox/FusionComboBox` | ComboBox full API | SetValue, Changed, When(args, x => x.Value).Eq(), When(comp.Value()).NotNull() |
+| `/Sandbox/FusionAutoComplete` | AutoComplete full API | SetValue, Changed, When(args, x => x.Value).Eq(), When(comp.Value()).NotNull() |
 | `/Sandbox/FusionMultiSelectDropdown` | MultiSelect full API | SetValue, Changed, When(args, x => x.Value).NotNull(), When(comp.Value()).IsEmpty() |
 | `/Sandbox/FusionInputMask` | InputMask full API | SetValue, Changed, When(args, x => x.Value).Matches(), When(comp.Value()).IsEmpty() |
 | `/Sandbox/FusionColorPicker` | ColorPicker full API | SetValue, Changed, When(args, x => x.Value).Eq(), When(comp.Value()).NotNull() |
@@ -299,7 +299,7 @@ Core Primitives           | Native Components        | Fusion Components
                           | - NativeDropDown         | - FusionTimePicker
                           | - NativeDatePicker       | - FusionDateTimePicker
                           | - NativeTimePicker       | - FusionDateRangePicker
-                          | - NativeNumericInput     | - FusionComboBox
+                          | - NativeNumericInput     | - FusionAutoComplete
                           | - NativeTextArea         | - FusionMultiSelectDropdown
                           | - NativeRadioButton      | - FusionInputMask
                           |                          | - FusionColorPicker

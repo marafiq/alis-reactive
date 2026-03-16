@@ -1,22 +1,22 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
-/// Exercises all FusionComboBox API end-to-end in the browser:
+/// Exercises all FusionAutoComplete API end-to-end in the browser:
 /// property writes, method calls, property reads, events, conditions, and gather.
 ///
-/// Page under test: /Sandbox/ComboBox
+/// Page under test: /Sandbox/AutoComplete
 ///
-/// Syncfusion AutoComplete (ComboBox) renders an input element inside the wrapper div.
+/// Syncfusion AutoComplete renders an input element inside the wrapper div.
 /// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
 /// Playwright interacts with the wrapper; the ej2 instance fires events.
 /// </summary>
 [TestFixture]
-public class WhenUsingFusionComboBox : PlaywrightTestBase
+public class WhenUsingFusionAutoComplete : PlaywrightTestBase
 {
-    private const string Path = "/Sandbox/ComboBox";
+    private const string Path = "/Sandbox/AutoComplete";
 
     // IdGenerator produces: {TypeScope}__{PropertyName}
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ComboBoxModel";
+    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_AutoCompleteModel";
     private const string PhysicianId = Scope + "__Physician";
 
     private async Task NavigateAndBoot()
@@ -31,7 +31,7 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
     public async Task page_loads_without_errors()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("ComboBox — Alis.Reactive Sandbox");
+        await Expect(Page).ToHaveTitleAsync("AutoComplete — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
     }
 
@@ -216,7 +216,7 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
         // DomReady sets Physician to "Dr. Smith" — gather must POST that value
         var request = await Page.RunAndWaitForRequestAsync(
             async () => await Page.Locator("#gather-btn").ClickAsync(),
-            "**/Sandbox/ComboBox/Echo");
+            "**/Sandbox/AutoComplete/Echo");
 
         var body = request.PostData ?? "";
         Assert.That(body, Does.Contain("Dr. Smith"),
@@ -247,7 +247,7 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
         // Gather must POST the CURRENT value "Dr. Johnson", not the initial "Dr. Smith"
         var request = await Page.RunAndWaitForRequestAsync(
             async () => await Page.Locator("#gather-btn").ClickAsync(),
-            "**/Sandbox/ComboBox/Echo");
+            "**/Sandbox/AutoComplete/Echo");
 
         var body = request.PostData ?? "";
         Assert.That(body, Does.Contain("Dr. Johnson"),
@@ -277,7 +277,7 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
         // Intercept the response to verify the server echoes back the gathered value
         var response = await Page.RunAndWaitForResponseAsync(
             async () => await Page.Locator("#gather-btn").ClickAsync(),
-            "**/Sandbox/ComboBox/Echo");
+            "**/Sandbox/AutoComplete/Echo");
 
         var responseBody = await response.TextAsync();
         Assert.That(responseBody, Does.Contain("Dr. Williams"),

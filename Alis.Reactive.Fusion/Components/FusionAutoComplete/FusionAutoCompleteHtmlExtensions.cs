@@ -8,14 +8,14 @@ using Syncfusion.EJ2.DropDowns;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating AutoCompleteBuilder (ComboBox) bound to a model property.
-    /// SF EJ2 ASP.NET Core exposes the ComboBox concept via AutoCompleteBuilder.
+    /// Factory extension for creating AutoCompleteBuilder bound to a model property.
+    /// SF EJ2 ASP.NET Core exposes the AutoComplete concept via AutoCompleteBuilder.
     /// </summary>
-    public static class FusionComboBoxHtmlExtensions
+    public static class FusionAutoCompleteHtmlExtensions
     {
-        private static readonly FusionComboBox Component = new FusionComboBox();
+        private static readonly FusionAutoComplete Component = new FusionAutoComplete();
 
-        public static AutoCompleteBuilder ComboBoxFor<TModel, TProp>(
+        public static AutoCompleteBuilder AutoCompleteFor<TModel, TProp>(
             this IHtmlHelper<TModel> html,
             IReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression)

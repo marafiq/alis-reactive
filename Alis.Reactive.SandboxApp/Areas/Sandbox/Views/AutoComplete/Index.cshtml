@@ -1,26 +1,26 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ComboBoxModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AutoCompleteModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Extensions
 @{
-    ViewData["Title"] = "ComboBox";
+    ViewData["Title"] = "AutoComplete";
 
-    var plan = Html.ReactivePlan<ComboBoxModel>();
+    var plan = Html.ReactivePlan<AutoCompleteModel>();
     var physicians = (List<string>)ViewBag.Physicians;
 
     // ── Section 1: Property Write (SetValue) from DomReady ──
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionComboBox>(m => m.Physician).SetValue("Dr. Smith");
+        p.Component<FusionAutoComplete>(m => m.Physician).SetValue("Dr. Smith");
     }));
 
     // ── Section 2: Property Read — display current value in echo text ──
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        var comp = p.Component<FusionComboBox>(m => m.Physician);
+        var comp = p.Component<FusionAutoComplete>(m => m.Physician);
         p.Element("value-echo").SetText(comp.Value());
     }));
 
@@ -28,8 +28,8 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
-        p.Post("/Sandbox/ComboBox/Echo", g =>
-            g.Include<FusionComboBox, ComboBoxModel>(m => m.Physician))
+        p.Post("/Sandbox/AutoComplete/Echo", g =>
+            g.Include<FusionAutoComplete, AutoCompleteModel>(m => m.Physician))
          .Response(r => r
             .OnSuccess(s =>
             {
@@ -40,9 +40,9 @@
 
 <div class="space-y-8">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">FusionComboBox — Full API</h1>
+        <h1 class="text-2xl font-bold tracking-tight">FusionAutoComplete — Full API</h1>
         <p class="mt-2 text-text-secondary">
-            Exercises all supported FusionComboBox API: property writes, method calls,
+            Exercises all supported FusionAutoComplete API: property writes, method calls,
             property reads, events, conditions, and gather.
         </p>
     </div>
@@ -54,8 +54,8 @@
             On DomReady, sets value="Dr. Smith" via structured prop on the Syncfusion ej2 instance.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.Field("Physician (SF ComboBox)", false, m => m.Physician, expr =>
-                Html.ComboBoxFor(plan, expr)
+            @{ Html.Field("Physician (SF AutoComplete)", false, m => m.Physician, expr =>
+                Html.AutoCompleteFor(plan, expr)
                     .DataSource(physicians)
                     .Placeholder("Select a physician")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -70,7 +70,7 @@
                     })
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
-                        var comp = p.Component<FusionComboBox>(m => m.Physician);
+                        var comp = p.Component<FusionAutoComplete>(m => m.Physician);
                         p.When(comp.Value()).NotNull()
                             .Then(then =>
                             {
@@ -108,13 +108,13 @@
                 .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionComboBox>(m => m.Physician).ShowPopup();
+                    p.Component<FusionAutoComplete>(m => m.Physician).ShowPopup();
                 }))
             @(Html.NativeButton("hide-popup-btn", "Hide Popup")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionComboBox>(m => m.Physician).HidePopup();
+                    p.Component<FusionAutoComplete>(m => m.Physician).HidePopup();
                 }))
         </div>
     </section>
@@ -147,7 +147,7 @@
         <h2 class="text-base font-semibold mb-4">6. Gather (Include in POST)</h2>
         <p class="text-sm text-text-secondary mb-4">
             Click to POST the Physician value gathered from the Syncfusion component via
-            <code>Include&lt;FusionComboBox&gt;</code>.
+            <code>Include&lt;FusionAutoComplete&gt;</code>.
         </p>
         @(Html.NativeButton("gather-btn", "Gather Physician")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")

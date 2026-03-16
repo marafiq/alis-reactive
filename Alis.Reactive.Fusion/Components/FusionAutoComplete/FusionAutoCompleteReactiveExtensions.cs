@@ -8,28 +8,28 @@ using Syncfusion.EJ2.DropDowns;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto the Syncfusion AutoCompleteBuilder (ComboBox).
+    /// Wires reactive event pipelines onto the Syncfusion AutoCompleteBuilder.
     ///
     /// Usage (in .cshtml):
-    ///   Html.ComboBoxFor(plan, expr)
+    ///   Html.AutoCompleteFor(plan, expr)
     ///       .Reactive(plan, evt => evt.Changed, (args, p) =>
     ///       {
-    ///           p.Component&lt;FusionComboBox&gt;(m => m.Physician).SetValue("Dr. Smith");
+    ///           p.Component&lt;FusionAutoComplete&gt;(m => m.Physician).SetValue("Dr. Smith");
     ///       })
     ///       .Render()
     /// </summary>
-    public static class FusionComboBoxReactiveExtensions
+    public static class FusionAutoCompleteReactiveExtensions
     {
-        private static readonly FusionComboBox Component = new FusionComboBox();
+        private static readonly FusionAutoComplete Component = new FusionAutoComplete();
 
         public static AutoCompleteBuilder Reactive<TModel, TArgs>(
             this AutoCompleteBuilder builder,
             IReactivePlan<TModel> plan,
-            Func<FusionComboBoxEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionAutoCompleteEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(FusionComboBoxEvents.Instance);
+            var descriptor = eventSelector(FusionAutoCompleteEvents.Instance);
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
