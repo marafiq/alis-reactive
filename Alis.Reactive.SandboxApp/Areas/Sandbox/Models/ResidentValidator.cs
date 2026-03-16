@@ -117,7 +117,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.ConfirmEmail).NotEmpty().WithMessage("'Confirm Email' is required.")
                 .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.");
 
-            RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
+            // Address rules conditional on user selecting "Custom Address".
+            // When Facility Address or nothing selected → rules skipped.
+            // When Custom Address selected but partial not loaded → unenriched → summary.
+            // When Custom Address selected and partial loaded → enriched → inline.
+            WhenField(x => x.AddressType, "Custom Address", () =>
+            {
+                RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
+            });
         }
     }
 

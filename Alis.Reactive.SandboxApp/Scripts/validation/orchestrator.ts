@@ -33,7 +33,13 @@ export function validate(desc: ValidationDescriptor): boolean {
   }
 
   const container = document.getElementById(desc.formId);
-  if (!container) return true;
+  if (!container) {
+    if (desc.fields.length > 0) {
+      log.warn("validate: form container missing, blocking", { formId: desc.formId });
+      return false;
+    }
+    return true;
+  }
 
   const byName = buildByName(desc);
   const condReader = domConditionReader(byName);
@@ -42,12 +48,31 @@ export function validate(desc: ValidationDescriptor): boolean {
   let summaryHasErrors = false;
 
   for (const f of desc.fields) {
-    // Unenriched: component not loaded yet (AJAX partial pending).
-    // Skip — the enrichment lifecycle will activate this field when the partial merges.
-    if (!f.fieldId || !f.vendor || !f.readExpr) continue;
+    // Unenriched: field declared in validator but no component registered.
+    // Check if ALL rules have conditions that evaluate to false — if so, skip
+    // (the field isn't needed yet because its conditions aren't met).
+    // Otherwise: block the form, show first rule message in summary.
+    if (!f.fieldId || !f.vendor || !f.readExpr) {
+      if (allRulesConditionallySkipped(f, condReader)) continue;
+      if (f.rules.length > 0 && summaryEl) {
+        addToSummary(summaryEl, f.fieldName, f.rules[0].message);
+        summaryHasErrors = true;
+      }
+      valid = false;
+      continue;
+    }
 
     const el = document.getElementById(f.fieldId);
-    if (!el) continue; // Element not in DOM — partial may have been removed
+
+    // Enriched but element missing from DOM — component was removed or partial unloaded.
+    if (!el) {
+      if (f.rules.length > 0 && summaryEl) {
+        addToSummary(summaryEl, f.fieldName, f.rules[0].message);
+        summaryHasErrors = true;
+      }
+      valid = false;
+      continue;
+    }
 
     if (!container.contains(el)) {
       log.trace("field outside form, skipping", { fieldName: f.fieldName, formId: desc.formId });
@@ -137,6 +162,22 @@ export function clearAll(desc: ValidationDescriptor): void {
 }
 
 // ── DOM readers (bridge pure modules ↔ DOM) ─────────────
+
+/**
+ * Returns true if every rule on this field has a condition AND that condition evaluates to false.
+ * Used for unenriched fields: if all rules are conditionally suppressed (e.g., AddressType != "Custom Address"),
+ * the field doesn't need a component yet and shouldn't block.
+ * If ANY rule is unconditional or has a true/null condition, returns false (must block).
+ */
+function allRulesConditionallySkipped(f: ValidationField, condReader: ConditionReader): boolean {
+  if (f.rules.length === 0) return true;
+  for (const rule of f.rules) {
+    if (!rule.when) return false; // unconditional rule → must block
+    const result = evalCondition(rule.when, condReader);
+    if (result !== false) return false; // condition met or unresolvable → must block
+  }
+  return true; // all conditions false → skip
+}
 
 function domConditionReader(byName: Map<string, ValidationField>): ConditionReader {
   return {

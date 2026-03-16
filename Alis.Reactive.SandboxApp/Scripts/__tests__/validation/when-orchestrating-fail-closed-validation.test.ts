@@ -84,10 +84,14 @@ function errorSpan(name: string): HTMLSpanElement | null {
 // ══════════════════════════════════════════════════════════
 
 describe("When form container does not exist", () => {
-  it("returns true (cannot validate without DOM container)", () => {
+  it("blocks when fields are declared (fail-closed)", () => {
     expect(validate(desc("nonexistent", [
       enrichedField("X", [{ rule: "required", message: "X required" }]),
-    ]))).toBe(true);
+    ]))).toBe(false);
+  });
+
+  it("passes when no fields declared", () => {
+    expect(validate(desc("nonexistent", []))).toBe(true);
   });
 });
 
@@ -96,19 +100,29 @@ describe("When form container does not exist", () => {
 // ══════════════════════════════════════════════════════════
 
 describe("When a field is unenriched (no fieldId/vendor/readExpr)", () => {
-  it("skips the field (partial not loaded yet)", () => {
+  it("blocks the request", () => {
     const result = validate(desc("form", [
       unenrichedField("Address.Street", [{ rule: "required", message: "Street required" }]),
     ]));
-    expect(result).toBe(true); // skipped, not blocked
+    expect(result).toBe(false);
   });
 
-  it("does not add anything to summary", () => {
+  it("adds first rule message to summary", () => {
     validate(desc("form", [
-      unenrichedField("Address.Street", [{ rule: "required", message: "Street required" }]),
+      unenrichedField("Address.Street", [
+        { rule: "required", message: "Street required" },
+        { rule: "minLength", message: "Too short", constraint: 5 },
+      ]),
     ]));
-    expect(summaryText()).toBe("");
-    expect(summaryDiv().hasAttribute("hidden")).toBe(true);
+    expect(summaryText()).toContain("Street required");
+    expect(summaryText()).not.toContain("Too short"); // first-rule-wins
+  });
+
+  it("shows the summary div", () => {
+    validate(desc("form", [
+      unenrichedField("X", [{ rule: "required", message: "X" }]),
+    ]));
+    expect(summaryDiv().hasAttribute("hidden")).toBe(false);
   });
 
   it("does not prevent enriched fields from validating inline", () => {
@@ -116,6 +130,7 @@ describe("When a field is unenriched (no fieldId/vendor/readExpr)", () => {
       unenrichedField("Unenriched", [{ rule: "required", message: "summary msg" }]),
       enrichedField("Name", [{ rule: "required", message: "Name required" }]),
     ]));
+    expect(summaryText()).toContain("summary msg");
     expect(errorSpan("Name")!.textContent).toBe("Name required");
   });
 });

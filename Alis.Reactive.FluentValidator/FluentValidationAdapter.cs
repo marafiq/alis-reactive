@@ -70,7 +70,8 @@ namespace Alis.Reactive.FluentValidator
             string prefix,
             Dictionary<string, List<ExtractedRule>> fieldRules,
             Func<Type, IValidator?> factory,
-            IReadOnlyDictionary<IValidationRule, ValidationCondition>? clientConditions = null)
+            IReadOnlyDictionary<IValidationRule, ValidationCondition>? clientConditions = null,
+            ValidationCondition? parentCondition = null)
         {
             if (!(validator is IEnumerable<IValidationRule> rules)) return;
 
@@ -127,16 +128,16 @@ namespace Alis.Reactive.FluentValidator
                     // Skip conditional components
                     if (component.HasCondition || component.HasAsyncCondition) continue;
 
-                    // Handle nested validators recursively
+                    // Handle nested validators recursively — propagate parent condition
                     if (component.Validator is IChildValidatorAdaptor adaptor)
                     {
                         var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
                         var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
-                        ExtractFromValidator(nested, fullPath, fieldRules, factory, nestedConditions);
+                        ExtractFromValidator(nested, fullPath, fieldRules, factory, nestedConditions, ruleCondition);
                         continue;
                     }
 
-                    var extracted = MapComponent(component, propertyName, ruleCondition);
+                    var extracted = MapComponent(component, propertyName, ruleCondition ?? parentCondition);
                     if (extracted.Count > 0)
                     {
                         if (!fieldRules.TryGetValue(fullPath, out var list))
