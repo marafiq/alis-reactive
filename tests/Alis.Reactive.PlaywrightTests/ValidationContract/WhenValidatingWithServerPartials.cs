@@ -9,6 +9,8 @@ public class WhenValidatingWithServerPartials : PlaywrightTestBase
     private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
+    private ILocator SummaryDiv => Page.Locator("[data-alis-validation-summary]");
+    private ILocator Result => Page.Locator("#result");
 
     private ILocator ErrorFor(string fieldName) =>
         Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
@@ -41,6 +43,7 @@ public class WhenValidatingWithServerPartials : PlaywrightTestBase
         await Expect(ErrorFor("Name")).ToContainTextAsync("required");
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
@@ -58,6 +61,7 @@ public class WhenValidatingWithServerPartials : PlaywrightTestBase
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
         await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
@@ -79,6 +83,7 @@ public class WhenValidatingWithServerPartials : PlaywrightTestBase
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.City")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.ZipCode")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
@@ -97,6 +102,7 @@ public class WhenValidatingWithServerPartials : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -112,6 +118,7 @@ public class WhenValidatingWithServerPartials : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("5 digits");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -130,6 +137,7 @@ public class WhenValidatingWithServerPartials : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -199,13 +207,14 @@ public class WhenValidatingWithServerPartials : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // Fill everything
         await FillAllRequired();
         await SubmitBtn.ClickAsync();
 
-        var result = Page.Locator("#result");
-        await Expect(result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 }

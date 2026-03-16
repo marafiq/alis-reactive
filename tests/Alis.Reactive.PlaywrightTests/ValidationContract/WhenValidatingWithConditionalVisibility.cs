@@ -9,6 +9,8 @@ public class WhenValidatingWithConditionalVisibility : PlaywrightTestBase
     private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
+    private ILocator SummaryDiv => Page.Locator("[data-alis-validation-summary]");
+    private ILocator Result => Page.Locator("#result");
 
     private ILocator ErrorFor(string fieldName) =>
         Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
@@ -61,6 +63,7 @@ public class WhenValidatingWithConditionalVisibility : PlaywrightTestBase
         // VeteranId rule fires → required error inline
         await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
         await Expect(ErrorFor("VeteranId")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -80,6 +83,7 @@ public class WhenValidatingWithConditionalVisibility : PlaywrightTestBase
         await Input("IsVeteran").CheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // 3. Fill → no error
         await Input("VeteranId").FillAsync("V12345");
@@ -128,6 +132,7 @@ public class WhenValidatingWithConditionalVisibility : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
@@ -147,6 +152,7 @@ public class WhenValidatingWithConditionalVisibility : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("MemoryAssessmentScore")).ToContainTextAsync("required");
         await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
@@ -169,6 +175,7 @@ public class WhenValidatingWithConditionalVisibility : PlaywrightTestBase
         await Expect(ErrorFor("ReasonForNoContact")).ToContainTextAsync("required");
         // EmergencyName not required (truthy condition not met)
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
@@ -192,6 +199,7 @@ public class WhenValidatingWithConditionalVisibility : PlaywrightTestBase
         await Expect(ErrorFor("EmergencyPhone")).ToContainTextAsync("required");
         // Reason NOT required (falsy condition not met)
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
@@ -208,18 +216,21 @@ public class WhenValidatingWithConditionalVisibility : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // 2. Check → Name required, Reason not required
         await Input("HasEmergencyContact").CheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("EmergencyName")).ToBeVisibleAsync();
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // 3. Uncheck → flips back
         await Input("HasEmergencyContact").UncheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }

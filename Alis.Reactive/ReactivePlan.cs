@@ -25,9 +25,10 @@ namespace Alis.Reactive
         private readonly List<Entry> _entries = new List<Entry>();
         private readonly Dictionary<string, ComponentRegistration> _componentsMap = new Dictionary<string, ComponentRegistration>();
 
-        public ReactivePlan() { }
+        public ReactivePlan(bool isPartial = false) { IsPartial = isPartial; }
 
         public string PlanId { get; } = typeof(TModel).FullName!;
+        public bool IsPartial { get; }
 
         public IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
 

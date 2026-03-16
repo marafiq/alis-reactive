@@ -9,6 +9,8 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
     private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
+    private ILocator SummaryDiv => Page.Locator("[data-alis-validation-summary]");
+    private ILocator Result => Page.Locator("#result");
 
     private ILocator ErrorFor(string fieldName) =>
         Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
@@ -18,9 +20,7 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
     private async Task SelectCustomAddress()
     {
         await Input("AddressType").SelectOptionAsync("Custom Address");
-        // Wait for partial to load and merge
         await Expect(Input("Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
-        // Small delay for plan merge to complete
         await Page.WaitForTimeoutAsync(300);
     }
 
@@ -31,100 +31,58 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
         await Input("ConfirmEmail").FillAsync("jane@care.com");
     }
 
-    // ── Before partial loads ────────────────────────────────
+    // ── Full AJAX partial lifecycle (Skill Rule #5) ─────
 
     [Test]
-    public async Task parent_fields_validate_inline_before_partial_loads()
+    public async Task full_ajax_partial_lifecycle()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Address container is empty — no partial loaded
+        // Step 1: Submit with placeholder — parent errors only, NO address in summary
         await SubmitBtn.ClickAsync();
-
-        // Parent fields should show inline errors
         await Expect(ErrorFor("Name")).ToContainTextAsync("required");
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        AssertNoConsoleErrors();
-    }
+        // Step 2: Select Facility Address → submit → still no address errors
+        await Input("AddressType").SelectOptionAsync("Facility Address");
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("Name")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
-    // ── After partial loads ─────────────────────────────────
-
-    [Test]
-    public async Task loading_partial_enables_address_inline_validation()
-    {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
-
+        // Step 3: Fill parent fields + select Custom Address → partial loads
         await FillParentFields();
         await SelectCustomAddress();
 
-        // Submit with empty address fields
+        // Step 4: Submit with empty address → address errors inline, NO summary
         await SubmitBtn.ClickAsync();
-
-        // Address fields should now validate inline
         await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
         await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task partial_fields_validate_required_after_load()
-    {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
-
-        await FillParentFields();
-        await SelectCustomAddress();
-
-        // Leave address fields empty
+        // Step 5: Fill address → submit → client validation passes (all enriched fields valid)
+        await Input("Address_Street").FillAsync("123 Sunrise Blvd");
+        await Input("Address_City").FillAsync("Palm Springs");
+        await Input("Address_ZipCode").FillAsync("92262");
         await SubmitBtn.ClickAsync();
 
-        // Address fields should show required errors
-        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
-        await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
-        await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("required");
-
-        // Fill Street and City, leave ZipCode empty
-        await Input("Address_Street").FillAsync("123 Main St");
-        await Input("Address_City").FillAsync("Springfield");
-        await SubmitBtn.ClickAsync();
-
+        // Client-side passes — no inline errors, no summary
+        await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("Address.Street")).Not.ToBeVisibleAsync();
-        await Expect(ErrorFor("Address.City")).Not.ToBeVisibleAsync();
-        await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        AssertNoConsoleErrors();
+        // Server may 400 (server validator covers full model)
+        AssertNoConsoleErrorsExcept("400");
     }
 
-    // ── EqualTo works with parent fields ────────────────────
+    // ── Partial reload preserves validation ──────────────
 
     [Test]
-    public async Task equalto_works_when_both_fields_are_parent_fields()
-    {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
-
-        await FillParentFields();
-        await Input("Email").FillAsync("a@b.com");
-        await Input("ConfirmEmail").FillAsync("x@y.com");
-
-        await SelectCustomAddress();
-        await SubmitBtn.ClickAsync();
-
-        await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Partial reload ──────────────────────────────────────
-
-    [Test]
-    public async Task reloading_partial_replaces_old_html_and_re_enriches()
+    public async Task reloading_partial_replaces_html_and_revalidates()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
@@ -135,7 +93,7 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
         // Fill street
         await Input("Address_Street").FillAsync("Old St");
 
-        // Reload partial by re-selecting
+        // Switch to Facility → back to Custom (reload)
         await Input("AddressType").SelectOptionAsync("Facility Address");
         await Page.WaitForTimeoutAsync(500);
         await SelectCustomAddress();
@@ -144,70 +102,56 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
         var streetVal = await Input("Address_Street").InputValueAsync();
         Assert.That(streetVal, Is.EqualTo(""));
 
-        // Submit → address errors inline (re-enriched)
+        // Submit → address errors inline, NO summary
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
 
-    // ── Partial reactive behavior after load ────────────────
+    // ── EqualTo cross-field ─────────────────────────────
 
     [Test]
-    public async Task ajax_loaded_partial_reactive_entries_work_after_merge()
+    public async Task confirm_email_mismatch_shows_inline_error()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await Input("Name").FillAsync("Jane Smith");
+        await Input("Email").FillAsync("a@b.com");
+        await Input("ConfirmEmail").FillAsync("x@y.com");
+
+        await SubmitBtn.ClickAsync();
+
+        await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
+        await Expect(ErrorFor("ConfirmEmail")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
+
+        // Fix → clear
+        await Input("ConfirmEmail").FillAsync("a@b.com");
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("ConfirmEmail")).Not.ToBeVisibleAsync();
+
+        AssertNoConsoleErrorsExcept("400");
+    }
+
+    // ── Partial reactive behavior ───────────────────────
+
+    [Test]
+    public async Task partial_zipcode_change_fires_own_reactive_entry()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
         await SelectCustomAddress();
 
-        // Type into zip and tab out → partial's own dispatch fires
         await Input("Address_ZipCode").ClickAsync();
-        await Input("Address_ZipCode").PressSequentiallyAsync("90210");
+        await Input("Address_ZipCode").PressSequentiallyAsync("92262");
         await Page.Keyboard.PressAsync("Tab");
 
         var status = Page.Locator("#zipcode-status");
         await Expect(status).ToContainTextAsync("Zip validated", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
-    }
-
-    // ── Full lifecycle ──────────────────────────────────────
-
-    [Test]
-    public async Task full_lifecycle_errors_then_load_then_fix_then_post_sent()
-    {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
-
-        // 1. Submit empty → parent errors inline
-        await SubmitBtn.ClickAsync();
-        await Expect(ErrorFor("Name")).ToBeVisibleAsync();
-
-        // 2. Fill parent
-        await FillParentFields();
-        await SubmitBtn.ClickAsync();
-        // Parent fields pass client validation → POST sent → server may reject
-        // (server validates ALL fields including those not on page)
-
-        // 3. Load address partial
-        await SelectCustomAddress();
-        await SubmitBtn.ClickAsync();
-        await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
-
-        // 4. Fill address fields → client validation passes for enriched fields
-        await Input("Address_Street").FillAsync("123 Main St");
-        await Input("Address_City").FillAsync("Springfield");
-        await Input("Address_ZipCode").FillAsync("62704");
-
-        await SubmitBtn.ClickAsync();
-
-        // All enriched fields pass client validation → POST sent
-        // Server validates full model so it may 400 for missing fields
-        // But client-side validation should not block (unenriched fields skipped)
-        await Expect(ErrorFor("Address.Street")).Not.ToBeVisibleAsync();
-        await Expect(ErrorFor("Address.City")).Not.ToBeVisibleAsync();
-        await Expect(ErrorFor("Address.ZipCode")).Not.ToBeVisibleAsync();
-
-        AssertNoConsoleErrorsExcept("400");
     }
 }

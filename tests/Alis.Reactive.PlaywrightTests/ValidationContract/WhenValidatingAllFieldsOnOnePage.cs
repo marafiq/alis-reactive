@@ -9,6 +9,8 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
     private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
+    private ILocator SummaryDiv => Page.Locator("[data-alis-validation-summary]");
+    private ILocator Result => Page.Locator("#result");
 
     private ILocator ErrorFor(string fieldName) =>
         Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
@@ -44,9 +46,9 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
 
         await Expect(Input("Name")).ToHaveClassAsync(new Regex("alis-has-error"));
         await Expect(Input("Email")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        var result = Page.Locator("#result");
-        await Expect(result).ToHaveTextAsync("");
+        await Expect(Result).ToHaveTextAsync("");
 
         AssertNoConsoleErrors();
     }
@@ -64,6 +66,7 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("Name")).ToContainTextAsync("minimum length");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -80,6 +83,7 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
 
         await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("5 digits");
         await Expect(Input("Address_ZipCode")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -99,6 +103,7 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
 
         await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
         await Expect(Input("ConfirmEmail")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -146,6 +151,7 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
 
         await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
         await Expect(ErrorFor("VeteranId")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -197,6 +203,7 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
 
         await Expect(ErrorFor("MemoryAssessmentScore")).ToContainTextAsync("required");
         await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -230,6 +237,7 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
 
         await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
         await Expect(ErrorFor("PhysicianName")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -245,6 +253,7 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -263,6 +272,7 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
 
         await Expect(ErrorFor("ReasonForNoContact")).ToContainTextAsync("required");
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
@@ -301,6 +311,7 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
         await Input("IsVeteran").CheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // Uncheck → no error again
         await Input("IsVeteran").UncheckAsync();
@@ -322,18 +333,21 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // Check → EmergencyName required, ReasonForNoContact not required
         await Input("HasEmergencyContact").CheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("EmergencyName")).ToBeVisibleAsync();
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // Uncheck → flips back
         await Input("HasEmergencyContact").UncheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
@@ -350,12 +364,14 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // Fix Name only → Name error gone, others remain
         await Input("Name").FillAsync("Jane Smith");
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // Fill remaining → all pass
         await FillAllRequired();
@@ -363,8 +379,8 @@ public class WhenValidatingAllFieldsOnOnePage : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         // All validation should pass — POST should be sent
-        var result = Page.Locator("#result");
-        await Expect(result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
