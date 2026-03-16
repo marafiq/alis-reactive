@@ -1,0 +1,123 @@
+@model CascadingModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@using Syncfusion.EJ2.DropDowns
+@{
+    ViewData["Title"] = "Cascading DropDownList";
+
+    var plan = Html.ReactivePlan<CascadingModel>();
+    var countries = ViewBag.Countries as object[];
+
+    // ── Gather both for final submit ──
+
+    Html.On(plan, t => t.CustomEvent("do-save", p =>
+    {
+        p.Post("/Sandbox/Cascading/Save", g =>
+        {
+            g.Include<FusionDropDownList, CascadingModel>(m => m.Country);
+            g.Include<FusionDropDownList, CascadingModel>(m => m.City);
+        })
+        .Response(r => r
+            .OnSuccess<CascadingSaveResponse>((json, s) =>
+            {
+                s.Element("save-result").SetText(json, j => j.Message);
+                s.Element("save-result").AddClass("text-green-600");
+                s.Element("save-result").RemoveClass("text-text-muted");
+            }));
+    }));
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Cascading DropDownList</h1>
+        <p class="mt-2 text-text-secondary">
+            Demonstrates cascading dropdowns: Country selection triggers HTTP GET to load cities.
+            Uses SetDataSource + DataBind to update the child dropdown with response data.
+            Senior living domain: facility location selection.
+        </p>
+    </div>
+
+    <!-- Section 1: Parent Dropdown (Country) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Country (Parent — Server-Side DataSource)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Complex objects with value, text, continent properties.
+            On change, sends ONLY the country value to fetch cities.
+        </p>
+        @{ Html.Field("Country", true, m => m.Country, expr =>
+            Html.DropDownListFor(plan, expr)
+                .DataSource(countries)
+                .Fields(new DropDownListFieldSettings { Text = "text", Value = "value" })
+                .Placeholder("Select a country")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    // Selective payload — only send country value
+                    p.Get("/Sandbox/Cascading/Cities")
+                     .Gather(g => g.Include<FusionDropDownList, CascadingModel>(m => m.Country))
+                     .Response(r => r
+                        .OnSuccess<CityLookupResponse>((json, s) =>
+                        {
+                            // Set child dropdown DataSource from response
+                            s.Component<FusionDropDownList>(m => m.City)
+                                .SetDataSource(json, j => j.Cities)
+                                .DataBind();
+                            s.Element("cascade-status").SetText("cities loaded");
+                            s.Element("cascade-status").AddClass("text-green-600");
+                            s.Element("cascade-status").RemoveClass("text-text-muted");
+                            s.Element("city-count").SetText(json, j => j.Count);
+                            s.Element("city-count").RemoveClass("text-text-muted");
+                        }));
+                })
+                .Render()); }
+    </section>
+
+    <!-- Section 2: Child Dropdown (City) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. City (Child — HTTP DataSource via Cascade)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Starts empty. Populated by SetDataSource + DataBind after country change.
+        </p>
+        @{ Html.Field("City", false, m => m.City, expr =>
+            Html.DropDownListFor(plan, expr)
+                .Fields(new DropDownListFieldSettings { Text = "text", Value = "value" })
+                .Placeholder("Select a city (choose country first)")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.Element("selected-city").SetText(args, x => x.Value);
+                    p.Element("selected-city").RemoveClass("text-text-muted");
+                })
+                .Render()); }
+        <div class="font-mono text-sm mt-2 space-y-1">
+            <p>Cascade status: <span id="cascade-status" class="text-text-muted">&mdash;</span></p>
+            <p>City count: <span id="city-count" class="text-text-muted">&mdash;</span></p>
+            <p>Selected city: <span id="selected-city" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 3: Submit Both -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Submit (Gather Both)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Gathers both Country and City values and POSTs to server.
+        </p>
+        @(Html.NativeButton("save-btn", "Save Location")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-save");
+            }))
+        <div class="font-mono text-sm mt-2">
+            <p>Result: <span id="save-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)
