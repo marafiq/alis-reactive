@@ -38,6 +38,20 @@ namespace Alis.Reactive
 
         public void AddToComponentsMap(string bindingPath, ComponentRegistration entry)
         {
+            if (_componentsMap.TryGetValue(bindingPath, out var existing))
+            {
+                if (existing.ComponentId == entry.ComponentId
+                    && existing.Vendor == entry.Vendor
+                    && existing.ReadExpr == entry.ReadExpr)
+                    return;
+
+                throw new InvalidOperationException(
+                    $"Duplicate component registration for binding path '{bindingPath}': " +
+                    $"existing [{existing.ComponentId}, {existing.Vendor}] vs " +
+                    $"new [{entry.ComponentId}, {entry.Vendor}]. " +
+                    "Each binding path must map to exactly one component.");
+            }
+
             _componentsMap[bindingPath] = entry;
         }
 
@@ -83,13 +97,17 @@ namespace Alis.Reactive
             var extractor = ReactivePlanConfig.Extractor;
             if (extractor != null)
             {
-                ValidationResolver.Resolve(_entries, extractor);
+                ValidationResolver.Resolve(_entries, extractor, _componentsMap);
             }
             else if (ValidationResolver.HasValidatorTypes(_entries))
             {
                 throw new InvalidOperationException(
                     "One or more requests use Validate<TValidator>() but no validation extractor is registered. " +
                     "Call ReactivePlanConfig.UseValidationExtractor(...) at app startup.");
+            }
+            else if (_componentsMap.Count > 0)
+            {
+                ValidationResolver.EnrichFromComponents(_entries, _componentsMap);
             }
         }
     }

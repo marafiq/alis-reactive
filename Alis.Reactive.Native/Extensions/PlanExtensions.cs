@@ -39,8 +39,10 @@ namespace Alis.Reactive.Native.Extensions
             IReactivePlan<TModel> plan) where TModel : class
         {
             var json = plan.Render();
+            var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
             return new HtmlString(
-                $"<script type=\"application/json\" data-alis-plan data-trace=\"trace\">{json}</script>");
+                $"<script type=\"application/json\" data-alis-plan data-trace=\"trace\">{json}</script>" +
+                $"<div data-alis-validation-summary=\"{planId}\" hidden></div>");
         }
     }
 }

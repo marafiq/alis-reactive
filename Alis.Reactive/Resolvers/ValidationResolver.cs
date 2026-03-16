@@ -8,7 +8,7 @@ namespace Alis.Reactive.Resolvers
 {
     /// <summary>
     /// Walks the reaction tree and resolves validation rules from an IValidationExtractor.
-    /// Uses req.ValidatorType directly — no build contexts, no components map.
+    /// After extraction, enriches validation fields from the ComponentsMap.
     /// </summary>
     internal static class ValidationResolver
     {
@@ -48,31 +48,40 @@ namespace Alis.Reactive.Resolvers
             return req.Chained != null && RequestHasValidatorType(req.Chained);
         }
 
-        internal static void Resolve(List<Entry> entries, IValidationExtractor extractor)
+        internal static void Resolve(
+            List<Entry> entries,
+            IValidationExtractor extractor,
+            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap = null)
         {
             foreach (var entry in entries)
-                ResolveReaction(entry.Reaction, extractor);
+                ResolveReaction(entry.Reaction, extractor, componentsMap);
         }
 
-        private static void ResolveReaction(Reaction reaction, IValidationExtractor extractor)
+        private static void ResolveReaction(
+            Reaction reaction,
+            IValidationExtractor extractor,
+            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap)
         {
             switch (reaction)
             {
                 case HttpReaction hr:
-                    ResolveRequest(hr.Request, extractor);
+                    ResolveRequest(hr.Request, extractor, componentsMap);
                     break;
                 case ParallelHttpReaction phr:
                     foreach (var req in phr.Requests)
-                        ResolveRequest(req, extractor);
+                        ResolveRequest(req, extractor, componentsMap);
                     break;
                 case ConditionalReaction cr:
                     foreach (var branch in cr.Branches)
-                        ResolveReaction(branch.Reaction, extractor);
+                        ResolveReaction(branch.Reaction, extractor, componentsMap);
                     break;
             }
         }
 
-        private static void ResolveRequest(RequestDescriptor req, IValidationExtractor extractor)
+        private static void ResolveRequest(
+            RequestDescriptor req,
+            IValidationExtractor extractor,
+            IReadOnlyDictionary<string, ComponentRegistration>? componentsMap)
         {
             if (req.ValidatorType != null && req.Validation != null)
             {
@@ -82,8 +91,64 @@ namespace Alis.Reactive.Resolvers
                     req.EnrichValidation(extracted);
             }
 
+            if (req.Validation != null && componentsMap != null)
+                EnrichFieldsFromComponents(req.Validation, componentsMap);
+
             if (req.Chained != null)
-                ResolveRequest(req.Chained, extractor);
+                ResolveRequest(req.Chained, extractor, componentsMap);
+        }
+
+        internal static void EnrichFromComponents(
+            List<Entry> entries,
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
+        {
+            foreach (var entry in entries)
+                EnrichReaction(entry.Reaction, componentsMap);
+        }
+
+        private static void EnrichReaction(
+            Reaction reaction,
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
+        {
+            switch (reaction)
+            {
+                case HttpReaction hr:
+                    EnrichRequest(hr.Request, componentsMap);
+                    break;
+                case ParallelHttpReaction phr:
+                    foreach (var req in phr.Requests)
+                        EnrichRequest(req, componentsMap);
+                    break;
+                case ConditionalReaction cr:
+                    foreach (var branch in cr.Branches)
+                        EnrichReaction(branch.Reaction, componentsMap);
+                    break;
+            }
+        }
+
+        private static void EnrichRequest(
+            RequestDescriptor req,
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
+        {
+            if (req.Validation != null)
+                EnrichFieldsFromComponents(req.Validation, componentsMap);
+            if (req.Chained != null)
+                EnrichRequest(req.Chained, componentsMap);
+        }
+
+        private static void EnrichFieldsFromComponents(
+            ValidationDescriptor desc,
+            IReadOnlyDictionary<string, ComponentRegistration> componentsMap)
+        {
+            foreach (var field in desc.Fields)
+            {
+                if (componentsMap.TryGetValue(field.FieldName, out var registration))
+                {
+                    field.FieldId = registration.ComponentId;
+                    field.Vendor = registration.Vendor;
+                    field.ReadExpr = registration.ReadExpr;
+                }
+            }
         }
     }
 }

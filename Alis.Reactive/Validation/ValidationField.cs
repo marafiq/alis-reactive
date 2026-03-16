@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// Describes a single field's validation rules within a form.
-    /// Runtime enriches fieldId/vendor/readExpr from plan.components at boot time.
+    /// Enriched at C# render time from ComponentsMap, then at TS boot from plan.components.
     /// </summary>
     public sealed class ValidationField
     {
@@ -12,6 +13,18 @@ namespace Alis.Reactive.Validation
         public string FieldName { get; }
 
         public List<ValidationRule> Rules { get; }
+
+        /// <summary>Element ID from component registration. Null when unenriched.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? FieldId { get; internal set; }
+
+        /// <summary>Vendor string ("native" or "fusion"). Null when unenriched.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Vendor { get; internal set; }
+
+        /// <summary>Property path to read value (e.g. "value", "checked"). Null when unenriched.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ReadExpr { get; internal set; }
 
         public ValidationField(string fieldName, List<ValidationRule> rules)
         {
