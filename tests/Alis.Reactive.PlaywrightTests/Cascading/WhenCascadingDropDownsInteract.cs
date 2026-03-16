@@ -218,4 +218,76 @@ public class WhenCascadingDropDownsInteract : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Full cascading workflow: country → city → save ──
+
+    [Test]
+    public async Task full_cascading_workflow_country_to_city_to_save()
+    {
+        await NavigateAndBoot();
+
+        // Step 1: Select United States
+        await SelectCountry("United States");
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#city-count"))
+            .ToHaveTextAsync("3", new() { Timeout = 3000 });
+
+        // Step 2: Select Seattle from cascaded city dropdown
+        await SelectCity("Seattle");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("SEA", new() { Timeout = 5000 });
+
+        // Step 3: Save — gathers both Country and City, verify server echoes both
+        await Page.Locator("#save-btn").ClickAsync();
+        await Expect(Page.Locator("#save-result"))
+            .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
+
+        // Verify the save result contains both the country and city values
+        var saveText = await Page.Locator("#save-result").TextContentAsync();
+        Assert.That(saveText, Does.Contain("SEA"),
+            $"Save result should contain city value 'SEA' but was '{saveText}'");
+        Assert.That(saveText, Does.Contain("US"),
+            $"Save result should contain country value 'US' but was '{saveText}'");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Switching country clears previous city selection ──
+
+    [Test]
+    public async Task switching_country_clears_previous_city_selection()
+    {
+        await NavigateAndBoot();
+
+        // Select US → wait for cities
+        await SelectCountry("United States");
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
+
+        // Select Seattle
+        await SelectCity("Seattle");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("SEA", new() { Timeout = 5000 });
+
+        // Switch to UK — cities reload, city dropdown gets new datasource
+        await SelectCountry("United Kingdom");
+        await Expect(Page.Locator("#city-count"))
+            .ToHaveTextAsync("2", new() { Timeout = 10000 });
+
+        // Verify the city ej2 instance value is reset (no stale "SEA")
+        var cityValue = await Page.EvaluateAsync<string?>(@$"() => {{
+            const el = document.getElementById('{CityId}');
+            return el && el.ej2_instances && el.ej2_instances[0] ? el.ej2_instances[0].value : null;
+        }}");
+        Assert.That(cityValue, Is.Null.Or.Empty,
+            $"City value should be cleared after switching country but was '{cityValue}'");
+
+        // Verify UK cities are available — select London
+        await SelectCity("London");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("LON", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }

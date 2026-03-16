@@ -258,4 +258,78 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Column headers ──
+
+    [Test]
+    public async Task columns_display_text_city_and_capacity()
+    {
+        await NavigateAndBoot();
+
+        // Open popup to reveal the multi-column grid
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-multicolumn-list.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Verify column headers are visible — SF renders .e-headercell for each column
+        var headers = Page.Locator(".e-multicolumn-list.e-popup .e-headercell");
+        await Expect(headers).ToHaveCountAsync(3, new() { Timeout = 5000 });
+
+        // Verify specific column header text: Name, City, Capacity
+        // SF appends accessibility text ("Press Enter to sort") so use substring matching
+        var headerTexts = await headers.AllTextContentsAsync();
+        Assert.That(headerTexts.Any(h => h.Contains("Name")), Is.True,
+            "Column headers must include 'Name'");
+        Assert.That(headerTexts.Any(h => h.Contains("City")), Is.True,
+            "Column headers must include 'City'");
+        Assert.That(headerTexts.Any(h => h.Contains("Capacity")), Is.True,
+            "Column headers must include 'Capacity'");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Select → condition → re-select → condition re-fires ──
+
+    [Test]
+    public async Task selecting_then_changing_fires_condition_each_time()
+    {
+        await NavigateAndBoot();
+
+        // Select Sunrise Manor (value="1") — condition: Eq("1") → "sunrise manor selected"
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-multicolumn-list.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-multicolumn-list.e-popup .e-row").Filter(new() { HasText = "Sunrise Manor" }).ClickAsync();
+
+        await Expect(Page.Locator("#args-condition"))
+            .ToHaveTextAsync("sunrise manor selected", new() { Timeout = 5000 });
+
+        // Wait for popup to close after selection before re-opening
+        await Expect(Page.Locator(".e-multicolumn-list.e-popup"))
+            .ToBeHiddenAsync(new() { Timeout = 5000 });
+
+        // Now select Lakeside Care (value="2") — condition: Eq("1") fails → "other facility"
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-multicolumn-list.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-multicolumn-list.e-popup .e-row").Filter(new() { HasText = "Lakeside Care" }).ClickAsync();
+
+        await Expect(Page.Locator("#args-condition"))
+            .ToHaveTextAsync("other facility", new() { Timeout = 5000 });
+
+        // Wait for popup to close after selection before re-opening
+        await Expect(Page.Locator(".e-multicolumn-list.e-popup"))
+            .ToBeHiddenAsync(new() { Timeout = 5000 });
+
+        // Select Sunrise Manor again — condition must fire again with "sunrise manor selected"
+        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-multicolumn-list.e-popup"))
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Page.Locator(".e-multicolumn-list.e-popup .e-row").Filter(new() { HasText = "Sunrise Manor" }).ClickAsync();
+
+        await Expect(Page.Locator("#args-condition"))
+            .ToHaveTextAsync("sunrise manor selected", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }

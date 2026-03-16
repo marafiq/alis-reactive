@@ -167,4 +167,116 @@ public class WhenUsingFusionMultiSelect : PlaywrightTestBase
             .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
+
+    // ── Multi-item selection + gather ──
+
+    [Test]
+    public async Task selecting_multiple_items_then_gathering_sends_all_values()
+    {
+        await NavigateAndBoot();
+
+        // Select 3 allergies via ej2 API — peanuts, shellfish, dairy
+        await Page.EvaluateAsync(@$"() => {{
+            const el = document.getElementById('{AllergiesId}');
+            const ej2 = el.ej2_instances[0];
+            ej2.value = ['peanuts', 'shellfish', 'dairy'];
+            ej2.dataBind();
+        }}");
+
+        // Wait for value to take effect (change event fires)
+        await Expect(Page.Locator("#change-value"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+
+        // Gather — intercept the POST to verify the payload
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#gather-btn").ClickAsync(),
+            "**/Sandbox/MultiSelect/Echo");
+
+        var body = request.PostData ?? "";
+        Assert.That(body, Does.Contain("peanuts"),
+            $"Gather must contain peanuts but was '{body}'");
+        Assert.That(body, Does.Contain("shellfish"),
+            $"Gather must contain shellfish but was '{body}'");
+        Assert.That(body, Does.Contain("dairy"),
+            $"Gather must contain dairy but was '{body}'");
+
+        // Confirm round-trip completes
+        await Expect(Page.Locator("#gather-result"))
+            .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ── GroupBy verification ──
+
+    [Test]
+    public async Task grouped_items_display_under_correct_group_headers()
+    {
+        await NavigateAndBoot();
+
+        // Open the allergies popup via ej2 showPopup()
+        await Page.EvaluateAsync(@$"() => {{
+            const el = document.getElementById('{AllergiesId}');
+            el.ej2_instances[0].showPopup();
+        }}");
+
+        // SF MultiSelect popup uses .e-ddl.e-popup (same as DropDownList)
+        var popup = Page.Locator(".e-ddl.e-popup");
+        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Verify group headers are present — SF renders .e-list-group-item for GroupBy
+        var groupHeaders = popup.Locator(".e-list-group-item");
+        await Expect(groupHeaders).ToHaveCountAsync(3, new() { Timeout = 5000 });
+
+        // Verify the three category group headers: Food, Medication, Environmental
+        var headerTexts = await groupHeaders.AllTextContentsAsync();
+        Assert.That(headerTexts, Does.Contain("Food"),
+            "Group headers must include 'Food'");
+        Assert.That(headerTexts, Does.Contain("Medication"),
+            "Group headers must include 'Medication'");
+        Assert.That(headerTexts, Does.Contain("Environmental"),
+            "Group headers must include 'Environmental'");
+
+        // Close popup
+        await Page.Keyboard.PressAsync("Escape");
+        AssertNoConsoleErrors();
+    }
+
+    // ── Remove selection updates value ──
+
+    [Test]
+    public async Task removing_one_selection_updates_value()
+    {
+        await NavigateAndBoot();
+
+        // Select 3 allergies via ej2 API
+        await Page.EvaluateAsync(@$"() => {{
+            const el = document.getElementById('{AllergiesId}');
+            const ej2 = el.ej2_instances[0];
+            ej2.value = ['peanuts', 'shellfish', 'dairy'];
+            ej2.dataBind();
+        }}");
+
+        // Wait for change to register
+        await Expect(Page.Locator("#change-value"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+
+        // Now remove one item — set to 2 items only
+        await Page.EvaluateAsync(@$"() => {{
+            const el = document.getElementById('{AllergiesId}');
+            const ej2 = el.ej2_instances[0];
+            ej2.value = ['peanuts', 'dairy'];
+            ej2.dataBind();
+        }}");
+
+        // The ej2 value should now have exactly 2 items (no stale shellfish)
+        var currentValue = await Page.EvaluateAsync<string>(@$"() => {{
+            const el = document.getElementById('{AllergiesId}');
+            const ej2 = el.ej2_instances[0];
+            return JSON.stringify(ej2.value);
+        }}");
+        Assert.That(currentValue, Does.Contain("peanuts"), "Value must contain peanuts");
+        Assert.That(currentValue, Does.Contain("dairy"), "Value must contain dairy");
+        Assert.That(currentValue, Does.Not.Contain("shellfish"), "Value must NOT contain removed shellfish");
+        AssertNoConsoleErrors();
+    }
 }
