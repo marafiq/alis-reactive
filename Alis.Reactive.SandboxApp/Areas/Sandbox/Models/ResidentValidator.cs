@@ -100,6 +100,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>
     /// Scoped validator for the AjaxPartial page — only Name, Email, ConfirmEmail + Address.
     /// </summary>
+    /// <summary>
+    /// Scoped validator for the AjaxPartial page — parent fields only.
+    /// Address rules are NOT here — they validate after the partial loads
+    /// and the address components merge into the plan.
+    /// </summary>
     public class AjaxPartialValidator : ReactiveValidator<ResidentModel>
     {
         public AjaxPartialValidator()
@@ -111,11 +116,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
             RuleFor(x => x.ConfirmEmail).NotEmpty().WithMessage("'Confirm Email' is required.")
                 .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.");
-
-            RuleFor(x => x.Address.Street).NotEmpty().WithMessage("'Street' is required.");
-            RuleFor(x => x.Address.City).NotEmpty().WithMessage("'City' is required.");
-            RuleFor(x => x.Address.ZipCode).NotEmpty().WithMessage("'Zip Code' is required.")
-                .Matches(@"^\d{5}$").WithMessage("'Zip Code' must be 5 digits.");
         }
     }
 }
