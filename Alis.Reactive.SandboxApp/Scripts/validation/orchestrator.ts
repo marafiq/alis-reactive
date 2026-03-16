@@ -188,7 +188,8 @@ function domConditionReader(byName: Map<string, ValidationField>): ConditionRead
       if (!el) return undefined;
       const root = resolveRoot(el, srcField.vendor);
       const val = walk(root, srcField.readExpr);
-      return val == null ? "" : String(val);
+      // Normalize: null/undefined/false → "" (empty = no value expressed)
+      return (val == null || val === false) ? "" : String(val);
     },
   };
 }

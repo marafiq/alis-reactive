@@ -39,10 +39,26 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         [HttpPost]
         public IActionResult Submit([FromBody] ResidentModel? model)
         {
+            return ValidateAndRespond(model, new ResidentValidator());
+        }
+
+        [HttpPost]
+        public IActionResult SubmitServerPartial([FromBody] ResidentModel? model)
+        {
+            return ValidateAndRespond(model, new ServerPartialValidator());
+        }
+
+        [HttpPost]
+        public IActionResult SubmitAjaxPartial([FromBody] ResidentModel? model)
+        {
+            return ValidateAndRespond(model, new AjaxPartialValidator());
+        }
+
+        private IActionResult ValidateAndRespond(ResidentModel? model, FluentValidation.IValidator<ResidentModel> validator)
+        {
             if (model == null)
                 return BadRequest(new { errors = new { Name = new[] { "Request body is required." } } });
 
-            var validator = new ResidentValidator();
             var result = validator.Validate(model);
 
             if (!result.IsValid)

@@ -24,8 +24,7 @@ export function evalCondition(
   if (raw === undefined) return null;
 
   const str = raw;
-  // String(false) === "false" — DOM readers stringify checkbox .checked=false to "false"
-  const empty = str === "" || str === "false";
+  const empty = str === "";
 
   switch (cond.op) {
     case "truthy": return !empty;

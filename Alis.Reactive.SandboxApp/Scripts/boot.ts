@@ -8,6 +8,7 @@ import { setLevel } from "./trace";
 import { scope } from "./trace";
 import { wireTrigger } from "./trigger";
 import { enrichEntries } from "./enrichment";
+import { wireLiveClearing } from "./validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "./validation/error-display";
 import {
   applyMergedPlan,
@@ -24,6 +25,7 @@ export function boot(plan: Plan): void {
   log.info("booting", { entries: plan.entries.length });
 
   enrichEntries(plan.entries, plan.components);
+  wireLiveClearingForEntries(plan.entries);
   wireEntries(plan.entries, plan.components, bootAbort.signal);
 
   registerBootedPlan(plan);
@@ -51,8 +53,7 @@ function wireEntries(entries: Entry[], components: Record<string, ComponentEntry
 export function mergePlan(incoming: Plan): void {
   const merged = applyMergedPlan(incoming, { enrichEntries, wireEntries });
 
-  // Clear stale summary entries — partial merge changes enrichment state,
-  // so previous validation results are invalid
+  wireLiveClearingForEntries(merged.entries);
   clearSummaryForPlan(merged.planId);
 
   log.info("merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
@@ -69,6 +70,28 @@ export function resetBootStateForTests(): void {
 }
 
 export const trace = { setLevel };
+
+function wireLiveClearingForEntries(entries: Entry[]): void {
+  for (const entry of entries) {
+    wireLiveClearingForReaction(entry.reaction);
+  }
+}
+
+function wireLiveClearingForReaction(reaction: { kind: string; request?: any; requests?: any[]; branches?: any[] }): void {
+  switch (reaction.kind) {
+    case "http":
+      if (reaction.request?.validation) wireLiveClearing(reaction.request.validation);
+      break;
+    case "parallel-http":
+      for (const req of reaction.requests ?? []) {
+        if (req.validation) wireLiveClearing(req.validation);
+      }
+      break;
+    case "conditional":
+      for (const branch of reaction.branches ?? []) wireLiveClearingForReaction(branch.reaction);
+      break;
+  }
+}
 
 function clearSummaryForPlan(planId: string): void {
   const el = findSummaryElement(planId);

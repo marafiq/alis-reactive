@@ -71,7 +71,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/ValidationContract/Submit", g => g.IncludeAll())
+                    p.Post("/Sandbox/ValidationContract/SubmitAjaxPartial", g => g.IncludeAll())
                      .Validate<AjaxPartialValidator>("resident-form")
                      .Response(r => r
                         .OnSuccess(s => s.Element("result").SetText("Admission saved"))

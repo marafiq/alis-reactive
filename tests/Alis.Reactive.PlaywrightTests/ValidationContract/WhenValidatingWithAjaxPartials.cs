@@ -64,19 +64,19 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
         await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("required");
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Step 5: Fill address → submit → client validation passes (all enriched fields valid)
+        // Step 5: Fill all fields → submit → success
+        await FillParentFields();
         await Input("Address_Street").FillAsync("123 Sunrise Blvd");
         await Input("Address_City").FillAsync("Palm Springs");
         await Input("Address_ZipCode").FillAsync("92262");
         await SubmitBtn.ClickAsync();
 
-        // Client-side passes — no inline errors, no summary
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
         await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("Address.Street")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Server may 400 (server validator covers full model)
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     // ── Partial reload preserves validation ──────────────

@@ -16,8 +16,8 @@ Validation is request-chained: `Validate<TValidator>(formId)` or `Validate(descr
 C# Authoring                          C# Render                         Runtime
 ────────────────────────────────────────────────────────────────────────────────────
 Validate<TValidator>(formId)    →    ResolveAll()                    →   pipeline.ts
-  placeholder descriptor               ExtractRules()                    passesValidation()
-  AttachValidator(type)                EnrichValidation (if non-null)     wireLiveClearing()
+  placeholder descriptor               ExtractRules() (throws if null)     passesValidation()
+  AttachValidator(type)                EnrichValidation                   wireLiveClearing()
                                        EnrichFieldsFromComponents         validate()
                                        StampPlanId
 
@@ -49,9 +49,9 @@ else if (_componentsMap.Count > 0)
 always: StampPlanId(_entries, PlanId)
 ```
 
-### ValidationResolver.ResolveRequest (ValidationResolver.cs:81-99)
+### ValidationResolver.ResolveRequest (ValidationResolver.cs:81-104)
 
-1. **Extract:** If `ValidatorType` and `Validation` set → `extractor.ExtractRules()` → if non-null, `EnrichValidation(extracted)`.
+1. **Extract:** If `ValidatorType` and `Validation` set → `extractor.ExtractRules()` → if null, throw; else `EnrichValidation(extracted)`.
 2. **Enrich:** If `Validation` and `componentsMap` set → `EnrichFieldsFromComponents(req.Validation, componentsMap)`.
 3. **Recurse:** If `Chained` → `ResolveRequest(req.Chained, ...)`.
 
@@ -105,12 +105,12 @@ function passesValidation(req): boolean {
 
 ### Server Errors (validation-errors command)
 
-- `ctx.validationDesc ?? { formId: cmd.formId, fields: [] }` — fallback when no descriptor in context.
+- Throws if `ctx.validationDesc` is missing. Use `.Validate<TValidator>(formId)` on the request to attach one.
 - `showServerErrors(desc, ctx.responseBody)` — `extractErrors` accepts only ProblemDetails `{ errors: Record<string, string[]> }`; otherwise returns null and logs.
 
 ### Live Clear (validation/live-clear.ts)
 
-One-time wiring on form container: `input` and `change` events. Matches `field.fieldId === target.id` to clear inline error for that field.
+One-time wiring on form container: `input` and `change` events. Walks up from event target to find the field wrapper's `[data-valmsg-for]` span, looks up field by name, clears inline error. Vendor-agnostic: works for native inputs and Fusion inner elements.
 
 ---
 
@@ -157,7 +157,7 @@ One-time wiring on form container: `input` and `change` events. Matches `field.f
 
 1. **Two-phase enrichment** — C# enriches from ComponentsMap; runtime enriches from plan.components. Partials can add components after boot; merge re-enriches.
 2. **Unenriched fields** — Block unless all rules conditionally skipped. Supports partial-owned fields that load later.
-3. **Empty extraction** — `ExtractRules` returns null when no rules → placeholder stays → `validate()` iterates nothing → pass. Server is authoritative when client has no rules.
+3. **Extraction null** — Throws at render time when `Validate<TValidator>` is used but `ExtractRules` returns null.
 4. **ProblemDetails only** — Server errors must be `{ errors }` shape.
 5. **planId scoping** — Summary div: `[data-alis-validation-summary="${planId}"]`. `findSummaryElement(undefined)` returns null (refuse to guess).
 
@@ -171,10 +171,3 @@ One-time wiring on form container: `input` and `change` events. Matches `field.f
 | Runtime | `pipeline.ts`, `validation/orchestrator.ts`, `validation/rule-engine.ts`, `validation/condition.ts`, `validation/error-display.ts`, `validation/live-clear.ts`, `enrichment.ts` |
 | Commands | `commands.ts` (validation-errors), `http.ts` (threads validationDesc to error handlers) |
 
----
-
-## Notes
-
-- **Live-clear matching:** Uses `fieldId === target.id`. Native inputs have id on the element; wrapper-based components (e.g. TestWidget) may fire from an inner element without id. Worth verifying for real Fusion components.
-- **ValidationErrors without descriptor:** Fallback `{ formId, fields: [] }` has no planId → no summary div. Server-only validation (no client Validate) cannot show summary errors.
-- **Extraction null:** `claudeissue/008` argues `Validate<TValidator>` with extractor returning null should throw at render time. Current behavior: pass through to server.

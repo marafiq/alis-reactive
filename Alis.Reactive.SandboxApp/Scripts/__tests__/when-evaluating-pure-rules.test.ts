@@ -131,13 +131,13 @@ const noSource: ConditionReader = { readConditionSource: () => undefined };
 describe("condition: truthy", () => {
   it("true for non-empty string", () => expect(evalCondition({ field: "f", op: "truthy" }, readerWith({ f: "yes" }))).toBe(true));
   it("false for empty string", () => expect(evalCondition({ field: "f", op: "truthy" }, readerWith({ f: "" }))).toBe(false));
-  it("false for 'false'", () => expect(evalCondition({ field: "f", op: "truthy" }, readerWith({ f: "false" }))).toBe(false));
+  it("true for 'false' string (non-empty — reader normalizes booleans upstream)", () => expect(evalCondition({ field: "f", op: "truthy" }, readerWith({ f: "false" }))).toBe(true));
   it("null when source unavailable", () => expect(evalCondition({ field: "f", op: "truthy" }, noSource)).toBeNull());
 });
 
 describe("condition: falsy", () => {
   it("true for empty string", () => expect(evalCondition({ field: "f", op: "falsy" }, readerWith({ f: "" }))).toBe(true));
-  it("true for 'false'", () => expect(evalCondition({ field: "f", op: "falsy" }, readerWith({ f: "false" }))).toBe(true));
+  it("false for 'false' string (non-empty — reader normalizes booleans upstream)", () => expect(evalCondition({ field: "f", op: "falsy" }, readerWith({ f: "false" }))).toBe(false));
   it("false for non-empty", () => expect(evalCondition({ field: "f", op: "falsy" }, readerWith({ f: "yes" }))).toBe(false));
   it("null when source unavailable", () => expect(evalCondition({ field: "f", op: "falsy" }, noSource)).toBeNull());
 });

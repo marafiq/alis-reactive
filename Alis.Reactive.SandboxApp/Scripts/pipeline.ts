@@ -1,7 +1,7 @@
 import type { HttpReaction, ParallelHttpReaction, RequestDescriptor, ExecContext } from "./types";
 import { execRequest } from "./http";
 import { executeCommands } from "./commands";
-import { validate, wireLiveClearing } from "./validation";
+import { validate } from "./validation";
 import { scope } from "./trace";
 
 const log = scope("pipeline");
@@ -9,7 +9,6 @@ const log = scope("pipeline");
 /** Pre-request validation gate. Returns true if the request should proceed. */
 function passesValidation(req: RequestDescriptor): boolean {
   if (!req.validation) return true;
-  wireLiveClearing(req.validation);
   if (!validate(req.validation)) {
     log.debug("validation failed, aborting request");
     return false;
