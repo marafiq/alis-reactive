@@ -527,10 +527,11 @@
     },
     "ValidationDescriptor": {
       "type": "object",
-      "required": ["formId", "fields"],
+      "required": ["formId", "planId", "fields"],
       "additionalProperties": false,
       "properties": {
         "formId": { "type": "string", "minLength": 1, "description": "Form container element ID" },
+        "planId": { "type": "string", "minLength": 1, "description": "Plan identity — used by runtime to scope validation summary div lookup" },
         "fields": {
           "type": "array",
           "items": { "$ref": "#/$defs/ValidationField" }
