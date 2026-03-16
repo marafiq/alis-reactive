@@ -26,7 +26,7 @@ function unenrichedField(name: string, rules: ValidationField["rules"] = []): Va
 }
 
 function desc(formId: string, fields: ValidationField[]): ValidationDescriptor {
-  return { formId, fields };
+  return { formId, planId: "Test.Plan", fields };
 }
 
 function errSpan(fieldName: string): string {
@@ -54,7 +54,7 @@ beforeEach(async () => {
       <input id="VetId" name="VetId" value="" />
       ${errSpan("VetId")}
     </form>
-    <div data-alis-validation-summary hidden></div>
+    <div data-alis-validation-summary="Test.Plan" hidden></div>
   </body></html>`);
 
   (globalThis as any).document = dom.window.document;

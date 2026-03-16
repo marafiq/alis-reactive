@@ -68,10 +68,8 @@ export function hideSummaryDiv(summaryEl: HTMLElement): void {
 }
 
 export function findSummaryElement(planId?: string): HTMLElement | null {
-  if (planId) {
-    return document.querySelector(`[data-alis-validation-summary="${planId}"]`);
-  }
-  return document.querySelector("[data-alis-validation-summary]");
+  if (!planId) return null; // No planId → cannot scope → refuse to guess
+  return document.querySelector(`[data-alis-validation-summary="${planId}"]`);
 }
 
 // ── Server error inline display ─────────────────────────

@@ -1,10 +1,11 @@
 // Validation Orchestrator — Fail-Closed
 //
 // Every declared validation field MUST be accounted for.
-// No silent skips. No pass-by-default. Three possible outcomes per field:
+// No silent skips. No pass-by-default. Four possible outcomes per field:
 //   1. Enriched + visible → validate, error inline
 //   2. Enriched + hidden  → validate, error to summary
-//   3. Unenriched         → first rule message to summary (cannot read value)
+//   3. Unenriched + unconditional rules → first rule message to summary (block)
+//   4. Unenriched + all conditions false → skip (field not needed yet)
 //
 // Vendor-agnostic: delegates value reading to component.ts via resolveRoot.
 
@@ -66,6 +67,7 @@ export function validate(desc: ValidationDescriptor): boolean {
 
     // Enriched but element missing from DOM — component was removed or partial unloaded.
     if (!el) {
+      if (allRulesConditionallySkipped(f, condReader)) continue;
       if (f.rules.length > 0 && summaryEl) {
         addToSummary(summaryEl, f.fieldName, f.rules[0].message);
         summaryHasErrors = true;

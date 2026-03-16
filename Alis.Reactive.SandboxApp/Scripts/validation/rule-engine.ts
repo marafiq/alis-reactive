@@ -50,6 +50,6 @@ export function ruleFails(
     case "atLeastOne":
       return Array.isArray(value) ? value.length === 0 : empty;
     default:
-      return false;
+      return true; // Unknown rule type → fail-closed (block, don't pass)
   }
 }
