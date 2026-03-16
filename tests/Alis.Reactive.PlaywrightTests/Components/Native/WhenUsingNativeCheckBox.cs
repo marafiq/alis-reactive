@@ -196,4 +196,125 @@ public class WhenUsingNativeCheckBox : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Plan JSON structure — refactoring safety ──
+
+    [Test]
+    public async Task plan_carries_native_vendor_for_checkbox_mutations()
+    {
+        // The plan must declare vendor "native" so the runtime resolves
+        // the raw DOM element (not ej2_instances). If vendor is missing or wrong,
+        // resolveRoot returns the wrong object and SetChecked silently breaks.
+        await NavigateAndBoot();
+
+        var planJson = await Page.Locator("#plan-json").TextContentAsync();
+        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""),
+            "Plan must carry vendor 'native' for checkbox mutations — " +
+            "runtime uses this to choose resolveRoot strategy");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task plan_carries_checked_readexpr_for_component_source()
+    {
+        // NativeCheckBox.ReadExpr is "checked" — the plan's ComponentSource must
+        // carry this so the runtime reads el.checked (not el.value).
+        // If readExpr changes or is lost, component value reads return wrong data.
+        await NavigateAndBoot();
+
+        var planJson = await Page.Locator("#plan-json").TextContentAsync();
+        Assert.That(planJson, Does.Contain("\"readExpr\": \"checked\""),
+            "Plan must carry readExpr 'checked' for NativeCheckBox component sources — " +
+            "runtime walks this path to read the checkbox state");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task plan_carries_boolean_coerce_for_setchecked()
+    {
+        // SetChecked emits coerce:"boolean" so the runtime coerces the string "false"
+        // to boolean false before assigning to el.checked. Without coerce, the string
+        // "false" is truthy and the checkbox stays checked.
+        await NavigateAndBoot();
+
+        var planJson = await Page.Locator("#plan-json").TextContentAsync();
+        Assert.That(planJson, Does.Contain("\"coerce\": \"boolean\""),
+            "Plan must carry coerce 'boolean' for SetChecked — " +
+            "without it, string 'false' is truthy and checkbox stays checked");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task plan_carries_prop_checked_for_setchecked_mutation()
+    {
+        // SetChecked writes to prop "checked" (not "value"). If prop changes,
+        // the runtime writes to the wrong DOM property.
+        await NavigateAndBoot();
+
+        var planJson = await Page.Locator("#plan-json").TextContentAsync();
+        Assert.That(planJson, Does.Contain("\"prop\": \"checked\""),
+            "Plan must carry prop 'checked' for SetChecked mutation — " +
+            "runtime uses bracket notation root[prop] = val");
+        AssertNoConsoleErrors();
+    }
+
+    // ── Initial DOM state — element rendering ──
+
+    [Test]
+    public async Task all_three_checkboxes_render_with_correct_element_ids()
+    {
+        // IdGenerator creates scoped IDs from the model namespace + property name.
+        // If IdGenerator changes, these elements vanish and all reactive wiring breaks.
+        await NavigateAndBoot();
+
+        await Expect(Page.Locator($"#{Scope}ReceivesMedication")).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{Scope}AllowsVisitors")).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{Scope}HasDietaryRestrictions")).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task all_checkboxes_render_as_input_type_checkbox()
+    {
+        // NativeCheckBoxBuilder renders <input type="checkbox">. If the HTML element
+        // type changes, the runtime's el.checked read/write path breaks silently.
+        await NavigateAndBoot();
+
+        var medication = Page.Locator($"#{Scope}ReceivesMedication");
+        var visitors = Page.Locator($"#{Scope}AllowsVisitors");
+        var dietary = Page.Locator($"#{Scope}HasDietaryRestrictions");
+
+        await Expect(medication).ToHaveAttributeAsync("type", "checkbox");
+        await Expect(visitors).ToHaveAttributeAsync("type", "checkbox");
+        await Expect(dietary).ToHaveAttributeAsync("type", "checkbox");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task restrictions_panel_starts_hidden_before_any_interaction()
+    {
+        // The restrictions panel has hidden attribute in markup. If the attribute
+        // is removed or the element ID changes, the show/hide reactive chain breaks.
+        await NavigateAndBoot();
+
+        var panel = Page.Locator("#restrictions-panel");
+        await Expect(panel).ToBeHiddenAsync();
+        await Expect(panel).ToHaveAttributeAsync("hidden", "");
+        AssertNoConsoleErrors();
+    }
+
+    // ── Boot trace ──
+
+    [Test]
+    public async Task boot_trace_is_emitted_on_page_load()
+    {
+        // auto-boot.ts emits a "booted" trace message. If boot fails silently,
+        // no reactive behavior works and tests pass vacuously.
+        await NavigateAndBoot();
+
+        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
+        Assert.That(hasBootTrace, Is.True,
+            "Boot trace must be emitted — confirms auto-boot discovered and executed the plan");
+        AssertNoConsoleErrors();
+    }
 }
