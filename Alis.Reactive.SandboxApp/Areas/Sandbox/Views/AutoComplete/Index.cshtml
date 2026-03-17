@@ -3,7 +3,6 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Extensions
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "AutoComplete";
 
@@ -55,8 +54,8 @@
             On DomReady, sets value="Dr. Smith" via structured prop on the Syncfusion ej2 instance.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.Field("Physician (SF AutoComplete)", false, m => m.Physician, expr =>
-                Html.AutoCompleteFor(plan, expr)
+            @{ Html.InputField(plan, m => m.Physician, o => o.Label("Physician (SF AutoComplete)"))
+                .AutoComplete(b => b
                     .DataSource(physicians)
                     .Fields<PhysicianItem>(t => t.Text, v => v.Value)
                     .Placeholder("Select a physician")
@@ -83,8 +82,7 @@
                             {
                                 else_.Element("selected-indicator").Hide();
                             });
-                    })
-                    .Render()); }
+                    })); }
         </div>
     </section>
 

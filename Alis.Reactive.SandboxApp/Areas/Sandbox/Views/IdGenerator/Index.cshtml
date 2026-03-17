@@ -35,31 +35,24 @@
     <section>
         <h2 class="text-sm font-semibold mb-2">1. JSON POST — Include (gathers by name)</h2>
         <form id="json-form" class="grid grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
-            ); }
-            @{ Html.Field("Amount (SF)", true, m => m.Amount, expr =>
-                Html.NumericTextBoxFor(plan, expr)
-                    .Min(0).Max(99999).Step(1)
-                    .Render()
-            ); }
-            @{ Html.Field("Status (Native)", false, m => m.Status, expr =>
-                Html.NativeDropDownFor(plan, expr)
+            @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount (SF)"))
+                .NumericTextBox(b => b
+                    .Min(0).Max(99999).Step(1)); }
+            @{ Html.InputField(plan, m => m.Status, o => o.Label("Status (Native)"))
+                .NativeDropDown(b => b
                     .Items(statusItems)
                     .Placeholder("-- Select --")
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
-            ); }
-            @{ Html.Field("City (Native)", false, m => m.Address!.City, expr =>
-                Html.NativeDropDownFor(plan, expr)
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.Address!.City, o => o.Label("City (Native)"))
+                .NativeDropDown(b => b
                     .Items(cityItems)
                     .Placeholder("-- Select --")
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
-            ); }
-            @{ Html.Field("Postal Code (SF)", false, m => m.Address!.PostalCode, expr =>
-                Html.NumericTextBoxFor(plan, expr)
-                    .Min(10000).Max(99999).Step(1)
-                    .Render()
-            ); }
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.Address!.PostalCode, o => o.Label("Postal Code (SF)"))
+                .NumericTextBox(b => b
+                    .Min(10000).Max(99999).Step(1)); }
         </form>
         @(Html.NativeButton("json-submit-btn", "Submit JSON")
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
@@ -86,20 +79,16 @@
     <section>
         <h2 class="text-sm font-semibold mb-2">2. FormData POST — Include (gathers by name)</h2>
         <form id="form-form" class="grid grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Name, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
-            ); }
-            @{ Html.Field("Amount (SF)", true, m => m.Amount, expr =>
-                Html.NumericTextBoxFor(plan, expr)
-                    .Min(0).Max(99999).Step(1)
-                    .Render()
-            ); }
-            @{ Html.Field("Status (Native)", false, m => m.Status, expr =>
-                Html.NativeDropDownFor(plan, expr)
+            @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount (SF)"))
+                .NumericTextBox(b => b
+                    .Min(0).Max(99999).Step(1)); }
+            @{ Html.InputField(plan, m => m.Status, o => o.Label("Status (Native)"))
+                .NativeDropDown(b => b
                     .Items(statusItems)
                     .Placeholder("-- Select --")
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
-            ); }
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
         </form>
         @(Html.NativeButton("form-submit-btn", "Submit FormData")
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")

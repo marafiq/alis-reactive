@@ -6,32 +6,28 @@
 }
 
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    @{ Html.Field("Has Emergency Contact", false, m => m.HasEmergencyContact, expr =>
-        Html.NativeCheckBoxFor(plan, expr)
-            .CssClass("rounded border-border")
-    ); }
+    @{ Html.InputField(plan, m => m.HasEmergencyContact, o => o.Label("Has Emergency Contact"))
+       .NativeCheckBox(b => b
+           .CssClass("rounded border-border")); }
 
-    @{ Html.Field("Emergency Name", false, m => m.EmergencyName, expr =>
-        Html.NativeTextBoxFor(plan, expr)
-            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-            .Placeholder("Contact name")
-    ); }
+    @{ Html.InputField(plan, m => m.EmergencyName, o => o.Label("Emergency Name"))
+       .NativeTextBox(b => b
+           .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+           .Placeholder("Contact name")); }
 
-    @{ Html.Field("Emergency Phone", false, m => m.EmergencyPhone, expr =>
-        Html.NativeTextBoxFor(plan, expr)
-            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-            .Placeholder("555-0123")
-            .Reactive(plan, evt => evt.Changed, (args, p) =>
-            {
-                p.Element("phone-format-status").SetText("Phone updated");
-            })
-    ); }
+    @{ Html.InputField(plan, m => m.EmergencyPhone, o => o.Label("Emergency Phone"))
+       .NativeTextBox(b => b
+           .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+           .Placeholder("555-0123")
+           .Reactive(plan, evt => evt.Changed, (args, p) =>
+           {
+               p.Element("phone-format-status").SetText("Phone updated");
+           })); }
 
-    @{ Html.Field("Reason for No Contact", false, m => m.ReasonForNoContact, expr =>
-        Html.NativeTextBoxFor(plan, expr)
-            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-            .Placeholder("Explain why no contact")
-    ); }
+    @{ Html.InputField(plan, m => m.ReasonForNoContact, o => o.Label("Reason for No Contact"))
+       .NativeTextBox(b => b
+           .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+           .Placeholder("Explain why no contact")); }
 </div>
 
 <div class="mt-2">

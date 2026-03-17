@@ -2,7 +2,6 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.Fusion.Extensions
 @{
     ViewData["Title"] = "FusionDatePicker";
 
@@ -41,8 +40,8 @@
             On DomReady, sets admission date to 2026-06-15 via structured prop on the Syncfusion ej2 instance.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.Field("Admission Date", false, m => m.AdmissionDate, expr =>
-                Html.DatePickerFor(plan, expr)
+            @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Label("Admission Date"))
+                .DatePicker(b => b
                     .Placeholder("Select admission date")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -67,8 +66,7 @@
                             {
                                 else_.Element("selected-indicator").Hide();
                             });
-                    })
-                    .Render()); }
+                    })); }
         </div>
     </section>
 
@@ -104,10 +102,9 @@
             Button reads discharge date via <code>When(comp.Value()).IsEmpty()</code>
             and shows a warning or confirmation.
         </p>
-        @{ Html.Field("Discharge Date", false, m => m.DischargeDate, expr =>
-            Html.DatePickerFor(plan, expr)
-                .Placeholder("Select discharge date")
-                .Render()); }
+        @{ Html.InputField(plan, m => m.DischargeDate, o => o.Label("Discharge Date"))
+            .DatePicker(b => b
+                .Placeholder("Select discharge date")); }
         <div class="mt-3">
             @(Html.NativeButton("check-discharge-btn", "Check Discharge Date")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")

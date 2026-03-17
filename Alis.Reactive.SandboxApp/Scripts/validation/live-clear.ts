@@ -2,7 +2,7 @@
 //
 // Single responsibility: one-time event wiring per form container.
 // Delegates actual clearing to error-display module.
-// Vendor-agnostic: Html.Field() wraps every input + error span in a div.
+// Vendor-agnostic: Html.InputField() wraps every input + error span in a div.
 // The event bubbles from the input (native or fusion inner) through the
 // field wrapper which contains data-valmsg-for. We match by finding
 // the error span in the target's ancestry and looking up the field by name.
@@ -22,7 +22,7 @@ export function wireLiveClearing(desc: ValidationDescriptor): void {
     const target = e.target as HTMLElement;
 
     // Walk up from target to find the field wrapper's error span.
-    // Html.Field renders: <div> <label/> <input/> <span data-valmsg-for="Name"/> </div>
+    // Html.InputField renders: <div> <label/> <input/> <span data-valmsg-for="Name"/> </div>
     // The input and span are siblings inside the wrapper div.
     let node: HTMLElement | null = target.parentElement;
     while (node && node !== container) {

@@ -14,14 +14,11 @@ namespace Alis.Reactive.Native.Components
     /// Follows the same CRTP-style pattern as DesignSystem native input builders.
     ///
     /// Usage:
-    ///   Html.Field("Status", true, m => m.Status, expr =>
-    ///       Html.NativeDropDownFor(expr)
+    ///   Html.InputField(plan, m => m.Status, o => o.Required().Label("Status"))
+    ///       .NativeDropDown(b => b
     ///           .Items(statusItems)
     ///           .Placeholder("-- Select --")
-    ///           .Reactive(plan, evt => evt.Changed, (args, p) => { ... })
-    ///   );
-    ///
-    /// .Reactive() is always the last call (native has no .Render()).
+    ///           .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
     /// </summary>
     public class NativeDropDownBuilder<TModel, TProp> : IHtmlContent
     {

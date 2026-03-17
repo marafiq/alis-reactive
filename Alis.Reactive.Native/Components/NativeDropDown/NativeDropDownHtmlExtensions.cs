@@ -1,6 +1,5 @@
 using System;
-using System.Linq.Expressions;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Alis.Reactive.Native.Extensions;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -11,25 +10,17 @@ namespace Alis.Reactive.Native.Components
     {
         private static readonly NativeDropDown _component = new NativeDropDown();
 
-        /// <summary>
-        /// Creates a native &lt;select&gt; builder bound to a model property.
-        /// </summary>
-        public static NativeDropDownBuilder<TModel, TProp> NativeDropDownFor<TModel, TProp>(
-            this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
-            Expression<Func<TModel, TProp>> expression)
+        public static void NativeDropDown<TModel, TProp>(
+            this InputFieldSetup<TModel, TProp> setup,
+            Action<NativeDropDownBuilder<TModel, TProp>> configure)
             where TModel : class
         {
-            var uniqueId = IdGenerator.For<TModel, TProp>(expression);
-            var name = html.NameFor(expression);
+            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
+                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr));
 
-            plan.AddToComponentsMap(name, new ComponentRegistration(
-                uniqueId,
-                _component.Vendor,
-                name,
-                _component.ReadExpr));
-
-            return new NativeDropDownBuilder<TModel, TProp>(html, expression);
+            var builder = new NativeDropDownBuilder<TModel, TProp>(setup.Helper, setup.Expression);
+            configure(builder);
+            setup.Render(builder);
         }
     }
 }

@@ -51,9 +51,8 @@
             On DomReady, sets medication time to 08:30 via structured prop on the Syncfusion ej2 instance.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.Field("Medication Time (SF TimePicker)", false, m => m.MedicationTime, expr =>
-                Html.TimePickerFor(plan, expr)
-                    .Render()); }
+            @{ Html.InputField(plan, m => m.MedicationTime, o => o.Label("Medication Time (SF TimePicker)"))
+                .TimePicker(b => { }); }
         </div>
     </section>
 
@@ -77,8 +76,8 @@
             and <code>When(comp.Value()).IsEmpty()</code> (component-read).
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Wake-Up Time (SF TimePicker)", false, m => m.WakeUpTime, expr =>
-                Html.TimePickerFor(plan, expr)
+            @{ Html.InputField(plan, m => m.WakeUpTime, o => o.Label("Wake-Up Time (SF TimePicker)"))
+                .TimePicker(b => b
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
@@ -111,8 +110,7 @@
                             {
                                 else_.Element("empty-indicator").Hide();
                             });
-                    })
-                    .Render()); }
+                    })); }
         </div>
         <div class="font-mono text-sm space-y-1">
             <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>

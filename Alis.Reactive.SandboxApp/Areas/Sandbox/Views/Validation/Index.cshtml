@@ -1,8 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ValidationShowcaseModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.FluentValidator
 @{
     ViewData["Title"] = "Validation";
     var plan = Html.ReactivePlan<ValidationShowcaseModel>();
@@ -21,24 +19,33 @@
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">1. All Rule Types</h2>
         <form id="all-rules-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.AllRules!.Name, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Full name")
-            ); }
-            @{ Html.Field("Email", true, m => m.AllRules!.Email, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("you@example.com")
-            ); }
-            @{ Html.Field("Age", false, m => m.AllRules!.Age, expr =>
-                Html.NativeTextBoxFor(plan, expr).Type("number").CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("0-120")
-            ); }
-            @{ Html.Field("Phone", false, m => m.AllRules!.Phone, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("123-456-7890")
-            ); }
-            @{ Html.Field("Salary", false, m => m.AllRules!.Salary, expr =>
-                Html.NativeTextBoxFor(plan, expr).Type("number").CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("0-500000")
-            ); }
-            @{ Html.Field("Password", false, m => m.AllRules!.Password, expr =>
-                Html.NativeTextBoxFor(plan, expr).Type("password").CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Min 8 chars")
-            ); }
+            @{ Html.InputField(plan, m => m.AllRules!.Name, o => o.Required().Label("Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Full name")); }
+            @{ Html.InputField(plan, m => m.AllRules!.Email, o => o.Required().Label("Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("you@example.com")); }
+            @{ Html.InputField(plan, m => m.AllRules!.Age, o => o.Label("Age"))
+               .NativeTextBox(b => b
+                   .Type("number")
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("0-120")); }
+            @{ Html.InputField(plan, m => m.AllRules!.Phone, o => o.Label("Phone"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("123-456-7890")); }
+            @{ Html.InputField(plan, m => m.AllRules!.Salary, o => o.Label("Salary"))
+               .NativeTextBox(b => b
+                   .Type("number")
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("0-500000")); }
+            @{ Html.InputField(plan, m => m.AllRules!.Password, o => o.Label("Password"))
+               .NativeTextBox(b => b
+                   .Type("password")
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Min 8 chars")); }
         </form>
         @(Html.NativeButton("validate-all-btn", "Validate All")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
@@ -60,12 +67,14 @@
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">2. Server Validation (400)</h2>
         <form id="server-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Server!.Name, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Leave empty")
-            ); }
-            @{ Html.Field("Email", true, m => m.Server!.Email, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Leave empty")
-            ); }
+            @{ Html.InputField(plan, m => m.Server!.Name, o => o.Required().Label("Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Leave empty")); }
+            @{ Html.InputField(plan, m => m.Server!.Email, o => o.Required().Label("Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Leave empty")); }
         </form>
         @(Html.NativeButton("server-save-btn", "Save (Server Validate)")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
@@ -93,12 +102,13 @@
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">3. Conditional Rules</h2>
         <form id="conditional-form" class="space-y-4 mb-4">
-            @{ Html.Field("Is Employed", false, m => m.Conditional!.IsEmployed, expr =>
-                Html.NativeCheckBoxFor(plan, expr).CssClass("h-4 w-4 rounded border-border text-accent")
-            ); }
-            @{ Html.Field("Job Title", false, m => m.Conditional!.JobTitle, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Required when employed")
-            ); }
+            @{ Html.InputField(plan, m => m.Conditional!.IsEmployed, o => o.Label("Is Employed"))
+               .NativeCheckBox(b => b
+                   .CssClass("h-4 w-4 rounded border-border text-accent")); }
+            @{ Html.InputField(plan, m => m.Conditional!.JobTitle, o => o.Label("Job Title"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Required when employed")); }
         </form>
         @(Html.NativeButton("conditional-validate-btn", "Validate Conditional")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
@@ -119,26 +129,29 @@
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">4. Hidden Fields</h2>
         <form id="hidden-fields-form" class="space-y-4 mb-4">
-            @{ Html.Field("Name (always visible)", true, m => m.Hidden!.Name, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Required")
-            ); }
-            @{ Html.Field("Show Extra Fields", false, m => m.Hidden!.ShowExtras, expr =>
-                Html.NativeCheckBoxFor(plan, expr)
-                    .CssClass("h-4 w-4 rounded border-border text-accent")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.When(args, a => a.Checked).Truthy()
-                         .Then(t => t.Element("hf_extras").Show())
-                         .Else(e => e.Element("hf_extras").Hide());
-                    })
-            ); }
+            @{ Html.InputField(plan, m => m.Hidden!.Name, o => o.Required().Label("Name (always visible)"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Required")); }
+            @{ Html.InputField(plan, m => m.Hidden!.ShowExtras, o => o.Label("Show Extra Fields"))
+               .NativeCheckBox(b => b
+                   .CssClass("h-4 w-4 rounded border-border text-accent")
+                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   {
+                       p.When(args, a => a.Checked).Truthy()
+                        .Then(t => t.Element("hf_extras").Show())
+                        .Else(e => e.Element("hf_extras").Hide());
+                   })); }
             <div id="hf_extras" hidden class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                @{ Html.Field("Phone (hidden)", false, m => m.Hidden!.Phone, expr =>
-                    Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("123-456-7890")
-                ); }
-                @{ Html.Field("Salary (hidden)", false, m => m.Hidden!.Salary, expr =>
-                    Html.NativeTextBoxFor(plan, expr).Type("number").CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("0-500000")
-                ); }
+                @{ Html.InputField(plan, m => m.Hidden!.Phone, o => o.Label("Phone (hidden)"))
+                   .NativeTextBox(b => b
+                       .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                       .Placeholder("123-456-7890")); }
+                @{ Html.InputField(plan, m => m.Hidden!.Salary, o => o.Label("Salary (hidden)"))
+                   .NativeTextBox(b => b
+                       .Type("number")
+                       .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                       .Placeholder("0-500000")); }
             </div>
         </form>
         @(Html.NativeButton("hidden-validate-btn", "Validate Hidden Form")
@@ -182,12 +195,14 @@
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">5. Fake DB Validation (ProblemDetails 400)</h2>
         <form id="db-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            @{ Html.Field("Name", true, m => m.Db!.Name, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Try 'admin'")
-            ); }
-            @{ Html.Field("Email", true, m => m.Db!.Email, expr =>
-                Html.NativeTextBoxFor(plan, expr).CssClass("rounded-md border border-border px-3 py-1.5 text-sm").Placeholder("Try 'taken@test.com'")
-            ); }
+            @{ Html.InputField(plan, m => m.Db!.Name, o => o.Required().Label("Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Try 'admin'")); }
+            @{ Html.InputField(plan, m => m.Db!.Email, o => o.Required().Label("Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Try 'taken@test.com'")); }
         </form>
         @(Html.NativeButton("db-save-btn", "Save with DB Check")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")

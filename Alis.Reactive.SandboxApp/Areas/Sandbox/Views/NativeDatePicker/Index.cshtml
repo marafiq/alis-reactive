@@ -36,10 +36,9 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, sets admission date to 2026-03-15.
         </p>
-        @{ Html.Field("Admission Date", false, m => m.AdmissionDate, expr =>
-            Html.NativeDatePickerFor(plan, expr)
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-        ); }
+        @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Label("Admission Date"))
+            .NativeDatePicker(b => b
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
     </section>
 
     <!-- Section 2: Property Read -->
@@ -60,8 +59,8 @@
             Birth date wires a Changed event with typed condition:
             <code>When(args, x =&gt; x.Value).NotNull()</code> shows status.
         </p>
-        @{ Html.Field("Birth Date", false, m => m.BirthDate, expr =>
-            Html.NativeDatePickerFor(plan, expr)
+        @{ Html.InputField(plan, m => m.BirthDate, o => o.Label("Birth Date"))
+            .NativeDatePicker(b => b
                 .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
@@ -77,8 +76,7 @@
                             e.Element("date-status").SetText("no date");
                             e.Element("date-status").RemoveClass("text-green-600");
                         });
-                })
-        ); }
+                })); }
         <div class="font-mono text-sm mt-2">
             <p>Status: <span id="date-status" class="text-text-muted">&mdash;</span></p>
         </div>

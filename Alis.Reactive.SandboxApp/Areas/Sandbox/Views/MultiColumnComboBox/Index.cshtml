@@ -3,7 +3,6 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Extensions
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "MultiColumnComboBox";
 
@@ -55,8 +54,8 @@
             On DomReady, sets value="1" (Sunrise Manor) via structured prop on the Syncfusion ej2 instance.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.Field("Facility (SF MultiColumnComboBox)", false, m => m.Facility, expr =>
-                Html.MultiColumnComboBoxFor(plan, expr)
+            @{ Html.InputField(plan, m => m.Facility, o => o.Label("Facility (SF MultiColumnComboBox)"))
+                .MultiColumnComboBox(b => b
                     .DataSource(facilities)
                     .Fields<FacilityItem>(t => t.Text, v => v.Value)
                     .Columns(col =>
@@ -90,8 +89,7 @@
                             {
                                 else_.Element("selected-indicator").Hide();
                             });
-                    })
-                    .Render()); }
+                    })); }
         </div>
     </section>
 

@@ -36,9 +36,8 @@
         <p class="text-sm text-text-secondary mb-4">
             Checkbox starts checked. On DomReady, <code>SetChecked(false)</code> unchecks it.
         </p>
-        @{ Html.Field("Receives Medication", false, m => m.ReceivesMedication, expr =>
-            Html.NativeCheckBoxFor(plan, expr).CssClass("h-4 w-4 rounded border-border text-accent")
-        ); }
+        @{ Html.InputField(plan, m => m.ReceivesMedication, o => o.Label("Receives Medication"))
+            .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
     </section>
 
     <!-- Section 2: Property Read -->
@@ -47,9 +46,8 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, reads the AllowsVisitors checkbox value and echoes it.
         </p>
-        @{ Html.Field("Allows Visitors", false, m => m.AllowsVisitors, expr =>
-            Html.NativeCheckBoxFor(plan, expr).CssClass("h-4 w-4 rounded border-border text-accent")
-        ); }
+        @{ Html.InputField(plan, m => m.AllowsVisitors, o => o.Label("Allows Visitors"))
+            .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
         <div class="font-mono text-sm mt-2">
             <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
         </div>
@@ -62,8 +60,8 @@
             Dietary restrictions checkbox wires a Changed event with typed condition:
             <code>When(args, x =&gt; x.Checked).Truthy()</code> shows/hides the restrictions panel.
         </p>
-        @{ Html.Field("Has Dietary Restrictions", false, m => m.HasDietaryRestrictions, expr =>
-            Html.NativeCheckBoxFor(plan, expr)
+        @{ Html.InputField(plan, m => m.HasDietaryRestrictions, o => o.Label("Has Dietary Restrictions"))
+            .NativeCheckBox(b => b
                 .CssClass("h-4 w-4 rounded border-border text-accent")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
@@ -81,8 +79,7 @@
                             e.Element("restrictions-status").SetText("unchecked");
                             e.Element("restrictions-status").RemoveClass("text-green-600");
                         });
-                })
-        ); }
+                })); }
         <div class="font-mono text-sm mt-2">
             <p>Status: <span id="restrictions-status" class="text-text-muted">&mdash;</span></p>
         </div>

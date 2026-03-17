@@ -3,7 +3,6 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Extensions
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @using Syncfusion.EJ2.DropDowns
 @{
     ViewData["Title"] = "MultiSelect";
@@ -51,8 +50,8 @@
             with GroupBy for categorized display. Pre-selects "peanuts" via SF builder Value().
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.Field("Allergies (SF MultiSelect)", false, m => m.Allergies, expr =>
-                Html.MultiSelectFor(plan, expr)
+            @{ Html.InputField(plan, m => m.Allergies, o => o.Label("Allergies (SF MultiSelect)"))
+                .MultiSelect(b => b
                     .DataSource(allergies)
                     .Fields<AllergyItem>(t => t.Text, v => v.Value, g => g.Category)
                     .Placeholder("Select allergies")
@@ -75,8 +74,7 @@
                             {
                                 else_.Element("selected-indicator").Hide();
                             });
-                    })
-                    .Render()); }
+                    })); }
         </div>
     </section>
 
@@ -88,8 +86,8 @@
             without GroupBy — flat list display.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.Field("Dietary Restrictions (SF MultiSelect)", false, m => m.DietaryRestrictions, expr =>
-                Html.MultiSelectFor(plan, expr)
+            @{ Html.InputField(plan, m => m.DietaryRestrictions, o => o.Label("Dietary Restrictions (SF MultiSelect)"))
+                .MultiSelect(b => b
                     .DataSource(dietaryRestrictions)
                     .Fields<DietaryItem>(t => t.Text, v => v.Value)
                     .Placeholder("Select dietary restrictions")
@@ -97,8 +95,7 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("dietary-change-value").SetText(args, x => x.Value);
-                    })
-                    .Render()); }
+                    })); }
         </div>
     </section>
 
