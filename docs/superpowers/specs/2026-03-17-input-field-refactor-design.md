@@ -1,7 +1,7 @@
 # InputField Refactor — Design Spec
 
 **Date:** 2026-03-17
-**Status:** Draft
+**Status:** Approved
 **Scope:** Refactor `Html.Field()` into `Html.InputField()` with fluent two-step API
 
 ## Problem
@@ -50,9 +50,23 @@ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission D
    .FusionDatePicker(b => b.Placeholder("Select date").CssClass("..."));
 
 // Minimal (label is dev responsibility — omitting Label() means no label renders)
+// The validation placeholder (data-valmsg-for) always renders regardless of label/required options.
 Html.InputField(plan, m => m.Phone)
    .NativeTextBox(b => b.CssClass("...").Placeholder("555-0123"));
 ```
+
+### Naming Convention
+
+| Context | Pattern | Example |
+|---------|---------|---------|
+| Standalone factory on `IHtmlHelper` | `Html.XxxFor(plan, expr)` | `Html.NativeTextBoxFor(plan, expr)` |
+| InputField extension on `InputFieldSetup` | `.Xxx(b => ...)` | `.NativeTextBox(b => ...)` |
+
+Both coexist. `Html.XxxFor()` is for standalone use without field wrapper. `.Xxx()` is for InputField use with label + validation slot.
+
+### Migration Scope
+
+~25 `.cshtml` view files across the SandboxApp currently use `Html.Field()` and will need migration.
 
 ## Architecture
 
@@ -90,14 +104,14 @@ public class InputFieldSetup<TModel, TProp> where TModel : class
     /// <summary>
     /// Renders the field wrapper (label + validation slot) around the given content.
     /// Called by vertical slice extensions — they never access InputFieldBuilder directly.
+    /// Public because Fusion vertical slice extensions live in a separate assembly.
     /// </summary>
     public void Render(IHtmlContent content)
     {
         var id = IdGenerator.For<TModel, TProp>(Expression);
         var name = Html.NameFor(Expression);
-        var fb = new InputFieldBuilder(Html.ViewContext.Writer, name)
-            .Label(Options.LabelText)
-            .ForId(id);
+        var fb = new InputFieldBuilder(Html.ViewContext.Writer, name).ForId(id);
+        if (Options.LabelText != null) fb.Label(Options.LabelText);
         if (Options.IsRequired) fb.Required();
         using (fb.Begin()) { content.WriteTo(Html.ViewContext.Writer, HtmlEncoder.Default); }
     }
@@ -159,6 +173,9 @@ public static void NativeCheckBox<TModel>(
 Type safety: `.NativeCheckBox()` only compiles when `TProp` is `bool`.
 
 #### Fusion Example (NumericTextBox)
+
+Note: `NumericTextBoxBuilder` below is `Syncfusion.EJ2.Inputs.NumericTextBoxBuilder`, not a framework type.
+All Fusion extensions reference Syncfusion's builder types directly.
 
 ```csharp
 public static void NumericTextBox<TModel, TProp>(
@@ -224,20 +241,12 @@ Fusion adds Native as a dependency. This is natural because:
 - JSON plan, TS runtime, schema — zero changes
 - `.Reactive()` extensions — unchanged
 
-### Type Safety Matrix
+### Type Safety (Illustrative)
 
-| `TProp` | Available extensions |
-|---------|---------------------|
-| `string` | NativeTextBox, NativeDropDown, NativeDatePicker, FusionAutoComplete, FusionDropDownList, FusionMultiColumnComboBox |
-| `bool` | NativeCheckBox |
-| `int`, `decimal`, `double` | NativeTextBox (.Type("number")), NumericTextBox |
-| `DateTime` | NativeDatePicker, FusionDatePicker |
-| `TimeSpan` | FusionTimePicker |
-| `IEnumerable<string>` | FusionMultiSelect |
-
-Note: Exact TProp constraints depend on each component's existing factory method signature.
-Components that accept `Expression<Func<TModel, TProp>>` (open generic) remain available for any TProp.
-Components with specific TProp constraints (like CheckBox requiring `bool`) are naturally constrained.
+Components with open `TProp` (e.g., NativeTextBox, NumericTextBox) accept any property type.
+Components with constrained `TProp` (e.g., NativeCheckBox requiring `bool`) are naturally
+restricted by the compiler — `.NativeCheckBox()` only compiles on `InputFieldSetup<TModel, bool>`.
+Exact constraints match each component's existing `Html.XxxFor()` factory signature.
 
 ## Migration Example
 
