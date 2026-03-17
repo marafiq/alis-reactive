@@ -1,6 +1,5 @@
 using System;
-using System.Linq.Expressions;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Alis.Reactive.Native.Extensions;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -11,22 +10,17 @@ namespace Alis.Reactive.Native.Components
     {
         private static readonly NativeCheckBox _component = new NativeCheckBox();
 
-        public static NativeCheckBoxBuilder<TModel, bool> NativeCheckBoxFor<TModel>(
-            this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
-            Expression<Func<TModel, bool>> expression)
+        public static void NativeCheckBox<TModel>(
+            this InputFieldSetup<TModel, bool> setup,
+            Action<NativeCheckBoxBuilder<TModel, bool>> configure)
             where TModel : class
         {
-            var uniqueId = IdGenerator.For<TModel, bool>(expression);
-            var name = html.NameFor(expression);
+            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
+                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr));
 
-            plan.AddToComponentsMap(name, new ComponentRegistration(
-                uniqueId,
-                _component.Vendor,
-                name,
-                _component.ReadExpr));
-
-            return new NativeCheckBoxBuilder<TModel, bool>(html, expression);
+            var builder = new NativeCheckBoxBuilder<TModel, bool>(setup.Helper, setup.Expression);
+            configure(builder);
+            setup.Render(builder);
         }
     }
 }

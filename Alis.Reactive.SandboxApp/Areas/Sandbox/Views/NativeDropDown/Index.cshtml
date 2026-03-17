@@ -1,7 +1,6 @@
 @model NativeDropDownModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
-@using Microsoft.AspNetCore.Mvc.Rendering
 @{
     ViewData["Title"] = "NativeDropDown";
 
@@ -40,12 +39,11 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, sets care level to "Memory Care".
         </p>
-        @{ Html.Field("Care Level", false, m => m.CareLevel, expr =>
-            Html.NativeDropDownFor(plan, expr)
+        @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
+            .NativeDropDown(b => b
                 .Items(careLevelItems)
                 .Placeholder("-- Select Care Level --")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-        ); }
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
     </section>
 
     <!-- Section 2: Property Read -->
@@ -66,8 +64,8 @@
             Facility type wires a Changed event with typed condition:
             <code>When(args, x =&gt; x.Value).Eq("Medical")</code> shows medical notice.
         </p>
-        @{ Html.Field("Facility Type", false, m => m.FacilityType, expr =>
-            Html.NativeDropDownFor(plan, expr)
+        @{ Html.InputField(plan, m => m.FacilityType, o => o.Label("Facility Type"))
+            .NativeDropDown(b => b
                 .Items(facilityTypeItems)
                 .Placeholder("-- Select Facility Type --")
                 .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
@@ -86,8 +84,7 @@
                             e.Element("medical-notice").RemoveClass("text-green-600");
                             e.Element("medical-notice").AddClass("text-text-muted");
                         });
-                })
-        ); }
+                })); }
         <div class="font-mono text-sm mt-2">
             <p>Notice: <span id="medical-notice" class="text-text-muted">&mdash;</span></p>
         </div>

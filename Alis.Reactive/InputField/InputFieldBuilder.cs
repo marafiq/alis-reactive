@@ -1,14 +1,14 @@
 using System.IO;
 using System.Net;
 
-namespace Alis.Reactive.Native.Builders
+namespace Alis.Reactive.InputField
 {
     /// <summary>
-    /// Form field container that renders a wrapper div, a label with optional required marker,
-    /// the child control (provided by the caller), and a validation error placeholder.
-    /// Label and required are always explicit — no model metadata inspection.
+    /// Renders a field wrapper: div, label with optional required marker,
+    /// child content slot, and validation error placeholder.
+    /// Pure BCL — no ASP.NET dependency.
     /// </summary>
-    internal class FieldBuilder
+    internal class InputFieldBuilder
     {
         private readonly TextWriter _writer;
         private readonly string? _name;
@@ -16,23 +16,19 @@ namespace Alis.Reactive.Native.Builders
         private bool _isRequired;
         private string? _forId;
 
-        internal FieldBuilder(TextWriter writer, string? name)
+        internal InputFieldBuilder(TextWriter writer, string? name)
         {
             _writer = writer;
             _name = name;
         }
 
-        internal FieldBuilder Label(string label) { _labelText = label; return this; }
+        internal InputFieldBuilder Label(string label) { _labelText = label; return this; }
 
-        internal FieldBuilder Required() { _isRequired = true; return this; }
+        internal InputFieldBuilder Required() { _isRequired = true; return this; }
 
-        internal FieldBuilder ForId(string? forId) { _forId = forId; return this; }
+        internal InputFieldBuilder ForId(string? forId) { _forId = forId; return this; }
 
-        /// <summary>
-        /// Opens the field wrapper div and returns an <see cref="HtmlRenderScope"/> whose
-        /// disposal writes the validation placeholder and closing tag.
-        /// </summary>
-        internal HtmlRenderScope Begin()
+        internal InputFieldRenderScope Begin()
         {
             _writer.Write("<div class=\"flex flex-col gap-1.5\">");
 
@@ -53,7 +49,7 @@ namespace Alis.Reactive.Native.Builders
             }
             closingHtml += "</div>";
 
-            return new HtmlRenderScope(_writer, closingHtml);
+            return new InputFieldRenderScope(_writer, closingHtml);
         }
     }
 }

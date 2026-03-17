@@ -53,6 +53,10 @@ the `ReactivePlan`. Nothing executes at this point.
 | `Alis.Reactive/Descriptors/Reactions/Reaction.cs` | `SequentialReaction` (list of commands) |
 | `Alis.Reactive/Descriptors/Entry.cs` | One entry = trigger + reaction |
 | `Alis.Reactive/ExpressionPathHelper.cs` | Converts `x => x.Address.City` to `"evt.address.city"` dot-path for source binding |
+| `Alis.Reactive/InputField/InputFieldSetup.cs` | Generic `InputFieldSetup<THelper, TModel, TProp>` — framework-agnostic base |
+| `Alis.Reactive/InputField/InputFieldOptions.cs` | `Required()`, `Label()` — field wrapper options |
+| `Alis.Reactive/InputField/InputFieldBuilder.cs` | Internal, BCL-only — renders label + validation slot wrapper HTML |
+| `Alis.Reactive.Native/Extensions/InputFieldExtensions.cs` | Closes `THelper` to `IHtmlHelper<TModel>`, provides `Html.InputField()` factory + `Render(IHtmlContent)` |
 | `Alis.Reactive.Native/Extensions/HtmlExtensions.cs` | `Html.On()` extension — the view entry point |
 
 ### Layer 2: JSON Plan (Schema-Validated Contract)

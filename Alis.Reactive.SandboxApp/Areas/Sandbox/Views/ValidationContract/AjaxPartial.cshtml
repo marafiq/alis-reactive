@@ -1,8 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
-@using Microsoft.AspNetCore.Mvc.Rendering
 @{
     ViewData["Title"] = "Validation Contract — Scenario 3b: AJAX Partials";
     var plan = Html.ReactivePlan<ResidentModel>();
@@ -27,42 +25,38 @@
         <h2 class="text-base font-semibold mb-2">Basic Information (Parent)</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.Field("Name", true, m => m.Name, expr =>
-                Html.NativeTextBoxFor(plan, expr)
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                    .Placeholder("Resident name")
-            ); }
+            @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Resident name")); }
 
-            @{ Html.Field("Email", true, m => m.Email, expr =>
-                Html.NativeTextBoxFor(plan, expr)
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                    .Placeholder("resident@care.com")
-            ); }
+            @{ Html.InputField(plan, m => m.Email, o => o.Required().Label("Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("resident@care.com")); }
 
-            @{ Html.Field("Confirm Email", true, m => m.ConfirmEmail, expr =>
-                Html.NativeTextBoxFor(plan, expr)
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                    .Placeholder("Confirm email")
-            ); }
+            @{ Html.InputField(plan, m => m.ConfirmEmail, o => o.Required().Label("Confirm Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Confirm email")); }
         </div>
 
         <h2 class="text-base font-semibold mb-2 mt-6">Address Type</h2>
 
-        @{ Html.Field("Address Type", false, m => m.AddressType, expr =>
-            Html.NativeDropDownFor(plan, expr)
-                .Items(addressTypes)
-                .Placeholder("-- Select Address Type --")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.When(args, a => a.Value).Eq("Custom Address")
-                        .Then(t =>
-                            t.Get("/Sandbox/ValidationContract/AddressPartial")
-                             .Response(r => r.OnSuccess(s => s.Into("address-container"))))
-                        .Else(e =>
-                            e.Element("address-container").SetHtml(""));
-                })
-        ); }
+        @{ Html.InputField(plan, m => m.AddressType, o => o.Label("Address Type"))
+           .NativeDropDown(b => b
+               .Items(addressTypes)
+               .Placeholder("-- Select Address Type --")
+               .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+               .Reactive(plan, evt => evt.Changed, (args, p) =>
+               {
+                   p.When(args, a => a.Value).Eq("Custom Address")
+                       .Then(t =>
+                           t.Get("/Sandbox/ValidationContract/AddressPartial")
+                            .Response(r => r.OnSuccess(s => s.Into("address-container"))))
+                       .Else(e =>
+                           e.Element("address-container").SetHtml(""));
+               })); }
 
         <div id="address-container" class="mt-4"></div>
 

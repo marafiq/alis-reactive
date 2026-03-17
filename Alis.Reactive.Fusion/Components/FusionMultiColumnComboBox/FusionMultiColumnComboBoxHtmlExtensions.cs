@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.MultiColumnComboBox;
 
@@ -13,25 +13,6 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionMultiColumnComboBoxHtmlExtensions
     {
         private static readonly FusionMultiColumnComboBox Component = new FusionMultiColumnComboBox();
-
-        public static MultiColumnComboBoxBuilder MultiColumnComboBoxFor<TModel, TProp>(
-            this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
-            Expression<Func<TModel, TProp>> expression)
-            where TModel : class
-        {
-            var uniqueId = IdGenerator.For(expression);
-            var name = html.NameFor(expression);
-
-            plan.AddToComponentsMap(name, new ComponentRegistration(
-                uniqueId,
-                Component.Vendor,
-                name,
-                Component.ReadExpr));
-
-            return html.EJS().MultiColumnComboBoxFor(expression)
-                .HtmlAttributes(new Dictionary<string, object> { ["id"] = uniqueId, ["name"] = name });
-        }
 
         /// <summary>
         /// Typed Fields binding — derives text/value field names from DataSource item expressions.
@@ -62,6 +43,20 @@ namespace Alis.Reactive.Fusion.Components
                 Value = ToCamelCase(GetMemberName(value)),
                 GroupBy = ToCamelCase(GetMemberName(groupBy))
             });
+        }
+
+        public static void MultiColumnComboBox<TModel, TProp>(
+            this InputFieldSetup<TModel, TProp> setup,
+            Action<MultiColumnComboBoxBuilder> configure)
+            where TModel : class
+        {
+            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr));
+
+            var builder = setup.Helper.EJS().MultiColumnComboBoxFor(setup.Expression)
+                .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
+            configure(builder);
+            setup.Render(builder.Render());
         }
 
         private static string GetMemberName<T>(Expression<Func<T, object?>> expr)

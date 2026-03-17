@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Calendars;
 
@@ -14,23 +13,18 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionDatePicker Component = new FusionDatePicker();
 
-        public static DatePickerBuilder DatePickerFor<TModel, TProp>(
-            this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
-            Expression<Func<TModel, TProp>> expression)
+        public static void DatePicker<TModel, TProp>(
+            this InputFieldSetup<TModel, TProp> setup,
+            Action<DatePickerBuilder> configure)
             where TModel : class
         {
-            var uniqueId = IdGenerator.For<TModel, TProp>(expression);
-            var name = html.NameFor(expression);
+            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr));
 
-            plan.AddToComponentsMap(name, new ComponentRegistration(
-                uniqueId,
-                Component.Vendor,
-                name,
-                Component.ReadExpr));
-
-            return html.EJS().DatePickerFor(expression)
-                .HtmlAttributes(new Dictionary<string, object> { ["id"] = uniqueId, ["name"] = name });
+            var builder = setup.Helper.EJS().DatePickerFor(setup.Expression)
+                .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
+            configure(builder);
+            setup.Render(builder.Render());
         }
     }
 }

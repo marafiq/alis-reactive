@@ -36,11 +36,10 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, sets resident name to "Jane Doe".
         </p>
-        @{ Html.Field("Resident Name", false, m => m.ResidentName, expr =>
-            Html.NativeTextBoxFor(plan, expr)
+        @{ Html.InputField(plan, m => m.ResidentName, o => o.Label("Resident Name"))
+            .NativeTextBox(b => b
                 .Placeholder("Enter resident name")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-        ); }
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
     </section>
 
     <!-- Section 2: Property Read -->
@@ -61,8 +60,8 @@
             Emergency contact wires a Changed event with typed condition:
             <code>When(args, x =&gt; x.Value).IsEmpty()</code> shows contact status.
         </p>
-        @{ Html.Field("Emergency Contact", false, m => m.EmergencyContact, expr =>
-            Html.NativeTextBoxFor(plan, expr)
+        @{ Html.InputField(plan, m => m.EmergencyContact, o => o.Label("Emergency Contact"))
+            .NativeTextBox(b => b
                 .Placeholder("Enter emergency contact")
                 .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -80,8 +79,7 @@
                             e.Element("contact-status").AddClass("text-green-600");
                             e.Element("contact-status").RemoveClass("text-red-600");
                         });
-                })
-        ); }
+                })); }
         <div class="font-mono text-sm mt-2">
             <p>Status: <span id="contact-status" class="text-text-muted">&mdash;</span></p>
         </div>

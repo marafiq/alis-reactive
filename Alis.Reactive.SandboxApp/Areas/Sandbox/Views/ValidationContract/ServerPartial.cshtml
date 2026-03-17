@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentModel
-@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Microsoft.AspNetCore.Mvc.Rendering
@@ -25,41 +24,35 @@
         <h2 class="text-base font-semibold mb-2">Basic Information (Parent)</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.Field("Name", true, m => m.Name, expr =>
-                Html.NativeTextBoxFor(plan, expr)
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                    .Placeholder("Resident name")
-            ); }
+            @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Resident name")); }
 
-            @{ Html.Field("Email", true, m => m.Email, expr =>
-                Html.NativeTextBoxFor(plan, expr)
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                    .Placeholder("resident@care.com")
-            ); }
+            @{ Html.InputField(plan, m => m.Email, o => o.Required().Label("Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("resident@care.com")); }
 
-            @{ Html.Field("Confirm Email", true, m => m.ConfirmEmail, expr =>
-                Html.NativeTextBoxFor(plan, expr)
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                    .Placeholder("Confirm email")
-            ); }
+            @{ Html.InputField(plan, m => m.ConfirmEmail, o => o.Required().Label("Confirm Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Confirm email")); }
 
-            @{ Html.Field("Care Level", true, m => m.CareLevel, expr =>
-                Html.NativeDropDownFor(plan, expr)
-                    .Items(careLevels)
-                    .Placeholder("-- Select Care Level --")
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-            ); }
+            @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
+               .NativeDropDown(b => b
+                   .Items(careLevels)
+                   .Placeholder("-- Select Care Level --")
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
 
-            @{ Html.Field("Veteran", false, m => m.IsVeteran, expr =>
-                Html.NativeCheckBoxFor(plan, expr)
-                    .CssClass("rounded border-border")
-            ); }
+            @{ Html.InputField(plan, m => m.IsVeteran, o => o.Label("Veteran"))
+               .NativeCheckBox(b => b
+                   .CssClass("rounded border-border")); }
 
-            @{ Html.Field("Veteran ID", false, m => m.VeteranId, expr =>
-                Html.NativeTextBoxFor(plan, expr)
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                    .Placeholder("V12345")
-            ); }
+            @{ Html.InputField(plan, m => m.VeteranId, o => o.Label("Veteran ID"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("V12345")); }
         </div>
 
         <h2 class="text-base font-semibold mb-2 mt-6">Address (Server Partial)</h2>

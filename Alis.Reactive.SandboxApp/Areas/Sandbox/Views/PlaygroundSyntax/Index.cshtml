@@ -27,27 +27,25 @@
     <div>
         <h1 class="text-2xl font-bold tracking-tight">Playground Syntax</h1>
         <p class="mt-1 text-text-secondary text-sm">
-            Exercises Html.Field() wrapping, .Reactive() on both Fusion and Native builders,
+            Exercises Html.InputField() wrapping, .Reactive() on both Fusion and Native builders,
             and cross-vendor pipelines via a single custom event.
         </p>
     </div>
 
-    <!-- Section 1: Fusion .Reactive() inside Html.Field() -->
+    <!-- Section 1: Fusion .Reactive() inside Html.InputField() -->
     <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        <h2 class="text-sm font-semibold mb-2">1. Fusion — Html.Field + .Reactive() before .Render()</h2>
+        <h2 class="text-sm font-semibold mb-2">1. Fusion — Html.InputField + .Reactive()</h2>
         <p class="text-xs text-text-secondary mb-3">
             <code class="bg-slate-100 px-1 rounded">Html.NumericTextBoxFor(expr).Reactive(plan, evt =&gt; evt.Changed, ...).Render()</code>
         </p>
         <div class="grid grid-cols-2 gap-4">
-            @{ Html.Field("Amount", true, m => m.Amount, expr =>
-                Html.NumericTextBoxFor(plan, expr)
-                    .Min(0).Max(10000).Step(1)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("amount-echo").SetText("Amount changed");
-                    })
-                    .Render()
-            ); }
+            @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount"))
+               .NumericTextBox(b => b
+                   .Min(0).Max(10000).Step(1)
+                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   {
+                       p.Element("amount-echo").SetText("Amount changed");
+                   })); }
         </div>
         <div class="mt-3 text-xs font-mono flex justify-between">
             <span class="text-text-secondary">Echo</span>
@@ -55,26 +53,24 @@
         </div>
     </section>
 
-    <!-- Section 2: Native .Reactive() inside Html.Field() -->
+    <!-- Section 2: Native .Reactive() inside Html.InputField() -->
     <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        <h2 class="text-sm font-semibold mb-2">2. Native — Html.Field + .Reactive() as last call</h2>
+        <h2 class="text-sm font-semibold mb-2">2. Native — Html.InputField + .Reactive()</h2>
         <p class="text-xs text-text-secondary mb-3">
             <code class="bg-slate-100 px-1 rounded">Html.NativeDropDownFor(expr).Items(...).Reactive(plan, evt =&gt; evt.Changed, ...)</code>
         </p>
         <div class="grid grid-cols-2 gap-4">
-            @{ Html.Field("Status", true, m => m.Status, expr =>
-                Html.NativeDropDownFor(plan, expr)
-                    .Items(statusItems)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("status-echo").SetText("Status changed");
-                    })
-            ); }
-            @{ Html.Field("Category", false, m => m.Category, expr =>
-                Html.NativeDropDownFor(plan, expr)
-                    .Items(categoryItems)
-                    .Placeholder("-- Select Category --")
-            ); }
+            @{ Html.InputField(plan, m => m.Status, o => o.Required().Label("Status"))
+               .NativeDropDown(b => b
+                   .Items(statusItems)
+                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   {
+                       p.Element("status-echo").SetText("Status changed");
+                   })); }
+            @{ Html.InputField(plan, m => m.Category, o => o.Label("Category"))
+               .NativeDropDown(b => b
+                   .Items(categoryItems)
+                   .Placeholder("-- Select Category --")); }
         </div>
         <div class="mt-3 text-xs font-mono flex justify-between">
             <span class="text-text-secondary">Echo</span>
@@ -122,23 +118,20 @@
             Both Fusion (SF) and Native (DOM) follow the same pattern.
         </p>
         <div class="grid grid-cols-2 gap-4">
-            @{ Html.Field("City", false, m => m.Address!.City, expr =>
-                Html.NativeDropDownFor(plan, expr)
-                    .Items(cityItems)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("city-echo").SetText("City changed");
-                    })
-            ); }
-            @{ Html.Field("Postal Code", false, m => m.Address!.PostalCode, expr =>
-                Html.NumericTextBoxFor(plan, expr)
-                    .Min(10000).Max(99999).Step(1)
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("postal-echo").SetText("PostalCode changed");
-                    })
-                    .Render()
-            ); }
+            @{ Html.InputField(plan, m => m.Address!.City, o => o.Label("City"))
+               .NativeDropDown(b => b
+                   .Items(cityItems)
+                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   {
+                       p.Element("city-echo").SetText("City changed");
+                   })); }
+            @{ Html.InputField(plan, m => m.Address!.PostalCode, o => o.Label("Postal Code"))
+               .NumericTextBox(b => b
+                   .Min(10000).Max(99999).Step(1)
+                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   {
+                       p.Element("postal-echo").SetText("PostalCode changed");
+                   })); }
         </div>
         <div class="mt-3 text-xs font-mono space-y-1">
             <div class="flex justify-between">

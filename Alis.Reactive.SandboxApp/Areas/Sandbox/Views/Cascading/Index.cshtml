@@ -3,7 +3,6 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Extensions
-@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "Cascading DropDownList";
 
@@ -46,8 +45,8 @@
             Complex objects with value, text, continent properties.
             On change, sends ONLY the country value to fetch cities.
         </p>
-        @{ Html.Field("Country", true, m => m.Country, expr =>
-            Html.DropDownListFor(plan, expr)
+        @{ Html.InputField(plan, m => m.Country, o => o.Required().Label("Country"))
+           .DropDownList(b => b
                 .DataSource(countries)
                 .Fields<CountryItem>(t => t.Text, v => v.Value)
                 .Placeholder("Select a country")
@@ -69,8 +68,7 @@
                             s.Element("city-count").SetText(json, j => j.Count);
                             s.Element("city-count").RemoveClass("text-text-muted");
                         }));
-                })
-                .Render()); }
+                })); }
     </section>
 
     <!-- Section 2: Child Dropdown (City) -->
@@ -79,16 +77,15 @@
         <p class="text-sm text-text-secondary mb-4">
             Starts empty. Populated by SetDataSource + DataBind after country change.
         </p>
-        @{ Html.Field("City", false, m => m.City, expr =>
-            Html.DropDownListFor(plan, expr)
+        @{ Html.InputField(plan, m => m.City, o => o.Label("City"))
+           .DropDownList(b => b
                 .Fields<CityItem>(t => t.Text, v => v.Value)
                 .Placeholder("Select a city (choose country first)")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     p.Element("selected-city").SetText(args, x => x.Value);
                     p.Element("selected-city").RemoveClass("text-text-muted");
-                })
-                .Render()); }
+                })); }
         <div class="font-mono text-sm mt-2 space-y-1">
             <p>Cascade status: <span id="cascade-status" class="text-text-muted">&mdash;</span></p>
             <p>City count: <span id="city-count" class="text-text-muted">&mdash;</span></p>

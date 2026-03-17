@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
+      <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
     </ItemGroup>
 
     <ItemGroup>
