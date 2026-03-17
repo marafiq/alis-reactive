@@ -37,7 +37,7 @@ the `ReactivePlan`. Nothing executes at this point.
         p.Dispatch("ready");
     }));
 }
-<script type="application/json" id="alis-plan">@Html.Raw(plan.Render())</script>
+<script type="application/json" data-alis-plan data-trace="trace">@Html.Raw(plan.Render())</script>
 ```
 
 **Key files:**
@@ -142,7 +142,7 @@ ESM module bundled by esbuild. The runtime reads the plan JSON and executes it. 
 
 | File | Purpose |
 |------|---------|
-| `Scripts/auto-boot.ts` | esbuild entry point — auto-discovers `#alis-plan`, reads `data-trace`, calls `boot()` |
+| `Scripts/auto-boot.ts` | esbuild entry point — auto-discovers `[data-alis-plan]`, reads `data-trace`, calls `boot()` |
 | `Scripts/boot.ts` | Two-phase boot: wire custom-event listeners first, then execute dom-ready (testable export) |
 | `Scripts/trigger.ts` | `wireTrigger()` — wires dom-ready and custom-event listeners |
 | `Scripts/execute.ts` | `executeReaction()` → `executeCommand()` — dispatch to command handlers |
@@ -171,17 +171,17 @@ Views emit only the plan JSON element — no inline scripts at all.
 <script type="module" src="~/js/alis-reactive.js" asp-append-version="true"></script>
 
 <!-- View — plan element only, auto-boot discovers it -->
-<script type="application/json" id="alis-plan" data-trace="trace">@Html.Raw(planJson)</script>
+<script type="application/json" data-alis-plan data-trace="trace">@Html.Raw(planJson)</script>
 ```
 
 **Auto-boot architecture:**
 
 | File | Role |
 |------|------|
-| `Scripts/auto-boot.ts` | esbuild entry point — auto-discovers `#alis-plan`, reads `data-trace`, calls `boot()` |
+| `Scripts/auto-boot.ts` | esbuild entry point — auto-discovers `[data-alis-plan]`, reads `data-trace`, calls `boot()` |
 | `Scripts/boot.ts` | Testable export — `boot()` and `trace` used by vitest, NOT the browser entry point |
 
-`auto-boot.ts` runs on every page load. If `#alis-plan` exists, it boots. If `data-trace`
+`auto-boot.ts` runs on every page load. If `[data-alis-plan]` exists, it boots. If `data-trace`
 is set, it enables tracing. This eliminates per-view inline scripts entirely.
 
 ## Projects

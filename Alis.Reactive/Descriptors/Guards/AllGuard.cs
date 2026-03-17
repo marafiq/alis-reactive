@@ -12,8 +12,8 @@ namespace Alis.Reactive.Descriptors.Guards
 
         public AllGuard(IReadOnlyList<Guard> guards)
         {
-            if (guards == null || guards.Count == 0)
-                throw new ArgumentException("AllGuard requires at least one guard.", nameof(guards));
+            if (guards == null || guards.Count < 2)
+                throw new ArgumentException("AllGuard requires at least two guards.", nameof(guards));
             Guards = guards;
         }
     }

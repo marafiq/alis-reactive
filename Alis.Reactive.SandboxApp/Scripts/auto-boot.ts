@@ -15,7 +15,11 @@ for (const el of planEls) {
   const traceLevel = el.getAttribute("data-trace") as TraceLevel | null;
   if (traceLevel) trace.setLevel(traceLevel);
 
-  plans.push(JSON.parse(el.textContent!));
+  try {
+    plans.push(JSON.parse(el.textContent!));
+  } catch (e) {
+    throw new Error(`[alis] failed to parse plan JSON from [data-alis-plan] element: ${(e as Error).message}`);
+  }
 }
 
 for (const plan of composeInitialPlans(plans)) {
