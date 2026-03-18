@@ -20,7 +20,7 @@
                 kind: event,
                 path: evt.value
               },
-              coerceAs: string,
+              coerceAs: array,
               op: not-empty
             },
             reaction: {

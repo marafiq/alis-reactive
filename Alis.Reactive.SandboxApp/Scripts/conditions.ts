@@ -136,6 +136,13 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
     case "min-length":
       return String(resolved ?? "").length >= Number(operand);
 
+    case "array-contains": {
+      if (!Array.isArray(resolved)) return false;
+      const elCoerce = guard.elementCoerceAs ?? "raw";
+      const typedOp = coerce(guard.operand, elCoerce);
+      return resolved.some(item => coerce(item, elCoerce) === typedOp);
+    }
+
     default:
       throw new Error(`Unknown guard operator: ${op}`);
   }

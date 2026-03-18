@@ -33,7 +33,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
                 new RadioButtonItem("HeartHealthy", "Heart Healthy"),
             };
 
-            return View(new NativeCheckListModel { Allergies = "Peanuts,Dairy" });
+            return View(new NativeCheckListModel { Allergies = new[] { "Peanuts", "Dairy" } });
         }
 
         [HttpPost]
@@ -65,7 +65,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
                 return BadRequest(new { errors });
             }
 
-            var items = model.Allergies?.Split(',') ?? Array.Empty<string>();
+            var items = model.Allergies ?? Array.Empty<string>();
             return Ok(new { message = $"Saved {items.Length} allergies and dietary needs for {model.ResidentName}" });
         }
     }

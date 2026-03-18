@@ -21,12 +21,30 @@ namespace Alis.Reactive.Descriptors.Guards
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public BindSource? RightSource { get; }
 
+        /// <summary>
+        /// Element-level coercion for array operators (array-contains).
+        /// When the source is an array, this specifies how to coerce individual elements
+        /// and the operand for type-consistent comparison.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ElementCoerceAs { get; }
+
         public ValueGuard(BindSource source, string coerceAs, string op, object? operand = null)
         {
             Source = source;
             CoerceAs = coerceAs;
             Op = op;
             Operand = operand;
+        }
+
+        /// <summary>Array operator constructor with element-level coercion.</summary>
+        public ValueGuard(BindSource source, string coerceAs, string op, object? operand, string? elementCoerceAs)
+        {
+            Source = source;
+            CoerceAs = coerceAs;
+            Op = op;
+            Operand = operand;
+            ElementCoerceAs = elementCoerceAs;
         }
 
         /// <summary>Source-vs-source constructor.</summary>

@@ -9,6 +9,15 @@ namespace Alis.Reactive.Builders.Conditions
     {
         public abstract BindSource ToBindSource();
         public string CoercionType => CoercionTypes.InferFromType(typeof(TProp));
+
+        /// <summary>
+        /// For array types, returns the element-level coercion type (e.g. "string" for string[]).
+        /// For non-array types, returns null.
+        /// </summary>
+        public string? ElementCoercionType =>
+            CoercionTypes.InferFromType(typeof(TProp)) == CoercionTypes.Array
+                ? CoercionTypes.InferElementType(typeof(TProp))
+                : null;
     }
 
     public sealed class EventArgSource<TPayload, TProp> : TypedSource<TProp>

@@ -25,6 +25,9 @@ namespace Alis.Reactive.Descriptors.Guards
         // Range
         public const string Between = "between";
 
+        // Array
+        public const string ArrayContains = "array-contains";
+
         // Text
         public const string Contains = "contains";
         public const string StartsWith = "starts-with";

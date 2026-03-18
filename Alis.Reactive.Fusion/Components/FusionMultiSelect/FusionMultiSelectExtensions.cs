@@ -14,7 +14,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly FusionMultiSelect Component = new FusionMultiSelect();
 
         public static ComponentRef<FusionMultiSelect, TModel> SetValue<TModel>(
-            this ComponentRef<FusionMultiSelect, TModel> self, string? value)
+            this ComponentRef<FusionMultiSelect, TModel> self, string[]? value)
             where TModel : class
             => self.Emit(new SetPropMutation("value"), value: value);
 
@@ -58,9 +58,9 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.Emit(new CallMutation("hidePopup"));
 
-        public static TypedComponentSource<string> Value<TModel>(
+        public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new TypedComponentSource<string[]>(self.TargetId, Component.Vendor, Component.ReadExpr);
     }
 }

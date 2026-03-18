@@ -15,7 +15,10 @@
               kind: set-prop,
               prop: value
             },
-            value: Shellfish,Gluten,
+            value: [
+              Shellfish,
+              Gluten
+            ],
             vendor: native
           },
           {

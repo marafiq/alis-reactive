@@ -8,12 +8,10 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Wires reactive event pipelines onto the NativeCheckListBuilder.
     ///
-    /// Creates ONE entry targeting the hidden input's change event (not N per checkbox).
-    /// checklist.ts aggregates all checked values into the hidden input and dispatches
-    /// a synthetic change event on it. The ComponentEventTrigger reads el.value from
-    /// the hidden input — getting the full comma-separated aggregate.
+    /// Creates ONE entry targeting the container div's change event (bubbles from checkboxes).
+    /// checklist.ts syncs checked values into container.value (string[]) and hidden.value (CSV).
+    /// The ComponentEventTrigger reads container.value — getting the full array.
     ///
-    /// Hidden input sync + event dispatch is handled by checklist.ts — not here.
     /// This extension only wires the developer's custom pipeline.
     /// </summary>
     public static class NativeCheckListReactiveExtensions

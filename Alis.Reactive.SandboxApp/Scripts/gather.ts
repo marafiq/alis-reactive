@@ -22,6 +22,22 @@ export function resolveGather(
   const body: Record<string, unknown> = {};
 
   function addValue(name: string, raw: unknown): void {
+    // Array values: repeated params for GET/FormData, as-is for JSON
+    if (Array.isArray(raw)) {
+      if (isGet) {
+        for (const item of raw)
+          urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(String(item))}`);
+      } else if (formData) {
+        for (const item of raw)
+          formData.append(name, String(item ?? ""));
+      } else {
+        setNested(body, name, raw);
+      }
+      log.trace("component", { name, value: raw });
+      return;
+    }
+
+    // Scalar path (unchanged)
     const value = raw === "" ? null : raw;
     if (isGet) {
       urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(String(raw))}`);

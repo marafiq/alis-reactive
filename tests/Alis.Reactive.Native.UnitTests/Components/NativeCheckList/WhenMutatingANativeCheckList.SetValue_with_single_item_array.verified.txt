@@ -1,4 +1,4 @@
-﻿{
+{
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
   entries: [
     {
@@ -10,12 +10,14 @@
         commands: [
           {
             kind: mutate-element,
-            target: allergyChecklist,
+            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
             mutation: {
               kind: set-prop,
               prop: value
             },
-            value: Dairy,
+            value: [
+              Dairy
+            ],
             vendor: native
           }
         ]
