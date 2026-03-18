@@ -28,6 +28,11 @@
   animation: alis-drawer-fade-in 0.3s ease;
 }
 
+/* Size variants — default is 24rem, use SetSize() for typed widths */
+.alis-drawer--sm .alis-drawer__panel { width: 28rem; }
+.alis-drawer--md .alis-drawer__panel { width: 36rem; }
+.alis-drawer--lg .alis-drawer__panel { width: 48rem; }
+
 .alis-drawer__panel {
   position: absolute;
   top: 0;

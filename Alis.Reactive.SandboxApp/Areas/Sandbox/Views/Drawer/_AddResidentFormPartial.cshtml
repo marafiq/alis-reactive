@@ -1,0 +1,32 @@
+<form class="space-y-4">
+    <div>
+        <label for="drawer-name">Resident Name *</label>
+        <input type="text" id="drawer-name" placeholder="Full name" />
+    </div>
+    <div>
+        <label for="drawer-email">Email</label>
+        <input type="email" id="drawer-email" placeholder="resident@facility.com" />
+    </div>
+    <div>
+        <label for="drawer-care">Care Level</label>
+        <select id="drawer-care">
+            <option value="">-- Select --</option>
+            <option>Independent Living</option>
+            <option>Assisted Living</option>
+            <option>Memory Care</option>
+            <option>Skilled Nursing</option>
+        </select>
+    </div>
+    <div>
+        <label for="drawer-date">Admission Date</label>
+        <input type="date" id="drawer-date" />
+    </div>
+    <div>
+        <label for="drawer-notes">Notes</label>
+        <textarea id="drawer-notes" rows="3" placeholder="Additional care notes..."></textarea>
+    </div>
+    <div class="pt-2 flex gap-2">
+        <button type="button" class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium">Save Resident</button>
+        <button type="button" class="px-4 py-2 rounded-lg border border-border text-sm font-medium text-text-secondary">Cancel</button>
+    </div>
+</form>

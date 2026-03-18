@@ -7,6 +7,28 @@ namespace Alis.Reactive.Native.AppLevel
 {
     public static class NativeDrawerExtensions
     {
+        private static readonly string[] SizeClasses = { "alis-drawer--sm", "alis-drawer--md", "alis-drawer--lg" };
+
+        public static ComponentRef<NativeDrawer, TModel> SetSize<TModel>(
+            this ComponentRef<NativeDrawer, TModel> self, DrawerSize size)
+            where TModel : class
+        {
+            // Remove all size classes, then add the requested one
+            foreach (var cls in SizeClasses)
+                self = self.Emit(new CallMutation("remove", "classList",
+                    new[] { new LiteralArg(cls) }));
+
+            var sizeClass = size switch
+            {
+                DrawerSize.Sm => "alis-drawer--sm",
+                DrawerSize.Md => "alis-drawer--md",
+                DrawerSize.Lg => "alis-drawer--lg",
+                _ => "alis-drawer--md"
+            };
+            return self.Emit(new CallMutation("add", "classList",
+                new[] { new LiteralArg(sizeClass) }));
+        }
+
         public static ComponentRef<NativeDrawer, TModel> Open<TModel>(
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class

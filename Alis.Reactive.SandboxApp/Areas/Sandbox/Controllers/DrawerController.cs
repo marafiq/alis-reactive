@@ -9,5 +9,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         {
             return View(new Models.DrawerModel());
         }
+
+        [HttpGet]
+        public IActionResult ResidentDetails()
+        {
+            return PartialView("_ResidentDetailsPartial");
+        }
+
+        [HttpGet]
+        public IActionResult CarePlanNotes()
+        {
+            return PartialView("_CarePlanNotesPartial");
+        }
+
+        [HttpGet]
+        public IActionResult AddResidentForm()
+        {
+            return PartialView("_AddResidentFormPartial");
+        }
     }
 }

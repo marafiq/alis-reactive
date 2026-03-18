@@ -24,6 +24,7 @@ function init(): void {
   container.addEventListener("transitionend", () => {
     if (!container.classList.contains("alis-drawer--visible")) {
       container.setAttribute("aria-hidden", "true");
+      container.classList.remove("alis-drawer--sm", "alis-drawer--md", "alis-drawer--lg");
       const content = document.getElementById("alis-drawer-content");
       if (content) content.innerHTML = "";
       const title = document.getElementById("alis-drawer-title");
