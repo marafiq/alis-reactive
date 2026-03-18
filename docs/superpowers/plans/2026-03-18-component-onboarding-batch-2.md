@@ -4,7 +4,7 @@
 
 **Goal:** Onboard 6 new input components as pure-additive vertical slices — zero changes to existing code or runtime.
 
-**Architecture:** Each component is a self-contained vertical slice (7 files + sandbox + tests). Native components render raw HTML; Fusion components delegate to Syncfusion EJ2 builders via `EJS()`. All components register in `ComponentsMap` for gather/validation. Each gets its own sandbox page demonstrating full API.
+**Architecture:** Each component is a self-contained vertical slice (7 files + sandbox + tests). Native components render raw HTML; Fusion components delegate to Syncfusion EJ2 builders via `EJS()`. All components register in `ComponentsMap` for gather/validation. Each gets its own sandbox page demonstrating component-specific API (property write/read, events, conditions). HTTP gather integration is tested by adding ALL new components to a single dedicated "ComponentGather" page that POSTs every type together — proving they all work in one form.
 
 **Tech Stack:** C# (ASP.NET Core MVC + Syncfusion EJ2 v32), TypeScript (vitest + jsdom), Playwright (.NET)
 
@@ -21,7 +21,7 @@
 4. **No changes to core C# descriptors** — `MutateElementCommand`, `CoercionTypes`, `Guard*`, `Mutation*` are untouched
 5. **Each component is 100% self-contained** — 7 files in its own folder under `Components/`
 6. **Every sandbox page uses the design system** — `native-vstack`, `native-card`, `native-heading`, `native-text` tag helpers
-7. **Every sandbox page has an HTTP POST section** — demonstrating gather with the component, verifying array/scalar payloads
+7. **HTTP gather tested on a shared ComponentGather page** — one form with ALL 6 new components + existing components, POST endpoint echoes payload. Each sandbox page demos component-specific behavior only (events, conditions, property read/write) — NOT its own POST endpoint.
 8. **Builder constructors are internal** — devs use `Html.InputField().ComponentName()` factories only
 
 ---
@@ -32,7 +32,7 @@
 |---|-----------|---------|--------|----------|---------|---------|----------|------------|
 | 1 | NativeTextArea | Native | native | value | `string` | string | string | N/A (raw HTML) |
 | 2 | FusionDateTimePicker | Fusion | fusion | value | `DateTime` | Date | date | `DateTimePickerFor` |
-| 3 | FusionDateRangePicker | Fusion | fusion | value | `DateTime[]` | Date[] | array | `DateRangePickerFor` |
+| 3 | FusionDateRangePicker | Fusion | fusion | startDate | `DateTime` | Date | date | `DateRangePickerFor` |
 | 4 | FusionInputMask | Fusion | fusion | value | `string` | string | string | `MaskedTextBoxFor` |
 | 5 | FusionRichTextEditor | Fusion | fusion | value | `string` | string | string | `RichTextEditorFor` |
 | 6 | FusionSwitch | Fusion | fusion | checked | `bool` | boolean | boolean | `SwitchFor` |
@@ -354,7 +354,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 }
 ```
 
-- [ ] **Step 2:** Create `NativeTextAreaController.cs` with Index + Submit POST endpoint
+- [ ] **Step 2:** Create `NativeTextAreaController.cs` with Index only (no POST — HTTP gather tested on shared page)
 
 ```csharp
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
@@ -369,24 +369,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         {
             return View(new NativeTextAreaModel { CareNotes = "Patient admitted. Initial assessment completed." });
         }
-
-        [HttpPost]
-        public IActionResult Submit([FromBody] NativeTextAreaModel? model)
-        {
-            if (model == null)
-                return BadRequest(new { errors = new { CareNotes = new[] { "Request body is required." } } });
-            return Ok(new { message = $"Notes saved for {model.ResidentName ?? "unknown"}" });
-        }
     }
 }
 ```
 
-- [ ] **Step 3:** Create `Views/NativeTextArea/Index.cshtml` — 5 sections: property write, property read, event+condition, HTTP POST with gather, plan JSON. Uses `native-vstack`, `native-card`, `native-heading`, `native-text` design system tag helpers. Include `Html.InputField(plan, m => m.ResidentName).NativeTextBox()` for the name field so HTTP gather has both scalar and textarea values.
-
-The HTTP POST section must:
-- Use `Html.NativeButton` with `.Reactive()` wiring
-- Call `p.Post("/Sandbox/NativeTextArea/Submit", g => g.IncludeAll())`
-- Show success/error result in echo element
+- [ ] **Step 3:** Create `Views/NativeTextArea/Index.cshtml` — 4 sections: property write, property read, event+condition, plan JSON. Uses `native-vstack`, `native-card`, `native-heading`, `native-text` design system tag helpers. NO HTTP POST section — that is on the shared ComponentGather page.
 
 - [ ] **Step 4:** Build and verify: `dotnet build Alis.Reactive.SandboxApp`
 - [ ] **Step 5:** Add nav link in `_Layout.cshtml` after the MultiSelect link
@@ -396,7 +383,7 @@ The HTTP POST section must:
 **File to create:**
 - `tests/Alis.Reactive.PlaywrightTests/Components/Native/WhenUsingNativeTextArea.cs`
 
-- [ ] **Step 1:** Create Playwright test with sections: page loads, property write sets initial value, property read echoes value, changed event with condition, HTTP POST gathers textarea value (intercept request body), component value condition.
+- [ ] **Step 1:** Create Playwright test with sections: page loads, property write sets initial value, property read echoes value, changed event with condition, component value condition. NO HTTP POST test — that goes on shared ComponentGather page.
 - [ ] **Step 2:** Run: `dotnet test tests/Alis.Reactive.PlaywrightTests --filter "NativeTextArea"`
 - [ ] **Step 3:** Commit: `git commit -m "feat: NativeTextArea vertical slice with sandbox + tests"`
 
@@ -434,8 +421,8 @@ The HTTP POST section must:
 - [ ] **Step 1:** Create unit tests: `WhenMutatingAFusionDateTimePicker.cs`, `WhenDescribingFusionDateTimePickerEvents.cs`
 - [ ] **Step 2:** Run and accept snapshots: `dotnet test tests/Alis.Reactive.Fusion.UnitTests --filter "DateTimePicker"`
 - [ ] **Step 3:** Create sandbox model `DateTimePickerModel.cs` — `DateTime? MedicationTime`, `string? ResidentName`
-- [ ] **Step 4:** Create controller `DateTimePickerController.cs` — Index + Submit POST
-- [ ] **Step 5:** Create view `Views/DateTimePicker/Index.cshtml` — property write, read, event+condition, HTTP POST gather, plan JSON
+- [ ] **Step 4:** Create controller `DateTimePickerController.cs` — Index only (no POST)
+- [ ] **Step 5:** Create view `Views/DateTimePicker/Index.cshtml` — property write, read, event+condition, plan JSON (no HTTP POST section)
 - [ ] **Step 6:** Add nav link in `_Layout.cshtml`
 - [ ] **Step 7:** Create Playwright test `WhenUsingFusionDateTimePicker.cs`
 - [ ] **Step 8:** Run all: `dotnet test tests/Alis.Reactive.Fusion.UnitTests --filter "DateTimePicker" && dotnet test tests/Alis.Reactive.PlaywrightTests --filter "DateTimePicker"`
@@ -447,7 +434,9 @@ The HTTP POST section must:
 
 ### Task 7: FusionDateRangePicker vertical slice (7 files)
 
-**Critical difference:** `ej2.value` returns `Date[]` (two-element array: start + end). ReadExpr = `"value"`. C# type = `DateTime[]`. Coercion = `"array"` with elementCoerceAs = `"date"`.
+**Design decision:** SF DateRangePicker exposes `ej2.startDate` and `ej2.endDate` as separate `Date` properties on the instance. We use `ReadExpr => "startDate"` as the primary read (for gather — binds to the start date). The change event args expose both `StartDate` and `EndDate` as typed `DateTime?` properties for condition expressions. This avoids the array coercion lie — a date range is NOT semantically an array, it's a structured from/to pair.
+
+**The model binds to TWO separate `DateTime?` properties** (not a `DateTime[]`). The gather sends `StartDate` and `EndDate` as two separate scalar date values.
 
 **Files to create:**
 - `Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs`
@@ -458,22 +447,28 @@ The HTTP POST section must:
 - `Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerReactiveExtensions.cs`
 
 **File to modify:**
-- `FusionTestBase.cs` — add `public DateTime[]? StayPeriod { get; set; }`
+- `FusionTestBase.cs` — add `public DateTime? StayStart { get; set; }` and `public DateTime? StayEnd { get; set; }`
 
-- [ ] **Step 1:** Create phantom type — `ReadExpr => "value"`
-- [ ] **Step 2:** Create event args — `DateTime[]? Value`, `DateTime? StartDate`, `DateTime? EndDate`, `bool IsInteracted`
+**Note on ComponentsMap:** DateRangePicker registers TWO entries in ComponentsMap — one for startDate (readExpr: "startDate") and one for endDate (readExpr: "endDate"). The HtmlExtensions factory handles this dual registration.
+
+- [ ] **Step 1:** Create phantom type — `ReadExpr => "startDate"` (primary property)
+- [ ] **Step 2:** Create event args — `DateTime? StartDate`, `DateTime? EndDate`, `int DaySpan`, `bool IsInteracted`
 - [ ] **Step 3:** Create events singleton — `Changed` → `"change"`
-- [ ] **Step 4:** Create extensions — `SetValue(DateTime[])`, `Value()` → `TypedComponentSource<DateTime[]>` (coercion = `"array"`)
-- [ ] **Step 5:** Create HTML extensions — `setup.Helper.EJS().DateRangePickerFor(setup.Expression)`, register ComponentsMap
+- [ ] **Step 4:** Create extensions:
+  - `StartDate()` → `TypedComponentSource<DateTime>` with readExpr `"startDate"`
+  - `EndDate()` → `TypedComponentSource<DateTime>` with readExpr `"endDate"`
+  - `Value()` → same as `StartDate()` (primary read)
+  - No `SetValue()` — DateRangePicker is set by user interaction, not programmatically
+- [ ] **Step 5:** Create HTML extensions — `setup.Helper.EJS().DateRangePickerFor(setup.Expression)`. Register TWO ComponentsMap entries: one with readExpr `"startDate"`, one with readExpr `"endDate"`, using qualified binding paths (e.g. `StayStart`, `StayEnd`).
 - [ ] **Step 6:** Create reactive extensions
-- [ ] **Step 7:** Add property to test base, build
+- [ ] **Step 7:** Add properties to test base, build
 
 ### Task 8: FusionDateRangePicker tests + sandbox
 
-- [ ] **Step 1:** Unit tests with snapshot + schema validation (array value in plan)
-- [ ] **Step 2:** Sandbox: `DateRangePickerModel.cs` (StayPeriod, ResidentName), controller, view with HTTP POST
+- [ ] **Step 1:** Unit tests — StartDate/EndDate typed sources, schema validation
+- [ ] **Step 2:** Sandbox: `DateRangePickerModel.cs` (`DateTime? StayStart`, `DateTime? StayEnd`, `string? ResidentName`), controller, view with conditions on startDate/endDate
 - [ ] **Step 3:** Nav link in layout
-- [ ] **Step 4:** Playwright tests — verify date range array in HTTP POST body
+- [ ] **Step 4:** Playwright tests — verify date conditions fire correctly
 - [ ] **Step 5:** Commit: `git commit -m "feat: FusionDateRangePicker vertical slice with sandbox + tests"`
 
 ---
@@ -506,7 +501,7 @@ The HTTP POST section must:
 ### Task 10: FusionInputMask tests + sandbox
 
 - [ ] **Step 1:** Unit tests (snapshot + schema)
-- [ ] **Step 2:** Sandbox: `InputMaskModel.cs` (PhoneNumber, SSN, InsuranceId), controller with POST, view with HTTP gather
+- [ ] **Step 2:** Sandbox: `InputMaskModel.cs` (PhoneNumber, SSN, InsuranceId), controller (Index only), view with events + conditions (no HTTP POST)
 - [ ] **Step 3:** Nav link, Playwright tests
 - [ ] **Step 4:** Commit: `git commit -m "feat: FusionInputMask vertical slice with sandbox + tests"`
 
@@ -540,7 +535,7 @@ The HTTP POST section must:
 ### Task 12: FusionRichTextEditor tests + sandbox
 
 - [ ] **Step 1:** Unit tests
-- [ ] **Step 2:** Sandbox: `RichTextEditorModel.cs` (CarePlan, DischargeSummary), controller with POST, view with HTTP gather
+- [ ] **Step 2:** Sandbox: `RichTextEditorModel.cs` (CarePlan, DischargeSummary), controller (Index only), view with events + conditions (no HTTP POST)
 - [ ] **Step 3:** Nav link, Playwright tests
 - [ ] **Step 4:** Commit: `git commit -m "feat: FusionRichTextEditor vertical slice with sandbox + tests"`
 
@@ -574,20 +569,110 @@ The HTTP POST section must:
 ### Task 14: FusionSwitch tests + sandbox
 
 - [ ] **Step 1:** Unit tests
-- [ ] **Step 2:** Sandbox: `SwitchModel.cs` (ReceiveNotifications, EmailAlerts, SmsAlerts), controller with POST, view with HTTP gather
-- [ ] **Step 3:** Nav link, Playwright tests — verify boolean in HTTP POST body
+- [ ] **Step 2:** Sandbox: `SwitchModel.cs` (ReceiveNotifications, EmailAlerts, SmsAlerts), controller (Index only), view with events + conditions (no HTTP POST)
+- [ ] **Step 3:** Nav link, Playwright tests — verify boolean toggle via conditions
 - [ ] **Step 4:** Commit: `git commit -m "feat: FusionSwitch vertical slice with sandbox + tests"`
 
 ---
 
-## Chunk 7: Final verification
+## Chunk 7: Shared ComponentGather page + final verification
 
-### Task 15: Full test suite + gather coverage
+### Task 15: ComponentGather sandbox page — all components in one form
 
-- [ ] **Step 1:** Add new components to gather test: `when-gathering-form-values.test.ts`
+**Purpose:** One page with ALL 6 new components + a NativeTextBox (existing) in a single `<form>`. A POST button gathers every field via `IncludeAll()` and POSTs to an echo endpoint. This proves all component types work together in a real HTTP gather flow — scalar strings, booleans, dates, and the DateRangePicker's structured start/end dates.
+
+**Files to create:**
+- `Alis.Reactive.SandboxApp/Areas/Sandbox/Models/ComponentGatherModel.cs`
+- `Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/ComponentGatherController.cs`
+- `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/ComponentGather/Index.cshtml`
+
+- [ ] **Step 1:** Create `ComponentGatherModel.cs` — one property per component type:
+
+```csharp
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+{
+    public class ComponentGatherModel
+    {
+        // Existing component types (prove they still work)
+        public string? ResidentName { get; set; }          // NativeTextBox
+        // New batch 2 components
+        public string? CareNotes { get; set; }             // NativeTextArea
+        public DateTime? MedicationTime { get; set; }       // FusionDateTimePicker
+        public DateTime? StayStart { get; set; }            // FusionDateRangePicker (startDate)
+        public DateTime? StayEnd { get; set; }              // FusionDateRangePicker (endDate)
+        public string? PhoneNumber { get; set; }            // FusionInputMask
+        public string? CarePlan { get; set; }               // FusionRichTextEditor
+        public bool ReceiveNotifications { get; set; }      // FusionSwitch
+    }
+}
+```
+
+- [ ] **Step 2:** Create `ComponentGatherController.cs` — Index + Echo POST endpoint
+
+```csharp
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
+{
+    [Area("Sandbox")]
+    public class ComponentGatherController : Controller
+    {
+        public IActionResult Index()
+        {
+            return View(new ComponentGatherModel
+            {
+                ResidentName = "Margaret Thompson",
+                CareNotes = "Initial assessment completed.",
+                ReceiveNotifications = true
+            });
+        }
+
+        [HttpPost]
+        public IActionResult Echo([FromBody] ComponentGatherModel? model)
+        {
+            if (model == null)
+                return BadRequest(new { error = "Empty body" });
+            return Ok(model);
+        }
+    }
+}
+```
+
+- [ ] **Step 3:** Create `Views/ComponentGather/Index.cshtml` — single form with all 8 components (1 existing + 6 new + DateRangePicker's dual binding). Uses design system tag helpers. Submit button gathers via `IncludeAll()`, POSTs to Echo, shows gathered JSON in result area.
+
+- [ ] **Step 4:** Add nav link in `_Layout.cshtml`
+- [ ] **Step 5:** Build: `dotnet build Alis.Reactive.SandboxApp`
+
+### Task 16: ComponentGather Playwright tests
+
+**File to create:**
+- `tests/Alis.Reactive.PlaywrightTests/Requests/WhenGatheringAllComponentTypes.cs`
+
+- [ ] **Step 1:** Create Playwright test that:
+  - Navigates to `/Sandbox/ComponentGather`, waits for boot
+  - Fills/selects values in every component
+  - Clicks Submit, intercepts the POST request via `RunAndWaitForRequestAsync`
+  - Asserts the JSON body contains ALL fields with correct types:
+    - `ResidentName` = string
+    - `CareNotes` = string (textarea)
+    - `MedicationTime` = date value (non-null)
+    - `StayStart` = date value (from DateRangePicker)
+    - `StayEnd` = date value (from DateRangePicker)
+    - `PhoneNumber` = string (masked)
+    - `CarePlan` = string (HTML content)
+    - `ReceiveNotifications` = boolean
+
+- [ ] **Step 2:** Run: `dotnet test tests/Alis.Reactive.PlaywrightTests --filter "WhenGatheringAllComponentTypes"`
+- [ ] **Step 3:** Commit: `git commit -m "feat: ComponentGather page proving all component types work together in HTTP POST"`
+
+### Task 17: TS gather tests + full suite verification
+
+- [ ] **Step 1:** Add new components to gather test: `when-gathering-form-values.test.ts` (additive)
   - NativeTextArea (native, value, string) — POST + GET
   - FusionDateTimePicker (fusion, value, Date) — POST + GET
-  - FusionDateRangePicker (fusion, value, Date[]) — POST + GET (array)
+  - FusionDateRangePicker (fusion, startDate, Date) — POST + GET (scalar, not array)
+  - FusionDateRangePicker (fusion, endDate, Date) — POST + GET (second scalar)
   - FusionInputMask (fusion, value, string) — POST + GET
   - FusionRichTextEditor (fusion, value, string) — POST + GET
   - FusionSwitch (fusion, checked, boolean) — POST + GET
@@ -603,9 +688,9 @@ dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 dotnet test tests/Alis.Reactive.PlaywrightTests
 ```
 
-- [ ] **Step 3:** Commit: `git commit -m "test: gather coverage for all 6 new components"`
+- [ ] **Step 3:** Commit: `git commit -m "test: gather coverage for all 6 new components + shared ComponentGather page"`
 
-- [ ] **Step 4:** Verify no existing tests broke — the only modified files outside vertical slices are `NativeTestBase.cs`, `FusionTestBase.cs`, `_Layout.cshtml`, and `when-gathering-form-values.test.ts` (additive only).
+- [ ] **Step 4:** Verify no existing tests broke — modified files outside vertical slices are ONLY: `NativeTestBase.cs`, `FusionTestBase.cs`, `_Layout.cshtml`, `when-gathering-form-values.test.ts` (all additive).
 
 ---
 
@@ -613,14 +698,17 @@ dotnet test tests/Alis.Reactive.PlaywrightTests
 
 | Task | Component | Deliverables |
 |------|-----------|-------------|
-| 1-4 | NativeTextArea | 7 slice files + model + controller + view + unit tests + Playwright |
-| 5-6 | FusionDateTimePicker | 7 slice files + model + controller + view + unit tests + Playwright |
-| 7-8 | FusionDateRangePicker | 7 slice files + model + controller + view + unit tests + Playwright |
-| 9-10 | FusionInputMask | 7 slice files + model + controller + view + unit tests + Playwright |
-| 11-12 | FusionRichTextEditor | 7 slice files + model + controller + view + unit tests + Playwright |
-| 13-14 | FusionSwitch | 7 slice files + model + controller + view + unit tests + Playwright |
-| 15 | Gather coverage | 12 new gather tests (6 components × POST + GET) |
+| 1-4 | NativeTextArea | 7 slice files + sandbox (model + controller + view) + unit tests + Playwright |
+| 5-6 | FusionDateTimePicker | 7 slice files + sandbox + unit tests + Playwright |
+| 7-8 | FusionDateRangePicker | 7 slice files + sandbox + unit tests + Playwright (startDate/endDate, NOT array) |
+| 9-10 | FusionInputMask | 7 slice files + sandbox + unit tests + Playwright |
+| 11-12 | FusionRichTextEditor | 7 slice files + sandbox + unit tests + Playwright |
+| 13-14 | FusionSwitch | 7 slice files + sandbox + unit tests + Playwright |
+| 15-16 | ComponentGather | Shared page with ALL components in one form + POST echo + Playwright (HTTP body assertion) |
+| 17 | TS gather tests | 14 new gather tests (7 component reads × POST + GET) + full suite verification |
 
-**Total new files:** ~66 (7 slice + 3 sandbox + ~4 test files) × 6 components + gather tests
-**Modified files:** 3 (NativeTestBase, FusionTestBase, _Layout.cshtml) + 1 gather test (additive)
+**Sandbox pages:** Each component gets its own page for component-specific demos (events, conditions, property read/write). HTTP gather is tested ONLY on the shared ComponentGather page where all types coexist in one form.
+
+**Total new files:** ~70 (7 slice + 3 sandbox) × 6 components + ComponentGather page + tests
+**Modified files:** 3 (NativeTestBase, FusionTestBase, _Layout.cshtml) + 1 gather test (all additive)
 **Existing code changes:** Zero (additive properties to test models, additive nav links, additive gather tests)
