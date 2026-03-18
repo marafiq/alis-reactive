@@ -50,18 +50,18 @@
     var formattedJson = plan.RenderFormatted();
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Payload Access</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">Payload Access</native-heading>
+        <native-text color="Secondary">
             Dispatches a payload with all primitive types + nested Address object.
             Each property is extracted via plan <code>source</code> binding and rendered to DOM.
-        </p>
+        </native-text>
     </div>
 
     <!-- Payload Property Grid — all driven by plan source resolution -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Resolved Payload Properties</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">Resolved Payload Properties</native-heading>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-sm">
             <div class="space-y-3">
@@ -106,13 +106,13 @@
         </div>
 
         <p id="payload-status" class="text-text-muted mt-6">Waiting for payload dispatch...</p>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
-    </section>
-</div>
+    </native-card-body></native-card>
+</native-vstack>
 
 @Html.RenderPlan(plan)

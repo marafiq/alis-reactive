@@ -11,13 +11,13 @@
         .ToList();
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Scenario 2 — Conditional Show/Hide</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">Scenario 2 — Conditional Show/Hide</native-heading>
+        <native-text color="Secondary">
             Fields show/hide based on condition source values. Validation rules may or may not align
             with visibility — hidden fields with unconditional rules show errors in summary.
-        </p>
+        </native-text>
     </div>
 
     <form id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
@@ -169,6 +169,6 @@
         </div>
         </div>
     </form>
-</div>
+</native-vstack>
 
 @Html.RenderPlan(plan)

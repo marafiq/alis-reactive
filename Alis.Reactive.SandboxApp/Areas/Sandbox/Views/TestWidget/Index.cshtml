@@ -44,21 +44,24 @@
     // ── 10-11: DataSource — wired directly on button click, no dispatch ──
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">TestWidget — Structured Mutation API Surface</h1>
+        <native-heading level="H1">TestWidget — Structured Mutation API Surface</native-heading>
     </div>
 
     <!-- 1: Property Write (static) -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Property Write (Static)</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">1. Property Write (Static)</native-heading>
         @(Html.TestWidget("tw-write")
             .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- 2: Void Method — Clear -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. Void Method — Clear</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">2. Void Method — Clear</native-heading>
         @(Html.TestWidget("tw-clear")
             .InitialValue("clear-me")
             .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full"))
@@ -70,11 +73,13 @@
                     p.Component<TestWidgetSyncFusion>("tw-clear").Clear().Focus();
                 }))
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- 3: Void Method — Focus -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. Void Method — Focus</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">3. Void Method — Focus</native-heading>
         @(Html.TestWidget("tw-focus")
             .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full"))
         <div class="mt-3">
@@ -85,11 +90,13 @@
                     p.Component<TestWidgetSyncFusion>("tw-focus").Focus();
                 }))
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- 4: Event Payload → Component (SetValue from args) -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">4. Event Payload → Component SetValue</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">4. Event Payload → Component SetValue</native-heading>
         @(Html.TestWidget("tw-event-write")
             .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -102,20 +109,24 @@
             @(Html.TestWidget("tw-event-mirror")
                 .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- 5: Component Read → Display -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">5. Component Read → Display</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">5. Component Read → Display</native-heading>
         @(Html.TestWidget("tw-read")
             .InitialValue("read-me")
             .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
         <p class="mt-3 font-mono text-sm">Read: <span id="read-echo" class="text-text-muted">&mdash;</span></p>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- 6: Component Value Condition -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">6. Component Value Condition</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">6. Component Value Condition</native-heading>
         @(Html.TestWidget("tw-comp-cond")
             .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
             .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -126,11 +137,13 @@
                     .Else(e => { e.Element("comp-cond-ind").Hide(); });
             }))
         <div id="comp-cond-ind" hidden class="mt-3 rounded-md bg-blue-50 border border-blue-200 p-4 text-sm">&mdash;</div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- 7: Method + Arg (SetItems from event) -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">7. Method + Arg (SetItems)</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">7. Method + Arg (SetItems)</native-heading>
         @(Html.TestWidget("tw-items")
             .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
         <div class="mt-3">
@@ -141,11 +154,13 @@
                     p.Dispatch("load-items", new DataSourceResponse { Items = new[] { "x", "y", "z" } });
                 }))
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- 8: Cross-Component Read → Write -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">8. Cross-Component Read → Write</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">8. Cross-Component Read → Write</native-heading>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium mb-1">Source</label>
@@ -163,11 +178,13 @@
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
             </div>
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- 9: Gather → HTTP Echo -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">9. Gather → HTTP Echo</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">9. Gather → HTTP Echo</native-heading>
         @(Html.TestWidget("tw-gather")
             .InitialValue("gather-me")
             .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full"))
@@ -177,11 +194,13 @@
                 .Reactive(plan, evt => evt.Click, (args, p) => { p.Dispatch("do-gather"); }))
         </div>
         <p class="mt-3 font-mono text-sm">Result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- 10-11: DataSource — Response Body → Component -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">10–11. Response Body → Component</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">10–11. Response Body → Component</native-heading>
         @(Html.TestWidget("tw-ds-target")
             .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"))
         <div class="mt-3">
@@ -202,14 +221,17 @@
                         }));
                 }))
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
-</div>
+    </native-card-body>
+    </native-card>
+</native-vstack>
 
 @section Scripts {
     <script src="~/js/test-widget.js" asp-append-version="true"></script>

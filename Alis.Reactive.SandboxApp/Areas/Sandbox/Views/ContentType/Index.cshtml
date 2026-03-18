@@ -55,18 +55,19 @@
     }));
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Content-Type Aware Success Handlers</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">Content-Type Aware Success Handlers</native-heading>
+        <native-text color="Secondary">
             JSON responses use <code>OnSuccess&lt;T&gt;</code> with typed path walking via <code>ResponseBody&lt;T&gt;</code>.
             HTML partials use <code>Into</code> with <code>ej.base.append</code>.
-        </p>
+        </native-text>
     </div>
 
     <!-- Section 1: Flat JSON Response -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. JSON Flat Response</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">1. JSON Flat Response</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             <code>OnSuccess&lt;FlatResponse&gt;((json, s) =&gt; s.Element("x").SetText(json, r =&gt; r.Message))</code>
             — walks <code>responseBody.message</code> at runtime.
@@ -82,11 +83,13 @@
             <p>Message: <span id="flat-message" class="text-text-muted">&mdash;</span></p>
             <p>Count: <span id="flat-count" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Section 2: Nested JSON Response -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. JSON Nested Response</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">2. JSON Nested Response</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             <code>OnSuccess&lt;NestedResponse&gt;((json, s) =&gt; s.Element("x").SetText(json, r =&gt; r.Data.User.Name))</code>
             — walks <code>responseBody.data.user.name</code> (3 levels deep).
@@ -103,11 +106,13 @@
             <p>Email: <span id="nested-email" class="text-text-muted">&mdash;</span></p>
             <p>Total: <span id="nested-total" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Section 3: HTML Partial via Into -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. HTML Partial via Into</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">3. HTML Partial via Into</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             <code>Into("partial-container")</code> injects server-rendered HTML.
             Partial includes native <code>&lt;input&gt;</code> via <code>Html.NativeTextBoxFor()</code> and Syncfusion <code>NumericTextBox</code> via <code>Html.NumericTextBoxFor()</code>.
@@ -125,14 +130,17 @@
         <div id="partial-container" class="mt-3 rounded-md border border-dashed border-border p-4">
             <p class="text-text-muted text-sm">Partial not loaded yet</p>
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
-</div>
+    </native-card-body>
+    </native-card>
+</native-vstack>
 
 @section Scripts {
     <script src="~/js/test-widget.js" asp-append-version="true"></script>

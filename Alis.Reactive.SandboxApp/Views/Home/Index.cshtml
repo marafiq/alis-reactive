@@ -2,318 +2,324 @@
     ViewData["Title"] = "Home";
 }
 
-<div class="space-y-8">
-    <div>
-        <h1 class="text-2xl font-bold tracking-tight">Alis.Reactive Sandbox</h1>
-        <p class="mt-2 text-text-secondary">
-            Proving ground for the reactive descriptor pattern.
-            Each feature is a self-contained demo with live behavior and source code.
-        </p>
+<native-vstack gap="Xl">
+    <!-- Hero -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#7A2E3B] via-[#8B3847] to-[#5E1F2C] px-8 py-12 sm:px-12 sm:py-16">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE4YzAtOS45NC04LjA2LTE4LTE4LTE4UzAgOC4wNiAwIDE4czguMDYgMTggMTggMTggMTgtOC4wNiAxOC0xOCIvPjwvZz48L2c+PC9zdmc+')] opacity-50"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white/90 ring-1 ring-white/20 backdrop-blur-sm">
+                    v1.0
+                </span>
+                <span class="inline-flex items-center rounded-full bg-[#D4A053]/20 px-3 py-1 text-xs font-medium text-[#D4A053] ring-1 ring-[#D4A053]/30">
+                    Reactive Framework
+                </span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                Alis.Reactive Sandbox
+            </h1>
+            <p class="mt-3 text-base text-white/70 max-w-2xl leading-relaxed">
+                Proving ground for the reactive descriptor pattern.
+                Each feature is a self-contained demo with live behavior and source code.
+            </p>
+        </div>
     </div>
 
     <!-- Group 1: Core Primitives -->
     <section>
-        <h2 class="text-lg font-semibold tracking-tight mb-3">Core Primitives</h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-1 h-6 rounded-full bg-[#7A2E3B]"></span>
+            <native-heading level="H2">Core Primitives</native-heading>
+        </div>
+        <native-grid cols="C3" gap="Base">
             <a asp-area="Sandbox" asp-controller="Events" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Events &amp; Dispatch
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Events &amp; Dispatch
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                     Custom event triggers, dispatch commands, payload flow, and event chaining.
                 </p>
             </a>
 
             <a asp-area="Sandbox" asp-controller="Payload" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Payload Resolution
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Payload Resolution
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                     Event payload structure and typed field resolution across vendors.
                 </p>
             </a>
 
             <a asp-area="Sandbox" asp-controller="Conditions" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Conditions &amp; Guards
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Conditions &amp; Guards
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                     All 20 operators, AND/OR composition, NOT inversion, Confirm dialog, per-action When guards.
                 </p>
             </a>
-        </div>
+        </native-grid>
     </section>
 
     <!-- Group 2: Native Components -->
     <section>
-        <h2 class="text-lg font-semibold tracking-tight mb-3">Native Components</h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <a asp-area="Sandbox" asp-controller="NativeButton" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    NativeButton
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Native HTML button with click events and reactive wiring.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="CheckBox" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    NativeCheckBox
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Native checkbox with checked state binding and change events.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="NativeTextBox" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    NativeTextBox
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Native text input with value binding and input events.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="NativeDropDown" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    NativeDropDown
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Native select element with option binding and change events.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="NativeDatePicker" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    NativeDatePicker
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Native date input with value binding and change events.
-                </p>
-            </a>
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-1 h-6 rounded-full bg-[#059669]"></span>
+            <native-heading level="H2">Native Components</native-heading>
         </div>
+        <native-grid cols="C3" gap="Base">
+            <a asp-area="Sandbox" asp-controller="NativeButton" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#059669]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#059669] transition-colors">NativeButton</h3>
+                    <span class="text-text-muted group-hover:text-[#059669] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Native HTML button with click events and reactive wiring.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="CheckBox" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#059669]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#059669] transition-colors">NativeCheckBox</h3>
+                    <span class="text-text-muted group-hover:text-[#059669] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Native checkbox with checked state binding and change events.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="NativeTextBox" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#059669]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#059669] transition-colors">NativeTextBox</h3>
+                    <span class="text-text-muted group-hover:text-[#059669] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Native text input with value binding and input events.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="NativeDropDown" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#059669]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#059669] transition-colors">NativeDropDown</h3>
+                    <span class="text-text-muted group-hover:text-[#059669] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Native select element with option binding and change events.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="NativeRadioGroup" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#059669]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#059669] transition-colors">NativeRadioGroup</h3>
+                    <span class="text-text-muted group-hover:text-[#059669] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Native radio button group with single selection and change events.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="NativeDatePicker" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#059669]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#059669] transition-colors">NativeDatePicker</h3>
+                    <span class="text-text-muted group-hover:text-[#059669] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Native date input with value binding and change events.</p>
+            </a>
+        </native-grid>
     </section>
 
     <!-- Group 3: Fusion Components -->
     <section>
-        <h2 class="text-lg font-semibold tracking-tight mb-3">Fusion Components</h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <a asp-area="Sandbox" asp-controller="NumericTextBox" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    FusionNumericTextBox
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Syncfusion numeric input with value coercion and change events.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="DropDownList" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    FusionDropDownList
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Syncfusion dropdown with item binding and selection events.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="AutoComplete" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    FusionAutoComplete
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Syncfusion autocomplete with filtering, selection, and source binding.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="FusionDatePicker" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    FusionDatePicker
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Syncfusion date picker with value binding and change events.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="TimePicker" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    FusionTimePicker
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Syncfusion time picker with value binding and change events.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="MultiColumnComboBox" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    FusionMultiColumnComboBox
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Syncfusion multi-column combo box with structured item display and selection.
-                </p>
-            </a>
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-1 h-6 rounded-full bg-[#2563EB]"></span>
+            <native-heading level="H2">Fusion Components</native-heading>
         </div>
+        <native-grid cols="C3" gap="Base">
+            <a asp-area="Sandbox" asp-controller="NumericTextBox" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#2563EB]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#2563EB] transition-colors">FusionNumericTextBox</h3>
+                    <span class="text-text-muted group-hover:text-[#2563EB] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Syncfusion numeric input with value coercion and change events.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="DropDownList" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#2563EB]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#2563EB] transition-colors">FusionDropDownList</h3>
+                    <span class="text-text-muted group-hover:text-[#2563EB] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Syncfusion dropdown with item binding and selection events.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="AutoComplete" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#2563EB]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#2563EB] transition-colors">FusionAutoComplete</h3>
+                    <span class="text-text-muted group-hover:text-[#2563EB] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Syncfusion autocomplete with filtering, selection, and source binding.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="FusionDatePicker" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#2563EB]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#2563EB] transition-colors">FusionDatePicker</h3>
+                    <span class="text-text-muted group-hover:text-[#2563EB] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Syncfusion date picker with value binding and change events.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="TimePicker" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#2563EB]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#2563EB] transition-colors">FusionTimePicker</h3>
+                    <span class="text-text-muted group-hover:text-[#2563EB] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Syncfusion time picker with value binding and change events.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="MultiColumnComboBox" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#2563EB]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#2563EB] transition-colors">FusionMultiColumnComboBox</h3>
+                    <span class="text-text-muted group-hover:text-[#2563EB] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Multi-column combo box with structured item display and selection.</p>
+            </a>
+        </native-grid>
     </section>
 
     <!-- Group 4: HTTP & Data -->
     <section>
-        <h2 class="text-lg font-semibold tracking-tight mb-3">HTTP &amp; Data</h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <a asp-area="Sandbox" asp-controller="Http" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    HTTP Requests
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    GET, POST with gather, chained sequential, and parallel concurrent requests with response routing.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="ContentType" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Content Types
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    JSON and HTML response handling with Into() content injection.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="Cascading" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Cascading DropDowns
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Dependent dropdown chains with server-side data filtering.
-                </p>
-            </a>
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-1 h-6 rounded-full bg-[#D97706]"></span>
+            <native-heading level="H2">HTTP &amp; Data</native-heading>
         </div>
+        <native-grid cols="C3" gap="Base">
+            <a asp-area="Sandbox" asp-controller="Http" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#D97706]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#D97706] transition-colors">HTTP Requests</h3>
+                    <span class="text-text-muted group-hover:text-[#D97706] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">GET, POST with gather, chained sequential, and parallel concurrent requests.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="ContentType" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#D97706]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#D97706] transition-colors">Content Types</h3>
+                    <span class="text-text-muted group-hover:text-[#D97706] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">JSON and HTML response handling with Into() content injection.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="Cascading" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#D97706]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#D97706] transition-colors">Cascading DropDowns</h3>
+                    <span class="text-text-muted group-hover:text-[#D97706] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Dependent dropdown chains with server-side data filtering.</p>
+            </a>
+        </native-grid>
     </section>
 
     <!-- Group 5: Validation -->
     <section>
-        <h2 class="text-lg font-semibold tracking-tight mb-3">Validation</h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <a asp-area="Sandbox" asp-controller="Validation" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Validation Showcase
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Full validation pipeline with FluentValidation rules and error display.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Scenario 1 — All Fields
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Single page with all field types, conditional rules, and equalTo validation.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="ConditionalHide"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Scenario 2 — Show/Hide
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Conditional visibility aligned with validation conditions.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="ServerPartial"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Scenario 3a — Server Partials
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Server-rendered partials with merged plans and own reactive behavior.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="AjaxPartial"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Scenario 3b — AJAX Partials
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Dynamic partial loading with enrichment lifecycle and summary routing.
-                </p>
-            </a>
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-1 h-6 rounded-full bg-[#DC2626]"></span>
+            <native-heading level="H2">Validation</native-heading>
         </div>
+        <native-grid cols="C3" gap="Base">
+            <a asp-area="Sandbox" asp-controller="Validation" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#DC2626]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#DC2626] transition-colors">Validation Showcase</h3>
+                    <span class="text-text-muted group-hover:text-[#DC2626] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Full validation pipeline with FluentValidation rules and error display.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#DC2626]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#DC2626] transition-colors">Scenario 1 — All Fields</h3>
+                    <span class="text-text-muted group-hover:text-[#DC2626] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Single page with all field types, conditional rules, and equalTo validation.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="ConditionalHide"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#DC2626]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#DC2626] transition-colors">Scenario 2 — Show/Hide</h3>
+                    <span class="text-text-muted group-hover:text-[#DC2626] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Conditional visibility aligned with validation conditions.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="ServerPartial"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#DC2626]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#DC2626] transition-colors">Scenario 3a — Server Partials</h3>
+                    <span class="text-text-muted group-hover:text-[#DC2626] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Server-rendered partials with merged plans and own reactive behavior.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="AjaxPartial"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#DC2626]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#DC2626] transition-colors">Scenario 3b — AJAX Partials</h3>
+                    <span class="text-text-muted group-hover:text-[#DC2626] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Dynamic partial loading with enrichment lifecycle and summary routing.</p>
+            </a>
+        </native-grid>
     </section>
 
     <!-- Group 6: Framework Infrastructure -->
     <section>
-        <h2 class="text-lg font-semibold tracking-tight mb-3">Framework Infrastructure</h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <a asp-area="Sandbox" asp-controller="IdGenerator" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    IdGenerator
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Automatic element ID generation from model expressions.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="Architecture" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Architecture Regression
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    End-to-end architecture test with TestWidget exercising all module paths.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Reactive Wiring
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Html.InputField() wrapping, .Reactive() on builders, cross-vendor custom events.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="ReactiveConditions"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    Reactive Conditions
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Conditions inside .Reactive() with cross-vendor mutations and nested targeting.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="TestWidget" asp-action="Index"
-               class="group block rounded-lg border border-border bg-white p-6 shadow-sm hover:shadow-md hover:border-accent/30 transition-all">
-                <h3 class="text-base font-semibold group-hover:text-accent transition-colors">
-                    TestWidget
-                </h3>
-                <p class="mt-1 text-sm text-text-secondary">
-                    Synthetic JS component with ej2_instances pattern for architecture verification.
-                </p>
-            </a>
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-1 h-6 rounded-full bg-[#6B7280]"></span>
+            <native-heading level="H2">Framework Infrastructure</native-heading>
         </div>
+        <native-grid cols="C3" gap="Base">
+            <a asp-area="Sandbox" asp-controller="IdGenerator" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#6B7280]/30 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#4B5563] transition-colors">IdGenerator</h3>
+                    <span class="text-text-muted group-hover:text-[#4B5563] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Automatic element ID generation from model expressions.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="Architecture" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#6B7280]/30 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#4B5563] transition-colors">Architecture Regression</h3>
+                    <span class="text-text-muted group-hover:text-[#4B5563] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">End-to-end architecture test with TestWidget exercising all module paths.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#6B7280]/30 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#4B5563] transition-colors">Reactive Wiring</h3>
+                    <span class="text-text-muted group-hover:text-[#4B5563] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Html.InputField() wrapping, .Reactive() on builders, cross-vendor custom events.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="ReactiveConditions"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#6B7280]/30 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#4B5563] transition-colors">Reactive Conditions</h3>
+                    <span class="text-text-muted group-hover:text-[#4B5563] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Conditions inside .Reactive() with cross-vendor mutations and nested targeting.</p>
+            </a>
+            <a asp-area="Sandbox" asp-controller="TestWidget" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#6B7280]/30 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#4B5563] transition-colors">TestWidget</h3>
+                    <span class="text-text-muted group-hover:text-[#4B5563] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">Synthetic JS component with ej2_instances pattern for architecture verification.</p>
+            </a>
+        </native-grid>
     </section>
-</div>
+</native-vstack>

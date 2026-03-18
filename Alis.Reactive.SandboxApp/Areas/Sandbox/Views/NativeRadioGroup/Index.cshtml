@@ -1,0 +1,142 @@
+@model NativeRadioGroupModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    ViewData["Title"] = "NativeRadioGroup";
+
+    var plan = Html.ReactivePlan<NativeRadioGroupModel>();
+    var roomTypeItems = (RadioButtonItem[])ViewBag.RoomTypeItems;
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">NativeRadioGroup</native-heading>
+        <native-text color="Secondary">
+            Radio button group: text-only variation, text + description variation,
+            form submission (JSON POST), and FluentValidation integration.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Text-Only Variation -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Text-Only Radio Group</native-heading>
+        <native-text color="Secondary">
+            Simple radio options with label text only. Uses <code>.Option(value, text)</code>.
+        </native-text>
+
+        @{ Html.InputField(plan, m => m.MealPlan, o => o.Required().Label("Meal Plan"))
+            .NativeRadioGroup(b => b
+                .Option("Standard", "Standard")
+                .Option("Vegetarian", "Vegetarian")
+                .Option("Diabetic", "Diabetic")
+                .Option("Kosher", "Kosher")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.Element("meal-echo").SetText(args, a => a.Value);
+                })); }
+
+        <div class="font-mono text-sm">
+            <p>Selected: <span id="meal-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 2: Text + Description Variation -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Text + Description Radio Group</native-heading>
+        <native-text color="Secondary">
+            Rich radio options with label and description. Uses <code>.Option(value, text, description)</code>.
+        </native-text>
+
+        @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
+            .NativeRadioGroup(b => b
+                .Option("Assisted Living", "Assisted Living", "Daily assistance with meals, bathing, and medication management")
+                .Option("Memory Care", "Memory Care", "Specialized care for Alzheimer's and other cognitive conditions")
+                .Option("Independent Living", "Independent Living", "Self-sufficient lifestyle with optional community services")
+                .Option("Skilled Nursing", "Skilled Nursing", "24/7 medical supervision with licensed nursing staff")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.When(args, x => x.Value).Eq("Memory Care")
+                        .Then(t =>
+                        {
+                            t.Element("care-notice").SetText("Memory Care selected — assessment score required");
+                            t.Element("care-notice").RemoveClass("text-text-muted");
+                            t.Element("care-notice").AddClass("text-amber-600");
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("care-notice").SetText("Standard admission process");
+                            e.Element("care-notice").RemoveClass("text-amber-600");
+                            e.Element("care-notice").AddClass("text-text-muted");
+                        });
+                })); }
+
+        <div class="font-mono text-sm">
+            <p>Notice: <span id="care-notice" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 3: Form with Validation -->
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Form — JSON POST + FluentValidation</native-heading>
+        <native-text color="Secondary">
+            All fields gathered via <code>IncludeAll()</code>, validated client-side by
+            <code>NativeRadioGroupFormValidator</code>, then POST as JSON. Server validates and returns errors.
+        </native-text>
+
+        <form id="radio-form" class="space-y-4">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Name"))
+                .NativeTextBox(b => b.Placeholder("Full resident name")); }
+
+            @{ Html.InputField(plan, m => m.RoomType, o => o.Required().Label("Room Type"))
+                .NativeRadioGroup(b => b.Items(roomTypeItems)); }
+
+            <div class="flex items-center gap-4">
+                @(Html.NativeButton("submit-btn", "Submit Preferences")
+                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post("/Sandbox/NativeRadioGroup/Submit", g => g.IncludeAll())
+                         .Validate<NativeRadioGroupFormValidator>("radio-form")
+                         .Response(r => r
+                            .OnSuccess(s => s.Element("result").SetText("Preferences saved"))
+                            .OnError(400, e =>
+                            {
+                                e.ValidationErrors("radio-form");
+                            }));
+                    }))
+
+                <p id="result" class="text-sm text-text-muted"></p>
+            </div>
+        </form>
+    </native-card-body></native-card>
+
+    <!-- Section 4: Component Value Condition -->
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Component Value Condition</native-heading>
+        <native-text color="Secondary">
+            Button reads care level via <code>When(comp.Value()).NotEmpty()</code>.
+        </native-text>
+
+        @(Html.NativeButton("check-care-btn", "Check Care Level")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var comp = p.Component<NativeRadioGroup>(m => m.CareLevel);
+                p.When(comp.Value()).NotEmpty()
+                    .Then(t => t.Element("care-confirmation").SetText("care level confirmed"))
+                    .Else(e => e.Element("care-confirmation").SetText("care level is required"));
+            }))
+        <div class="font-mono text-sm">
+            <p>Status: <span id="care-confirmation" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

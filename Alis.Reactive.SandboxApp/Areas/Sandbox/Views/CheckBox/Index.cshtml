@@ -20,29 +20,29 @@
     }));
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">NativeCheckBox — Full API</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">NativeCheckBox — Full API</native-heading>
+        <native-text color="Secondary">
             Exercises NativeCheckBox vertical slice: property writes (SetChecked),
             property reads (Value), events (Changed with typed condition), and component-read conditions.
             Senior living domain: resident medication, visitors, and dietary restrictions.
-        </p>
+        </native-text>
     </div>
 
     <!-- Section 1: Property Write -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Property Write (SetChecked)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Property Write (SetChecked)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Checkbox starts checked. On DomReady, <code>SetChecked(false)</code> unchecks it.
         </p>
         @{ Html.InputField(plan, m => m.ReceivesMedication, o => o.Label("Receives Medication"))
             .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 2: Property Read -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. Property Read (Value as Source)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, reads the AllowsVisitors checkbox value and echoes it.
         </p>
@@ -51,11 +51,11 @@
         <div class="font-mono text-sm mt-2">
             <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 3: Event + Event-Args Condition -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. Changed Event with Typed Condition</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Changed Event with Typed Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Dietary restrictions checkbox wires a Changed event with typed condition:
             <code>When(args, x =&gt; x.Checked).Truthy()</code> shows/hides the restrictions panel.
@@ -86,11 +86,11 @@
         <div id="restrictions-panel" hidden class="rounded-md bg-slate-100 p-4 text-sm mt-2">
             Resident has dietary restrictions on file. Review care plan.
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 4: Component-Read Condition -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">4. Component Value Condition</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Button reads medication checkbox via <code>When(comp.Value()).Truthy()</code>
             and shows a confirmation or warning.
@@ -107,13 +107,13 @@
         <div class="font-mono text-sm mt-2">
             <p>Status: <span id="medication-warning" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
-</div>
+    </native-card-body></native-card>
+</native-vstack>
 
 @Html.RenderPlan(plan)

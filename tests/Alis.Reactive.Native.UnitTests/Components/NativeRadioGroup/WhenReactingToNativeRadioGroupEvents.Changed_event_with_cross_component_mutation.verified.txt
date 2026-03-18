@@ -1,0 +1,45 @@
+﻿{
+  planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: mobility-cascade
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Native_UnitTests_NativeTestModel__MobilityLevel,
+            mutation: {
+              kind: set-prop,
+              prop: value
+            },
+            value: Ambulatory,
+            vendor: native
+          },
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
+            mutation: {
+              kind: set-prop,
+              prop: value
+            },
+            value: Active,
+            vendor: native
+          },
+          {
+            kind: mutate-element,
+            target: echo,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: Both updated
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -106,18 +106,18 @@
     }));
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Architecture Verification</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">Architecture Verification</native-heading>
+        <native-text color="Secondary">
             Vendor-agnostic component architecture: same readExpr, same walk, different vendor root.
             Each section tests one interaction type with both native and fusion vendors.
-        </p>
+        </native-text>
     </div>
 
     <!-- Section 1: Property Write via structured prop -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Property Write (structured prop)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Property Write (structured prop)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             dom-ready writes values. Native: <code>el.value=val</code>.
             Fusion: <code>el.value=val</code> (vendor root resolved by runtime).
@@ -134,11 +134,11 @@
                      class="rounded-md border border-border px-3 py-1.5 text-sm w-full bg-gray-50"></div>
             </div>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 2: Void Method Call -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. Void Method Call (structured method)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Void Method Call (structured method)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             dom-ready calls <code>focus()</code> on the fusion TestWidget.
         </p>
@@ -147,11 +147,11 @@
             <div id="fusion-focus" data-test-widget
                  class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 3: Property Read via Gather -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. Property Read (Gather)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Property Read (Gather)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Both vendors use readExpr <code>"value"</code>. Native reads <code>el.value</code>,
             fusion reads <code>ej2_instances[0].value</code>.
@@ -186,11 +186,11 @@
             <p>Native: <span id="gather-native-result" class="text-text-muted">not gathered</span></p>
             <p>Fusion: <span id="gather-fusion-result" class="text-text-muted">not gathered</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 4: Event Wiring -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">4. Event Wiring</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Event Wiring</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Type in native input (fires DOM change) or fusion TestWidget inner input
             (widget fires "change" with <code>{newValue}</code>).
@@ -211,11 +211,11 @@
             <p>Native event: <span id="native-event-result" class="text-text-muted">&mdash;</span></p>
             <p>Fusion event: <span id="fusion-event-result" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 5: Deep Dot-Path Walk -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">5. Deep Dot-Path Walk</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">5. Deep Dot-Path Walk</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Dispatches nested payload, walks <code>evt.result.detail.total</code>
             and <code>evt.result.detail.address.city</code>.
@@ -240,11 +240,11 @@
             <p>Total: <span id="deep-total" class="text-text-muted">&mdash;</span></p>
             <p>City: <span id="deep-city" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 6: Validation (Cross-Vendor) -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">6. Validation (Cross-Vendor)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">6. Validation (Cross-Vendor)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Native input and fusion TestWidget both validated with readExpr <code>"value"</code>.
         </p>
@@ -287,11 +287,11 @@
         <div class="mt-3 font-mono text-sm">
             <p id="val-result" class="text-text-muted">Click to validate</p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 7: Cross-Vendor EqualTo -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">7. Cross-Vendor EqualTo</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">7. Cross-Vendor EqualTo</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Native password + fusion confirm. EqualTo rule compares across vendors.
         </p>
@@ -338,11 +338,11 @@
         <div class="mt-3 font-mono text-sm">
             <p id="equalto-result" class="text-text-muted">Click to validate</p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 8: Both Vendors Gathered Together -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">8. Same ReadExpr Gathers Both Vendors</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">8. Same ReadExpr Gathers Both Vendors</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             One button gathers native and fusion values together. Same readExpr <code>"value"</code>,
             different vendor roots.
@@ -366,14 +366,14 @@
                 p.Dispatch("do-gather-both");
             }))
         <p id="both-vendors-result" class="font-mono text-sm text-text-muted">not gathered</p>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
-</div>
+    </native-card-body></native-card>
+</native-vstack>
 
 @section Scripts {
     <script src="~/js/test-widget.js" asp-append-version="true"></script>

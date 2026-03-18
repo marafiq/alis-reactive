@@ -6,18 +6,19 @@
     var plan = Html.ReactivePlan<ValidationShowcaseModel>();
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Validation Showcase</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">Validation Showcase</native-heading>
+        <native-text color="Secondary">
             Each form uses a scoped validator that covers exactly its fields.
             Fail-closed: unenriched fields block, hidden fields validate to summary.
-        </p>
+        </native-text>
     </div>
 
     <!-- Section 1: All Rule Types -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. All Rule Types</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">1. All Rule Types</native-heading>
         <form id="all-rules-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.AllRules!.Name, o => o.Required().Label("Name"))
                .NativeTextBox(b => b
@@ -61,11 +62,13 @@
                  }));
             }))
         <p id="all-rules-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Section 2: Server 400 -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. Server Validation (400)</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">2. Server Validation (400)</native-heading>
         <form id="server-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.Server!.Name, o => o.Required().Label("Name"))
                .NativeTextBox(b => b
@@ -96,11 +99,13 @@
                     }));
             }))
         <p id="server-result" class="mt-3 text-sm text-text-muted">Not submitted yet</p>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Section 3: Conditional -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. Conditional Rules</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">3. Conditional Rules</native-heading>
         <form id="conditional-form" class="space-y-4 mb-4">
             @{ Html.InputField(plan, m => m.Conditional!.IsEmployed, o => o.Label("Is Employed"))
                .NativeCheckBox(b => b
@@ -123,11 +128,13 @@
                  }));
             }))
         <p id="conditional-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Section 4: Hidden Fields -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">4. Hidden Fields</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">4. Hidden Fields</native-heading>
         <form id="hidden-fields-form" class="space-y-4 mb-4">
             @{ Html.InputField(plan, m => m.Hidden!.Name, o => o.Required().Label("Name (always visible)"))
                .NativeTextBox(b => b
@@ -189,11 +196,13 @@
                     }));
             }))
         <p id="hidden-result" class="mt-3 text-sm text-text-muted">Click to validate or submit</p>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Section 5: DB Validation -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">5. Fake DB Validation (ProblemDetails 400)</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">5. Fake DB Validation (ProblemDetails 400)</native-heading>
         <form id="db-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.Db!.Name, o => o.Required().Label("Name"))
                .NativeTextBox(b => b
@@ -224,13 +233,16 @@
                     }));
             }))
         <p id="db-result" class="mt-3 text-sm text-text-muted">Not submitted yet</p>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
-</div>
+    </native-card-body>
+    </native-card>
+</native-vstack>
 
 @Html.RenderPlan(plan)

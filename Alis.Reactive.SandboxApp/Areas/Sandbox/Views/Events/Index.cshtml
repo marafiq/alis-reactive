@@ -42,35 +42,35 @@
     var formattedJson = plan.RenderFormatted();
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Events &amp; Dispatch</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">Events &amp; Dispatch</native-heading>
+        <native-text color="Secondary">
             Three-hop event chain: dom-ready dispatches "test" &rarr; "test-received" &rarr; "final" with payload.
             Open DevTools console to see trace output.
-        </p>
+        </native-text>
     </div>
 
     <!-- Chain Status — all driven by plan, zero manual JS -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Event Chain Status</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">Event Chain Status</native-heading>
         <div class="space-y-2 font-mono text-sm">
             <p id="step-1" class="text-text-muted">Step 1: waiting for dom-ready...</p>
             <p id="step-2" class="text-text-muted">Step 2: waiting for "test" event...</p>
             <p id="step-3" class="text-text-muted">Step 3: waiting for "test-received" event...</p>
             <p id="chain-status" class="text-text-muted mt-4">Chain not started</p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
-    </section>
+    </native-card-body></native-card>
 
     <!-- C# DSL -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">C# DSL</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">C# DSL</native-heading>
         <pre class="rounded-md bg-slate-900 text-sky-400 p-4 font-mono text-xs overflow-x-auto"><code>// Entry 1: On page load, dispatch "test" event + update DOM
 Html.On(plan, t =&gt; t.DomReady(p =&gt;
 {
@@ -100,11 +100,11 @@ Html.On(plan, t =&gt; t.CustomEvent("final", p =&gt;
     p.Element("chain-status").AddClass("text-green-600");
     p.Element("chain-status").SetText("Chain complete");
 }));</code></pre>
-    </section>
+    </native-card-body></native-card>
 
     <!-- TypeScript Runtime -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Runtime Boot (TypeScript)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">Runtime Boot (TypeScript)</native-heading>
         <pre class="rounded-md bg-slate-900 text-amber-400 p-4 font-mono text-xs overflow-x-auto"><code>// Two-phase boot: wire listeners first, then execute dom-ready
 export function boot(plan: Plan): void {
   const deferred: Entry[] = [];
@@ -121,7 +121,7 @@ export function boot(plan: Plan): void {
     wireTrigger(entry.trigger, entry.reaction);
   }
 }</code></pre>
-    </section>
-</div>
+    </native-card-body></native-card>
+</native-vstack>
 
 @Html.RenderPlan(plan)

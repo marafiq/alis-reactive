@@ -118,7 +118,7 @@
 <native-vstack gap="Lg">
     <div>
         <native-heading level="H1">Drawer</native-heading>
-        <native-text color="Secondary" class="mt-2">
+        <native-text color="Secondary">
             Plan-driven slide-out drawer: open, set title/content, close — all via C# DSL.
             Escape key and close button also work (handled by drawer.ts).
         </native-text>
@@ -126,8 +126,8 @@
 
     <!-- Section 1: Open Drawer -->
     <native-card><native-card-body>
-        <native-heading level="H2" class="mb-4">Open Drawer</native-heading>
-        <native-text color="Secondary" class="mb-4">
+        <native-heading level="H2">Open Drawer</native-heading>
+        <native-text color="Secondary">
             Click a button to open the drawer with different content.
         </native-text>
         <div class="flex flex-wrap gap-3">
@@ -149,8 +149,8 @@
 
     <!-- Section 2: Open Drawer with Form Inputs -->
     <native-card><native-card-body>
-        <native-heading level="H2" class="mb-4">Drawer with Input Controls</native-heading>
-        <native-text color="Secondary" class="mb-4">
+        <native-heading level="H2">Drawer with Input Controls</native-heading>
+        <native-text color="Secondary">
             Opens the drawer with a complete form: text, email, select, date, checkbox, textarea, and buttons.
             Tests that design system CSS cascades into the fixed-position drawer panel.
         </native-text>
@@ -164,8 +164,8 @@
 
     <!-- Section 3: Close Drawer via Plan -->
     <native-card><native-card-body>
-        <native-heading level="H2" class="mb-4">Close Drawer via Plan</native-heading>
-        <native-text color="Secondary" class="mb-4">
+        <native-heading level="H2">Close Drawer via Plan</native-heading>
+        <native-text color="Secondary">
             Close the drawer programmatically. The drawer also closes via the X button or Escape key.
         </native-text>
         @(Html.NativeButton("btn-close-drawer", "Close Drawer")
@@ -178,13 +178,13 @@
 
     <!-- Status -->
     <native-card><native-card-body>
-        <native-heading level="H2" class="mb-4">Drawer Status</native-heading>
+        <native-heading level="H2">Drawer Status</native-heading>
         <p id="drawer-status" class="font-mono text-sm text-text-muted">Drawer not opened yet</p>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->
     <native-card><native-card-body>
-        <native-heading level="H2" class="mb-4">Plan JSON</native-heading>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code>@Html.Raw(formattedJson)</code></pre>
     </native-card-body></native-card>
 </native-vstack>

@@ -43,18 +43,18 @@
     }));
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">FusionNumericTextBox — Full API</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">FusionNumericTextBox — Full API</native-heading>
+        <native-text color="Secondary">
             Exercises all supported FusionNumericTextBox API: property writes, method calls,
             property reads, events, conditions, and gather.
-        </p>
+        </native-text>
     </div>
 
     <!-- Section 1: Property Write (SetValue + SetMin) -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Property Write (SetValue + SetMin)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Property Write (SetValue + SetMin)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, sets value=42 and min=0 via structured prop on the Syncfusion ej2 instance.
         </p>
@@ -63,22 +63,22 @@
                 .NumericTextBox(b => b
                     .Min(-100).Max(99999).Step(1)); }
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 2: Property Read — Echo Value -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. Property Read (Value as Source)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, reads the Amount component's <code>value</code> property and displays it in a text element.
         </p>
         <div class="font-mono text-sm">
             <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 3: Method Calls (Increment / Decrement) -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. Method Calls (Increment / Decrement)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Method Calls (Increment / Decrement)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Buttons invoke <code>el.increment()</code> and <code>el.decrement()</code> on the Syncfusion instance.
             After each call, the <code>change</code> event fires and updates the echo.
@@ -100,11 +100,11 @@
         <div class="font-mono text-sm">
             <p>Method result: <span id="method-result" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 4: Events — Changed, Focus, Blur -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">4. Events (Changed, Focus, Blur)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Events (Changed, Focus, Blur)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             The Temperature field wires all three events. Change shows the new value,
             Focus/Blur show focus state.
@@ -161,22 +161,22 @@
             <p>Positive: <span id="positive-indicator" hidden class="text-emerald-600">&mdash;</span></p>
             <p>High temp: <span id="high-temp-warning" hidden class="text-rose-600">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 5: Condition — Positive Indicator -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">5. Conditions (Both Patterns)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">5. Conditions (Both Patterns)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Section 4 exercises both typed condition patterns:
             <code>When(args, x =&gt; x.Value).Gt(100m)</code> (event-args) shows a high-temp warning,
             <code>When(comp.Value()).Gt(0m)</code> (component-read) shows a positive indicator.
             Enter a value &gt; 100 to see both; enter 1–100 to see only the positive indicator.
         </p>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 6: Gather — Include in POST -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">6. Gather (Include in POST)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">6. Gather (Include in POST)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Click to POST the Amount value gathered from the Syncfusion component via
             <code>Include&lt;FusionNumericTextBox&gt;</code>.
@@ -190,11 +190,11 @@
         <div class="font-mono text-sm">
             <p>Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 7: Increment/Decrement Tracking -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">7. Quantity with Increment/Decrement Tracking</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">7. Quantity with Increment/Decrement Tracking</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             A standalone quantity field with its own change event.
             Increment and decrement buttons update the value and the echo tracks changes.
@@ -226,13 +226,13 @@
         <div class="font-mono text-sm">
             <p>Quantity echo: <span id="qty-echo" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
-</div>
+    </native-card-body></native-card>
+</native-vstack>
 
 @Html.RenderPlan(plan)

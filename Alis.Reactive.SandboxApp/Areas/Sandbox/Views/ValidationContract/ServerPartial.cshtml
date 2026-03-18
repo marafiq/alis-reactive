@@ -11,13 +11,13 @@
         .ToList();
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Scenario 3a — Server-Rendered Partials</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">Scenario 3a — Server-Rendered Partials</native-heading>
+        <native-text color="Secondary">
             Parent view renders basic fields. Address and Emergency partials rendered server-side
             via PartialAsync. Same TModel, merged plans. Each partial has own reactive behavior.
-        </p>
+        </native-text>
     </div>
 
     <form id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
@@ -79,6 +79,6 @@
             <p id="result" class="text-sm text-text-muted"></p>
         </div>
     </form>
-</div>
+</native-vstack>
 
 @Html.RenderPlan(plan)

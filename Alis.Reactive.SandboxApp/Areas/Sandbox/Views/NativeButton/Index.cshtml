@@ -22,19 +22,19 @@
     }));
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">NativeButton — Full API</h1>
-        <p class="mt-2 text-text-secondary">
+        <native-heading level="H1">NativeButton — Full API</native-heading>
+        <native-text color="Secondary">
             Exercises NativeButton vertical slice: click events, SetText mutations,
             FocusIn calls, and dispatch chains.
             Senior living domain: resident admit, discharge, and transfer actions.
-        </p>
+        </native-text>
     </div>
 
     <!-- Section 1: Click Event -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Click Event (Updates Status Text)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Click Event (Updates Status Text)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Clicking "Admit Resident" updates the status span below.
         </p>
@@ -49,21 +49,21 @@
         <div class="font-mono text-sm mt-2">
             <p>Status: <span id="admit-status" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 2: SetText on DomReady -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. SetText (DomReady Changes Button Label)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">2. SetText (DomReady Changes Button Label)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, the button text changes from "Loading..." to "Admit Resident".
         </p>
         @(Html.NativeButton("btn-admit-text", "Loading...")
             .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors"))
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 3: FocusIn -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. FocusIn (Click Focuses Another Button)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">3. FocusIn (Click Focuses Another Button)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Clicking "Focus Discharge" moves keyboard focus to the "Discharge Resident" button.
         </p>
@@ -77,11 +77,11 @@
             @(Html.NativeButton("btn-discharge", "Discharge Resident")
                 .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"))
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Section 4: Dispatch Chain -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">4. Dispatch Chain (Click Dispatches Event to Listener)</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Dispatch Chain (Click Dispatches Event to Listener)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Clicking "Transfer Resident" dispatches a <code>resident-transferred</code> custom event.
             A separate listener picks it up and updates the status text.
@@ -95,13 +95,13 @@
         <div class="font-mono text-sm mt-2">
             <p>Transfer: <span id="transfer-status" class="text-text-muted">&mdash;</span></p>
         </div>
-    </section>
+    </native-card-body></native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
-</div>
+    </native-card-body></native-card>
+</native-vstack>
 
 @Html.RenderPlan(plan)

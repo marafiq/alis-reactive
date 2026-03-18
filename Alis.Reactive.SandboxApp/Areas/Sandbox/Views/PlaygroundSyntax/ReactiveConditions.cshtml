@@ -13,21 +13,22 @@
     var plan = new ReactivePlan<PlaygroundSyntaxModel>();
 }
 
-<div class="space-y-6">
+<native-vstack gap="Lg">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Reactive Conditions</h1>
-        <p class="mt-1 text-text-secondary text-sm">
+        <native-heading level="H1">Reactive Conditions</native-heading>
+        <native-text color="Secondary">
             Conditions inside <code class="bg-slate-100 px-1 rounded">.Reactive()</code>
             — each control is rendered once, its <code class="bg-slate-100 px-1 rounded">.Reactive()</code>
             pipeline uses conditions to mutate other controls cross-vendor.
-        </p>
+        </native-text>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════
          All form fields rendered once — each with its own .Reactive()
          ═══════════════════════════════════════════════════════════ -->
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        <h2 class="text-sm font-semibold mb-4">Form — Each control has its own .Reactive() pipeline</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Form — Each control has its own .Reactive() pipeline</native-heading>
 
         <!-- Row 1: Status (native) + Amount (fusion) -->
         <div class="grid grid-cols-2 gap-4 mb-4">
@@ -173,11 +174,13 @@
                 <span id="city-auto">Select a city</span>
             </div>
         </div>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- What this proves -->
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        <h2 class="text-sm font-semibold mb-2">What this proves</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2" class="mb-2">What this proves</native-heading>
         <ul class="text-xs text-text-secondary space-y-1 list-disc pl-4">
             <li><strong>Conditions inside .Reactive()</strong> — ElseIf branching evaluates event payload at runtime</li>
             <li><strong>Cross-vendor mutations</strong> — Native event → mutates Fusion component and vice versa</li>
@@ -186,13 +189,16 @@
             <li><strong>DOM mutations</strong> — SetText, AddClass, RemoveClass, Show, Hide all execute in branches</li>
             <li><strong>Plan JSON</strong> — Branches with guards serialize correctly to the runtime plan</li>
         </ul>
-    </section>
+    </native-card-body>
+    </native-card>
 
     <!-- Plan JSON -->
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        <h2 class="text-sm font-semibold mb-3">Plan JSON</h2>
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2" class="mb-3">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
-</div>
+    </native-card-body>
+    </native-card>
+</native-vstack>
 
 @Html.RenderPlan(plan)

@@ -24,12 +24,14 @@
     IReactivePlan<IdGeneratorModel> plan = new ReactivePlan<IdGeneratorModel>();
 }
 
-<div class="max-w-3xl mx-auto space-y-8">
-    <h1 class="text-xl font-bold">IdGenerator — Collision-Free IDs</h1>
-    <p class="text-sm text-text-secondary">
-        Verifies that <code>NumericTextBoxFor</code> and <code>NativeDropDownFor</code>
-        produce unique element IDs while preserving <code>name</code> attributes for MVC posting.
-    </p>
+<native-vstack gap="Lg" class="max-w-3xl mx-auto">
+    <div>
+        <native-heading level="H1">IdGenerator — Collision-Free IDs</native-heading>
+        <native-text color="Secondary">
+            Verifies that <code>NumericTextBoxFor</code> and <code>NativeDropDownFor</code>
+            produce unique element IDs while preserving <code>name</code> attributes for MVC posting.
+        </native-text>
+    </div>
 
     <!-- ── Section 1: JSON POST ── -->
     <section>
@@ -136,6 +138,6 @@
             </div>
         </div>
     </section>
-</div>
+</native-vstack>
 
 @Html.RenderPlan(plan)
