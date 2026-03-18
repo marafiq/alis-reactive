@@ -35,11 +35,14 @@
                 .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
+                    p.Element("alis-loader-message").SetText("Saving resident...");
                     p.Post("/Sandbox/Drawer/SubmitResident", g => g.IncludeAll())
                      .Validate<DrawerResidentValidator>("drawer-resident-form")
+                     .WhileLoading(loader=> loader.Component<NativeLoader>().SetTarget("drawer-resident-form").SetTimeout(1000).Show())
                      .Response(r => r
                         .OnSuccess(s =>
                         {
+                            s.Component<NativeLoader>().Hide();
                             s.Component<FusionToast>()
                                 .SetTitle("Admission")
                                 .SetContent("Resident saved successfully")
@@ -49,6 +52,7 @@
                         })
                         .OnError(400, e =>
                         {
+                            e.Component<NativeLoader>().Hide();
                             e.ValidationErrors("drawer-resident-form");
                         }));
                 }))

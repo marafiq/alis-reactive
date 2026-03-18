@@ -30,8 +30,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         }
 
         [HttpPost]
-        public IActionResult SubmitResident([FromBody] DrawerResidentModel? model)
+        public async Task<IActionResult> SubmitResident([FromBody] DrawerResidentModel? model)
         {
+            await Task.Delay(5000);
             if (model == null)
                 return BadRequest(new { errors = new { Name = new[] { "Request body is required." } } });
 
