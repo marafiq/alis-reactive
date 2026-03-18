@@ -1,0 +1,71 @@
+﻿{
+  planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: allergy-guarded
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: not-empty
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: panel,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: panel,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

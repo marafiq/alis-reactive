@@ -17,6 +17,7 @@ public class NativeTestModel
     public DateTime? AdmissionDate { get; set; }
     public NativeTestAddress? Address { get; set; }
     public string? MobilityLevel { get; set; }
+    public string? Allergies { get; set; }
 }
 
 [TestFixture]

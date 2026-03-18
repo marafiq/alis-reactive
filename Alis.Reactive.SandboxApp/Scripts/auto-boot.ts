@@ -3,6 +3,7 @@ import { init as initConfirm } from "./confirm";
 import { initNativeActionLinks } from "./native-action-link";
 import "./drawer";  // side-effect: wires close button + Escape key
 import "./loader";  // side-effect: handles target positioning + timeout
+import "./checklist";  // side-effect: syncs checkbox values to hidden input
 import { composeInitialPlans } from "./merge-plan";
 import type { Plan } from "./types";
 import type { TraceLevel } from "./trace";
