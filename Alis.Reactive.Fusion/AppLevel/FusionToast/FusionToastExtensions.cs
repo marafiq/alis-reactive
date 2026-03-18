@@ -3,6 +3,7 @@ using Alis.Reactive.Descriptors.Mutations;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
+using Syncfusion.EJ2.Notifications;
 
 namespace Alis.Reactive.Fusion.AppLevel
 {
@@ -76,6 +77,7 @@ namespace Alis.Reactive.Fusion.AppLevel
         {
             return html.EJS().Toast(AppLevel.FusionToast.ElementId)
                 .Target("body")
+                .Position(new ToastToastPosition { X = "Right", Y = "Bottom" })
                 .NewestOnTop(true)
                 .ShowCloseButton(true)
                 .Render();

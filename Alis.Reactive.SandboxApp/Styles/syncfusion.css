@@ -186,3 +186,34 @@
 .e-multiselect .e-chips-close {
   color: var(--color-text-muted);
 }
+
+/* Toast */
+.e-toast-container .e-toast {
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-sf);
+}
+
+.e-toast-container .e-toast.e-toast-success {
+  background-color: var(--color-success-light) !important;
+  color: var(--color-success) !important;
+  border-left: 4px solid var(--color-success);
+}
+
+.e-toast-container .e-toast.e-toast-warning {
+  background-color: var(--color-warning-light) !important;
+  color: var(--color-warning) !important;
+  border-left: 4px solid var(--color-warning);
+}
+
+.e-toast-container .e-toast.e-toast-danger {
+  background-color: var(--color-error-light) !important;
+  color: var(--color-error) !important;
+  border-left: 4px solid var(--color-error);
+}
+
+.e-toast-container .e-toast.e-toast-info {
+  background-color: var(--color-info-light) !important;
+  color: var(--color-info) !important;
+  border-left: 4px solid var(--color-info);
+}

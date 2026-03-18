@@ -2,6 +2,7 @@
 @using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.AppLevel
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     var plan = Html.ResolvePlan<DrawerResidentModel>();
@@ -39,7 +40,11 @@
                      .Response(r => r
                         .OnSuccess(s =>
                         {
-                            s.Element("drawer-result").SetText("Resident saved successfully");
+                            s.Component<FusionToast>()
+                                .SetTitle("Admission")
+                                .SetContent("Resident saved successfully")
+                                .Success()
+                                .Show();
                             s.Component<NativeDrawer>().Close();
                         })
                         .OnError(400, e =>
