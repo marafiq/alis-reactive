@@ -1,4 +1,5 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.DrawerResidentModel
+@using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
@@ -36,7 +37,11 @@
                     p.Post("/Sandbox/Drawer/SubmitResident", g => g.IncludeAll())
                      .Validate<DrawerResidentValidator>("drawer-resident-form")
                      .Response(r => r
-                        .OnSuccess(s => s.Element("drawer-result").SetText("Resident saved successfully"))
+                        .OnSuccess(s =>
+                        {
+                            s.Element("drawer-result").SetText("Resident saved successfully");
+                            s.Component<NativeDrawer>().Close();
+                        })
                         .OnError(400, e =>
                         {
                             e.ValidationErrors("drawer-resident-form");
