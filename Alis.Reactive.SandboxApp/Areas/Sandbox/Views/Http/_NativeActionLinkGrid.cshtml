@@ -1,7 +1,7 @@
 @model IReadOnlyList<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.HttpActionLinkRow>
 @using Alis.Reactive.Native.Components
 
-<div class="space-y-3">
+<native-vstack gap="Base">
     @foreach (var row in Model)
     {
         <div data-testid="native-action-link-row-@row.Id" class="flex items-center justify-between rounded-md border border-border px-3 py-2">
@@ -26,4 +26,4 @@
                 .Attr("data-testid", $"native-action-link-{row.Id}")))
         </div>
     }
-</div>
+</native-vstack>

@@ -5,7 +5,7 @@
     var plan = Html.ResolvePlan<ResidentModel>();
 }
 
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<native-grid cols="C2" gap="Base">
     @{ Html.InputField(plan, m => m.HasEmergencyContact, o => o.Label("Has Emergency Contact"))
        .NativeCheckBox(b => b
            .CssClass("rounded border-border")); }
@@ -28,7 +28,7 @@
        .NativeTextBox(b => b
            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
            .Placeholder("Explain why no contact")); }
-</div>
+</native-grid>
 
 <div class="mt-2">
     <span id="phone-format-status" class="text-sm text-text-muted"></span>

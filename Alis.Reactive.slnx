@@ -5,9 +5,12 @@
     <Project Path="tests/Alis.Reactive.Native.UnitTests/Alis.Reactive.Native.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj" />
     <Project Path="tests/Alis.Reactive.FluentValidator.UnitTests/Alis.Reactive.FluentValidator.UnitTests.csproj" />
+    <Project Path="tests/Alis.Reactive.DesignSystem.Tests/Alis.Reactive.DesignSystem.Tests.csproj" />
+    <Project Path="tests/Alis.Reactive.NativeTagHelpers.Tests/Alis.Reactive.NativeTagHelpers.Tests.csproj" />
   </Folder>
   <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
   <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
+  <Project Path="Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj" />
   <Project Path="Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
   <Project Path="Alis.Reactive/Alis.Reactive.csproj" />
   <Project Path="Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" />

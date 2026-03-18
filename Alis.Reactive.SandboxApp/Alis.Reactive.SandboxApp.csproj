@@ -13,16 +13,17 @@
       <ProjectReference Include="..\Alis.Reactive.FluentValidator\Alis.Reactive.FluentValidator.csproj" />
       <ProjectReference Include="..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
       <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
+      <ProjectReference Include="..\Alis.Reactive.NativeTagHelpers\Alis.Reactive.NativeTagHelpers.csproj" />
       <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
     </ItemGroup>
 
     <!-- Auto-build JS bundle + Tailwind CSS before compile -->
     <Target Name="BuildClientAssets" BeforeTargets="Build"
             Inputs="Scripts\**\*.ts;Styles\app.css;Views\**\*.cshtml;Areas\**\*.cshtml"
-            Outputs="wwwroot\js\alis-reactive.js;wwwroot\css\alis-modern-tailwind.css">
+            Outputs="wwwroot\js\alis-reactive.js;wwwroot\css\design-system.css">
       <Exec Command="npx esbuild Scripts/auto-boot.ts --bundle --format=esm --outfile=wwwroot/js/alis-reactive.js --minify"
             WorkingDirectory="$(MSBuildProjectDirectory)" />
-      <Exec Command="npx @tailwindcss/cli -i Styles/app.css -o wwwroot/css/alis-modern-tailwind.css --minify"
+      <Exec Command="npx @tailwindcss/cli -i Styles/app.css -o wwwroot/css/design-system.css --minify"
             WorkingDirectory="$(MSBuildProjectDirectory)" />
     </Target>
 

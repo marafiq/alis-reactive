@@ -5,7 +5,7 @@
     var plan = Html.ResolvePlan<ResidentModel>();
 }
 
-<div id="address-section" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<native-grid id="address-section" cols="C2" gap="Base">
     @{ Html.InputField(plan, m => m.Address.Street, o => o.Required().Label("Street"))
        .NativeTextBox(b => b
            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
@@ -24,7 +24,7 @@
            {
                p.Dispatch<NativeTextBoxChangeArgs>("zipcode-validated", args);
            })); }
-</div>
+</native-grid>
 
 <div class="mt-2">
     <span id="zipcode-status" class="text-sm text-text-muted"></span>

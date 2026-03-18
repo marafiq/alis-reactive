@@ -7,18 +7,18 @@
     var plan = new ReactivePlan<ContentTypeModel>();
 }
 
-<div class="space-y-3">
-    <p class="text-sm text-text-secondary">
+<native-vstack gap="Base">
+    <native-text color="Secondary">
         This partial was loaded via <code>Into</code> — HTML response injected with <code>ej.base.append</code>.
-    </p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    </native-text>
+    <native-grid cols="C2" gap="Base">
         @{ Html.InputField(plan, m => m.NativeValue, o => o.Label("Native Input (from partial)"))
            .NativeTextBox(b => b
                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
         @{ Html.InputField(plan, m => m.FusionAmount, o => o.Label("Fusion NumericTextBox (from partial)"))
            .NumericTextBox(b => b
                .Min(0).Max(10000).Step(1)); }
-    </div>
+    </native-grid>
     <p class="text-xs text-text-muted" id="partial-loaded-marker">Partial loaded successfully</p>
-</div>
+</native-vstack>
 @Html.EJS().ScriptManager()
