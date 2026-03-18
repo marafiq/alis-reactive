@@ -1,0 +1,42 @@
+/* ── Field-level error indicator ── */
+.alis-root .alis-has-error input,
+.alis-root .alis-has-error select,
+.alis-root .alis-has-error textarea,
+.alis-root .alis-has-error .e-input-group {
+  border-color: var(--color-error);
+  --tw-ring-color: var(--color-error);
+}
+
+/* ── Inline error message ── */
+.alis-root span[data-valmsg-for] {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-error);
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+/* ── Validation summary box ── */
+.alis-root [data-alis-validation-summary] {
+  background-color: var(--color-error-light, #FEE2E2);
+  border: 1px solid var(--color-error);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.alis-root [data-alis-validation-summary][hidden] {
+  display: none;
+}
+
+.alis-root [data-alis-validation-summary] > div {
+  font-size: 0.8125rem;
+  color: var(--color-error);
+  padding: 0.125rem 0;
+}
+
+.alis-root [data-alis-validation-summary] > div + div {
+  border-top: 1px solid rgba(220, 38, 38, 0.1);
+  margin-top: 0.25rem;
+  padding-top: 0.375rem;
+}

@@ -5,60 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] — Alis.Reactive Sandbox</title>
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/tailwind3.css"/>
-    <link rel="stylesheet" href="~/css/alis-modern-tailwind.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/design-system.css" asp-append-version="true"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
 </head>
-<body class="h-full bg-surface text-text-primary antialiased">
+<body class="alis-root h-full">
 
 <div class="min-h-full flex flex-col">
+    <!-- Brand bar -->
+    <div class="h-1 bg-gradient-to-r from-[#7A2E3B] via-[#9B4A57] to-[#D4A053]"></div>
+
     <header class="border-b border-border bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-14">
+        <native-container>
+            <div class="flex items-center h-16 gap-8">
                 <a asp-controller="Home" asp-action="Index"
-                   class="text-lg font-semibold tracking-tight text-accent">
-                    Alis.Reactive
+                   class="flex items-center gap-2.5 shrink-0 group">
+                    <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7A2E3B] to-[#9B4A57] flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">A</span>
+                    </span>
+                    <span class="text-lg font-bold tracking-tight text-[#7A2E3B] group-hover:text-[#5E1F2C] transition-colors">
+                        Alis.Reactive
+                    </span>
                 </a>
-                <nav class="flex gap-6 text-sm font-medium">
+                <nav class="flex items-center gap-1 overflow-x-auto scrollbar-hide">
                     <a asp-controller="Home" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">Home</a>
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Home</a>
                     <a asp-area="Sandbox" asp-controller="Events" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">Events</a>
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Events</a>
                     <a asp-area="Sandbox" asp-controller="Payload" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">Payload</a>
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Payload</a>
                     <a asp-area="Sandbox" asp-controller="Conditions" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">Conditions</a>
-                    <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">Playground</a>
-                    <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="ReactiveConditions"
-                       class="text-text-secondary hover:text-text-primary transition-colors">Reactive Conditions</a>
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Conditions</a>
                     <a asp-area="Sandbox" asp-controller="Validation" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">Validation</a>
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Validation</a>
                     <a asp-area="Sandbox" asp-controller="Architecture" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">Architecture</a>
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Architecture</a>
+                    <a asp-area="Sandbox" asp-controller="Drawer" asp-action="Index"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Drawer</a>
+
+                    <span class="w-px h-5 bg-border mx-1"></span>
+
+                    <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="Index"
+                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Playground</a>
+                    <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="ReactiveConditions"
+                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Reactive Cond.</a>
                     <a asp-area="Sandbox" asp-controller="ContentType" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">Content Type</a>
+                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Content Type</a>
                     <a asp-area="Sandbox" asp-controller="NumericTextBox" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">NumericTextBox</a>
+                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">NumericTextBox</a>
                     <a asp-area="Sandbox" asp-controller="DropDownList" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">DropDownList</a>
+                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">DropDownList</a>
                     <a asp-area="Sandbox" asp-controller="AutoComplete" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">AutoComplete</a>
+                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">AutoComplete</a>
                     <a asp-area="Sandbox" asp-controller="MultiSelect" asp-action="Index"
-                       class="text-text-secondary hover:text-text-primary transition-colors">MultiSelect</a>
+                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">MultiSelect</a>
                 </nav>
             </div>
-        </div>
+        </native-container>
     </header>
 
     <main class="flex-1">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <native-container class="py-10">
             @RenderBody()
-        </div>
+        </native-container>
     </main>
 
-    <footer class="border-t border-border bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <p class="text-xs text-text-muted">&copy; 2026 Alis.Reactive Sandbox</p>
-        </div>
+    <footer class="border-t border-border bg-white mt-auto">
+        <native-container class="py-6">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-text-muted">&copy; 2026 Alis.Reactive Sandbox</p>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-[#7A2E3B]"></span>
+                    <span class="w-2 h-2 rounded-full bg-[#D4A053]"></span>
+                    <span class="w-2 h-2 rounded-full bg-border"></span>
+                </div>
+            </div>
+        </native-container>
     </footer>
 </div>
 
@@ -67,6 +90,7 @@
 @await RenderSectionAsync("Scripts", required: false)
 
 @Html.FusionConfirmDialog()
+@Html.NativeDrawer()
 <script type="module" src="~/js/alis-reactive.js" asp-append-version="true"></script>
 </body>
 </html>

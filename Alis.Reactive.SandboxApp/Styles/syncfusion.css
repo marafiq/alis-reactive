@@ -1,0 +1,188 @@
+/* ── Syncfusion brand remapping via CSS variables ── */
+/* SF's tailwind3.css theme uses --color-sf-* in RGB tuple format */
+:root {
+  /* SF primary → our brand primary (#7A2E3B = 122, 46, 59) */
+  --color-sf-primary: 122, 46, 59;
+  --color-sf-primary-text-color: 255, 255, 255;
+  --color-sf-primary-hover: 94, 31, 44;
+  --color-sf-primary-active: 94, 31, 44;
+
+  /* SF font → our font */
+  --font-sf: 'Inter', system-ui, sans-serif;
+}
+
+.e-control,
+.e-lib {
+  font-family: var(--font-sf);
+}
+
+/* ── Targeted overrides (where SF variables don't cover) ── */
+
+/* Input groups */
+.e-input-group {
+  border-radius: 0.75rem;
+}
+
+.e-input-group.e-input-focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(122, 46, 59, 0.08) !important;
+}
+
+.e-input-group.e-input-focus .e-input-group-icon {
+  color: var(--color-primary) !important;
+}
+
+/* Buttons */
+.e-btn.e-primary {
+  border-radius: 0.75rem;
+}
+
+/* Checkbox */
+.e-checkbox-wrapper .e-frame.e-check {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* Radio button */
+.e-radio:checked + label .e-ripple-container {
+  background-color: rgba(122, 46, 59, 0.1);
+}
+
+/* Switch */
+.e-switch-wrapper .e-switch-on {
+  background-color: var(--color-primary) !important;
+}
+
+/* Datepicker */
+.e-datepicker .e-selected span.e-day {
+  background-color: var(--color-primary) !important;
+}
+
+.e-datepicker .e-today span.e-day {
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* Dropdown active item */
+.e-dropdownbase .e-list-item.e-active {
+  background-color: rgba(122, 46, 59, 0.08) !important;
+  color: var(--color-primary) !important;
+}
+
+/* Slider */
+.e-slider .e-range {
+  background-color: var(--color-primary) !important;
+}
+
+.e-slider .e-handle {
+  border-color: var(--color-primary) !important;
+}
+
+/* Tab */
+.e-tab .e-tab-header .e-toolbar-item.e-active .e-tab-text {
+  color: var(--color-primary) !important;
+}
+
+.e-tab .e-tab-header .e-indicator {
+  background: var(--color-primary) !important;
+}
+
+/* Accordion */
+.e-accordion .e-acrdn-item.e-select > .e-acrdn-header {
+  background-color: rgba(122, 46, 59, 0.04) !important;
+}
+
+/* Grid */
+.e-grid .e-headercell {
+  background-color: var(--color-surface-alt) !important;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.e-grid .e-row:hover .e-rowcell {
+  background-color: rgba(122, 46, 59, 0.04) !important;
+}
+
+/* Tree view */
+.e-treeview .e-list-item.e-active > .e-text-content .e-list-text {
+  color: var(--color-primary) !important;
+}
+
+/* Dialog */
+.e-dialog {
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.e-dialog .e-dlg-header-content {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.e-dialog .e-footer-content {
+  border-top: 1px solid var(--color-border);
+}
+
+/* Popup */
+.e-popup {
+  border-radius: 0.75rem;
+}
+
+/* Tooltip */
+.e-tooltip-wrap {
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+}
+
+/* Sidebar */
+.e-sidebar {
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
+}
+
+/* Toolbar */
+.e-toolbar {
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
+}
+
+/* Message */
+.e-message.e-success {
+  background-color: var(--color-success-light) !important;
+  color: var(--color-success) !important;
+}
+
+.e-message.e-warning {
+  background-color: var(--color-warning-light) !important;
+  color: var(--color-warning) !important;
+}
+
+.e-message.e-error {
+  background-color: var(--color-error-light) !important;
+  color: var(--color-error) !important;
+}
+
+/* Color picker */
+.e-colorpicker-wrapper .e-split-btn-wrapper {
+  border-radius: 0.375rem;
+}
+
+/* Rich Text Editor */
+.e-richtexteditor .e-rte-content .e-content {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Uploader */
+.e-upload .e-upload-files {
+  border-color: var(--color-border);
+}
+
+/* Multiselect chip */
+.e-multiselect .e-chips {
+  font-size: 0.75rem;
+}
+
+.e-multiselect .e-chips-close {
+  color: var(--color-text-muted);
+}

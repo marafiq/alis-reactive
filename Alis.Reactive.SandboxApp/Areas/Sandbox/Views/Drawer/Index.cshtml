@@ -1,0 +1,192 @@
+@model DrawerModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@{
+    ViewData["Title"] = "Drawer";
+
+    var plan = Html.ReactivePlan<DrawerModel>();
+
+    // Section 1: Open drawer with title + content
+    Html.On(plan, t => t.CustomEvent("open-drawer", p =>
+    {
+        p.Element("alis-drawer-title").SetText("Resident Details");
+        p.Element("alis-drawer-content").SetHtml(
+            "<p class=\"text-sm text-text-secondary mb-4\">This drawer was opened via the reactive plan.</p>" +
+            "<p class=\"text-sm text-text-secondary\">The title and content were set using <code>SetText</code> and <code>SetHtml</code> commands.</p>"
+        );
+        p.Component<NativeDrawer>().Open();
+    }));
+
+    // Section 2: Open with different content
+    Html.On(plan, t => t.CustomEvent("open-drawer-alt", p =>
+    {
+        p.Element("alis-drawer-title").SetText("Care Plan Notes");
+        p.Element("alis-drawer-content").SetHtml(
+            "<div class=\"space-y-3\">" +
+            "<p class=\"text-sm font-medium text-text-primary\">Care Level: Memory Care</p>" +
+            "<p class=\"text-sm text-text-secondary\">Last assessment: March 2026</p>" +
+            "<p class=\"text-sm text-text-secondary\">Next review: June 2026</p>" +
+            "</div>"
+        );
+        p.Component<NativeDrawer>().Open();
+    }));
+
+    // Section 3: Open drawer with form inputs
+    Html.On(plan, t => t.CustomEvent("open-drawer-form", p =>
+    {
+        p.Element("alis-drawer-title").SetText("Add Resident");
+        p.Element("alis-drawer-content").SetHtml(
+            "<form class=\"space-y-4\">" +
+            "  <div>" +
+            "    <label for=\"drawer-name\">Resident Name *</label>" +
+            "    <input type=\"text\" id=\"drawer-name\" placeholder=\"Full name\" />" +
+            "  </div>" +
+            "  <div>" +
+            "    <label for=\"drawer-email\">Email</label>" +
+            "    <input type=\"email\" id=\"drawer-email\" placeholder=\"resident@facility.com\" />" +
+            "  </div>" +
+            "  <div>" +
+            "    <label for=\"drawer-care\">Care Level</label>" +
+            "    <select id=\"drawer-care\">" +
+            "      <option value=\"\">-- Select --</option>" +
+            "      <option>Independent Living</option>" +
+            "      <option>Assisted Living</option>" +
+            "      <option>Memory Care</option>" +
+            "      <option>Skilled Nursing</option>" +
+            "    </select>" +
+            "  </div>" +
+            "  <div>" +
+            "    <label for=\"drawer-date\">Admission Date</label>" +
+            "    <input type=\"date\" id=\"drawer-date\" />" +
+            "  </div>" +
+            "  <div class=\"flex items-center gap-2\">" +
+            "    <input type=\"checkbox\" id=\"drawer-veteran\" />" +
+            "    <label for=\"drawer-veteran\" class=\"!mb-0\">Veteran</label>" +
+            "  </div>" +
+            "  <div>" +
+            "    <label for=\"drawer-notes\">Notes</label>" +
+            "    <textarea id=\"drawer-notes\" rows=\"3\" placeholder=\"Additional care notes...\"></textarea>" +
+            "  </div>" +
+            "  <div class=\"pt-2 flex gap-2\">" +
+            "    <button type=\"button\" class=\"px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium\">Save Resident</button>" +
+            "    <button type=\"button\" class=\"px-4 py-2 rounded-lg border border-border text-sm font-medium text-text-secondary\">Cancel</button>" +
+            "  </div>" +
+            "</form>"
+        );
+        p.Component<NativeDrawer>().Open();
+    }));
+
+    // Section 4: Close drawer via button
+    Html.On(plan, t => t.CustomEvent("close-drawer", p =>
+    {
+        p.Component<NativeDrawer>().Close();
+    }));
+
+    // Status tracking
+    Html.On(plan, t => t.CustomEvent("open-drawer", p =>
+    {
+        p.Element("drawer-status").RemoveClass("text-text-muted");
+        p.Element("drawer-status").AddClass("text-green-600");
+        p.Element("drawer-status").SetText("Drawer opened — \"Resident Details\"");
+    }));
+
+    Html.On(plan, t => t.CustomEvent("open-drawer-alt", p =>
+    {
+        p.Element("drawer-status").RemoveClass("text-text-muted");
+        p.Element("drawer-status").AddClass("text-green-600");
+        p.Element("drawer-status").SetText("Drawer opened — \"Care Plan Notes\"");
+    }));
+
+    Html.On(plan, t => t.CustomEvent("open-drawer-form", p =>
+    {
+        p.Element("drawer-status").RemoveClass("text-text-muted");
+        p.Element("drawer-status").AddClass("text-green-600");
+        p.Element("drawer-status").SetText("Drawer opened — \"Add Resident\" (with form)");
+    }));
+
+    Html.On(plan, t => t.CustomEvent("close-drawer", p =>
+    {
+        p.Element("drawer-status").RemoveClass("text-green-600");
+        p.Element("drawer-status").AddClass("text-text-muted");
+        p.Element("drawer-status").SetText("Drawer closed");
+    }));
+
+    var formattedJson = plan.RenderFormatted();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Drawer</native-heading>
+        <native-text color="Secondary" class="mt-2">
+            Plan-driven slide-out drawer: open, set title/content, close — all via C# DSL.
+            Escape key and close button also work (handled by drawer.ts).
+        </native-text>
+    </div>
+
+    <!-- Section 1: Open Drawer -->
+    <native-card><native-card-body>
+        <native-heading level="H2" class="mb-4">Open Drawer</native-heading>
+        <native-text color="Secondary" class="mb-4">
+            Click a button to open the drawer with different content.
+        </native-text>
+        <div class="flex flex-wrap gap-3">
+            @(Html.NativeButton("btn-open-drawer", "Open Resident Details")
+                .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Dispatch("open-drawer");
+                }))
+
+            @(Html.NativeButton("btn-open-alt", "Open Care Plan Notes")
+                .CssClass("px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent-dark transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Dispatch("open-drawer-alt");
+                }))
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 2: Open Drawer with Form Inputs -->
+    <native-card><native-card-body>
+        <native-heading level="H2" class="mb-4">Drawer with Input Controls</native-heading>
+        <native-text color="Secondary" class="mb-4">
+            Opens the drawer with a complete form: text, email, select, date, checkbox, textarea, and buttons.
+            Tests that design system CSS cascades into the fixed-position drawer panel.
+        </native-text>
+        @(Html.NativeButton("btn-open-form", "Open Add Resident Form")
+            .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("open-drawer-form");
+            }))
+    </native-card-body></native-card>
+
+    <!-- Section 3: Close Drawer via Plan -->
+    <native-card><native-card-body>
+        <native-heading level="H2" class="mb-4">Close Drawer via Plan</native-heading>
+        <native-text color="Secondary" class="mb-4">
+            Close the drawer programmatically. The drawer also closes via the X button or Escape key.
+        </native-text>
+        @(Html.NativeButton("btn-close-drawer", "Close Drawer")
+            .CssClass("px-4 py-2 rounded-lg border border-border text-sm font-medium text-text-secondary hover:bg-surface-alt transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("close-drawer");
+            }))
+    </native-card-body></native-card>
+
+    <!-- Status -->
+    <native-card><native-card-body>
+        <native-heading level="H2" class="mb-4">Drawer Status</native-heading>
+        <p id="drawer-status" class="font-mono text-sm text-text-muted">Drawer not opened yet</p>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2" class="mb-4">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code>@Html.Raw(formattedJson)</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

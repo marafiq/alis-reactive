@@ -1,22 +1,78 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/forms";
 
+/* ── Source scanning ── */
 @source "../Views/**/*.cshtml";
 @source "../Areas/**/*.cshtml";
 @source "../Areas/**/*.cs";
 @source "../Controllers/**/*.cs";
 @source "../Models/**/*.cs";
+@source "../../Alis.Reactive/DesignSystem/**/*.cs";
+@source "../../Alis.Reactive.NativeTagHelpers/**/*.cs";
+@source "../../Alis.Reactive.Native/**/*.cs";
+@source "../../Alis.Reactive.Fusion/**/*.cs";
 
+/* Safelisted dynamic classes from C# TokenMap */
+@source inline("grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5 grid-cols-6");
+@source inline("sm:grid-cols-2 sm:grid-cols-3 sm:grid-cols-4 sm:grid-cols-5 sm:grid-cols-6");
+@source inline("lg:grid-cols-3 lg:grid-cols-4 lg:grid-cols-5 lg:grid-cols-6");
+@source inline("gap-0 gap-1 gap-2 gap-4 gap-6 gap-8 gap-10 gap-12 gap-16");
+@source inline("gap-x-0 gap-x-1 gap-x-2 gap-x-4 gap-x-6 gap-x-8 gap-x-10 gap-x-12 gap-x-16");
+@source inline("gap-y-0 gap-y-1 gap-y-2 gap-y-4 gap-y-6 gap-y-8 gap-y-10 gap-y-12 gap-y-16");
+@source inline("py-0 py-1 py-2 py-4 py-6 py-8 py-10 py-12 py-16");
+@source inline("items-start items-center items-end items-stretch items-baseline");
+@source inline("justify-start justify-center justify-end justify-between justify-around justify-evenly");
+@source inline("text-xs text-sm text-base text-lg text-xl");
+@source inline("shadow-sm shadow-md shadow-lg");
+@source inline("border-l-4");
+@source inline("rounded-2xl ring-1");
+
+/* ── Theme tokens — registered as Tailwind utilities ── */
 @theme {
-  --color-surface: #f8fafc;
-  --color-surface-alt: #f1f5f9;
-  --color-border: #e2e8f0;
-  --color-text-primary: #0f172a;
+  /* Brand */
+  --color-primary: #7A2E3B;
+  --color-primary-light: #9B4A57;
+  --color-primary-dark: #5E1F2C;
+  --color-accent: #D4A053;
+  --color-accent-light: #E0B975;
+  --color-accent-dark: #B8873C;
+
+  /* Surfaces */
+  --color-surface: #F8FAFC;
+  --color-surface-alt: #F1F5F9;
+  --color-surface-elevated: #FFFFFF;
+
+  /* Borders */
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+
+  /* Content */
+  --color-text-primary: #0F172A;
   --color-text-secondary: #475569;
-  --color-text-muted: #94a3b8;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-success: #16a34a;
-  --color-warning: #d97706;
-  --color-error: #dc2626;
-  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+  --color-text-muted: #94A3B8;
+
+  /* Status */
+  --color-success: #059669;
+  --color-success-light: #D1FAE5;
+  --color-warning: #D97706;
+  --color-warning-light: #FEF3C7;
+  --color-error: #DC2626;
+  --color-error-light: #FEE2E2;
+  --color-info: #2563EB;
+  --color-info-light: #DBEAFE;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+
+  /* Typography */
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
+
+/* ── Layers ── */
+@import "./base.css";
+@import "./syncfusion.css";
+@import "./validation.css";
+@import "./components/drawer.css";
+@import "./components/hovercard.css";
