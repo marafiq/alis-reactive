@@ -43,12 +43,12 @@ describe("when validating array components", () => {
         addEventListener: () => {},
       };
 
+      // Real SF MultiSelect DOM: ej2_instances on the original <input style="display:none">
+      // SF hides the input and creates its own wrapper UI
       const dom = new JSDOM(`<!DOCTYPE html><html><body>
         <form id="myForm">
           <div>
-            <span class="e-control-wrapper" id="DietaryRestrictions">
-              <input class="e-multi-select e-input" name="DietaryRestrictions" />
-            </span>
+            <input id="DietaryRestrictions" name="DietaryRestrictions" style="display:none" />
             <span id="DietaryRestrictions_error" data-valmsg-for="DietaryRestrictions" hidden></span>
           </div>
         </form>
@@ -58,8 +58,8 @@ describe("when validating array components", () => {
       (globalThis as any).HTMLElement = dom.window.HTMLElement;
       (globalThis as any).Event = dom.window.Event;
 
-      const wrapper = dom.window.document.getElementById("DietaryRestrictions")!;
-      (wrapper as any).ej2_instances = [ej2Instance];
+      const input = dom.window.document.getElementById("DietaryRestrictions")!;
+      (input as any).ej2_instances = [ej2Instance];
 
       const mod = await import("../validation");
       validate = mod.validate;

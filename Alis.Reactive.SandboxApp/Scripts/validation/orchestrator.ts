@@ -81,7 +81,8 @@ export function validate(desc: ValidationDescriptor): boolean {
       continue;
     }
 
-    const hidden = isHidden(el);
+    const errorSpan = document.getElementById(f.fieldId + "_error");
+    const hidden = errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
     const root = resolveRoot(el, f.vendor);
     const value = walk(root, f.readExpr);
 
