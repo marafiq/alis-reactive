@@ -55,7 +55,7 @@ beforeEach(async () => {
       <input id="VetId" name="VetId" value="" />
       ${errSpan("VetId", "VetId")}
     </form>
-    <div id="Test_Plan_validation_summary" data-alis-validation-summary="Test.Plan" hidden></div>
+    <div id="Test_Plan_validation_summary" data-reactive-validation-summary="Test.Plan" hidden></div>
   </body></html>`);
 
   (globalThis as any).document = dom.window.document;
@@ -69,7 +69,7 @@ beforeEach(async () => {
 });
 
 function summaryDiv(): HTMLElement {
-  return document.querySelector("[data-alis-validation-summary]")!;
+  return document.querySelector("[data-reactive-validation-summary]")!;
 }
 
 function summaryText(): string {

@@ -7,7 +7,7 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
     private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
-    private ILocator SummaryDiv => Page.Locator("[data-alis-validation-summary]");
+    private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
     private ILocator Result => Page.Locator("#result");
 
     private ILocator ErrorFor(string fieldName) =>

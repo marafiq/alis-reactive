@@ -66,7 +66,7 @@ beforeEach(async () => {
         ${errSpan("VisibleField", "VisibleField")}
       </div>
     </form>
-    <div data-alis-validation-summary hidden></div>
+    <div data-reactive-validation-summary hidden></div>
   </body></html>`);
 
   (globalThis as any).document = dom.window.document;

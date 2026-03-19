@@ -54,7 +54,7 @@ beforeEach(async () => {
         <div><input id="HiddenInput" name="HiddenInput" value="" />${errSpan("HiddenInput", "HiddenInput")}</div>
       </div>
     </form>
-    <div data-alis-validation-summary hidden></div>
+    <div data-reactive-validation-summary hidden></div>
   </body></html>`);
 
   (globalThis as any).document = dom.window.document;

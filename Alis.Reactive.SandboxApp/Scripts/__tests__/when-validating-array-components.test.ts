@@ -369,7 +369,7 @@ describe("when validating array components", () => {
     beforeEach(async () => {
       const dom = new JSDOM(`<!DOCTYPE html><html><body>
         <form id="myForm">
-          <div data-alis-checklist id="Allergies">
+          <div data-reactive-checklist id="Allergies">
             <input type="hidden" name="Allergies" value="" />
             <label><input type="checkbox" value="peanuts" /> Peanuts</label>
             <label><input type="checkbox" value="dairy" /> Dairy</label>

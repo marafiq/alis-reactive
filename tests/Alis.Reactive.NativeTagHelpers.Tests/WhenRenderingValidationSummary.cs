@@ -17,7 +17,7 @@ public class WhenRenderingValidationSummary : TagHelperTestBase
         tagHelper.Process(context, output);
 
         Assert.That(output.TagName, Is.EqualTo("div"));
-        Assert.That(output.Attributes["data-alis-validation-summary"]?.Value?.ToString(), Is.EqualTo("my-plan"));
+        Assert.That(output.Attributes["data-reactive-validation-summary"]?.Value?.ToString(), Is.EqualTo("my-plan"));
     }
 
     [Test]
@@ -41,7 +41,7 @@ public class WhenRenderingValidationSummary : TagHelperTestBase
 
         tagHelper.Process(context, output);
 
-        Assert.That(output.Attributes["data-alis-validation-summary"]?.Value?.ToString(), Is.EqualTo(""));
+        Assert.That(output.Attributes["data-reactive-validation-summary"]?.Value?.ToString(), Is.EqualTo(""));
     }
 
     [Test]

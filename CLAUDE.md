@@ -532,6 +532,21 @@ layout uses `src=` (not inline `import from`), and ASP.NET's tag helpers compute
 
 Every change goes through all three test layers before it's done. No exceptions.
 
+## Cross-Layer Changes (C# + TS + CSS + Tests)
+
+**When a change touches both C# and TS (e.g., renaming a data attribute, changing plan shape):**
+
+1. Make the change in ALL files (C#, TS, CSS, tests)
+2. `npm run build:all` — rebuild JS + CSS bundles
+3. `dotnet build` — rebuild C# (triggers esbuild via csproj target)
+4. `npm test` — vitest must pass
+5. **Restart the app** — `dotnet run --project Alis.Reactive.SandboxApp`
+6. `dotnet test tests/Alis.Reactive.PlaywrightTests` — browser tests against running app
+
+**Playwright tests run against the LIVE app.** If the app is serving stale bundles
+(old JS/CSS), Playwright will fail even if the code is correct. Always rebuild AND
+restart before running Playwright.
+
 ## Pre-Commit Verification (MANDATORY)
 
 **Before every commit, ALL tests must pass. No exceptions.**

@@ -21,7 +21,7 @@ describe("When injectHtml receives HTML with a plan script", () => {
 
     const partialHtml = `
       <input id="street" name="Address.Street" value="" />
-      <script type="application/json" data-alis-plan>${JSON.stringify({
+      <script type="application/json" data-reactive-plan>${JSON.stringify({
         planId: "Test.Model",
         components: { "Address.Street": { id: "street", vendor: "native", readExpr: "value" } },
         entries: [],
@@ -43,7 +43,7 @@ describe("When injectHtml receives HTML with a plan script", () => {
     container.id = "my-container";
     document.body.appendChild(container);
 
-    const html = `<script type="application/json" data-alis-plan>${JSON.stringify({
+    const html = `<script type="application/json" data-reactive-plan>${JSON.stringify({
       planId: "Test.Model",
       components: { "Field": { id: "f", vendor: "native", readExpr: "value" } },
       entries: [],
@@ -55,7 +55,7 @@ describe("When injectHtml receives HTML with a plan script", () => {
     expect(plan.components["Field"]).toBeDefined();
 
     // Reload with different component — old should be removed
-    const html2 = `<script type="application/json" data-alis-plan>${JSON.stringify({
+    const html2 = `<script type="application/json" data-reactive-plan>${JSON.stringify({
       planId: "Test.Model",
       components: { "Field2": { id: "f2", vendor: "native", readExpr: "value" } },
       entries: [],
@@ -75,7 +75,7 @@ describe("When injectHtml receives HTML with a plan script", () => {
 
     const html = `
       <div id="injected-content">Hello</div>
-      <script type="application/json" data-alis-plan>${JSON.stringify({
+      <script type="application/json" data-reactive-plan>${JSON.stringify({
         planId: "X",
         components: {},
         entries: [],
@@ -87,7 +87,7 @@ describe("When injectHtml receives HTML with a plan script", () => {
     expect(document.getElementById("injected-content")).toBeTruthy();
     expect(document.getElementById("injected-content")!.textContent).toBe("Hello");
     // Plan script should NOT be in the DOM (extracted before insertion)
-    expect(container.querySelector("[data-alis-plan]")).toBeNull();
+    expect(container.querySelector("[data-reactive-plan]")).toBeNull();
   });
 
   it("replaces previous container content on reload", () => {
@@ -124,12 +124,12 @@ describe("When injectHtml receives multiple plan scripts with same planId", () =
     document.body.appendChild(container);
 
     const html = `
-      <script type="application/json" data-alis-plan>${JSON.stringify({
+      <script type="application/json" data-reactive-plan>${JSON.stringify({
         planId: "Test.Model",
         components: { "FA": { id: "fa", vendor: "native", readExpr: "value" } },
         entries: [],
       })}</script>
-      <script type="application/json" data-alis-plan>${JSON.stringify({
+      <script type="application/json" data-reactive-plan>${JSON.stringify({
         planId: "Test.Model",
         components: { "FB": { id: "fb", vendor: "native", readExpr: "value" } },
         entries: [],

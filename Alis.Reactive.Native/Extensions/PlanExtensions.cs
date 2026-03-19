@@ -39,7 +39,7 @@ namespace Alis.Reactive.Native.Extensions
             IReactivePlan<TModel> plan) where TModel : class
         {
             var json = plan.Render();
-            var script = $"<script type=\"application/json\" data-alis-plan data-trace=\"trace\">{json}</script>";
+            var script = $"<script type=\"application/json\" data-reactive-plan data-trace=\"trace\">{json}</script>";
 
             // Summary div only for parent plans — partials merge into parent's plan,
             // parent's summary div handles all validation error routing.
@@ -48,7 +48,7 @@ namespace Alis.Reactive.Native.Extensions
 
             var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
             return new HtmlString(script +
-                $"<div data-alis-validation-summary=\"{planId}\" hidden></div>");
+                $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
         }
     }
 }

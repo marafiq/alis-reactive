@@ -2,12 +2,12 @@
 // Syncs checked checkbox values into:
 //   1. container.value (string[]) — for evalRead + gather (array semantics)
 //   2. hidden input .value (CSV string) — for MVC form submission
-// The container div carries [data-alis-checklist] and the element ID.
+// The container div carries [data-reactive-checklist] and the element ID.
 // Checkbox change events naturally bubble to the container — no synthetic dispatch needed.
 export {}; // Module marker — prevents TS global-scope collisions
 
 function init(): void {
-  const containers = document.querySelectorAll<HTMLElement>("[data-alis-checklist]");
+  const containers = document.querySelectorAll<HTMLElement>("[data-reactive-checklist]");
 
   for (const container of containers) {
     const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement | null;

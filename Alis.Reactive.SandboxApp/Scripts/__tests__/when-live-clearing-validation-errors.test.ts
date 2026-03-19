@@ -249,7 +249,7 @@ describe("when live-clearing validation errors", () => {
             ${errSpan("Name", "Name")}
           </div>
         </form>
-        <div id="TestPlan_validation_summary" data-alis-validation-summary="TestPlan" hidden></div>
+        <div id="TestPlan_validation_summary" data-reactive-validation-summary="TestPlan" hidden></div>
       </body></html>`);
 
       (globalThis as any).document = dom.window.document;
@@ -341,7 +341,7 @@ describe("when live-clearing validation errors", () => {
             ${errSpan("Hidden", "HiddenField")}
           </div>
         </form>
-        <div id="TestPlan_validation_summary" data-alis-validation-summary="TestPlan" hidden></div>
+        <div id="TestPlan_validation_summary" data-reactive-validation-summary="TestPlan" hidden></div>
       </body></html>`);
 
       (globalThis as any).document = dom.window.document;

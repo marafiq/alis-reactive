@@ -1,5 +1,5 @@
 // root.ts — ESM entry point for alis-reactive runtime
-// esbuild bundles from here. Auto-discovers [data-alis-plan] elements on page load.
+// esbuild bundles from here. Auto-discovers [data-reactive-plan] elements on page load.
 // Lives at Scripts/ root by design — everything else is organized in subdirectories.
 
 import { boot, trace } from "./lifecycle/boot";
@@ -15,7 +15,7 @@ import type { TraceLevel } from "./core/trace";
 initConfirm();
 initNativeActionLinks();
 
-const planEls = document.querySelectorAll<HTMLElement>("[data-alis-plan]");
+const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
 const plans: Plan[] = [];
 
 for (const el of planEls) {
@@ -25,7 +25,7 @@ for (const el of planEls) {
   try {
     plans.push(JSON.parse(el.textContent!));
   } catch (e) {
-    throw new Error(`[alis] failed to parse plan JSON from [data-alis-plan] element: ${(e as Error).message}`);
+    throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(e as Error).message}`);
   }
 }
 

@@ -9,7 +9,7 @@ describe("when auto booting plans", () => {
   it("merges plans with the same planId before booting", async () => {
     document.body.innerHTML = `
       <div id="status"></div>
-      <script type="application/json" data-alis-plan>
+      <script type="application/json" data-reactive-plan>
         ${JSON.stringify({
           planId: "Test.Model",
           components: {
@@ -29,7 +29,7 @@ describe("when auto booting plans", () => {
           }],
         })}
       </script>
-      <script type="application/json" data-alis-plan>
+      <script type="application/json" data-reactive-plan>
         ${JSON.stringify({
           planId: "Test.Model",
           components: {

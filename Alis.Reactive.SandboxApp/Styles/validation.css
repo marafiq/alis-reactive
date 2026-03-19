@@ -17,7 +17,7 @@
 }
 
 /* ── Validation summary box ── */
-.alis-root [data-alis-validation-summary] {
+.alis-root [data-reactive-validation-summary] {
   background-color: var(--color-error-light, #FEE2E2);
   border: 1px solid var(--color-error);
   border-radius: 0.75rem;
@@ -25,17 +25,17 @@
   margin-bottom: 1rem;
 }
 
-.alis-root [data-alis-validation-summary][hidden] {
+.alis-root [data-reactive-validation-summary][hidden] {
   display: none;
 }
 
-.alis-root [data-alis-validation-summary] > div {
+.alis-root [data-reactive-validation-summary] > div {
   font-size: 0.8125rem;
   color: var(--color-error);
   padding: 0.125rem 0;
 }
 
-.alis-root [data-alis-validation-summary] > div + div {
+.alis-root [data-reactive-validation-summary] > div + div {
   border-top: 1px solid rgba(220, 38, 38, 0.1);
   margin-top: 0.25rem;
   padding-top: 0.375rem;

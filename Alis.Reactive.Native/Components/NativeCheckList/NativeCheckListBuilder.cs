@@ -109,8 +109,8 @@ namespace Alis.Reactive.Native.Components
             }
 
             // Container div IS the canonical element — carries the element ID.
-            // checklist.ts discovers via [data-alis-checklist] and sets container.value = string[].
-            writer.Write($"<div id=\"{encoder.Encode(_elementId)}\" class=\"{encoder.Encode(_cssClass)}\" data-alis-checklist>");
+            // checklist.ts discovers via [data-reactive-checklist] and sets container.value = string[].
+            writer.Write($"<div id=\"{encoder.Encode(_elementId)}\" class=\"{encoder.Encode(_cssClass)}\" data-reactive-checklist>");
 
             // Hidden input — for MVC form submission (CSV value), NOT the canonical element.
             writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");

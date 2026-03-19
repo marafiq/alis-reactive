@@ -7,7 +7,7 @@ describe("when-using-native-checklist", () => {
 
   /**
    * Sets up a checklist matching the new DOM structure:
-   *   <div id="{elementId}" data-alis-checklist>
+   *   <div id="{elementId}" data-reactive-checklist>
    *     <input type="hidden" name="{name}" value="csv" />
    *     <input type="checkbox" id="{elementId}_c0" ... />
    *     ...
@@ -16,7 +16,7 @@ describe("when-using-native-checklist", () => {
   function setupChecklist(elementId: string, options: string[], checked: string[] = []): void {
     const container = document.createElement("div");
     container.id = elementId;
-    container.setAttribute("data-alis-checklist", "");
+    container.setAttribute("data-reactive-checklist", "");
 
     const hidden = document.createElement("input");
     hidden.type = "hidden";
@@ -38,7 +38,7 @@ describe("when-using-native-checklist", () => {
 
   /** Mirrors checklist.ts init logic */
   function initChecklist(): void {
-    const containers = document.querySelectorAll<HTMLElement>("[data-alis-checklist]");
+    const containers = document.querySelectorAll<HTMLElement>("[data-reactive-checklist]");
     for (const container of containers) {
       const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement | null;
       if (!hidden) continue;
