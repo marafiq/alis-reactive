@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { boot } from "../lifecycle/boot";
-import { wireTrigger } from "../trigger";
+import { wireTrigger } from "../execution/trigger";
 
 describe("when triggering on component event", () => {
   describe("native vendor", () => {

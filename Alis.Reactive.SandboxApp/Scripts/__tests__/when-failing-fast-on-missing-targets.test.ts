@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { evalRead, resolveRoot } from "../resolution/component";
-import { wireTrigger } from "../trigger";
+import { wireTrigger } from "../execution/trigger";
 import { mutateElement } from "../execution/element";
 import { resolveGather } from "../http/gather";
 import { TestWidget } from "../components/lab/test-widget";

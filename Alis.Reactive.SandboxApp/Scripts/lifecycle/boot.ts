@@ -6,7 +6,7 @@
 import type { Plan, Entry, ComponentEntry } from "../types";
 import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
-import { wireTrigger } from "../trigger";
+import { wireTrigger } from "../execution/trigger";
 import { enrichEntries } from "./enrichment";
 import { wireLiveClearing } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
