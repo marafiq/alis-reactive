@@ -6,8 +6,8 @@ export type CoercionType = "string" | "number" | "boolean" | "date" | "raw" | "a
 export type EventPayload = Record<string, unknown>;
 
 export interface ExecContext {
-  evt?: Record<string, unknown>;
-  responseBody?: unknown;
-  validationDesc?: ValidationDescriptor;
-  components?: Record<string, ComponentEntry>;
+  readonly evt?: Record<string, unknown>;
+  readonly responseBody?: unknown;
+  readonly validationDesc?: ValidationDescriptor;
+  readonly components?: Record<string, ComponentEntry>;
 }
