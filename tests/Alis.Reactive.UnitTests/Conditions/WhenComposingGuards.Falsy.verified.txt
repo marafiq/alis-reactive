@@ -1,0 +1,50 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.active
+              },
+              coerceAs: boolean,
+              op: falsy
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: r,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

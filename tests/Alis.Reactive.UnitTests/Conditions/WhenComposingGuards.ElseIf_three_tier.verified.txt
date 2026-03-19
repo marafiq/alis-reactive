@@ -1,0 +1,110 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.score
+              },
+              coerceAs: number,
+              op: gte,
+              operand: 90
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: grade,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: A
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.score
+              },
+              coerceAs: number,
+              op: gte,
+              operand: 80
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: grade,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: B
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.score
+              },
+              coerceAs: number,
+              op: gte,
+              operand: 70
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: grade,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: C
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: grade,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: F
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

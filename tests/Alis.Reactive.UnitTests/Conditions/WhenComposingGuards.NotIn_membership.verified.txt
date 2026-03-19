@@ -1,0 +1,45 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.status
+              },
+              coerceAs: string,
+              op: not-in,
+              operand: [
+                blocked,
+                deleted
+              ]
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: r,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: allowed
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
