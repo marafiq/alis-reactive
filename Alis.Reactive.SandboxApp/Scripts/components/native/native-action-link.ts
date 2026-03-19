@@ -5,6 +5,7 @@ import type {
   RequestDescriptor,
   StatusHandler,
 } from "../../types";
+import { assertNever } from "../../core/assert-never";
 
 const log = scope("native-action-link");
 const SELECTOR = "a[data-reactive-link]";
@@ -89,6 +90,8 @@ function resolveSingleRequest(
       return;
     case "parallel-http":
       throw new Error("NativeActionLink does not support Parallel().");
+    default:
+      assertNever(reaction, "reaction kind in NativeActionLink");
   }
 }
 
@@ -130,5 +133,7 @@ function assertNestedReactionContainsNoRequest(reaction: Reaction): void {
     case "http":
     case "parallel-http":
       throw new Error("NativeActionLink response handlers cannot start a second HTTP request.");
+    default:
+      assertNever(reaction, "reaction kind in NativeActionLink handler");
   }
 }
