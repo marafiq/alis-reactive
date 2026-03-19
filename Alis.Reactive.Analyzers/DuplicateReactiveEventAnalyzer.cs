@@ -26,7 +26,7 @@ namespace Alis.Reactive.Analyzers
             title: "Duplicate .Reactive() for the same event",
             messageFormat: "Multiple .Reactive() calls for '{0}' on the same builder. Combine into a single .Reactive() call.",
             category: "Alis.Reactive",
-            defaultSeverity: DiagnosticSeverity.Error,
+            defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description: "Each component event should have exactly one .Reactive() call. Multiple calls create duplicate plan entries. Combine all logic into a single .Reactive() pipeline.");
 
