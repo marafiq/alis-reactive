@@ -1,0 +1,100 @@
+@model NativeHiddenFieldModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "NativeHiddenField";
+
+    var plan = Html.ReactivePlan<NativeHiddenFieldModel>();
+
+    // Section 2: Property read — DomReady reads hidden values into echo spans
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Element("resident-id-echo").SetText(
+            p.Component<NativeHiddenField>(m => m.ResidentId).Value());
+        p.Element("form-token-echo").SetText(
+            p.Component<NativeHiddenField>(m => m.FormToken).Value());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">NativeHiddenField — Full API</native-heading>
+        <native-text color="Secondary">
+            Exercises NativeHiddenField vertical slice: hidden inputs that carry values
+            (resident IDs, form tokens) invisibly. They participate in ComponentsMap
+            for gather (IncludeAll picks them up) and support property reads.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Hidden Fields (rendered but invisible) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Hidden Fields (Seeded Values)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Two hidden inputs seeded by the server: ResidentId="RES-1042" and FormToken="abc123".
+            They render as <code>&lt;input type="hidden"&gt;</code> and are invisible in the browser.
+        </p>
+        <form id="hidden-form">
+            @Html.HiddenFieldFor(plan, m => m.ResidentId)
+            @Html.HiddenFieldFor(plan, m => m.FormToken)
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Label("Resident Name"))
+                .NativeTextBox(b => b
+                    .Placeholder("Enter resident name")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
+        </form>
+        <div class="mt-4 font-mono text-sm text-text-muted">
+            <p>Hidden inputs are present in the DOM but not visible to the user.</p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 2: Property Read -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads hidden field values into echo spans using
+            <code>Component&lt;NativeHiddenField&gt;(m =&gt; m.ResidentId).Value()</code>.
+        </p>
+        <div class="font-mono text-sm space-y-1">
+            <p>Resident ID: <span id="resident-id-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Form Token: <span id="form-token-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 3: POST Gather -->
+    <native-card><native-card-body>
+        <native-heading level="H2">3. POST Gather (IncludeAll)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Clicks "Submit" to POST all gathered fields (including hidden inputs) to the server.
+            Server echoes back what it received, proving hidden values are gathered.
+        </p>
+        @(Html.NativeButton("submit-btn", "Submit")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/NativeHiddenField/Echo", g => g.IncludeAll())
+                 .Response(r => r
+                    .OnSuccess<NativeHiddenFieldEchoResponse>((json, s) =>
+                    {
+                        s.Element("echo-resident-id").SetText(json, x => x.ResidentId);
+                        s.Element("echo-form-token").SetText(json, x => x.FormToken);
+                        s.Element("echo-resident-name").SetText(json, x => x.ResidentName);
+                        s.Element("echo-field-count").SetText(json, x => x.FieldCount);
+                        s.Element("echo-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="echo-result" class="mt-4 space-y-1 font-mono text-sm text-text-muted">
+            <p>Resident ID: <span id="echo-resident-id">&mdash;</span></p>
+            <p>Form Token: <span id="echo-form-token">&mdash;</span></p>
+            <p>Resident Name: <span id="echo-resident-name">&mdash;</span></p>
+            <p class="font-semibold">Fields Received: <span id="echo-field-count">&mdash;</span>/3</p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

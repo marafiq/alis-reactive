@@ -18,6 +18,7 @@ public class NativeTestModel
     public string? MobilityLevel { get; set; }
     public string[]? Allergies { get; set; }
     public string? CareNotes { get; set; }
+    public string? ResidentId { get; set; }
 }
 
 [TestFixture]
