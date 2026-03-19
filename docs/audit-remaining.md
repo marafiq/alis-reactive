@@ -12,7 +12,14 @@
 - [x] Memory files cleaned
 - [x] CLAUDE.md test counts updated
 - [x] SOLID skill updated
-- [ ] Sequence diagrams — FULL regeneration from actual code. Old diagrams reference http/, lifecycle/inject.ts, auto-boot.ts. Must retrace every module with new structure.
+- [x] Sequence diagrams regenerated
+- [x] Async fire-and-forget — .catch() added to all 3 async call sites
+
+## Next: HTTP Pipeline Hardening (HIGH PRIORITY)
+- [ ] Pre-fetch errors (gather throws, validation throws) must route through developer's onError handlers, not swallow into .catch() log
+- [ ] ExecContext immutability — HTTP spreads ctx for responseBody but original is mutable. Must be immutable for retry support
+- [ ] Retry support — plan must be able to specify retry policy, pipeline must support it
+- [ ] Error status handlers must ALWAYS fire when registered — the .catch() safety net must not skip them
 
 ## Done This Session
 - [x] assertNever on all switches
