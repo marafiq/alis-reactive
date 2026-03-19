@@ -170,7 +170,7 @@ describe("two-phase boot", () => {
     expect(document.getElementById("step3")!.textContent).toBe("c");
   });
 
-  it("conditional reaction with pre-commands executes commands then evaluates branches", () => {
+  it("conditional reaction with pre-commands executes commands then evaluates branches", async () => {
     const plan: Plan = {
       planId: "test",
       components: {},
@@ -197,6 +197,8 @@ describe("two-phase boot", () => {
     boot(plan);
     document.dispatchEvent(new CustomEvent("check", { detail: { ok: true } }));
 
+    // Pre-commands run synchronously; branch reaction is async — flush microtasks
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("step1")!.textContent).toBe("pre-command ran");
     expect(document.getElementById("step2")!.textContent).toBe("branch taken");
   });

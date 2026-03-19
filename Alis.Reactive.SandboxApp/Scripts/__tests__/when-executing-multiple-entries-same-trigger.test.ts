@@ -48,7 +48,7 @@ describe("multiple entries on the same trigger", () => {
     expect(document.getElementById("r2")!.textContent).toBe("second");
   });
 
-  it("fires all entries when custom-event has multiple entries", () => {
+  it("fires all entries when custom-event has multiple entries", async () => {
     const plan: Plan = {
       planId: "test",
       components: {},
@@ -79,11 +79,13 @@ describe("multiple entries on the same trigger", () => {
     };
     boot(plan);
     document.dispatchEvent(new CustomEvent("my-event", { detail: { name: "hello" } }));
+    // Sequential entry runs sync; conditional branch is async — flush microtasks
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("r1")!.textContent).toBe("entry-1");
     expect(document.getElementById("r2")!.textContent).toBe("matched");
   });
 
-  it("sequential entry + conditional entry + sequential entry all fire independently", () => {
+  it("sequential entry + conditional entry + sequential entry all fire independently", async () => {
     const plan: Plan = {
       planId: "test",
       components: {},
@@ -137,13 +139,15 @@ describe("multiple entries on the same trigger", () => {
     boot(plan);
     document.dispatchEvent(new CustomEvent("test", { detail: { active: true, score: 95 } }));
 
+    // Sequential entries run sync; conditional branches are async — flush microtasks
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("echo")!.textContent).toBe("before");
     expect(document.getElementById("r1")!.textContent).toBe("active");
     expect(document.getElementById("r2")!.textContent).toBe("high");
     expect(document.getElementById("footer")!.textContent).toBe("after");
   });
 
-  it("two independent conditions evaluate separately — first match does NOT skip second", () => {
+  it("two independent conditions evaluate separately — first match does NOT skip second", async () => {
     const plan: Plan = {
       planId: "test",
       components: {},
@@ -182,13 +186,14 @@ describe("multiple entries on the same trigger", () => {
     };
     boot(plan);
 
-    // Both conditions true
+    // Both conditions true — conditional branches are async, flush microtasks
     document.dispatchEvent(new CustomEvent("test", { detail: { color: "red", size: 20 } }));
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("r1")!.textContent).toBe("is red");
     expect(document.getElementById("r2")!.textContent).toBe("big");
   });
 
-  it("first condition matches, second does not — both still evaluate", () => {
+  it("first condition matches, second does not — both still evaluate", async () => {
     const plan: Plan = {
       planId: "test",
       components: {},
@@ -227,8 +232,9 @@ describe("multiple entries on the same trigger", () => {
     };
     boot(plan);
 
-    // First matches (red), second falls to else (size=5 < 100)
+    // First matches (red), second falls to else (size=5 < 100) — conditional branches async, flush microtasks
     document.dispatchEvent(new CustomEvent("test", { detail: { color: "red", size: 5 } }));
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("r1")!.textContent).toBe("is red");
     expect(document.getElementById("r2")!.textContent).toBe("normal");
   });

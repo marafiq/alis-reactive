@@ -40,7 +40,7 @@ describe("when executing a conditional workflow", () => {
 
   // ── 1. If / Else ──
 
-  it("if-else branches execute correctly", () => {
+  it("if-else branches execute correctly", async () => {
     setupDom("panel");
     document.getElementById("panel")!.setAttribute("hidden", "");
 
@@ -68,12 +68,13 @@ describe("when executing a conditional workflow", () => {
       }],
     });
 
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("panel")!.hasAttribute("hidden")).toBe(false);
   });
 
   // ── 2. If / ElseIf / Else ──
 
-  it("if-elseif-else branches execute correctly", () => {
+  it("if-elseif-else branches execute correctly", async () => {
     setupDom("tier");
 
     boot({
@@ -104,12 +105,13 @@ describe("when executing a conditional workflow", () => {
       }],
     });
 
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("tier")!.textContent).toBe("Silver");
   });
 
   // ── 3. Multiple actions inside Then ──
 
-  it("multiple actions execute inside then", () => {
+  it("multiple actions execute inside then", async () => {
     setupDom("admin-panel", "delete-btn");
     document.getElementById("admin-panel")!.setAttribute("hidden", "");
     document.getElementById("delete-btn")!.setAttribute("hidden", "");
@@ -144,6 +146,7 @@ describe("when executing a conditional workflow", () => {
       }],
     });
 
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("admin-panel")!.hasAttribute("hidden")).toBe(false);
     expect(document.getElementById("delete-btn")!.hasAttribute("hidden")).toBe(false);
     expect(adminLoaded).toBe(true);
@@ -151,7 +154,7 @@ describe("when executing a conditional workflow", () => {
 
   // ── 4. Multiple actions inside Else ──
 
-  it("multiple actions execute inside else", () => {
+  it("multiple actions execute inside else", async () => {
     setupDom("panel", "notice");
 
     let accessDenied = false;
@@ -188,13 +191,14 @@ describe("when executing a conditional workflow", () => {
       }],
     });
 
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("notice")!.textContent).toBe("Contact admin for access");
     expect(accessDenied).toBe(true);
   });
 
   // ── 5. Compound conditions (AND) ──
 
-  it("compound conditions execute correctly", () => {
+  it("compound conditions execute correctly", async () => {
     setupDom("admin-panel");
     document.getElementById("admin-panel")!.setAttribute("hidden", "");
 
@@ -231,6 +235,7 @@ describe("when executing a conditional workflow", () => {
       }],
     });
 
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("admin-panel")!.hasAttribute("hidden")).toBe(false);
   });
 
@@ -277,7 +282,7 @@ describe("when executing a conditional workflow", () => {
 
   // ── 6. Unconditional actions alongside a condition block ──
 
-  it("unconditional actions execute alongside a condition block", () => {
+  it("unconditional actions execute alongside a condition block", async () => {
     setupDom("status", "admin-panel");
     document.getElementById("admin-panel")!.setAttribute("hidden", "");
 
@@ -312,10 +317,11 @@ describe("when executing a conditional workflow", () => {
       }],
     });
 
-    // Unconditional actions ran
+    // Pre-commands (unconditional) run sync — assert immediately
     expect(document.getElementById("status")!.textContent).toBe("Processing...");
     expect(workflowStarted).toBe(true);
-    // Branch ran
+    // Branch is async — flush microtasks
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("admin-panel")!.hasAttribute("hidden")).toBe(false);
   });
 

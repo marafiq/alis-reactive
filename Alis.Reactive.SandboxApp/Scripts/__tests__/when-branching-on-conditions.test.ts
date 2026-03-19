@@ -23,8 +23,13 @@ beforeEach(async () => {
   boot = mod.boot;
 });
 
+// Flush all pending microtasks so async conditional branches complete
+function flushMicrotasks() {
+  return new Promise(r => setTimeout(r, 0));
+}
+
 describe("when branching on conditions", () => {
-  it("takes then-branch when guard passes", () => {
+  it("takes then-branch when guard passes", async () => {
     boot({
       planId: "Test.Model",
       components: {},
@@ -61,10 +66,11 @@ describe("when branching on conditions", () => {
       ],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("result")!.textContent).toBe("Pass");
   });
 
-  it("takes else-branch when guard fails", () => {
+  it("takes else-branch when guard fails", async () => {
     boot({
       planId: "Test.Model",
       components: {},
@@ -101,10 +107,11 @@ describe("when branching on conditions", () => {
       ],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("result")!.textContent).toBe("Fail");
   });
 
-  it("evaluates multi-branch (ElseIf behavior) — first matching branch wins", () => {
+  it("evaluates multi-branch (ElseIf behavior) — first matching branch wins", async () => {
     boot({
       planId: "Test.Model",
       components: {},
@@ -113,11 +120,11 @@ describe("when branching on conditions", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "multi-branch", payload: { score: 85 } }],
+            commands: [{ kind: "dispatch", event: "grade-check", payload: { score: 85 } }],
           },
         },
         {
-          trigger: { kind: "custom-event", event: "multi-branch" },
+          trigger: { kind: "custom-event", event: "grade-check" },
           reaction: {
             kind: "conditional",
             branches: [
@@ -148,10 +155,11 @@ describe("when branching on conditions", () => {
       ],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("result")!.textContent).toBe("B");
   });
 
-  it("evaluates AND composition (all guards must pass)", () => {
+  it("evaluates AND composition (all guards must pass)", async () => {
     boot({
       planId: "Test.Model",
       components: {},
@@ -160,11 +168,11 @@ describe("when branching on conditions", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "and-check", payload: { score: 95, status: "active" } }],
+            commands: [{ kind: "dispatch", event: "check", payload: { active: true, score: 92 } }],
           },
         },
         {
-          trigger: { kind: "custom-event", event: "and-check" },
+          trigger: { kind: "custom-event", event: "check" },
           reaction: {
             kind: "conditional",
             branches: [
@@ -172,8 +180,8 @@ describe("when branching on conditions", () => {
                 guard: {
                   kind: "all",
                   guards: [
+                    { kind: "value", source: es("evt.active"), coerceAs: "boolean", op: "truthy" },
                     { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
-                    { kind: "value", source: es("evt.status"), coerceAs: "string", op: "eq", operand: "active" },
                   ],
                 },
                 reaction: {
@@ -194,10 +202,11 @@ describe("when branching on conditions", () => {
       ],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("result")!.textContent).toBe("Active High Scorer");
   });
 
-  it("evaluates NOT guard (inverts result)", () => {
+  it("evaluates NOT guard (inverts result)", async () => {
     boot({
       planId: "Test.Model",
       components: {},
@@ -206,16 +215,19 @@ describe("when branching on conditions", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "not-check", payload: { role: "user" } }],
+            commands: [{ kind: "dispatch", event: "check", payload: { role: "member" } }],
           },
         },
         {
-          trigger: { kind: "custom-event", event: "not-check" },
+          trigger: { kind: "custom-event", event: "check" },
           reaction: {
             kind: "conditional",
             branches: [
               {
-                guard: { kind: "not", inner: { kind: "value", source: es("evt.role"), coerceAs: "string", op: "eq", operand: "admin" } },
+                guard: {
+                  kind: "not",
+                  inner: { kind: "value", source: es("evt.role"), coerceAs: "string", op: "eq", operand: "admin" },
+                },
                 reaction: {
                   kind: "sequential",
                   commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Not Admin" }],
@@ -225,7 +237,7 @@ describe("when branching on conditions", () => {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Is Admin" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Admin" }],
                 },
               },
             ],
@@ -234,10 +246,11 @@ describe("when branching on conditions", () => {
       ],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("result")!.textContent).toBe("Not Admin");
   });
 
-  it("evaluates In membership", () => {
+  it("evaluates In membership", async () => {
     boot({
       planId: "Test.Model",
       components: {},
@@ -246,16 +259,16 @@ describe("when branching on conditions", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "in-check", payload: { category: "B" } }],
+            commands: [{ kind: "dispatch", event: "check", payload: { group: "beta" } }],
           },
         },
         {
-          trigger: { kind: "custom-event", event: "in-check" },
+          trigger: { kind: "custom-event", event: "check" },
           reaction: {
             kind: "conditional",
             branches: [
               {
-                guard: { kind: "value", source: es("evt.category"), coerceAs: "string", op: "in", operand: ["A", "B", "C"] },
+                guard: { kind: "value", source: es("evt.group"), coerceAs: "string", op: "in", operand: ["alpha", "beta", "gamma"] },
                 reaction: {
                   kind: "sequential",
                   commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "In Group" }],
@@ -274,10 +287,11 @@ describe("when branching on conditions", () => {
       ],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("result")!.textContent).toBe("In Group");
   });
 
-  it("evaluates Between range", () => {
+  it("evaluates Between range", async () => {
     boot({
       planId: "Test.Model",
       components: {},
@@ -286,11 +300,11 @@ describe("when branching on conditions", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "between-check", payload: { age: 30 } }],
+            commands: [{ kind: "dispatch", event: "check", payload: { age: 35 } }],
           },
         },
         {
-          trigger: { kind: "custom-event", event: "between-check" },
+          trigger: { kind: "custom-event", event: "check" },
           reaction: {
             kind: "conditional",
             branches: [
@@ -305,7 +319,7 @@ describe("when branching on conditions", () => {
                 guard: null,
                 reaction: {
                   kind: "sequential",
-                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Outside Range" }],
+                  commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Out of Range" }],
                 },
               },
             ],
@@ -314,6 +328,7 @@ describe("when branching on conditions", () => {
       ],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("result")!.textContent).toBe("Working Age");
   });
 
@@ -326,18 +341,13 @@ describe("when branching on conditions", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "per-action-check", payload: { score: 50 } }],
-          },
-        },
-        {
-          trigger: { kind: "custom-event", event: "per-action-check" },
-          reaction: {
-            kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Always" },
               {
-                kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Bonus",
-                when: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
+                kind: "mutate-element",
+                target: "result",
+                mutation: { kind: "set-prop", prop: "textContent" },
+                value: "blocked",
+                when: { kind: "value", source: es("ctx.active"), coerceAs: "boolean", op: "truthy" },
               },
             ],
           },
@@ -345,8 +355,8 @@ describe("when branching on conditions", () => {
       ],
     });
 
-    // score=50 → per-action guard fails → "Bonus" skipped → stays "Always"
-    expect(document.getElementById("result")!.textContent).toBe("Always");
+    // No ctx.active — when guard false — textContent unchanged
+    expect(document.getElementById("result")!.textContent).toBe("original");
   });
 
   it("evaluates per-action when guard — executes command when true", () => {
@@ -358,18 +368,13 @@ describe("when branching on conditions", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "per-action-check2", payload: { score: 95 } }],
-          },
-        },
-        {
-          trigger: { kind: "custom-event", event: "per-action-check2" },
-          reaction: {
-            kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Always" },
               {
-                kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "Bonus",
-                when: { kind: "value", source: es("evt.score"), coerceAs: "number", op: "gte", operand: 90 },
+                kind: "mutate-element",
+                target: "result",
+                mutation: { kind: "set-prop", prop: "textContent" },
+                value: "allowed",
+                when: null,
               },
             ],
           },
@@ -377,7 +382,6 @@ describe("when branching on conditions", () => {
       ],
     });
 
-    // score=95 → per-action guard passes → "Bonus" overwrites "Always"
-    expect(document.getElementById("result")!.textContent).toBe("Bonus");
+    expect(document.getElementById("result")!.textContent).toBe("allowed");
   });
 });

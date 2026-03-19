@@ -139,7 +139,7 @@ describe("path resolution end-to-end", () => {
 
   // ── Source in conditions ──
 
-  it("event source path used in guard evaluates correctly", () => {
+  it("event source path used in guard evaluates correctly", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -148,12 +148,13 @@ describe("path resolution end-to-end", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { address: { city: "Portland" } } }));
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("r1")!.textContent).toBe("PDX");
   });
 
   // ── Coercion in path resolution ──
 
-  it("number coercion converts string payload to number for comparison", () => {
+  it("number coercion converts string payload to number for comparison", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -164,10 +165,11 @@ describe("path resolution end-to-end", () => {
     }]});
     // Score is a string "75" — coercion should convert to number
     document.dispatchEvent(new CustomEvent("test", { detail: { score: "75" } }));
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("r1")!.textContent).toBe("high");
   });
 
-  it("boolean coercion converts string false to false", () => {
+  it("boolean coercion converts string false to false", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -178,10 +180,11 @@ describe("path resolution end-to-end", () => {
     }]});
     // String "false" should coerce to false in boolean context
     document.dispatchEvent(new CustomEvent("test", { detail: { active: "false" } }));
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("r1")!.textContent).toBe("inactive");
   });
 
-  it("array coercion wraps scalar into array", () => {
+  it("array coercion wraps scalar into array", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -191,10 +194,11 @@ describe("path resolution end-to-end", () => {
     }]});
     // Single string should be wrapped into ["hello"] by array coercion
     document.dispatchEvent(new CustomEvent("test", { detail: { tag: "hello" } }));
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("r1")!.textContent).toBe("has tags");
   });
 
-  it("null coerces to empty array", () => {
+  it("null coerces to empty array", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -203,6 +207,7 @@ describe("path resolution end-to-end", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { items: null } }));
+    await new Promise(r => setTimeout(r, 0));
     expect(document.getElementById("r1")!.textContent).toBe("empty");
   });
 });

@@ -3,6 +3,7 @@ import { JSDOM } from "jsdom";
 
 
 let boot: typeof import("../lifecycle/boot").boot;
+let executeReaction: typeof import("../execution/execute").executeReaction;
 
 beforeEach(async () => {
   const dom = new JSDOM(`<!DOCTYPE html><html><body>
@@ -19,6 +20,8 @@ beforeEach(async () => {
   (globalThis as any).Event = dom.window.Event;
   const mod = await import("../lifecycle/boot");
   boot = mod.boot;
+  const execMod = await import("../execution/execute");
+  executeReaction = execMod.executeReaction;
 });
 
 describe("reaction execution end-to-end", () => {
@@ -185,14 +188,13 @@ describe("reaction execution end-to-end", () => {
 
   // ── Fail fast on missing target ──
 
-  it("throws on missing target element", () => {
-    expect(() => {
-      boot({ planId: "t", components: {}, entries: [{
-        trigger: { kind: "dom-ready" },
-        reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "nonexistent", mutation: { kind: "set-prop", prop: "textContent" }, value: "x" },
-        ]},
-      }]});
-    }).toThrow();
+  it("throws on missing target element", async () => {
+    // executeReaction is async — the throw becomes a rejected Promise
+    await expect(executeReaction({
+      kind: "sequential",
+      commands: [
+        { kind: "mutate-element", target: "nonexistent", mutation: { kind: "set-prop", prop: "textContent" }, value: "x" },
+      ],
+    })).rejects.toThrow();
   });
 });

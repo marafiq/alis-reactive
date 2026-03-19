@@ -21,11 +21,16 @@ beforeEach(async () => {
   boot = mod.boot;
 });
 
+// Flush all pending microtasks so async conditional branches complete
+function flushMicrotasks() {
+  return new Promise(r => setTimeout(r, 0));
+}
+
 describe("conditions end-to-end via boot", () => {
 
   // ── Comparison operators ──
 
-  it("eq matches exact string value", () => {
+  it("eq matches exact string value", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -35,10 +40,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { status: "active" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("yes");
   });
 
-  it("eq falls to else when no match", () => {
+  it("eq falls to else when no match", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -48,10 +54,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { status: "blocked" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("no");
   });
 
-  it("neq matches when value differs", () => {
+  it("neq matches when value differs", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -60,10 +67,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { role: "admin" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("authorized");
   });
 
-  it("gt compares numbers correctly", () => {
+  it("gt compares numbers correctly", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -73,13 +81,15 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { score: 95 } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("high");
     document.getElementById("r1")!.textContent = "—";
     document.dispatchEvent(new CustomEvent("test", { detail: { score: 50 } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("low");
   });
 
-  it("between matches range inclusive", () => {
+  it("between matches range inclusive", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -89,12 +99,13 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { temp: 72 } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("comfortable");
   });
 
   // ── Presence operators ──
 
-  it("truthy matches non-empty values", () => {
+  it("truthy matches non-empty values", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -104,10 +115,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { active: true } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("active");
   });
 
-  it("falsy matches empty/false/null values", () => {
+  it("falsy matches empty/false/null values", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -116,10 +128,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { name: "" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("missing");
   });
 
-  it("is-null detects null values", () => {
+  it("is-null detects null values", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -128,10 +141,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { address: null } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("no address");
   });
 
-  it("not-empty detects non-empty string", () => {
+  it("not-empty detects non-empty string", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -140,10 +154,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { name: "Margaret" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("has name");
   });
 
-  it("is-empty detects empty array", () => {
+  it("is-empty detects empty array", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -152,12 +167,13 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { items: [] } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("empty");
   });
 
   // ── Membership operators ──
 
-  it("in matches value in set", () => {
+  it("in matches value in set", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -167,10 +183,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { status: "pending" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("valid");
   });
 
-  it("not-in excludes values in set", () => {
+  it("not-in excludes values in set", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -179,12 +196,13 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { role: "member" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("allowed");
   });
 
   // ── Text operators ──
 
-  it("contains matches substring", () => {
+  it("contains matches substring", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -193,10 +211,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { name: "Thompson" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("matched");
   });
 
-  it("starts-with matches prefix", () => {
+  it("starts-with matches prefix", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -205,10 +224,11 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { name: "Dr. Smith" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("doctor");
   });
 
-  it("min-length checks string length", () => {
+  it("min-length checks string length", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -218,15 +238,17 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { code: "ABC" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("too short");
     document.getElementById("r1")!.textContent = "—";
     document.dispatchEvent(new CustomEvent("test", { detail: { code: "ABCDEF" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("long enough");
   });
 
   // ── Composite guards ──
 
-  it("all guard requires both conditions true", () => {
+  it("all guard requires both conditions true", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -239,13 +261,15 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { active: true, score: 80 } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("both");
     document.getElementById("r1")!.textContent = "—";
     document.dispatchEvent(new CustomEvent("test", { detail: { active: true, score: 30 } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("nope");
   });
 
-  it("any guard requires at least one condition true", () => {
+  it("any guard requires at least one condition true", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -258,13 +282,15 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { role: "superadmin" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("access");
     document.getElementById("r1")!.textContent = "—";
     document.dispatchEvent(new CustomEvent("test", { detail: { role: "guest" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("denied");
   });
 
-  it("not guard inverts the inner guard", () => {
+  it("not guard inverts the inner guard", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -273,12 +299,13 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { blocked: false } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("allowed");
   });
 
   // ── ElseIf chain — first match wins ──
 
-  it("elseif chain picks first matching branch", () => {
+  it("elseif chain picks first matching branch", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -293,21 +320,25 @@ describe("conditions end-to-end via boot", () => {
     }]});
 
     document.dispatchEvent(new CustomEvent("test", { detail: { score: 95 } }));
+    await flushMicrotasks();
     expect(document.getElementById("grade")!.textContent).toBe("A");
 
     document.dispatchEvent(new CustomEvent("test", { detail: { score: 85 } }));
+    await flushMicrotasks();
     expect(document.getElementById("grade")!.textContent).toBe("B");
 
     document.dispatchEvent(new CustomEvent("test", { detail: { score: 72 } }));
+    await flushMicrotasks();
     expect(document.getElementById("grade")!.textContent).toBe("C");
 
     document.dispatchEvent(new CustomEvent("test", { detail: { score: 40 } }));
+    await flushMicrotasks();
     expect(document.getElementById("grade")!.textContent).toBe("F");
   });
 
   // ── Pre-commands + condition ──
 
-  it("pre-commands execute before condition evaluates", () => {
+  it("pre-commands execute before condition evaluates", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional",
@@ -319,13 +350,15 @@ describe("conditions end-to-end via boot", () => {
       },
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { ok: true } }));
+    // Pre-commands run sync; verify immediately, then flush for branch
     expect(document.getElementById("echo")!.textContent).toBe("pre");
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("branch");
   });
 
   // ── Array coercion ──
 
-  it("array-contains checks item in array", () => {
+  it("array-contains checks item in array", async () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
@@ -335,15 +368,17 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { tags: ["normal", "urgent", "review"] } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("has urgent");
     document.getElementById("r1")!.textContent = "—";
     document.dispatchEvent(new CustomEvent("test", { detail: { tags: ["normal", "review"] } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("no urgent");
   });
 
   // ── Date coercion ──
 
-  it("date coercion compares dates as milliseconds", () => {
+  it("date coercion compares dates as milliseconds", async () => {
     const _cutoff = new Date("2024-06-01").getTime();
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
@@ -354,6 +389,7 @@ describe("conditions end-to-end via boot", () => {
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { date: "2024-07-15" } }));
+    await flushMicrotasks();
     expect(document.getElementById("r1")!.textContent).toBe("after");
   });
 });

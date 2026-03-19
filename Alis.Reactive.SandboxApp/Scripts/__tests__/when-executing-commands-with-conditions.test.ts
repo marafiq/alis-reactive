@@ -22,6 +22,11 @@ function dispatch(event: string, payload?: Record<string, unknown>): Command {
   return { kind: "dispatch", event, payload };
 }
 
+// Flush all pending microtasks so async conditional branches complete
+function flushMicrotasks() {
+  return new Promise(r => setTimeout(r, 0));
+}
+
 describe("when executing commands with conditions", () => {
   afterEach(() => { document.body.innerHTML = ""; });
 
@@ -36,7 +41,7 @@ describe("when executing commands with conditions", () => {
 
   // ── Single command + condition (no HTTP) ──
 
-  it("single command before condition — both execute", () => {
+  it("single command before condition — both execute", async () => {
     setupDom("status", "express");
 
     boot({
@@ -61,13 +66,15 @@ describe("when executing commands with conditions", () => {
       }],
     });
 
+    // Pre-commands run sync; branch is async — flush microtasks
+    await flushMicrotasks();
     expect(document.getElementById("status")!.textContent).toBe("Received");
     expect(document.getElementById("express")!.hasAttribute("hidden")).toBe(false);
   });
 
   // ── Multiple commands + condition ──
 
-  it("multiple commands before condition — all execute then branch evaluates", () => {
+  it("multiple commands before condition — all execute then branch evaluates", async () => {
     setupDom("confirmation", "spinner", "tier");
 
     // Set initial hidden state
@@ -108,6 +115,8 @@ describe("when executing commands with conditions", () => {
       }],
     });
 
+    // Pre-commands run sync; branch is async — flush microtasks
+    await flushMicrotasks();
     // All pre-commands ran
     expect(document.getElementById("confirmation")!.hasAttribute("hidden")).toBe(false);
     expect(document.getElementById("spinner")!.textContent).toBe("Done");
@@ -117,7 +126,7 @@ describe("when executing commands with conditions", () => {
 
   // ── Commands execute even when no branch matches ──
 
-  it("commands execute even when no branch matches", () => {
+  it("commands execute even when no branch matches", async () => {
     setupDom("status", "tier");
 
     boot({
@@ -142,6 +151,7 @@ describe("when executing commands with conditions", () => {
       }],
     });
 
+    await flushMicrotasks();
     // Command ran
     expect(document.getElementById("status")!.textContent).toBe("Checked");
     // No branch matched — tier stays empty
@@ -150,7 +160,7 @@ describe("when executing commands with conditions", () => {
 
   // ── Multiple actions inside Then branch ──
 
-  it("multiple actions inside then branch", () => {
+  it("multiple actions inside then branch", async () => {
     setupDom("loading", "admin-panel", "delete-btn");
 
     document.getElementById("admin-panel")!.setAttribute("hidden", "");
@@ -197,6 +207,7 @@ describe("when executing commands with conditions", () => {
       }],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("loading")!.textContent).toBe("Done");
     expect(document.getElementById("admin-panel")!.hasAttribute("hidden")).toBe(false);
     expect(document.getElementById("delete-btn")!.hasAttribute("hidden")).toBe(false);
@@ -205,7 +216,7 @@ describe("when executing commands with conditions", () => {
 
   // ── Condition-only (no pre-commands) still works ──
 
-  it("condition without pre-commands works as before", () => {
+  it("condition without pre-commands works as before", async () => {
     setupDom("badge");
     document.getElementById("badge")!.setAttribute("hidden", "");
 
@@ -233,12 +244,13 @@ describe("when executing commands with conditions", () => {
       }],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("badge")!.hasAttribute("hidden")).toBe(false);
   });
 
   // ── Dispatch in pre-commands chains into custom-event listener ──
 
-  it("dispatch in pre-commands chains into custom-event listener", () => {
+  it("dispatch in pre-commands chains into custom-event listener", async () => {
     setupDom("result");
 
     // Listener for the dispatched event
@@ -270,13 +282,16 @@ describe("when executing commands with conditions", () => {
       }],
     });
 
+    // Pre-command (dispatch) fires sync — audit-log received synchronously
     expect(received).toBe(true);
+    // Branch is async — flush microtasks for "Standard" branch
+    await flushMicrotasks();
     expect(document.getElementById("result")!.textContent).toBe("Standard");
   });
 
   // ── Else branch with multiple actions ──
 
-  it("else branch with multiple actions executes all", () => {
+  it("else branch with multiple actions executes all", async () => {
     setupDom("panel", "notice", "status");
 
     boot({
@@ -310,6 +325,7 @@ describe("when executing commands with conditions", () => {
       }],
     });
 
+    await flushMicrotasks();
     expect(document.getElementById("status")!.textContent).toBe("Loaded");
     expect(document.getElementById("panel")!.textContent).toBe("Read-only");
     expect(document.getElementById("notice")!.textContent).toBe("Contact admin for access");
