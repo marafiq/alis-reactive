@@ -573,3 +573,85 @@ describe("gather infrastructure", () => {
     expect(() => resolveGather(items, "POST", {})).toThrow(/IncludeAll/);
   });
 });
+
+// ═══════════════════════════════════════════════════════════════
+// File objects — FormData transport handles File natively
+// ═══════════════════════════════════════════════════════════════
+
+describe("File object gather", () => {
+  it("File in FormData array uses formData.append with file", () => {
+    const container = document.createElement("div");
+    container.id = "Uploader";
+    // Simulate evalRead returning a FileList-like array of File objects
+    const file = new File(["test content"], "test.txt", { type: "text/plain" });
+    (container as any).value = [file];
+    document.body.appendChild(container);
+
+    const result = resolveGather(
+      [gather("Uploader", "native", "Documents")], "POST", {}, "form-data");
+    const fd = result.body as FormData;
+    const entries = fd.getAll("Documents");
+    expect(entries.length).toBe(1);
+    expect(entries[0]).toBeInstanceOf(File);
+    expect((entries[0] as File).name).toBe("test.txt");
+  });
+
+  it("multiple Files in FormData appends each", () => {
+    const container = document.createElement("div");
+    container.id = "Uploader";
+    const file1 = new File(["content 1"], "doc1.pdf", { type: "application/pdf" });
+    const file2 = new File(["content 2"], "doc2.pdf", { type: "application/pdf" });
+    (container as any).value = [file1, file2];
+    document.body.appendChild(container);
+
+    const result = resolveGather(
+      [gather("Uploader", "native", "Documents")], "POST", {}, "form-data");
+    const fd = result.body as FormData;
+    const entries = fd.getAll("Documents");
+    expect(entries.length).toBe(2);
+    expect((entries[0] as File).name).toBe("doc1.pdf");
+    expect((entries[1] as File).name).toBe("doc2.pdf");
+  });
+
+  it("File in JSON POST throws", () => {
+    const container = document.createElement("div");
+    container.id = "Uploader";
+    const file = new File(["test"], "test.txt", { type: "text/plain" });
+    (container as any).value = [file];
+    document.body.appendChild(container);
+
+    expect(() => resolveGather(
+      [gather("Uploader", "native", "Documents")], "POST", {}))
+      .toThrow(/form-data/);
+  });
+
+  it("File in GET throws", () => {
+    const container = document.createElement("div");
+    container.id = "Uploader";
+    const file = new File(["test"], "test.txt", { type: "text/plain" });
+    (container as any).value = [file];
+    document.body.appendChild(container);
+
+    expect(() => resolveGather(
+      [gather("Uploader", "native", "Documents")], "GET", {}))
+      .toThrow(/GET/);
+  });
+
+  it("Files coexist with scalar fields in FormData", () => {
+    nativeEl("Name", "input", { value: "Margaret" });
+    const container = document.createElement("div");
+    container.id = "Uploader";
+    const file = new File(["content"], "photo.jpg", { type: "image/jpeg" });
+    (container as any).value = [file];
+    document.body.appendChild(container);
+
+    const result = resolveGather([
+      gather("Name", "native", "ResidentName"),
+      gather("Uploader", "native", "Documents"),
+    ], "POST", {}, "form-data");
+    const fd = result.body as FormData;
+    expect(fd.get("ResidentName")).toBe("Margaret");
+    expect(fd.getAll("Documents").length).toBe(1);
+    expect((fd.getAll("Documents")[0] as File).name).toBe("photo.jpg");
+  });
+});

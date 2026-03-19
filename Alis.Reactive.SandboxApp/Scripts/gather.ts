@@ -29,7 +29,10 @@ function createTransport(
     return {
       emitScalar: (name, value) => formData.append(name, String(value ?? "")),
       emitArray: (name, items) => {
-        for (const item of items) formData.append(name, String(item ?? ""));
+        for (const item of items) {
+          if (item instanceof File) formData.append(name, item, item.name);
+          else formData.append(name, String(item ?? ""));
+        }
       },
     };
   }
@@ -41,8 +44,11 @@ function createTransport(
     emitScalar: (name, value) => urlParams.push(
       `${encodeURIComponent(name)}=${encodeURIComponent(String(value))}`),
     emitArray: (name, items) => {
-      for (const item of items)
+      for (const item of items) {
+        if (item instanceof File)
+          throw new Error("[alis] File objects cannot be sent via GET");
         urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(String(item))}`);
+      }
     },
   };
 }
@@ -50,7 +56,11 @@ function createTransport(
 function createJsonTransport(body: Record<string, unknown>): Transport {
   return {
     emitScalar: (name, value) => setNested(body, name, value === "" ? null : value),
-    emitArray: (name, items) => setNested(body, name, items),
+    emitArray: (name, items) => {
+      if (items.some(item => item instanceof File))
+        throw new Error("[alis] File objects require contentType: form-data");
+      setNested(body, name, items);
+    },
   };
 }
 
@@ -72,6 +82,12 @@ export function resolveGather(
       : createJsonTransport(body);
 
   function emit(name: string, raw: unknown): void {
+    // FileList — browser native, array-like but not Array.isArray
+    if (typeof FileList !== "undefined" && raw instanceof FileList) {
+      transport.emitArray(name, Array.from(raw));
+      log.trace("file", { name, count: raw.length });
+      return;
+    }
     if (Array.isArray(raw)) {
       transport.emitArray(name, raw);
     } else {
