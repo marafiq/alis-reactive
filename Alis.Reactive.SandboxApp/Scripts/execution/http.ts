@@ -45,14 +45,14 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     const body = await readResponseBody(response);
     if (response.ok) {
       const successCtx = body != null ? { ...ctx, responseBody: body } : ctx;
-      routeHandlers(req.onSuccess, response.status, successCtx);
+      await routeHandlers(req.onSuccess, response.status, successCtx);
     } else {
       const errorCtx: ExecContext = {
         ...ctx,
         responseBody: body ?? undefined,
         validationDesc: req.validation,
       };
-      routeHandlers(req.onError, response.status, errorCtx);
+      await routeHandlers(req.onError, response.status, errorCtx);
     }
 
     // 6. Chained request — fires after current request completes successfully
@@ -62,7 +62,7 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
   } catch (err) {
     log.error("network error", { url, error: String(err) });
     // Route to catch-all error handler if available
-    routeHandlers(req.onError, 0, ctx);
+    await routeHandlers(req.onError, 0, ctx);
   }
 }
 
@@ -74,29 +74,27 @@ async function readResponseBody(response: Response): Promise<unknown> {
   return null;
 }
 
-function routeHandlers(handlers: StatusHandler[] | undefined, status: number, ctx?: ExecContext): void {
+export async function routeHandlers(handlers: StatusHandler[] | undefined, status: number, ctx?: ExecContext): Promise<void> {
   if (!handlers || handlers.length === 0) return;
 
-  // Try specific status match first
   for (const h of handlers) {
     if (h.statusCode != null && h.statusCode === status) {
-      executeHandler(h, ctx);
+      await executeHandler(h, ctx);
       return;
     }
   }
 
-  // Fall through to catch-all (no statusCode)
   for (const h of handlers) {
     if (h.statusCode == null) {
-      executeHandler(h, ctx);
+      await executeHandler(h, ctx);
       return;
     }
   }
 }
 
-function executeHandler(h: StatusHandler, ctx?: ExecContext): void {
+async function executeHandler(h: StatusHandler, ctx?: ExecContext): Promise<void> {
   if (h.reaction) {
-    executeReaction(h.reaction, ctx);
+    await executeReaction(h.reaction, ctx);
   } else if (h.commands) {
     executeCommands(h.commands, ctx);
   }
