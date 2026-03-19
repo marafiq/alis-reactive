@@ -58,12 +58,16 @@ export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
 
     case "http":
       log.debug("http", { url: reaction.request.url });
-      executeHttpReaction(reaction, ctx);
+      executeHttpReaction(reaction, ctx).catch(err =>
+        log.error("http reaction failed", { error: String(err) })
+      );
       break;
 
     case "parallel-http":
       log.debug("parallel-http", { count: reaction.requests.length });
-      executeParallelHttpReaction(reaction, ctx);
+      executeParallelHttpReaction(reaction, ctx).catch(err =>
+        log.error("parallel-http reaction failed", { error: String(err) })
+      );
       break;
 
     default:
