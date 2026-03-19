@@ -45,7 +45,8 @@ export function executeCommand(cmd: Command, ctx?: ExecContext): void {
 
     case "into": {
       const container = document.getElementById(cmd.target);
-      if (container && ctx?.responseBody != null) {
+      if (!container) throw new Error(`[alis] Into("${cmd.target}") target not found. Is the element rendered?`);
+      if (ctx?.responseBody != null) {
         injectHtml(container, String(ctx.responseBody));
       }
       break;

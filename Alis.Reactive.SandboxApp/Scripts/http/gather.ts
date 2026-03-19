@@ -1,6 +1,7 @@
 import type { GatherItem, ComponentEntry } from "../types";
 import { evalRead } from "../resolution/component";
 import { scope } from "../core/trace";
+import { assertNever } from "../core/assert-never";
 
 const log = scope("gather");
 
@@ -49,10 +50,6 @@ function createTransport(
         }
       },
     };
-  }
-  if (urlParams === body as unknown) {
-    // unreachable — type guard for exhaustiveness
-    throw new Error("unreachable");
   }
   return {
     emitScalar: (name, value) => urlParams.push(
@@ -129,6 +126,9 @@ export function resolveGather(
           emit(bindingPath, evalRead(comp.id, comp.vendor, comp.readExpr));
         }
         break;
+
+      default:
+        assertNever(g, "gather item kind");
     }
   }
 
