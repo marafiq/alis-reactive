@@ -223,7 +223,7 @@ export interface MutateElementCommand {
   kind: "mutate-element";
   target: string;
   mutation: Mutation;
-  value?: unknown;
+  value?: string | string[];
   source?: BindSource;
   vendor?: Vendor;
   when?: Guard;
