@@ -1,0 +1,23 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: dispatch,
+            event: data-ready,
+            payload: {
+              count: 5,
+              message: loaded
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

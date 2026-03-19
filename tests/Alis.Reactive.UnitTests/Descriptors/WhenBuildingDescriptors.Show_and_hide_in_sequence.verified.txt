@@ -1,0 +1,47 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: panel,
+            mutation: {
+              kind: call,
+              method: removeAttribute,
+              args: [
+                {
+                  kind: literal,
+                  value: hidden
+                }
+              ]
+            }
+          },
+          {
+            kind: mutate-element,
+            target: panel,
+            mutation: {
+              kind: call,
+              method: setAttribute,
+              args: [
+                {
+                  kind: literal,
+                  value: hidden
+                },
+                {
+                  kind: literal,
+                  value: 
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
