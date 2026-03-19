@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom";
 
 
 let boot: typeof import("../lifecycle/boot").boot;
-let execRequest: typeof import("../http/http").execRequest;
+let execRequest: typeof import("../execution/http").execRequest;
 
 function mockFetch(status: number, body: unknown, contentType = "application/json") {
   return vi.fn().mockResolvedValue({
@@ -33,7 +33,7 @@ beforeEach(async () => {
 
   const bootMod = await import("../lifecycle/boot");
   boot = bootMod.boot;
-  const httpMod = await import("../http/http");
+  const httpMod = await import("../execution/http");
   execRequest = httpMod.execRequest;
 });
 

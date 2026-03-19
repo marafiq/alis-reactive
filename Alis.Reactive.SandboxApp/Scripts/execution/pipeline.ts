@@ -1,6 +1,6 @@
 import type { HttpReaction, ParallelHttpReaction, RequestDescriptor, ExecContext } from "../types";
 import { execRequest } from "./http";
-import { executeCommands } from "../execution/commands";
+import { executeCommands } from "./commands";
 import { validate } from "../validation";
 import { scope } from "../core/trace";
 

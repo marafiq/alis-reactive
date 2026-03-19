@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { JSDOM } from "jsdom";
 import type { RequestDescriptor } from "../types";
 
-let execRequest: typeof import("../http/http").execRequest;
+let execRequest: typeof import("../execution/http").execRequest;
 
 function mockFetch(status: number, body: unknown) {
   return vi.fn().mockResolvedValue({
@@ -27,7 +27,7 @@ beforeEach(async () => {
   (globalThis as any).CustomEvent = dom.window.CustomEvent;
   (globalThis as any).FormData = dom.window.FormData;
 
-  const mod = await import("../http/http");
+  const mod = await import("../execution/http");
   execRequest = mod.execRequest;
 });
 

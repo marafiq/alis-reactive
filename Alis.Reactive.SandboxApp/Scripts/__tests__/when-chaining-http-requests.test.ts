@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom";
 
 
 let boot: typeof import("../lifecycle/boot").boot;
-let execRequest: typeof import("../http/http").execRequest;
+let execRequest: typeof import("../execution/http").execRequest;
 
 function mockResponse(status: number, body: unknown) {
   return {
@@ -32,7 +32,7 @@ beforeEach(async () => {
   (globalThis as any).FormData = dom.window.FormData;
   const bootMod = await import("../lifecycle/boot");
   boot = bootMod.boot;
-  const httpMod = await import("../http/http");
+  const httpMod = await import("../execution/http");
   execRequest = httpMod.execRequest;
 });
 

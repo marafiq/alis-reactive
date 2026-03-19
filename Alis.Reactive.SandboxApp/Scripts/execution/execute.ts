@@ -2,7 +2,7 @@ import type { Reaction, ExecContext } from "../types";
 import { scope } from "../core/trace";
 import { executeCommand } from "./commands";
 import { evaluateGuard, evaluateGuardAsync, isConfirmGuard } from "../conditions/conditions";
-import { executeHttpReaction, executeParallelHttpReaction } from "../http/pipeline";
+import { executeHttpReaction, executeParallelHttpReaction } from "./pipeline";
 import { assertNever } from "../core/assert-never";
 
 const log = scope("execute");

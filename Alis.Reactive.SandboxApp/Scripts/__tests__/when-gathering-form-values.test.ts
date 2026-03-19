@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { JSDOM } from "jsdom";
 import type { GatherItem, ComponentEntry } from "../types";
 
-let resolveGather: typeof import("../http/gather").resolveGather;
+let resolveGather: typeof import("../execution/gather").resolveGather;
 
 // ── DOM helpers ──
 
@@ -30,7 +30,7 @@ beforeEach(async () => {
   const dom = new JSDOM(`<!DOCTYPE html><html><body></body></html>`);
   (globalThis as any).document = dom.window.document;
   (globalThis as any).FormData = dom.window.FormData;
-  const mod = await import("../http/gather");
+  const mod = await import("../execution/gather");
   resolveGather = mod.resolveGather;
 });
 
