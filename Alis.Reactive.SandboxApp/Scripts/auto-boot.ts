@@ -6,7 +6,7 @@ import "./loader";  // side-effect: handles target positioning + timeout
 import "./checklist";  // side-effect: syncs checkbox values to hidden input
 import { composeInitialPlans } from "./merge-plan";
 import type { Plan } from "./types";
-import type { TraceLevel } from "./trace";
+import type { TraceLevel } from "./core/trace";
 
 initConfirm();
 initNativeActionLinks();

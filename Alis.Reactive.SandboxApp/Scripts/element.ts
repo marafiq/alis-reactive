@@ -1,5 +1,5 @@
 import type { MutateElementCommand, MethodArg, ExecContext } from "./types";
-import { scope } from "./trace";
+import { scope } from "./core/trace";
 import { resolveSource, coerce } from "./resolver";
 import { resolveRoot } from "./component";
 import { assertNever } from "./core/assert-never";

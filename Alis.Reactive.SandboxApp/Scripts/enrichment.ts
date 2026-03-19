@@ -5,7 +5,7 @@
 // of the validation field objects.
 
 import type { Entry, ComponentEntry, Reaction, ValidationDescriptor } from "./types";
-import { scope } from "./trace";
+import { scope } from "./core/trace";
 
 const log = scope("enrichment");
 

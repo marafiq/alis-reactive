@@ -1,6 +1,6 @@
 import type { Guard, ValueGuard, ExecContext } from "./types";
 import { resolveSource, resolveSourceAs, coerce } from "./resolver";
-import { scope } from "./trace";
+import { scope } from "./core/trace";
 import { assertNever } from "./core/assert-never";
 
 const log = scope("conditions");

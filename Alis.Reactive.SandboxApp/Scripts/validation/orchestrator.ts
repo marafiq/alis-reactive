@@ -11,8 +11,8 @@
 
 import type { ValidationDescriptor, ValidationField } from "../types";
 import { resolveRoot } from "../component";
-import { scope } from "../trace";
-import { walk } from "../walk";
+import { scope } from "../core/trace";
+import { walk } from "../core/walk";
 import { ruleFails, type PeerReader } from "./rule-engine";
 import { evalCondition, type ConditionReader } from "./condition";
 import {

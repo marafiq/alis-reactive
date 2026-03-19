@@ -1,7 +1,7 @@
 import type { Trigger, Reaction, ComponentEntry } from "./types";
 import { resolveRoot } from "./component";
-import { walk } from "./walk";
-import { scope } from "./trace";
+import { walk } from "./core/walk";
+import { scope } from "./core/trace";
 import { executeReaction } from "./execute";
 import { assertNever } from "./core/assert-never";
 

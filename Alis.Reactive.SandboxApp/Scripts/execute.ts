@@ -1,5 +1,5 @@
 import type { Reaction, ExecContext } from "./types";
-import { scope } from "./trace";
+import { scope } from "./core/trace";
 import { executeCommand } from "./commands";
 import { evaluateGuard, evaluateGuardAsync, isConfirmGuard } from "./conditions";
 import { executeHttpReaction, executeParallelHttpReaction } from "./pipeline";

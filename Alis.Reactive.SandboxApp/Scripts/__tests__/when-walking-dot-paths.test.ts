@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { walk } from "../walk";
+import { walk } from "../core/walk";
 
 describe("when walking dot paths", () => {
   it("reads single property", () => expect(walk({ value: "x" }, "value")).toBe("x"));

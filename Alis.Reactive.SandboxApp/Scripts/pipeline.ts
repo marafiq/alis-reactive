@@ -2,7 +2,7 @@ import type { HttpReaction, ParallelHttpReaction, RequestDescriptor, ExecContext
 import { execRequest } from "./http";
 import { executeCommands } from "./commands";
 import { validate } from "./validation";
-import { scope } from "./trace";
+import { scope } from "./core/trace";
 
 const log = scope("pipeline");
 

@@ -1,5 +1,5 @@
 import { executeReaction } from "./execute";
-import { scope } from "./trace";
+import { scope } from "./core/trace";
 import type {
   Reaction,
   RequestDescriptor,

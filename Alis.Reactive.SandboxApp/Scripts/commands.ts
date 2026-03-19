@@ -3,7 +3,7 @@ import { mutateElement } from "./element";
 import { evaluateGuard, isConfirmGuard } from "./conditions";
 import { showServerErrors } from "./validation";
 import { injectHtml } from "./inject";
-import { scope } from "./trace";
+import { scope } from "./core/trace";
 import { assertNever } from "./core/assert-never";
 
 const log = scope("command");

@@ -1,7 +1,7 @@
 import type { BindSource, ExecContext } from "./types";
-import { walk } from "./walk";
+import { walk } from "./core/walk";
 import { evalRead } from "./component";
-import { scope } from "./trace";
+import { scope } from "./core/trace";
 import { assertNever } from "./core/assert-never";
 
 const log = scope("resolver");

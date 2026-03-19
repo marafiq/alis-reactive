@@ -1,6 +1,6 @@
 import type { Vendor } from "./types";
-import { walk } from "./walk";
-import { scope } from "./trace";
+import { walk } from "./core/walk";
+import { scope } from "./core/trace";
 
 const log = scope("component");
 

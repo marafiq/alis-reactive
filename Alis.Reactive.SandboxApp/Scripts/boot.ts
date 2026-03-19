@@ -4,8 +4,8 @@
 // Delegates enrichment to enrichment.ts, state to merge-plan.ts PlanRegistry.
 
 import type { Plan, Entry, ComponentEntry } from "./types";
-import { setLevel } from "./trace";
-import { scope } from "./trace";
+import { setLevel } from "./core/trace";
+import { scope } from "./core/trace";
 import { wireTrigger } from "./trigger";
 import { enrichEntries } from "./enrichment";
 import { wireLiveClearing } from "./validation/live-clear";
