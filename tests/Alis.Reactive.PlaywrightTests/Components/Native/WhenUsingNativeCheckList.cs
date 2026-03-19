@@ -66,7 +66,8 @@ public class WhenUsingNativeCheckList : PlaywrightTestBase
         // Click Gluten (index 3)
         await Page.Locator($"#{Scope}Allergies_c3").ClickAsync();
 
-        var hidden = Page.Locator($"input[type='hidden']#{Scope}Allergies");
+        // Hidden input is inside the container div (which has the ID)
+        var hidden = Page.Locator($"#{Scope}Allergies input[type='hidden']");
         await Expect(hidden).ToHaveValueAsync("Peanuts,Dairy,Gluten", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
@@ -110,6 +111,38 @@ public class WhenUsingNativeCheckList : PlaywrightTestBase
 
         var result = Page.Locator("#result");
         await Expect(result).ToHaveTextAsync("Preferences saved", new() { Timeout = 3000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task form_submit_sends_array_values_in_json_body()
+    {
+        await NavigateAndBoot();
+
+        var nameInput = Page.Locator($"#{Scope}ResidentName");
+        await nameInput.FillAsync("Margaret Thompson");
+
+        // Check a dietary need (LowSodium at index 0)
+        await Page.Locator($"#{Scope}DietaryNeeds_c0").ClickAsync();
+
+        // Intercept the POST to verify array payload
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#submit-btn").ClickAsync(),
+            "**/Sandbox/NativeCheckList/Submit");
+
+        var body = request.PostData ?? "";
+        // Allergies are pre-selected: ["Peanuts","Dairy"] — should be array in JSON
+        Assert.That(body, Does.Contain("\"Allergies\""),
+            $"Body must contain Allergies key but was '{body}'");
+        Assert.That(body, Does.Contain("Peanuts"),
+            $"Body must contain Peanuts but was '{body}'");
+        Assert.That(body, Does.Contain("Dairy"),
+            $"Body must contain Dairy but was '{body}'");
+        // DietaryNeeds should also be array
+        Assert.That(body, Does.Contain("\"DietaryNeeds\""),
+            $"Body must contain DietaryNeeds key but was '{body}'");
+        Assert.That(body, Does.Contain("LowSodium"),
+            $"Body must contain LowSodium but was '{body}'");
         AssertNoConsoleErrors();
     }
 
@@ -167,7 +200,7 @@ public class WhenUsingNativeCheckList : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var hidden = Page.Locator($"input[type='hidden']#{Scope}Allergies");
+        var hidden = Page.Locator($"#{Scope}Allergies input[type='hidden']");
         await Expect(hidden).ToHaveValueAsync("Peanuts,Dairy", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
@@ -179,9 +212,10 @@ public class WhenUsingNativeCheckList : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Expect(Page.Locator($"input[type='hidden']#{Scope}Allergies")).ToHaveCountAsync(1);
-        await Expect(Page.Locator($"input[type='hidden']#{Scope}Amenities")).ToHaveCountAsync(1);
-        await Expect(Page.Locator($"input[type='hidden']#{Scope}DietaryNeeds")).ToHaveCountAsync(1);
+        // Hidden inputs are now inside container divs (which carry the element ID)
+        await Expect(Page.Locator($"#{Scope}Allergies input[type='hidden']")).ToHaveCountAsync(1);
+        await Expect(Page.Locator($"#{Scope}Amenities input[type='hidden']")).ToHaveCountAsync(1);
+        await Expect(Page.Locator($"#{Scope}DietaryNeeds input[type='hidden']")).ToHaveCountAsync(1);
         AssertNoConsoleErrors();
     }
 

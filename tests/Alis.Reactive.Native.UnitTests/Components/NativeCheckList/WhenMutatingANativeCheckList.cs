@@ -10,7 +10,7 @@ public class WhenMutatingANativeCheckList : NativeTestBase
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
-            p.Component<NativeCheckList>(m => m.Allergies).SetValue("Peanuts,Dairy"));
+            p.Component<NativeCheckList>(m => m.Allergies).SetValue(new[] { "Peanuts", "Dairy" }));
         var json = plan.Render();
         AssertSchemaValid(json);
         return VerifyJson(json);
@@ -33,7 +33,7 @@ public class WhenMutatingANativeCheckList : NativeTestBase
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            p.Component<NativeCheckList>(m => m.Allergies).SetValue("Shellfish,Gluten");
+            p.Component<NativeCheckList>(m => m.Allergies).SetValue(new[] { "Shellfish", "Gluten" });
             p.Element("echo").SetText("Allergies updated");
         });
         var json = plan.Render();
@@ -48,16 +48,16 @@ public class WhenMutatingANativeCheckList : NativeTestBase
         Trigger(plan).DomReady(p =>
         {
             var source = p.Component<NativeCheckList>(m => m.Allergies).Value();
-            Assert.That(source, Is.InstanceOf<Alis.Reactive.Builders.Conditions.TypedComponentSource<string>>());
+            Assert.That(source, Is.InstanceOf<Alis.Reactive.Builders.Conditions.TypedComponentSource<string[]>>());
         });
     }
 
     [Test]
-    public Task String_ref_overload()
+    public Task SetValue_with_single_item_array()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
-            p.Component<NativeCheckList>("allergyChecklist").SetValue("Dairy"));
+            p.Component<NativeCheckList>(m => m.Allergies).SetValue(new[] { "Dairy" }));
         var json = plan.Render();
         AssertSchemaValid(json);
         return VerifyJson(json);

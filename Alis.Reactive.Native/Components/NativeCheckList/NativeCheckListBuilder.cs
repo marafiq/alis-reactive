@@ -10,11 +10,9 @@ namespace Alis.Reactive.Native.Components
 {
     /// <summary>
     /// Renders a native HTML checkbox list bound to a model property.
-    /// Uses a hidden input as the canonical element for evalRead + gather,
-    /// and individual checkboxes for user interaction.
-    ///
-    /// The hidden input holds comma-separated values (e.g. "Peanuts,Dairy").
-    /// checklist.ts syncs checked checkbox values into the hidden input on every change.
+    /// The container div is the canonical element (carries the element ID).
+    /// A hidden input inside carries the form binding path for MVC submission.
+    /// checklist.ts syncs checked values into both container.value (array) and hidden.value (CSV).
     ///
     /// Usage:
     ///   Html.InputField(plan, m => m.Allergies, o => o.Label("Allergies"))
@@ -94,15 +92,28 @@ namespace Alis.Reactive.Native.Components
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
-            var modelValue = _html.ValueFor(_expression, "{0}")?.ToString() ?? "";
-            var checkedValues = new HashSet<string>(
-                modelValue.Split(',', StringSplitOptions.RemoveEmptyEntries));
+            // Resolve model value — may be string[] or CSV string depending on model binding
+            var rawValue = _html.ViewData.Eval(_html.NameFor(_expression));
+            string modelValue;
+            HashSet<string> checkedValues;
+            if (rawValue is string[] arr)
+            {
+                modelValue = string.Join(",", arr);
+                checkedValues = new HashSet<string>(arr);
+            }
+            else
+            {
+                modelValue = rawValue?.ToString() ?? "";
+                checkedValues = new HashSet<string>(
+                    modelValue.Split(',', StringSplitOptions.RemoveEmptyEntries));
+            }
 
-            // Hidden input — canonical element for evalRead + gather. NO name attr.
-            writer.Write($"<input type=\"hidden\" id=\"{encoder.Encode(_elementId)}\" value=\"{encoder.Encode(modelValue)}\" />");
+            // Container div IS the canonical element — carries the element ID.
+            // checklist.ts discovers via [data-alis-checklist] and sets container.value = string[].
+            writer.Write($"<div id=\"{encoder.Encode(_elementId)}\" class=\"{encoder.Encode(_cssClass)}\" data-alis-checklist>");
 
-            // Checkbox options container — data-alis-checklist for checklist.ts discovery
-            writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\" data-alis-checklist=\"{encoder.Encode(_elementId)}\">");
+            // Hidden input — for MVC form submission (CSV value), NOT the canonical element.
+            writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)
             {
@@ -110,17 +121,13 @@ namespace Alis.Reactive.Native.Components
                 var checkboxId = $"{_elementId}_c{i}";
                 var isChecked = checkedValues.Contains(option.Value);
 
-                // Label wrapper — stays display:block per design system (.alis-root label).
-                // Inner div provides flex layout for checkbox + text.
                 writer.Write("<label>");
                 writer.Write($"<div class=\"{encoder.Encode(_optionCssClass)}\">");
 
-                // Checkbox input with name for MVC binding
                 writer.Write($"<input type=\"checkbox\" id=\"{encoder.Encode(checkboxId)}\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(option.Value)}\"");
                 if (isChecked) writer.Write(" checked");
                 writer.Write(" />");
 
-                // Text block — flex-col stacks label above description
                 writer.Write("<div class=\"flex flex-col\">");
                 writer.Write($"<span class=\"text-sm font-medium leading-none\">{encoder.Encode(option.Text)}</span>");
                 if (option.Description != null)

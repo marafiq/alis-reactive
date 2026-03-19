@@ -125,6 +125,37 @@ namespace Alis.Reactive.Builders.Conditions
         public GuardBuilder<TModel> MinLength(int length) =>
             Build(GuardOp.MinLength, length);
 
+        // --- Array operators ---
+
+        public GuardBuilder<TModel> ArrayContains(object item)
+        {
+            var bindSource = _typedSource.ToBindSource();
+            var guard = new ValueGuard(bindSource, _coerceAs, GuardOp.ArrayContains,
+                item, _typedSource.ElementCoercionType);
+
+            if (_mode != CompositionMode.None && _existingGuard != null)
+            {
+                Guard combined;
+                if (_mode == CompositionMode.All)
+                {
+                    var guards = new System.Collections.Generic.List<Guard>();
+                    GuardBuilder<TModel>.FlattenAllStatic(_existingGuard, guards);
+                    guards.Add(guard);
+                    combined = new AllGuard(guards);
+                }
+                else
+                {
+                    var guards = new System.Collections.Generic.List<Guard>();
+                    GuardBuilder<TModel>.FlattenAnyStatic(_existingGuard, guards);
+                    guards.Add(guard);
+                    combined = new AnyGuard(guards);
+                }
+                return WrapGuard(combined);
+            }
+
+            return WrapGuard(guard);
+        }
+
         // --- Source-vs-source comparison (right side is a TypedSource, not a literal) ---
 
         public GuardBuilder<TModel> Eq(TypedSource<TProp> right) => BuildVsSource(GuardOp.Eq, right);

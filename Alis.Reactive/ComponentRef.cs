@@ -36,7 +36,7 @@ namespace Alis.Reactive
         /// </summary>
         internal ComponentRef<TComponent, TModel> Emit(
             Mutation mutation,
-            string? value = null,
+            object? value = null,
             BindSource? source = null)
         {
             Pipeline.AddCommand(new MutateElementCommand(

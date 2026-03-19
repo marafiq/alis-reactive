@@ -1,0 +1,26 @@
+﻿{
+  planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__ReceiveNotifications,
+            mutation: {
+              kind: set-prop,
+              prop: checked,
+              coerce: boolean
+            },
+            value: false,
+            vendor: fusion
+          }
+        ]
+      }
+    }
+  ]
+}

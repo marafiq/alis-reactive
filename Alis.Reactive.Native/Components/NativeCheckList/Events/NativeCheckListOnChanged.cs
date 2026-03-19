@@ -5,12 +5,12 @@ namespace Alis.Reactive.Native.Components
     /// Properties are typed markers for expression-based condition sources:
     ///   p.When(args, x => x.Value).NotEmpty()
     /// ExpressionPathHelper resolves x => x.Value to "evt.value".
-    /// Value holds the comma-separated checked values (e.g. "Peanuts,Dairy").
+    /// Value holds the array of checked values (e.g. ["Peanuts","Dairy"]).
     /// </summary>
     public class NativeCheckListChangeArgs
     {
-        /// <summary>Comma-separated checked values after the change.</summary>
-        public string? Value { get; set; }
+        /// <summary>Array of checked values after the change.</summary>
+        public string[]? Value { get; set; }
 
         public NativeCheckListChangeArgs() { }
     }

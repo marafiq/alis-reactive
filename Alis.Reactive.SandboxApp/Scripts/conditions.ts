@@ -86,15 +86,25 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
   // comparisons are type-consistent (e.g. both sides are numbers).
   const resolved = resolveSourceAs(guard.source, guard.coerceAs, ctx);
 
+  // Operand coercion: elementCoerceAs (for array operators) or coerceAs (for scalars).
+  // For non-array operators elementCoerceAs is null, so opCoerceAs === coerceAs — same behavior.
+  const opCoerceAs = guard.elementCoerceAs ?? guard.coerceAs;
+
   // Source-vs-source: if rightSource present, resolve it instead of literal operand.
   // For array operands (in, not-in, between), coerce each element individually.
   // For scalar operands, coerce the whole value.
   const rawOp = guard.rightSource
-    ? resolveSourceAs(guard.rightSource, guard.coerceAs, ctx)
+    ? resolveSourceAs(guard.rightSource, opCoerceAs, ctx)
     : guard.operand;
   const operand = rawOp != null && !guard.rightSource
-    ? (Array.isArray(rawOp) ? rawOp.map(v => coerce(v, guard.coerceAs)) : coerce(rawOp, guard.coerceAs))
+    ? (Array.isArray(rawOp) ? rawOp.map(v => coerce(v, opCoerceAs)) : coerce(rawOp, opCoerceAs))
     : rawOp;
+
+  // For array sources with element coercion: pre-coerce elements so switch cases stay pure.
+  // For non-array operators elementCoerceAs is null → items is undefined → unused.
+  const items = guard.elementCoerceAs != null && Array.isArray(resolved)
+    ? (resolved as unknown[]).map(item => coerce(item, guard.elementCoerceAs!))
+    : undefined;
 
   log.trace("eval", { source: guard.source, op, resolved, operand });
 
@@ -117,6 +127,10 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
     // Range — operand is coerced per-element above
     case "between":
       return Array.isArray(operand) && (resolved as number) >= operand[0] && (resolved as number) <= operand[1];
+
+    // Array membership — elements and operand pre-coerced via elementCoerceAs above
+    case "array-contains":
+      return items != null && items.includes(operand);
 
     // Text
     case "contains":

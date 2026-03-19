@@ -1,0 +1,27 @@
+{
+  planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
+            mutation: {
+              kind: set-prop,
+              prop: value
+            },
+            value: [
+              Dairy
+            ],
+            vendor: native
+          }
+        ]
+      }
+    }
+  ]
+}

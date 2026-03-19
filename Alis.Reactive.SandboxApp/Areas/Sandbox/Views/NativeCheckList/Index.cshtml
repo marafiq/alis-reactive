@@ -111,8 +111,8 @@
     <native-card><native-card-body>
         <native-heading level="H2">5. Model Binding Proof</native-heading>
         <native-text color="Secondary">
-            Controller sets <code>Allergies = "Peanuts,Dairy"</code> — checkboxes pre-select on load.
-            Hidden input value: <code>@(Model.Allergies ?? "(empty)")</code>.
+            Controller sets <code>Allergies = ["Peanuts","Dairy"]</code> — checkboxes pre-select on load.
+            Hidden input value: <code>@(Model.Allergies != null ? string.Join(",", Model.Allergies) : "(empty)")</code>.
         </native-text>
     </native-card-body></native-card>
 

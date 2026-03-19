@@ -11,7 +11,7 @@ namespace Alis.Reactive.Native.Components
         private static readonly NativeCheckList _component = new NativeCheckList();
 
         public static ComponentRef<NativeCheckList, TModel> SetValue<TModel>(
-            this ComponentRef<NativeCheckList, TModel> self, string value)
+            this ComponentRef<NativeCheckList, TModel> self, string[] value)
             where TModel : class
         {
             return self.Emit(new SetPropMutation("value"), value: value);
@@ -33,11 +33,11 @@ namespace Alis.Reactive.Native.Components
             return self.Emit(new CallMutation("focus"));
         }
 
-        public static TypedComponentSource<string> Value<TModel>(
+        public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class
         {
-            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            return new TypedComponentSource<string[]>(self.TargetId, _component.Vendor, _component.ReadExpr);
         }
     }
 }

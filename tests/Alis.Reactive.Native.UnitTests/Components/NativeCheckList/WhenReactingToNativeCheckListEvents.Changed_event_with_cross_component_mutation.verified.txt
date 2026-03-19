@@ -16,7 +16,9 @@
               kind: set-prop,
               prop: value
             },
-            value: Peanuts,
+            value: [
+              Peanuts
+            ],
             vendor: native
           },
           {

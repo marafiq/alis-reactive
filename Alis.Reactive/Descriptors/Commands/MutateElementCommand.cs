@@ -13,7 +13,7 @@ namespace Alis.Reactive.Descriptors.Commands
         public Mutation Mutation { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Value { get; }
+        public object? Value { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public BindSource? Source { get; }
@@ -24,7 +24,7 @@ namespace Alis.Reactive.Descriptors.Commands
         public MutateElementCommand(
             string target,
             Mutation mutation,
-            string? value = null,
+            object? value = null,
             BindSource? source = null,
             string? vendor = null)
         {

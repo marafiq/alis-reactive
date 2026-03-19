@@ -10,7 +10,7 @@ public class WhenReactingToNativeCheckListEvents : NativeTestBase
     {
         var plan = CreatePlan();
         Trigger(plan).CustomEvent<NativeCheckListChangeArgs>("allergy-changed", (args, p) =>
-            p.Component<NativeCheckList>(m => m.Allergies).SetValue("Peanuts,Dairy"));
+            p.Component<NativeCheckList>(m => m.Allergies).SetValue(new[] { "Peanuts", "Dairy" }));
         var json = plan.Render();
         AssertSchemaValid(json);
         return VerifyJson(json);
@@ -35,7 +35,7 @@ public class WhenReactingToNativeCheckListEvents : NativeTestBase
         var plan = CreatePlan();
         Trigger(plan).CustomEvent<NativeCheckListChangeArgs>("allergy-cascade", (args, p) =>
         {
-            p.Component<NativeCheckList>(m => m.Allergies).SetValue("Peanuts");
+            p.Component<NativeCheckList>(m => m.Allergies).SetValue(new[] { "Peanuts" });
             p.Component<NativeRadioGroup>(m => m.Status).SetValue("Active");
             p.Element("echo").SetText("Both updated");
         });

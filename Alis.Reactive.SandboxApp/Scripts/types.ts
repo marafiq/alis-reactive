@@ -134,6 +134,7 @@ export type GuardOp =
   | "is-null" | "not-null"
   | "is-empty" | "not-empty"
   | "in" | "not-in" | "between"
+  | "array-contains"
   | "contains" | "starts-with" | "ends-with" | "matches" | "min-length";
 
 export type Guard = ValueGuard | AllGuard | AnyGuard | InvertGuard | ConfirmGuard;
@@ -141,10 +142,11 @@ export type Guard = ValueGuard | AllGuard | AnyGuard | InvertGuard | ConfirmGuar
 export interface ValueGuard {
   kind: "value";
   source: BindSource;
-  coerceAs: "string" | "number" | "boolean" | "date" | "raw";
+  coerceAs: "string" | "number" | "boolean" | "date" | "raw" | "array";
   op: GuardOp;
   operand?: unknown;
   rightSource?: BindSource;
+  elementCoerceAs?: "string" | "number" | "boolean" | "date" | "raw" | "array";
 }
 
 export interface AllGuard {
@@ -185,7 +187,7 @@ export interface DispatchCommand {
   when?: Guard;
 }
 
-export type CoercionType = "string" | "number" | "boolean" | "date" | "raw";
+export type CoercionType = "string" | "number" | "boolean" | "date" | "raw" | "array";
 
 // ── Mutation (discriminated by kind) ──
 
@@ -221,7 +223,7 @@ export interface MutateElementCommand {
   kind: "mutate-element";
   target: string;
   mutation: Mutation;
-  value?: string;
+  value?: string | string[];
   source?: BindSource;
   vendor?: Vendor;
   when?: Guard;

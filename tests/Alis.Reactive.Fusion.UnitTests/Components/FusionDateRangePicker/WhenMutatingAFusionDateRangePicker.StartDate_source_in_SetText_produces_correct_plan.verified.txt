@@ -1,0 +1,29 @@
+﻿{
+  planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: start-echo,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            source: {
+              kind: component,
+              componentId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayStart,
+              vendor: fusion,
+              readExpr: startDate
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+﻿{
+  planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__PhoneNumber,
+            mutation: {
+              kind: set-prop,
+              prop: value
+            },
+            value: (555) 987-6543,
+            vendor: fusion
+          },
+          {
+            kind: mutate-element,
+            target: echo,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: Phone updated
+          }
+        ]
+      }
+    }
+  ]
+}

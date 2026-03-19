@@ -14,10 +14,10 @@ public class NativeTestModel
 {
     public string? Status { get; set; }
     public string? Category { get; set; }
-    public DateTime? AdmissionDate { get; set; }
     public NativeTestAddress? Address { get; set; }
     public string? MobilityLevel { get; set; }
-    public string? Allergies { get; set; }
+    public string[]? Allergies { get; set; }
+    public string? CareNotes { get; set; }
 }
 
 [TestFixture]

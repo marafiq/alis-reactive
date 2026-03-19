@@ -2,8 +2,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class MultiSelectModel
     {
-        public string? Allergies { get; set; }
-        public string? DietaryRestrictions { get; set; }
+        public string[]? Allergies { get; set; }
+        public string[]? DietaryRestrictions { get; set; }
     }
 
     public class AllergyItem

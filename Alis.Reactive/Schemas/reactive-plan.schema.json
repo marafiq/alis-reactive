@@ -159,7 +159,7 @@
     },
     "CoercionType": {
       "type": "string",
-      "enum": ["string", "number", "boolean", "date", "raw"],
+      "enum": ["string", "number", "boolean", "date", "raw", "array"],
       "description": "Type coercion applied to resolved BindExpr value"
     },
 
@@ -170,6 +170,7 @@
         "truthy", "falsy", "is-null", "not-null",
         "is-empty", "not-empty",
         "in", "not-in", "between",
+        "array-contains",
         "contains", "starts-with", "ends-with", "matches", "min-length"
       ],
       "description": "Comparison operator for a ValueGuard"
@@ -198,6 +199,10 @@
         "rightSource": {
           "$ref": "#/$defs/BindSource",
           "description": "When present, the right-hand side is a source (component or event), not a literal operand. Enables source-vs-source comparisons."
+        },
+        "elementCoerceAs": {
+          "$ref": "#/$defs/CoercionType",
+          "description": "Element-level coercion for array operators (array-contains). Specifies how to coerce individual elements and the operand."
         }
       }
     },
@@ -336,7 +341,7 @@
         "kind": { "const": "mutate-element" },
         "target": { "type": "string", "minLength": 1 },
         "mutation": { "$ref": "#/$defs/Mutation" },
-        "value": { "type": "string" },
+        "value": { "description": "Static value for mutations — string for scalars, array for multi-select" },
         "source": { "$ref": "#/$defs/BindSource" },
         "vendor": { "$ref": "#/$defs/Vendor" },
         "when": { "$ref": "#/$defs/Guard" }

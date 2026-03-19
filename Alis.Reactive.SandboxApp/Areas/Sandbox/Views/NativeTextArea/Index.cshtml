@@ -1,0 +1,118 @@
+@model NativeTextAreaModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "NativeTextArea";
+
+    var plan = Html.ReactivePlan<NativeTextAreaModel>();
+
+    // Section 1: Property write — DomReady sets care notes
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<NativeTextArea>(m => m.CareNotes).SetValue("Resident stable. Vitals within normal range.");
+    }));
+
+    // Section 2: Property read — DomReady reads care notes into echo
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var comp = p.Component<NativeTextArea>(m => m.CareNotes);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">NativeTextArea — Full API</native-heading>
+        <native-text color="Secondary">
+            Exercises NativeTextArea vertical slice: property writes (SetValue),
+            property reads (Value), events (Changed), typed conditions (When), and reactive wiring.
+            Senior living domain: care notes and incident descriptions.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Property Write -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Property Write (SetValue)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, sets care notes to "Resident stable. Vitals within normal range."
+        </p>
+        @{ Html.InputField(plan, m => m.CareNotes, o => o.Label("Care Notes"))
+            .NativeTextArea(b => b
+                .Rows(4)
+                .Placeholder("Enter care notes")
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+    </native-card-body></native-card>
+
+    <!-- Section 2: Property Read -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the care notes component value and echoes it.
+        </p>
+        <div class="font-mono text-sm">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 3: Event + Event-Args Condition -->
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Changed Event with Typed Condition</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Incident description wires a Changed event with typed condition:
+            <code>When(args, x =&gt; x.Value).IsEmpty()</code> shows incident status.
+        </p>
+        @{ Html.InputField(plan, m => m.IncidentDescription, o => o.Label("Incident Description"))
+            .NativeTextArea(b => b
+                .Rows(4)
+                .Placeholder("Describe the incident")
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.When(args, x => x.Value).IsEmpty()
+                        .Then(t =>
+                        {
+                            t.Element("incident-status").SetText("no incident");
+                            t.Element("incident-status").AddClass("text-red-600");
+                            t.Element("incident-status").RemoveClass("text-green-600");
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("incident-status").SetText("incident logged");
+                            e.Element("incident-status").AddClass("text-green-600");
+                            e.Element("incident-status").RemoveClass("text-red-600");
+                        });
+                })); }
+        <div class="font-mono text-sm mt-2">
+            <p>Status: <span id="incident-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 4: Component-Read Condition -->
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Component Value Condition</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Button reads care notes via <code>When(comp.Value()).IsEmpty()</code>
+            and shows a warning or confirmation.
+        </p>
+        @(Html.NativeButton("check-notes-btn", "Check Care Notes")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var comp = p.Component<NativeTextArea>(m => m.CareNotes);
+                p.When(comp.Value()).IsEmpty()
+                    .Then(t => t.Element("notes-warning").SetText("notes required"))
+                    .Else(e => e.Element("notes-warning").SetText("notes recorded"));
+            }))
+        <div class="font-mono text-sm mt-2">
+            <p>Warning: <span id="notes-warning" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
