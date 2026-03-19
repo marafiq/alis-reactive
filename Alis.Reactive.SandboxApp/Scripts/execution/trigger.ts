@@ -18,9 +18,9 @@ export function wireTrigger(
   switch (trigger.kind) {
     case "dom-ready":
       if (document.readyState === "complete" || document.readyState === "interactive") {
-        executeReaction(reaction, { components });
+        executeReaction(reaction, { components }).catch(err => log.error("reaction failed", { error: String(err) }));
       } else {
-        document.addEventListener("DOMContentLoaded", () => executeReaction(reaction, { components }), opts);
+        document.addEventListener("DOMContentLoaded", () => executeReaction(reaction, { components }).catch(err => log.error("reaction failed", { error: String(err) })), opts);
       }
       break;
 
@@ -28,7 +28,7 @@ export function wireTrigger(
       log.debug("custom-event: listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e) => {
         const detail = (e as CustomEvent).detail;
-        executeReaction(reaction, { evt: detail ?? {}, components });
+        executeReaction(reaction, { evt: detail ?? {}, components }).catch(err => log.error("reaction failed", { error: String(err) }));
       }, opts);
       break;
 
@@ -42,7 +42,7 @@ export function wireTrigger(
         const detail = trigger.vendor === "native"
           ? (expr ? { [expr]: walk(el, expr), event: e } : { event: e })
           : (e ?? {});
-        executeReaction(reaction, { evt: detail, components });
+        executeReaction(reaction, { evt: detail, components }).catch(err => log.error("reaction failed", { error: String(err) }));
       }, opts);
       break;
     }

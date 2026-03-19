@@ -41,7 +41,9 @@ function handleClick(event: MouseEvent): void {
   const payload = decodePayload(anchor);
   bindHrefToSingleRequest(payload.reaction, anchor.getAttribute("href") ?? anchor.href);
   log.debug("activate", { id: anchor.id, href: anchor.href });
-  executeReaction(payload.reaction);
+  executeReaction(payload.reaction).catch(err =>
+    log.error("reaction failed", { error: String(err) })
+  );
 }
 
 function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
