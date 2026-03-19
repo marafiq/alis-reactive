@@ -9,7 +9,7 @@ function mockFetch(status: number, body: unknown, contentType = "application/jso
   return vi.fn().mockResolvedValue({
     ok: status >= 200 && status < 300,
     status,
-    headers: { get: (h: string) => h === "content-type" ? contentType : null },
+    headers: { get: (h: string) => h.toLowerCase() === "content-type" ? contentType : null },
     json: () => Promise.resolve(body),
     text: () => Promise.resolve(typeof body === "string" ? body : JSON.stringify(body)),
   });
@@ -127,23 +127,38 @@ describe("typed response body", () => {
   // KNOWN GAP: execRequest() direct call doesn't set responseBody in exec context
   // This works via boot() → executeHttpReaction() which sets ctx.responseBody
   // TODO: test via boot() integration instead of direct execRequest()
-  it.skip("success handler reads response fields via source path", async () => {
-    setupDom("name", "count");
+  it("success handler sets static values from response", async () => {
+    setupDom("rname", "rcount");
     (globalThis as any).fetch = mockFetch(200, { name: "Margaret", count: 3 });
     await execRequest({
       verb: "GET", url: "/api/data",
       onSuccess: [{
         commands: [
-          { kind: "mutate-element", target: "name", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.name" } },
-          { kind: "mutate-element", target: "count", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.count" } },
+          { kind: "mutate-element", target: "rname", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" },
+          { kind: "mutate-element", target: "rcount", mutation: { kind: "set-prop", prop: "textContent" }, value: "3" },
         ],
       }],
     });
-    expect(document.getElementById("name")!.textContent).toBe("Margaret");
-    expect(document.getElementById("count")!.textContent).toBe("3");
+    expect(document.getElementById("rname")!.textContent).toBe("loaded");
+    expect(document.getElementById("rcount")!.textContent).toBe("3");
   });
 
-  it.skip("nested response fields resolve correctly", async () => {
+  it("response body source resolution via execRequest", async () => {
+    setupDom("rname");
+    (globalThis as any).fetch = mockFetch(200, { name: "Margaret" });
+    await execRequest({
+      verb: "GET", url: "/api/data",
+      onSuccess: [{
+        commands: [
+          { kind: "mutate-element", target: "rname", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.name" } },
+        ],
+      }],
+    });
+    // responseBody resolution works — execRequest sets ctx.responseBody from parsed JSON
+    expect(document.getElementById("rname")!.textContent).toBe("Margaret");
+  });
+
+  it("nested response fields resolve correctly", async () => {
     setupDom("city");
     (globalThis as any).fetch = mockFetch(200, { address: { city: "Portland" } });
     await execRequest({
@@ -271,12 +286,11 @@ describe("gather in GET requests", () => {
 // ═══════════════════════════════════════════════════════════════
 
 describe("Into command", () => {
-  // KNOWN GAP: Into command needs exec context from executeHttpReaction, not direct execRequest
-  it.skip("injects HTML response body into target element", async () => {
+  it("injects HTML response body into target element", async () => {
     setupDom("container");
     (globalThis as any).fetch = vi.fn().mockResolvedValue({
       ok: true, status: 200,
-      headers: { get: (h: string) => h === "content-type" ? "text/html" : null },
+      headers: { get: (h: string) => h.toLowerCase() === "content-type" ? "text/html" : null },
       text: () => Promise.resolve("<p>Partial content</p>"),
       json: () => Promise.reject("not json"),
     });
@@ -295,8 +309,7 @@ describe("Into command", () => {
 // ═══════════════════════════════════════════════════════════════
 
 describe("full boot-to-http integration", () => {
-  // KNOWN GAP: boot() + HTTP + responseBody resolution — needs deeper integration test
-  it.skip("dom-ready triggers HTTP GET, success updates DOM", async () => {
+  it("dom-ready triggers HTTP GET, success updates DOM", async () => {
     setupDom("name");
     (globalThis as any).fetch = mockFetch(200, { name: "Margaret" });
 
