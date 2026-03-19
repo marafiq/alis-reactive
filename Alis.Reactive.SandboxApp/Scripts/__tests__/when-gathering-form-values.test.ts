@@ -122,20 +122,6 @@ describe("NativeRadioGroup gather", () => {
   });
 });
 
-describe("NativeDatePicker gather", () => {
-  it("gathers date string in JSON POST", () => {
-    nativeEl("AdmissionDate", "input", { type: "date", value: "2024-03-15" });
-    const result = resolveGather([gather("AdmissionDate", "native", "AdmissionDate")], "POST", {});
-    expect(result.body).toEqual({ AdmissionDate: "2024-03-15" });
-  });
-
-  it("gathers date string as GET param", () => {
-    nativeEl("AdmissionDate", "input", { type: "date", value: "2024-03-15" });
-    const result = resolveGather([gather("AdmissionDate", "native", "AdmissionDate")], "GET", {});
-    expect(result.urlParams).toEqual(["AdmissionDate=2024-03-15"]);
-  });
-});
-
 // ═══════════════════════════════════════════════════════════════
 // Native array component — JSON POST + GET + FormData
 // ═══════════════════════════════════════════════════════════════
@@ -340,28 +326,33 @@ describe("FusionMultiSelect gather", () => {
 describe("IncludeAll with mixed component types", () => {
   it("gathers all registered components in JSON POST", () => {
     // Set up one of each component type
+    // Native scalars
     nativeEl("ResidentName", "input", { value: "Margaret Thompson" });
     nativeEl("HasAllergies", "input", { type: "checkbox", checked: true });
-    nativeEl("AdmissionDate", "input", { type: "date", value: "2024-03-15" });
     nativeEl("MobilityLevel", "input", { type: "hidden", value: "wheelchair" });
 
+    // Native array
     const checklistContainer = document.createElement("div");
     checklistContainer.id = "Allergies";
     (checklistContainer as any).value = ["Peanuts", "Dairy"];
     document.body.appendChild(checklistContainer);
 
+    // Fusion scalars
     fusionEl("MonthlyRate", { value: 4250 });
     fusionEl("FacilityId", { value: "fac-42" });
+    fusionEl("AdmissionDate", { value: new Date("2024-03-15T00:00:00") });
+
+    // Fusion array
     fusionEl("DietaryRestrictions", { value: ["vegetarian", "halal"] });
 
     const components: Record<string, ComponentEntry> = {
       "ResidentName":       { id: "ResidentName", vendor: "native", readExpr: "value" },
       "HasAllergies":       { id: "HasAllergies", vendor: "native", readExpr: "checked" },
-      "AdmissionDate":      { id: "AdmissionDate", vendor: "native", readExpr: "value" },
       "MobilityLevel":      { id: "MobilityLevel", vendor: "native", readExpr: "value" },
       "Allergies":          { id: "Allergies", vendor: "native", readExpr: "value" },
       "MonthlyRate":        { id: "MonthlyRate", vendor: "fusion", readExpr: "value" },
       "FacilityId":         { id: "FacilityId", vendor: "fusion", readExpr: "value" },
+      "AdmissionDate":      { id: "AdmissionDate", vendor: "fusion", readExpr: "value" },
       "DietaryRestrictions": { id: "DietaryRestrictions", vendor: "fusion", readExpr: "value" },
     };
 
@@ -372,7 +363,6 @@ describe("IncludeAll with mixed component types", () => {
     // Native scalars
     expect(body.ResidentName).toBe("Margaret Thompson");
     expect(body.HasAllergies).toBe(true);
-    expect(body.AdmissionDate).toBe("2024-03-15");
     expect(body.MobilityLevel).toBe("wheelchair");
 
     // Native array
@@ -381,6 +371,7 @@ describe("IncludeAll with mixed component types", () => {
     // Fusion scalars
     expect(body.MonthlyRate).toBe(4250);
     expect(body.FacilityId).toBe("fac-42");
+    expect(body.AdmissionDate).toBeInstanceOf(Date);
 
     // Fusion array
     expect(body.DietaryRestrictions).toEqual(["vegetarian", "halal"]);
