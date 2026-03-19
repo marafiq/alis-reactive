@@ -46,15 +46,9 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         p.When(args, x => x.Value).NotEmpty()
                             .Then(t => t.Element("args-condition").SetText("content entered"))
                             .Else(e => e.Element("args-condition").SetText("no content"));
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
                         p.When(comp.Value()).NotEmpty()
                             .Then(then =>

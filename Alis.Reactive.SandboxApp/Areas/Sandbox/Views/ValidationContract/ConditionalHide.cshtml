@@ -49,9 +49,6 @@
                        p.When(args, a => a.Value).Eq("Memory Care")
                            .Then(t => t.Element("memory-section").Show())
                            .Else(e => e.Element("memory-section").Hide());
-                   })
-                   .Reactive(plan, evt => evt.Changed, (args, p) =>
-                   {
                        p.When(args, a => a.Value).Eq("Independent")
                            .Then(t => t.Element("physician-section").Hide())
                            .Else(e => e.Element("physician-section").Show());

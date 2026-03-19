@@ -116,9 +116,6 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         // Event-args condition: When(args, x => x.Value).Gt(100m)
                         p.When(args, x => x.Value).Gt(100m)
                             .Then(then =>
@@ -130,9 +127,6 @@
                             {
                                 else_.Element("high-temp-warning").Hide();
                             });
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         // Component-read condition: When(comp.Value()).Gt(0m)
                         var comp = p.Component<FusionNumericTextBox>(m => m.Temperature);
                         p.When(comp.Value()).Gt(0m)

@@ -81,9 +81,6 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         // Event-args condition: When(args, x => x.Value).NotNull()
                         p.When(args, x => x.Value).NotNull()
                             .Then(then =>
@@ -95,9 +92,6 @@
                             {
                                 else_.Element("time-status").Hide();
                             });
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         // Component-read condition: When(comp.Value()).IsEmpty()
                         var comp = p.Component<FusionTimePicker>(m => m.WakeUpTime);
                         p.When(comp.Value()).IsEmpty()

@@ -60,9 +60,6 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
                         p.When(comp.Value()).NotNull()
                             .Then(then =>

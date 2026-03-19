@@ -62,15 +62,9 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         p.When(args, x => x.Value).Eq("smith")
                             .Then(t => t.Element("args-condition").SetText("dr smith selected"))
                             .Else(e => e.Element("args-condition").SetText("other physician"));
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         var comp = p.Component<FusionAutoComplete>(m => m.Physician);
                         p.When(comp.Value()).NotNull()
                             .Then(then =>

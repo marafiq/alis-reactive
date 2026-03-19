@@ -46,15 +46,9 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Checked);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         p.When(args, x => x.Checked).Truthy()
                             .Then(t => t.Element("args-condition").SetText("notifications enabled"))
                             .Else(e => e.Element("args-condition").SetText("notifications disabled"));
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         var comp = p.Component<FusionSwitch>(m => m.ReceiveNotifications);
                         p.When(comp.Value()).Truthy()
                             .Then(then =>

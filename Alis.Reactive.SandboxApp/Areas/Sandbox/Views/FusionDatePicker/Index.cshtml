@@ -46,15 +46,9 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         p.When(args, x => x.Value).NotNull()
                             .Then(t => t.Element("args-condition").SetText("date selected"))
                             .Else(e => e.Element("args-condition").SetText("no date"));
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
                         p.When(comp.Value()).NotNull()
                             .Then(then =>

@@ -69,15 +69,9 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         p.When(args, x => x.Value).Eq("1")
                             .Then(t => t.Element("args-condition").SetText("sunrise manor selected"))
                             .Else(e => e.Element("args-condition").SetText("other facility"));
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         var comp = p.Component<FusionMultiColumnComboBox>(m => m.Facility);
                         p.When(comp.Value()).NotNull()
                             .Then(then =>

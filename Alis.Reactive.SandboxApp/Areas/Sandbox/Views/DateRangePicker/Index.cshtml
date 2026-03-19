@@ -42,15 +42,9 @@
                     {
                         p.Element("change-start").SetText(args, x => x.StartDate);
                         p.Element("change-end").SetText(args, x => x.EndDate);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         p.When(args, x => x.StartDate).NotNull()
                             .Then(t => t.Element("args-condition").SetText("stay period selected"))
                             .Else(e => e.Element("args-condition").SetText("no period"));
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
                         var comp = p.Component<FusionDateRangePicker>(m => m.StayStart);
                         p.When(comp.StartDate()).NotNull()
                             .Then(then =>
