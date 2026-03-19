@@ -420,6 +420,131 @@ describe("IncludeAll with mixed component types", () => {
 // Infrastructure — static, nested, empty, error cases
 // ═══════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════
+// NativeTextArea — JSON POST + GET
+// ═══════════════════════════════════════════════════════════════
+
+describe("NativeTextArea gather", () => {
+  it("gathers textarea string value in JSON POST", () => {
+    const textarea = document.createElement("textarea");
+    textarea.id = "CareNotes";
+    textarea.value = "Patient stable, vitals normal";
+    document.body.appendChild(textarea);
+    const result = resolveGather([gather("CareNotes", "native", "CareNotes")], "POST", {});
+    expect(result.body).toEqual({ CareNotes: "Patient stable, vitals normal" });
+  });
+
+  it("gathers textarea value as GET param", () => {
+    const textarea = document.createElement("textarea");
+    textarea.id = "CareNotes";
+    textarea.value = "Patient stable";
+    document.body.appendChild(textarea);
+    const result = resolveGather([gather("CareNotes", "native", "CareNotes")], "GET", {});
+    expect(result.urlParams).toEqual(["CareNotes=Patient%20stable"]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// FusionDateTimePicker — JSON POST + GET
+// ═══════════════════════════════════════════════════════════════
+
+describe("FusionDateTimePicker gather", () => {
+  it("gathers DateTime value in JSON POST", () => {
+    fusionEl("MedicationTime", { value: new Date("2024-03-15T08:30:00") });
+    const result = resolveGather([gather("MedicationTime", "fusion", "MedicationTime")], "POST", {});
+    expect((result.body as any).MedicationTime).toBeInstanceOf(Date);
+  });
+
+  it("gathers DateTime as GET param", () => {
+    fusionEl("MedicationTime", { value: new Date("2024-03-15T08:30:00") });
+    const result = resolveGather([gather("MedicationTime", "fusion", "MedicationTime")], "GET", {});
+    expect(result.urlParams.length).toBe(1);
+    expect(result.urlParams[0]).toMatch(/^MedicationTime=.+/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// FusionDateRangePicker — JSON POST (startDate + endDate)
+// ═══════════════════════════════════════════════════════════════
+
+describe("FusionDateRangePicker gather", () => {
+  it("gathers startDate in JSON POST", () => {
+    fusionEl("StayStart", { startDate: new Date("2024-01-15") });
+    const result = resolveGather([gather("StayStart", "fusion", "StayStart", "startDate")], "POST", {});
+    expect((result.body as any).StayStart).toBeInstanceOf(Date);
+  });
+
+  it("gathers endDate in JSON POST", () => {
+    fusionEl("StayStart", { endDate: new Date("2024-06-15") });
+    const result = resolveGather([gather("StayStart", "fusion", "StayEnd", "endDate")], "POST", {});
+    expect((result.body as any).StayEnd).toBeInstanceOf(Date);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// FusionInputMask — JSON POST + GET
+// ═══════════════════════════════════════════════════════════════
+
+describe("FusionInputMask gather", () => {
+  it("gathers masked string in JSON POST", () => {
+    fusionEl("PhoneNumber", { value: "(555) 123-4567" });
+    const result = resolveGather([gather("PhoneNumber", "fusion", "PhoneNumber")], "POST", {});
+    expect(result.body).toEqual({ PhoneNumber: "(555) 123-4567" });
+  });
+
+  it("gathers masked string as GET param", () => {
+    fusionEl("PhoneNumber", { value: "(555) 123-4567" });
+    const result = resolveGather([gather("PhoneNumber", "fusion", "PhoneNumber")], "GET", {});
+    expect(result.urlParams).toEqual(["PhoneNumber=(555)%20123-4567"]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// FusionRichTextEditor — JSON POST + GET
+// ═══════════════════════════════════════════════════════════════
+
+describe("FusionRichTextEditor gather", () => {
+  it("gathers HTML string in JSON POST", () => {
+    fusionEl("CarePlan", { value: "<p>Daily medications at 8am</p>" });
+    const result = resolveGather([gather("CarePlan", "fusion", "CarePlan")], "POST", {});
+    expect(result.body).toEqual({ CarePlan: "<p>Daily medications at 8am</p>" });
+  });
+
+  it("gathers HTML string as GET param", () => {
+    fusionEl("CarePlan", { value: "<p>Care plan</p>" });
+    const result = resolveGather([gather("CarePlan", "fusion", "CarePlan")], "GET", {});
+    expect(result.urlParams[0]).toMatch(/^CarePlan=.+/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// FusionSwitch — JSON POST + GET (readExpr: "checked")
+// ═══════════════════════════════════════════════════════════════
+
+describe("FusionSwitch gather", () => {
+  it("gathers checked=true in JSON POST", () => {
+    fusionEl("ReceiveNotifications", { checked: true });
+    const result = resolveGather([gather("ReceiveNotifications", "fusion", "ReceiveNotifications", "checked")], "POST", {});
+    expect(result.body).toEqual({ ReceiveNotifications: true });
+  });
+
+  it("gathers checked=false in JSON POST", () => {
+    fusionEl("ReceiveNotifications", { checked: false });
+    const result = resolveGather([gather("ReceiveNotifications", "fusion", "ReceiveNotifications", "checked")], "POST", {});
+    expect(result.body).toEqual({ ReceiveNotifications: false });
+  });
+
+  it("gathers checked as GET param", () => {
+    fusionEl("ReceiveNotifications", { checked: true });
+    const result = resolveGather([gather("ReceiveNotifications", "fusion", "ReceiveNotifications", "checked")], "GET", {});
+    expect(result.urlParams).toEqual(["ReceiveNotifications=true"]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Infrastructure — static, nested, empty, error cases
+// ═══════════════════════════════════════════════════════════════
+
 describe("gather infrastructure", () => {
   it("static values appear in POST body", () => {
     const items: GatherItem[] = [

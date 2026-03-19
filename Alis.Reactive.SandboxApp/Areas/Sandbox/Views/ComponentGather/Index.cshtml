@@ -1,0 +1,82 @@
+@model ComponentGatherModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@using Syncfusion.EJ2.Calendars
+@using Syncfusion.EJ2.Inputs
+@using Syncfusion.EJ2.Buttons
+@using Syncfusion.EJ2.RichTextEditor
+@{
+    ViewData["Title"] = "ComponentGather";
+
+    var plan = Html.ReactivePlan<ComponentGatherModel>();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">ComponentGather — All Component Types</native-heading>
+        <native-text color="Secondary">
+            A single form with all component types gathered via <code>IncludeAll()</code>
+            and POST as JSON. Proves NativeTextBox, NativeTextArea, FusionDateTimePicker,
+            FusionDateRangePicker, FusionInputMask, FusionRichTextEditor, and FusionSwitch
+            all work together in a single HTTP POST.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Gather Form</native-heading>
+        <form id="gather-form" class="space-y-4">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Label("Resident Name"))
+                .NativeTextBox(b => b.Placeholder("Full resident name")); }
+
+            @{ Html.InputField(plan, m => m.CareNotes, o => o.Label("Care Notes"))
+                .NativeTextArea(b => b
+                    .Rows(3)
+                    .Placeholder("Enter care notes")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @{ Html.InputField(plan, m => m.MedicationTime, o => o.Label("Medication Time"))
+                    .DateTimePicker(b => b.Placeholder("Select medication time")); }
+
+                @{ Html.InputField(plan, m => m.StayStart, o => o.Label("Stay Period"))
+                    .DateRangePicker(b => b.Placeholder("Select stay period")); }
+            </div>
+
+            @{ Html.InputField(plan, m => m.PhoneNumber, o => o.Label("Phone Number"))
+                .InputMask(b => b
+                    .Mask("(000) 000-0000")
+                    .Placeholder("Enter phone number")); }
+
+            @{ Html.InputField(plan, m => m.CarePlan, o => o.Label("Care Plan"))
+                .RichTextEditor(b => b.Placeholder("Enter care plan notes...")); }
+
+            @{ Html.InputField(plan, m => m.ReceiveNotifications, o => o.Label("Receive Notifications"))
+                .Switch(b => { }); }
+
+            <div class="flex items-center gap-4">
+                @(Html.NativeButton("submit-btn", "Submit")
+                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post("/Sandbox/ComponentGather/Echo", g => g.IncludeAll())
+                         .Response(r => r.OnSuccess(s =>
+                         {
+                             s.Element("echo-result").SetText("gathered");
+                         }));
+                    }))
+
+                <p id="echo-result" class="text-sm text-text-muted"></p>
+            </div>
+        </form>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
