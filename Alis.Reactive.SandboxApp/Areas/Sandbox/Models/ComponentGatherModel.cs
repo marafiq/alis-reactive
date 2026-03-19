@@ -4,6 +4,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ComponentGatherModel
     {
+        // Native hidden
+        public string? ResidentId { get; set; }              // NativeHiddenField
+        public string? FormToken { get; set; }               // NativeHiddenField
+
         // Native scalar
         public string? ResidentName { get; set; }            // NativeTextBox
         public string? CareNotes { get; set; }               // NativeTextArea
@@ -35,6 +39,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     public class GatherEchoResponse
     {
+        public string? ResidentId { get; set; }
+        public string? FormToken { get; set; }
         public string? ResidentName { get; set; }
         public string? CareNotes { get; set; }
         public bool HasAllergies { get; set; }

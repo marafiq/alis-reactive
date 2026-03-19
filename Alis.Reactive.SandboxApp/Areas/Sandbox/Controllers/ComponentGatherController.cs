@@ -54,6 +54,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
 
             return View(new ComponentGatherModel
             {
+                ResidentId = "RES-1042",
+                FormToken = "csrf-abc123",
                 ResidentName = "Margaret Thompson",
                 CareNotes = "Initial assessment completed.",
                 HasAllergies = true,
@@ -83,6 +85,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         {
             return new
             {
+                residentId = m.ResidentId,
+                formToken = m.FormToken,
                 residentName = m.ResidentName,
                 careNotes = m.CareNotes != null
                     ? (m.CareNotes.Length > 30 ? m.CareNotes.Substring(0, 30) + "..." : m.CareNotes)
@@ -112,6 +116,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
         private static int CountNonNull(ComponentGatherModel m)
         {
             var count = 0;
+            if (m.ResidentId != null) count++;
+            if (m.FormToken != null) count++;
             if (m.ResidentName != null) count++;
             if (m.CareNotes != null) count++;
             if (m.HasAllergies) count++;
