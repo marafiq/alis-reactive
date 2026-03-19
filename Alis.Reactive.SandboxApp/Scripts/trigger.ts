@@ -3,6 +3,7 @@ import { resolveRoot } from "./component";
 import { walk } from "./walk";
 import { scope } from "./trace";
 import { executeReaction } from "./execute";
+import { assertNever } from "./core/assert-never";
 
 const log = scope("trigger");
 
@@ -45,5 +46,8 @@ export function wireTrigger(
       }, opts);
       break;
     }
+
+    default:
+      assertNever(trigger, "trigger kind");
   }
 }

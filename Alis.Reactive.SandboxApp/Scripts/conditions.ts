@@ -1,6 +1,7 @@
 import type { Guard, ValueGuard, ExecContext } from "./types";
 import { resolveSource, resolveSourceAs, coerce } from "./resolver";
 import { scope } from "./trace";
+import { assertNever } from "./core/assert-never";
 
 const log = scope("conditions");
 
@@ -18,7 +19,7 @@ export function evaluateGuard(guard: Guard, ctx?: ExecContext): boolean {
       log.warn("ConfirmGuard in sync context — denying (callers should use async path)");
       return false;
     default:
-      throw new Error(`Unknown guard kind: ${(guard as any).kind}`);
+      assertNever(guard, "guard kind");
   }
 }
 
@@ -45,7 +46,7 @@ export async function evaluateGuardAsync(guard: Guard, ctx?: ExecContext): Promi
     case "confirm":
       return (window as any).alis?.confirm?.(guard.message) ?? Promise.resolve(false);
     default:
-      throw new Error(`Unknown guard kind: ${(guard as any).kind}`);
+      assertNever(guard, "guard kind");
   }
 }
 

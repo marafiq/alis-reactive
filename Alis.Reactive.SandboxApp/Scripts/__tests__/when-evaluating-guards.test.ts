@@ -775,7 +775,7 @@ describe("when evaluating guards", () => {
 
     it("throws on unknown guard kind", () => {
       const guard = { kind: "unknown", source: { kind: "event", path: "evt.x" }, coerceAs: "raw", op: "eq", operand: 1 } as any;
-      expect(() => evaluateGuard(guard, ctx({}))).toThrow("Unknown guard kind: unknown");
+      expect(() => evaluateGuard(guard, ctx({}))).toThrow("Unhandled guard kind: unknown");
     });
 
     it("throws on unknown operator", () => {

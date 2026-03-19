@@ -3,6 +3,7 @@ import { scope } from "./trace";
 import { executeCommand } from "./commands";
 import { evaluateGuard, evaluateGuardAsync, isConfirmGuard } from "./conditions";
 import { executeHttpReaction, executeParallelHttpReaction } from "./pipeline";
+import { assertNever } from "./core/assert-never";
 
 const log = scope("execute");
 
@@ -62,6 +63,9 @@ export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
       log.debug("parallel-http", { count: reaction.requests.length });
       executeParallelHttpReaction(reaction, ctx);
       break;
+
+    default:
+      assertNever(reaction, "reaction kind");
   }
 }
 
@@ -108,5 +112,8 @@ async function dispatchAsync(reaction: Reaction, ctx?: ExecContext): Promise<voi
       log.debug("parallel-http", { count: reaction.requests.length });
       await executeParallelHttpReaction(reaction, ctx);
       return;
+
+    default:
+      assertNever(reaction, "reaction kind");
   }
 }

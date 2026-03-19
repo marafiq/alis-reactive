@@ -4,6 +4,7 @@ import { evaluateGuard, isConfirmGuard } from "./conditions";
 import { showServerErrors } from "./validation";
 import { injectHtml } from "./inject";
 import { scope } from "./trace";
+import { assertNever } from "./core/assert-never";
 
 const log = scope("command");
 
@@ -49,6 +50,9 @@ export function executeCommand(cmd: Command, ctx?: ExecContext): void {
       }
       break;
     }
+
+    default:
+      assertNever(cmd, "command kind");
   }
 }
 

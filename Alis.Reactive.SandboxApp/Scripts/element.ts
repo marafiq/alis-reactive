@@ -2,6 +2,7 @@ import type { MutateElementCommand, MethodArg, ExecContext } from "./types";
 import { scope } from "./trace";
 import { resolveSource, coerce } from "./resolver";
 import { resolveRoot } from "./component";
+import { assertNever } from "./core/assert-never";
 
 const log = scope("element");
 
@@ -12,6 +13,7 @@ function resolveArg(arg: MethodArg, ctx?: ExecContext): unknown {
       const raw = resolveSource(arg.source, ctx);
       return arg.coerce ? coerce(raw, arg.coerce) : raw;
     }
+    default: assertNever(arg, "method arg kind");
   }
 }
 
@@ -37,5 +39,8 @@ export function mutateElement(cmd: MutateElementCommand, ctx?: ExecContext): voi
       (target as any)[m.method].apply(target, resolved);
       break;
     }
+
+    default:
+      assertNever(m, "mutation kind");
   }
 }

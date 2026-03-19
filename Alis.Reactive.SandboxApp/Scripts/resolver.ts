@@ -2,6 +2,7 @@ import type { BindSource, ExecContext } from "./types";
 import { walk } from "./walk";
 import { evalRead } from "./component";
 import { scope } from "./trace";
+import { assertNever } from "./core/assert-never";
 
 const log = scope("resolver");
 
@@ -31,7 +32,7 @@ export function resolveSource(source: BindSource, ctx?: ExecContext): unknown {
     case "component":
       return evalRead(source.componentId, source.vendor, source.readExpr);
     default:
-      return undefined;
+      assertNever(source, "source kind");
   }
 }
 
