@@ -1,5 +1,5 @@
 import type { Plan } from "../types";
-import { mergePlan } from "./boot";
+import { mergePlan } from "../lifecycle/boot";
 
 /**
  * Inject HTML into a container, using ej.base.append when available (SF component init).

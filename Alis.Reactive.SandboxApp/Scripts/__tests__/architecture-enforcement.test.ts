@@ -44,7 +44,7 @@ describe("architecture enforcement", () => {
   it("no ej.base outside inject.ts", () => {
     const violations: string[] = [];
     for (const file of allSourceFiles()) {
-      if (file === "lifecycle/inject.ts") continue;
+      if (file === "execution/inject.ts") continue;
       const content = readSource(file);
       if (/ej\.base/.test(content)) {
         violations.push(file);
