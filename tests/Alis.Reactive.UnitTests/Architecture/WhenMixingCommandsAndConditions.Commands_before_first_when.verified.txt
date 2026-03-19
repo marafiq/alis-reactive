@@ -1,0 +1,69 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        commands: [
+          {
+            kind: mutate-element,
+            target: echo,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: before
+          }
+        ],
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: eq,
+              operand: hello
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: r1,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: matched
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: r1,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: nope
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

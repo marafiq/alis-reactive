@@ -35,8 +35,8 @@ namespace Alis.Reactive.Native.Components
             pipeline(descriptor.Args, pb);
 
             var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, _component.Vendor, builder.BindingPath, _component.ReadExpr);
-            var entry = new Entry(trigger, pb.BuildReaction());
-            plan.AddEntry(entry);
+            foreach (var reaction in pb.BuildReactions())
+                plan.AddEntry(new Entry(trigger, reaction));
 
             return builder;
         }

@@ -7,17 +7,11 @@
 
     var plan = Html.ReactivePlan<SwitchModel>();
 
-    // ── Section 1: Property Write (SetChecked) from DomReady ──
+    // ── Section 1+2: Property Write (SetChecked) + Property Read on DomReady ──
 
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<FusionSwitch>(m => m.ReceiveNotifications).SetChecked(false);
-    }));
-
-    // ── Section 2: Property Read — display current value in echo text ──
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
         var comp = p.Component<FusionSwitch>(m => m.EmailAlerts);
         p.Element("value-echo").SetText(comp.Value());
     }));

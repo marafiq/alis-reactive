@@ -9,17 +9,11 @@
     var plan = Html.ReactivePlan<AutoCompleteModel>();
     var physicians = (List<PhysicianItem>)ViewBag.Physicians;
 
-    // ── Section 1: Property Write (SetValue) from DomReady ──
+    // ── Section 1+2: Property Write (SetValue) + Property Read on DomReady ──
 
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<FusionAutoComplete>(m => m.Physician).SetValue("smith");
-    }));
-
-    // ── Section 2: Property Read — display current value in echo text ──
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
         var comp = p.Component<FusionAutoComplete>(m => m.Physician);
         p.Element("value-echo").SetText(comp.Value());
     }));

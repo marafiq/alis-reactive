@@ -9,13 +9,17 @@ namespace Alis.Reactive.Builders
     {
         /// <summary>
         /// Starts a conditional branch on an event payload property.
-        /// TProp is inferred from the expression — operators on the returned builder
-        /// demand TProp operands (e.g. int property → Gte(int), string → Eq(string)).
+        /// If a previous conditional block exists, flushes it as a completed segment
+        /// so each When().Then().Else() block evaluates independently.
         /// </summary>
         public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
+            // Flush previous segment if there are already branches (second+ When call)
+            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
+                FlushSegment();
+
             SetMode(PipelineMode.Conditional);
 
             var source = new EventArgSource<TPayload, TProp>(path);
@@ -24,12 +28,13 @@ namespace Alis.Reactive.Builders
 
         /// <summary>
         /// Starts a conditional branch on a component property.
-        /// TProp is inferred from the TypedSource — operators on the returned builder
-        /// demand TProp operands (e.g. decimal property → Gt(0m)).
-        /// Usage: p.When(comp.Value()).Gt(0m).Then(...)
+        /// If a previous conditional block exists, flushes it as a completed segment.
         /// </summary>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
+            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
+                FlushSegment();
+
             SetMode(PipelineMode.Conditional);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
@@ -40,6 +45,9 @@ namespace Alis.Reactive.Builders
         /// </summary>
         public GuardBuilder<TModel> Confirm(string message)
         {
+            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
+                FlushSegment();
+
             SetMode(PipelineMode.Conditional);
 
             return new GuardBuilder<TModel>(new ConfirmGuard(message), this);

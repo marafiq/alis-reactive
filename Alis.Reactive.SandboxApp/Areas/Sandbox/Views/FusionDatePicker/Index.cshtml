@@ -7,17 +7,11 @@
 
     var plan = Html.ReactivePlan<FusionDatePickerModel>();
 
-    // ── Section 1: Property Write (SetValue) from DomReady ──
+    // ── Section 1+2: Property Write (SetValue) + Property Read on DomReady ──
 
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<FusionDatePicker>(m => m.AdmissionDate).SetValue(new DateTime(2026, 6, 15));
-    }));
-
-    // ── Section 2: Property Read — display current value in echo text ──
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
         var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
         p.Element("value-echo").SetText(comp.Value());
     }));

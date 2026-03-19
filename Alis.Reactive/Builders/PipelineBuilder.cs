@@ -18,6 +18,13 @@ namespace Alis.Reactive.Builders
         private PipelineMode _mode = PipelineMode.Sequential;
 
         /// <summary>
+        /// Completed reaction segments. When a new When() is called after a previous
+        /// When().Then().Else() block, the current segment (commands + branches) is
+        /// flushed here so both conditionals produce independent reactions.
+        /// </summary>
+        private List<Reaction>? _segments;
+
+        /// <summary>
         /// Adds a command to the pipeline. Used by vendor-specific projects
         /// (Fusion, Native) to emit their own command descriptors.
         /// </summary>
@@ -98,7 +105,72 @@ namespace Alis.Reactive.Builders
             ConditionalBranches = branches;
         }
 
+        /// <summary>
+        /// Flushes the current segment (accumulated commands + conditional branches)
+        /// into _segments, then resets for the next segment. Called by When() when
+        /// a previous conditional block already exists.
+        /// </summary>
+        internal void FlushSegment()
+        {
+            _segments ??= new List<Reaction>();
+
+            // Flush any accumulated commands as a sequential segment
+            if (Commands.Count > 0)
+            {
+                _segments.Add(new SequentialReaction(new List<Command>(Commands)));
+                Commands.Clear();
+            }
+
+            // Flush current conditional block
+            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
+            {
+                _segments.Add(new ConditionalReaction(null, ConditionalBranches.ToArray()));
+                ConditionalBranches = null;
+            }
+        }
+
+        /// <summary>
+        /// Returns a single reaction for simple pipelines (one segment),
+        /// or the first reaction for backwards compatibility.
+        /// Prefer BuildReactions() for multi-segment pipelines.
+        /// </summary>
         public Reaction BuildReaction()
+        {
+            var reactions = BuildReactions();
+            return reactions.Count == 1
+                ? reactions[0]
+                : reactions[0]; // caller should use BuildReactions() for multi-segment
+        }
+
+        /// <summary>
+        /// Builds all reactions from the pipeline. A single When() block produces
+        /// one reaction. Multiple When() blocks produce multiple reactions.
+        /// Commands between/around conditions produce sequential reactions.
+        /// </summary>
+        public List<Reaction> BuildReactions()
+        {
+            // If no segments were flushed, build a single reaction (common case)
+            if (_segments == null || _segments.Count == 0)
+            {
+                return new List<Reaction> { BuildSingleReaction() };
+            }
+
+            // Flush any trailing commands/branches after the last When()
+            if (Commands.Count > 0)
+            {
+                _segments.Add(new SequentialReaction(new List<Command>(Commands)));
+                Commands.Clear();
+            }
+            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
+            {
+                _segments.Add(new ConditionalReaction(null, ConditionalBranches.ToArray()));
+                ConditionalBranches = null;
+            }
+
+            return _segments;
+        }
+
+        private Reaction BuildSingleReaction()
         {
             return _mode switch
             {

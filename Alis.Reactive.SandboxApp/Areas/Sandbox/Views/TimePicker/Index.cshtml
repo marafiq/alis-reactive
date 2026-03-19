@@ -8,15 +8,10 @@
 
     var plan = Html.ReactivePlan<TimePickerModel>();
 
-    // Section 1: Property Write — DomReady sets medication time to 08:30
+    // Section 1+2: Property Write + Property Read on DomReady
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<FusionTimePicker>(m => m.MedicationTime).SetValue(new DateTime(2026, 1, 1, 8, 30, 0));
-    }));
-
-    // Section 2: Property Read — DomReady reads medication time into echo
-    Html.On(plan, t => t.DomReady(p =>
-    {
         var comp = p.Component<FusionTimePicker>(m => m.MedicationTime);
         p.Element("value-echo").SetText(comp.Value());
     }));

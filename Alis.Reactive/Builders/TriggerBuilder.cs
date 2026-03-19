@@ -49,7 +49,8 @@ namespace Alis.Reactive.Builders
 
         private void AddEntryWithContexts(Trigger trigger, PipelineBuilder<TModel> pb)
         {
-            _plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+            foreach (var reaction in pb.BuildReactions())
+                _plan.AddEntry(new Entry(trigger, reaction));
         }
     }
 }

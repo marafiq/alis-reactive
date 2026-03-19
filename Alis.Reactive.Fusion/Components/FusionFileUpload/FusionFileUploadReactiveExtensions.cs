@@ -40,8 +40,8 @@ namespace Alis.Reactive.Fusion.Components
             var bindingPath = (string)attrs["name"];
 
             var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, Component.Vendor, bindingPath, Component.ReadExpr);
-            var entry = new Entry(trigger, pb.BuildReaction());
-            plan.AddEntry(entry);
+            foreach (var reaction in pb.BuildReactions())
+                plan.AddEntry(new Entry(trigger, reaction));
 
             return builder;
         }

@@ -47,7 +47,8 @@ namespace Alis.Reactive.Native.Components
                     radioId, "change", _component.Vendor,
                     builder.BindingPath, _component.ReadExpr);
 
-                setup.Plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+                foreach (var reaction in pb.BuildReactions())
+                    setup.Plan.AddEntry(new Entry(trigger, reaction));
             }
 
             setup.Render(builder);

@@ -25,8 +25,8 @@ namespace Alis.Reactive.Fusion.Components
                 descriptor.JsEvent,
                 _component.Vendor,
                 readExpr: _component.ReadExpr);
-            var entry = new Entry(trigger, pb.BuildReaction());
-            plan.AddEntry(entry);
+            foreach (var reaction in pb.BuildReactions())
+                plan.AddEntry(new Entry(trigger, reaction));
 
             return builder;
         }

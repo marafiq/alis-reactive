@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -8,13 +9,16 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Alis.Reactive.Analyzers
 {
     /// <summary>
-    /// Warns when .Reactive() is chained multiple times on the same builder for the same event.
+    /// Error when .Reactive() is called multiple times for the same event on the same builder chain.
     /// Each event should have ONE .Reactive() call containing all the logic for that event.
     ///
-    /// BAD:  .Reactive(plan, evt => evt.Changed, (args, p) => { ... })
-    ///       .Reactive(plan, evt => evt.Changed, (args, p) => { ... })
+    /// Catches:
+    ///   .Reactive(plan, evt => evt.Changed, ...).Reactive(plan, evt => evt.Changed, ...)
+    ///   .Reactive(plan, evt => evt.Changed, ...).Reactive(plan, evt => evt.Focus, ...).Reactive(plan, evt => evt.Changed, ...)
     ///
-    /// GOOD: .Reactive(plan, evt => evt.Changed, (args, p) => { /* all logic here */ })
+    /// Does NOT flag:
+    ///   Different builders each with their own .Reactive(evt.Click) — separate components
+    ///   .Reactive(evt.Changed) and .Reactive(evt.Focus) on same builder — different events
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DuplicateReactiveEventAnalyzer : DiagnosticAnalyzer
@@ -24,11 +28,11 @@ namespace Alis.Reactive.Analyzers
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             title: "Duplicate .Reactive() for the same event",
-            messageFormat: "Multiple .Reactive() calls for '{0}' on the same builder. Combine into a single .Reactive() call.",
+            messageFormat: "Multiple .Reactive() calls for '{0}' on the same builder chain. Combine into a single .Reactive() call.",
             category: "Alis.Reactive",
-            defaultSeverity: DiagnosticSeverity.Warning,
+            defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "Each component event should have exactly one .Reactive() call. Multiple calls create duplicate plan entries. Combine all logic into a single .Reactive() pipeline.");
+            description: "Each component event should have exactly one .Reactive() call per builder chain. Multiple calls for the same event create redundant plan entries.");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
@@ -45,33 +49,39 @@ namespace Alis.Reactive.Analyzers
         {
             var invocation = (InvocationExpressionSyntax)context.Node;
 
-            // Only check Razor-generated files
             if (!IsRazorGeneratedFile(invocation.SyntaxTree))
                 return;
 
-            // Is this a .Reactive() call?
             if (!IsReactiveCall(invocation))
                 return;
 
-            // Is the receiver (what .Reactive() is called on) ALSO a .Reactive() call?
-            var receiver = GetReceiverInvocation(invocation);
-            if (receiver == null || !IsReactiveCall(receiver))
+            var eventName = ExtractEventName(invocation);
+            if (eventName == null)
                 return;
 
-            // Both are .Reactive() calls — check if they have the same event selector
-            var outerEvent = ExtractEventName(invocation);
-            var innerEvent = ExtractEventName(receiver);
+            // Walk the receiver chain backwards — collect all .Reactive() calls on this builder
+            var seenEvents = new HashSet<string>();
+            var current = GetReceiverInvocation(invocation);
 
-            if (outerEvent != null && innerEvent != null && outerEvent == innerEvent)
+            while (current != null)
+            {
+                if (IsReactiveCall(current))
+                {
+                    var innerEvent = ExtractEventName(current);
+                    if (innerEvent != null)
+                        seenEvents.Add(innerEvent);
+                }
+                current = GetReceiverInvocation(current);
+            }
+
+            // If the current event was already seen in an earlier .Reactive() on this chain, flag it
+            if (seenEvents.Contains(eventName))
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(Rule, invocation.GetLocation(), outerEvent));
+                    Diagnostic.Create(Rule, invocation.GetLocation(), eventName));
             }
         }
 
-        /// <summary>
-        /// Checks if an invocation is a .Reactive() call by method name.
-        /// </summary>
         private static bool IsReactiveCall(InvocationExpressionSyntax invocation)
         {
             if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
@@ -79,10 +89,6 @@ namespace Alis.Reactive.Analyzers
             return false;
         }
 
-        /// <summary>
-        /// Gets the invocation that .Reactive() is called on (the receiver).
-        /// For: expr.Reactive(...), returns expr if it's also an InvocationExpression.
-        /// </summary>
         private static InvocationExpressionSyntax? GetReceiverInvocation(InvocationExpressionSyntax invocation)
         {
             if (invocation.Expression is MemberAccessExpressionSyntax memberAccess
@@ -91,17 +97,12 @@ namespace Alis.Reactive.Analyzers
             return null;
         }
 
-        /// <summary>
-        /// Extracts the event name from the event selector lambda: evt => evt.Changed → "Changed"
-        /// The event selector is the second argument: .Reactive(plan, evt => evt.Changed, ...)
-        /// </summary>
         private static string? ExtractEventName(InvocationExpressionSyntax invocation)
         {
             var args = invocation.ArgumentList.Arguments;
             if (args.Count < 2)
                 return null;
 
-            // Second argument should be a lambda: evt => evt.Changed
             var selectorArg = args[1].Expression;
             if (selectorArg is SimpleLambdaExpressionSyntax lambda
                 && lambda.Body is MemberAccessExpressionSyntax memberAccess)

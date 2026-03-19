@@ -1,0 +1,34 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: a,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: one
+          },
+          {
+            kind: mutate-element,
+            target: b,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: two
+          }
+        ]
+      }
+    }
+  ]
+}

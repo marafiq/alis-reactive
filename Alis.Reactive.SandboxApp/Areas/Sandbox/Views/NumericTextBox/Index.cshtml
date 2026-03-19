@@ -8,18 +8,12 @@
 
     var plan = Html.ReactivePlan<NumericTextBoxModel>();
 
-    // ── Section 1: Property Write (SetValue + SetMin) from DomReady ──
+    // ── Section 1+2: Property Write (SetValue + SetMin) + Property Read on DomReady ──
 
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<FusionNumericTextBox>(m => m.Amount).SetValue(42);
         p.Component<FusionNumericTextBox>(m => m.Amount).SetMin(0);
-    }));
-
-    // ── Section 2: Property Read — display current value in echo text ──
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
         var comp = p.Component<FusionNumericTextBox>(m => m.Amount);
         p.Element("value-echo").SetText(comp.Value());
     }));
