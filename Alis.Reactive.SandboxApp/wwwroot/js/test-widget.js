@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-  // Alis.Reactive.SandboxApp/Scripts/test-widget.ts
+  // Alis.Reactive.SandboxApp/Scripts/components/lab/test-widget.ts
   var TestWidget = class {
     constructor(el) {
       this._el = el;
