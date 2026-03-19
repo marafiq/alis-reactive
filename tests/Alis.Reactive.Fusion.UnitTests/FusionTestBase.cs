@@ -21,6 +21,7 @@ public class FusionTestModel
     public string? PhoneNumber { get; set; }
     public string? CarePlan { get; set; }
     public bool ReceiveNotifications { get; set; }
+    public string? Documents { get; set; }
 }
 
 [TestFixture]
