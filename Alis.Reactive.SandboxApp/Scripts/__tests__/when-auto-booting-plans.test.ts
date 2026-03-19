@@ -52,7 +52,7 @@ describe("when auto booting plans", () => {
     `;
 
     const bootModule = await import("../lifecycle/boot");
-    await import("../auto-boot");
+    await import("../root");
 
     const plan = bootModule.getBootedPlan("Test.Model");
     expect(plan).toBeDefined();

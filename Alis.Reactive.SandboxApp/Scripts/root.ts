@@ -1,3 +1,7 @@
+// root.ts — ESM entry point for alis-reactive runtime
+// esbuild bundles from here. Auto-discovers [data-alis-plan] elements on page load.
+// Lives at Scripts/ root by design — everything else is organized in subdirectories.
+
 import { boot, trace } from "./lifecycle/boot";
 import { init as initConfirm } from "./components/fusion/confirm";
 import { initNativeActionLinks } from "./components/native/native-action-link";
