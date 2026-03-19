@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { boot, mergePlan, getBootedPlan, resetBootStateForTests } from "../lifecycle/boot";
-import type { Plan, Entry, ValidationDescriptor, ValidationField, ComponentEntry } from "../types";
+import type { Entry, ValidationField, ComponentEntry } from "../types";
 
 /**
  * Tests the enrichment behavior when validation descriptors exist in the root plan

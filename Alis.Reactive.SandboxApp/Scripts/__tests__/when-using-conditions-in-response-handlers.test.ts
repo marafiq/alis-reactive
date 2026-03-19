@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../lifecycle/boot";
-import type { Plan, Command, Guard, Reaction, StatusHandler } from "../types";
+import type { Command, Guard } from "../types";
 
 function es(path: string) {
   return { kind: "event" as const, path };
@@ -255,7 +255,7 @@ describe("when using conditions in response handlers", () => {
   it("http reaction inside OnSuccess branch executes correctly", async () => {
     setupDom("result");
     let fetchCount = 0;
-    globalThis.fetch = (async (url: string) => {
+    globalThis.fetch = (async (_url: string) => {
       fetchCount++;
       return new Response(JSON.stringify({ ok: true }), {
         status: 200,

@@ -1,7 +1,6 @@
 import type { Vendor } from "./context";
 import type { Command } from "./commands";
 import type { Reaction } from "./reactions";
-import type { Guard } from "./guards";
 import type { ValidationDescriptor } from "./validation";
 
 export type GatherItem = ComponentGather | StaticGather | AllGather;

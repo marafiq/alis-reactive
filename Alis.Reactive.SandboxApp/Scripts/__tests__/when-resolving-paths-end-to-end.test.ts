@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { JSDOM } from "jsdom";
-import type { Plan } from "../types";
+
 
 let boot: typeof import("../lifecycle/boot").boot;
 

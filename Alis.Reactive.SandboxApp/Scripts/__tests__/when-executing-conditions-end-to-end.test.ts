@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { JSDOM } from "jsdom";
-import type { Plan } from "../types";
+
 
 let boot: typeof import("../lifecycle/boot").boot;
 
@@ -344,7 +344,7 @@ describe("conditions end-to-end via boot", () => {
   // ── Date coercion ──
 
   it("date coercion compares dates as milliseconds", () => {
-    const cutoff = new Date("2024-06-01").getTime();
+    const _cutoff = new Date("2024-06-01").getTime();
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [

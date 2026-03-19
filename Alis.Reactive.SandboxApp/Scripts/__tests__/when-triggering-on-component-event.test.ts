@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { boot } from "../lifecycle/boot";
-import { wireTrigger } from "../execution/trigger";
 
 describe("when triggering on component event", () => {
   describe("native vendor", () => {
@@ -126,9 +125,9 @@ describe("when triggering on component event", () => {
       // Create a fake SF element with ej2_instances
       const el = document.createElement("input");
       el.id = "Amount";
-      const listeners: Record<string, Function[]> = {};
+      const listeners: Record<string, ((...args: unknown[]) => unknown)[]> = {};
       (el as any).ej2_instances = [{
-        addEventListener: (event: string, fn: Function) => {
+        addEventListener: (event: string, fn: (...args: unknown[]) => unknown) => {
           if (!listeners[event]) listeners[event] = [];
           listeners[event].push(fn);
         },

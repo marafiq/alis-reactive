@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../lifecycle/boot";
-import type { Plan, Command, Guard } from "../types";
+import type { Command, Guard } from "../types";
 
 function es(path: string) {
   return { kind: "event" as const, path };
@@ -324,7 +324,7 @@ describe("when executing a conditional workflow", () => {
   it("a then branch can execute an http workflow", async () => {
     setupDom("result");
 
-    const mockFetch = globalThis.fetch = Object.assign(
+    const _mockFetch = globalThis.fetch = Object.assign(
       async (_url: string, _opts?: RequestInit) =>
         new Response(JSON.stringify({ ok: true }), { status: 200 }),
       { __isMock: true }

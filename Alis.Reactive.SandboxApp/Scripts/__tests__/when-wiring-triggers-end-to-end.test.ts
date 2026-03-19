@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { JSDOM } from "jsdom";
-import type { Plan } from "../types";
 
 let boot: typeof import("../lifecycle/boot").boot;
 
@@ -70,7 +69,7 @@ describe("trigger wiring end-to-end", () => {
   });
 
   it("custom-event fires multiple times", () => {
-    let count = 0;
+    const _count = 0;
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "tick" },
       reaction: { kind: "sequential", commands: [

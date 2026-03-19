@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { JSDOM } from "jsdom";
-import type { RequestDescriptor, ExecContext, Reaction, ConditionalReaction } from "../types";
+import type { RequestDescriptor, ConditionalReaction } from "../types";
 
 let execRequest: typeof import("../http/http").execRequest;
 let executeReaction: typeof import("../execution/execute").executeReaction;

@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { validate, clearAll } from "../validation";
+import { validate } from "../validation";
 import { TestWidget } from "../components/lab/test-widget";
 
 describe("when validating component values", () => {

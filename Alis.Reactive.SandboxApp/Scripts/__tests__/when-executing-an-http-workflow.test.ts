@@ -14,7 +14,7 @@ function hide(target: string): Command {
   return { kind: "mutate-element", target, mutation: { kind: "call", method: "setAttribute", args: [{ kind: "literal", value: "hidden" }, { kind: "literal", value: "" }] } };
 }
 
-function dispatch(event: string, payload?: Record<string, unknown>): Command {
+function _dispatch(event: string, payload?: Record<string, unknown>): Command {
   return { kind: "dispatch", event, payload };
 }
 

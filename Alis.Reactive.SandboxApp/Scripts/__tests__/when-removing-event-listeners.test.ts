@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { boot, mergePlan, getBootedPlan, resetBootStateForTests } from "../lifecycle/boot";
-import type { Plan, Entry } from "../types";
+import { boot, mergePlan, resetBootStateForTests } from "../lifecycle/boot";
+import type { Entry } from "../types";
 
 /**
  * Proves that event listeners are actually cleaned up when partials are
@@ -87,8 +87,8 @@ describe("After partial is reloaded 5 times", () => {
       });
     }
 
-    let fireCount = 0;
-    document.addEventListener("ping", () => { fireCount++; });
+    let _fireCount = 0;
+    document.addEventListener("ping", () => { _fireCount++; });
 
     // Fire the event that the partial listens for
     // The partial dispatches are already wired — we need a different approach

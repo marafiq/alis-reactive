@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { boot, getBootedPlan, resetBootStateForTests } from "../lifecycle/boot";
 import { injectHtml } from "../lifecycle/inject";
-import type { Plan } from "../types";
 
 beforeEach(() => {
   document.body.innerHTML = "";

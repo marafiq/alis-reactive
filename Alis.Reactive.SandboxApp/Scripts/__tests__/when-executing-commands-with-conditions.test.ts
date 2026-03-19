@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../lifecycle/boot";
-import type { Plan, Command, Branch } from "../types";
+import type { Command } from "../types";
 
 function es(path: string) {
   return { kind: "event" as const, path };

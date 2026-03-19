@@ -3,7 +3,6 @@ import { evalRead, resolveRoot } from "../resolution/component";
 import { wireTrigger } from "../execution/trigger";
 import { mutateElement } from "../execution/element";
 import { resolveGather } from "../http/gather";
-import { TestWidget } from "../components/lab/test-widget";
 
 describe("when failing fast on missing targets", () => {
   afterEach(() => { document.body.innerHTML = ""; });

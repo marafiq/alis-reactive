@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { boot } from "../lifecycle/boot";
-import type { Plan } from "../types";
+
 
 describe("when dispatching an event", () => {
   it("fires CustomEvent on document", () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { JSDOM } from "jsdom";
-import type { ParallelHttpReaction, HttpReaction, ExecContext } from "../types";
+import type { ParallelHttpReaction, HttpReaction } from "../types";
 
 let executeHttpReaction: typeof import("../http/pipeline").executeHttpReaction;
 let executeParallelHttpReaction: typeof import("../http/pipeline").executeParallelHttpReaction;

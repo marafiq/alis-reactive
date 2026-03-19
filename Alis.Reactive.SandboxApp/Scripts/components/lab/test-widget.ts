@@ -18,7 +18,7 @@ export class TestWidget {
   private _value: string;
   private _items: unknown[];
   private _focused: boolean;
-  private _listeners: Record<string, Function[]>;
+  private _listeners: Record<string, (...args: unknown[]) => void[]>;
 
   constructor(el: HTMLElement) {
     this._el = el;
@@ -122,12 +122,12 @@ export class TestWidget {
 
   // -- Event API (Syncfusion-compatible) --
 
-  addEventListener(event: string, fn: Function): void {
+  addEventListener(event: string, fn: (...args: unknown[]) => void): void {
     if (!this._listeners[event]) this._listeners[event] = [];
     this._listeners[event].push(fn);
   }
 
-  removeEventListener(event: string, fn: Function): void {
+  removeEventListener(event: string, fn: (...args: unknown[]) => void): void {
     const list = this._listeners[event];
     if (!list) return;
     this._listeners[event] = list.filter(f => f !== fn);
