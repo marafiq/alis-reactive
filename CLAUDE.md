@@ -555,26 +555,26 @@ restart before running Playwright.
 # Full test suite — run all from the repo root:
 cd /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive
 
-# 1. TS unit tests (vitest + jsdom) — 432 tests
+# 1. TS unit tests (vitest + jsdom) — 894 tests
 npm test
 
-# 2. C# unit + schema tests — 150 tests
+# 2. C# unit + schema tests — 155 tests
 dotnet test tests/Alis.Reactive.UnitTests
 
-# 3. Native component unit tests — 35 tests
+# 3. Native component unit tests — 46 tests
 dotnet test tests/Alis.Reactive.Native.UnitTests
 
-# 4. Fusion component unit tests — 61 tests
+# 4. Fusion component unit tests — 58 tests
 dotnet test tests/Alis.Reactive.Fusion.UnitTests
 
-# 5. FluentValidator unit tests — 43 tests
+# 5. FluentValidator unit tests — 50 tests
 dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 
-# 6. Playwright browser tests (browser behavior) — 186 tests
+# 6. Playwright browser tests (browser behavior) — 481 tests
 dotnet test tests/Alis.Reactive.PlaywrightTests
 ```
 
-**Total: 907 tests (432 TS + 289 C# unit + 186 Playwright)**
+**Total: ~1,700 tests (894 TS + 326 C# unit + 481 Playwright)**
 
 If any test fails, fix the issue and re-run ALL tests before committing.
 Never commit with failing tests. Never skip Playwright.

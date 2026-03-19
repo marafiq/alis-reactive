@@ -9,11 +9,10 @@
 - [x] `root.ts` — PASS. One justified wide selector for plan discovery
 
 ## Remaining
-- [ ] Flaky SF ComboBox Playwright test — appears every run, needs root cause
-- [ ] Sequence diagrams outdated — directory structure changed (http/ merged into execution/, inject moved)
 - [ ] Memory files stale — validation-multiselect-bug.md (fixed), test counts, next-session file
 - [ ] CLAUDE.md test counts outdated (still says 907)
 - [ ] Update SOLID skill with session learnings (tree walker pattern, isHidden lesson, no rubber-stamping)
+- [ ] Sequence diagrams outdated — directory structure changed (http/ merged into execution/, inject moved)
 
 ## Done This Session
 - [x] assertNever on all switches
