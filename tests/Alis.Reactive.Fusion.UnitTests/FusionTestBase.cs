@@ -18,6 +18,7 @@ public class FusionTestModel
     public DateTime? AppointmentTime { get; set; }
     public DateTime? StayStart { get; set; }
     public DateTime? StayEnd { get; set; }
+    public string? PhoneNumber { get; set; }
 }
 
 [TestFixture]
