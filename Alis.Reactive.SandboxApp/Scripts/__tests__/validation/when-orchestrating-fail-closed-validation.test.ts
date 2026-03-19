@@ -29,32 +29,33 @@ function desc(formId: string, fields: ValidationField[]): ValidationDescriptor {
   return { formId, planId: "Test.Plan", fields };
 }
 
-function errSpan(fieldName: string): string {
-  return `<span data-valmsg-for="${fieldName}" hidden style="display:none"></span>`;
+function errSpan(fieldName: string, fieldId?: string): string {
+  const idAttr = fieldId ? ` id="${fieldId}_error"` : "";
+  return `<span${idAttr} data-valmsg-for="${fieldName}" hidden style="display:none"></span>`;
 }
 
 beforeEach(async () => {
   const dom = new JSDOM(`<!DOCTYPE html><html><body>
     <form id="form">
       <input id="Name" name="Name" value="" />
-      ${errSpan("Name")}
+      ${errSpan("Name", "Name")}
 
       <input id="Email" name="Email" value="" />
-      ${errSpan("Email")}
+      ${errSpan("Email", "Email")}
 
       <div id="hiddenWrapper" hidden>
         <input id="HiddenField" name="HiddenField" value="" />
-        ${errSpan("HiddenField")}
+        ${errSpan("HiddenField", "HiddenField")}
       </div>
 
       <input id="VisibleField" name="VisibleField" value="" />
-      ${errSpan("VisibleField")}
+      ${errSpan("VisibleField", "VisibleField")}
 
       <input id="IsVet" name="IsVet" type="checkbox" />
       <input id="VetId" name="VetId" value="" />
-      ${errSpan("VetId")}
+      ${errSpan("VetId", "VetId")}
     </form>
-    <div data-alis-validation-summary="Test.Plan" hidden></div>
+    <div id="Test_Plan_validation_summary" data-alis-validation-summary="Test.Plan" hidden></div>
   </body></html>`);
 
   (globalThis as any).document = dom.window.document;

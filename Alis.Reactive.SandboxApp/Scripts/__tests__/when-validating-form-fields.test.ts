@@ -21,36 +21,37 @@ function makeDesc(formId: string, fields: ValidationField[]): ValidationDescript
   return { formId, fields };
 }
 
-function errSpan(fieldName: string): string {
-  return `<span data-valmsg-for="${fieldName}"></span>`;
+function errSpan(fieldName: string, fieldId?: string): string {
+  const idAttr = fieldId ? ` id="${fieldId}_error"` : "";
+  return `<span${idAttr} data-valmsg-for="${fieldName}" hidden></span>`;
 }
 
 beforeEach(async () => {
   const dom = new JSDOM(`<!DOCTYPE html><html><body>
     <form id="testForm">
-      <div><input id="Name" name="Name" value="" />${errSpan("Name")}</div>
-      <div><input id="Email" name="Email" value="" />${errSpan("Email")}</div>
-      <div><input id="Phone" name="Phone" value="" />${errSpan("Phone")}</div>
-      <div><input id="Age" name="Age" type="number" value="" />${errSpan("Age")}</div>
-      <div><input id="Website" name="Website" value="" />${errSpan("Website")}</div>
-      <div><input id="Salary" name="Salary" type="number" value="" />${errSpan("Salary")}</div>
+      <div><input id="Name" name="Name" value="" />${errSpan("Name", "Name")}</div>
+      <div><input id="Email" name="Email" value="" />${errSpan("Email", "Email")}</div>
+      <div><input id="Phone" name="Phone" value="" />${errSpan("Phone", "Phone")}</div>
+      <div><input id="Age" name="Age" type="number" value="" />${errSpan("Age", "Age")}</div>
+      <div><input id="Website" name="Website" value="" />${errSpan("Website", "Website")}</div>
+      <div><input id="Salary" name="Salary" type="number" value="" />${errSpan("Salary", "Salary")}</div>
 
       <input id="Password" name="Password" type="password" value="" />
-      ${errSpan("Password")}
+      ${errSpan("Password", "Password")}
 
       <input id="ConfirmPassword" name="ConfirmPassword" type="password" value="" />
-      ${errSpan("ConfirmPassword")}
+      ${errSpan("ConfirmPassword", "ConfirmPassword")}
 
       <input id="Tags" name="Tags" value="" />
-      ${errSpan("Tags")}
+      ${errSpan("Tags", "Tags")}
 
       <div><input id="IsEmployed" name="IsEmployed" type="checkbox" /></div>
-      <div><input id="JobTitle" name="JobTitle" value="" />${errSpan("JobTitle")}</div>
-      <div><input id="Address_Street" name="Address.Street" value="" />${errSpan("Address.Street")}</div>
-      <div><input id="Address_City" name="Address.City" value="" />${errSpan("Address.City")}</div>
-      <div><div id="FusionDrop"></div>${errSpan("FusionDrop")}</div>
+      <div><input id="JobTitle" name="JobTitle" value="" />${errSpan("JobTitle", "JobTitle")}</div>
+      <div><input id="Address_Street" name="Address.Street" value="" />${errSpan("Address.Street", "Address_Street")}</div>
+      <div><input id="Address_City" name="Address.City" value="" />${errSpan("Address.City", "Address_City")}</div>
+      <div><div id="FusionDrop"></div>${errSpan("FusionDrop", "FusionDrop")}</div>
       <div id="hiddenField" style="display:none">
-        <div><input id="HiddenInput" name="HiddenInput" value="" />${errSpan("HiddenInput")}</div>
+        <div><input id="HiddenInput" name="HiddenInput" value="" />${errSpan("HiddenInput", "HiddenInput")}</div>
       </div>
     </form>
     <div data-alis-validation-summary hidden></div>
@@ -69,7 +70,9 @@ beforeEach(async () => {
 });
 
 function errorSpan(fieldName: string): HTMLSpanElement | null {
-  return document.querySelector(`span[data-valmsg-for="${fieldName}"]`);
+  // For nested fields (Address.Street), the fieldId uses underscores (Address_Street)
+  const fieldId = fieldName.replace(/\./g, "_");
+  return document.getElementById(fieldId + "_error") as HTMLSpanElement | null;
 }
 
 // ── validate — required ───────────────────────────────────

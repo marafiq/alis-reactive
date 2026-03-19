@@ -137,7 +137,7 @@ export function showServerErrors(desc: ValidationDescriptor, data: unknown): voi
   for (const [name, msgs] of Object.entries(errors)) {
     const msg = Array.isArray(msgs) ? msgs.join(", ") : String(msgs);
 
-    const spanExists = findErrorSpanExists(desc.formId, name, desc.fields);
+    const spanExists = findErrorSpanExists(name, desc.fields);
     if (spanExists) {
       showServerErrorInline(desc.formId, name, msg, desc.fields);
     } else if (summaryEl) {
@@ -215,14 +215,10 @@ function buildByName(desc: ValidationDescriptor): Map<string, ValidationField> {
   return map;
 }
 
-function findErrorSpanExists(containerId: string, fieldName: string, fields: ValidationField[]): boolean {
-  // Try ID-based lookup first: {fieldId}_error
+function findErrorSpanExists(fieldName: string, fields: ValidationField[]): boolean {
   const field = fields.find(f => f.fieldName === fieldName);
-  if (field?.fieldId && document.getElementById(field.fieldId + "_error")) return true;
-  // Fallback: querySelector scan
-  const container = document.getElementById(containerId);
-  if (!container) return false;
-  return container.querySelector(`span[data-valmsg-for="${fieldName}"]`) !== null;
+  if (!field?.fieldId) return false;
+  return document.getElementById(field.fieldId + "_error") !== null;
 }
 
 /** Visibility check — owned by orchestrator (routing decision), not error-display. */

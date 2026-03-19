@@ -379,7 +379,7 @@ describe("When validate() is called after partial merge", () => {
     document.body.innerHTML = `
       <form id="form">
         <input id="zip" name="Address.ZipCode" value="bad" />
-        <span data-valmsg-for="Address.ZipCode"></span>
+        <span id="zip_error" data-valmsg-for="Address.ZipCode" hidden></span>
       </form>
     `;
 
@@ -413,7 +413,7 @@ describe("When validate() is called after partial merge", () => {
     expect(descAfter.fields[0].fieldId).toBe("zip");
     expect(validate(descAfter)).toBe(false);
 
-    const span = document.querySelector('span[data-valmsg-for="Address.ZipCode"]');
+    const span = document.getElementById("zip_error");
     expect(span!.textContent).toBe("5 digits");
   });
 });

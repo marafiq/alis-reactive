@@ -20,49 +20,50 @@ function makeDesc(formId: string, fields: ValidationField[]): ValidationDescript
   return { formId, fields };
 }
 
-function errSpan(fieldName: string): string {
-  return `<span data-valmsg-for="${fieldName}" hidden style="display:none"></span>`;
+function errSpan(fieldName: string, fieldId?: string): string {
+  const idAttr = fieldId ? ` id="${fieldId}_error"` : "";
+  return `<span${idAttr} data-valmsg-for="${fieldName}" hidden style="display:none"></span>`;
 }
 
 beforeEach(async () => {
   const dom = new JSDOM(`<!DOCTYPE html><html><body>
     <form id="testForm">
       <input id="Name" name="Name" value="" />
-      ${errSpan("Name")}
+      ${errSpan("Name", "Name")}
 
       <input id="Email" name="Email" value="" />
-      ${errSpan("Email")}
+      ${errSpan("Email", "Email")}
 
       <input id="Phone" name="Phone" value="" />
-      ${errSpan("Phone")}
+      ${errSpan("Phone", "Phone")}
 
       <input id="IsEmployed" name="IsEmployed" type="checkbox" />
 
       <input id="JobTitle" name="JobTitle" value="" />
-      ${errSpan("JobTitle")}
+      ${errSpan("JobTitle", "JobTitle")}
 
       <input id="CareLevel" name="CareLevel" value="" />
-      ${errSpan("CareLevel")}
+      ${errSpan("CareLevel", "CareLevel")}
 
       <input id="Physician" name="Physician" value="" />
-      ${errSpan("Physician")}
+      ${errSpan("Physician", "Physician")}
 
       <input id="HasContact" name="HasContact" type="checkbox" />
 
       <input id="Reason" name="Reason" value="" />
-      ${errSpan("Reason")}
+      ${errSpan("Reason", "Reason")}
 
       <div id="FusionDrop"></div>
-      ${errSpan("FusionDrop")}
+      ${errSpan("FusionDrop", "FusionDrop")}
 
       <div id="hiddenSection" hidden>
         <input id="HiddenField" name="HiddenField" value="" />
-        ${errSpan("HiddenField")}
+        ${errSpan("HiddenField", "HiddenField")}
       </div>
 
       <div id="visibleSection">
         <input id="VisibleField" name="VisibleField" value="" />
-        ${errSpan("VisibleField")}
+        ${errSpan("VisibleField", "VisibleField")}
       </div>
     </form>
     <div data-alis-validation-summary hidden></div>
@@ -79,7 +80,9 @@ beforeEach(async () => {
 });
 
 function errorSpan(fieldName: string): HTMLSpanElement | null {
-  return document.querySelector(`span[data-valmsg-for="${fieldName}"]`);
+  // For nested fields (Address.Street), the fieldId uses underscores (Address_Street)
+  const fieldId = fieldName.replace(/\./g, "_");
+  return document.getElementById(fieldId + "_error") as HTMLSpanElement | null;
 }
 
 // ── Form container contract ─────────────────────────────
@@ -284,11 +287,11 @@ describe("When server error field has a visible error span", () => {
 });
 
 describe("When server error field has no matching field in descriptor", () => {
-  it("still shows in the error span if it exists in DOM", () => {
+  it("does not show inline — no field to resolve span ID", () => {
     const desc = makeDesc("testForm", []);
     showServerErrors(desc, { errors: { Name: ["Orphan error"] } });
-    // The span exists in DOM but no matching field — span still gets populated
-    expect(errorSpan("Name")!.textContent).toBe("Orphan error");
+    // No matching field in descriptor → findErrorSpan can't resolve ID → not shown inline
+    expect(errorSpan("Name")!.textContent).toBe("");
   });
 });
 

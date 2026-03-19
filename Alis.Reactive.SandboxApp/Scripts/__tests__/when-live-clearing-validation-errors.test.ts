@@ -246,7 +246,7 @@ describe("when live-clearing validation errors", () => {
           <div>
             <label for="Name">Name</label>
             <input id="Name" name="Name" type="text" value="" />
-            ${errSpan("Name")}
+            ${errSpan("Name", "Name")}
           </div>
         </form>
         <div id="TestPlan_validation_summary" data-alis-validation-summary="TestPlan" hidden></div>
@@ -390,15 +390,15 @@ describe("when live-clearing validation errors", () => {
           </div>
           <div>
             <input id="Company" name="Company" value="" />
-            ${errSpan("Company")}
+            ${errSpan("Company", "Company")}
           </div>
           <div>
             <select id="Country" name="Country"><option value="">--</option><option value="US">US</option></select>
-            ${errSpan("Country")}
+            ${errSpan("Country", "Country")}
           </div>
           <div>
             <input id="State" name="State" value="" />
-            ${errSpan("State")}
+            ${errSpan("State", "State")}
           </div>
         </form>
       </body></html>`);

@@ -12,8 +12,9 @@ describe("when validating component values", () => {
     return form;
   }
 
-  function addErrorSpan(form: HTMLElement, fieldName: string): void {
+  function addErrorSpan(form: HTMLElement, fieldName: string, fieldId?: string): void {
     const span = document.createElement("span");
+    if (fieldId) span.id = fieldId + "_error";
     span.setAttribute("data-valmsg-for", fieldName);
     span.setAttribute("hidden", "");
     span.style.display = "none";
@@ -24,7 +25,7 @@ describe("when validating component values", () => {
     const input = document.createElement("input");
     input.id = id; input.value = value;
     form.appendChild(input);
-    addErrorSpan(form, id);
+    addErrorSpan(form, id, id);
     return input;
   }
 
@@ -35,12 +36,12 @@ describe("when validating component values", () => {
     widget.value = value;
     (el as any).ej2_instances = [widget];
     form.appendChild(el);
-    addErrorSpan(form, id);
+    addErrorSpan(form, id, id);
     return widget;
   }
 
   function errorSpan(formId: string, fieldName: string): HTMLElement | null {
-    return document.querySelector(`#${formId} span[data-valmsg-for="${fieldName}"]`);
+    return document.getElementById(fieldName + "_error");
   }
 
   describe("native vendor", () => {

@@ -4,8 +4,9 @@
 // Orchestrator decides WHERE to route — this module only executes display.
 // Vendor-agnostic: never touches ej2_instances or vendor-specific APIs.
 //
-// Error spans are found by predictable ID: {fieldId}_error (O(1) lookup).
-// Fallback to querySelector for server errors where only fieldName is available.
+// Error spans found by predictable ID: {fieldId}_error (O(1) lookup).
+// Summary found by predictable ID: {planId_sanitized}_validation_summary.
+// No fallbacks. No querySelector scanning. ID-aware only.
 
 import type { ValidationField } from "../types";
 
@@ -19,7 +20,7 @@ export function showInline(formId: string, field: ValidationField, message: stri
     if (el) el.classList.add(ERR_CLASS);
   }
 
-  const span = findErrorSpanForField(field) ?? findErrorSpanByName(formId, field.fieldName);
+  const span = findErrorSpan(field);
   if (span) {
     span.textContent = message;
     span.removeAttribute("hidden");
@@ -28,7 +29,7 @@ export function showInline(formId: string, field: ValidationField, message: stri
 }
 
 export function clearInline(formId: string, field: ValidationField): void {
-  const span = findErrorSpanForField(field) ?? findErrorSpanByName(formId, field.fieldName);
+  const span = findErrorSpan(field);
   if (span) {
     span.textContent = "";
     span.setAttribute("hidden", "");
@@ -72,18 +73,15 @@ export function hideSummaryDiv(summaryEl: HTMLElement): void {
 
 export function findSummaryElement(planId?: string): HTMLElement | null {
   if (!planId) return null;
-  // ID-based lookup: {planId with dots→underscores}_validation_summary
   const summaryId = planId.replace(/[.+]/g, "_") + "_validation_summary";
-  return document.getElementById(summaryId)
-    // Fallback: data attribute scan (backward compat for manually rendered summaries)
-    ?? document.querySelector(`[data-alis-validation-summary="${planId}"]`);
+  return document.getElementById(summaryId);
 }
 
 // ── Server error inline display ─────────────────────────
 
 export function showServerErrorInline(formId: string, fieldName: string, message: string, fields: ValidationField[]): void {
   const field = fields.find(f => f.fieldName === fieldName);
-  const span = (field ? findErrorSpanForField(field) : null) ?? findErrorSpanByName(formId, fieldName);
+  const span = field ? findErrorSpan(field) : null;
   if (span) {
     span.textContent = message;
     span.removeAttribute("hidden");
@@ -96,17 +94,10 @@ export function showServerErrorInline(formId: string, fieldName: string, message
   }
 }
 
-// ── Error span lookup ───────────────────────────────────
+// ── Error span lookup — ID only, no scanning ────────────
 
 /** ID-based lookup: O(1). Convention: {fieldId}_error. */
-function findErrorSpanForField(field: ValidationField): HTMLElement | null {
+function findErrorSpan(field: ValidationField): HTMLElement | null {
   if (!field.fieldId) return null;
   return document.getElementById(field.fieldId + "_error");
-}
-
-/** Fallback: querySelector scan within form container. Used when only fieldName is available. */
-function findErrorSpanByName(containerId: string, fieldName: string): HTMLElement | null {
-  const container = document.getElementById(containerId);
-  if (!container) return null;
-  return container.querySelector(`span[data-valmsg-for="${fieldName}"]`);
 }
