@@ -25,7 +25,9 @@ export function executeReaction(reaction: Reaction, ctx?: ExecContext): void {
   // Single async check at the top — if any guard in the tree is a ConfirmGuard,
   // delegate to the async path. Zero overhead for the common sync case.
   if (needsAsync(reaction)) {
-    dispatchAsync(reaction, ctx);
+    dispatchAsync(reaction, ctx).catch(err =>
+      log.error("async reaction failed", { error: String(err) })
+    );
     return;
   }
 
