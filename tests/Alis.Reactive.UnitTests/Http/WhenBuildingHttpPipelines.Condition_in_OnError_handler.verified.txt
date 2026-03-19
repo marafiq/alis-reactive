@@ -1,0 +1,70 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: submit
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/save,
+          gather: [
+            {
+              kind: static,
+              param: data,
+              value: x
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: ok,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          onError: [
+            {
+              statusCode: 400,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: error,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                },
+                {
+                  kind: validation-errors,
+                  formId: form
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

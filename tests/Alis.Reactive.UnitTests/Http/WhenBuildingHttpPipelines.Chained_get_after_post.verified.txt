@@ -1,0 +1,58 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/save,
+          gather: [
+            {
+              kind: static,
+              param: name,
+              value: John
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: save-status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: saved
+                }
+              ]
+            }
+          ],
+          chained: {
+            verb: GET,
+            url: /api/list,
+            onSuccess: [
+              {
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: list,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: refreshed
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

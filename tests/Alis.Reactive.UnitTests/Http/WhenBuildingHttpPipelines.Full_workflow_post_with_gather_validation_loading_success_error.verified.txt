@@ -1,0 +1,155 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: save-resident
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/residents,
+          gather: [
+            {
+              kind: static,
+              param: name,
+              value: Margaret
+            },
+            {
+              kind: all
+            }
+          ],
+          whileLoading: [
+            {
+              kind: mutate-element,
+              target: spinner,
+              mutation: {
+                kind: call,
+                method: removeAttribute,
+                args: [
+                  {
+                    kind: literal,
+                    value: hidden
+                  }
+                ]
+              }
+            },
+            {
+              kind: mutate-element,
+              target: save-btn,
+              mutation: {
+                kind: call,
+                method: setAttribute,
+                args: [
+                  {
+                    kind: literal,
+                    value: hidden
+                  },
+                  {
+                    kind: literal,
+                    value: 
+                  }
+                ]
+              }
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: spinner,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                },
+                {
+                  kind: mutate-element,
+                  target: save-btn,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                },
+                {
+                  kind: mutate-element,
+                  target: result,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  source: {
+                    kind: event,
+                    path: responseBody.id
+                  }
+                }
+              ]
+            }
+          ],
+          onError: [
+            {
+              statusCode: 400,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: spinner,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                },
+                {
+                  kind: mutate-element,
+                  target: save-btn,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                },
+                {
+                  kind: validation-errors,
+                  formId: resident-form
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

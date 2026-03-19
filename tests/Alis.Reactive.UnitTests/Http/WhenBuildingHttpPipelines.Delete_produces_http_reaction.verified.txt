@@ -1,0 +1,32 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: DELETE,
+          url: /api/residents/42,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: deleted
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

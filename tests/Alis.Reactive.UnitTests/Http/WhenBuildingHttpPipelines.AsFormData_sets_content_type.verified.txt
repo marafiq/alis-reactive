@@ -1,0 +1,38 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/upload,
+          gather: [
+            {
+              kind: all
+            }
+          ],
+          contentType: form-data,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: result,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: uploaded
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

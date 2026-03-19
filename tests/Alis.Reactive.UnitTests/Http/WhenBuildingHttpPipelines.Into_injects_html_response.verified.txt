@@ -1,0 +1,27 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: GET,
+          url: /api/partial,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: into,
+                  target: container
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

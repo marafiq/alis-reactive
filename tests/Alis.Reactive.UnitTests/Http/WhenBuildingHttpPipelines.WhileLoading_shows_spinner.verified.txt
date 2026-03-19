@@ -1,0 +1,89 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: GET,
+          url: /api/slow,
+          whileLoading: [
+            {
+              kind: mutate-element,
+              target: spinner,
+              mutation: {
+                kind: call,
+                method: removeAttribute,
+                args: [
+                  {
+                    kind: literal,
+                    value: hidden
+                  }
+                ]
+              }
+            },
+            {
+              kind: mutate-element,
+              target: content,
+              mutation: {
+                kind: call,
+                method: setAttribute,
+                args: [
+                  {
+                    kind: literal,
+                    value: hidden
+                  },
+                  {
+                    kind: literal,
+                    value: 
+                  }
+                ]
+              }
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: spinner,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                },
+                {
+                  kind: mutate-element,
+                  target: content,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

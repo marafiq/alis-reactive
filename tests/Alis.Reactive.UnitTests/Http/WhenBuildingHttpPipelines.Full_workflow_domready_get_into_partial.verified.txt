@@ -1,0 +1,95 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        preFetch: [
+          {
+            kind: mutate-element,
+            target: loader,
+            mutation: {
+              kind: call,
+              method: removeAttribute,
+              args: [
+                {
+                  kind: literal,
+                  value: hidden
+                }
+              ]
+            }
+          }
+        ],
+        request: {
+          verb: GET,
+          url: /api/dashboard,
+          whileLoading: [
+            {
+              kind: mutate-element,
+              target: shimmer,
+              mutation: {
+                kind: call,
+                method: removeAttribute,
+                args: [
+                  {
+                    kind: literal,
+                    value: hidden
+                  }
+                ]
+              }
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: loader,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                },
+                {
+                  kind: mutate-element,
+                  target: shimmer,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                },
+                {
+                  kind: into,
+                  target: dashboard-content
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

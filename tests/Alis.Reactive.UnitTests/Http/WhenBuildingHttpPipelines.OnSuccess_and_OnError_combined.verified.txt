@@ -1,0 +1,72 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: submit
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/submit,
+          gather: [
+            {
+              kind: static,
+              param: data,
+              value: test
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: id,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  source: {
+                    kind: event,
+                    path: responseBody.id
+                  }
+                },
+                {
+                  kind: mutate-element,
+                  target: status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: success
+                }
+              ]
+            }
+          ],
+          onError: [
+            {
+              statusCode: 422,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: invalid
+                },
+                {
+                  kind: validation-errors,
+                  formId: form
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

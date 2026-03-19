@@ -1,0 +1,69 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: parallel-http,
+        preFetch: [
+          {
+            kind: mutate-element,
+            target: spinner,
+            mutation: {
+              kind: call,
+              method: removeAttribute,
+              args: [
+                {
+                  kind: literal,
+                  value: hidden
+                }
+              ]
+            }
+          }
+        ],
+        requests: [
+          {
+            verb: GET,
+            url: /api/a,
+            onSuccess: [
+              {
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: a,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: done
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            verb: GET,
+            url: /api/b,
+            onSuccess: [
+              {
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: b,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: done
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
