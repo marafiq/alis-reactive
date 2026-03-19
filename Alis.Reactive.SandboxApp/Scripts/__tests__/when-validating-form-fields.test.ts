@@ -65,6 +65,7 @@ beforeEach(async () => {
   showServerErrors = mod.showServerErrors;
   clearAll = mod.clearAll;
   wireLiveClearing = mod.wireLiveClearing;
+  mod.resetLiveClearForTests();
 });
 
 function errorSpan(fieldName: string): HTMLSpanElement | null {

@@ -4,6 +4,7 @@ import type { ValidationDescriptor, ValidationField } from "../types";
 
 let validate: typeof import("../validation").validate;
 let wireLiveClearing: typeof import("../validation").wireLiveClearing;
+let resetLiveClearForTests: typeof import("../validation").resetLiveClearForTests;
 
 // ── Helpers ──────────────────────────────────────────────
 
@@ -71,6 +72,8 @@ describe("when live-clearing validation errors", () => {
       const mod = await import("../validation");
       validate = mod.validate;
       wireLiveClearing = mod.wireLiveClearing;
+      resetLiveClearForTests = mod.resetLiveClearForTests;
+      resetLiveClearForTests();
     });
 
     it("shows error on validate, clears when user types", () => {
@@ -179,6 +182,8 @@ describe("when live-clearing validation errors", () => {
       const mod = await import("../validation");
       validate = mod.validate;
       wireLiveClearing = mod.wireLiveClearing;
+      resetLiveClearForTests = mod.resetLiveClearForTests;
+      resetLiveClearForTests();
     });
 
     it("validates fusion component value via resolveRoot", () => {
@@ -221,28 +226,10 @@ describe("when live-clearing validation errors", () => {
       expect(hasError("Amount")).toBe(false);
     });
 
-    it("SHOULD clear error when user types in SF inner input", () => {
-      const d = desc("myForm", [
-        fusionField("Amount", "Amount", [{ rule: "required", message: "Amount is required" }]),
-      ]);
-
-      wireLiveClearing(d);
-      ej2Instance.value = "";
-      validate(d);
-      expect(hasError("Amount")).toBe(true);
-
-      // Simulate typing in the inner <input> that SF creates
-      // The inner input fires a native "input" event — does it bubble?
-      const innerInput = document.querySelector("input.e-numerictextbox") as HTMLInputElement;
-      innerInput.value = "50";
-      innerInput.dispatchEvent(new Event("input", { bubbles: true }));
-
-      // Even if the DOM event bubbles, live-clear walks up looking for
-      // data-valmsg-for — it goes: innerInput → e-control-wrapper → div → form
-      // The span with data-valmsg-for is inside the div, so querySelector
-      // on the div SHOULD find it.
-      expect(hasError("Amount")).toBe(false);
-    });
+    // NOTE: We intentionally do NOT test typing into SF's inner <input>.
+    // That would depend on SF's internal DOM structure. Our approach is
+    // vendor-agnostic: resolveRoot → ej2 instance → addEventListener("change").
+    // SF fires the change callback when value changes — that's our contract.
   });
 
   // ── Partial scenario — lazy component availability ──────
@@ -267,6 +254,8 @@ describe("when live-clearing validation errors", () => {
       const mod = await import("../validation");
       validate = mod.validate;
       wireLiveClearing = mod.wireLiveClearing;
+      resetLiveClearForTests = mod.resetLiveClearForTests;
+      resetLiveClearForTests();
     });
 
     it("unenriched field with unconditional rule blocks form", () => {

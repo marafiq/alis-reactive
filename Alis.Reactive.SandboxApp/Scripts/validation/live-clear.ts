@@ -1,46 +1,49 @@
-// Live Clear — Wires input/change events to auto-clear field errors
+// Live Clear — Per-field event wiring to auto-clear validation errors
 //
-// Single responsibility: one-time event wiring per form container.
-// Delegates actual clearing to error-display module.
-// Vendor-agnostic: Html.InputField() wraps every input + error span in a div.
-// The event bubbles from the input (native or fusion inner) through the
-// field wrapper which contains data-valmsg-for. We match by finding
-// the error span in the target's ancestry and looking up the field by name.
+// Vendor-agnostic: uses resolveRoot() for both native and fusion components.
+// Native: listens for "input" + "change" on the DOM element.
+// Fusion: listens for "change" on the ej2 instance (SF callback, not DOM event).
+// Tracks wired fields by ID to prevent double-wiring on partial merge.
 
-import type { ValidationDescriptor } from "../types";
+import type { ValidationDescriptor, ValidationField } from "../types";
+import { resolveRoot } from "../resolution/component";
 import { clearInline } from "./error-display";
 
+/** Set of fieldIds already wired — prevents double-wiring on partial reload. */
+const wiredFields = new Set<string>();
+
 export function wireLiveClearing(desc: ValidationDescriptor): void {
-  const container = document.getElementById(desc.formId);
-  if (!container || container.dataset.alisValidated) return;
-  container.dataset.alisValidated = "true";
+  for (const field of desc.fields) {
+    wireField(desc.formId, field);
+  }
+}
 
-  // Build name→field lookup
-  const byName = new Map(desc.fields.map(f => [f.fieldName, f]));
+function wireField(formId: string, field: ValidationField): void {
+  // Only wire enriched fields — unenriched fields have no component to listen on
+  if (!field.fieldId || !field.vendor) return;
 
-  const handler = (e: Event) => {
-    const target = e.target as HTMLElement;
+  // Already wired — skip (partial reload dedup)
+  if (wiredFields.has(field.fieldId)) return;
+  wiredFields.add(field.fieldId);
 
-    // Walk up from target to find the field wrapper's error span.
-    // Html.InputField renders: <div> <label/> <input/> <span data-valmsg-for="Name"/> </div>
-    // The input and span are siblings inside the wrapper div.
-    let node: HTMLElement | null = target.parentElement;
-    while (node && node !== container) {
-      const span = node.querySelector<HTMLElement>("[data-valmsg-for]");
-      if (span) {
-        const fieldName = span.getAttribute("data-valmsg-for");
-        if (fieldName) {
-          const field = byName.get(fieldName);
-          if (field) {
-            clearInline(desc.formId, field);
-            return;
-          }
-        }
-      }
-      node = node.parentElement;
-    }
-  };
+  const el = document.getElementById(field.fieldId);
+  if (!el) return; // Element not in DOM yet (lazy partial)
 
-  container.addEventListener("input", handler);
-  container.addEventListener("change", handler);
+  const clearHandler = () => clearInline(formId, field);
+
+  if (field.vendor === "native") {
+    // Native DOM elements fire standard input/change events
+    el.addEventListener("input", clearHandler);
+    el.addEventListener("change", clearHandler);
+  } else {
+    // Fusion (and future vendors): listen on the vendor root
+    // SF ej2 instances implement addEventListener for their callbacks
+    const root = resolveRoot(el, field.vendor);
+    (root as EventTarget).addEventListener("change", clearHandler);
+  }
+}
+
+/** Reset for tests — clears the wired set so tests start clean. */
+export function resetLiveClearForTests(): void {
+  wiredFields.clear();
 }

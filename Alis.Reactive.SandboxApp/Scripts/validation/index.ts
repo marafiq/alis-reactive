@@ -4,4 +4,4 @@
 // This barrel re-export provides the public surface.
 
 export { validate, showServerErrors, clearAll } from "./orchestrator";
-export { wireLiveClearing } from "./live-clear";
+export { wireLiveClearing, resetLiveClearForTests } from "./live-clear";
