@@ -45,6 +45,31 @@ public class WhenRenderingValidationSummary : TagHelperTestBase
     }
 
     [Test]
+    public void Renders_predictable_id_from_plan_id()
+    {
+        var tagHelper = new NativeValidationSummaryTagHelper { PlanId = "My.App.Models.ResidentModel" };
+        var context = CreateContext("native-validation-summary");
+        var output = CreateOutput("native-validation-summary");
+
+        tagHelper.Process(context, output);
+
+        Assert.That(output.Attributes["id"]?.Value?.ToString(),
+            Is.EqualTo("My_App_Models_ResidentModel_validation_summary"));
+    }
+
+    [Test]
+    public void Omits_id_when_plan_id_is_null()
+    {
+        var tagHelper = new NativeValidationSummaryTagHelper();
+        var context = CreateContext("native-validation-summary");
+        var output = CreateOutput("native-validation-summary");
+
+        tagHelper.Process(context, output);
+
+        Assert.That(output.Attributes.ContainsName("id"), Is.False);
+    }
+
+    [Test]
     public void Applies_user_css_class()
     {
         var tagHelper = new NativeValidationSummaryTagHelper { PlanId = "plan-1", CssClass = "mt-4" };

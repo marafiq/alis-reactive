@@ -249,7 +249,7 @@ describe("when live-clearing validation errors", () => {
             ${errSpan("Name")}
           </div>
         </form>
-        <div data-alis-validation-summary="TestPlan" hidden></div>
+        <div id="TestPlan_validation_summary" data-alis-validation-summary="TestPlan" hidden></div>
       </body></html>`);
 
       (globalThis as any).document = dom.window.document;
@@ -334,14 +334,14 @@ describe("when live-clearing validation errors", () => {
         <form id="myForm">
           <div>
             <input id="VisibleField" name="Visible" value="" />
-            ${errSpan("Visible")}
+            ${errSpan("Visible", "VisibleField")}
           </div>
           <div hidden>
             <input id="HiddenField" name="Hidden" value="" />
-            ${errSpan("Hidden")}
+            ${errSpan("Hidden", "HiddenField")}
           </div>
         </form>
-        <div data-alis-validation-summary="TestPlan" hidden></div>
+        <div id="TestPlan_validation_summary" data-alis-validation-summary="TestPlan" hidden></div>
       </body></html>`);
 
       (globalThis as any).document = dom.window.document;
@@ -358,7 +358,7 @@ describe("when live-clearing validation errors", () => {
       ], "TestPlan");
 
       validate(d);
-      expect(errorText("Visible")).toBe("visible required");
+      expect(errorText("VisibleField")).toBe("visible required");
       expect(hasError("VisibleField")).toBe(true);
     });
 
@@ -370,10 +370,10 @@ describe("when live-clearing validation errors", () => {
       validate(d);
 
       // Inline error should NOT be shown for hidden fields
-      expect(errorText("Hidden")).toBe("");
+      expect(errorText("HiddenField")).toBe("");
 
       // Error should be in summary instead
-      const summary = document.querySelector("[data-alis-validation-summary]")!;
+      const summary = document.getElementById("TestPlan_validation_summary")!;
       expect(summary.hasAttribute("hidden")).toBe(false); // summary shown
       expect(summary.querySelector("[data-valmsg-summary-for='Hidden']")?.textContent).toBe("hidden required");
     });

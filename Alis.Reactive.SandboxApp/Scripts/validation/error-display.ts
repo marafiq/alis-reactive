@@ -72,7 +72,11 @@ export function hideSummaryDiv(summaryEl: HTMLElement): void {
 
 export function findSummaryElement(planId?: string): HTMLElement | null {
   if (!planId) return null;
-  return document.querySelector(`[data-alis-validation-summary="${planId}"]`);
+  // ID-based lookup: {planId with dots→underscores}_validation_summary
+  const summaryId = planId.replace(/[.+]/g, "_") + "_validation_summary";
+  return document.getElementById(summaryId)
+    // Fallback: data attribute scan (backward compat for manually rendered summaries)
+    ?? document.querySelector(`[data-alis-validation-summary="${planId}"]`);
 }
 
 // ── Server error inline display ─────────────────────────
