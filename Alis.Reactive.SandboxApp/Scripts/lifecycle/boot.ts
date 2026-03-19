@@ -3,13 +3,14 @@
 // Single responsibility: wire triggers (two-phase) and register plans.
 // Delegates enrichment to enrichment.ts, state to merge-plan.ts PlanRegistry.
 
-import type { Plan, Entry, ComponentEntry, Reaction } from "../types";
+import type { Plan, Entry, ComponentEntry } from "../types";
 import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
 import { wireTrigger } from "../execution/trigger";
 import { enrichEntries } from "./enrichment";
 import { wireLiveClearing } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
+import { walkValidationDescriptors } from "./walk-reactions";
 import {
   applyMergedPlan,
   getBootedPlan as getTrackedBootedPlan,
@@ -25,7 +26,7 @@ export function boot(plan: Plan): void {
   log.info("booting", { entries: plan.entries.length });
 
   enrichEntries(plan.entries, plan.components);
-  wireLiveClearingForEntries(plan.entries);
+  walkValidationDescriptors(plan.entries, wireLiveClearing);
   wireEntries(plan.entries, plan.components, bootAbort.signal);
 
   registerBootedPlan(plan);
@@ -53,7 +54,7 @@ function wireEntries(entries: Entry[], components: Record<string, ComponentEntry
 export function mergePlan(incoming: Plan): void {
   const merged = applyMergedPlan(incoming, { enrichEntries, wireEntries });
 
-  wireLiveClearingForEntries(merged.entries);
+  walkValidationDescriptors(merged.entries, wireLiveClearing);
   clearSummaryForPlan(merged.planId);
 
   log.info("merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
@@ -70,28 +71,6 @@ export function resetBootStateForTests(): void {
 }
 
 export const trace = { setLevel };
-
-function wireLiveClearingForEntries(entries: Entry[]): void {
-  for (const entry of entries) {
-    wireLiveClearingForReaction(entry.reaction);
-  }
-}
-
-function wireLiveClearingForReaction(reaction: Reaction): void {
-  switch (reaction.kind) {
-    case "http":
-      if (reaction.request.validation) wireLiveClearing(reaction.request.validation);
-      break;
-    case "parallel-http":
-      for (const req of reaction.requests) {
-        if (req.validation) wireLiveClearing(req.validation);
-      }
-      break;
-    case "conditional":
-      for (const branch of reaction.branches) wireLiveClearingForReaction(branch.reaction);
-      break;
-  }
-}
 
 function clearSummaryForPlan(planId: string): void {
   const el = findSummaryElement(planId);
