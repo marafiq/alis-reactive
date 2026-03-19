@@ -1,22 +1,17 @@
 import type { RequestDescriptor, StatusHandler, ExecContext } from "../types";
-import { resolveGather } from "./gather";
+import { resolveGather, type GatherResult } from "./gather";
 import { executeCommands } from "./commands";
 import { executeReaction } from "./execute";
 import { scope } from "../core/trace";
 
 const log = scope("http");
 
-/** Execute a single HTTP request with gather, whileLoading, response routing, and chaining. */
-export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Promise<void> {
-  // 1. WhileLoading — execute commands immediately (revert is the caller's responsibility via onSuccess/onError)
-  if (req.whileLoading) {
-    executeCommands(req.whileLoading, ctx);
-  }
+interface ResolvedFetch {
+  readonly url: string;
+  readonly init: RequestInit;
+}
 
-  // 2. Gather
-  const gatherResult = resolveGather(req.gather ?? [], req.verb, ctx?.components ?? {}, req.contentType);
-
-  // 3. Build fetch options
+function buildFetch(req: RequestDescriptor, gatherResult: GatherResult): ResolvedFetch {
   let url = req.url;
   const init: RequestInit = { method: req.verb };
 
@@ -27,7 +22,6 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
 
   if (req.verb !== "GET") {
     if (gatherResult.body instanceof FormData) {
-      // FormData: browser auto-sets Content-Type with multipart boundary
       init.body = gatherResult.body;
     } else if (Object.keys(gatherResult.body).length > 0) {
       init.headers = { "Content-Type": "application/json" };
@@ -35,16 +29,30 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     }
   }
 
-  log.debug("fetch", { verb: req.verb, url });
+  return { url, init };
+}
 
+/** Execute a single HTTP request with gather, whileLoading, response routing, and chaining. */
+export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Promise<void> {
   try {
-    // 4. Execute fetch
-    const response = await fetch(url, init);
+    // 1. WhileLoading
+    if (req.whileLoading) {
+      executeCommands(req.whileLoading, ctx);
+    }
 
-    // 5. Route response — thread response body for both success (Into) and error (validation errors)
+    // 2. Gather → freeze
+    const gatherResult = resolveGather(req.gather ?? [], req.verb, ctx?.components ?? {}, req.contentType);
+    const resolved = buildFetch(req, gatherResult);
+
+    log.debug("fetch", { verb: req.verb, url: resolved.url });
+
+    // 3. Fetch
+    const response = await fetch(resolved.url, resolved.init);
+
+    // 4. Route response
     const body = await readResponseBody(response);
     if (response.ok) {
-      const successCtx = body != null ? { ...ctx, responseBody: body } : ctx;
+      const successCtx: ExecContext = body != null ? { ...ctx, responseBody: body } : ctx ?? {};
       await routeHandlers(req.onSuccess, response.status, successCtx);
     } else {
       const errorCtx: ExecContext = {
@@ -53,16 +61,18 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
         validationDesc: req.validation,
       };
       await routeHandlers(req.onError, response.status, errorCtx);
-    }
-
-    // 6. Chained request — fires after current request completes successfully
-    if (req.chained && response.ok) {
-      await execRequest(req.chained, ctx);
+      return; // no chained on error
     }
   } catch (err) {
-    log.error("network error", { url, error: String(err) });
-    // Route to catch-all error handler if available
-    await routeHandlers(req.onError, 0, ctx);
+    const status = err instanceof TypeError ? 0 : -1;
+    log.error(status === 0 ? "network error" : "client error", { url: req.url, error: String(err) });
+    await routeHandlers(req.onError, status, ctx);
+    return; // no chained on error
+  }
+
+  // 5. Chained — only after success
+  if (req.chained) {
+    await execRequest(req.chained, ctx);
   }
 }
 
