@@ -4,6 +4,19 @@ import { scope } from "./trace";
 
 const log = scope("gather");
 
+/** Extracts a File from a value — handles raw File objects and wrapper objects with .rawFile. */
+function toFile(item: unknown): File | null {
+  if (item instanceof File) return item;
+  if (item != null && typeof item === "object" && "rawFile" in item && (item as any).rawFile instanceof File)
+    return (item as any).rawFile;
+  return null;
+}
+
+/** Returns true if any item in the array is or wraps a File. */
+function hasFiles(items: unknown[]): boolean {
+  return items.some(item => toFile(item) != null);
+}
+
 export interface GatherResult {
   urlParams: string[];
   body: Record<string, unknown> | FormData;
@@ -30,7 +43,8 @@ function createTransport(
       emitScalar: (name, value) => formData.append(name, String(value ?? "")),
       emitArray: (name, items) => {
         for (const item of items) {
-          if (item instanceof File) formData.append(name, item, item.name);
+          const file = toFile(item);
+          if (file) formData.append(name, file, file.name);
           else formData.append(name, String(item ?? ""));
         }
       },
@@ -44,11 +58,10 @@ function createTransport(
     emitScalar: (name, value) => urlParams.push(
       `${encodeURIComponent(name)}=${encodeURIComponent(String(value))}`),
     emitArray: (name, items) => {
-      for (const item of items) {
-        if (item instanceof File)
-          throw new Error("[alis] File objects cannot be sent via GET");
+      if (hasFiles(items))
+        throw new Error("[alis] File objects cannot be sent via GET");
+      for (const item of items)
         urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(String(item))}`);
-      }
     },
   };
 }
@@ -57,7 +70,7 @@ function createJsonTransport(body: Record<string, unknown>): Transport {
   return {
     emitScalar: (name, value) => setNested(body, name, value === "" ? null : value),
     emitArray: (name, items) => {
-      if (items.some(item => item instanceof File))
+      if (hasFiles(items))
         throw new Error("[alis] File objects require contentType: form-data");
       setNested(body, name, items);
     },

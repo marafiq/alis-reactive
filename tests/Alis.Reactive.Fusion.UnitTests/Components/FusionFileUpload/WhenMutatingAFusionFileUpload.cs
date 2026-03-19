@@ -22,7 +22,7 @@ public class WhenMutatingAFusionFileUpload : FusionTestBase
             var cs = (ComponentSource)bindSource;
             Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Documents"));
             Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("element.files"));
+            Assert.That(cs.ReadExpr, Is.EqualTo("filesData"));
         });
     }
 }
