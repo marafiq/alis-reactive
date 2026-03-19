@@ -20,12 +20,17 @@ function desc(formId: string, fields: ValidationField[], planId?: string): Valid
   return { formId, fields, planId };
 }
 
-function errSpan(fieldName: string): string {
-  return `<span data-valmsg-for="${fieldName}" hidden></span>`;
+function errSpan(fieldName: string, fieldId?: string): string {
+  const idAttr = fieldId ? ` id="${fieldId}_error"` : "";
+  return `<span${idAttr} data-valmsg-for="${fieldName}" hidden></span>`;
 }
 
-function errorText(fieldName: string): string {
-  return document.querySelector(`span[data-valmsg-for="${fieldName}"]`)?.textContent ?? "";
+function errorText(fieldId: string): string {
+  // Try ID-based lookup first (matches InputFieldBuilder {fieldId}_error convention)
+  const byId = document.getElementById(fieldId + "_error");
+  if (byId) return byId.textContent ?? "";
+  // Fallback for tests without ID on span
+  return document.querySelector(`span[data-valmsg-for="${fieldId}"]`)?.textContent ?? "";
 }
 
 function hasError(id: string): boolean {
@@ -55,12 +60,12 @@ describe("when live-clearing validation errors", () => {
           <div>
             <label for="Name">Name</label>
             <input id="Name" name="Name" type="text" value="" />
-            ${errSpan("Name")}
+            ${errSpan("Name", "Name")}
           </div>
           <div>
             <label for="Email">Email</label>
             <input id="Email" name="Email" type="text" value="" />
-            ${errSpan("Email")}
+            ${errSpan("Email", "Email")}
           </div>
         </form>
       </body></html>`);
@@ -166,7 +171,7 @@ describe("when live-clearing validation errors", () => {
             <span class="e-control-wrapper" id="Amount">
               <input class="e-numerictextbox e-input" name="Amount" />
             </span>
-            ${errSpan("Amount")}
+            ${errSpan("Amount", "Amount")}
           </div>
         </form>
       </body></html>`);

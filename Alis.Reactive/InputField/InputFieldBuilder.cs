@@ -45,7 +45,8 @@ namespace Alis.Reactive.InputField
             var closingHtml = "";
             if (_name != null)
             {
-                closingHtml += $"<span data-valmsg-for=\"{WebUtility.HtmlEncode(_name)}\" class=\"text-[11px] text-danger\"></span>";
+                var errorId = _forId != null ? $" id=\"{WebUtility.HtmlEncode(_forId)}_error\"" : "";
+                closingHtml += $"<span{errorId} data-valmsg-for=\"{WebUtility.HtmlEncode(_name)}\" class=\"text-[11px] text-danger\"></span>";
             }
             closingHtml += "</div>";
 
