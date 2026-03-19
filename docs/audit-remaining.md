@@ -9,10 +9,10 @@
 - [x] `root.ts` — PASS. One justified wide selector for plan discovery
 
 ## Remaining
-- [ ] Memory files stale — validation-multiselect-bug.md (fixed), test counts, next-session file
-- [ ] CLAUDE.md test counts outdated (still says 907)
-- [ ] Update SOLID skill with session learnings (tree walker pattern, isHidden lesson, no rubber-stamping)
-- [ ] Sequence diagrams outdated — directory structure changed (http/ merged into execution/, inject moved)
+- [x] Memory files cleaned
+- [x] CLAUDE.md test counts updated
+- [x] SOLID skill updated
+- [ ] Sequence diagrams — FULL regeneration from actual code. Old diagrams reference http/, lifecycle/inject.ts, auto-boot.ts. Must retrace every module with new structure.
 
 ## Done This Session
 - [x] assertNever on all switches
