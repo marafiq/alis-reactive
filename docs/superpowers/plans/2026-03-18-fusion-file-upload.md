@@ -2,163 +2,225 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development or superpowers:executing-plans.
 
-**Goal:** Onboard FusionFileUpload as a vertical slice that sends files as part of FormData alongside other fields via `IncludeAll()`.
+**Goal:** Onboard FusionFileUpload as a pure vertical slice. Files sent as part of FormData alongside other fields via `IncludeAll()`.
 
-**Architecture:** SF Uploader in form mode (`saveUrl=null`, `autoUpload=false`). Files live in `filesData[].rawFile` as `File` objects. The gather system needs a File-aware emit path — `formData.append(name, file, file.name)` instead of `String(value)`.
+**Architecture:** SF Uploader in form mode (`saveUrl=null`, `autoUpload=false`). `readExpr: "element.files"` resolves to the browser's native `FileList` — zero vendor wrapper extraction. Gather's FormData transport handles `File` objects natively via `formData.append(name, file, file.name)`.
 
 **Tech Stack:** C# (ASP.NET Core + Syncfusion EJ2), TypeScript
 
 ---
 
-## Why This Is NOT a Pure Vertical Slice
+## Pure Vertical Slice Confirmation
 
-The Uploader is the first component whose `readExpr` resolves to `File[]` — not a string, number, boolean, Date, or string[]. The current `Transport` interface in `gather.ts` only handles:
-- `emitScalar(name, value)` → `String(value)` or `setNested(body, name, value)`
-- `emitArray(name, items)` → iterate and `String(item)`
+**This IS a pure vertical slice.** The experiment (FileUploadLab) proved:
 
-`String(file)` produces `"[object File]"` — garbage. We need `formData.append(name, file, file.name)`.
+1. `readExpr: "element.files"` → `walk(ej2, "element.files")` → `ej2.element.files` → native `FileList`
+2. `FileList` contains real `File` objects (`instanceof File === true`, `instanceof Blob === true`)
+3. `FormData.append(name, file, file.name)` works — server receives `IFormFile` with correct name + size
+4. Files + scalar fields coexist in the same FormData POST
 
-**Changes required outside the vertical slice:**
-1. `gather.ts` — new `emitFile(name, file)` on Transport + File detection in `emit()`
-2. `types.ts` — FileUpload-specific types (optional, may use existing `unknown`)
-3. `component.ts` — potentially, if readExpr resolution needs to handle `filesData` extraction
+**No vendor coupling:** `FileList` and `File` are browser APIs, not Syncfusion concepts. The gather Transport just needs to handle the browser's native `File` type in its FormData path — same level of awareness as knowing `FormData.append()` exists.
 
-**Changes inside the vertical slice (standard 7 files):**
-1. Component phantom type, events, extensions, builder, html extensions, reactive extensions
-2. `readExpr` = `"filesData"` — returns the `FileInfo[]` array
-3. Extensions: `Value()` returns `TypedComponentSource<IFormFile[]>` (or a custom type)
+**What changes:**
+
+| Layer | Change | Vendor-agnostic? |
+|-------|--------|-----------------|
+| gather.ts `emitArray` | When item is `File`, use `formData.append(name, file, file.name)` instead of `String(file)` | Yes — `File` is browser API |
+| gather.ts `emitScalar` | When value is `FileList`, iterate and append each `File` | Yes — `FileList` is browser API |
+| Vertical slice (7 files) | Standard component pattern | Yes |
+
+**What does NOT change:** `component.ts`, `resolver.ts`, `walk.ts`, `types.ts`, `conditions.ts`, `element.ts`, `boot.ts`, `auto-boot.ts`, `execute.ts`, `trigger.ts`, JSON schema, C# descriptors.
 
 ---
 
-## Design Decisions Needed
+## Experiment Results (FileUploadLab)
 
-### 1. ReadExpr — what does the plan carry?
+```
+ej2.filesData[0].rawFile  →  File (instanceof File === true)
+ej2.element.files          →  FileList (native browser, no SF wrapper)
+ej2.element.files[0]       →  File (instanceof File === true)
 
-**Option A:** `readExpr: "filesData"` — gather reads `ej2.filesData`, gets `FileInfo[]`, extracts `.rawFile` from each.
-- Pro: Single readExpr, gather handles extraction
-- Con: Gather needs to know about FileInfo structure (couples gather to SF)
+walk(ej2, "element.files") →  FileList (same as ej2.element.files)
 
-**Option B:** Custom gather kind `"file-component"` with its own resolution logic.
-- Pro: Clean separation — gather.ts just appends files
-- Con: New descriptor kind, more plan complexity
-
-**Recommendation:** Option A with a `vendor: "fusion"` + `readExpr: "filesData"` combination. The gather `emit()` function detects `File`/`FileList` objects and uses `formData.append(name, file, file.name)`. The `filesData[].rawFile` extraction happens in a small adapter in `component.ts` or inline in gather.
-
-### 2. Gather Transport — how to handle Files
-
-```typescript
-// In gather.ts emit():
-if (raw instanceof FileList || (Array.isArray(raw) && raw.length > 0 && raw[0] instanceof File)) {
-  for (const file of raw) transport.emitFile(name, file);
-  return;
-}
-
-// New Transport method:
-emitFile(name: string, file: File): void {
-  // Only FormData supports files — JSON and GET cannot carry files
-  formData.append(name, file, file.name);
-}
+FormData.append("Docs", file, file.name)  →  Server receives IFormFile ✓
+Scalar fields + files in same POST         →  Both received correctly ✓
 ```
 
-JSON and GET transports should throw if they encounter a File — files can only travel via FormData.
-
-### 3. C# Model Type
-
-`IFormFile[]` (or `List<IFormFile>`) for the model property. The `[FromForm]` binding handles multipart file parsing.
-
-### 4. contentType enforcement
-
-When any component in the gather produces File objects, the request MUST be `form-data`. The plan should enforce this — if a FileUpload component is in the gather and contentType is not `form-data`, throw at runtime.
+`readExpr: "element.files"` is the clean path. No `.rawFile` extraction, no SF FileInfo wrappers, no vendor coupling.
 
 ---
 
 ## Task Breakdown
 
-### Task 1: Extend gather.ts Transport with emitFile
+### Task 1: Gather Transport — handle native File objects (3 lines)
 
-**Files to modify:**
-- `Scripts/gather.ts` — add `emitFile(name: File)` to Transport interface, implement for FormData (append file), throw for JSON/GET
-- `Scripts/gather.ts` — add File detection in `emit()` before array/scalar dispatch
+**File to modify:** `Scripts/gather.ts`
+
+In `createTransport` (FormData path), update `emitArray` to handle `File` items:
 
 ```typescript
-interface Transport {
-  emitScalar(name: string, value: unknown): void;
-  emitArray(name: string, items: unknown[]): void;
-  emitFile(name: string, file: File): void;
-}
+emitArray: (name, items) => {
+  for (const item of items) {
+    if (item instanceof File) formData.append(name, item, item.name);
+    else formData.append(name, String(item ?? ""));
+  }
+},
 ```
 
-FormData transport: `formData.append(name, file, file.name)`
-JSON transport: `throw new Error("[alis] File objects require contentType: form-data")`
-GET transport: `throw new Error("[alis] File objects cannot be sent via GET")`
+In `createTransport` (GET path), `emitArray` should throw on File:
 
-File detection in emit():
+```typescript
+emitArray: (name, items) => {
+  for (const item of items) {
+    if (item instanceof File) throw new Error("[alis] File objects cannot be sent via GET");
+    urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(String(item))}`);
+  }
+},
+```
+
+In `createJsonTransport`, `emitArray` should throw on File:
+
+```typescript
+emitArray: (name, items) => {
+  if (items.some(item => item instanceof File))
+    throw new Error("[alis] File objects require contentType: form-data");
+  setNested(body, name, items);
+},
+```
+
+Also handle `FileList` in `emit()` — `FileList` is array-like but not `Array.isArray`:
+
 ```typescript
 function emit(name: string, raw: unknown): void {
-  // File or FileInfo[] with rawFile — extract and emit as files
-  if (isFileData(raw)) {
-    const files = extractFiles(raw);
-    for (const file of files) transport.emitFile(name, file);
-    log.trace("file", { name, count: files.length });
+  // FileList — browser native, array-like but not Array
+  if (raw instanceof FileList) {
+    for (let i = 0; i < raw.length; i++) transport.emitArray(name, [raw[i]]);
+    log.trace("file", { name, count: raw.length });
     return;
   }
   // existing array/scalar paths...
 }
 ```
 
-`isFileData()` checks: is it a `FileList`? Is it an array where items have `.rawFile` (SF FileInfo pattern)?
-`extractFiles()` returns `File[]` — either from `FileList` or by mapping `fileInfo.rawFile`.
+Wait — simpler: just convert FileList to array and let emitArray handle it:
 
-- [ ] Write TS unit tests for emitFile (FormData, JSON throw, GET throw)
-- [ ] Implement
-- [ ] Verify existing gather tests still pass
+```typescript
+if (raw instanceof FileList) {
+  transport.emitArray(name, Array.from(raw));
+  log.trace("file", { name, count: raw.length });
+  return;
+}
+```
 
-### Task 2: FusionFileUpload vertical slice (7 files)
+- [ ] Update `emitArray` in FormData transport — File instanceof check (1 line)
+- [ ] Update `emitArray` in GET transport — throw on File (1 line)
+- [ ] Update `emitArray` in JSON transport — throw on File (1 line)
+- [ ] Add FileList detection in `emit()` before array check (3 lines)
+- [ ] Write TS unit tests: File in FormData, File in GET throws, File in JSON throws, FileList conversion
+- [ ] Verify ALL existing gather tests still pass
+- [ ] `npm run build` — rebuild bundle
+
+### Task 2: FusionFileUpload vertical slice (6 files)
 
 **Files to create under `Alis.Reactive.Fusion/Components/FusionFileUpload/`:**
 
-1. `FusionFileUpload.cs` — sealed, `FusionComponent`, `IInputComponent`, `ReadExpr => "filesData"`
-2. `Events/FusionFileUploadOnSelected.cs` — event args (file count, file names)
-3. `FusionFileUploadEvents.cs` — singleton, `Selected` → `"selected"` (NOT "change")
-4. `FusionFileUploadExtensions.cs` — `Value()` → `TypedComponentSource<IFormFile[]>` (or string[] for names)
-5. `FusionFileUploadHtmlExtensions.cs` — factory using `Html.EJS().Uploader("id").AutoUpload(false).SaveUrl(null).Render()`. Register in ComponentsMap.
-6. `FusionFileUploadReactiveExtensions.cs` — `.Reactive()` on Uploader
+1. **`FusionFileUpload.cs`** — sealed, `FusionComponent`, `IInputComponent`, `ReadExpr => "element.files"`
 
-**Key SF configuration:**
 ```csharp
-setup.Helper.EJS().Uploader(setup.ElementId)
-    .AutoUpload(false)       // Don't upload automatically
-    .AllowedExtensions(".pdf,.jpg,.png,.doc,.docx")
-    .Multiple(true)
-    .Render()
+public sealed class FusionFileUpload : FusionComponent, IInputComponent
+{
+    public string ReadExpr => "element.files";
+}
 ```
 
-No `SaveUrl` / `RemoveUrl` — form mode only.
+2. **`Events/FusionFileUploadOnSelected.cs`** — event args
 
-### Task 3: FusionFileUpload tests + sandbox
+```csharp
+public class FusionFileUploadSelectedArgs
+{
+    public int FilesCount { get; set; }
+    public bool IsInteracted { get; set; }
+    public FusionFileUploadSelectedArgs() { }
+}
+```
 
-- Unit tests: snapshot + schema
-- Sandbox page: file picker + other fields + FormData POST
-- Playwright: select files via `SetInputFiles()`, verify POST body contains files
+3. **`FusionFileUploadEvents.cs`** — singleton, `Selected` → `"selected"`
 
-### Task 4: Add to ComponentGather
+4. **`FusionFileUploadExtensions.cs`** — `Value()` → `TypedComponentSource<string>` (reads as string for conditions — file input .files is not useful in conditions, but the pattern requires it)
+
+5. **`FusionFileUploadHtmlExtensions.cs`** — factory. SF Uploader has no `UploaderFor()`, so use direct `EJS().Uploader(id)`:
+
+```csharp
+public static void FileUpload<TModel, TProp>(
+    this InputFieldSetup<TModel, TProp> setup,
+    Action<UploaderBuilder> configure) where TModel : class
+{
+    setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
+        setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr));
+
+    var builder = setup.Helper.EJS().Uploader(setup.ElementId)
+        .AutoUpload(false)
+        .HtmlAttributes(new Dictionary<string, object> { ["name"] = setup.BindingPath });
+    configure(builder);
+    setup.Render(builder.Render());
+}
+```
+
+6. **`FusionFileUploadReactiveExtensions.cs`** — `.Reactive()` on `UploaderBuilder`
+
+**File to modify:** `FusionTestBase.cs` — add `public string? Documents { get; set; }` (string for snapshot tests — real files only in Playwright)
+
+### Task 3: FusionFileUpload unit tests
+
+Under `tests/Alis.Reactive.Fusion.UnitTests/Components/FusionFileUpload/`:
+
+1. `WhenDescribingFusionFileUploadEvents.cs` — singleton, jsEvent = "selected", args type
+2. `WhenMutatingAFusionFileUpload.cs` — Value source type (TypedComponentSource<string>), readExpr = "element.files"
+
+### Task 4: FusionFileUpload sandbox page
+
+1. `FileUploadModel.cs` — `string? ResidentName`, `IFormFile[]? Documents`
+2. `FileUploadController.cs` — Index + EchoFormData `[FromForm]` POST (returns file names + sizes + form fields)
+3. `Views/FileUpload/Index.cshtml`:
+   - Section 1: File picker + NativeTextBox for ResidentName
+   - Section 2: Submit FormData button — `p.Post(...).AsFormData()` with `IncludeAll()`
+   - Section 3: Echo result — shows file names received by server
+   - Section 4: Plan JSON
+4. Nav link in `_Layout.cshtml`
+5. Home page card
+
+### Task 5: FusionFileUpload Playwright tests
+
+`tests/Alis.Reactive.PlaywrightTests/Components/Fusion/WhenUsingFusionFileUpload.cs`:
+- Page loads
+- File picker renders
+- Select files via `SetInputFiles()`, submit, intercept POST, verify files received
+- Verify scalar fields also gathered alongside files
+
+### Task 6: Add to ComponentGather
 
 - Add `IFormFile[]? Documents` to ComponentGatherModel
 - Add uploader to ComponentGather form
-- Ensure FormData submit button sends files alongside other fields
+- FormData submit sends files + all other fields
 - Field count → 21
+
+### Task 7: Full test suite
+
+```bash
+npm test
+dotnet test tests/Alis.Reactive.UnitTests
+dotnet test tests/Alis.Reactive.Native.UnitTests
+dotnet test tests/Alis.Reactive.Fusion.UnitTests
+dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
+dotnet test tests/Alis.Reactive.PlaywrightTests
+```
 
 ---
 
 ## Constraints
 
-1. **Files ONLY via FormData** — JSON POST cannot carry files. If user clicks "Submit JSON" with files selected, the framework should either: (a) skip file fields in JSON, or (b) throw a clear error.
-2. **No SF async upload** — `saveUrl=null`, `autoUpload=false`. The framework's gather handles the POST.
-3. **readExpr = "filesData"** — gather reads SF's `filesData` array, extracts `.rawFile` (File objects).
-4. **Vertical slice for the component** — standard 7 files. Runtime changes are isolated to `gather.ts` (Transport.emitFile + File detection).
-
----
-
-## Risk
-
-This is the first component that requires a runtime change (`gather.ts`). The change is additive (new method on Transport, new detection in emit) and backwards-compatible (existing scalar/array paths unchanged). But it MUST be tested in isolation before the vertical slice.
+1. **Files ONLY via FormData** — JSON POST and GET throw on `File` objects. This is fail-fast, not silent fallback.
+2. **No SF async upload** — `saveUrl` not set, `autoUpload=false`. Framework gather handles POST.
+3. **`readExpr: "element.files"`** — walks to native `FileList` on the underlying `<input type="file">`. Zero vendor wrapper extraction.
+4. **Vertical slice purity** — 6 component files + sandbox + tests. The gather change (File handling in Transport) is browser API awareness, not vendor coupling.
+5. **No changes to:** `component.ts`, `resolver.ts`, `walk.ts`, `types.ts`, `conditions.ts`, `element.ts`, JSON schema, C# descriptors.
