@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { boot, mergePlan, getBootedPlan } from "../boot";
+import { boot, mergePlan, getBootedPlan } from "../lifecycle/boot";
 import type { Plan } from "../types";
 
 describe("when merging plans", () => {

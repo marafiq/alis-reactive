@@ -1,4 +1,4 @@
-import type { ComponentEntry, Entry, Plan } from "./types";
+import type { ComponentEntry, Entry, Plan } from "../types";
 
 type EnrichEntries = (entries: Entry[], components: Record<string, ComponentEntry>) => void;
 type WireEntries = (entries: Entry[], components: Record<string, ComponentEntry>, signal?: AbortSignal) => void;

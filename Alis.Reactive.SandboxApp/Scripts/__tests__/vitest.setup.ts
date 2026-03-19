@@ -1,6 +1,6 @@
 import { afterEach, vi } from "vitest";
-import { resetBootStateForTests } from "../boot";
-import { resetNativeActionLinksForTests } from "../native-action-link";
+import { resetBootStateForTests } from "../lifecycle/boot";
+import { resetNativeActionLinksForTests } from "../components/native/native-action-link";
 
 afterEach(() => {
   resetNativeActionLinksForTests();

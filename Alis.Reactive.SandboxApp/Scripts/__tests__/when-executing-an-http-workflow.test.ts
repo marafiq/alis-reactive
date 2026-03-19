@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { boot } from "../boot";
+import { boot } from "../lifecycle/boot";
 import type { Command } from "../types";
 
 function setText(target: string, value: string): Command {

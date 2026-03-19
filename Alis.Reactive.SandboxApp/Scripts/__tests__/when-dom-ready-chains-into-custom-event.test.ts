@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { boot } from "../boot";
+import { boot } from "../lifecycle/boot";
 
 describe("when dom-ready chains into custom-event", () => {
   it("completes a three-hop chain: dom-ready → custom-event → custom-event", () => {

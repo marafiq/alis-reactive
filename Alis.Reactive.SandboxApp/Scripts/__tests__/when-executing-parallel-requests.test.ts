@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { JSDOM } from "jsdom";
 import type { ParallelHttpReaction, HttpReaction, ExecContext } from "../types";
 
-let executeHttpReaction: typeof import("../pipeline").executeHttpReaction;
-let executeParallelHttpReaction: typeof import("../pipeline").executeParallelHttpReaction;
+let executeHttpReaction: typeof import("../http/pipeline").executeHttpReaction;
+let executeParallelHttpReaction: typeof import("../http/pipeline").executeParallelHttpReaction;
 
 function mockFetchSequence(...responses: Array<{ status: number; body: unknown }>) {
   const fn = vi.fn();
@@ -32,7 +32,7 @@ beforeEach(async () => {
   (globalThis as any).CustomEvent = dom.window.CustomEvent;
   (globalThis as any).FormData = dom.window.FormData;
 
-  const mod = await import("../pipeline");
+  const mod = await import("../http/pipeline");
   executeHttpReaction = mod.executeHttpReaction;
   executeParallelHttpReaction = mod.executeParallelHttpReaction;
 });

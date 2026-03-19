@@ -4,8 +4,8 @@
 // from plan.components. No DOM, no wiring, no side effects beyond mutation
 // of the validation field objects.
 
-import type { Entry, ComponentEntry, Reaction, ValidationDescriptor } from "./types";
-import { scope } from "./core/trace";
+import type { Entry, ComponentEntry, Reaction, ValidationDescriptor } from "../types";
+import { scope } from "../core/trace";
 
 const log = scope("enrichment");
 

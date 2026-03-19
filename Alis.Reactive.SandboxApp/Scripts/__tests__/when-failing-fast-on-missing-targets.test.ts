@@ -1,9 +1,9 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { evalRead, resolveRoot } from "../component";
+import { evalRead, resolveRoot } from "../resolution/component";
 import { wireTrigger } from "../trigger";
-import { mutateElement } from "../element";
-import { resolveGather } from "../gather";
-import { TestWidget } from "../test-widget";
+import { mutateElement } from "../execution/element";
+import { resolveGather } from "../http/gather";
+import { TestWidget } from "../components/lab/test-widget";
 
 describe("when failing fast on missing targets", () => {
   afterEach(() => { document.body.innerHTML = ""; });

@@ -10,7 +10,7 @@
 // Vendor-agnostic: delegates value reading to component.ts via resolveRoot.
 
 import type { ValidationDescriptor, ValidationField } from "../types";
-import { resolveRoot } from "../component";
+import { resolveRoot } from "../resolution/component";
 import { scope } from "../core/trace";
 import { walk } from "../core/walk";
 import { ruleFails, type PeerReader } from "./rule-engine";

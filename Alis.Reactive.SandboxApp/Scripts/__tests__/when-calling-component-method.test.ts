@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { boot } from "../boot";
-import { TestWidget } from "../test-widget";
+import { boot } from "../lifecycle/boot";
+import { TestWidget } from "../components/lab/test-widget";
 
 describe("when calling component method (void)", () => {
   afterEach(() => { document.body.innerHTML = ""; });

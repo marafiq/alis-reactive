@@ -3,13 +3,13 @@
 // Single responsibility: wire triggers (two-phase) and register plans.
 // Delegates enrichment to enrichment.ts, state to merge-plan.ts PlanRegistry.
 
-import type { Plan, Entry, ComponentEntry } from "./types";
-import { setLevel } from "./core/trace";
-import { scope } from "./core/trace";
-import { wireTrigger } from "./trigger";
+import type { Plan, Entry, ComponentEntry } from "../types";
+import { setLevel } from "../core/trace";
+import { scope } from "../core/trace";
+import { wireTrigger } from "../trigger";
 import { enrichEntries } from "./enrichment";
-import { wireLiveClearing } from "./validation/live-clear";
-import { findSummaryElement, clearSummary, hideSummaryDiv } from "./validation/error-display";
+import { wireLiveClearing } from "../validation/live-clear";
+import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
 import {
   applyMergedPlan,
   getBootedPlan as getTrackedBootedPlan,

@@ -19,7 +19,7 @@ beforeEach(async () => {
   (globalThis as any).CustomEvent = dom.window.CustomEvent;
 
   // Re-import to get fresh module with new document
-  const mod = await import("../boot");
+  const mod = await import("../lifecycle/boot");
   boot = mod.boot;
 });
 

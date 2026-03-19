@@ -1,6 +1,7 @@
 // loader.ts — self-initializing side-effect module
 // Handles target positioning, timeout auto-hide, and cleanup.
 // Plan-driven show/hide uses existing native mutations (AddClass/RemoveClass).
+export {}; // Module marker — prevents TS global-scope collisions
 
 function init(): void {
   const loader = document.getElementById("alis-loader");

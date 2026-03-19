@@ -1,10 +1,10 @@
-import type { Command, ExecContext } from "./types";
+import type { Command, ExecContext } from "../types";
 import { mutateElement } from "./element";
-import { evaluateGuard, isConfirmGuard } from "./conditions";
-import { showServerErrors } from "./validation";
-import { injectHtml } from "./inject";
-import { scope } from "./core/trace";
-import { assertNever } from "./core/assert-never";
+import { evaluateGuard, isConfirmGuard } from "../conditions/conditions";
+import { showServerErrors } from "../validation";
+import { injectHtml } from "../lifecycle/inject";
+import { scope } from "../core/trace";
+import { assertNever } from "../core/assert-never";
 
 const log = scope("command");
 

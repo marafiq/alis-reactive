@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { JSDOM } from "jsdom";
 import type { Plan, RequestDescriptor } from "../types";
 
-let boot: typeof import("../boot").boot;
-let execRequest: typeof import("../http").execRequest;
+let boot: typeof import("../lifecycle/boot").boot;
+let execRequest: typeof import("../http/http").execRequest;
 
 function mockFetch(status: number, body: unknown, contentType = "application/json") {
   return vi.fn().mockResolvedValue({
@@ -31,9 +31,9 @@ beforeEach(async () => {
   (globalThis as any).Event = dom.window.Event;
   (globalThis as any).FormData = dom.window.FormData;
 
-  const bootMod = await import("../boot");
+  const bootMod = await import("../lifecycle/boot");
   boot = bootMod.boot;
-  const httpMod = await import("../http");
+  const httpMod = await import("../http/http");
   execRequest = httpMod.execRequest;
 });
 

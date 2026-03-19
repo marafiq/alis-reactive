@@ -5,22 +5,36 @@ import * as path from "path";
 describe("architecture enforcement", () => {
   const scriptsDir = path.resolve(__dirname, "..");
 
-  function readSource(filename: string): string {
-    return fs.readFileSync(path.join(scriptsDir, filename), "utf-8");
+  function readSource(relPath: string): string {
+    return fs.readFileSync(path.join(scriptsDir, relPath), "utf-8");
   }
 
-  function allSourceFiles(): string[] {
-    return fs.readdirSync(scriptsDir)
-      .filter(f => f.endsWith(".ts") && f !== "test-widget.ts")
-      .filter(f => !f.startsWith("__"));
+  /** Recursively collect all .ts source files (relative paths), excluding __tests__ and __experiments__. */
+  function allSourceFiles(dir = scriptsDir, prefix = ""): string[] {
+    const results: string[] = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name.startsWith("__")) continue;
+      const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) {
+        results.push(...allSourceFiles(path.join(dir, entry.name), rel));
+      } else if (entry.name.endsWith(".ts") && rel !== "components/lab/test-widget.ts") {
+        results.push(rel);
+      }
+    }
+    return results;
   }
 
   it("no ej2_instances outside component.ts", () => {
     const violations: string[] = [];
     for (const file of allSourceFiles()) {
-      if (file === "component.ts") continue;
+      if (file === "resolution/component.ts") continue;
       const content = readSource(file);
-      if (content.includes("ej2_instances")) {
+      // Only flag non-comment lines that reference ej2_instances
+      const hasCodeRef = content.split("\n").some(line => {
+        const trimmed = line.trimStart();
+        return !trimmed.startsWith("//") && !trimmed.startsWith("*") && trimmed.includes("ej2_instances");
+      });
+      if (hasCodeRef) {
         violations.push(file);
       }
     }
@@ -30,7 +44,7 @@ describe("architecture enforcement", () => {
   it("no ej.base outside inject.ts", () => {
     const violations: string[] = [];
     for (const file of allSourceFiles()) {
-      if (file === "inject.ts") continue;
+      if (file === "lifecycle/inject.ts") continue;
       const content = readSource(file);
       if (/ej\.base/.test(content)) {
         violations.push(file);
@@ -45,7 +59,7 @@ describe("architecture enforcement", () => {
     const writePattern = /\(window\s+as\s+any\)\.alis\s*=/;
     const violations: string[] = [];
     for (const file of allSourceFiles()) {
-      if (file === "confirm.ts") continue;
+      if (file === "components/fusion/confirm.ts") continue;
       const content = readSource(file);
       if (writePattern.test(content)) {
         violations.push(file);

@@ -1,4 +1,4 @@
-import type { Plan } from "./types";
+import type { Plan } from "../types";
 import { mergePlan } from "./boot";
 
 /**

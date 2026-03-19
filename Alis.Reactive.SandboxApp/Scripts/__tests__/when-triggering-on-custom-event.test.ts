@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { boot } from "../boot";
+import { boot } from "../lifecycle/boot";
 
 describe("when triggering on custom event", () => {
   it("does not execute until the event fires", () => {

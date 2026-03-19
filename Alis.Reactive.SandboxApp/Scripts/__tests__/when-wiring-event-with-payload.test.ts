@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { boot } from "../boot";
-import { TestWidget } from "../test-widget";
+import { boot } from "../lifecycle/boot";
+import { TestWidget } from "../components/lab/test-widget";
 
 describe("when wiring component event with payload", () => {
   afterEach(() => { document.body.innerHTML = ""; });

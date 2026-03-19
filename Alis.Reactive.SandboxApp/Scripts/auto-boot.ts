@@ -1,10 +1,10 @@
-import { boot, trace } from "./boot";
-import { init as initConfirm } from "./confirm";
-import { initNativeActionLinks } from "./native-action-link";
-import "./drawer";  // side-effect: wires close button + Escape key
-import "./loader";  // side-effect: handles target positioning + timeout
-import "./checklist";  // side-effect: syncs checkbox values to hidden input
-import { composeInitialPlans } from "./merge-plan";
+import { boot, trace } from "./lifecycle/boot";
+import { init as initConfirm } from "./components/fusion/confirm";
+import { initNativeActionLinks } from "./components/native/native-action-link";
+import "./components/native/drawer";  // side-effect: wires close button + Escape key
+import "./components/native/loader";  // side-effect: handles target positioning + timeout
+import "./components/native/checklist";  // side-effect: syncs checkbox values to hidden input
+import { composeInitialPlans } from "./lifecycle/merge-plan";
 import type { Plan } from "./types";
 import type { TraceLevel } from "./core/trace";
 

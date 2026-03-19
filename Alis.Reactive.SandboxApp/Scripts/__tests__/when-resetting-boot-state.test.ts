@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boot, resetBootStateForTests } from "../boot";
+import { boot, resetBootStateForTests } from "../lifecycle/boot";
 
 describe("when resetting boot state", () => {
   it("removes previously wired custom-event listeners between tests", () => {

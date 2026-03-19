@@ -1,7 +1,7 @@
-import type { Guard, ValueGuard, ExecContext } from "./types";
-import { resolveSource, resolveSourceAs, coerce } from "./resolver";
-import { scope } from "./core/trace";
-import { assertNever } from "./core/assert-never";
+import type { Guard, ValueGuard, ExecContext } from "../types";
+import { resolveSource, resolveSourceAs, coerce } from "../resolution/resolver";
+import { scope } from "../core/trace";
+import { assertNever } from "../core/assert-never";
 
 const log = scope("conditions");
 

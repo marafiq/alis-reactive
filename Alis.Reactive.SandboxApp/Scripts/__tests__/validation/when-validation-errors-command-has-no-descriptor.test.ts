@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { executeCommand } from "../../commands";
+import { executeCommand } from "../../execution/commands";
 
 beforeEach(() => {
   document.body.innerHTML = "";

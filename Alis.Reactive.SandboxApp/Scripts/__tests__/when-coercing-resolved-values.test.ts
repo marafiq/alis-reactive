@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { coerce } from "../resolver";
+import { coerce } from "../resolution/resolver";
 
 describe("when coercing resolved values", () => {
   // --- string coercion ---

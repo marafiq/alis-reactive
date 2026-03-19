@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import type { Guard, ExecContext } from "../types";
-import { evaluateGuard, evaluateGuardAsync, isConfirmGuard } from "../conditions";
+import { evaluateGuard, evaluateGuardAsync, isConfirmGuard } from "../conditions/conditions";
 
 function ctx(evt: Record<string, unknown>): ExecContext {
   return { evt };

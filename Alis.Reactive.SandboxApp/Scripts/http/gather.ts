@@ -1,6 +1,6 @@
-import type { GatherItem, ComponentEntry } from "./types";
-import { evalRead } from "./component";
-import { scope } from "./core/trace";
+import type { GatherItem, ComponentEntry } from "../types";
+import { evalRead } from "../resolution/component";
+import { scope } from "../core/trace";
 
 const log = scope("gather");
 

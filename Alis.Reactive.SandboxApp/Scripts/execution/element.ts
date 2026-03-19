@@ -1,8 +1,8 @@
-import type { MutateElementCommand, MethodArg, ExecContext } from "./types";
-import { scope } from "./core/trace";
-import { resolveSource, coerce } from "./resolver";
-import { resolveRoot } from "./component";
-import { assertNever } from "./core/assert-never";
+import type { MutateElementCommand, MethodArg, ExecContext } from "../types";
+import { scope } from "../core/trace";
+import { resolveSource, coerce } from "../resolution/resolver";
+import { resolveRoot } from "../resolution/component";
+import { assertNever } from "../core/assert-never";
 
 const log = scope("element");
 

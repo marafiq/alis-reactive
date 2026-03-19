@@ -51,7 +51,7 @@ describe("when auto booting plans", () => {
       </script>
     `;
 
-    const bootModule = await import("../boot");
+    const bootModule = await import("../lifecycle/boot");
     await import("../auto-boot");
 
     const plan = bootModule.getBootedPlan("Test.Model");

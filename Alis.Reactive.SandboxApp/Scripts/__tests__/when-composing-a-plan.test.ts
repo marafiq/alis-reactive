@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { boot } from "../boot";
+import { boot } from "../lifecycle/boot";
 
 describe("when composing a plan", () => {
   it("wires each entry independently", () => {

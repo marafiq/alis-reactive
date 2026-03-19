@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { JSDOM } from "jsdom";
 import type { RequestDescriptor, ExecContext, Reaction, ConditionalReaction } from "../types";
 
-let execRequest: typeof import("../http").execRequest;
-let executeReaction: typeof import("../execute").executeReaction;
+let execRequest: typeof import("../http/http").execRequest;
+let executeReaction: typeof import("../execution/execute").executeReaction;
 
 function mockFetch(status: number, body: unknown) {
   return vi.fn().mockResolvedValue({
@@ -32,10 +32,10 @@ beforeEach(async () => {
   (globalThis as any).FormData = dom.window.FormData;
   (globalThis as any).window = dom.window;
 
-  const httpMod = await import("../http");
+  const httpMod = await import("../http/http");
   execRequest = httpMod.execRequest;
 
-  const execMod = await import("../execute");
+  const execMod = await import("../execution/execute");
   executeReaction = execMod.executeReaction;
 });
 

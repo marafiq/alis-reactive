@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { JSDOM } from "jsdom";
 import type { Plan } from "../types";
 
-let boot: typeof import("../boot").boot;
+let boot: typeof import("../lifecycle/boot").boot;
 
 beforeEach(async () => {
   const dom = new JSDOM(`<!DOCTYPE html><html><body>
@@ -16,7 +16,7 @@ beforeEach(async () => {
   (globalThis as any).CustomEvent = dom.window.CustomEvent;
   (globalThis as any).Event = dom.window.Event;
 
-  const mod = await import("../boot");
+  const mod = await import("../lifecycle/boot");
   boot = mod.boot;
 });
 

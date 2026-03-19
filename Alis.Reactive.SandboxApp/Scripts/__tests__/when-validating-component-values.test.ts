@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { validate, clearAll } from "../validation";
-import { TestWidget } from "../test-widget";
+import { TestWidget } from "../components/lab/test-widget";
 
 describe("when validating component values", () => {
   afterEach(() => { document.body.innerHTML = ""; });

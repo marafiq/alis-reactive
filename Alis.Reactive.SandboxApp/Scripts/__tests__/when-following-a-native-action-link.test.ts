@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { initNativeActionLinks } from "../native-action-link";
+import { initNativeActionLinks } from "../components/native/native-action-link";
 
 describe("when following a native action link", () => {
   afterEach(() => {

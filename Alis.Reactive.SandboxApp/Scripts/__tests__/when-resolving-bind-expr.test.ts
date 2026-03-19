@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { resolveEventPath, coerce } from "../resolver";
+import { resolveEventPath, coerce } from "../resolution/resolver";
 import type { ExecContext } from "../types";
 
 describe("when resolving a BindExpr against execution context", () => {

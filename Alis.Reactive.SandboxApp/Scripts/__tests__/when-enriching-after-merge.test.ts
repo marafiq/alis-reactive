@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { boot, mergePlan, getBootedPlan, resetBootStateForTests } from "../boot";
+import { boot, mergePlan, getBootedPlan, resetBootStateForTests } from "../lifecycle/boot";
 import type { Plan, Entry, ValidationDescriptor, ValidationField, ComponentEntry } from "../types";
 
 /**

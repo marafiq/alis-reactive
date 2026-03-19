@@ -1,8 +1,8 @@
-import type { RequestDescriptor, StatusHandler, ExecContext } from "./types";
+import type { RequestDescriptor, StatusHandler, ExecContext } from "../types";
 import { resolveGather } from "./gather";
-import { executeCommands } from "./commands";
-import { executeReaction } from "./execute";
-import { scope } from "./core/trace";
+import { executeCommands } from "../execution/commands";
+import { executeReaction } from "../execution/execute";
+import { scope } from "../core/trace";
 
 const log = scope("http");
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { boot } from "../boot";
+import { boot } from "../lifecycle/boot";
 
 describe("when triggering on dom-ready", () => {
   it("executes commands immediately when document is ready", () => {

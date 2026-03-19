@@ -1,10 +1,10 @@
-import { executeReaction } from "./execute";
-import { scope } from "./core/trace";
+import { executeReaction } from "../../execution/execute";
+import { scope } from "../../core/trace";
 import type {
   Reaction,
   RequestDescriptor,
   StatusHandler,
-} from "./types";
+} from "../../types";
 
 const log = scope("native-action-link");
 const SELECTOR = "a[data-reactive-link]";

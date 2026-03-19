@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { boot } from "../boot";
+import { boot } from "../lifecycle/boot";
 
 describe("when resolving payload source in mutate-element", () => {
   it("resolves flat string property from event detail", () => {

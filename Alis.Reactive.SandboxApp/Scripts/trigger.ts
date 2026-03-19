@@ -1,8 +1,8 @@
 import type { Trigger, Reaction, ComponentEntry } from "./types";
-import { resolveRoot } from "./component";
+import { resolveRoot } from "./resolution/component";
 import { walk } from "./core/walk";
 import { scope } from "./core/trace";
-import { executeReaction } from "./execute";
+import { executeReaction } from "./execution/execute";
 import { assertNever } from "./core/assert-never";
 
 const log = scope("trigger");

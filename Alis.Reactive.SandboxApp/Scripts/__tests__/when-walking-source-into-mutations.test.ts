@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { boot } from "../boot";
-import { TestWidget } from "../test-widget";
+import { boot } from "../lifecycle/boot";
+import { TestWidget } from "../components/lab/test-widget";
 
 /**
  * Proves that source walk (dot-path resolution from event payload)

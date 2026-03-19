@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { evalRead } from "../component";
-import { TestWidget } from "../test-widget";
+import { evalRead } from "../resolution/component";
+import { TestWidget } from "../components/lab/test-widget";
 
 describe("when reading component value", () => {
   afterEach(() => { document.body.innerHTML = ""; });
