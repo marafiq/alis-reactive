@@ -1,1613 +1,1673 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Alis.Reactive Runtime — Exhaustive Sequence Diagrams</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; }
-  h1 { padding: 24px 32px 8px; font-size: 24px; color: #f1f5f9; }
-  h2 { padding: 16px 32px 8px; font-size: 18px; color: #94a3b8; border-top: 1px solid #1e293b; margin-top: 32px; }
-  h3 { padding: 8px 32px 4px; font-size: 15px; color: #7dd3fc; }
-  .subtitle { padding: 0 32px 16px; color: #64748b; font-size: 14px; }
-  nav { padding: 8px 32px; display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background: #0f172a; z-index: 10; }
-  nav a { color: #38bdf8; text-decoration: none; font-size: 13px; padding: 4px 12px; border-radius: 6px; border: 1px solid #1e293b; }
-  nav a:hover { background: #1e293b; }
-  .diagram { padding: 16px 32px; overflow-x: auto; }
-  .diagram .mermaid { background: #1e293b; border-radius: 8px; padding: 24px; }
-  .note { padding: 8px 32px; color: #64748b; font-size: 13px; font-style: italic; }
-  .file-ref { padding: 4px 32px; color: #475569; font-size: 12px; font-family: monospace; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alis.Reactive Runtime — Exhaustive Sequence Diagrams</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+    }
+
+    /* ── Sticky Navigation ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      font-size: 13px;
+    }
+    nav a {
+      color: #93c5fd;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    nav a:hover { color: #bfdbfe; text-decoration: underline; }
+    nav .sep { color: #475569; }
+
+    /* ── Main content ── */
+    main { max-width: 1400px; margin: 0 auto; padding: 30px 20px 80px; }
+
+    h1 {
+      font-size: 28px;
+      color: #f1f5f9;
+      border-bottom: 2px solid #3b82f6;
+      padding-bottom: 12px;
+      margin-bottom: 30px;
+    }
+
+    section {
+      margin-bottom: 60px;
+      scroll-margin-top: 60px;
+    }
+
+    h2 {
+      font-size: 22px;
+      color: #93c5fd;
+      margin-bottom: 8px;
+      border-left: 4px solid #3b82f6;
+      padding-left: 12px;
+    }
+
+    h3 {
+      font-size: 16px;
+      color: #cbd5e1;
+      margin: 16px 0 8px;
+    }
+
+    p, .note {
+      color: #94a3b8;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .note {
+      background: #1e293b;
+      border-left: 3px solid #f59e0b;
+      padding: 8px 14px;
+      border-radius: 4px;
+    }
+
+    code {
+      background: #1e293b;
+      color: #7dd3fc;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+
+    .path {
+      color: #a78bfa;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .mermaid {
+      background: #0f172a;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 13px;
+      width: 100%;
+    }
+    th { background: #1e293b; color: #93c5fd; text-align: left; padding: 8px 12px; }
+    td { border-top: 1px solid #334155; padding: 6px 12px; color: #cbd5e1; }
+    tr:nth-child(even) td { background: rgba(30,41,59,0.3); }
+  </style>
 </head>
 <body>
-<h1>Alis.Reactive TypeScript Runtime — Exhaustive Sequence Diagrams</h1>
-<p class="subtitle">100% code path coverage — every branch, every error, every edge case. Generated from actual source.</p>
 
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- STICKY NAVIGATION                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <nav>
-  <a href="#s1">1. root.ts</a>
-  <a href="#s2">2. boot.ts</a>
-  <a href="#s3">3. trigger.ts</a>
-  <a href="#s4">4. execute.ts</a>
-  <a href="#s5">5. commands.ts</a>
-  <a href="#s6">6. element.ts</a>
-  <a href="#s7">7. conditions.ts</a>
-  <a href="#s8">8. resolver.ts</a>
-  <a href="#s9">9. component.ts</a>
-  <a href="#s10">10. pipeline.ts</a>
-  <a href="#s11">11. http.ts</a>
-  <a href="#s12">12. gather.ts</a>
-  <a href="#s13">13. orchestrator.ts</a>
-  <a href="#s14">14. rule-engine.ts</a>
-  <a href="#s15">15. merge-plan.ts</a>
-  <a href="#s16">16. inject.ts</a>
-  <a href="#s17">17. live-clear.ts</a>
-  <a href="#s18">18. Components</a>
+  <a href="#root">1. root.ts</a> <span class="sep">|</span>
+  <a href="#boot">2. boot.ts</a> <span class="sep">|</span>
+  <a href="#trigger">3. trigger.ts</a> <span class="sep">|</span>
+  <a href="#execute">4. execute.ts</a> <span class="sep">|</span>
+  <a href="#commands">5. commands.ts</a> <span class="sep">|</span>
+  <a href="#element">6. element.ts</a> <span class="sep">|</span>
+  <a href="#conditions">7. conditions.ts</a> <span class="sep">|</span>
+  <a href="#resolver">8. resolver.ts</a> <span class="sep">|</span>
+  <a href="#component">9. component.ts</a> <span class="sep">|</span>
+  <a href="#pipeline">10. pipeline.ts</a> <span class="sep">|</span>
+  <a href="#http">11. http.ts</a> <span class="sep">|</span>
+  <a href="#gather">12. gather.ts</a> <span class="sep">|</span>
+  <a href="#orchestrator">13. orchestrator.ts</a> <span class="sep">|</span>
+  <a href="#rule-engine">14. rule-engine.ts</a> <span class="sep">|</span>
+  <a href="#merge-plan">15. merge-plan.ts</a> <span class="sep">|</span>
+  <a href="#inject">16. inject.ts</a> <span class="sep">|</span>
+  <a href="#live-clear">17. live-clear.ts</a> <span class="sep">|</span>
+  <a href="#components">18. Components</a> <span class="sep">|</span>
+  <a href="#supplementary">Supplementary</a>
 </nav>
 
-<!-- ============================================================ -->
-<!-- SECTION 1: root.ts -->
-<!-- ============================================================ -->
-<h2 id="s1">1. root.ts — Entry Point</h2>
-<p class="file-ref">Scripts/root.ts</p>
-<p class="note">ESM entry point. Side-effect imports wire drawer, loader, checklist. Then discovers all [data-alis-plan] elements, parses JSON, composes initial plans, and boots each.</p>
-<div class="diagram"><pre class="mermaid">
+<main>
+<h1>Alis.Reactive TypeScript Runtime &mdash; Exhaustive Sequence Diagrams</h1>
+<p>Every function, every branch, every throw. Generated from the current source tree.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 1. root.ts                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="root">
+<h2>1. root.ts &mdash; Entry Point</h2>
+<p class="path">Scripts/root.ts</p>
+<p>ESM entry point. Side-effect imports wire components. Discovers all <code>[data-reactive-plan]</code> elements,
+parses JSON, composes plans by planId, then boots each composed plan.</p>
+
+<div class="mermaid">
 sequenceDiagram
     participant Browser
     participant root as root.ts
     participant confirm as confirm.ts
     participant nal as native-action-link.ts
-    participant drawer as drawer.ts
-    participant loader as loader.ts
-    participant checklist as checklist.ts
-    participant mp as merge-plan.ts
+    participant drawer as drawer.ts (side-effect)
+    participant loader as loader.ts (side-effect)
+    participant checklist as checklist.ts (side-effect)
+    participant mergePlan as merge-plan.ts
     participant boot as boot.ts
 
-    Browser->>root: ESM module load
-    Note over root: Side-effect imports execute
-    root->>drawer: import (side-effect) -> drawer.init()
-    root->>loader: import (side-effect) -> loader.init()
-    root->>checklist: import (side-effect) -> checklist.init()
+    Browser->>root: ESM module loaded
 
+    Note over root: Side-effect imports execute on load
     root->>confirm: initConfirm()
     root->>nal: initNativeActionLinks()
+    Note over drawer: drawer.ts init() runs (side-effect import)
+    Note over loader: loader.ts init() runs (side-effect import)
+    Note over checklist: checklist.ts init() runs (side-effect import)
 
-    root->>Browser: querySelectorAll("[data-alis-plan]")
-    Browser-->>root: planEls (NodeList)
+    root->>Browser: querySelectorAll("[data-reactive-plan]")
+    Browser-->>root: NodeList of plan elements
 
-    loop for each planEl
+    loop Each plan element
         root->>root: el.getAttribute("data-trace")
-        alt data-trace attribute present
+        alt data-trace is set
             root->>boot: trace.setLevel(traceLevel)
         end
-
         root->>root: JSON.parse(el.textContent!)
-        alt JSON parse succeeds
+        alt JSON parse fails
+            root-->>Browser: THROW Error("[alis] failed to parse plan JSON...")
+        else JSON parse succeeds
             root->>root: plans.push(parsed)
-        else JSON parse fails
-            Note right of root: THROW Error("[alis] failed to parse plan JSON from [data-alis-plan] element: ...")
         end
     end
 
-    root->>mp: composeInitialPlans(plans)
-    mp-->>root: composed Plan[]
+    root->>mergePlan: composeInitialPlans(plans)
+    Note over mergePlan: Groups plans by planId,<br/>merges components + entries
+    mergePlan-->>root: Plan[] (one per unique planId)
 
-    loop for each composed plan
+    loop Each composed plan
         root->>boot: boot(plan)
     end
-</pre></div>
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 2: boot.ts -->
-<!-- ============================================================ -->
-<h2 id="s2">2. lifecycle/boot.ts — boot() + mergePlan() + wireEntries()</h2>
-<p class="file-ref">Scripts/lifecycle/boot.ts</p>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 2. boot.ts                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="boot">
+<h2>2. boot.ts &mdash; boot() + mergePlan() + Two-Phase Wiring</h2>
+<p class="path">Scripts/lifecycle/boot.ts</p>
+<p>Orchestrates enrichment, live-clear wiring, two-phase trigger wiring, and plan registration.
+<code>mergePlan()</code> handles partial reloads. <code>wireEntries()</code> guarantees custom-event listeners
+exist before dom-ready reactions fire.</p>
 
-<h3>2a. boot(plan)</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>boot(plan)</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
     participant boot as boot.ts
-    participant enrich as enrichment.ts
-    participant lc as live-clear.ts
+    participant enrichment as enrichment.ts
+    participant walkR as walk-reactions.ts
+    participant liveClear as live-clear.ts
     participant trigger as trigger.ts
-    participant mp as merge-plan.ts
+    participant registry as merge-plan.ts
 
     Caller->>boot: boot(plan)
-    boot->>boot: log.info("booting", entries.length)
+    boot->>boot: log.info("booting", {entries})
 
-    boot->>enrich: enrichEntries(plan.entries, plan.components)
-    Note over enrich: Walks entry/reaction graph,<br/>enriches validation fields<br/>from plan.components
+    boot->>enrichment: enrichEntries(plan.entries, plan.components)
+    Note over enrichment: Enriches validation fields<br/>from plan.components
 
-    boot->>boot: wireLiveClearingForEntries(plan.entries)
-    loop for each entry
-        boot->>boot: wireLiveClearingForReaction(entry.reaction)
-    end
+    boot->>walkR: walkValidationDescriptors(plan.entries, wireLiveClearing)
+    Note over walkR: Walks reaction tree, finds<br/>ValidationDescriptors
+    walkR->>liveClear: wireLiveClearing(desc) [for each descriptor]
 
     boot->>boot: wireEntries(plan.entries, plan.components, bootAbort.signal)
-    Note over boot: Two-phase wiring (see 2b)
 
-    boot->>mp: registerBootedPlan(plan)
-    boot->>boot: log.info("booted")
-</pre></div>
-
-<h3>2b. wireEntries() — Two-Phase Wiring</h3>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant boot as boot.ts
-    participant trigger as trigger.ts
-
-    Note over boot: Phase 1: Wire all NON-dom-ready triggers first
-
-    loop for each entry
-        alt entry.trigger.kind === "dom-ready"
-            boot->>boot: deferred.push(entry)
-        else non-dom-ready trigger
-            boot->>trigger: wireTrigger(trigger, reaction, components, signal)
+    Note over boot: TWO-PHASE WIRING (critical invariant)
+    rect rgb(30, 58, 95)
+        Note over boot: Phase 1: Wire non-dom-ready triggers
+        loop Each entry where trigger.kind != "dom-ready"
+            boot->>trigger: wireTrigger(entry.trigger, entry.reaction, components, signal)
         end
     end
 
-    Note over boot: Phase 2: Execute dom-ready triggers<br/>(listeners from Phase 1 are now active)
-
-    loop for each deferred entry
-        boot->>trigger: wireTrigger(trigger, reaction, components, signal)
+    rect rgb(30, 80, 50)
+        Note over boot: Phase 2: Execute dom-ready triggers
+        loop Each deferred entry (trigger.kind == "dom-ready")
+            boot->>trigger: wireTrigger(entry.trigger, entry.reaction, components, signal)
+        end
     end
-</pre></div>
 
-<h3>2c. mergePlan(incoming)</h3>
-<div class="diagram"><pre class="mermaid">
+    boot->>registry: registerBootedPlan(plan)
+    boot->>boot: log.info("booted")
+</div>
+
+<h3>mergePlan(incoming)</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
     participant boot as boot.ts
-    participant mp as merge-plan.ts
-    participant ed as error-display.ts
+    participant registry as merge-plan.ts
+    participant enrichment as enrichment.ts
+    participant walkR as walk-reactions.ts
+    participant liveClear as live-clear.ts
+    participant errDisplay as error-display.ts
 
     Caller->>boot: mergePlan(incoming)
-    boot->>mp: applyMergedPlan(incoming, hooks)
-    Note over mp: hooks = { enrichEntries, wireEntries }
-    mp-->>boot: merged Plan
+    boot->>registry: applyMergedPlan(incoming, {enrichEntries, wireEntries})
+    Note over registry: PlanRegistry.add() handles<br/>source dedup, re-enrichment,<br/>wiring with AbortController
+    registry-->>boot: merged Plan
 
-    boot->>boot: wireLiveClearingForEntries(merged.entries)
+    boot->>walkR: walkValidationDescriptors(merged.entries, wireLiveClearing)
+    walkR->>liveClear: wireLiveClearing(desc) [for each descriptor]
 
     boot->>boot: clearSummaryForPlan(merged.planId)
-    boot->>ed: findSummaryElement(planId)
-    alt summaryEl found
-        boot->>ed: clearSummary(summaryEl)
-        boot->>ed: hideSummaryDiv(summaryEl)
+    boot->>errDisplay: findSummaryElement(planId)
+    alt summary element exists
+        boot->>errDisplay: clearSummary(el)
+        boot->>errDisplay: hideSummaryDiv(el)
     end
 
-    boot->>boot: log.info("merge", ...)
-</pre></div>
+    boot->>boot: log.info("merge", {planId, newComponents})
+</div>
 
-<h3>2d. wireLiveClearingForReaction() — Recursive Reaction Walker</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>resetBootStateForTests()</h3>
+<div class="mermaid">
 sequenceDiagram
+    participant Test
     participant boot as boot.ts
-    participant lc as live-clear.ts
+    participant registry as merge-plan.ts
 
-    Note over boot: switch(reaction.kind)
-
-    alt kind === "http"
-        alt reaction.request.validation exists
-            boot->>lc: wireLiveClearing(reaction.request.validation)
-        end
-    else kind === "parallel-http"
-        loop for each request in reaction.requests
-            alt req.validation exists
-                boot->>lc: wireLiveClearing(req.validation)
-            end
-        end
-    else kind === "conditional"
-        loop for each branch in reaction.branches
-            boot->>boot: wireLiveClearingForReaction(branch.reaction)
-            Note over boot: Recurse into each branch
-        end
-    else kind === "sequential" (implicit)
-        Note over boot: No validation to wire, skip
-    end
-</pre></div>
-
-<h3>2e. resetBootStateForTests()</h3>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant Caller
-    participant boot as boot.ts
-    participant mp as merge-plan.ts
-
-    Caller->>boot: resetBootStateForTests()
+    Test->>boot: resetBootStateForTests()
     boot->>boot: bootAbort.abort()
-    Note over boot: Aborts all listeners<br/>wired with previous signal
+    Note over boot: Cancels all event listeners<br/>registered with this signal
     boot->>boot: bootAbort = new AbortController()
-    boot->>mp: resetMergePlanState()
-</pre></div>
+    boot->>registry: resetMergePlanState()
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 3: trigger.ts -->
-<!-- ============================================================ -->
-<h2 id="s3">3. execution/trigger.ts — wireTrigger()</h2>
-<p class="file-ref">Scripts/execution/trigger.ts</p>
-<div class="diagram"><pre class="mermaid">
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 3. trigger.ts                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="trigger">
+<h2>3. trigger.ts &mdash; wireTrigger() All 3 Kinds</h2>
+<p class="path">Scripts/execution/trigger.ts</p>
+<p>Wires a single trigger to its reaction. Three trigger kinds: <code>dom-ready</code>,
+<code>custom-event</code>, and <code>component-event</code> (native + fusion variants).</p>
+
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant trig as trigger.ts
-    participant comp as component.ts
+    participant trigger as trigger.ts
+    participant execute as execute.ts
+    participant component as component.ts
     participant walk as walk.ts
-    participant exec as execute.ts
     participant DOM
 
-    Caller->>trig: wireTrigger(trigger, reaction, components, signal)
-    trig->>trig: opts = signal ? { signal } : undefined
+    Caller->>trigger: wireTrigger(trigger, reaction, components, signal)
+    trigger->>trigger: opts = signal ? {signal} : undefined
 
-    alt trigger.kind === "dom-ready"
-        alt document.readyState === "complete" OR "interactive"
-            trig->>exec: executeReaction(reaction, { components })
-            Note over trig: Execute immediately, DOM is ready
-        else readyState === "loading"
-            trig->>DOM: document.addEventListener("DOMContentLoaded", handler, opts)
+    alt trigger.kind == "dom-ready"
+        alt document.readyState is "complete" or "interactive"
+            trigger->>execute: executeReaction(reaction, {components})
+            Note over trigger: Immediate execution
+        else DOM not ready
+            trigger->>DOM: document.addEventListener("DOMContentLoaded", handler, opts)
             Note over DOM: When DOMContentLoaded fires:
-            DOM->>exec: executeReaction(reaction, { components })
+            DOM->>execute: executeReaction(reaction, {components})
         end
 
-    else trigger.kind === "custom-event"
-        trig->>trig: log.debug("custom-event: listening", { event })
-        trig->>DOM: document.addEventListener(trigger.event, handler, opts)
+    else trigger.kind == "custom-event"
+        trigger->>trigger: log.debug("custom-event: listening", {event})
+        trigger->>DOM: document.addEventListener(trigger.event, handler, opts)
         Note over DOM: When custom event fires:
         DOM->>DOM: detail = (e as CustomEvent).detail
-        DOM->>exec: executeReaction(reaction, { evt: detail ?? {}, components })
+        DOM->>execute: executeReaction(reaction, {evt: detail ?? {}, components})
 
-    else trigger.kind === "component-event"
-        trig->>DOM: document.getElementById(trigger.componentId)
-        alt element NOT found
-            Note right of trig: THROW Error("[alis] element not found: {componentId}")
+    else trigger.kind == "component-event"
+        trigger->>DOM: document.getElementById(trigger.componentId)
+        alt element not found
+            trigger-->>Caller: THROW Error("[alis] element not found: {id}")
         end
-        DOM-->>trig: el
-
-        trig->>comp: resolveRoot(el, trigger.vendor)
-        comp-->>trig: root (EventTarget)
-
-        trig->>trig: log.debug("component-event", { componentId, jsEvent, vendor })
-        trig->>DOM: root.addEventListener(trigger.jsEvent, handler, opts)
+        trigger->>component: resolveRoot(el, trigger.vendor)
+        component-->>trigger: root (native=el, fusion=ej2)
+        trigger->>trigger: log.debug("component-event", {componentId, jsEvent, vendor})
+        trigger->>DOM: (root as EventTarget).addEventListener(trigger.jsEvent, handler, opts)
 
         Note over DOM: When component event fires:
-        alt trigger.vendor === "native"
-            alt readExpr exists
-                trig->>walk: walk(el, readExpr)
-                walk-->>trig: value
-                Note over trig: detail = { [readExpr]: value, event: e }
+        alt trigger.vendor == "native"
+            alt trigger.readExpr exists
+                DOM->>walk: walk(el, readExpr)
+                walk-->>DOM: value
+                Note over DOM: detail = {[readExpr]: value, event: e}
             else no readExpr
-                Note over trig: detail = { event: e }
+                Note over DOM: detail = {event: e}
             end
-        else vendor === "fusion"
-            Note over trig: detail = e ?? {} (use event as-is)
+        else trigger.vendor == "fusion"
+            Note over DOM: detail = e ?? {}
         end
-        DOM->>exec: executeReaction(reaction, { evt: detail, components })
+        DOM->>execute: executeReaction(reaction, {evt: detail, components})
 
-    else default (unknown trigger kind)
-        Note right of trig: THROW assertNever(trigger, "trigger kind")
+    else unknown trigger kind
+        trigger->>trigger: assertNever(trigger, "trigger kind")
+        trigger-->>Caller: THROW Error("[alis] Unhandled trigger kind: ...")
     end
-</pre></div>
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 4: execute.ts -->
-<!-- ============================================================ -->
-<h2 id="s4">4. execution/execute.ts — executeReaction() + dispatchAsync()</h2>
-<p class="file-ref">Scripts/execution/execute.ts</p>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 4. execute.ts                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="execute">
+<h2>4. execute.ts &mdash; executeReaction() + dispatchAsync()</h2>
+<p class="path">Scripts/execution/execute.ts</p>
+<p>Entry point for reaction execution. Routes to sync or async path based on whether any
+ConfirmGuard exists in the reaction tree. Handles 4 reaction kinds:
+<code>sequential</code>, <code>conditional</code>, <code>http</code>, <code>parallel-http</code>.</p>
 
-<h3>4a. needsAsync() — Recursive ConfirmGuard Detection</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>needsAsync() &mdash; ConfirmGuard detection</h3>
+<div class="mermaid">
 sequenceDiagram
-    participant exec as execute.ts
-    participant cond as conditions.ts
+    participant execute as execute.ts
+    participant conditions as conditions.ts
 
-    Note over exec: needsAsync(reaction)
+    Note over execute: needsAsync(reaction) recursive check
+    alt reaction.kind == "conditional"
+        loop Each branch
+            alt branch.guard != null AND isConfirmGuard(guard)
+                execute-->>execute: return true
+            else recurse into branch.reaction
+                execute->>execute: needsAsync(branch.reaction)
+            end
+        end
+    end
+    Note over execute: For sequential/http/parallel-http: return false
+</div>
 
-    alt reaction.kind === "conditional"
-        loop for each branch
-            alt branch.guard != null AND isConfirmGuard(branch.guard)
-                exec-->>exec: return true
-            else check nested reaction
-                exec->>exec: needsAsync(branch.reaction)
-                alt nested returns true
-                    exec-->>exec: return true
+<h3>executeReaction() &mdash; Sync path</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant Caller
+    participant execute as execute.ts
+    participant commands as commands.ts
+    participant conditions as conditions.ts
+    participant pipeline as pipeline.ts
+
+    Caller->>execute: executeReaction(reaction, ctx)
+
+    alt needsAsync(reaction) == true
+        execute->>execute: dispatchAsync(reaction, ctx)
+        Note over execute: Delegates to async path
+        execute-->>Caller: return (void)
+    end
+
+    alt reaction.kind == "sequential"
+        execute->>execute: log.debug("sequential", {commands.length})
+        loop Each command
+            execute->>commands: executeCommand(cmd, ctx)
+        end
+
+    else reaction.kind == "conditional"
+        execute->>execute: log.debug("conditional", {commands, branches})
+        opt reaction.commands exists
+            loop Each pre-branch command
+                execute->>commands: executeCommand(cmd, ctx)
+            end
+        end
+        loop Each branch
+            alt branch.guard == null (else branch)
+                execute->>execute: log.trace("branch-taken", {guard: "else"})
+                execute->>execute: executeReaction(branch.reaction, ctx)
+                execute-->>Caller: return (first match wins)
+            else evaluateGuard(branch.guard, ctx) == true
+                execute->>conditions: evaluateGuard(branch.guard, ctx)
+                conditions-->>execute: true
+                execute->>execute: log.trace("branch-taken", {guard})
+                execute->>execute: executeReaction(branch.reaction, ctx)
+                execute-->>Caller: return
+            else guard is false
+                Note over execute: Skip this branch
+            end
+        end
+        execute->>execute: log.trace("no-branch-taken")
+
+    else reaction.kind == "http"
+        execute->>execute: log.debug("http", {url})
+        execute->>pipeline: executeHttpReaction(reaction, ctx)
+
+    else reaction.kind == "parallel-http"
+        execute->>execute: log.debug("parallel-http", {count})
+        execute->>pipeline: executeParallelHttpReaction(reaction, ctx)
+
+    else unknown reaction kind
+        execute->>execute: assertNever(reaction, "reaction kind")
+        execute-->>Caller: THROW Error("[alis] Unhandled reaction kind: ...")
+    end
+</div>
+
+<h3>dispatchAsync() &mdash; Async path (ConfirmGuard present)</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant execute as execute.ts
+    participant commands as commands.ts
+    participant conditions as conditions.ts
+    participant pipeline as pipeline.ts
+
+    Note over execute: dispatchAsync(reaction, ctx) - async
+
+    alt reaction.kind == "sequential"
+        execute->>execute: log.debug("sequential", {commands.length})
+        loop Each command
+            execute->>commands: executeCommand(cmd, ctx)
+        end
+
+    else reaction.kind == "conditional"
+        execute->>execute: log.debug("conditional", {commands, branches})
+        opt reaction.commands exists
+            loop Each pre-branch command
+                execute->>commands: executeCommand(cmd, ctx)
+            end
+        end
+        loop Each branch
+            alt branch.guard == null (else branch)
+                execute->>execute: await dispatchAsync(branch.reaction, ctx)
+                execute-->>execute: return
+            else
+                execute->>conditions: await evaluateGuardAsync(branch.guard, ctx)
+                conditions-->>execute: boolean
+                alt guard result is true
+                    execute->>execute: log.trace("branch-taken", {guard})
+                    execute->>execute: await dispatchAsync(branch.reaction, ctx)
+                    execute-->>execute: return
                 end
             end
         end
-        exec-->>exec: return false (no confirm found)
-    else any other reaction kind
-        exec-->>exec: return false
-    end
-</pre></div>
+        execute->>execute: log.trace("no-branch-taken")
 
-<h3>4b. executeReaction() — Sync Path</h3>
-<div class="diagram"><pre class="mermaid">
+    else reaction.kind == "http"
+        execute->>execute: log.debug("http", {url})
+        execute->>pipeline: await executeHttpReaction(reaction, ctx)
+
+    else reaction.kind == "parallel-http"
+        execute->>execute: log.debug("parallel-http", {count})
+        execute->>pipeline: await executeParallelHttpReaction(reaction, ctx)
+
+    else unknown kind
+        execute->>execute: assertNever(reaction, "reaction kind")
+        execute-->>execute: THROW
+    end
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 5. commands.ts                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="commands">
+<h2>5. commands.ts &mdash; executeCommand() All 4 Kinds</h2>
+<p class="path">Scripts/execution/commands.ts</p>
+<p>Executes a single command. Supports per-action <code>When</code> guards. Four command kinds:
+<code>dispatch</code>, <code>mutate-element</code>, <code>validation-errors</code>, <code>into</code>.</p>
+
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant exec as execute.ts
-    participant cmd as commands.ts
-    participant cond as conditions.ts
-    participant pipe as pipeline.ts
-
-    Caller->>exec: executeReaction(reaction, ctx)
-
-    alt needsAsync(reaction) returns true
-        exec->>exec: dispatchAsync(reaction, ctx)
-        exec-->>Caller: return (async path takes over)
-    end
-
-    Note over exec: Sync path — switch(reaction.kind)
-
-    alt kind === "sequential"
-        exec->>exec: log.debug("sequential", { commands.length })
-        loop for each command
-            exec->>cmd: executeCommand(cmd, ctx)
-        end
-
-    else kind === "conditional"
-        exec->>exec: log.debug("conditional", { commands, branches })
-        opt reaction.commands exists (preamble)
-            loop for each preamble command
-                exec->>cmd: executeCommand(cmd, ctx)
-            end
-        end
-        loop for each branch
-            alt branch.guard == null (else branch)
-                exec->>exec: log.trace("branch-taken", { guard: "else" })
-                exec->>exec: executeReaction(branch.reaction, ctx)
-                exec-->>Caller: return (first match wins)
-            else evaluateGuard(branch.guard, ctx) === true
-                exec->>cond: evaluateGuard(branch.guard, ctx)
-                cond-->>exec: true
-                exec->>exec: log.trace("branch-taken", { guard })
-                exec->>exec: executeReaction(branch.reaction, ctx)
-                exec-->>Caller: return (first match wins)
-            else evaluateGuard returns false
-                exec->>cond: evaluateGuard(branch.guard, ctx)
-                cond-->>exec: false
-                Note over exec: continue to next branch
-            end
-        end
-        exec->>exec: log.trace("no-branch-taken")
-
-    else kind === "http"
-        exec->>exec: log.debug("http", { url })
-        exec->>pipe: executeHttpReaction(reaction, ctx)
-
-    else kind === "parallel-http"
-        exec->>exec: log.debug("parallel-http", { count })
-        exec->>pipe: executeParallelHttpReaction(reaction, ctx)
-
-    else default
-        Note right of exec: THROW assertNever(reaction, "reaction kind")
-    end
-</pre></div>
-
-<h3>4c. dispatchAsync() — Async Path (ConfirmGuard Present)</h3>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant exec as execute.ts
-    participant cmd as commands.ts
-    participant cond as conditions.ts
-    participant pipe as pipeline.ts
-
-    Note over exec: dispatchAsync(reaction, ctx) - async
-
-    alt kind === "sequential"
-        exec->>exec: log.debug("sequential", { commands.length })
-        loop for each command
-            exec->>cmd: executeCommand(cmd, ctx)
-        end
-
-    else kind === "conditional"
-        exec->>exec: log.debug("conditional", { commands, branches })
-        opt reaction.commands exists (preamble)
-            loop for each preamble command
-                exec->>cmd: executeCommand(cmd, ctx)
-            end
-        end
-        loop for each branch
-            alt branch.guard == null (else branch)
-                exec->>exec: await dispatchAsync(branch.reaction, ctx)
-                exec-->>exec: return
-            else guard present
-                exec->>cond: await evaluateGuardAsync(branch.guard, ctx)
-                alt returns true
-                    exec->>exec: log.trace("branch-taken")
-                    exec->>exec: await dispatchAsync(branch.reaction, ctx)
-                    exec-->>exec: return
-                else returns false
-                    Note over exec: continue to next branch
-                end
-            end
-        end
-        exec->>exec: log.trace("no-branch-taken")
-
-    else kind === "http"
-        exec->>exec: log.debug("http", { url })
-        exec->>pipe: await executeHttpReaction(reaction, ctx)
-
-    else kind === "parallel-http"
-        exec->>exec: log.debug("parallel-http", { count })
-        exec->>pipe: await executeParallelHttpReaction(reaction, ctx)
-
-    else default
-        Note right of exec: THROW assertNever(reaction, "reaction kind")
-    end
-</pre></div>
-
-<!-- ============================================================ -->
-<!-- SECTION 5: commands.ts -->
-<!-- ============================================================ -->
-<h2 id="s5">5. execution/commands.ts — executeCommand()</h2>
-<p class="file-ref">Scripts/execution/commands.ts</p>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant Caller
-    participant cmds as commands.ts
-    participant cond as conditions.ts
-    participant elem as element.ts
-    participant val as validation/index.ts
+    participant commands as commands.ts
+    participant conditions as conditions.ts
+    participant element as element.ts
+    participant validation as validation/index.ts
     participant inject as inject.ts
     participant DOM
 
-    Caller->>cmds: executeCommand(cmd, ctx)
+    Caller->>commands: executeCommand(cmd, ctx)
 
-    alt cmd.when guard exists
-        cmds->>cond: isConfirmGuard(cmd.when)
-        alt is ConfirmGuard
-            cmds->>cmds: log.warn("ConfirmGuard on per-action When not supported")
-            cmds-->>Caller: return (skip command)
+    alt cmd.when is set (per-action guard)
+        alt isConfirmGuard(cmd.when) == true
+            commands->>commands: log.warn("ConfirmGuard on per-action When not supported")
+            commands-->>Caller: return (skip command)
+        else
+            commands->>conditions: evaluateGuard(cmd.when, ctx)
+            conditions-->>commands: boolean
+            alt guard is false
+                commands->>commands: log.trace("per-action-when-skipped", {kind})
+                commands-->>Caller: return (skip command)
+            end
         end
-
-        cmds->>cond: evaluateGuard(cmd.when, ctx)
-        alt returns false
-            cmds->>cmds: log.trace("per-action-when-skipped", { kind })
-            cmds-->>Caller: return (skip command)
-        end
-        Note over cmds: Guard passed, continue to command execution
     end
 
-    Note over cmds: switch(cmd.kind)
+    alt cmd.kind == "dispatch"
+        commands->>commands: log.trace("dispatch", {event, payload})
+        commands->>DOM: document.dispatchEvent(new CustomEvent(cmd.event, {detail: cmd.payload ?? {}}))
 
-    alt kind === "dispatch"
-        cmds->>cmds: log.trace("dispatch", { event, payload })
-        cmds->>DOM: document.dispatchEvent(new CustomEvent(cmd.event, { detail: payload ?? {} }))
+    else cmd.kind == "mutate-element"
+        commands->>commands: log.trace("mutate-element", {target, mutation.kind})
+        commands->>element: mutateElement(cmd, ctx)
 
-    else kind === "mutate-element"
-        cmds->>cmds: log.trace("mutate-element", { target, mutation.kind })
-        cmds->>elem: mutateElement(cmd, ctx)
-
-    else kind === "validation-errors"
+    else cmd.kind == "validation-errors"
         alt ctx.responseBody is falsy
-            Note over cmds: break (no response body to display)
-        else responseBody exists
-            alt ctx.validationDesc is falsy
-                Note right of cmds: THROW Error('[alis] ValidationErrors("{formId}") requires a validation descriptor.')
-            else validationDesc exists
-                cmds->>val: showServerErrors(ctx.validationDesc, ctx.responseBody)
-            end
+            Note over commands: break (no body to display)
+        end
+        alt ctx.validationDesc is missing
+            commands-->>Caller: THROW Error("[alis] ValidationErrors requires a validation descriptor...")
+        end
+        commands->>validation: showServerErrors(ctx.validationDesc, ctx.responseBody)
+
+    else cmd.kind == "into"
+        commands->>DOM: document.getElementById(cmd.target)
+        alt container not found
+            commands-->>Caller: THROW Error('[alis] Into("{target}") target not found...')
+        end
+        alt ctx.responseBody != null
+            commands->>inject: injectHtml(container, String(ctx.responseBody))
         end
 
-    else kind === "into"
-        cmds->>DOM: document.getElementById(cmd.target)
-        DOM-->>cmds: container (or null)
-        alt container exists AND ctx.responseBody != null
-            cmds->>inject: injectHtml(container, String(ctx.responseBody))
-        else container null OR no responseBody
-            Note over cmds: No-op (silent skip)
-        end
-
-    else default
-        Note right of cmds: THROW assertNever(cmd, "command kind")
+    else unknown command kind
+        commands->>commands: assertNever(cmd, "command kind")
+        commands-->>Caller: THROW Error("[alis] Unhandled command kind: ...")
     end
-</pre></div>
+</div>
 
-<p class="note">executeCommands(commands, ctx) simply loops over commands and calls executeCommand for each.</p>
-
-<!-- ============================================================ -->
-<!-- SECTION 6: element.ts -->
-<!-- ============================================================ -->
-<h2 id="s6">6. execution/element.ts — mutateElement() + resolveArg()</h2>
-<p class="file-ref">Scripts/execution/element.ts</p>
-
-<h3>6a. resolveArg()</h3>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant elem as element.ts
-    participant res as resolver.ts
-
-    Note over elem: resolveArg(arg, ctx)
-
-    alt arg.kind === "literal"
-        elem-->>elem: return arg.value
-
-    else arg.kind === "source"
-        elem->>res: resolveSource(arg.source, ctx)
-        res-->>elem: raw value
-        alt arg.coerce defined
-            elem->>res: coerce(raw, arg.coerce)
-            res-->>elem: coerced value
-            elem-->>elem: return coerced
-        else no coerce
-            elem-->>elem: return raw
-        end
-
-    else default
-        Note right of elem: THROW assertNever(arg, "method arg kind")
-    end
-</pre></div>
-
-<h3>6b. mutateElement()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>executeCommands() &mdash; batch</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant elem as element.ts
+    participant commands as commands.ts
+
+    Caller->>commands: executeCommands(commands[], ctx)
+    loop Each command in list
+        commands->>commands: executeCommand(cmd, ctx)
+    end
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 6. element.ts                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="element">
+<h2>6. element.ts &mdash; mutateElement() + resolveArg()</h2>
+<p class="path">Scripts/execution/element.ts</p>
+<p>Resolves the target element, determines vendor root, then applies the mutation via bracket notation.
+Two mutation kinds: <code>set-prop</code> and <code>call</code>.</p>
+
+<h3>resolveArg()</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant element as element.ts
+    participant resolver as resolver.ts
+    participant coerce as coerce.ts
+
+    Note over element: resolveArg(arg, ctx)
+    alt arg.kind == "literal"
+        element-->>element: return arg.value (pass-through)
+    else arg.kind == "source"
+        element->>resolver: resolveSource(arg.source, ctx)
+        resolver-->>element: raw value
+        alt arg.coerce is set
+            element->>coerce: coerce(raw, arg.coerce)
+            coerce-->>element: coerced value
+        end
+        element-->>element: return raw or coerced
+    else unknown arg kind
+        element->>element: assertNever(arg, "method arg kind")
+        element-->>element: THROW
+    end
+</div>
+
+<h3>mutateElement()</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant Caller
+    participant element as element.ts
     participant DOM
-    participant comp as component.ts
-    participant res as resolver.ts
+    participant component as component.ts
+    participant resolver as resolver.ts
+    participant coerce as coerce.ts
 
-    Caller->>elem: mutateElement(cmd, ctx)
-
-    elem->>DOM: document.getElementById(cmd.target)
-    alt element NOT found
-        Note right of elem: THROW Error("[alis] target not found: {target}")
+    Caller->>element: mutateElement(cmd, ctx)
+    element->>DOM: document.getElementById(cmd.target)
+    alt element not found
+        element-->>Caller: THROW Error("[alis] target not found: {target}")
     end
-    DOM-->>elem: domEl
 
-    alt cmd.vendor defined
-        elem->>comp: resolveRoot(domEl, cmd.vendor)
-        comp-->>elem: root (vendor instance)
+    alt cmd.vendor is set
+        element->>component: resolveRoot(domEl, cmd.vendor)
+        component-->>element: root (vendor-specific)
     else no vendor
-        Note over elem: root = domEl (raw DOM element)
+        Note over element: root = domEl (plain DOM)
     end
 
-    Note over elem: switch(cmd.mutation.kind)
-
-    alt mutation.kind === "set-prop"
-        alt cmd.source defined
-            elem->>res: resolveSource(cmd.source, ctx)
-            res-->>elem: val (from source)
+    alt mutation.kind == "set-prop"
+        alt cmd.source is set
+            element->>resolver: resolveSource(cmd.source, ctx)
+            resolver-->>element: val
         else no source
-            Note over elem: val = cmd.value (static)
+            Note over element: val = cmd.value (literal)
         end
-        alt mutation.coerce defined
-            elem->>res: coerce(val, mutation.coerce)
-            res-->>elem: coerced val
+        alt mutation.coerce is set
+            element->>coerce: coerce(val, mutation.coerce)
+            coerce-->>element: coerced val
         end
-        elem->>elem: log.trace("set-prop", { target, prop, val })
-        elem->>DOM: root[mutation.prop] = val
+        element->>element: log.trace("set-prop", {target, prop, val})
+        element->>DOM: root[mutation.prop] = coerced val
 
-    else mutation.kind === "call"
-        alt mutation.chain defined
-            Note over elem: target = root[mutation.chain] (e.g. classList)
+    else mutation.kind == "call"
+        alt mutation.chain is set
+            Note over element: target = root[mutation.chain]
         else no chain
-            Note over elem: target = root
+            Note over element: target = root
         end
-
-        loop for each arg in mutation.args (default [])
-            elem->>elem: resolveArg(arg, ctx)
+        loop Each arg in mutation.args
+            element->>element: resolveArg(arg, ctx)
         end
-        elem->>elem: log.trace("call", { target, method, args })
-        elem->>DOM: target[mutation.method].apply(target, resolvedArgs)
+        element->>element: log.trace("call", {target, method, args})
+        element->>DOM: target[mutation.method].apply(target, resolvedArgs)
 
-    else default
-        Note right of elem: THROW assertNever(mutation, "mutation kind")
+    else unknown mutation kind
+        element->>element: assertNever(mutation, "mutation kind")
+        element-->>Caller: THROW
     end
-</pre></div>
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 7: conditions.ts -->
-<!-- ============================================================ -->
-<h2 id="s7">7. conditions/conditions.ts — evaluateGuard() + evaluateValueGuard()</h2>
-<p class="file-ref">Scripts/conditions/conditions.ts</p>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 7. conditions.ts                                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="conditions">
+<h2>7. conditions.ts &mdash; Guard Evaluation (Sync + Async)</h2>
+<p class="path">Scripts/conditions/conditions.ts</p>
+<p>Evaluates guard trees. Five guard kinds: <code>value</code>, <code>all</code>, <code>any</code>,
+<code>not</code>, <code>confirm</code>. The <code>value</code> guard supports 21 operators.</p>
 
-<h3>7a. isConfirmGuard() — Recursive Check</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>evaluateGuard() &mdash; Sync</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant cond as conditions.ts
+    participant conditions as conditions.ts
+    participant resolver as resolver.ts
 
-    Caller->>cond: isConfirmGuard(guard)
+    Caller->>conditions: evaluateGuard(guard, ctx)
 
-    alt guard.kind === "confirm"
-        cond-->>Caller: return true
-    else guard.kind === "not"
-        cond->>cond: isConfirmGuard(guard.inner)
-        cond-->>Caller: return result
-    else guard.kind === "all" or "any"
-        cond->>cond: guard.guards.some(isConfirmGuard)
-        cond-->>Caller: return result
-    else guard.kind === "value"
-        cond-->>Caller: return false
-    end
-</pre></div>
+    alt guard.kind == "value"
+        conditions->>conditions: evaluateValueGuard(guard, ctx)
 
-<h3>7b. evaluateGuard() — Sync</h3>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant Caller
-    participant cond as conditions.ts
-
-    Caller->>cond: evaluateGuard(guard, ctx)
-
-    alt guard.kind === "value"
-        cond->>cond: evaluateValueGuard(guard, ctx)
-        cond-->>Caller: return boolean
-
-    else guard.kind === "all"
-        cond->>cond: guard.guards.every(g => evaluateGuard(g, ctx))
-        cond-->>Caller: return boolean
-
-    else guard.kind === "any"
-        cond->>cond: guard.guards.some(g => evaluateGuard(g, ctx))
-        cond-->>Caller: return boolean
-
-    else guard.kind === "not"
-        cond->>cond: !evaluateGuard(guard.inner, ctx)
-        cond-->>Caller: return boolean
-
-    else guard.kind === "confirm"
-        cond->>cond: log.warn("ConfirmGuard in sync context - denying")
-        cond-->>Caller: return false
-
-    else default
-        Note right of cond: THROW assertNever(guard, "guard kind")
-    end
-</pre></div>
-
-<h3>7c. evaluateGuardAsync() — Async</h3>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant Caller
-    participant cond as conditions.ts
-    participant win as window.alis
-
-    Caller->>cond: await evaluateGuardAsync(guard, ctx)
-
-    alt guard.kind === "value"
-        cond->>cond: evaluateValueGuard(guard, ctx)
-        cond-->>Caller: return boolean
-
-    else guard.kind === "all"
-        loop for each guard in guards (sequential)
-            cond->>cond: await evaluateGuardAsync(g, ctx)
-            alt returns false
-                cond-->>Caller: return false (short-circuit)
+    else guard.kind == "all"
+        loop Each inner guard
+            conditions->>conditions: evaluateGuard(g, ctx)
+            alt any returns false
+                conditions-->>Caller: false (short-circuit)
             end
         end
-        cond-->>Caller: return true
+        conditions-->>Caller: true
 
-    else guard.kind === "any"
-        loop for each guard in guards (sequential)
-            cond->>cond: await evaluateGuardAsync(g, ctx)
-            alt returns true
-                cond-->>Caller: return true (short-circuit)
+    else guard.kind == "any"
+        loop Each inner guard
+            conditions->>conditions: evaluateGuard(g, ctx)
+            alt any returns true
+                conditions-->>Caller: true (short-circuit)
             end
         end
-        cond-->>Caller: return false
+        conditions-->>Caller: false
 
-    else guard.kind === "not"
-        cond->>cond: await evaluateGuardAsync(guard.inner, ctx)
-        cond-->>Caller: return negated result
+    else guard.kind == "not"
+        conditions->>conditions: evaluateGuard(guard.inner, ctx)
+        conditions-->>Caller: !result
 
-    else guard.kind === "confirm"
-        cond->>win: window.alis?.confirm?.(guard.message)
-        alt alis.confirm exists
-            win-->>cond: Promise of boolean (user clicks OK/Cancel)
-        else alis.confirm missing
-            Note over cond: Fallback: Promise.resolve(false)
-        end
-        cond-->>Caller: return boolean
+    else guard.kind == "confirm"
+        conditions->>conditions: log.warn("ConfirmGuard in sync context")
+        conditions-->>Caller: false (deny in sync)
 
-    else default
-        Note right of cond: THROW assertNever(guard, "guard kind")
+    else unknown kind
+        conditions->>conditions: assertNever(guard, "guard kind")
+        conditions-->>Caller: THROW
     end
-</pre></div>
+</div>
 
-<h3>7d. evaluateValueGuard() — All Operators</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>evaluateGuardAsync()</h3>
+<div class="mermaid">
 sequenceDiagram
-    participant cond as conditions.ts
-    participant res as resolver.ts
+    participant Caller
+    participant conditions as conditions.ts
+    participant Window
 
-    Note over cond: evaluateValueGuard(guard, ctx)
+    Caller->>conditions: await evaluateGuardAsync(guard, ctx)
 
-    alt op === "is-null" or "not-null"
-        cond->>res: resolveSource(guard.source, ctx)
-        res-->>cond: raw (NO coercion)
-        cond->>cond: log.trace("eval-presence")
-        alt op === "is-null"
-            cond-->>cond: return raw == null
-        else op === "not-null"
-            cond-->>cond: return raw != null
+    alt guard.kind == "value"
+        conditions->>conditions: evaluateValueGuard(guard, ctx)
+        conditions-->>Caller: boolean
+
+    else guard.kind == "all"
+        loop Each inner guard (sequential)
+            conditions->>conditions: await evaluateGuardAsync(g, ctx)
+            alt result is false
+                conditions-->>Caller: false (short-circuit)
+            end
+        end
+        conditions-->>Caller: true
+
+    else guard.kind == "any"
+        loop Each inner guard (sequential)
+            conditions->>conditions: await evaluateGuardAsync(g, ctx)
+            alt result is true
+                conditions-->>Caller: true (short-circuit)
+            end
+        end
+        conditions-->>Caller: false
+
+    else guard.kind == "not"
+        conditions->>conditions: await evaluateGuardAsync(guard.inner, ctx)
+        conditions-->>Caller: !result
+
+    else guard.kind == "confirm"
+        conditions->>Window: window.alis?.confirm?.(guard.message)
+        Window-->>conditions: Promise boolean (user clicks OK/Cancel)
+        alt window.alis.confirm is undefined
+            conditions-->>Caller: false
         end
 
-    else op === "is-empty" or "not-empty"
-        cond->>res: resolveSource(guard.source, ctx)
-        res-->>cond: raw (NO coercion)
-        cond->>cond: log.trace("eval-presence")
-        Note over cond: isEmpty = raw==="" || raw===null || raw===undefined || (isArray && length===0)
-        alt op === "is-empty"
-            cond-->>cond: return isEmpty
-        else op === "not-empty"
-            cond-->>cond: return !isEmpty
+    else unknown kind
+        conditions->>conditions: assertNever(guard, "guard kind")
+        conditions-->>Caller: THROW
+    end
+</div>
+
+<h3>isConfirmGuard() &mdash; tree scan</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant Caller
+    participant conditions as conditions.ts
+
+    Caller->>conditions: isConfirmGuard(guard)
+    alt guard.kind == "confirm"
+        conditions-->>Caller: true
+    else guard.kind == "not"
+        conditions->>conditions: isConfirmGuard(guard.inner)
+    else guard.kind == "all" or "any"
+        conditions->>conditions: guard.guards.some(isConfirmGuard)
+    else (value or other)
+        conditions-->>Caller: false
+    end
+</div>
+
+<h3>evaluateValueGuard() &mdash; All 21 Operators</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant conditions as conditions.ts
+    participant resolver as resolver.ts
+    participant coerce as coerce.ts
+
+    Note over conditions: evaluateValueGuard(guard, ctx)
+
+    alt op == "is-null" or "not-null" (RAW resolution)
+        conditions->>resolver: resolveSource(guard.source, ctx)
+        resolver-->>conditions: raw
+        conditions->>conditions: log.trace("eval-presence")
+        alt op == "is-null"
+            conditions-->>conditions: raw == null
+        else op == "not-null"
+            conditions-->>conditions: raw != null
         end
 
-    else all other operators
-        cond->>res: resolveSourceAs(guard.source, guard.coerceAs, ctx)
-        res-->>cond: resolved (coerced left side)
+    else op == "is-empty" or "not-empty" (RAW resolution)
+        conditions->>resolver: resolveSource(guard.source, ctx)
+        resolver-->>conditions: raw
+        conditions->>conditions: log.trace("eval-presence")
+        Note over conditions: isEmpty = raw==="" or null or undefined or (Array+length===0)
+        alt op == "is-empty"
+            conditions-->>conditions: isEmpty
+        else op == "not-empty"
+            conditions-->>conditions: !isEmpty
+        end
 
-        Note over cond: Operand coercion: opCoerceAs = elementCoerceAs ?? coerceAs
-
-        alt guard.rightSource present
-            cond->>res: resolveSourceAs(guard.rightSource, opCoerceAs, ctx)
-            res-->>cond: operand (coerced right side from source)
+    else All other operators (coerced resolution)
+        conditions->>resolver: resolveSourceAs(guard.source, guard.coerceAs, ctx)
+        resolver-->>conditions: resolved (coerced)
+        Note over conditions: opCoerceAs = guard.elementCoerceAs ?? guard.coerceAs
+        alt guard.rightSource exists (source-vs-source)
+            conditions->>resolver: resolveSourceAs(guard.rightSource, opCoerceAs, ctx)
+            resolver-->>conditions: operand
         else literal operand
             alt operand is Array
-                Note over cond: operand = rawOp.map(v => coerce(v, opCoerceAs))
-            else operand is scalar
-                cond->>res: coerce(rawOp, opCoerceAs)
-                res-->>cond: operand
+                loop Each element
+                    conditions->>coerce: coerce(v, opCoerceAs)
+                end
+            else scalar operand
+                conditions->>coerce: coerce(guard.operand, opCoerceAs)
             end
         end
-
-        opt elementCoerceAs present AND resolved is Array
-            Note over cond: items = resolved.map(item => coerce(item, elementCoerceAs))
-        end
-
-        cond->>cond: log.trace("eval", { source, op, resolved, operand })
-
-        alt op === "eq"
-            cond-->>cond: return resolved === operand
-        else op === "neq"
-            cond-->>cond: return resolved !== operand
-        else op === "gt"
-            cond-->>cond: return resolved > operand
-        else op === "gte"
-            cond-->>cond: return resolved >= operand
-        else op === "lt"
-            cond-->>cond: return resolved < operand
-        else op === "lte"
-            cond-->>cond: return resolved <= operand
-        else op === "truthy"
-            cond-->>cond: return !!resolved
-        else op === "falsy"
-            cond-->>cond: return !resolved
-        else op === "in"
-            cond-->>cond: return isArray(operand) && operand.includes(resolved)
-        else op === "not-in"
-            cond-->>cond: return !isArray(operand) || !operand.includes(resolved)
-        else op === "between"
-            cond-->>cond: return isArray(operand) && resolved >= [0] && resolved <= [1]
-        else op === "array-contains"
-            cond-->>cond: return items != null && items.includes(operand)
-        else op === "contains"
-            cond-->>cond: return String(resolved).includes(String(operand))
-        else op === "starts-with"
-            cond-->>cond: return String(resolved).startsWith(String(operand))
-        else op === "ends-with"
-            cond-->>cond: return String(resolved).endsWith(String(operand))
-        else op === "matches"
-            cond->>cond: try new RegExp(operand).test(resolved)
-            alt regex succeeds
-                cond-->>cond: return test result
-            else regex throws (invalid pattern)
-                cond->>cond: log.warn("invalid guard regex")
-                cond-->>cond: return false
+        opt guard.elementCoerceAs != null AND resolved is Array
+            loop Each item in resolved
+                conditions->>coerce: coerce(item, guard.elementCoerceAs)
             end
-        else op === "min-length"
-            cond-->>cond: return String(resolved).length >= Number(operand)
-        else default (unknown op)
-            Note right of cond: THROW Error("Unknown guard operator: {op}")
+            Note over conditions: items = coerced array
         end
+
+        conditions->>conditions: log.trace("eval", {source, op, resolved, operand})
+
+        Note over conditions: Switch on operator:
+        Note over conditions: eq: resolved === operand
+        Note over conditions: neq: resolved !== operand
+        Note over conditions: gt: resolved > operand
+        Note over conditions: gte: resolved >= operand
+        Note over conditions: lt: resolved < operand
+        Note over conditions: lte: resolved <= operand
+        Note over conditions: truthy: !!resolved
+        Note over conditions: falsy: !resolved
+        Note over conditions: in: Array.includes(resolved)
+        Note over conditions: not-in: !Array.includes(resolved)
+        Note over conditions: between: resolved >= [0] AND resolved <= [1]
+        Note over conditions: array-contains: items.includes(operand)
+        Note over conditions: contains: String.includes
+        Note over conditions: starts-with: String.startsWith
+        Note over conditions: ends-with: String.endsWith
+        Note over conditions: matches: new RegExp(operand).test(resolved)
+        Note over conditions: min-length: String.length >= operand
     end
-</pre></div>
 
-<!-- ============================================================ -->
-<!-- SECTION 8: resolver.ts -->
-<!-- ============================================================ -->
-<h2 id="s8">8. resolution/resolver.ts — resolveSource() + coerce()</h2>
-<p class="file-ref">Scripts/resolution/resolver.ts</p>
+    alt op == "matches" and regex is invalid
+        conditions->>conditions: log.warn("invalid guard regex")
+        conditions-->>conditions: false
+    end
+    alt unknown operator
+        conditions-->>conditions: THROW Error("Unknown guard operator: {op}")
+    end
+</div>
+</section>
 
-<h3>8a. resolveSource()</h3>
-<div class="diagram"><pre class="mermaid">
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 8. resolver.ts                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="resolver">
+<h2>8. resolver.ts &mdash; BindSource Resolution</h2>
+<p class="path">Scripts/resolution/resolver.ts</p>
+<p>Unified entry point for resolving <code>BindSource</code> values. Dispatches by source kind:
+<code>event</code> (walk execution context) or <code>component</code> (read from DOM). Re-exports <code>coerce</code> from <code>core/coerce.ts</code>.</p>
+
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant res as resolver.ts
+    participant resolver as resolver.ts
     participant walk as walk.ts
-    participant comp as component.ts
+    participant component as component.ts
+    participant coerce as core/coerce.ts
 
-    Caller->>res: resolveSource(source, ctx)
+    Caller->>resolver: resolveSource(source, ctx)
 
-    alt source.kind === "event"
-        res->>res: resolveEventPath(source.path, ctx)
-        alt ctx is falsy (undefined/null)
-            res-->>Caller: return undefined
-        else ctx exists
-            res->>walk: walk(ctx, source.path)
-            walk-->>res: result
-            res->>res: log.trace("resolve", { path, value })
-            res-->>Caller: return result
+    alt source.kind == "event"
+        resolver->>resolver: resolveEventPath(source.path, ctx)
+        alt ctx is undefined
+            resolver-->>Caller: undefined
+        else
+            resolver->>walk: walk(ctx, source.path)
+            walk-->>resolver: result
+            resolver->>resolver: log.trace("resolve", {path, value})
+            resolver-->>Caller: result
         end
 
-    else source.kind === "component"
-        res->>comp: evalRead(source.componentId, source.vendor, source.readExpr)
-        comp-->>res: value
-        res-->>Caller: return value
+    else source.kind == "component"
+        resolver->>component: evalRead(source.componentId, source.vendor, source.readExpr)
+        component-->>resolver: value
+        resolver-->>Caller: value
 
-    else default
-        Note right of res: THROW assertNever(source, "source kind")
+    else unknown source kind
+        resolver->>resolver: assertNever(source, "source kind")
+        resolver-->>Caller: THROW
     end
-</pre></div>
+</div>
 
-<h3>8b. resolveSourceAs()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>resolveSourceAs()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant res as resolver.ts
+    participant resolver as resolver.ts
+    participant coerce as core/coerce.ts
 
-    Caller->>res: resolveSourceAs(source, coerceAs, ctx)
-    res->>res: resolveSource(source, ctx)
-    res->>res: coerce(raw, coerceAs)
-    res-->>Caller: return coerced value
-</pre></div>
+    Caller->>resolver: resolveSourceAs(source, coerceAs, ctx)
+    resolver->>resolver: resolveSource(source, ctx)
+    resolver-->>resolver: raw
+    resolver->>coerce: coerce(raw, coerceAs)
+    coerce-->>resolver: coerced value
+    resolver-->>Caller: coerced value
+</div>
+</section>
 
-<h3>8c. coerce() — All Coercion Types</h3>
-<div class="diagram"><pre class="mermaid">
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 9. component.ts                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="component">
+<h2>9. component.ts &mdash; Vendor Root Resolution</h2>
+<p class="path">Scripts/resolution/component.ts</p>
+<p>The ONLY module that knows about <code>ej2_instances</code>. Maps vendor to root object.
+Two exports: <code>resolveRoot()</code> and <code>evalRead()</code>.</p>
+
+<h3>resolveRoot()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant res as resolver.ts
+    participant component as component.ts
 
-    Caller->>res: coerce(value, coerceAs)
+    Caller->>component: resolveRoot(el, vendor)
 
-    alt coerceAs === "string"
-        Note over res: String(value ?? "")
-        Note over res: null/undefined -> ""
-        res-->>Caller: return string
+    alt vendor == "native"
+        component-->>Caller: el (the DOM element itself)
 
-    else coerceAs === "number"
-        Note over res: n = Number(value)
-        alt Number.isNaN(n)
-            res-->>Caller: return 0
-        else valid number
-            res-->>Caller: return n
+    else vendor == "fusion"
+        component->>component: el.ej2_instances?.[0]
+        alt ej2 root is null/undefined
+            component-->>Caller: THROW Error('[alis] no vendor root for "{id}" (vendor: fusion) -- is the component initialized?')
+        else
+            component-->>Caller: ej2 instance
         end
 
-    else coerceAs === "boolean"
-        alt typeof value === "string"
-            Note over res: return value !== "" && value !== "false" && value !== "0"
-            res-->>Caller: return boolean
-        else non-string
-            Note over res: return Boolean(value)
-            res-->>Caller: return boolean
-        end
-
-    else coerceAs === "date"
-        alt value == null
-            res-->>Caller: return NaN
-        else value exists
-            Note over res: d = new Date(value as string)
-            res-->>Caller: return d.getTime()
-        end
-
-    else coerceAs === "array"
-        alt Array.isArray(value)
-            res-->>Caller: return value (pass-through)
-        else value == null or value === ""
-            res-->>Caller: return [] (empty array)
-        else scalar value
-            res-->>Caller: return [value] (wrap in array)
-        end
-
-    else coerceAs === "raw"
-        res-->>Caller: return value (no coercion)
+    else unknown vendor
+        component-->>Caller: THROW Error('[alis] unknown vendor: "{vendor}"')
     end
-</pre></div>
+</div>
 
-<!-- ============================================================ -->
-<!-- SECTION 9: component.ts -->
-<!-- ============================================================ -->
-<h2 id="s9">9. resolution/component.ts — resolveRoot() + evalRead()</h2>
-<p class="file-ref">Scripts/resolution/component.ts</p>
-<div class="diagram"><pre class="mermaid">
+<h3>evalRead()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant comp as component.ts
+    participant component as component.ts
     participant walk as walk.ts
     participant DOM
 
-    Note over comp: resolveRoot(el, vendor)
-
-    alt vendor === "native"
-        comp-->>Caller: return el (DOM element is the root)
-
-    else vendor === "fusion"
-        comp->>comp: root = el.ej2_instances?.[0]
-        alt root is null/undefined
-            Note right of comp: THROW Error('[alis] no vendor root for "{el.id}" (vendor: fusion) - is the component initialized?')
-        end
-        comp-->>Caller: return root (Syncfusion instance)
-
-    else default (unknown vendor)
-        Note right of comp: THROW Error('[alis] unknown vendor: "{vendor}"')
+    Caller->>component: evalRead(id, vendor, readExpr)
+    component->>DOM: document.getElementById(id)
+    alt element not found
+        component-->>Caller: THROW Error("[alis] element not found: {id}")
     end
+    component->>component: resolveRoot(el, vendor)
+    component-->>component: root
+    component->>walk: walk(root, readExpr)
+    walk-->>component: value
+    component-->>Caller: value
+</div>
+</section>
 
-    Note over comp: evalRead(id, vendor, readExpr)
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 10. pipeline.ts                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="pipeline">
+<h2>10. pipeline.ts &mdash; HTTP Pipeline Orchestration</h2>
+<p class="path">Scripts/execution/pipeline.ts</p>
+<p>Pre-request validation gate, then delegates to <code>http.ts</code> for actual fetch.
+Two flows: single request (<code>executeHttpReaction</code>) and parallel (<code>executeParallelHttpReaction</code>).</p>
 
-    Caller->>comp: evalRead(id, vendor, readExpr)
-    comp->>DOM: document.getElementById(id)
-    alt element NOT found
-        Note right of comp: THROW Error("[alis] element not found: {id}")
-    end
-    DOM-->>comp: el
-
-    comp->>comp: resolveRoot(el, vendor)
-    comp-->>comp: root
-
-    comp->>walk: walk(root, readExpr)
-    walk-->>comp: value
-    comp-->>Caller: return value
-</pre></div>
-
-<!-- ============================================================ -->
-<!-- SECTION 10: pipeline.ts -->
-<!-- ============================================================ -->
-<h2 id="s10">10. http/pipeline.ts — executeHttpReaction() + executeParallelHttpReaction()</h2>
-<p class="file-ref">Scripts/http/pipeline.ts</p>
-
-<h3>10a. passesValidation()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>passesValidation()</h3>
+<div class="mermaid">
 sequenceDiagram
-    participant pipe as pipeline.ts
-    participant val as validation
+    participant pipeline as pipeline.ts
+    participant validation as validation/index.ts
 
-    Note over pipe: passesValidation(req)
-
+    Note over pipeline: passesValidation(req)
     alt req.validation is falsy
-        pipe-->>pipe: return true (no validation needed)
-    else validation descriptor exists
-        pipe->>val: validate(req.validation)
-        alt validate returns false
-            pipe->>pipe: log.debug("validation failed, aborting request")
-            pipe-->>pipe: return false
-        else validate returns true
-            pipe-->>pipe: return true
+        pipeline-->>pipeline: return true (no validation needed)
+    else
+        pipeline->>validation: validate(req.validation)
+        validation-->>pipeline: boolean
+        alt validation fails
+            pipeline->>pipeline: log.debug("validation failed, aborting request")
+            pipeline-->>pipeline: return false
+        else
+            pipeline-->>pipeline: return true
         end
     end
-</pre></div>
+</div>
 
-<h3>10b. executeHttpReaction()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>executeHttpReaction()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant pipe as pipeline.ts
-    participant cmds as commands.ts
+    participant pipeline as pipeline.ts
+    participant commands as commands.ts
+    participant validation as validation/index.ts
     participant http as http.ts
 
-    Caller->>pipe: await executeHttpReaction(reaction, ctx)
+    Caller->>pipeline: await executeHttpReaction(reaction, ctx)
 
     opt reaction.preFetch exists
-        pipe->>cmds: executeCommands(reaction.preFetch, ctx)
+        pipeline->>commands: executeCommands(reaction.preFetch, ctx)
     end
 
-    pipe->>pipe: passesValidation(reaction.request)
+    pipeline->>pipeline: passesValidation(reaction.request)
     alt validation fails
-        pipe-->>Caller: return (abort - request not sent)
+        pipeline-->>Caller: return (abort)
     end
 
-    pipe->>http: await execRequest(reaction.request, ctx)
-</pre></div>
+    pipeline->>http: await execRequest(reaction.request, ctx)
+</div>
 
-<h3>10c. executeParallelHttpReaction()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>executeParallelHttpReaction()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant pipe as pipeline.ts
-    participant cmds as commands.ts
+    participant pipeline as pipeline.ts
+    participant commands as commands.ts
     participant http as http.ts
 
-    Caller->>pipe: await executeParallelHttpReaction(reaction, ctx)
+    Caller->>pipeline: await executeParallelHttpReaction(reaction, ctx)
 
     opt reaction.preFetch exists
-        pipe->>cmds: executeCommands(reaction.preFetch, ctx)
+        pipeline->>commands: executeCommands(reaction.preFetch, ctx)
     end
 
-    pipe->>pipe: reaction.requests.filter(req => passesValidation(req))
-    Note over pipe: Only requests that pass validation are fired
+    Note over pipeline: Filter: only requests passing validation
+    pipeline->>pipeline: validRequests = reaction.requests.filter(passesValidation)
+    pipeline->>pipeline: log.debug("parallel", {count})
 
-    pipe->>pipe: log.debug("parallel", { count: validRequests.length })
+    pipeline->>http: Promise.allSettled(validRequests.map(req => execRequest(req, ctx)))
+    Note over http: All requests fire concurrently
+    http-->>pipeline: SettledResult[]
 
-    pipe->>http: Promise.allSettled(validRequests.map(req => execRequest(req, ctx)))
-    Note over http: All valid requests fire concurrently
-    http-->>pipe: results (PromiseSettledResult[])
-
-    loop for each result
-        alt status === "rejected"
-            pipe->>pipe: log.error("parallel branch error", { reason })
+    loop Each result
+        alt result.status == "rejected"
+            pipeline->>pipeline: log.error("parallel branch error", {reason})
         end
     end
 
     opt reaction.onAllSettled exists
-        pipe->>cmds: executeCommands(reaction.onAllSettled, ctx)
+        pipeline->>commands: executeCommands(reaction.onAllSettled, ctx)
     end
-</pre></div>
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 11: http.ts -->
-<!-- ============================================================ -->
-<h2 id="s11">11. http/http.ts — execRequest() Full Lifecycle</h2>
-<p class="file-ref">Scripts/http/http.ts</p>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 11. http.ts                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="http">
+<h2>11. http.ts &mdash; execRequest() Full Lifecycle</h2>
+<p class="path">Scripts/execution/http.ts</p>
+<p>Single HTTP request: whileLoading commands, gather, URL construction, fetch, response body reading,
+status routing, chaining, and network error handling.</p>
 
-<h3>11a. execRequest()</h3>
-<div class="diagram"><pre class="mermaid">
+<div class="mermaid">
 sequenceDiagram
     participant Caller
     participant http as http.ts
-    participant cmds as commands.ts
+    participant commands as commands.ts
     participant gather as gather.ts
-    participant exec as execute.ts
+    participant execute as execute.ts
     participant Network
+    participant DOM
 
     Caller->>http: await execRequest(req, ctx)
 
-    Note over http: Step 1: WhileLoading
+    Note over http: Step 1 - WhileLoading
     opt req.whileLoading exists
-        http->>cmds: executeCommands(req.whileLoading, ctx)
+        http->>commands: executeCommands(req.whileLoading, ctx)
     end
 
-    Note over http: Step 2: Gather
+    Note over http: Step 2 - Gather
     http->>gather: resolveGather(req.gather ?? [], req.verb, ctx.components ?? {}, req.contentType)
-    gather-->>http: gatherResult { urlParams, body }
+    gather-->>http: GatherResult {urlParams, body}
 
-    Note over http: Step 3: Build fetch options
-    http->>http: url = req.url
-    http->>http: init = { method: req.verb }
-
+    Note over http: Step 3 - Build fetch options
+    Note over http: url = req.url, init = {method: req.verb}
     alt gatherResult.urlParams.length > 0
-        alt url includes "?"
-            Note over http: url = url + "&" + params.join("&")
-        else no existing query string
-            Note over http: url = url + "?" + params.join("&")
+        Note over http: Append params with ? or &
+    end
+    alt req.verb != "GET"
+        alt body is FormData
+            Note over http: init.body = formData (browser sets Content-Type)
+        else body has keys
+            Note over http: headers = {"Content-Type": "application/json"}
+            Note over http: init.body = JSON.stringify(body)
         end
     end
 
-    alt req.verb !== "GET"
-        alt body instanceof FormData
-            Note over http: init.body = formData<br/>(browser auto-sets Content-Type<br/>with multipart boundary)
-        else body has keys (JSON object)
-            Note over http: init.headers = { "Content-Type": "application/json" }<br/>init.body = JSON.stringify(body)
-        else body is empty object
-            Note over http: No body attached
-        end
+    http->>http: log.debug("fetch", {verb, url})
+
+    Note over http: Step 4 - Fetch
+    http->>Network: await fetch(url, init)
+
+    alt Network error (catch block)
+        http->>http: log.error("network error", {url, error})
+        http->>http: routeHandlers(req.onError, status=0, ctx)
+        http-->>Caller: return
     end
 
-    http->>http: log.debug("fetch", { verb, url })
+    Network-->>http: Response
 
-    Note over http: Step 4: Execute fetch
-    http->>Network: fetch(url, init)
+    Note over http: Step 5 - Read response body
+    http->>http: await readResponseBody(response)
+    Note over http: "application/json" -> response.json()
+    Note over http: "text/" -> response.text()
+    Note over http: "html" -> response.text()
+    Note over http: other -> null
 
-    alt fetch succeeds (no network error)
-        Network-->>http: response
-
-        Note over http: Step 5: Read response body
-        http->>http: readResponseBody(response)
-
-        alt Content-Type includes "application/json"
-            http->>http: response.json()
-        else Content-Type includes "text/"
-            http->>http: response.text()
-        else Content-Type includes "html"
-            http->>http: response.text()
-        else no matching Content-Type
-            Note over http: body = null
-        end
-
-        alt response.ok (status 2xx)
-            alt body != null
-                Note over http: successCtx = { ...ctx, responseBody: body }
-            else body is null
-                Note over http: successCtx = ctx (no responseBody)
-            end
-            http->>http: routeHandlers(req.onSuccess, response.status, successCtx)
-        else response NOT ok (4xx, 5xx)
-            Note over http: errorCtx = { ...ctx, responseBody: body ?? undefined, validationDesc: req.validation }
-            http->>http: routeHandlers(req.onError, response.status, errorCtx)
-        end
-
-        Note over http: Step 6: Chained request
-        alt req.chained exists AND response.ok
-            http->>http: await execRequest(req.chained, ctx)
-        end
-
-    else fetch throws (network error)
-        http->>http: log.error("network error", { url, error })
-        http->>http: routeHandlers(req.onError, 0, ctx)
-        Note over http: status 0 = network failure
+    Note over http: Step 6 - Route response
+    alt response.ok == true
+        Note over http: successCtx = {...ctx, responseBody: body}
+        http->>http: routeHandlers(req.onSuccess, response.status, successCtx)
+    else response.ok == false
+        Note over http: errorCtx = {...ctx, responseBody, validationDesc}
+        http->>http: routeHandlers(req.onError, response.status, errorCtx)
     end
-</pre></div>
 
-<h3>11b. routeHandlers() + executeHandler()</h3>
-<div class="diagram"><pre class="mermaid">
+    Note over http: Step 7 - Chained request
+    alt req.chained exists AND response.ok
+        http->>http: await execRequest(req.chained, ctx)
+    end
+</div>
+
+<h3>routeHandlers() &mdash; Status routing</h3>
+<div class="mermaid">
 sequenceDiagram
     participant http as http.ts
-    participant exec as execute.ts
-    participant cmds as commands.ts
+    participant execute as execute.ts
+    participant commands as commands.ts
 
     Note over http: routeHandlers(handlers, status, ctx)
-
     alt handlers is undefined or empty
         http-->>http: return (no-op)
     end
 
-    Note over http: Priority 1: Try specific status code match
-    loop for each handler
-        alt handler.statusCode != null AND === status
+    Note over http: Try specific status match first
+    loop Each handler
+        alt handler.statusCode == status
             http->>http: executeHandler(handler, ctx)
-            http-->>http: return
+            http-->>http: return (first match wins)
         end
     end
 
-    Note over http: Priority 2: Fall through to catch-all (no statusCode)
-    loop for each handler
+    Note over http: Fall through to catch-all (no statusCode)
+    loop Each handler
         alt handler.statusCode == null
             http->>http: executeHandler(handler, ctx)
             http-->>http: return
         end
     end
+</div>
 
-    Note over http: No handler matched — silent no-op
+<h3>executeHandler()</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant http as http.ts
+    participant execute as execute.ts
+    participant commands as commands.ts
 
-    Note over http: executeHandler(h, ctx)
-    alt h.reaction exists
-        http->>exec: executeReaction(h.reaction, ctx)
-    else h.commands exists
-        http->>cmds: executeCommands(h.commands, ctx)
-    else neither
-        Note over http: No-op
+    Note over http: executeHandler(handler, ctx)
+    alt handler.reaction exists
+        http->>execute: executeReaction(handler.reaction, ctx)
+    else handler.commands exists
+        http->>commands: executeCommands(handler.commands, ctx)
     end
-</pre></div>
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 12: gather.ts -->
-<!-- ============================================================ -->
-<h2 id="s12">12. http/gather.ts — resolveGather()</h2>
-<p class="file-ref">Scripts/http/gather.ts</p>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 12. gather.ts                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="gather">
+<h2>12. gather.ts &mdash; Form Value Gathering</h2>
+<p class="path">Scripts/execution/gather.ts</p>
+<p>Resolves gather items into URL params, JSON body, or FormData. Three item kinds:
+<code>component</code>, <code>static</code>, <code>all</code>. Transport pattern encapsulates emission format.</p>
 
-<h3>12a. Transport Selection</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>resolveGather() &mdash; Transport selection + item loop</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant g as gather.ts
+    participant gather as gather.ts
+    participant component as component.ts
+    participant DOM
 
-    Caller->>g: resolveGather(items, verb, components, contentType)
+    Caller->>gather: resolveGather(items, verb, components, contentType)
 
-    g->>g: useFormData = contentType === "form-data"
-    g->>g: formData = useFormData ? new FormData() : null
-
-    alt verb === "GET"
-        Note over g: Transport: URL params<br/>emitScalar: push encoded key=value<br/>emitArray: push encoded key=value per item<br/>(Files in array -> THROW)
-    else verb !== "GET" AND formData is not null
-        Note over g: Transport: FormData<br/>emitScalar: formData.append(name, String(value))<br/>emitArray: loop items, file -> append(name,file,file.name), else append(name, String)
-    else verb !== "GET" AND no formData (JSON)
-        Note over g: Transport: JSON body<br/>emitScalar: setNested(body, name, value==""?null:value)<br/>emitArray: if hasFiles -> THROW, else setNested(body, name, items)
-    end
-</pre></div>
-
-<h3>12b. Gather Item Loop + emit()</h3>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant g as gather.ts
-    participant comp as component.ts
-    participant transport as Transport
-
-    Note over g: emit(name, raw) - internal function
-
-    alt raw instanceof FileList
-        g->>transport: emitArray(name, Array.from(raw))
-        g->>g: log.trace("file", { name, count })
-    else Array.isArray(raw)
-        g->>transport: emitArray(name, raw)
-        g->>g: log.trace("component", { name, value })
-    else scalar value
-        g->>transport: emitScalar(name, raw)
-        g->>g: log.trace("component", { name, value })
+    Note over gather: Transport selection:
+    alt verb == "GET"
+        Note over gather: URL params transport (no body)
+    else contentType == "form-data"
+        Note over gather: FormData transport (multipart)
+    else default (POST/PUT/DELETE etc.)
+        Note over gather: JSON body transport (setNested)
     end
 
-    Note over g: Main gather loop
+    loop Each gather item
+        alt item.kind == "component"
+            gather->>component: evalRead(item.componentId, item.vendor, item.readExpr)
+            component-->>gather: raw value
+            gather->>gather: emit(item.name, raw)
 
-    loop for each gather item
-        alt item.kind === "component"
-            g->>comp: evalRead(item.componentId, item.vendor, item.readExpr)
-            comp-->>g: value
-            g->>g: emit(item.name, value)
+        else item.kind == "static"
+            gather->>gather: emit(item.param, item.value)
 
-        else item.kind === "static"
-            g->>g: emit(item.param, item.value)
-
-        else item.kind === "all"
-            alt Object.keys(components).length === 0
-                Note right of g: THROW Error("[alis] IncludeAll() executed but plan.components is empty.")
+        else item.kind == "all"
+            alt components map is empty
+                gather-->>Caller: THROW Error("[alis] IncludeAll() but plan.components is empty...")
             end
-            loop for each [bindingPath, comp] in components
-                g->>comp: evalRead(comp.id, comp.vendor, comp.readExpr)
-                comp-->>g: value
-                g->>g: emit(bindingPath, value)
+            loop Each [bindingPath, comp] in components
+                gather->>component: evalRead(comp.id, comp.vendor, comp.readExpr)
+                component-->>gather: value
+                gather->>gather: emit(bindingPath, value)
             end
+
+        else unknown kind
+            gather->>gather: assertNever(item, "gather item kind")
+            gather-->>Caller: THROW
         end
     end
 
-    g-->>g: return { urlParams, body: formData ?? body }
-</pre></div>
+    gather-->>Caller: GatherResult {urlParams, body}
+</div>
 
-<h3>12c. setNested() — Dot-Path Object Builder</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>emit() &mdash; value routing</h3>
+<div class="mermaid">
 sequenceDiagram
-    participant g as gather.ts
+    participant gather as gather.ts
 
-    Note over g: setNested(obj, key, value)
+    Note over gather: emit(name, raw)
 
-    g->>g: parts = key.split(".")
-    alt parts.length === 1
-        Note over g: obj[key] = value (simple assignment)
-    else parts.length > 1
-        Note over g: Walk/create nested objects
-        loop for i = 0 to parts.length - 2
-            alt parts[i] not in cur OR not an object OR null
-                Note over g: cur[parts[i]] = {} (create intermediate)
-            end
-            Note over g: cur = cur[parts[i]]
-        end
-        Note over g: cur[lastPart] = value
+    alt raw is FileList
+        gather->>gather: transport.emitArray(name, Array.from(raw))
+        gather->>gather: log.trace("file", {name, count})
+    else raw is Array
+        gather->>gather: transport.emitArray(name, raw)
+        gather->>gather: log.trace("component", {name, value})
+    else scalar
+        gather->>gather: transport.emitScalar(name, raw)
+        gather->>gather: log.trace("component", {name, value})
     end
-</pre></div>
+</div>
 
-<h3>12d. File Handling Edge Cases</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>Transport variants</h3>
+<div class="mermaid">
 sequenceDiagram
-    participant g as gather.ts
+    participant T as Transport
 
-    Note over g: toFile(item) — File extraction
+    Note over T: FormData transport
+    Note over T: emitScalar: formData.append(name, String(value))
+    Note over T: emitArray: for each item - File? append(name,file,file.name) else append(name,String(item))
 
-    alt item instanceof File
-        g-->>g: return item
-    else item is object with .rawFile instanceof File
-        g-->>g: return item.rawFile (SF wrapper unwrap)
-    else
-        g-->>g: return null
+    Note over T: URL params transport
+    Note over T: emitScalar: urlParams.push(encoded pair)
+    Note over T: emitArray: if hasFiles THROW "File objects cannot be sent via GET"
+    Note over T: else: for each item push encoded pair
+
+    Note over T: JSON transport (setNested)
+    Note over T: emitScalar: setNested(body, name, value==="" ? null : value)
+    Note over T: emitArray: if hasFiles THROW "File objects require contentType: form-data"
+    Note over T: else: setNested(body, name, items)
+</div>
+
+<h3>setNested() &mdash; dot-path JSON body building</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant gather as gather.ts
+
+    Note over gather: setNested(obj, key, value)
+    Note over gather: Split key by "."
+    alt single part (no dots)
+        Note over gather: obj[key] = value
+    else multiple parts
+        Note over gather: Walk/create nested objects
+        Note over gather: e.g. "address.city" creates obj.address then sets .city
     end
+</div>
+</section>
 
-    Note over g: File transport restrictions
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 13. orchestrator.ts                                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="orchestrator">
+<h2>13. orchestrator.ts &mdash; Validation Orchestrator (Fail-Closed)</h2>
+<p class="path">Scripts/validation/orchestrator.ts</p>
+<p>Four outcomes per field: enriched+visible (inline), enriched+hidden (summary),
+unenriched+unconditional (block+summary), unenriched+all-conditions-false (skip).
+Uses <code>isHidden()</code> checking error span's <em>parent</em> element.</p>
 
-    alt GET + File in array
-        Note right of g: THROW Error("[alis] File objects cannot be sent via GET")
-    else JSON + File in array
-        Note right of g: THROW Error("[alis] File objects require contentType: form-data")
-    else FormData + File
-        Note over g: formData.append(name, file, file.name) -- allowed
-    end
-</pre></div>
-
-<!-- ============================================================ -->
-<!-- SECTION 13: orchestrator.ts -->
-<!-- ============================================================ -->
-<h2 id="s13">13. validation/orchestrator.ts — validate() Full Lifecycle</h2>
-<p class="file-ref">Scripts/validation/orchestrator.ts</p>
-
-<h3>13a. validate()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>validate()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
     participant orch as orchestrator.ts
-    participant ed as error-display.ts
-    participant comp as component.ts
+    participant errDisp as error-display.ts
+    participant component as component.ts
     participant walk as walk.ts
-    participant re as rule-engine.ts
-    participant cnd as condition.ts
+    participant ruleEngine as rule-engine.ts
+    participant condition as condition.ts
     participant DOM
 
     Caller->>orch: validate(desc)
-
-    orch->>ed: clearAllInline(desc.formId, desc.fields)
-    orch->>ed: findSummaryElement(desc.planId)
-    opt summaryEl found
-        orch->>ed: clearSummary(summaryEl)
-        orch->>ed: hideSummaryDiv(summaryEl)
+    orch->>errDisp: clearAllInline(desc.formId, desc.fields)
+    orch->>errDisp: findSummaryElement(desc.planId)
+    opt summaryEl exists
+        orch->>errDisp: clearSummary(summaryEl)
+        orch->>errDisp: hideSummaryDiv(summaryEl)
     end
 
     orch->>DOM: document.getElementById(desc.formId)
-    alt container NOT found
+    alt container not found
         alt desc.fields.length > 0
-            orch->>orch: log.warn("validate: form container missing, blocking")
-            orch-->>Caller: return false
+            orch->>orch: log.warn("form container missing, blocking")
+            orch-->>Caller: false
         else no fields
-            orch-->>Caller: return true
+            orch-->>Caller: true
         end
     end
-    DOM-->>orch: container
 
-    orch->>orch: buildByName(desc) -> Map
-    orch->>orch: domConditionReader(byName) -> condReader
-    orch->>orch: domPeerReader(byName) -> peerReader
-    Note over orch: valid = true, summaryHasErrors = false
+    orch->>orch: buildByName(desc)
+    orch->>orch: domConditionReader(byName)
+    orch->>orch: domPeerReader(byName)
 
-    loop for each field f in desc.fields
-        alt UNENRICHED: !f.fieldId OR !f.vendor OR !f.readExpr
-            orch->>orch: allRulesConditionallySkipped(f, condReader)
-            alt all rules conditionally skipped
+    loop Each field in desc.fields
+        alt field is UNENRICHED (no fieldId/vendor/readExpr)
+            orch->>orch: allRulesConditionallySkipped(field, condReader)
+            alt all skipped
                 Note over orch: continue (field not needed yet)
-            else has blocking rules
-                alt f.rules.length > 0 AND summaryEl
-                    orch->>ed: addToSummary(summaryEl, f.fieldName, f.rules[0].message)
-                    Note over orch: summaryHasErrors = true
+            else
+                alt rules exist and summaryEl
+                    orch->>errDisp: addToSummary(summaryEl, fieldName, rules[0].message)
                 end
                 Note over orch: valid = false
             end
-        else ENRICHED
-            orch->>DOM: document.getElementById(f.fieldId)
 
-            alt element NOT in DOM
-                orch->>orch: allRulesConditionallySkipped(f, condReader)
-                alt all rules conditionally skipped
+        else field is ENRICHED
+            orch->>DOM: document.getElementById(field.fieldId)
+            alt element not in DOM
+                orch->>orch: allRulesConditionallySkipped(field, condReader)
+                alt all skipped
                     Note over orch: continue
-                else has blocking rules
-                    alt f.rules.length > 0 AND summaryEl
-                        orch->>ed: addToSummary(summaryEl, f.fieldName, f.rules[0].message)
-                        Note over orch: summaryHasErrors = true
+                else
+                    opt summaryEl
+                        orch->>errDisp: addToSummary(summaryEl, fieldName, rules[0].message)
                     end
                     Note over orch: valid = false
                 end
-            else element found
-                alt container does NOT contain element (partial)
-                    orch->>orch: log.trace("field outside form, skipping")
-                    Note over orch: continue
-                else element is inside container
-                    orch->>orch: isHidden(el)
-                    orch->>comp: resolveRoot(el, f.vendor)
-                    comp-->>orch: root
-                    orch->>walk: walk(root, f.readExpr)
-                    walk-->>orch: value
+            end
 
-                    loop for each rule in f.rules
-                        opt rule.when condition present
-                            orch->>cnd: evalCondition(rule.when, condReader)
-                            alt returns false
-                                Note over orch: continue (skip this rule)
-                            else returns null (unresolvable)
-                                alt summaryEl exists
-                                    orch->>ed: addToSummary(summaryEl, f.fieldName, rule.message)
-                                    Note over orch: summaryHasErrors = true
-                                end
-                                Note over orch: valid = false, break
-                            else returns true
-                                Note over orch: condition met, continue to ruleFails
-                            end
+            alt element not inside form container
+                orch->>orch: log.trace("field outside form, skipping")
+                Note over orch: continue
+            end
+
+            orch->>DOM: getElementById(field.fieldId + "_error")
+            Note over orch: hidden = errorSpan?.parentElement<br/>? isHidden(errorSpan.parentElement) : true
+            orch->>component: resolveRoot(el, field.vendor)
+            component-->>orch: root
+            orch->>walk: walk(root, field.readExpr)
+            walk-->>orch: value
+
+            loop Each rule in field.rules
+                opt rule.when exists
+                    orch->>condition: evalCondition(rule.when, condReader)
+                    alt result == false
+                        Note over orch: continue (skip rule)
+                    else result == null (unresolvable)
+                        opt summaryEl
+                            orch->>errDisp: addToSummary(summaryEl, fieldName, rule.message)
                         end
+                        Note over orch: valid = false, break
+                    end
+                end
 
-                        orch->>re: ruleFails(rule, value, peerReader)
-                        alt rule fails
-                            alt field is hidden
-                                alt summaryEl exists
-                                    orch->>ed: addToSummary(summaryEl, f.fieldName, rule.message)
-                                    Note over orch: summaryHasErrors = true
-                                end
-                            else field is visible
-                                orch->>ed: showInline(desc.formId, f, rule.message)
-                                alt summaryEl exists
-                                    orch->>ed: removeSummaryEntry(summaryEl, f.fieldName)
-                                end
-                            end
-                            Note over orch: valid = false, break
+                orch->>ruleEngine: ruleFails(rule, value, peerReader)
+                alt rule fails
+                    alt field is hidden
+                        opt summaryEl
+                            orch->>errDisp: addToSummary(summaryEl, fieldName, rule.message)
+                        end
+                    else field is visible
+                        orch->>errDisp: showInline(formId, field, rule.message)
+                        opt summaryEl
+                            orch->>errDisp: removeSummaryEntry(summaryEl, fieldName)
                         end
                     end
+                    Note over orch: valid = false, break
                 end
             end
         end
     end
 
-    alt summaryHasErrors AND summaryEl
-        orch->>ed: showSummaryDiv(summaryEl)
+    opt summaryHasErrors AND summaryEl
+        orch->>errDisp: showSummaryDiv(summaryEl)
     end
 
-    orch->>orch: log.debug("validate", { formId, valid })
-    orch-->>Caller: return valid
-</pre></div>
+    orch->>orch: log.debug("validate", {formId, valid})
+    orch-->>Caller: valid (boolean)
+</div>
 
-<h3>13b. allRulesConditionallySkipped()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>showServerErrors()</h3>
+<div class="mermaid">
 sequenceDiagram
+    participant Caller
     participant orch as orchestrator.ts
-    participant cnd as condition.ts
+    participant errDisp as error-display.ts
 
-    Note over orch: allRulesConditionallySkipped(f, condReader)
-
-    alt f.rules.length === 0
-        orch-->>orch: return true (no rules to block)
+    Caller->>orch: showServerErrors(desc, data)
+    orch->>errDisp: clearAllInline(desc.formId, desc.fields)
+    orch->>errDisp: findSummaryElement(desc.planId)
+    opt summaryEl
+        orch->>errDisp: clearSummary(summaryEl)
+        orch->>errDisp: hideSummaryDiv(summaryEl)
     end
 
-    loop for each rule
-        alt rule has NO when condition (unconditional rule)
-            orch-->>orch: return false (must block)
-        else rule has when condition
-            orch->>cnd: evalCondition(rule.when, condReader)
-            alt result !== false (true or null)
-                orch-->>orch: return false (condition met or unresolvable -> must block)
-            else result === false
-                Note over orch: this rule is conditionally skipped, check next
+    orch->>orch: extractErrors(data)
+    Note over orch: Expects ProblemDetails: {errors: Record}
+    alt data is not ProblemDetails shape
+        orch->>orch: log.warn("not ProblemDetails shape, ignoring")
+        orch-->>Caller: return
+    end
+
+    loop Each [name, msgs] in errors
+        orch->>orch: findErrorSpanExists(name, desc.fields)
+        alt span exists
+            orch->>errDisp: showServerErrorInline(formId, name, msg, fields)
+        else no span
+            opt summaryEl
+                orch->>errDisp: addToSummary(summaryEl, name, msg)
             end
         end
     end
 
-    orch-->>orch: return true (all conditions false -> skip)
-</pre></div>
-
-<h3>13c. showServerErrors()</h3>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant Caller
-    participant orch as orchestrator.ts
-    participant ed as error-display.ts
-
-    Caller->>orch: showServerErrors(desc, data)
-
-    orch->>ed: clearAllInline(desc.formId, desc.fields)
-    orch->>ed: findSummaryElement(desc.planId)
-    opt summaryEl found
-        orch->>ed: clearSummary(summaryEl)
-        orch->>ed: hideSummaryDiv(summaryEl)
+    opt summaryHasErrors AND summaryEl
+        orch->>errDisp: showSummaryDiv(summaryEl)
     end
+    orch->>orch: log.debug("showServerErrors", {formId, fieldCount})
+</div>
 
-    orch->>orch: extractErrors(data)
-
-    alt data is null or not object
-        orch-->>Caller: return (null errors)
-    else data has "errors" property that is non-null object
-        Note over orch: errors = data.errors (ProblemDetails shape)
-    else data is object but no "errors" property
-        orch->>orch: log.warn("response is not ProblemDetails shape, ignoring")
-        orch-->>Caller: return
-    end
-
-    loop for each [name, msgs] in errors
-        alt msgs is Array
-            Note over orch: msg = msgs.join(", ")
-        else msgs is scalar
-            Note over orch: msg = String(msgs)
-        end
-
-        orch->>orch: findErrorSpanExists(desc.formId, name)
-        alt error span exists in DOM
-            orch->>ed: showServerErrorInline(desc.formId, name, msg, desc.fields)
-        else no span AND summaryEl exists
-            orch->>ed: addToSummary(summaryEl, name, msg)
-            Note over orch: summaryHasErrors = true
-        end
-    end
-
-    alt summaryHasErrors AND summaryEl
-        orch->>ed: showSummaryDiv(summaryEl)
-    end
-
-    orch->>orch: log.debug("showServerErrors", { formId, fieldCount })
-</pre></div>
-
-<h3>13d. isHidden() — Visibility Walk</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>allRulesConditionallySkipped()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant orch as orchestrator.ts
+    participant condition as condition.ts
 
-    Note over orch: isHidden(el)
+    Note over orch: allRulesConditionallySkipped(field, condReader)
+    alt field.rules is empty
+        orch-->>orch: true (no rules = nothing to block)
+    end
+    loop Each rule
+        alt rule has no .when (unconditional)
+            orch-->>orch: false (must block)
+        else
+            orch->>condition: evalCondition(rule.when, condReader)
+            alt result !== false (true or null)
+                orch-->>orch: false (must block)
+            end
+        end
+    end
+    orch-->>orch: true (all conditions were false = skip)
+</div>
 
-    loop walk up from el to document root
-        alt node.hasAttribute("hidden") OR node.style.display === "none"
-            orch-->>orch: return true
+<h3>isHidden() &mdash; visibility check on error span parent</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant orch as orchestrator.ts
+    participant DOM
+
+    Note over orch: isHidden(el) - walks up DOM tree from error span parent
+    loop While node is not null
+        alt node has "hidden" attribute
+            orch-->>orch: true
+        else node.style.display == "none"
+            orch-->>orch: true
         end
         Note over orch: node = node.parentElement
     end
-    orch-->>orch: return false (all ancestors visible)
-</pre></div>
+    orch-->>orch: false (nothing hidden)
+</div>
 
-<!-- ============================================================ -->
-<!-- SECTION 14: rule-engine.ts -->
-<!-- ============================================================ -->
-<h2 id="s14">14. validation/rule-engine.ts — ruleFails()</h2>
-<p class="file-ref">Scripts/validation/rule-engine.ts</p>
-<div class="diagram"><pre class="mermaid">
+<h3>domConditionReader &mdash; bridge to DOM</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant orch as orchestrator.ts
+    participant component as component.ts
+    participant walk as walk.ts
+    participant DOM
+
+    Note over orch: readConditionSource(fieldName)
+    orch->>orch: Look up field by name in byName map
+    alt field not enriched (no fieldId/vendor/readExpr)
+        orch-->>orch: undefined
+    end
+    orch->>DOM: document.getElementById(field.fieldId)
+    alt element not found
+        orch-->>orch: undefined
+    end
+    orch->>component: resolveRoot(el, field.vendor)
+    component-->>orch: root
+    orch->>walk: walk(root, field.readExpr)
+    walk-->>orch: val
+    Note over orch: Normalize: null/undefined/false -> ""
+    orch-->>orch: String(val) or ""
+</div>
+
+<h3>domPeerReader &mdash; bridge to DOM</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant orch as orchestrator.ts
+    participant component as component.ts
+    participant walk as walk.ts
+    participant DOM
+
+    Note over orch: readPeer(fieldName)
+    orch->>orch: Look up field by name
+    alt field not enriched
+        orch-->>orch: undefined
+    end
+    orch->>DOM: document.getElementById(field.fieldId)
+    alt element not found
+        orch-->>orch: undefined
+    end
+    orch->>component: resolveRoot(el, field.vendor)
+    component-->>orch: root
+    orch->>walk: walk(root, field.readExpr)
+    walk-->>orch: val
+    orch-->>orch: String(val ?? "")
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 14. rule-engine.ts                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="rule-engine">
+<h2>14. rule-engine.ts &mdash; Pure Rule Evaluation</h2>
+<p class="path">Scripts/validation/rule-engine.ts</p>
+<p>No DOM, no vendor, no side effects. Takes a value and rule, returns pass/fail.
+Fail-closed: unknown rules block the form. 12 rule types.</p>
+
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant re as rule-engine.ts
+    participant engine as rule-engine.ts
     participant peer as PeerReader
 
-    Caller->>re: ruleFails(rule, value, peerReader)
+    Caller->>engine: ruleFails(rule, value, peerReader)
+    Note over engine: str = String(value ?? "")
+    Note over engine: empty = value==null or str==="" or value===false
 
-    Note over re: str = value==null ? "" : String(value)<br/>empty = value==null || str==="" || value===false
+    alt rule.rule == "required"
+        engine-->>Caller: empty
 
-    alt rule === "required"
-        re-->>Caller: return empty
+    else rule.rule == "minLength"
+        engine-->>Caller: !empty AND str.length < constraint
 
-    else rule === "minLength"
-        re-->>Caller: return !empty AND str.length < constraint
+    else rule.rule == "maxLength"
+        engine-->>Caller: !empty AND str.length > constraint
 
-    else rule === "maxLength"
-        re-->>Caller: return !empty AND str.length > constraint
+    else rule.rule == "email"
+        engine-->>Caller: !empty AND regex fails
 
-    else rule === "email"
-        Note over re: regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        re-->>Caller: return !empty AND regex fails
-
-    else rule === "regex"
-        re->>re: try new RegExp(constraint).test(str)
-        alt regex valid
-            re-->>Caller: return !empty AND regex fails
-        else regex throws (broken pattern)
-            re-->>Caller: return true (fail-closed)
+    else rule.rule == "regex"
+        alt regex construction throws
+            engine-->>Caller: true (fail-closed: broken regex blocks)
+        else
+            engine-->>Caller: !empty AND !regex.test(str)
         end
 
-    else rule === "url"
-        Note over re: regex: /^https?:\/\/.+/
-        re-->>Caller: return !empty AND regex fails
+    else rule.rule == "url"
+        engine-->>Caller: !empty AND url regex fails
 
-    else rule === "min"
-        re-->>Caller: return !empty AND Number(str) < constraint
+    else rule.rule == "min"
+        engine-->>Caller: !empty AND Number(str) < constraint
 
-    else rule === "max"
-        re-->>Caller: return !empty AND Number(str) > constraint
+    else rule.rule == "max"
+        engine-->>Caller: !empty AND Number(str) > constraint
 
-    else rule === "range"
-        Note over re: [lo, hi] = constraint
-        Note over re: n = Number(str)
-        re-->>Caller: return !empty AND (n < lo OR n > hi)
+    else rule.rule == "range"
+        Note over engine: [lo, hi] = constraint
+        engine-->>Caller: !empty AND (n < lo or n > hi)
 
-    else rule === "equalTo"
-        re->>peer: readPeer(String(rule.constraint))
-        alt peerVal === undefined
-            re-->>Caller: return true (fail-closed: peer unresolvable)
-        else peerVal resolved
-            re-->>Caller: return String(value ?? "") !== peerVal
+    else rule.rule == "equalTo"
+        engine->>peer: readPeer(String(constraint))
+        alt peerVal is undefined
+            engine-->>Caller: true (fail-closed: peer unresolvable)
+        else
+            engine-->>Caller: String(value) !== peerVal
         end
 
-    else rule === "atLeastOne"
+    else rule.rule == "atLeastOne"
         alt value is Array
-            re-->>Caller: return value.length === 0
-        else non-array
-            re-->>Caller: return empty
+            engine-->>Caller: value.length === 0
+        else
+            engine-->>Caller: empty
         end
 
-    else default (unknown rule type)
-        re-->>Caller: return true (fail-closed)
+    else unknown rule type
+        engine-->>Caller: true (fail-closed: unknown rule blocks)
     end
-</pre></div>
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 15: merge-plan.ts -->
-<!-- ============================================================ -->
-<h2 id="s15">15. lifecycle/merge-plan.ts — PlanRegistry</h2>
-<p class="file-ref">Scripts/lifecycle/merge-plan.ts</p>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 15. merge-plan.ts                                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="merge-plan">
+<h2>15. merge-plan.ts &mdash; PlanRegistry</h2>
+<p class="path">Scripts/lifecycle/merge-plan.ts</p>
+<p>SOLID class encapsulating plan lifecycle state. Handles registration, merging with source dedup,
+removal of old sources, and full reset.</p>
 
-<h3>15a. composeInitialPlans()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>composeInitialPlans()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
     participant mp as merge-plan.ts
 
-    Caller->>mp: composeInitialPlans(plans)
-
-    Note over mp: Dedup by planId, merge components + entries
-
-    loop for each plan
-        mp->>mp: byPlanId.get(plan.planId)
-        alt no existing plan for this planId
-            Note over mp: Create new: { planId, components: {...}, entries: [...] }
-            mp->>mp: byPlanId.set(plan.planId, newPlan)
-        else existing plan found
-            Note over mp: Object.assign(existing.components, plan.components)
-            Note over mp: existing.entries.push(...plan.entries)
+    Caller->>mp: composeInitialPlans(plans[])
+    Note over mp: Group plans by planId
+    loop Each plan
+        alt planId not seen yet
+            mp->>mp: byPlanId.set(planId, copy of plan)
+        else planId exists
+            mp->>mp: Object.assign(existing.components, plan.components)
+            mp->>mp: existing.entries.push(...plan.entries)
         end
     end
+    mp-->>Caller: Plan[] (one per unique planId)
+</div>
 
-    mp-->>Caller: return Array.from(byPlanId.values())
-</pre></div>
-
-<h3>15b. PlanRegistry.register()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>PlanRegistry.register()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
     participant reg as PlanRegistry
@@ -1615,698 +1675,823 @@ sequenceDiagram
     Caller->>reg: register(plan)
     reg->>reg: plans.set(plan.planId, plan)
     reg->>reg: rootPlanIds.add(plan.planId)
-</pre></div>
+</div>
 
-<h3>15c. PlanRegistry.add() — Full Merge</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>PlanRegistry.add() &mdash; merge with source dedup</h3>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
     participant reg as PlanRegistry
     participant hooks as MergeHooks
 
     Caller->>reg: add(incoming, hooks)
+    Note over reg: sourceId = incoming.sourceId
 
-    reg->>reg: sourceId = incoming.sourceId
-    reg->>reg: previousPlanId = sourceOwners.get(sourceId)
-
-    alt sourceId AND previousPlanId exist
+    alt sourceId exists AND already tracked
         reg->>reg: removeSource(previousPlanId, sourceId)
-        Note over reg: Clean up previous source's entries + components
+        Note over reg: Aborts old listeners,<br/>removes old entries + component keys
     end
 
     reg->>reg: target = plans.get(incoming.planId)
-    alt target NOT found
-        Note over reg: Create new: { planId, components: {}, entries: [] }
-        reg->>reg: plans.set(incoming.planId, target)
+    alt target not found
+        reg->>reg: Create empty plan shell
+        reg->>reg: plans.set(planId, target)
     end
 
     reg->>reg: Object.assign(target.components, incoming.components)
 
-    alt target.entries.length > 0 (existing entries need re-enrichment)
+    alt target.entries.length > 0 (existing entries)
         reg->>hooks: enrichEntries(target.entries, target.components)
+        Note over hooks: Re-enrich existing entries with new components
     end
 
-    reg->>reg: abort = sourceId ? new AbortController() : undefined
-
+    opt sourceId exists
+        reg->>reg: abort = new AbortController()
+    end
     reg->>hooks: enrichEntries(incoming.entries, target.components)
     reg->>hooks: wireEntries(incoming.entries, target.components, abort?.signal)
     reg->>reg: target.entries.push(...incoming.entries)
 
-    alt sourceId AND abort exist
-        reg->>reg: sourceOwners.set(sourceId, incoming.planId)
+    opt sourceId exists
+        reg->>reg: sourceOwners.set(sourceId, planId)
         reg->>reg: abortControllers.set(sourceId, abort)
-        reg->>reg: sourceEntries.set(sourceId, [...incoming.entries])
-        reg->>reg: sourceComponentKeys.set(sourceId, Object.keys(incoming.components))
+        reg->>reg: sourceEntries.set(sourceId, entries copy)
+        reg->>reg: sourceComponentKeys.set(sourceId, component keys)
     end
 
-    reg-->>Caller: return target
-</pre></div>
+    reg-->>Caller: target (merged Plan)
+</div>
 
-<h3>15d. PlanRegistry.removeSource() — Cleanup</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>PlanRegistry.removeSource()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant reg as PlanRegistry
 
     Note over reg: removeSource(planId, sourceId)
-
     reg->>reg: plan = plans.get(planId)
-    alt plan NOT found
+    alt plan not found
         reg->>reg: clearTracking(sourceId)
         reg-->>reg: return
     end
 
     reg->>reg: abortControllers.get(sourceId)?.abort()
-    Note over reg: Abort listeners wired by this source
+    Note over reg: Aborts all event listeners for this source
 
-    reg->>reg: oldEntries = sourceEntries.get(sourceId)
-    opt oldEntries exist
-        loop for each old entry
-            reg->>reg: idx = plan.entries.indexOf(entry)
-            alt idx >= 0
-                reg->>reg: plan.entries.splice(idx, 1)
-            end
+    opt old entries exist
+        loop Each old entry
+            reg->>reg: plan.entries.splice(idx, 1)
         end
     end
 
-    reg->>reg: oldKeys = sourceComponentKeys.get(sourceId)
-    opt oldKeys exist
-        loop for each key
+    opt old component keys exist
+        loop Each key
             reg->>reg: delete plan.components[key]
         end
     end
 
     reg->>reg: clearTracking(sourceId)
-    Note over reg: Delete from: sourceOwners, abortControllers, sourceEntries, sourceComponentKeys
 
-    alt NOT a rootPlanId AND entries.length===0 AND no components
+    alt plan is NOT a root plan AND empty
         reg->>reg: plans.delete(planId)
-        Note over reg: Garbage collect empty non-root plan
     end
-</pre></div>
+</div>
 
-<h3>15e. PlanRegistry.reset()</h3>
-<div class="diagram"><pre class="mermaid">
+<h3>PlanRegistry.reset()</h3>
+<div class="mermaid">
 sequenceDiagram
     participant reg as PlanRegistry
 
     Note over reg: reset()
-
     reg->>reg: plans.clear()
     reg->>reg: rootPlanIds.clear()
     reg->>reg: sourceOwners.clear()
-    loop for each abort controller
+    loop Each abort controller
         reg->>reg: abort.abort()
     end
     reg->>reg: abortControllers.clear()
     reg->>reg: sourceEntries.clear()
     reg->>reg: sourceComponentKeys.clear()
-</pre></div>
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 16: inject.ts -->
-<!-- ============================================================ -->
-<h2 id="s16">16. lifecycle/inject.ts — injectHtml()</h2>
-<p class="file-ref">Scripts/lifecycle/inject.ts</p>
-<div class="diagram"><pre class="mermaid">
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 16. inject.ts                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="inject">
+<h2>16. inject.ts &mdash; HTML Injection</h2>
+<p class="path">Scripts/execution/inject.ts</p>
+<p>Injects HTML into a container. Extracts <code>[data-reactive-plan]</code> script elements
+before injection, then merges them via <code>mergePlan()</code>. Uses <code>ej.base.append</code>
+when available for Syncfusion component initialization.</p>
+
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant inj as inject.ts
+    participant inject as inject.ts
     participant boot as boot.ts
     participant DOM
+    participant EJ as ej.base.append
 
-    Caller->>inj: injectHtml(container, html)
+    Caller->>inject: injectHtml(container, html)
 
-    inj->>DOM: document.createElement("div")
-    DOM-->>inj: temp
-    inj->>inj: temp.innerHTML = html
+    inject->>DOM: temp = document.createElement("div")
+    inject->>DOM: temp.innerHTML = html
 
-    Note over inj: Extract plan elements before injection
-    inj->>inj: temp.querySelectorAll("[data-alis-plan]")
-
-    loop for each planEl
-        inj->>inj: JSON.parse(el.textContent!)
-        inj->>inj: plans.push(parsed)
-        inj->>inj: el.remove()
-        Note over inj: Remove script tags from temp<br/>(ej.base.append cannot handle them)
+    Note over inject: Extract plan elements before injection
+    inject->>DOM: temp.querySelectorAll("[data-reactive-plan]")
+    loop Each plan element
+        inject->>inject: JSON.parse(el.textContent!)
+        inject->>DOM: el.remove() (from temp)
     end
 
-    inj->>inj: container.innerHTML = ""
+    inject->>DOM: container.innerHTML = ""
 
-    alt ej?.base?.append exists (Syncfusion available)
-        inj->>DOM: ej.base.append(Array.from(temp.childNodes), container, true)
-        Note over DOM: SF component initialization during append
+    alt ej?.base?.append exists (Syncfusion loaded)
+        inject->>EJ: ej.base.append(childNodes, container, true)
+        Note over EJ: SF component initialization during append
     else no Syncfusion
-        inj->>DOM: container.append(...Array.from(temp.childNodes))
+        inject->>DOM: container.append(...childNodes)
     end
 
-    loop for each extracted plan
-        alt container.id exists
-            inj->>inj: plan.sourceId = container.id
-            Note over inj: sourceId enables dedup on partial reload
+    loop Each extracted plan
+        alt container has ID
+            inject->>inject: plan.sourceId = container.id
         end
-        inj->>boot: mergePlan(plan)
+        inject->>boot: mergePlan(plan)
     end
-</pre></div>
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 17: live-clear.ts -->
-<!-- ============================================================ -->
-<h2 id="s17">17. validation/live-clear.ts — wireLiveClearing()</h2>
-<p class="file-ref">Scripts/validation/live-clear.ts</p>
-<div class="diagram"><pre class="mermaid">
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 17. live-clear.ts                                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="live-clear">
+<h2>17. live-clear.ts &mdash; Per-Field Live Error Clearing</h2>
+<p class="path">Scripts/validation/live-clear.ts</p>
+<p>Per-field wiring via <code>resolveRoot()</code>. Native: <code>input</code> + <code>change</code> on DOM element.
+Fusion: <code>change</code> on ej2 instance. Tracks wired field IDs to prevent double-wiring on partial reload.</p>
+
+<div class="mermaid">
 sequenceDiagram
     participant Caller
     participant lc as live-clear.ts
-    participant ed as error-display.ts
+    participant component as component.ts
+    participant errDisp as error-display.ts
     participant DOM
 
     Caller->>lc: wireLiveClearing(desc)
+    loop Each field in desc.fields
+        lc->>lc: wireField(desc.formId, field)
 
-    lc->>DOM: document.getElementById(desc.formId)
-    alt container NOT found
-        lc-->>Caller: return (no-op)
-    end
-    DOM-->>lc: container
+        alt field has no fieldId or no vendor (unenriched)
+            Note over lc: Skip (no component to listen on)
+        else
 
-    alt container.dataset.alisValidated is truthy
-        lc-->>Caller: return (already wired, prevent double-wiring)
-    end
+            alt wiredFields.has(field.fieldId)
+                Note over lc: Skip (already wired - dedup)
+            else
+                lc->>lc: wiredFields.add(field.fieldId)
+                lc->>DOM: document.getElementById(field.fieldId)
+                alt element not in DOM
+                    Note over lc: Skip (lazy partial not loaded yet)
+                else
+                    Note over lc: clearHandler = () => clearInline(formId, field)
 
-    lc->>lc: container.dataset.alisValidated = "true"
-    lc->>lc: byName = new Map(fields.map(f => [f.fieldName, f]))
+                    alt field.vendor == "native"
+                        lc->>DOM: el.addEventListener("input", clearHandler)
+                        lc->>DOM: el.addEventListener("change", clearHandler)
+                    else fusion (or future vendor)
+                        lc->>component: resolveRoot(el, field.vendor)
+                        component-->>lc: root (ej2 instance)
+                        lc->>DOM: (root as EventTarget).addEventListener("change", clearHandler)
+                    end
 
-    Note over lc: Wire "input" and "change" event listeners on container
-
-    lc->>DOM: container.addEventListener("input", handler)
-    lc->>DOM: container.addEventListener("change", handler)
-
-    Note over lc: Handler fires on input/change events (bubbled):
-
-    DOM->>lc: handler(event)
-    lc->>lc: target = e.target as HTMLElement
-    Note over lc: node = target.parentElement
-
-    loop walk up from target.parentElement to container
-        lc->>DOM: node.querySelector("[data-valmsg-for]")
-        alt span found
-            lc->>lc: fieldName = span.getAttribute("data-valmsg-for")
-            alt fieldName exists
-                lc->>lc: field = byName.get(fieldName)
-                alt field found in map
-                    lc->>ed: clearInline(desc.formId, field)
-                    lc-->>lc: return (done)
+                    Note over DOM: When user types/changes:
+                    DOM->>errDisp: clearInline(formId, field)
+                    Note over errDisp: span.textContent = ""
+                    Note over errDisp: span hidden + display none
+                    Note over errDisp: el.classList.remove("alis-has-error")
                 end
             end
         end
-        Note over lc: node = node.parentElement
     end
-    Note over lc: No matching field found — no-op
-</pre></div>
+</div>
+</section>
 
-<!-- ============================================================ -->
-<!-- SECTION 18: Components -->
-<!-- ============================================================ -->
-<h2 id="s18">18. Components — drawer, loader, checklist, confirm, native-action-link</h2>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 18. Components                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="components">
+<h2>18. Components &mdash; drawer, loader, checklist, confirm, native-action-link</h2>
 
-<h3>18a. drawer.ts — Self-Initializing Side-Effect</h3>
-<p class="file-ref">Scripts/components/native/drawer.ts</p>
-<div class="diagram"><pre class="mermaid">
+<h3>18a. drawer.ts (side-effect module)</h3>
+<p class="path">Scripts/components/native/drawer.ts</p>
+<div class="mermaid">
 sequenceDiagram
-    participant Module
+    participant Browser
     participant drawer as drawer.ts
     participant DOM
 
-    Module->>drawer: init() (called on import)
-
-    drawer->>DOM: document.getElementById("alis-drawer")
-    alt container NOT found
-        drawer-->>Module: return (no drawer on page)
-    end
-    DOM-->>drawer: container
-
-    drawer->>DOM: document.getElementById("alis-drawer-close")
-    alt closeBtn found
-        drawer->>DOM: closeBtn.addEventListener("click", ...)
-        Note over DOM: On click: container.classList.remove("alis-drawer--visible")
+    Note over drawer: init() runs on import (side-effect)
+    drawer->>DOM: getElementById("alis-drawer")
+    alt container not found
+        Note over drawer: return (no drawer on page)
     end
 
-    drawer->>DOM: document.addEventListener("keydown", ...)
-    Note over DOM: On Escape key:
-    alt container has class "alis-drawer--visible"
-        DOM->>drawer: close(container)
-        Note over drawer: container.classList.remove("alis-drawer--visible")
-    else drawer not visible
-        Note over DOM: No-op
+    drawer->>DOM: getElementById("alis-drawer-close")
+    opt closeBtn exists
+        drawer->>DOM: closeBtn.addEventListener("click", handler)
+        Note over DOM: On click: classList.remove("alis-drawer--visible")
     end
 
-    drawer->>DOM: container.addEventListener("transitionend", ...)
-    Note over DOM: On transition end:
-    alt container does NOT have "alis-drawer--visible"
-        Note over drawer: Cleanup:<br/>1. container.setAttribute("aria-hidden", "true")<br/>2. remove size classes (sm, md, lg)<br/>3. clear #alis-drawer-content innerHTML<br/>4. clear #alis-drawer-title textContent
-    else drawer still visible
-        Note over DOM: No-op (opening transition)
-    end
-</pre></div>
+    drawer->>DOM: document.addEventListener("keydown", handler)
+    Note over DOM: On Escape + drawer visible:
+    Note over DOM: classList.remove("alis-drawer--visible")
 
-<h3>18b. loader.ts — Self-Initializing Side-Effect</h3>
-<p class="file-ref">Scripts/components/native/loader.ts</p>
-<div class="diagram"><pre class="mermaid">
+    drawer->>DOM: container.addEventListener("transitionend", handler)
+    Note over DOM: On transitionend + NOT visible:
+    Note over DOM: setAttribute("aria-hidden", "true")
+    Note over DOM: classList.remove("alis-drawer--sm", "--md", "--lg")
+    Note over DOM: alis-drawer-content.innerHTML = ""
+    Note over DOM: alis-drawer-title.textContent = ""
+</div>
+
+<h3>18b. loader.ts (side-effect module)</h3>
+<p class="path">Scripts/components/native/loader.ts</p>
+<div class="mermaid">
 sequenceDiagram
-    participant Module
+    participant Browser
     participant loader as loader.ts
     participant DOM
 
-    Module->>loader: init() (called on import)
-
-    loader->>DOM: document.getElementById("alis-loader")
-    alt loader element NOT found
-        loader-->>Module: return (no loader on page)
+    Note over loader: init() runs on import (side-effect)
+    loader->>DOM: getElementById("alis-loader")
+    alt loader not found
+        Note over loader: return
     end
-    DOM-->>loader: loader element
 
     loader->>DOM: new MutationObserver(callback)
-    Note over loader: Observes class attribute changes
+    loader->>DOM: observer.observe(loader, {attributes: true, attributeFilter: ["class"]})
 
-    loader->>DOM: observer.observe(loader, { attributes: true, attributeFilter: ["class"] })
-
-    Note over DOM: When class changes (mutation observed):
-
-    alt loader has "alis-loader--visible" class
-        Note over loader: VISIBLE path
-        loader->>DOM: loader.getAttribute("data-target")
+    Note over DOM: When class attribute changes:
+    alt classList.contains("alis-loader--visible")
+        DOM->>DOM: Read data-target attribute
         opt targetId exists
-            loader->>DOM: document.getElementById(targetId)
-            alt target found
-                Note over loader: target.style.position = "relative"
-                Note over loader: target.appendChild(loader)
-            end
+            DOM->>DOM: target.style.position = "relative"
+            DOM->>DOM: target.appendChild(loader)
         end
-
-        loader->>DOM: loader.getAttribute("data-timeout")
-        opt timeout attribute exists
-            Note over loader: ms = parseInt(timeout, 10)
-            alt ms > 0
-                Note over loader: setTimeout(() => {<br/>loader.classList.remove("alis-loader--visible")<br/>loader.setAttribute("aria-hidden", "true")<br/>}, ms)
-            end
+        DOM->>DOM: Read data-timeout attribute
+        opt timeout > 0
+            DOM->>DOM: setTimeout: remove visible class after ms
         end
-
-    else loader does NOT have "alis-loader--visible"
-        Note over loader: CLEANUP path
-        alt loader.parentElement !== document.body
-            loader->>DOM: document.body.appendChild(loader)
-            Note over loader: Move back to body
+    else loader is NOT visible
+        alt loader not in document.body
+            DOM->>DOM: document.body.appendChild(loader)
         end
-        loader->>DOM: loader.removeAttribute("data-target")
-        loader->>DOM: loader.removeAttribute("data-timeout")
-        loader->>DOM: document.getElementById("alis-loader-message")
-        opt msg element found
-            Note over loader: msg.textContent = ""
-        end
+        DOM->>DOM: removeAttribute("data-target")
+        DOM->>DOM: removeAttribute("data-timeout")
+        DOM->>DOM: loader-message.textContent = ""
     end
-</pre></div>
+</div>
 
-<h3>18c. checklist.ts — Self-Initializing Side-Effect</h3>
-<p class="file-ref">Scripts/components/native/checklist.ts</p>
-<div class="diagram"><pre class="mermaid">
+<h3>18c. checklist.ts (side-effect module)</h3>
+<p class="path">Scripts/components/native/checklist.ts</p>
+<div class="mermaid">
 sequenceDiagram
-    participant Module
-    participant cl as checklist.ts
+    participant Browser
+    participant checklist as checklist.ts
     participant DOM
 
-    Module->>cl: init() (called on import)
+    Note over checklist: init() runs on import (side-effect)
+    checklist->>DOM: querySelectorAll("[data-reactive-checklist]")
 
-    cl->>DOM: querySelectorAll("[data-alis-checklist]")
-    DOM-->>cl: containers (NodeList)
-
-    loop for each container
-        cl->>DOM: container.querySelector('input[type="hidden"]')
-        alt hidden input NOT found
-            Note over cl: continue (skip this container)
+    loop Each container
+        checklist->>DOM: container.querySelector('input[type="hidden"]')
+        alt hidden input not found
+            Note over checklist: continue (skip container)
         end
-        DOM-->>cl: hidden input
 
-        Note over cl: Initialize container.value = hidden.value.split(",").filter(Boolean)
+        Note over checklist: Initialize container.value from hidden CSV
 
-        cl->>DOM: container.addEventListener("change", handler)
-        Note over DOM: On change event:
-        DOM->>cl: handler fires
-        Note over cl: Scan all checkboxes in container
-        cl->>DOM: container.querySelectorAll('input[type="checkbox"]')
-        loop for each checkbox
-            alt cb.checked
-                Note over cl: values.push(cb.value)
-            end
-        end
-        Note over cl: container.value = values (array for runtime)
-        Note over cl: hidden.value = values.join(",") (CSV for MVC)
+        checklist->>DOM: container.addEventListener("change", handler)
+        Note over DOM: On change (checkbox bubble):
+        DOM->>DOM: Collect all checked checkbox values
+        DOM->>DOM: container.value = values[] (array for runtime)
+        DOM->>DOM: hidden.value = values.join(",") (CSV for MVC)
     end
-</pre></div>
+</div>
 
-<h3>18d. confirm.ts — Syncfusion Dialog Init</h3>
-<p class="file-ref">Scripts/components/fusion/confirm.ts</p>
-<div class="diagram"><pre class="mermaid">
+<h3>18d. confirm.ts (Fusion SF Dialog)</h3>
+<p class="path">Scripts/components/fusion/confirm.ts</p>
+<div class="mermaid">
 sequenceDiagram
     participant root as root.ts
-    participant conf as confirm.ts
+    participant confirm as confirm.ts
     participant DOM
     participant SF as ej.popups.Dialog
 
-    root->>conf: init()
-
-    conf->>DOM: document.getElementById("alisConfirmDialog")
-    alt element NOT found
-        conf->>conf: log.warn("confirm element not found")
-        conf-->>root: return (no confirm dialog on page)
+    root->>confirm: init()
+    confirm->>DOM: getElementById("alisConfirmDialog")
+    alt element not found
+        confirm->>confirm: log.warn("confirm element not found")
+        confirm-->>root: return
     end
-    DOM-->>conf: el
 
-    conf->>SF: new ej.popups.Dialog({ isModal, visible:false, width, ... })
-    SF-->>conf: dialog instance
-    conf->>SF: dialog.appendTo(el)
+    confirm->>SF: new ej.popups.Dialog({isModal, visible:false, width:400px})
+    confirm->>SF: dialog.appendTo(el)
 
-    Note over conf: Register window.alis.confirm(message)
+    confirm->>DOM: window.alis = window.alis || {}
+    confirm->>DOM: window.alis.confirm = function(message)
 
-    conf->>DOM: window.alis = window.alis || {}
-    conf->>DOM: window.alis.confirm = function(message)
+    Note over confirm: When alis.confirm(message) is called:
+    Note over confirm: Returns Promise boolean
+    Note over confirm: Queues via Promise chain (sequential dialogs)
 
-    Note over conf: When confirm(message) is called:
-    Note over conf: Returns Promise of boolean
-    Note over conf: Queued via Promise chain (serialized)
-
-    conf->>SF: dialog.header = "Confirm"
-    conf->>SF: dialog.content = message
-    conf->>SF: dialog.buttons = [OK, Cancel]
-
+    Note over SF: Dialog shows with OK + Cancel buttons
     alt User clicks OK
-        conf->>SF: dialog.close = null
-        conf->>SF: dialog.hide()
-        conf-->>conf: resolve queue + outerResolve(true)
+        SF-->>confirm: outerResolve(true)
     else User clicks Cancel
-        conf->>SF: dialog.close = null
-        conf->>SF: dialog.hide()
-        conf-->>conf: resolve queue + outerResolve(false)
-    else User presses Escape (dialog.close fires)
-        conf-->>conf: resolve queue + outerResolve(false)
+        SF-->>confirm: outerResolve(false)
+    else Dialog closed via Escape
+        SF-->>confirm: outerResolve(false)
     end
+</div>
 
-    conf->>conf: log.info("initialized")
-</pre></div>
-
-<h3>18e. native-action-link.ts — Click Interception</h3>
-<p class="file-ref">Scripts/components/native/native-action-link.ts</p>
-<div class="diagram"><pre class="mermaid">
+<h3>18e. native-action-link.ts</h3>
+<p class="path">Scripts/components/native/native-action-link.ts</p>
+<div class="mermaid">
 sequenceDiagram
     participant root as root.ts
     participant nal as native-action-link.ts
-    participant exec as execute.ts
+    participant execute as execute.ts
     participant DOM
 
     root->>nal: initNativeActionLinks()
     alt already initialized
-        nal-->>root: return (no-op)
+        nal-->>root: return (idempotent)
     end
     nal->>nal: initialized = true
     nal->>DOM: document.addEventListener("click", handleClick)
 
-    Note over DOM: User clicks anywhere on page
-
+    Note over DOM: When ANY click on document:
     DOM->>nal: handleClick(event)
-
-    alt event.defaultPrevented
-        nal-->>DOM: return (another handler already handled it)
-    end
-    alt event.button !== 0 (not left click)
+    alt event.defaultPrevented or button != 0
         nal-->>DOM: return
     end
-    alt metaKey OR ctrlKey OR shiftKey OR altKey pressed
-        nal-->>DOM: return (modifier keys = browser default)
+    alt modifier key held (meta/ctrl/shift/alt)
+        nal-->>DOM: return
     end
-
-    nal->>DOM: target.closest("a[data-reactive-link]")
-    alt no matching anchor found
-        nal-->>DOM: return (not a reactive link)
+    nal->>DOM: target.closest('a[data-reactive-link]')
+    alt no matching anchor
+        nal-->>DOM: return
     end
-    DOM-->>nal: anchor element
 
     nal->>DOM: event.preventDefault()
-
     nal->>nal: decodePayload(anchor)
-    Note over nal: Extract data-reactive-link attribute
-    alt attribute missing
-        Note right of nal: THROW Error("NativeActionLink is missing data-reactive-link.")
+    alt data-reactive-link is missing
+        nal-->>DOM: THROW Error("missing data-reactive-link")
     end
-    nal->>nal: JSON.parse(raw)
     alt JSON parse fails
-        Note right of nal: THROW Error("NativeActionLink payload is invalid JSON: ...")
+        nal-->>DOM: THROW Error("invalid JSON")
     end
-    Note over nal: payload = { reaction }
 
-    nal->>nal: bindHrefToSingleRequest(payload.reaction, anchor.href)
-    Note over nal: Find exactly ONE request in reaction tree
-    nal->>nal: resolveSingleRequest(reaction, state)
-</pre></div>
-
-<h3>18f. native-action-link.ts — resolveSingleRequest() + assertRequestSupported()</h3>
-<div class="diagram"><pre class="mermaid">
-sequenceDiagram
-    participant nal as native-action-link.ts
-    participant exec as execute.ts
-
-    Note over nal: resolveSingleRequest(reaction, state) - recursive
-
-    alt reaction.kind === "sequential"
-        nal-->>nal: return (no request in sequential)
-
-    else reaction.kind === "conditional"
-        loop for each branch
-            nal->>nal: resolveSingleRequest(branch.reaction, state)
+    nal->>nal: bindHrefToSingleRequest(reaction, href)
+    Note over nal: resolveSingleRequest walks reaction tree
+    alt reaction.kind == "sequential"
+        Note over nal: return (no request)
+    else reaction.kind == "conditional"
+        Note over nal: Recurse into each branch
+    else reaction.kind == "http"
+        Note over nal: state.count++
+        alt count > 1
+            nal-->>DOM: THROW "exactly one request"
         end
-
-    else reaction.kind === "http"
-        nal->>nal: state.count++
-        alt state.count > 1
-            Note right of nal: THROW Error("NativeActionLink supports exactly one request.")
+        Note over nal: assertRequestSupported(request):
+        alt request.chained exists
+            nal-->>DOM: THROW "does not support chained"
         end
-        nal->>nal: assertRequestSupported(reaction.request)
-        nal->>nal: state.request = reaction.request
-
-    else reaction.kind === "parallel-http"
-        Note right of nal: THROW Error("NativeActionLink does not support Parallel().")
-    end
-
-    Note over nal: After resolveSingleRequest completes:
-    alt state.count !== 1 OR !state.request
-        Note right of nal: THROW Error("NativeActionLink requires exactly one request.")
-    end
-    Note over nal: state.request.url = href (bind href to request)
-
-    Note over nal: assertRequestSupported(request):
-    alt request.chained exists
-        Note right of nal: THROW Error("NativeActionLink does not support chained requests.")
-    end
-    alt request.validation exists
-        Note right of nal: THROW Error("NativeActionLink does not support validation.")
-    end
-    alt request.gather has "all" kind item
-        Note right of nal: THROW Error("NativeActionLink does not support IncludeAll().")
-    end
-
-    nal->>nal: assertHandlersContainNoRequest(request.onSuccess)
-    nal->>nal: assertHandlersContainNoRequest(request.onError)
-
-    Note over nal: assertNestedReactionContainsNoRequest(reaction) - recursive:
-    alt reaction.kind === "sequential"
-        Note over nal: return (OK)
-    else reaction.kind === "conditional"
-        loop for each branch
-            nal->>nal: assertNestedReactionContainsNoRequest(branch.reaction)
+        alt request.validation exists
+            nal-->>DOM: THROW "does not support validation"
         end
-    else reaction.kind === "http" OR "parallel-http"
-        Note right of nal: THROW Error("response handlers cannot start a second HTTP request.")
+        alt gather has "all" item
+            nal-->>DOM: THROW "does not support IncludeAll()"
+        end
+        Note over nal: Assert no nested HTTP in handlers
+        alt handler has http/parallel-http reaction
+            nal-->>DOM: THROW "handlers cannot start second HTTP request"
+        end
+    else reaction.kind == "parallel-http"
+        nal-->>DOM: THROW "does not support Parallel()"
     end
 
-    nal->>nal: log.debug("activate", { id, href })
-    nal->>exec: executeReaction(payload.reaction)
-</pre></div>
+    alt state.count != 1
+        nal-->>DOM: THROW "requires exactly one request"
+    end
+    Note over nal: state.request.url = href
 
-<!-- ============================================================ -->
-<!-- SUPPLEMENTARY: enrichment.ts -->
-<!-- ============================================================ -->
-<h3>Supplementary: enrichment.ts — Reaction Tree Walker</h3>
-<p class="file-ref">Scripts/lifecycle/enrichment.ts</p>
-<div class="diagram"><pre class="mermaid">
+    nal->>nal: log.debug("activate", {id, href})
+    nal->>execute: executeReaction(payload.reaction)
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SUPPLEMENTARY MODULES                                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="supplementary">
+<h2>Supplementary Modules</h2>
+
+<h3>enrichment.ts</h3>
+<p class="path">Scripts/lifecycle/enrichment.ts</p>
+<p>Enriches validation fields from <code>plan.components</code>. No DOM, no wiring. Uses <code>walkValidationDescriptors()</code>.</p>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant enr as enrichment.ts
+    participant enrichment as enrichment.ts
+    participant walkR as walk-reactions.ts
 
-    Caller->>enr: enrichEntries(entries, components)
+    Caller->>enrichment: enrichEntries(entries, components)
+    enrichment->>walkR: walkValidationDescriptors(entries, visitor)
+    Note over walkR: Walks reaction tree
 
-    loop for each entry
-        enr->>enr: enrichReaction(entry.reaction, components)
+    loop Each ValidationDescriptor found
+        loop Each field in desc.fields
+            alt components[fieldName] exists
+                Note over enrichment: field.fieldId = comp.id
+                Note over enrichment: field.vendor = comp.vendor
+                Note over enrichment: field.readExpr = comp.readExpr
+            else component not found
+                opt field was previously enriched
+                    enrichment->>enrichment: log.warn("clearing enrichment")
+                end
+                Note over enrichment: field.fieldId = undefined
+                Note over enrichment: field.vendor = undefined
+                Note over enrichment: field.readExpr = undefined
+            end
+        end
+    end
+</div>
+
+<h3>walk-reactions.ts</h3>
+<p class="path">Scripts/lifecycle/walk-reactions.ts</p>
+<p>Shared reaction tree walker. Visits every <code>ValidationDescriptor</code> found in http/parallel-http requests
+(including chained). Used by both <code>enrichment.ts</code> and <code>boot.ts</code>.</p>
+<div class="mermaid">
+sequenceDiagram
+    participant Caller
+    participant wr as walk-reactions.ts
+
+    Caller->>wr: walkValidationDescriptors(entries, visitor)
+    loop Each entry
+        wr->>wr: walkReaction(entry.reaction, visitor)
     end
 
-    Note over enr: enrichReaction(reaction, components)
-
-    alt reaction.kind === "http"
-        enr->>enr: enrichRequest(reaction.request, components)
-    else reaction.kind === "parallel-http"
-        loop for each request
-            enr->>enr: enrichRequest(req, components)
+    Note over wr: walkReaction(reaction, visitor):
+    alt reaction.kind == "http"
+        wr->>wr: walkRequest(reaction.request, visitor)
+    else reaction.kind == "parallel-http"
+        loop Each request
+            wr->>wr: walkRequest(req, visitor)
         end
-    else reaction.kind === "conditional"
-        loop for each branch
-            enr->>enr: enrichReaction(branch.reaction, components)
+    else reaction.kind == "conditional"
+        loop Each branch
+            wr->>wr: walkReaction(branch.reaction, visitor)
         end
-    else kind === "sequential"
-        Note over enr: No validation to enrich
+    else reaction.kind == "sequential"
+        Note over wr: no-op (no requests)
     end
 
-    Note over enr: enrichRequest(req, components)
-
+    Note over wr: walkRequest(req, visitor):
     opt req.validation exists
-        enr->>enr: enrichValidationFields(req.validation, components)
+        wr->>Caller: visitor(req.validation)
     end
     opt req.chained exists
-        enr->>enr: enrichRequest(req.chained, components)
-        Note over enr: Recurse into chained request
+        wr->>wr: walkRequest(req.chained, visitor)
     end
+</div>
 
-    Note over enr: enrichValidationFields(desc, components)
-
-    loop for each field in desc.fields
-        alt components[f.fieldName] exists
-            Note over enr: f.fieldId = comp.id<br/>f.vendor = comp.vendor<br/>f.readExpr = comp.readExpr
-        else component NOT found
-            alt f.fieldId was previously set (partial removed)
-                enr->>enr: log.warn("clearing enrichment - component removed")
-            end
-            Note over enr: f.fieldId = undefined<br/>f.vendor = undefined<br/>f.readExpr = undefined
-        end
-    end
-</pre></div>
-
-<!-- ============================================================ -->
-<!-- SUPPLEMENTARY: condition.ts -->
-<!-- ============================================================ -->
-<h3>Supplementary: condition.ts — Validation Condition Evaluation</h3>
-<p class="file-ref">Scripts/validation/condition.ts</p>
-<div class="diagram"><pre class="mermaid">
+<h3>coerce.ts</h3>
+<p class="path">Scripts/core/coerce.ts</p>
+<p>Value coercion for plan-driven resolution. 6 coercion types.
+Used by <code>resolver.ts</code>, <code>element.ts</code>, and <code>conditions.ts</code>.</p>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant cnd as condition.ts
+    participant coerce as core/coerce.ts
+
+    Caller->>coerce: coerce(value, type)
+
+    alt type == "string"
+        Note over coerce: null/undefined -> ""
+        Note over coerce: everything else -> String()
+        coerce-->>Caller: string
+
+    else type == "number"
+        Note over coerce: NaN -> 0, null/undefined -> 0
+        Note over coerce: everything else -> Number()
+        coerce-->>Caller: number
+
+    else type == "boolean"
+        alt value is string
+            Note over coerce: "" -> false, "false" -> false, "0" -> false
+            Note over coerce: anything else -> true
+        else non-string
+            Note over coerce: Boolean(value)
+        end
+        coerce-->>Caller: boolean
+
+    else type == "date"
+        alt value is null/undefined
+            coerce-->>Caller: NaN
+        else value is Date
+            coerce-->>Caller: value.getTime()
+        else value is number
+            coerce-->>Caller: value (already timestamp)
+        else value is "YYYY-MM-DD" string
+            Note over coerce: Parse as LOCAL midnight (avoids UTC off-by-one)
+            coerce-->>Caller: new Date(y, m-1, d).getTime()
+        else other string
+            coerce-->>Caller: new Date(str).getTime()
+        end
+
+    else type == "array"
+        alt value is Array
+            coerce-->>Caller: value (pass-through)
+        else value is null or ""
+            coerce-->>Caller: []
+        else scalar
+            coerce-->>Caller: [value]
+        end
+
+    else type == "raw"
+        coerce-->>Caller: value (pass-through)
+    end
+</div>
+
+<h3>condition.ts (validation)</h3>
+<p class="path">Scripts/validation/condition.ts</p>
+<p>Pure validation condition evaluation. No DOM, no vendor. 4 operators: <code>truthy</code>, <code>falsy</code>,
+<code>eq</code>, <code>neq</code>. Returns <code>true</code>/<code>false</code>/<code>null</code>.</p>
+<div class="mermaid">
+sequenceDiagram
+    participant Caller
+    participant cond as condition.ts
     participant reader as ConditionReader
 
-    Caller->>cnd: evalCondition(cond, reader)
-
-    cnd->>reader: readConditionSource(cond.field)
+    Caller->>cond: evalCondition(cond, reader)
+    cond->>reader: readConditionSource(cond.field)
     alt raw === undefined (source unavailable)
-        cnd-->>Caller: return null (cannot evaluate)
+        cond-->>Caller: null
     end
-    reader-->>cnd: raw string value
 
-    Note over cnd: str = raw, empty = str === ""
-
-    alt cond.op === "truthy"
-        cnd-->>Caller: return !empty
-
-    else cond.op === "falsy"
-        cnd-->>Caller: return empty
-
-    else cond.op === "eq"
+    Note over cond: str = raw, empty = (str === "")
+    alt op == "truthy"
+        cond-->>Caller: !empty
+    else op == "falsy"
+        cond-->>Caller: empty
+    else op == "eq"
         alt empty
-            cnd-->>Caller: return false
+            cond-->>Caller: false
         else
-            cnd-->>Caller: return str === String(cond.value ?? "")
+            cond-->>Caller: str === String(cond.value ?? "")
         end
-
-    else cond.op === "neq"
+    else op == "neq"
         alt empty
-            cnd-->>Caller: return false
+            cond-->>Caller: false
         else
-            cnd-->>Caller: return str !== String(cond.value ?? "")
+            cond-->>Caller: str !== String(cond.value ?? "")
         end
-
-    else default (unknown op)
-        cnd-->>Caller: return true
+    else unknown op
+        cond-->>Caller: true (permissive default)
     end
-</pre></div>
+</div>
 
-<!-- ============================================================ -->
-<!-- SUPPLEMENTARY: walk.ts + trace.ts + assert-never.ts -->
-<!-- ============================================================ -->
-<h3>Supplementary: Core Primitives — walk.ts, trace.ts, assert-never.ts</h3>
-<p class="file-ref">Scripts/core/walk.ts, Scripts/core/trace.ts, Scripts/core/assert-never.ts</p>
-<div class="diagram"><pre class="mermaid">
+<h3>walk.ts</h3>
+<p class="path">Scripts/core/walk.ts</p>
+<p>Pure utility. Zero side effects, zero DOM, zero vendor knowledge.
+Walks a dot-notation path on any object.</p>
+<div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant w as walk.ts
-    participant t as trace.ts
+    participant walk as walk.ts
+
+    Caller->>walk: walk(root, "evt.address.city")
+    walk->>walk: parts = path.split(".")
+    loop Each part: ["evt", "address", "city"]
+        alt current == null
+            walk-->>Caller: undefined (null safety)
+        end
+        walk->>walk: current = current[part]
+    end
+    walk-->>Caller: final value (or undefined)
+</div>
+
+<h3>trace.ts</h3>
+<p class="path">Scripts/core/trace.ts</p>
+<p>Deterministic single-string trace output. Levels: off(0), error(1), warn(2), info(3), debug(4), trace(5).
+Format: <code>[alis:scope] msg {"key":"val"}</code>. Uses <code>console.error</code> for error,
+<code>console.warn</code> for warn, <code>console.log</code> for everything else.</p>
+<div class="mermaid">
+sequenceDiagram
+    participant Caller
+    participant trace as trace.ts
+    participant Console
+
+    Caller->>trace: scope("boot")
+    trace-->>Caller: Logger {error, warn, info, debug, trace}
+
+    Caller->>trace: setLevel("debug")
+    Note over trace: active = LEVELS["debug"] = 4
+
+    Caller->>trace: logger.info("booted", {entries: 3})
+    trace->>trace: emit(LEVELS.info=3, "[alis:boot]", "booted", {entries:3})
+    alt level > active
+        Note over trace: No-op (filtered out)
+    else level <= active
+        Note over trace: line = '[alis:boot] booted {"entries":3}'
+        alt level <= LEVELS.error
+            trace->>Console: console.error(line)
+        else level <= LEVELS.warn
+            trace->>Console: console.warn(line)
+        else
+            trace->>Console: console.log(line)
+        end
+    end
+</div>
+
+<h3>assert-never.ts</h3>
+<p class="path">Scripts/core/assert-never.ts</p>
+<p>Exhaustiveness check for discriminated union switches. Compile-time error if a case is missing,
+runtime throw if an impossible value reaches the function.</p>
+<div class="mermaid">
+sequenceDiagram
+    participant Caller
     participant an as assert-never.ts
 
-    Note over w: walk(root, path) - dot-path walking
+    Caller->>an: assertNever(value, "trigger kind")
+    an-->>Caller: THROW Error('[alis] Unhandled trigger kind: {value.kind ?? value}')
+    Note over an: Return type is "never"<br/>TypeScript compile error if reachable
+</div>
 
-    Caller->>w: walk(root, "evt.address.city")
-    w->>w: parts = path.split(".")
-    loop for each part (["evt", "address", "city"])
-        alt current == null
-            w-->>Caller: return undefined (null in chain)
+<h3>error-display.ts</h3>
+<p class="path">Scripts/validation/error-display.ts</p>
+<p>Single responsibility: DOM error manipulation. Two destinations: inline (next to field) and
+summary (aggregated div). Error spans by ID: <code>{fieldId}_error</code> (O(1) lookup).
+Summary by ID: <code>{planId_sanitized}_validation_summary</code>.</p>
+<div class="mermaid">
+sequenceDiagram
+    participant Caller
+    participant ed as error-display.ts
+    participant DOM
+
+    Note over ed: INLINE ERRORS
+
+    Caller->>ed: showInline(formId, field, message)
+    ed->>DOM: getElementById(field.fieldId) -> add "alis-has-error"
+    ed->>DOM: getElementById(field.fieldId + "_error")
+    ed->>DOM: span.textContent = message
+    ed->>DOM: span.removeAttribute("hidden")
+    ed->>DOM: span.style.display = ""
+
+    Caller->>ed: clearInline(formId, field)
+    ed->>DOM: getElementById(field.fieldId + "_error")
+    ed->>DOM: span.textContent = ""
+    ed->>DOM: span.setAttribute("hidden", "")
+    ed->>DOM: span.style.display = "none"
+    ed->>DOM: getElementById(field.fieldId) -> remove "alis-has-error"
+
+    Caller->>ed: clearAllInline(formId, fields)
+    loop Each field
+        ed->>ed: clearInline(formId, field)
+    end
+
+    Note over ed: SUMMARY ERRORS
+
+    Caller->>ed: findSummaryElement(planId)
+    Note over ed: summaryId = planId.replace(/[.+]/g, "_") + "_validation_summary"
+    ed->>DOM: getElementById(summaryId)
+    ed-->>Caller: HTMLElement or null
+
+    Caller->>ed: addToSummary(summaryEl, fieldName, message)
+    ed->>DOM: createElement("div")
+    ed->>DOM: item.setAttribute("data-valmsg-summary-for", fieldName)
+    ed->>DOM: item.textContent = message
+    ed->>DOM: summaryEl.appendChild(item)
+
+    Caller->>ed: removeSummaryEntry(summaryEl, fieldName)
+    ed->>DOM: querySelector('[data-valmsg-summary-for="{fieldName}"]')
+    opt entry exists
+        ed->>DOM: entry.remove()
+    end
+
+    Caller->>ed: clearSummary(summaryEl)
+    ed->>DOM: summaryEl.innerHTML = ""
+
+    Caller->>ed: showSummaryDiv(summaryEl)
+    ed->>DOM: summaryEl.removeAttribute("hidden")
+
+    Caller->>ed: hideSummaryDiv(summaryEl)
+    ed->>DOM: summaryEl.setAttribute("hidden", "")
+
+    Note over ed: SERVER ERRORS
+
+    Caller->>ed: showServerErrorInline(formId, fieldName, message, fields)
+    ed->>ed: Find field by fieldName in fields array
+    ed->>DOM: getElementById(field.fieldId + "_error")
+    ed->>DOM: span.textContent = message
+    ed->>DOM: span.removeAttribute("hidden")
+    ed->>DOM: span.style.display = ""
+    ed->>DOM: getElementById(field.fieldId) -> add "alis-has-error"
+</div>
+
+<h3>test-widget.ts (lab)</h3>
+<p class="path">Scripts/components/lab/test-widget.ts</p>
+<p>Architecture verification component. Follows ej2_instances pattern. Properties, void methods,
+parameterized methods, SF-compatible event API. Auto-mounts on <code>[data-test-widget]</code> elements.</p>
+<div class="mermaid">
+sequenceDiagram
+    participant Browser
+    participant tw as test-widget.ts
+    participant DOM
+
+    Note over tw: mount() runs on module load
+    tw->>DOM: querySelectorAll("[data-test-widget]")
+    loop Each element
+        alt el.ej2_instances already exists
+            Note over tw: Skip (already mounted)
+        else
+            tw->>tw: widget = new TestWidget(el)
+            Note over tw: Finds or creates inner input element
+            Note over tw: Reads data-initialValue
+            Note over tw: Wires input event -> change callback
+            tw->>DOM: el.ej2_instances = [widget]
         end
-        Note over w: current = current[part]
-    end
-    w-->>Caller: return current (final value)
-
-    Note over t: trace — level-gated logging
-
-    Caller->>t: setLevel("debug")
-    Note over t: active = LEVELS["debug"] = 4
-
-    Caller->>t: scope("boot")
-    t-->>Caller: Logger { error, warn, info, debug, trace }
-
-    Note over t: emit(level, tag, msg, data)
-    alt level > active
-        Note over t: return (suppressed)
-    end
-    alt data !== undefined
-        Note over t: line = `${tag} ${msg} ${JSON.stringify(data)}`
-    else no data
-        Note over t: line = `${tag} ${msg}`
-    end
-    alt level <= LEVELS.error
-        t->>t: console.error(line)
-    else level <= LEVELS.warn
-        t->>t: console.warn(line)
-    else level > warn
-        t->>t: console.log(line)
     end
 
-    Note over an: assertNever(value, context)
-    Caller->>an: assertNever(unknownValue, "trigger kind")
-    Note right of an: THROW Error("[alis] Unhandled trigger kind: {value.kind ?? value}")
-</pre></div>
+    Note over tw: Property access:
+    Note over tw: widget.value (get/set) - updates input + fires "change"
+    Note over tw: widget.items (get) - returns array
+    Note over tw: widget.focused (get) - returns boolean
+
+    Note over tw: Methods:
+    Note over tw: focus() - _focused=true, input.focus()
+    Note over tw: clear() - resets value, items, input
+    Note over tw: setItems(items) - sets items, data-itemsCount, fires "items-changed"
+    Note over tw: addItem(item, index) - splice into items
+    Note over tw: setProperty(name, value) - dynamic property set
+
+    Note over tw: Event API (SF-compatible):
+    Note over tw: addEventListener(event, fn) - adds to listener map
+    Note over tw: removeEventListener(event, fn) - removes from map
+</div>
+
+</section>
+
+</main>
 
 <script>
-mermaid.initialize({
-  startOnLoad: true,
-  theme: 'dark',
-  sequence: {
-    mirrorActors: false,
-    useMaxWidth: false,
-    wrap: true
-  },
-  themeVariables: {
-    primaryColor: '#1e293b',
-    primaryBorderColor: '#38bdf8',
-    primaryTextColor: '#f1f5f9',
-    lineColor: '#475569',
-    actorBkg: '#1e293b',
-    actorBorder: '#38bdf8',
-    actorTextColor: '#f1f5f9',
-    noteBkgColor: '#1e3a5f',
-    noteTextColor: '#e2e8f0',
-    noteBorderColor: '#2563eb'
-  }
-});
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#0f172a',
+      primaryColor: '#1e3a5f',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#3b82f6',
+      lineColor: '#64748b',
+      secondaryColor: '#1e293b',
+      tertiaryColor: '#0f172a',
+      noteBkgColor: '#1e293b',
+      noteTextColor: '#e2e8f0',
+      noteBorderColor: '#475569',
+      actorBkg: '#1e3a5f',
+      actorBorder: '#3b82f6',
+      actorTextColor: '#e2e8f0',
+      signalColor: '#93c5fd',
+      signalTextColor: '#e2e8f0',
+      labelBoxBkgColor: '#1e293b',
+      labelBoxBorderColor: '#475569',
+      labelTextColor: '#e2e8f0',
+      loopTextColor: '#93c5fd',
+      activationBorderColor: '#3b82f6',
+      activationBkgColor: '#1e3a5f',
+      sequenceNumberColor: '#0f172a',
+    },
+    sequence: {
+      diagramMarginX: 20,
+      diagramMarginY: 20,
+      actorMargin: 60,
+      width: 200,
+      height: 50,
+      boxMargin: 10,
+      boxTextMargin: 5,
+      noteMargin: 10,
+      messageMargin: 40,
+      mirrorActors: false,
+      useMaxWidth: true,
+      wrap: true,
+    },
+  });
 </script>
 </body>
 </html>
