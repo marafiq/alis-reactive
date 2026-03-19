@@ -3,7 +3,7 @@
 // Single responsibility: wire triggers (two-phase) and register plans.
 // Delegates enrichment to enrichment.ts, state to merge-plan.ts PlanRegistry.
 
-import type { Plan, Entry, ComponentEntry } from "../types";
+import type { Plan, Entry, ComponentEntry, Reaction } from "../types";
 import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
 import { wireTrigger } from "../execution/trigger";
@@ -77,18 +77,18 @@ function wireLiveClearingForEntries(entries: Entry[]): void {
   }
 }
 
-function wireLiveClearingForReaction(reaction: { kind: string; request?: any; requests?: any[]; branches?: any[] }): void {
+function wireLiveClearingForReaction(reaction: Reaction): void {
   switch (reaction.kind) {
     case "http":
-      if (reaction.request?.validation) wireLiveClearing(reaction.request.validation);
+      if (reaction.request.validation) wireLiveClearing(reaction.request.validation);
       break;
     case "parallel-http":
-      for (const req of reaction.requests ?? []) {
+      for (const req of reaction.requests) {
         if (req.validation) wireLiveClearing(req.validation);
       }
       break;
     case "conditional":
-      for (const branch of reaction.branches ?? []) wireLiveClearingForReaction(branch.reaction);
+      for (const branch of reaction.branches) wireLiveClearingForReaction(branch.reaction);
       break;
   }
 }

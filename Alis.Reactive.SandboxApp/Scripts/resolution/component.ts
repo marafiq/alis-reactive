@@ -13,12 +13,13 @@ const _log = scope("component");
  *   "native" -> el (the DOM element)
  *   "fusion" -> el.ej2_instances[0] (the Syncfusion component instance)
  */
-export function resolveRoot(el: any, vendor: Vendor): unknown {
+export function resolveRoot(el: HTMLElement, vendor: Vendor): unknown {
   switch (vendor) {
     case "native":
       return el;
     case "fusion": {
-      const root = el.ej2_instances?.[0];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ej2_instances is a Syncfusion runtime property not on HTMLElement
+      const root = (el as any).ej2_instances?.[0];
       if (root == null) throw new Error(`[alis] no vendor root for "${el.id}" (vendor: ${vendor}) — is the component initialized?`);
       return root;
     }
@@ -34,7 +35,7 @@ export function resolveRoot(el: any, vendor: Vendor): unknown {
  * Examples: "checked", "value", "selectedItems.0.text"
  */
 export function evalRead(id: string, vendor: Vendor, readExpr: string): unknown {
-  const el = document.getElementById(id) as any;
+  const el = document.getElementById(id);
   if (!el) throw new Error(`[alis] element not found: ${id}`);
 
   const root = resolveRoot(el, vendor);
