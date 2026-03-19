@@ -15,6 +15,7 @@ public class FusionTestModel
     public decimal Amount { get; set; }
     public string? Status { get; set; }
     public FusionTestAddress? Address { get; set; }
+    public DateTime? AppointmentTime { get; set; }
 }
 
 [TestFixture]

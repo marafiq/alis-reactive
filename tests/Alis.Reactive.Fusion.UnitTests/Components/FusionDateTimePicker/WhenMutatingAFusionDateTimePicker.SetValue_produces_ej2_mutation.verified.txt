@@ -1,0 +1,25 @@
+﻿{
+  planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime,
+            mutation: {
+              kind: set-prop,
+              prop: value
+            },
+            value: 2026-06-15T14:30,
+            vendor: fusion
+          }
+        ]
+      }
+    }
+  ]
+}
