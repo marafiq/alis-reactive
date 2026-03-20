@@ -279,4 +279,85 @@ public class WhenUsingFusionMultiSelect : PlaywrightTestBase
         Assert.That(currentValue, Does.Not.Contain("shellfish"), "Value must NOT contain removed shellfish");
         AssertNoConsoleErrors();
     }
+
+    // ── Section 6: Filtering Event — Server-Filtered HTTP ──
+
+    private const string SuppliesId = Scope + "__Supplies";
+
+    /// <summary>
+    /// Types text into the Supplies MultiSelect using PressSequentially,
+    /// which simulates real keystrokes that trigger SF's filtering event.
+    /// FillAsync won't work — SF listens for keyup/keydown, not synthetic input events.
+    ///
+    /// SF MultiSelect DOM structure with AllowFiltering:
+    ///   .e-multi-select-wrapper (grandparent)
+    ///     └── span.e-searcher (parent)
+    ///         ├── input.e-dropdownbase (filter input — type here)
+    ///         └── input#SuppliesId (component input)
+    /// </summary>
+    private async Task TypeInSupplies(string text)
+    {
+        // The filter input is a sibling of the component input inside the wrapper
+        var filterInput = Page.Locator($"#{SuppliesId}").Locator("xpath=preceding-sibling::input[contains(@class,'e-dropdownbase')]");
+        await Expect(filterInput).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await filterInput.ClickAsync();
+        await filterInput.PressSequentiallyAsync(text, new() { Delay = 50 });
+    }
+
+    [Test]
+    public async Task filtering_event_fires_http_get_and_updates_datasource()
+    {
+        await NavigateAndBoot();
+
+        // Type "gl" to trigger the SF filtering event → HTTP GET → DataSource update
+        await TypeInSupplies("gl");
+
+        // Wait for the HTTP response to update the status element
+        await Expect(Page.Locator("#filter-status"))
+            .ToHaveTextAsync("results loaded", new() { Timeout = 10000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task filtering_http_request_includes_supplies_query_param()
+    {
+        await NavigateAndBoot();
+
+        var filterInput = Page.Locator($"#{SuppliesId}").Locator("xpath=preceding-sibling::input[contains(@class,'e-dropdownbase')]");
+        await Expect(filterInput).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await filterInput.ClickAsync();
+
+        // Intercept the HTTP GET request triggered by filtering
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await filterInput.PressSequentiallyAsync("band", new() { Delay = 50 }),
+            r => r.Url.Contains("/Supplies"));
+
+        // Verify the request URL targets the Supplies endpoint
+        Assert.That(request.Url, Does.Contain("Supplies"),
+            "GET request should target the Supplies endpoint");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task filtering_response_populates_multiselect_dropdown()
+    {
+        await NavigateAndBoot();
+
+        // Type to trigger filtering → HTTP → updateData populates popup
+        await TypeInSupplies("gl");
+
+        // Wait for the HTTP response to complete
+        await Expect(Page.Locator("#filter-status"))
+            .ToHaveTextAsync("results loaded", new() { Timeout = 10000 });
+
+        // Verify the popup contains filtered items (updateData renders the popup)
+        var popupItems = Page.Locator(".e-ddl.e-popup .e-list-item");
+        await Expect(popupItems.First).ToBeVisibleAsync(new() { Timeout = 5000 });
+        var count = await popupItems.CountAsync();
+        Assert.That(count, Is.GreaterThan(0),
+            "Popup should contain filtered supply items after updateData");
+        AssertNoConsoleErrors();
+    }
 }

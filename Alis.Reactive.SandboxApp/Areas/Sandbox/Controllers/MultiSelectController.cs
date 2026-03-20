@@ -33,6 +33,36 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
             return View(new MultiSelectModel());
         }
 
+        [HttpGet]
+        public IActionResult Supplies([FromQuery] string? Supplies)
+        {
+            var all = new List<SupplyItem>
+            {
+                new() { Value = "gloves", Text = "Gloves", Category = "PPE" },
+                new() { Value = "masks", Text = "Masks", Category = "PPE" },
+                new() { Value = "gowns", Text = "Gowns", Category = "PPE" },
+                new() { Value = "gauze", Text = "Gauze", Category = "Wound Care" },
+                new() { Value = "bandages", Text = "Bandages", Category = "Wound Care" },
+                new() { Value = "tape", Text = "Medical Tape", Category = "Wound Care" },
+                new() { Value = "syringes", Text = "Syringes", Category = "Injection" },
+                new() { Value = "needles", Text = "Needles", Category = "Injection" },
+                new() { Value = "thermometer", Text = "Thermometer", Category = "Monitoring" },
+                new() { Value = "stethoscope", Text = "Stethoscope", Category = "Monitoring" }
+            };
+
+            var search = Supplies == "null" ? null : Supplies;
+            var filtered = string.IsNullOrEmpty(search)
+                ? all
+                : all.Where(s => s.Text.Contains(search, StringComparison.OrdinalIgnoreCase)
+                              || s.Value.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            return Ok(new SupplySearchResponse
+            {
+                Supplies = filtered,
+                Count = filtered.Count
+            });
+        }
+
         [HttpPost]
         public IActionResult Echo([FromBody] Dictionary<string, object> data)
         {

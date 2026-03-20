@@ -19,6 +19,9 @@
         p.Element("value-echo").SetText(comp.Value());
     }));
 
+    // ── Section 6: Filtering event with HTTP — Server-filtered Supplies ──
+    // (Section 6 plan wiring is inline below via .Reactive on the component)
+
     // ── Gather — POST with Include ──
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
@@ -135,6 +138,39 @@
             }))
         <div class="font-mono text-sm">
             <p>Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
+        </div>
+    </section>
+
+    <!-- Section 6: Filtering Event — Server-Filtered Supplies -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">6. Filtering Event (Server-Filtered HTTP)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Type to search supplies. The Filtering event fires on each keystroke (debounced 300ms),
+            sends the typed text to the server via HTTP GET, and updates the dropdown DataSource from the response.
+            Requires <code>AllowFiltering(true)</code> on SF MultiSelect.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.Supplies, o => o.Label("Supplies (Server-Filtered)"))
+                .MultiSelect(b => b
+                    .Fields<SupplyItem>(t => t.Text, v => v.Value)
+                    .Placeholder("Type to search supplies...")
+                    .AllowFiltering(true)
+                    .Mode(VisualMode.Box)
+                    .Reactive(plan, evt => evt.Filtering, (args, p) =>
+                    {
+                        args.PreventDefault(p);
+                        p.Get("/Sandbox/MultiSelect/Supplies")
+                         .Gather(g => g.FromEvent(args, x => x.Text, "Supplies"))
+                         .Response(r => r
+                            .OnSuccess<SupplySearchResponse>((json, s) =>
+                            {
+                                args.UpdateData(s, json, j => j.Supplies);
+                                s.Element("filter-status").SetText("results loaded");
+                            }));
+                    })); }
+        </div>
+        <div class="font-mono text-sm mt-2 space-y-1">
+            <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
         </div>
     </section>
 

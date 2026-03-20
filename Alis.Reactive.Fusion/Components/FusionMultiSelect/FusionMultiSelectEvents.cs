@@ -14,5 +14,10 @@ namespace Alis.Reactive.Fusion.Components
         public TypedEventDescriptor<FusionMultiSelectChangeArgs> Changed =>
             new TypedEventDescriptor<FusionMultiSelectChangeArgs>(
                 "change", new FusionMultiSelectChangeArgs());
+
+        /// <summary>Fires when the user types to filter (SF "filtering" event).</summary>
+        public TypedEventDescriptor<FusionMultiSelectFilteringArgs> Filtering =>
+            new TypedEventDescriptor<FusionMultiSelectFilteringArgs>(
+                "filtering", new FusionMultiSelectFilteringArgs());
     }
 }
