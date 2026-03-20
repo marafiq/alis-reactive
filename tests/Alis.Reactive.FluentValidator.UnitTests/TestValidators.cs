@@ -277,6 +277,29 @@ public class ReactiveMixedValidator : ReactiveValidator<TestModel>
     }
 }
 
+// --- Conditional parity: ALL rule types under WhenField ---
+
+public class ConditionalAllRulesValidator : ReactiveValidator<TestModel>
+{
+    public ConditionalAllRulesValidator()
+    {
+        WhenField(x => x.IsEmployed, () =>
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name required when employed");
+            RuleFor(x => x.Name).MinimumLength(3).WithMessage("Name min 3");
+            RuleFor(x => x.Name).MaximumLength(100).WithMessage("Name max 100");
+            RuleFor(x => x.Email).EmailAddress().WithMessage("Valid email required");
+            RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{3}-\d{4}$").WithMessage("Phone format");
+            RuleFor(x => x.Age).InclusiveBetween(18, 65).WithMessage("Age 18-65");
+            RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m).WithMessage("Salary min 0");
+            RuleFor(x => x.Salary).LessThanOrEqualTo(500000m).WithMessage("Salary max 500k");
+            RuleFor(x => x.Salary).GreaterThan(0m).WithMessage("Salary gt 0");
+            RuleFor(x => x.Salary).LessThan(1000000m).WithMessage("Salary lt 1M");
+            RuleFor(x => x.ConfirmEmail).Equal(x => x.Email).WithMessage("Emails must match");
+        });
+    }
+}
+
 // --- Empty validator ---
 
 public class EmptyValidator : AbstractValidator<TestModel>

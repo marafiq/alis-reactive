@@ -76,6 +76,38 @@ public class WhenExtractingClientConditionalRules
     }
 
     [Test]
+    public void WhenField_all_rule_types_extract_with_condition()
+    {
+        var desc = _adapter.ExtractRules(typeof(ConditionalAllRulesValidator), "testForm");
+
+        Assert.That(desc, Is.Not.Null);
+
+        // Verify each rule type has the IsEmployed condition
+        void AssertConditionalRule(string fieldName, string expectedRule, string label)
+        {
+            var field = desc!.Fields.FirstOrDefault(f => f.FieldName == fieldName);
+            Assert.That(field, Is.Not.Null, $"{label}: field '{fieldName}' missing");
+            var rule = field!.Rules.FirstOrDefault(r => r.Rule == expectedRule);
+            Assert.That(rule, Is.Not.Null, $"{label}: rule '{expectedRule}' missing on '{fieldName}'");
+            Assert.That(rule!.When, Is.Not.Null, $"{label}: condition missing");
+            Assert.That(rule.When!.Field, Is.EqualTo("IsEmployed"), $"{label}: wrong condition field");
+            Assert.That(rule.When.Op, Is.EqualTo("truthy"), $"{label}: wrong condition op");
+        }
+
+        AssertConditionalRule("Name", "required", "NotEmpty");
+        AssertConditionalRule("Name", "minLength", "MinimumLength");
+        AssertConditionalRule("Name", "maxLength", "MaximumLength");
+        AssertConditionalRule("Email", "email", "EmailAddress");
+        AssertConditionalRule("Phone", "regex", "Matches");
+        AssertConditionalRule("Age", "range", "InclusiveBetween");
+        AssertConditionalRule("Salary", "min", "GreaterThanOrEqualTo");
+        AssertConditionalRule("Salary", "max", "LessThanOrEqualTo");
+        AssertConditionalRule("Salary", "gt", "GreaterThan");
+        AssertConditionalRule("Salary", "lt", "LessThan");
+        AssertConditionalRule("ConfirmEmail", "equalTo", "Equal");
+    }
+
+    [Test]
     public void WhenField_condition_source_field_included_in_descriptor()
     {
         var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
