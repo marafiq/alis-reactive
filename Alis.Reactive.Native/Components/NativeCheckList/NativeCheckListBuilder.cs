@@ -108,9 +108,11 @@ namespace Alis.Reactive.Native.Components
                     modelValue.Split(',', StringSplitOptions.RemoveEmptyEntries));
             }
 
+            var encodedId = encoder.Encode(_elementId);
+
             // Container div IS the canonical element — carries the element ID.
-            // checklist.ts discovers via [data-reactive-checklist] and sets container.value = string[].
-            writer.Write($"<div id=\"{encoder.Encode(_elementId)}\" class=\"{encoder.Encode(_cssClass)}\" data-reactive-checklist>");
+            // Inline init sets container.value = string[] (array semantics for evalRead + gather).
+            writer.Write($"<div id=\"{encodedId}\" class=\"{encoder.Encode(_cssClass)}\">");
 
             // Hidden input — for MVC form submission (CSV value), NOT the canonical element.
             writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");
@@ -141,6 +143,11 @@ namespace Alis.Reactive.Native.Components
             }
 
             writer.Write("</div>");
+
+            // Inline init — same pattern as SF component initialization.
+            // Targets known ID, no DOM scanning. Works on page load AND partial injection.
+            // Sets container.value = string[] (array semantics) and syncs hidden input (CSV for MVC).
+            writer.Write($@"<script>(function(){{var c=document.getElementById(""{encodedId}"");var h=c.querySelector(""input[type=hidden]"");var init=h.value.split("","").filter(Boolean);c.value=init;c.isInteracted=false;c.addEventListener(""change"",function(e){{if(e.target.type!==""checkbox"")return;var v=[];var cbs=c.querySelectorAll(""input[type=checkbox]"");for(var i=0;i<cbs.length;i++)if(cbs[i].checked)v.push(cbs[i].value);c.value=v;h.value=v.join("","");c.isInteracted=true;}});}})();</script>");
         }
     }
 }

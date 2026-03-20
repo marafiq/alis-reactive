@@ -1,21 +1,15 @@
 using System;
-using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
-using Alis.Reactive.Descriptors.Triggers;
 using Alis.Reactive.Native.Extensions;
 
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
     /// Factory extension for creating NativeRadioGroupBuilder bound to a model property.
-    /// Registers in ComponentsMap, creates builder, wires auto-sync entries, renders.
+    /// Registers in ComponentsMap, creates builder, renders.
     ///
-    /// Auto-sync: each radio's change event copies its value to the hidden input.
-    /// This is inherent to how radio groups work — N elements, 1 logical value.
-    /// The hidden input is the canonical element for evalRead/gather/validation.
+    /// Auto-sync (radio value → hidden input) is handled by radio-group.ts,
+    /// which discovers containers via [data-reactive-radio-group] and wires
+    /// change events. This keeps the plan clean — no N auto-sync entries.
     /// </summary>
     public static class NativeRadioGroupHtmlExtensions
     {
@@ -31,26 +25,6 @@ namespace Alis.Reactive.Native.Components
 
             var builder = new NativeRadioGroupBuilder<TModel, TProp>(setup.Helper, setup.Expression);
             configure(builder);
-
-            // Auto-sync: each radio's change event → hidden input .value
-            for (int i = 0; i < builder.Options.Count; i++)
-            {
-                var pb = new PipelineBuilder<TModel>();
-                pb.AddCommand(new MutateElementCommand(
-                    builder.ElementId,
-                    new SetPropMutation("value"),
-                    source: new EventSource("evt.value"),
-                    vendor: _component.Vendor));
-
-                var radioId = $"{builder.ElementId}_r{i}";
-                var trigger = new ComponentEventTrigger(
-                    radioId, "change", _component.Vendor,
-                    builder.BindingPath, _component.ReadExpr);
-
-                foreach (var reaction in pb.BuildReactions())
-                    setup.Plan.AddEntry(new Entry(trigger, reaction));
-            }
-
             setup.Render(builder);
         }
     }

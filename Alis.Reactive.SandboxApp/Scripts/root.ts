@@ -7,7 +7,8 @@ import { init as initConfirm } from "./components/fusion/confirm";
 import { initNativeActionLinks } from "./components/native/native-action-link";
 import "./components/native/drawer";  // side-effect: wires close button + Escape key
 import "./components/native/loader";  // side-effect: handles target positioning + timeout
-import "./components/native/checklist";  // side-effect: syncs checkbox values to hidden input
+// NativeCheckList and NativeRadioGroup use inline init scripts (same pattern as SF).
+// No side-effect imports needed — builders ship JS with HTML.
 import { composeInitialPlans } from "./lifecycle/merge-plan";
 import type { Plan } from "./types";
 import type { TraceLevel } from "./core/trace";

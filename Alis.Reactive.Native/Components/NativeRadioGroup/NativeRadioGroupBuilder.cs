@@ -95,11 +95,13 @@ namespace Alis.Reactive.Native.Components
         {
             var modelValue = _html.ValueFor(_expression, "{0}")?.ToString() ?? "";
 
-            // Hidden input — canonical element for evalRead + gather. NO name attr.
-            writer.Write($"<input type=\"hidden\" id=\"{encoder.Encode(_elementId)}\" value=\"{encoder.Encode(modelValue)}\" />");
+            var encodedId = encoder.Encode(_elementId);
 
-            // Radio options container
+            // Container div wraps the radio group.
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
+
+            // Hidden input — canonical element for evalRead + gather. NO name attr.
+            writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(modelValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)
             {
@@ -130,6 +132,10 @@ namespace Alis.Reactive.Native.Components
             }
 
             writer.Write("</div>");
+
+            // Inline init — same pattern as SF component initialization.
+            // Targets known ID, no DOM scanning. Works on page load AND partial injection.
+            writer.Write($@"<script>(function(){{var h=document.getElementById(""{encodedId}"");h.isInteracted=false;h.parentElement.addEventListener(""change"",function(e){{if(e.target.type!==""radio"")return;h.value=e.target.value;h.isInteracted=true;h.dispatchEvent(new Event(""change"",{{bubbles:true}}));}});}})();</script>");
         }
     }
 }
