@@ -1,169 +1,178 @@
-# Validation Rules Guide — Writing Rules on TModel
+# How to Add Validation to a Form
 
-> **For developers writing FluentValidation validators that extract to client-side validation.**
-> Every rule you write here runs BOTH on the server (FluentValidation) AND in the browser (TS rule engine).
-
-## How It Works
-
-```
-C# Validator (FluentValidation)
-    ↓ FluentValidationAdapter extracts rules
-JSON Plan (validation descriptor)
-    ↓ Runtime reads plan
-TS Rule Engine (browser evaluation)
-```
-
-The adapter reads your FluentValidation rules at render time and serializes them into the plan.
-The TS runtime evaluates them in the browser on submit and on blur/change (live re-validation).
-You never write JS. The plan carries everything.
+> Step-by-step guide. Follow in order. Every rule you write validates on the server AND in the browser automatically.
 
 ---
 
-## Quick Reference — All 18 Rule Types
+## Step 1: Create Your Model
 
-| # | C# DSL | Plan rule | Plan fields | Browser behavior |
-|---|--------|-----------|-------------|------------------|
-| 1 | `.NotEmpty()` | `required` | — | fails when empty/null/false |
-| 2 | `.NotNull()` | `required` | — | fails when empty/null/false |
-| 3 | `.IsEmpty()` | `empty` | — | fails when NOT empty |
-| 4 | `.MinimumLength(N)` | `minLength` | `constraint: N` | skips empty |
-| 5 | `.MaximumLength(N)` | `maxLength` | `constraint: N` | skips empty |
-| 6 | `.EmailAddress()` | `email` | — | skips empty |
-| 7 | `.Matches(pattern)` | `regex` | `constraint: "pattern"` | skips empty |
-| 8 | `.CreditCard()` | `creditCard` | — | skips empty, Luhn check |
-| 9 | `.InclusiveBetween(lo, hi)` | `range` | `constraint: [lo, hi], coerceAs` | skips empty, boundaries included |
-| 10 | `.IsExclusiveBetween(lo, hi)` | `exclusiveRange` | `constraint: [lo, hi], coerceAs` | skips empty, boundaries excluded |
-| 11 | `.GreaterThanOrEqualTo(val)` | `min` | `constraint: val, coerceAs` | skips empty |
-| 12 | `.GreaterThanOrEqualTo(x => x.Prop)` | `min` | `field: "Prop", coerceAs` | skips empty |
-| 13 | `.LessThanOrEqualTo(val)` | `max` | `constraint: val, coerceAs` | skips empty |
-| 14 | `.LessThanOrEqualTo(x => x.Prop)` | `max` | `field: "Prop", coerceAs` | skips empty |
-| 15 | `.GreaterThan(val)` | `gt` | `constraint: val, coerceAs` | **fails when empty (implies required)** |
-| 16 | `.GreaterThan(x => x.Prop)` | `gt` | `field: "Prop", coerceAs` | **fails when empty (implies required)** |
-| 17 | `.LessThan(val)` | `lt` | `constraint: val, coerceAs` | skips empty |
-| 18 | `.LessThan(x => x.Prop)` | `lt` | `field: "Prop", coerceAs` | skips empty |
-| 19 | `.Equal(x => x.Prop)` | `equalTo` | `field: "Prop"` | skips empty |
-| 20 | `.Equal(val)` | `equalTo` | `constraint: val, coerceAs` | skips empty |
-| 21 | `.NotEqual(x => x.Prop)` | `notEqualTo` | `field: "Prop"` | skips empty |
-| 22 | `.NotEqual(val)` | `notEqual` | `constraint: val` | skips empty |
-
-> **`.IsEmpty()` and `.IsExclusiveBetween()` are our custom extensions** (in `Alis.Reactive.FluentValidator.Validators`).
-> FluentValidation's `.Empty()` and `.ExclusiveBetween()` are NOT extractable — use ours instead.
-
----
-
-## coerceAs — Automatic Type-Aware Comparison
-
-The adapter determines `coerceAs` from your **property type** at extraction time. You never set it manually.
-
-| C# Property Type | coerceAs | Comparison behavior |
-|-----------------|----------|---------------------|
-| `int`, `long`, `decimal`, `double`, `float`, `byte`, `short`, `uint`, `ushort`, `ulong` | `"number"` | Numeric comparison |
-| `DateTime`, `DateTime?`, `DateTimeOffset`, `DateTimeOffset?`, `DateOnly`, `DateOnly?` | `"date"` | Date comparison (ISO strings, Date objects) |
-| `string`, all others | omitted | String comparison |
-
-**Every comparison rule MUST have `coerceAs`.** The adapter sets it automatically. If you build a manual `ValidationDescriptor`, you must set it yourself — the runtime throws without it.
-
----
-
-## Writing a Validator
-
-### Basic Example — Resident Admission
+Your model is a plain C# class with properties. Every property you want to validate must be here.
 
 ```csharp
-using FluentValidation;
-using Alis.Reactive.FluentValidator.Validators; // for IsEmpty, IsExclusiveBetween
-
-public class ResidentModel
+namespace YourApp.Models
 {
-    public string? Name { get; set; }
-    public string? Email { get; set; }
-    public string? ConfirmEmail { get; set; }
-    public int Age { get; set; }
-    public decimal MonthlyRate { get; set; }
-    public DateTime AdmissionDate { get; set; }
-    public DateTime DischargeDate { get; set; }
-}
-
-public class ResidentValidator : AbstractValidator<ResidentModel>
-{
-    public ResidentValidator()
+    public class ResidentModel
     {
-        // Required
-        RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
-        RuleFor(x => x.Name).MinimumLength(2).WithMessage("Name must be at least 2 characters.");
-        RuleFor(x => x.Name).MaximumLength(100).WithMessage("Name must be at most 100 characters.");
+        // Text fields — use string? (nullable) so NotEmpty can detect missing values
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? ConfirmEmail { get; set; }
+        public string? Phone { get; set; }
 
-        // Email + confirmation
-        RuleFor(x => x.Email).EmailAddress().WithMessage("Valid email required.");
-        RuleFor(x => x.ConfirmEmail).Equal(x => x.Email)
-            .WithMessage("Emails must match.");
+        // Numeric fields — the type determines how comparisons work in the browser
+        public int Age { get; set; }           // coerceAs: "number" (automatic)
+        public decimal MonthlyRate { get; set; } // coerceAs: "number" (automatic)
 
-        // Numeric range
-        RuleFor(x => x.Age).InclusiveBetween(0, 120)
-            .WithMessage("Age must be between 0 and 120.");
+        // Date fields — compared as timestamps in the browser
+        public DateTime AdmissionDate { get; set; }   // coerceAs: "date" (automatic)
+        public DateTime DischargeDate { get; set; }    // coerceAs: "date" (automatic)
 
-        // gt implies required — rate must be positive
-        RuleFor(x => x.MonthlyRate).GreaterThan(0m)
-            .WithMessage("Monthly rate must be greater than zero.");
+        // Boolean fields — used as condition sources (WhenField)
+        public bool IsEmployed { get; set; }
 
-        // Date constraints
-        RuleFor(x => x.AdmissionDate).GreaterThanOrEqualTo(new DateTime(2020, 1, 1))
-            .WithMessage("Admission date must be on or after January 1, 2020.");
-
-        // Cross-property date comparison
-        RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)
-            .WithMessage("Discharge date must be after admission date.");
+        // Conditional fields
+        public string? JobTitle { get; set; }
+        public decimal Salary { get; set; }
     }
 }
 ```
 
-### What the Adapter Produces
-
-For `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)`:
-
-```json
-{
-  "rule": "gt",
-  "message": "Discharge date must be after admission date.",
-  "field": "AdmissionDate",
-  "coerceAs": "date"
-}
-```
-
-- `field: "AdmissionDate"` — the adapter reads `MemberToCompare.Name`
-- `coerceAs: "date"` — the adapter reads `MemberToCompare.PropertyType` → `DateTime` → `"date"`
-- No `constraint` — `field` and `constraint` are mutually exclusive
-- The adapter automatically ensures `"AdmissionDate"` appears in the descriptor (even with zero rules)
-
-For `RuleFor(x => x.MonthlyRate).GreaterThan(0m)`:
-
-```json
-{
-  "rule": "gt",
-  "message": "Monthly rate must be greater than zero.",
-  "constraint": 0,
-  "coerceAs": "number"
-}
-```
-
-- `constraint: 0` — fixed comparison value
-- `coerceAs: "number"` — from `typeof(decimal)` → `"number"`
+**Key:** The property TYPE matters. `int` → numeric comparison. `DateTime` → date comparison. `string` → string comparison. This is determined at extraction time, not runtime.
 
 ---
 
-## Conditional Rules — WhenField
+## Step 2: Create Your Validator
 
-Use `ReactiveValidator<T>` instead of `AbstractValidator<T>` to get client-extractable conditions.
+### Which Base Class?
+
+| Base class | When to use |
+|-----------|-------------|
+| `AbstractValidator<T>` | All rules are unconditional |
+| `ReactiveValidator<T>` | You need `WhenField` / `WhenFieldNot` conditional rules |
+
+### Required Using Statements
 
 ```csharp
-public class ConditionalResidentValidator : ReactiveValidator<ResidentModel>
-{
-    public ConditionalResidentValidator()
-    {
-        // Always required
-        RuleFor(x => x.Name).NotEmpty();
+using FluentValidation;                              // Always needed
+using Alis.Reactive.FluentValidator.Validators;       // Only if using IsEmpty or IsExclusiveBetween
+```
 
-        // Only when employed
+### Unconditional Validator
+
+```csharp
+public class ResidentValidator : AbstractValidator<ResidentModel>
+{
+    public ResidentValidator()
+    {
+        // ── Text rules ────────────────────────────────────────
+
+        // NotEmpty: value must not be null, empty string, or false
+        RuleFor(x => x.Name).NotEmpty()
+            .WithMessage("Resident name is required.");
+
+        // MinimumLength: value must have at least N characters (skips empty — NotEmpty handles that)
+        RuleFor(x => x.Name).MinimumLength(2)
+            .WithMessage("Name must be at least 2 characters.");
+
+        // MaximumLength: value must have at most N characters (skips empty)
+        RuleFor(x => x.Name).MaximumLength(100)
+            .WithMessage("Name must be at most 100 characters.");
+
+        // EmailAddress: must match basic email pattern (skips empty)
+        RuleFor(x => x.Email).EmailAddress()
+            .WithMessage("Enter a valid email address.");
+
+        // Matches: must match regex pattern (skips empty)
+        RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{3}-\d{4}$")
+            .WithMessage("Phone format: 123-456-7890.");
+
+        // CreditCard: Luhn algorithm check (skips empty)
+        RuleFor(x => x.CardNumber).CreditCard()
+            .WithMessage("Enter a valid card number.");
+
+
+        // ── Cross-property text rules ─────────────────────────
+
+        // Equal(x => x.OtherProp): value must match another field (skips empty)
+        // The OTHER field ("Email") is automatically included in the validation descriptor
+        RuleFor(x => x.ConfirmEmail).Equal(x => x.Email)
+            .WithMessage("Emails must match.");
+
+        // NotEqual(x => x.OtherProp): value must differ from another field (skips empty)
+        RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email)
+            .WithMessage("Alternate email must differ from primary.");
+
+        // NotEqual("value"): value must not be a specific string (skips empty)
+        RuleFor(x => x.Status).NotEqual("deleted")
+            .WithMessage("Status cannot be 'deleted'.");
+
+
+        // ── Numeric rules ─────────────────────────────────────
+        // coerceAs: "number" is set AUTOMATICALLY because Age is int, Salary is decimal, etc.
+
+        // InclusiveBetween: value must be >= lo AND <= hi (boundaries included, skips empty)
+        RuleFor(x => x.Age).InclusiveBetween(0, 120)
+            .WithMessage("Age must be between 0 and 120.");
+
+        // IsExclusiveBetween: value must be > lo AND < hi (boundaries EXCLUDED, skips empty)
+        // NOTE: Use our extension, NOT FluentValidation's .ExclusiveBetween()
+        RuleFor(x => x.Score).IsExclusiveBetween(0m, 100m)
+            .WithMessage("Score must be between 0 and 100 (exclusive).");
+
+        // GreaterThanOrEqualTo: value must be >= N (skips empty)
+        RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m)
+            .WithMessage("Salary cannot be negative.");
+
+        // LessThanOrEqualTo: value must be <= N (skips empty)
+        RuleFor(x => x.Salary).LessThanOrEqualTo(500_000m)
+            .WithMessage("Salary must be at most 500,000.");
+
+        // GreaterThan: value must be > N (DOES NOT SKIP EMPTY — implies required)
+        RuleFor(x => x.MonthlyRate).GreaterThan(0m)
+            .WithMessage("Monthly rate must be greater than zero.");
+
+        // LessThan: value must be < N (skips empty)
+        RuleFor(x => x.MaxDeposit).LessThan(1_000_000m)
+            .WithMessage("Deposit must be less than 1,000,000.");
+
+
+        // ── Date rules ────────────────────────────────────────
+        // coerceAs: "date" is set AUTOMATICALLY because AdmissionDate is DateTime.
+        // DateTime constraints serialize as ISO strings: DateTime(2020,1,1) → "2020-01-01"
+
+        // GreaterThanOrEqualTo(date): admission must be on or after Jan 1, 2020
+        RuleFor(x => x.AdmissionDate).GreaterThanOrEqualTo(new DateTime(2020, 1, 1))
+            .WithMessage("Admission must be on or after January 1, 2020.");
+
+        // GreaterThan(x => x.OtherDate): discharge must be AFTER admission (cross-property)
+        RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)
+            .WithMessage("Discharge must be after admission date.");
+
+
+        // ── Empty rule ────────────────────────────────────────
+        // NOTE: Use our extension .IsEmpty(), NOT FluentValidation's .Empty()
+
+        // IsEmpty: value MUST be empty (for conditional fields — see WhenField below)
+        RuleFor(x => x.Nickname).IsEmpty()
+            .WithMessage("Nickname must be empty.");
+    }
+}
+```
+
+### Conditional Validator (WhenField / WhenFieldNot)
+
+```csharp
+using Alis.Reactive.FluentValidator.Validators;
+
+public class ResidentConditionalValidator : ReactiveValidator<ResidentModel>
+{
+    public ResidentConditionalValidator()
+    {
+        // ── Unconditional (always applies) ────────────────────
+        RuleFor(x => x.Name).NotEmpty()
+            .WithMessage("Name is always required.");
+
+        // ── WhenField(bool): rules apply when IsEmployed is true ──
         WhenField(x => x.IsEmployed, () =>
         {
             RuleFor(x => x.JobTitle).NotEmpty()
@@ -172,149 +181,264 @@ public class ConditionalResidentValidator : ReactiveValidator<ResidentModel>
                 .WithMessage("Salary must be positive when employed.");
         });
 
-        // Only when NOT employed
+        // ── WhenFieldNot(bool): rules apply when IsEmployed is false ──
         WhenFieldNot(x => x.IsEmployed, () =>
         {
             RuleFor(x => x.Salary).IsEmpty()
                 .WithMessage("Salary must be empty when not employed.");
         });
 
-        // When specific value
+        // ── WhenField(string, value): rules apply when CareLevel equals "Memory Care" ──
         WhenField(x => x.CareLevel, "Memory Care", () =>
         {
             RuleFor(x => x.EmergencyPhone).NotEmpty()
                 .WithMessage("Emergency phone required for Memory Care.");
         });
+
+        // ── WhenFieldNot(string, value): rules apply when CareLevel is NOT "Independent" ──
+        WhenFieldNot(x => x.CareLevel, "Independent", () =>
+        {
+            RuleFor(x => x.PhysicianName).NotEmpty()
+                .WithMessage("Physician required unless independent.");
+        });
     }
 }
 ```
 
-**Condition operators:** `truthy` (WhenField bool), `falsy` (WhenFieldNot bool), `eq` (WhenField string value), `neq` (WhenFieldNot string value).
-
-**Standard `.When()` / `.Unless()` are server-only** — the adapter skips them. Only `WhenField` / `WhenFieldNot` extract to the client.
-
 ---
 
-## Wiring in a View
+## Step 3: Wire in the View
 
 ```csharp
+@model YourApp.Models.ResidentModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
 @{
     var plan = Html.ReactivePlan<ResidentModel>();
 }
 
 <form id="resident-form">
-    @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+    @* Every input field MUST use Html.InputField() — this registers the component *@
+    @* Without it, the runtime can't read the field's value for validation *@
+
+    @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Resident Name"))
        .NativeTextBox(b => b.Placeholder("Full name")); }
+
+    @{ Html.InputField(plan, m => m.Email, o => o.Required().Label("Email"))
+       .NativeTextBox(b => b.Placeholder("nurse@facility.com")); }
+
+    @{ Html.InputField(plan, m => m.ConfirmEmail, o => o.Label("Confirm Email"))
+       .NativeTextBox(b => b.Placeholder("Confirm email")); }
+
+    @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))
+       .NativeTextBox(b => b.Type("number").Placeholder("0-120")); }
 
     @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
        .DatePicker(b => b.Placeholder("Select date")); }
+
+    @{ Html.InputField(plan, m => m.DischargeDate, o => o.Required().Label("Discharge Date"))
+       .DatePicker(b => b.Placeholder("Select date")); }
 </form>
 
-@(Html.NativeButton("save-btn", "Save")
+@* The button wires validation + HTTP post *@
+@(Html.NativeButton("save-btn", "Save Resident")
+    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
     .Reactive(plan, evt => evt.Click, (args, p) =>
     {
         p.Post("/Residents/Save")
-         .Validate<ResidentValidator>("resident-form")
-         .Response(r => r.OnSuccess(s => { /* handle success */ }));
+         .Validate<ResidentValidator>("resident-form")    @* ← extracts rules into plan *@
+         .Response(r => r.OnSuccess(s =>
+         {
+             s.Element("result").SetText("Saved!");
+         }));
     }))
 
+<p id="result"></p>
+
+@* Validation summary for unenriched/hidden field errors *@
+<div data-reactive-validation-summary hidden></div>
+
+@* MUST be last — renders the plan JSON *@
 @Html.RenderPlan(plan)
 ```
 
-**Key points:**
-- Every input MUST use `Html.InputField()` — this registers the component in `plan.components` for enrichment
-- `.Validate<TValidator>("formId")` extracts rules and embeds them in the plan
-- The runtime enriches validation fields from `plan.components` automatically (maps `fieldName` → `fieldId`, `vendor`, `readExpr`)
-- Live re-validation on blur/change happens automatically after the first submit
+**What happens when the user clicks "Save":**
+1. Runtime reads ALL validation rules from the plan
+2. For each field: reads the component value via `resolveRoot` + `walk(readExpr)`
+3. Evaluates each rule (skips conditional rules whose condition is false)
+4. If any rule fails: shows error inline next to the field (or in summary if hidden)
+5. If all pass: sends the HTTP POST
+6. After first submit: live re-validation on blur/change fires automatically
 
 ---
 
-## Server-Only Rules (Not Extracted)
+## Step 4: Handle Server Response
 
-These FluentValidation rules are NOT extractable and run server-side only:
-
-| FV Method | Why server-only |
-|-----------|-----------------|
-| `.Must()` / `.MustAsync()` | Custom lambda — can't serialize to plan |
-| `.Custom()` / `.CustomAsync()` | Custom validation context |
-| `.When()` / `.Unless()` | Server-side conditions (use `WhenField` instead) |
-| `.ForEach()` | Collection iteration |
-| `.SetValidator()` (polymorphic) | Runtime type dispatch |
-| `.PrecisionScale()` | Decimal precision — server concern |
-| `.IsInEnum()` / `.IsEnumName()` | Enum membership — server concern |
-| FV's `.Empty()` | No public interface — use `.IsEmpty()` instead |
-| FV's `.ExclusiveBetween()` | No distinguishing interface — use `.IsExclusiveBetween()` instead |
-
----
-
-## Custom Extensions (Ours)
-
-These are in `Alis.Reactive.FluentValidator.Validators`. Use these instead of FV's equivalents.
+The controller endpoint handles server-side validation (for `.Must()`, `.When()`, and other server-only rules):
 
 ```csharp
+[HttpPost]
+public IActionResult Save([FromBody] ResidentModel? model)
+{
+    if (model == null)
+        return BadRequest(new { errors = new { Name = new[] { "Request body required." } } });
+
+    var validator = new ResidentValidator();
+    var result = validator.Validate(model);
+
+    if (!result.IsValid)
+    {
+        var errors = new Dictionary<string, string[]>();
+        foreach (var failure in result.Errors)
+            errors[failure.PropertyName] = new[] { failure.ErrorMessage };
+        return BadRequest(new { errors });
+    }
+
+    return Ok(new { message = "Saved!" });
+}
+```
+
+Server errors in the `{ errors: { "PropertyName": ["message"] } }` format are automatically routed to the correct inline error spans by the runtime.
+
+---
+
+## Common Mistakes
+
+### DO NOT use FV's `.Empty()` or `.ExclusiveBetween()`
+
+```csharp
+// WRONG — FV has no public interface, adapter can't extract
+RuleFor(x => x.Nickname).Empty();
+RuleFor(x => x.Score).ExclusiveBetween(0m, 100m);
+
+// CORRECT — our extensions with clean interfaces
 using Alis.Reactive.FluentValidator.Validators;
-
-// Instead of .Empty()
 RuleFor(x => x.Nickname).IsEmpty();
-
-// Instead of .ExclusiveBetween(lo, hi)
 RuleFor(x => x.Score).IsExclusiveBetween(0m, 100m);
 ```
 
-**Why?** FluentValidation's `EmptyValidator` and `ExclusiveBetweenValidator` don't expose public interfaces. Our versions implement `IEmptyValidator` and `IExclusiveBetweenValidator` which the adapter matches directly — no reflection, no string matching.
+### DO NOT use `.When()` for client-side conditions
+
+```csharp
+// WRONG — .When() is server-only, adapter skips it entirely
+RuleFor(x => x.JobTitle).NotEmpty().When(x => x.IsEmployed);
+
+// CORRECT — use ReactiveValidator + WhenField
+WhenField(x => x.IsEmployed, () =>
+{
+    RuleFor(x => x.JobTitle).NotEmpty();
+});
+```
+
+### DO NOT forget `Html.InputField()` for peer fields
+
+```csharp
+// If ConfirmEmail has .Equal(x => x.Email), then BOTH fields must be
+// registered via Html.InputField(). If Email is not in the form,
+// the equalTo rule fails closed (blocks the form).
+
+// The adapter auto-includes peer fields in the descriptor,
+// but the component must be registered via InputField in the view.
+```
+
+### DO NOT use `Html.Element()` for input components
+
+```csharp
+// WRONG — Element() is for display elements, not input components
+p.Element("name-field").SetText("value");
+
+// CORRECT — use Html.InputField() which registers the component
+Html.InputField(plan, m => m.Name, o => o.Label("Name"))
+    .NativeTextBox(b => b.Placeholder("Name"));
+```
+
+### DO NOT build manual ValidationDescriptors without coerceAs
+
+```csharp
+// WRONG — comparison rules without coerceAs throw at runtime
+new ValidationRule("min", "Too low", constraint: 0)
+
+// CORRECT — always specify coerceAs for comparison rules
+new ValidationRule("min", "Too low", constraint: 0, coerceAs: "number")
+```
 
 ---
 
-## Date Handling
+## Rule Type Reference — Complete
 
-DateTime constraints are serialized as timezone-safe ISO strings:
+### Text Rules (no coerceAs needed)
 
-| DateTime value | Serialized as | Parsed by browser |
-|---------------|---------------|-------------------|
-| `new DateTime(2020, 1, 1)` (midnight) | `"2020-01-01"` | Local midnight (no UTC shift) |
-| `new DateTime(2020, 1, 1, 14, 30, 0)` (with time) | `"2020-01-01T14:30:00"` | Local datetime |
+| Rule | C# DSL | When empty |
+|------|--------|-----------|
+| `required` | `.NotEmpty()` or `.NotNull()` | **Fails** |
+| `empty` | `.IsEmpty()` | **Passes** |
+| `minLength` | `.MinimumLength(N)` | Skips |
+| `maxLength` | `.MaximumLength(N)` | Skips |
+| `email` | `.EmailAddress()` | Skips |
+| `regex` | `.Matches(pattern)` | Skips |
+| `creditCard` | `.CreditCard()` | Skips |
+| `notEqual` | `.NotEqual("value")` | Skips |
 
-Syncfusion DatePicker returns `Date` objects. The rule engine's `coerce(value, "date")` handles both:
-- `Date` objects → `getTime()` (milliseconds)
-- `"YYYY-MM-DD"` strings → local midnight (avoids the off-by-one day UTC bug)
-- ISO datetime strings → `new Date(str).getTime()`
+### Comparison Rules (coerceAs set automatically from property type)
 
----
+| Rule | C# DSL (fixed value) | C# DSL (cross-property) | When empty |
+|------|---------------------|------------------------|-----------|
+| `min` | `.GreaterThanOrEqualTo(val)` | `.GreaterThanOrEqualTo(x => x.Prop)` | Skips |
+| `max` | `.LessThanOrEqualTo(val)` | `.LessThanOrEqualTo(x => x.Prop)` | Skips |
+| `gt` | `.GreaterThan(val)` | `.GreaterThan(x => x.Prop)` | **Fails** |
+| `lt` | `.LessThan(val)` | `.LessThan(x => x.Prop)` | Skips |
+| `equalTo` | `.Equal(val)` | `.Equal(x => x.Prop)` | Skips |
+| `notEqualTo` | — | `.NotEqual(x => x.Prop)` | Skips |
 
-## Cross-Property Rules
+### Range Rules (coerceAs set automatically)
 
-When a rule references another property (`x => x.OtherProp`), the adapter:
-
-1. Sets `field: "OtherProp"` (the model property name)
-2. Sets `coerceAs` from `OtherProp`'s property type
-3. Ensures `"OtherProp"` appears in the validation descriptor (even with zero rules)
-
-At runtime, the peer reader looks up `"OtherProp"` in the enriched field map → resolves `fieldId` → reads the component value via `resolveRoot` + `walk(readExpr)`.
-
-**Both fields must be registered as components** (via `Html.InputField().NativeTextBox()` / `.DatePicker()` / etc.).
-If the peer field isn't in the form, the rule fails closed (blocks the form).
-
----
-
-## Empty Behavior Summary
-
-| Rule | Empty value behavior |
-|------|---------------------|
-| `required` | **Fails** (that's the point) |
-| `empty` | **Passes** (empty is valid) |
-| `gt` | **Fails** (gt implies required) |
-| All others | **Skips** (no error — `required` handles emptiness separately) |
-
-This means: if a field is optional, don't add `required`. The comparison rules (`min`, `max`, `range`, etc.) will skip empty values automatically. Only `gt` implies the field must have a value.
+| Rule | C# DSL | When empty |
+|------|--------|-----------|
+| `range` | `.InclusiveBetween(lo, hi)` | Skips |
+| `exclusiveRange` | `.IsExclusiveBetween(lo, hi)` | Skips |
 
 ---
 
-## Fail-Closed Guarantee
+## What the Plan Looks Like
 
-- Unknown rule type → **blocks** (doesn't silently pass)
-- Missing `coerceAs` on comparison rules → **throws** (no silent default)
-- Peer field not in descriptor → **blocks** (can't read → fail-closed)
-- Condition source not enriched → **blocks** (can't evaluate → assume true → rule applies)
-- Broken regex pattern → **blocks** (exception caught → fail-closed)
+For `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)`:
 
-Nothing silently passes. If something is wrong, validation blocks the form.
+```json
+{
+  "rule": "gt",
+  "message": "Discharge must be after admission date.",
+  "field": "AdmissionDate",
+  "coerceAs": "date"
+}
+```
+
+- `field` = model property name of the peer field (NOT the DOM element ID)
+- `coerceAs` = derived from `AdmissionDate`'s `DateTime` type → `"date"`
+- `constraint` is absent — `field` and `constraint` are mutually exclusive
+- The adapter auto-includes `"AdmissionDate"` in the descriptor
+
+For `RuleFor(x => x.Age).InclusiveBetween(0, 120)`:
+
+```json
+{
+  "rule": "range",
+  "message": "Age must be between 0 and 120.",
+  "constraint": [0, 120],
+  "coerceAs": "number"
+}
+```
+
+---
+
+## Fail-Closed — Nothing Silently Passes
+
+| What goes wrong | What happens |
+|----------------|-------------|
+| Unknown rule type in plan | Form blocked |
+| Comparison rule without `coerceAs` | Runtime throws |
+| Peer field not registered in form | Form blocked |
+| Condition source field not in form | Rule applies (assumes condition is true) |
+| Invalid regex pattern | Form blocked |
+| Unenriched field with rules | Error → validation summary |
+
+If validation is misconfigured, the form blocks. It never silently lets bad data through.
