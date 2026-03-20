@@ -239,7 +239,7 @@ describe("When equalTo peer is enriched and in DOM", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "Name", fieldName: "Name", rules: [] }),
       field({ fieldId: "Email", fieldName: "Email", rules: [
-        { rule: "equalTo", message: "must match Name", constraint: "Name" },
+        { rule: "equalTo", message: "must match Name", field: "Name" },
       ] }),
     ]);
     expect(validate(desc)).toBe(false);
@@ -252,7 +252,7 @@ describe("When equalTo peer is enriched and in DOM", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "Name", fieldName: "Name", rules: [] }),
       field({ fieldId: "Email", fieldName: "Email", rules: [
-        { rule: "equalTo", message: "must match", constraint: "Name" },
+        { rule: "equalTo", message: "must match", field: "Name" },
       ] }),
     ]);
     expect(validate(desc)).toBe(true);
@@ -265,7 +265,7 @@ describe("When equalTo peer is not enriched", () => {
     const desc = makeDesc("testForm", [
       // Name not in field list — peer not enriched
       field({ fieldId: "Email", fieldName: "Email", rules: [
-        { rule: "equalTo", message: "must match", constraint: "NonExistent" },
+        { rule: "equalTo", message: "must match", field: "NonExistent" },
       ] }),
     ]);
     // Fail-closed: peer unresolvable → rule fails → form blocked

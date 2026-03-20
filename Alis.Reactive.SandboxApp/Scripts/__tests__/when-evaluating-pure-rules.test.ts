@@ -67,7 +67,7 @@ describe("rule-engine: url", () => {
 });
 
 describe("rule-engine: min", () => {
-  const rule = { rule: "min" as const, message: "too low", constraint: 100 };
+  const rule = { rule: "min" as const, message: "too low", constraint: 100, coerceAs: "number" as const };
 
   it("fails below", () => expect(ruleFails(rule, "50", noPeers)).toBe(true));
   it("passes at boundary", () => expect(ruleFails(rule, "100", noPeers)).toBe(false));
@@ -75,7 +75,7 @@ describe("rule-engine: min", () => {
 });
 
 describe("rule-engine: max", () => {
-  const rule = { rule: "max" as const, message: "too high", constraint: 500 };
+  const rule = { rule: "max" as const, message: "too high", constraint: 500, coerceAs: "number" as const };
 
   it("fails above", () => expect(ruleFails(rule, "600", noPeers)).toBe(true));
   it("passes at boundary", () => expect(ruleFails(rule, "500", noPeers)).toBe(false));
@@ -83,7 +83,7 @@ describe("rule-engine: max", () => {
 });
 
 describe("rule-engine: gt (strict greater-than, implies required)", () => {
-  const rule = { rule: "gt" as const, message: "must be > 0", constraint: 0 };
+  const rule = { rule: "gt" as const, message: "must be > 0", constraint: 0, coerceAs: "number" as const };
 
   it("fails for empty (implies required)", () => expect(ruleFails(rule, "", noPeers)).toBe(true));
   it("fails for null (implies required)", () => expect(ruleFails(rule, null, noPeers)).toBe(true));
@@ -94,7 +94,7 @@ describe("rule-engine: gt (strict greater-than, implies required)", () => {
 });
 
 describe("rule-engine: lt (strict less-than, skips empty)", () => {
-  const rule = { rule: "lt" as const, message: "must be < 1000000", constraint: 1000000 };
+  const rule = { rule: "lt" as const, message: "must be < 1000000", constraint: 1000000, coerceAs: "number" as const };
 
   it("skips empty", () => expect(ruleFails(rule, "", noPeers)).toBe(false));
   it("skips null", () => expect(ruleFails(rule, null, noPeers)).toBe(false));
@@ -104,7 +104,7 @@ describe("rule-engine: lt (strict less-than, skips empty)", () => {
 });
 
 describe("rule-engine: range", () => {
-  const rule = { rule: "range" as const, message: "out of range", constraint: [0, 120] as [number, number] };
+  const rule = { rule: "range" as const, message: "out of range", constraint: [0, 120] as [number, number], coerceAs: "number" as const };
 
   it("fails below", () => expect(ruleFails(rule, "-1", noPeers)).toBe(true));
   it("fails above", () => expect(ruleFails(rule, "121", noPeers)).toBe(true));
@@ -115,19 +115,19 @@ describe("rule-engine: range", () => {
 
 describe("rule-engine: equalTo", () => {
   it("fails when values differ", () => {
-    const rule = { rule: "equalTo" as const, message: "must match", constraint: "Password" };
+    const rule = { rule: "equalTo" as const, message: "must match", field: "Password" };
     const reader: PeerReader = { readPeer: () => "secret" };
     expect(ruleFails(rule, "different", reader)).toBe(true);
   });
 
   it("passes when values match", () => {
-    const rule = { rule: "equalTo" as const, message: "must match", constraint: "Password" };
+    const rule = { rule: "equalTo" as const, message: "must match", field: "Password" };
     const reader: PeerReader = { readPeer: () => "secret" };
     expect(ruleFails(rule, "secret", reader)).toBe(false);
   });
 
   it("fails closed when peer is unavailable (blocks, does not pass)", () => {
-    const rule = { rule: "equalTo" as const, message: "must match", constraint: "Missing" };
+    const rule = { rule: "equalTo" as const, message: "must match", field: "Missing" };
     expect(ruleFails(rule, "anything", noPeers)).toBe(true);
   });
 });

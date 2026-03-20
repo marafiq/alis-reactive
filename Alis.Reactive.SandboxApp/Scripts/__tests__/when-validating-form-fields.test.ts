@@ -225,7 +225,7 @@ describe("validate — url", () => {
 describe("validate — min", () => {
   it("fails below minimum", () => {
     const desc = makeDesc("testForm", [
-      field({ fieldId: "Salary", rules: [{ rule: "min", message: "too low", constraint: 100 }] }),
+      field({ fieldId: "Salary", rules: [{ rule: "min", message: "too low", constraint: 100, coerceAs: "number" }] }),
     ]);
     (document.getElementById("Salary")! as HTMLInputElement).value = "50";
     expect(validate(desc)).toBe(false);
@@ -233,7 +233,7 @@ describe("validate — min", () => {
 
   it("passes at minimum", () => {
     const desc = makeDesc("testForm", [
-      field({ fieldId: "Salary", rules: [{ rule: "min", message: "too low", constraint: 100 }] }),
+      field({ fieldId: "Salary", rules: [{ rule: "min", message: "too low", constraint: 100, coerceAs: "number" }] }),
     ]);
     (document.getElementById("Salary")! as HTMLInputElement).value = "100";
     expect(validate(desc)).toBe(true);
@@ -243,7 +243,7 @@ describe("validate — min", () => {
 describe("validate — max", () => {
   it("fails above maximum", () => {
     const desc = makeDesc("testForm", [
-      field({ fieldId: "Salary", rules: [{ rule: "max", message: "too high", constraint: 500 }] }),
+      field({ fieldId: "Salary", rules: [{ rule: "max", message: "too high", constraint: 500, coerceAs: "number" }] }),
     ]);
     (document.getElementById("Salary")! as HTMLInputElement).value = "600";
     expect(validate(desc)).toBe(false);
@@ -251,7 +251,7 @@ describe("validate — max", () => {
 
   it("passes at maximum", () => {
     const desc = makeDesc("testForm", [
-      field({ fieldId: "Salary", rules: [{ rule: "max", message: "too high", constraint: 500 }] }),
+      field({ fieldId: "Salary", rules: [{ rule: "max", message: "too high", constraint: 500, coerceAs: "number" }] }),
     ]);
     (document.getElementById("Salary")! as HTMLInputElement).value = "500";
     expect(validate(desc)).toBe(true);
@@ -261,7 +261,7 @@ describe("validate — max", () => {
 describe("validate — range", () => {
   it("fails outside range", () => {
     const desc = makeDesc("testForm", [
-      field({ fieldId: "Age", rules: [{ rule: "range", message: "out of range", constraint: [0, 120] }] }),
+      field({ fieldId: "Age", rules: [{ rule: "range", message: "out of range", constraint: [0, 120], coerceAs: "number" }] }),
     ]);
     (document.getElementById("Age")! as HTMLInputElement).value = "-1";
     expect(validate(desc)).toBe(false);
@@ -269,7 +269,7 @@ describe("validate — range", () => {
 
   it("passes within range", () => {
     const desc = makeDesc("testForm", [
-      field({ fieldId: "Age", rules: [{ rule: "range", message: "out of range", constraint: [0, 120] }] }),
+      field({ fieldId: "Age", rules: [{ rule: "range", message: "out of range", constraint: [0, 120], coerceAs: "number" }] }),
     ]);
     (document.getElementById("Age")! as HTMLInputElement).value = "25";
     expect(validate(desc)).toBe(true);
@@ -283,7 +283,7 @@ describe("validate — equalTo", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "Password", fieldName: "Password", rules: [] }),
       field({ fieldId: "ConfirmPassword", fieldName: "ConfirmPassword", rules: [
-        { rule: "equalTo", message: "must match", constraint: "Password" },
+        { rule: "equalTo", message: "must match", field: "Password" },
       ] }),
     ]);
     (document.getElementById("Password")! as HTMLInputElement).value = "secret";
@@ -295,7 +295,7 @@ describe("validate — equalTo", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "Password", fieldName: "Password", rules: [] }),
       field({ fieldId: "ConfirmPassword", fieldName: "ConfirmPassword", rules: [
-        { rule: "equalTo", message: "must match", constraint: "Password" },
+        { rule: "equalTo", message: "must match", field: "Password" },
       ] }),
     ]);
     (document.getElementById("Password")! as HTMLInputElement).value = "secret";

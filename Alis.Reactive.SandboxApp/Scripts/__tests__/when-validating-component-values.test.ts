@@ -100,7 +100,7 @@ describe("when validating component values", () => {
       expect(validate({
         formId: "f6",
         fields: [{ fieldId: "score", fieldName: "score", vendor: "fusion",
-          readExpr: "value", rules: [{ rule: "max", constraint: 100, message: "Max 100" }] }],
+          readExpr: "value", rules: [{ rule: "max", constraint: 100, message: "Max 100", coerceAs: "number" }] }],
       })).toBe(false);
       expect(errorSpan("f6", "score")?.textContent).toBe("Max 100");
     });
@@ -160,7 +160,7 @@ describe("when validating component values", () => {
       expect(validate({
         formId: "fn4",
         fields: [{ fieldId: "amount", fieldName: "amount", vendor: "fusion",
-          readExpr: "value", rules: [{ rule: "min", constraint: 10, message: "Min 10" }] }],
+          readExpr: "value", rules: [{ rule: "min", constraint: 10, message: "Min 10", coerceAs: "number" }] }],
       })).toBe(false);
       expect(errorSpan("fn4", "amount")?.textContent).toBe("Min 10");
     });
@@ -172,7 +172,7 @@ describe("when validating component values", () => {
       expect(validate({
         formId: "fn5",
         fields: [{ fieldId: "amount", fieldName: "amount", vendor: "fusion",
-          readExpr: "value", rules: [{ rule: "min", constraint: 10, message: "Min 10" }] }],
+          readExpr: "value", rules: [{ rule: "min", constraint: 10, message: "Min 10", coerceAs: "number" }] }],
       })).toBe(true); // min skips empty values — only required catches empty
     });
   });
@@ -189,7 +189,7 @@ describe("when validating component values", () => {
           { fieldId: "password", fieldName: "password", vendor: "native",
             readExpr: "value", rules: [{ rule: "required", message: "Required" }] },
           { fieldId: "confirm", fieldName: "confirm", vendor: "fusion",
-            readExpr: "value", rules: [{ rule: "equalTo", constraint: "password", message: "Must match" }] },
+            readExpr: "value", rules: [{ rule: "equalTo", field: "password", message: "Must match" }] },
         ],
       })).toBe(true);
     });
@@ -205,7 +205,7 @@ describe("when validating component values", () => {
           { fieldId: "password", fieldName: "password", vendor: "native",
             readExpr: "value", rules: [{ rule: "required", message: "Required" }] },
           { fieldId: "confirm", fieldName: "confirm", vendor: "fusion",
-            readExpr: "value", rules: [{ rule: "equalTo", constraint: "password", message: "Must match" }] },
+            readExpr: "value", rules: [{ rule: "equalTo", field: "password", message: "Must match" }] },
         ],
       })).toBe(false);
       expect(errorSpan("f8", "confirm")?.textContent).toBe("Must match");

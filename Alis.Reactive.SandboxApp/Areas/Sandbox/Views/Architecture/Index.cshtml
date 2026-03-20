@@ -324,7 +324,7 @@
                          new List<ValidationRule>
                          {
                              new ValidationRule("required", "Required"),
-                             new ValidationRule("equalTo", "Must match", "native-password")
+                             new ValidationRule("equalTo", "Must match", field: "native-password")
                          })
                  }))
                  .Response(r => r

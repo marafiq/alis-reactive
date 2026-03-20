@@ -226,13 +226,13 @@ function domConditionReader(byName: Map<string, ValidationField>): ConditionRead
 
 function domPeerReader(byName: Map<string, ValidationField>): PeerReader {
   return {
-    readPeer(fieldName: string): string | undefined {
+    readPeer(fieldName: string): unknown {
       const other = byName.get(fieldName);
       if (!other?.fieldId || !other.vendor || !other.readExpr) return undefined;
       const otherEl = document.getElementById(other.fieldId);
       if (!otherEl) return undefined;
       const otherRoot = resolveRoot(otherEl, other.vendor);
-      return String(walk(otherRoot, other.readExpr) ?? "");
+      return walk(otherRoot, other.readExpr);
     },
   };
 }

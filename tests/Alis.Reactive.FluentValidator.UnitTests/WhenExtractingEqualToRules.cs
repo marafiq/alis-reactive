@@ -6,14 +6,15 @@ public class WhenExtractingEqualToRules
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
-    public void Equal_to_other_field_extracts_equalTo_rule()
+    public void Equal_to_other_field_extracts_equalTo_with_field()
     {
         var desc = _adapter.ExtractRules(typeof(EqualToValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var field = desc!.Fields.First(f => f.FieldName == "ConfirmEmail");
         var equalRule = field.Rules.First(r => r.Rule == "equalTo");
-        Assert.That(equalRule.Constraint, Is.EqualTo("Email"));
+        Assert.That(equalRule.Field, Is.EqualTo("Email"));
+        Assert.That(equalRule.Constraint, Is.Null);
     }
 
     [Test]
@@ -25,6 +26,6 @@ public class WhenExtractingEqualToRules
         var field = desc!.Fields.First(f => f.FieldName == "ConfirmEmail");
         var equalRule = field.Rules.First(r => r.Rule == "equalTo");
         Assert.That(equalRule.Message, Is.EqualTo("Emails must match."));
-        Assert.That(equalRule.Constraint, Is.EqualTo("Email"));
+        Assert.That(equalRule.Field, Is.EqualTo("Email"));
     }
 }

@@ -1,3 +1,4 @@
+import type { CoercionType } from "../core/coerce";
 import type { Vendor } from "./context";
 
 export interface ValidationDescriptor {
@@ -16,13 +17,20 @@ export interface ValidationField {
 }
 
 export type ValidationRuleType =
-  | "required" | "minLength" | "maxLength" | "email" | "regex" | "url"
-  | "range" | "min" | "max" | "gt" | "lt" | "equalTo" | "atLeastOne";
+  | "required" | "empty"
+  | "minLength" | "maxLength"
+  | "email" | "regex" | "url" | "creditCard"
+  | "range" | "exclusiveRange"
+  | "min" | "max" | "gt" | "lt"
+  | "equalTo" | "notEqual" | "notEqualTo"
+  | "atLeastOne";
 
 export interface ValidationRule {
   rule: ValidationRuleType;
   message: string;
-  constraint?: boolean | number | string | [number, number];
+  constraint?: unknown;
+  field?: string;
+  coerceAs?: CoercionType;
   when?: ValidationCondition;
 }
 

@@ -1,4 +1,5 @@
 using FluentValidation;
+using Alis.Reactive.FluentValidator.Validators;
 
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
@@ -314,6 +315,61 @@ public class MultipleRulesValidator : AbstractValidator<TestModel>
     public MultipleRulesValidator()
     {
         RuleFor(x => x.Name).NotEmpty().MinimumLength(3).MaximumLength(100);
+    }
+}
+
+// --- Full coverage validator (all 18 rule types) ---
+
+public class FullCoverageValidator : AbstractValidator<FullCoverageModel>
+{
+    public FullCoverageValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x.Name).MinimumLength(3);
+        RuleFor(x => x.Name).MaximumLength(100);
+        RuleFor(x => x.Email).EmailAddress();
+        RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{3}-\d{4}$");
+        RuleFor(x => x.CreditCardNumber).CreditCard();
+        RuleFor(x => x.Age).InclusiveBetween(0, 120);
+        RuleFor(x => x.Score).IsExclusiveBetween(0m, 100m);
+        RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m);
+        RuleFor(x => x.Salary).LessThanOrEqualTo(500000m);
+        RuleFor(x => x.MonthlyRate).GreaterThan(0m);
+        RuleFor(x => x.MonthlyRate).LessThan(1000000m);
+        RuleFor(x => x.ConfirmEmail).Equal(x => x.Email);
+        RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email);
+        RuleFor(x => x.Status).NotEqual("deleted");
+        RuleFor(x => x.AdmissionDate).GreaterThanOrEqualTo(new DateTime(2020, 1, 1));
+        RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate);
+        RuleFor(x => x.Nickname).IsEmpty();
+    }
+}
+
+public class FullCoverageConditionalValidator : ReactiveValidator<FullCoverageModel>
+{
+    public FullCoverageConditionalValidator()
+    {
+        WhenField(x => x.IsEmployed, () =>
+        {
+            RuleFor(x => x.Name).NotEmpty();
+            RuleFor(x => x.Name).MinimumLength(3);
+            RuleFor(x => x.Name).MaximumLength(100);
+            RuleFor(x => x.Email).EmailAddress();
+            RuleFor(x => x.Phone).Matches(@"^\d{3}-\d{3}-\d{4}$");
+            RuleFor(x => x.CreditCardNumber).CreditCard();
+            RuleFor(x => x.Age).InclusiveBetween(0, 120);
+            RuleFor(x => x.Score).IsExclusiveBetween(0m, 100m);
+            RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m);
+            RuleFor(x => x.Salary).LessThanOrEqualTo(500000m);
+            RuleFor(x => x.MonthlyRate).GreaterThan(0m);
+            RuleFor(x => x.MonthlyRate).LessThan(1000000m);
+            RuleFor(x => x.ConfirmEmail).Equal(x => x.Email);
+            RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email);
+            RuleFor(x => x.Status).NotEqual("deleted");
+            RuleFor(x => x.AdmissionDate).GreaterThanOrEqualTo(new DateTime(2020, 1, 1));
+            RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate);
+            RuleFor(x => x.Nickname).IsEmpty();
+        });
     }
 }
 

@@ -5,6 +5,7 @@ using FluentValidation;
 using FluentValidation.Internal;
 using FluentValidation.Validators;
 using Alis.Reactive.Validation;
+using Alis.Reactive.FluentValidator.Validators;
 
 namespace Alis.Reactive.FluentValidator
 {
@@ -47,6 +48,19 @@ namespace Alis.Reactive.FluentValidator
 
             ExtractFromValidator(validator, "", fieldRules, _factory, clientConditions);
 
+            // Ensure cross-property peer fields are in the descriptor (runtime needs them for value reading)
+            var peerFields = new HashSet<string>();
+            foreach (var kvp in fieldRules)
+            {
+                foreach (var er in kvp.Value)
+                {
+                    if (!string.IsNullOrEmpty(er.Field) && !fieldRules.ContainsKey(er.Field))
+                        peerFields.Add(er.Field);
+                }
+            }
+            foreach (var peerField in peerFields)
+                fieldRules[peerField] = new List<ExtractedRule>();
+
             // Build fields
             var fields = new List<ValidationField>();
             foreach (var kvp in fieldRules)
@@ -55,7 +69,7 @@ namespace Alis.Reactive.FluentValidator
                 var rules = new List<ValidationRule>();
                 foreach (var er in kvp.Value)
                 {
-                    rules.Add(new ValidationRule(er.Rule, er.Message, er.Constraint, er.When));
+                    rules.Add(new ValidationRule(er.Rule, er.Message, er.Constraint, er.When, er.Field, er.CoerceAs));
                 }
                 fields.Add(new ValidationField(propertyPath, rules));
             }
@@ -199,6 +213,13 @@ namespace Alis.Reactive.FluentValidator
                         null, ruleCondition));
                     break;
 
+                case IEmptyValidator _:
+                    result.Add(new ExtractedRule(
+                        "empty",
+                        customMsg ?? $"'{displayName}' must be empty.",
+                        null, ruleCondition));
+                    break;
+
                 case ILengthValidator lv:
                 {
                     if (lv.Min > 0)
@@ -235,53 +256,146 @@ namespace Alis.Reactive.FluentValidator
                     }
                     break;
 
+                case FluentValidation.Validators.ICreditCardValidator _:
+                    result.Add(new ExtractedRule(
+                        "creditCard",
+                        customMsg ?? $"'{displayName}' must be a valid credit card number.",
+                        null, ruleCondition));
+                    break;
+
+                case IExclusiveBetweenValidator ebv:
+                {
+                    var coerceAs = InferCoerceAs(ebv.From?.GetType());
+                    var from = coerceAs == "date" ? SerializeDateConstraint(ebv.From!) : ebv.From;
+                    var to = coerceAs == "date" ? SerializeDateConstraint(ebv.To!) : ebv.To;
+                    result.Add(new ExtractedRule(
+                        "exclusiveRange",
+                        customMsg ?? $"'{displayName}' must be between {ebv.From} and {ebv.To} (exclusive).",
+                        new object[] { from!, to! }, ruleCondition, field: null, coerceAs: coerceAs));
+                    break;
+                }
+
                 case IBetweenValidator bv:
+                {
+                    var coerceAs = InferCoerceAs(bv.From?.GetType());
+                    var from = coerceAs == "date" ? SerializeDateConstraint(bv.From!) : bv.From;
+                    var to = coerceAs == "date" ? SerializeDateConstraint(bv.To!) : bv.To;
                     result.Add(new ExtractedRule(
                         "range",
                         customMsg ?? $"'{displayName}' must be between {bv.From} and {bv.To}.",
-                        new object[] { bv.From, bv.To }, ruleCondition));
+                        new object[] { from!, to! }, ruleCondition, field: null, coerceAs: coerceAs));
                     break;
+                }
 
                 case IComparisonValidator cv:
-                    if (cv.Comparison == Comparison.Equal && cv.MemberToCompare != null)
+                {
+                    Type? propertyType = null;
+                    string? field = null;
+                    object? constraint = null;
+
+                    if (cv.MemberToCompare != null)
                     {
-                        result.Add(new ExtractedRule(
-                            "equalTo",
-                            customMsg ?? $"'{displayName}' must match '{Humanize(cv.MemberToCompare.Name)}'.",
-                            cv.MemberToCompare.Name, ruleCondition));
+                        field = cv.MemberToCompare.Name;
+                        if (cv.MemberToCompare is System.Reflection.PropertyInfo pi)
+                            propertyType = pi.PropertyType;
+                        else if (cv.MemberToCompare is System.Reflection.FieldInfo fi)
+                            propertyType = fi.FieldType;
                     }
-                    else if (cv.Comparison == Comparison.GreaterThanOrEqual)
+                    else
                     {
-                        result.Add(new ExtractedRule(
-                            "min",
-                            customMsg ?? $"'{displayName}' must be at least {cv.ValueToCompare}.",
-                            cv.ValueToCompare, ruleCondition));
+                        constraint = cv.ValueToCompare;
+                        propertyType = cv.ValueToCompare?.GetType();
                     }
-                    else if (cv.Comparison == Comparison.GreaterThan)
+
+                    var coerceAs = InferCoerceAs(propertyType);
+                    if (coerceAs == "date" && constraint != null)
+                        constraint = SerializeDateConstraint(constraint);
+
+                    string ruleType;
+                    string defaultMsg;
+
+                    switch (cv.Comparison)
                     {
-                        result.Add(new ExtractedRule(
-                            "gt",
-                            customMsg ?? $"'{displayName}' must be greater than {cv.ValueToCompare}.",
-                            cv.ValueToCompare, ruleCondition));
+                        case Comparison.Equal:
+                            ruleType = "equalTo";
+                            defaultMsg = field != null
+                                ? $"'{displayName}' must match '{Humanize(field)}'."
+                                : $"'{displayName}' must equal {constraint}.";
+                            break;
+                        case Comparison.NotEqual:
+                            if (field != null)
+                            {
+                                ruleType = "notEqualTo";
+                                defaultMsg = $"'{displayName}' must not match '{Humanize(field)}'.";
+                            }
+                            else
+                            {
+                                ruleType = "notEqual";
+                                defaultMsg = $"'{displayName}' must not equal '{constraint}'.";
+                            }
+                            break;
+                        case Comparison.GreaterThanOrEqual:
+                            ruleType = "min";
+                            defaultMsg = field != null
+                                ? $"'{displayName}' must be at least '{Humanize(field)}'."
+                                : $"'{displayName}' must be at least {constraint}.";
+                            break;
+                        case Comparison.LessThanOrEqual:
+                            ruleType = "max";
+                            defaultMsg = field != null
+                                ? $"'{displayName}' must be at most '{Humanize(field)}'."
+                                : $"'{displayName}' must be at most {constraint}.";
+                            break;
+                        case Comparison.GreaterThan:
+                            ruleType = "gt";
+                            defaultMsg = field != null
+                                ? $"'{displayName}' must be greater than '{Humanize(field)}'."
+                                : $"'{displayName}' must be greater than {constraint}.";
+                            break;
+                        case Comparison.LessThan:
+                            ruleType = "lt";
+                            defaultMsg = field != null
+                                ? $"'{displayName}' must be less than '{Humanize(field)}'."
+                                : $"'{displayName}' must be less than {constraint}.";
+                            break;
+                        default:
+                            throw new InvalidOperationException(
+                                $"Unknown Comparison type '{cv.Comparison}' on property '{propertyName}'. " +
+                                $"This FluentValidation comparison is not supported for client-side extraction.");
                     }
-                    else if (cv.Comparison == Comparison.LessThanOrEqual)
-                    {
-                        result.Add(new ExtractedRule(
-                            "max",
-                            customMsg ?? $"'{displayName}' must be at most {cv.ValueToCompare}.",
-                            cv.ValueToCompare, ruleCondition));
-                    }
-                    else if (cv.Comparison == Comparison.LessThan)
-                    {
-                        result.Add(new ExtractedRule(
-                            "lt",
-                            customMsg ?? $"'{displayName}' must be less than {cv.ValueToCompare}.",
-                            cv.ValueToCompare, ruleCondition));
-                    }
+
+                    result.Add(new ExtractedRule(ruleType, customMsg ?? defaultMsg, constraint, ruleCondition, field, coerceAs));
                     break;
+                }
             }
 
             return result;
+        }
+
+        private static string? InferCoerceAs(Type? propertyType)
+        {
+            if (propertyType == null) return null;
+            var t = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+            if (t == typeof(decimal) || t == typeof(int) || t == typeof(long) ||
+                t == typeof(double) || t == typeof(float) || t == typeof(byte) || t == typeof(short) ||
+                t == typeof(uint) || t == typeof(ushort) || t == typeof(ulong))
+                return "number";
+            if (t == typeof(DateTime) || t == typeof(DateTimeOffset) || t == typeof(DateOnly))
+                return "date";
+            return null;
+        }
+
+        private static object SerializeDateConstraint(object value)
+        {
+            if (value is DateTime dt)
+                return dt.TimeOfDay == TimeSpan.Zero
+                    ? dt.ToString("yyyy-MM-dd")
+                    : dt.ToString("s");
+            if (value is DateTimeOffset dto)
+                return dto.TimeOfDay == TimeSpan.Zero
+                    ? dto.ToString("yyyy-MM-dd")
+                    : dto.ToString("s");
+            return value;
         }
 
         private static string Humanize(string propertyName)
@@ -302,14 +416,19 @@ namespace Alis.Reactive.FluentValidator
             public string Rule { get; }
             public string Message { get; }
             public object? Constraint { get; }
+            public string? Field { get; }
+            public string? CoerceAs { get; }
             public ValidationCondition? When { get; }
 
-            public ExtractedRule(string rule, string message, object? constraint, ValidationCondition? when = null)
+            public ExtractedRule(string rule, string message, object? constraint,
+                ValidationCondition? when = null, string? field = null, string? coerceAs = null)
             {
                 Rule = rule;
                 Message = message;
                 Constraint = constraint;
                 When = when;
+                Field = field;
+                CoerceAs = coerceAs;
             }
         }
     }

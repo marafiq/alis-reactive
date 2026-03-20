@@ -33,3 +33,22 @@ public class TestModel
     public string? JobTitle { get; set; }
     public string? ConfirmEmail { get; set; }
 }
+
+public class FullCoverageModel
+{
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public string? ConfirmEmail { get; set; }
+    public string? AlternateEmail { get; set; }
+    public string? Phone { get; set; }
+    public string? CreditCardNumber { get; set; }
+    public int Age { get; set; }
+    public decimal Score { get; set; }
+    public decimal Salary { get; set; }
+    public decimal MonthlyRate { get; set; }
+    public string? Status { get; set; }
+    public string? Nickname { get; set; }
+    public DateTime AdmissionDate { get; set; }
+    public DateTime DischargeDate { get; set; }
+    public bool IsEmployed { get; set; }
+}

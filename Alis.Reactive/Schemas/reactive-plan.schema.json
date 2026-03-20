@@ -505,7 +505,9 @@
     },
     "ValidationRuleType": {
       "type": "string",
-      "enum": ["required", "minLength", "maxLength", "email", "regex", "url", "range", "min", "max", "equalTo", "atLeastOne"]
+      "enum": ["required", "empty", "minLength", "maxLength", "email", "regex", "url",
+               "creditCard", "range", "exclusiveRange", "min", "max", "gt", "lt",
+               "equalTo", "notEqual", "notEqualTo", "atLeastOne"]
     },
     "ValidationRule": {
       "type": "object",
@@ -515,6 +517,8 @@
         "rule": { "$ref": "#/$defs/ValidationRuleType" },
         "message": { "type": "string", "minLength": 1 },
         "constraint": { "description": "Rule-specific constraint value" },
+        "field": { "type": "string", "minLength": 1, "description": "Cross-property: binding path of field to compare against" },
+        "coerceAs": { "type": "string", "enum": ["string", "number", "boolean", "date"], "description": "Coercion type for comparison — derived from TProperty" },
         "when": { "$ref": "#/$defs/ValidationCondition" }
       }
     },

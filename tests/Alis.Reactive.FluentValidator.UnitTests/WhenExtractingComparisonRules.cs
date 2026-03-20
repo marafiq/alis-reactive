@@ -6,27 +6,29 @@ public class WhenExtractingComparisonRules
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
-    public void GreaterThanOrEqualTo_produces_min_rule()
+    public void GreaterThanOrEqualTo_produces_min_rule_with_number_coercion()
     {
         var desc = _adapter.ExtractRules(typeof(MinComparisonValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc!.Fields[0].Rules[0].Rule, Is.EqualTo("min"));
         Assert.That(desc.Fields[0].Rules[0].Constraint, Is.EqualTo(0m));
+        Assert.That(desc.Fields[0].Rules[0].CoerceAs, Is.EqualTo("number"));
     }
 
     [Test]
-    public void LessThanOrEqualTo_produces_max_rule()
+    public void LessThanOrEqualTo_produces_max_rule_with_number_coercion()
     {
         var desc = _adapter.ExtractRules(typeof(MaxComparisonValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc!.Fields[0].Rules[0].Rule, Is.EqualTo("max"));
         Assert.That(desc.Fields[0].Rules[0].Constraint, Is.EqualTo(500000m));
+        Assert.That(desc.Fields[0].Rules[0].CoerceAs, Is.EqualTo("number"));
     }
 
     [Test]
-    public void GreaterThan_produces_gt_rule()
+    public void GreaterThan_produces_gt_rule_with_number_coercion()
     {
         var desc = _adapter.ExtractRules(typeof(StrictGreaterThanValidator), "testForm");
 
@@ -34,10 +36,11 @@ public class WhenExtractingComparisonRules
         Assert.That(desc!.Fields[0].Rules.Count, Is.EqualTo(1));
         Assert.That(desc.Fields[0].Rules[0].Rule, Is.EqualTo("gt"));
         Assert.That(desc.Fields[0].Rules[0].Constraint, Is.EqualTo(0m));
+        Assert.That(desc.Fields[0].Rules[0].CoerceAs, Is.EqualTo("number"));
     }
 
     [Test]
-    public void LessThan_produces_lt_rule()
+    public void LessThan_produces_lt_rule_with_number_coercion()
     {
         var desc = _adapter.ExtractRules(typeof(StrictLessThanValidator), "testForm");
 
@@ -45,5 +48,6 @@ public class WhenExtractingComparisonRules
         Assert.That(desc!.Fields[0].Rules.Count, Is.EqualTo(1));
         Assert.That(desc.Fields[0].Rules[0].Rule, Is.EqualTo("lt"));
         Assert.That(desc.Fields[0].Rules[0].Constraint, Is.EqualTo(1000000m));
+        Assert.That(desc.Fields[0].Rules[0].CoerceAs, Is.EqualTo("number"));
     }
 }
