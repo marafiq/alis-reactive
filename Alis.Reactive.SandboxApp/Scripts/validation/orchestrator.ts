@@ -16,7 +16,7 @@ import { walk } from "../core/walk";
 import { ruleFails, type PeerReader } from "./rule-engine";
 import { evalCondition, type ConditionReader } from "./condition";
 import {
-  showInline, clearAllInline,
+  showInline, clearInline, clearAllInline,
   addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
   showServerErrorInline,
 } from "./error-display";
@@ -49,70 +49,9 @@ export function validate(desc: ValidationDescriptor): boolean {
   let summaryHasErrors = false;
 
   for (const f of desc.fields) {
-    // Unenriched: field declared in validator but no component registered.
-    // Check if ALL rules have conditions that evaluate to false — if so, skip
-    // (the field isn't needed yet because its conditions aren't met).
-    // Otherwise: block the form, show first rule message in summary.
-    if (!f.fieldId || !f.vendor || !f.readExpr) {
-      if (allRulesConditionallySkipped(f, condReader)) continue;
-      if (f.rules.length > 0 && summaryEl) {
-        addToSummary(summaryEl, f.fieldName, f.rules[0].message);
-        summaryHasErrors = true;
-      }
+    if (!evaluateField(f, desc.formId, container, condReader, peerReader, summaryEl)) {
       valid = false;
-      continue;
-    }
-
-    const el = document.getElementById(f.fieldId);
-
-    // Enriched but element missing from DOM — component was removed or partial unloaded.
-    if (!el) {
-      if (allRulesConditionallySkipped(f, condReader)) continue;
-      if (f.rules.length > 0 && summaryEl) {
-        addToSummary(summaryEl, f.fieldName, f.rules[0].message);
-        summaryHasErrors = true;
-      }
-      valid = false;
-      continue;
-    }
-
-    if (!container.contains(el)) {
-      log.trace("field outside form, skipping", { fieldName: f.fieldName, formId: desc.formId });
-      continue;
-    }
-
-    const errorSpan = document.getElementById(f.fieldId + "_error");
-    const hidden = errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
-    const root = resolveRoot(el, f.vendor);
-    const value = walk(root, f.readExpr);
-
-    for (const rule of f.rules) {
-      if (rule.when) {
-        const condResult = evalCondition(rule.when, condReader);
-        if (condResult === false) continue;
-        if (condResult === null) {
-          if (summaryEl) {
-            addToSummary(summaryEl, f.fieldName, rule.message);
-            summaryHasErrors = true;
-          }
-          valid = false;
-          break;
-        }
-      }
-
-      if (ruleFails(rule, value, peerReader)) {
-        if (hidden) {
-          if (summaryEl) {
-            addToSummary(summaryEl, f.fieldName, rule.message);
-            summaryHasErrors = true;
-          }
-        } else {
-          showInline(desc.formId, f, rule.message);
-          if (summaryEl) removeSummaryEntry(summaryEl, f.fieldName);
-        }
-        valid = false;
-        break;
-      }
+      summaryHasErrors = summaryHasErrors || hasSummaryEntry(summaryEl, f.fieldName);
     }
   }
 
@@ -120,6 +59,96 @@ export function validate(desc: ValidationDescriptor): boolean {
 
   log.debug("validate", { formId: desc.formId, valid });
   return valid;
+}
+
+/** Re-validate a single field on blur/change (live-validate). */
+export function revalidateField(desc: ValidationDescriptor, field: ValidationField): void {
+  if (!field.fieldId || !field.vendor || !field.readExpr) return;
+
+  clearInline(desc.formId, field);
+
+  const container = document.getElementById(desc.formId);
+  if (!container) return;
+
+  const el = document.getElementById(field.fieldId);
+  if (!el || !container.contains(el)) return;
+
+  const byName = buildByName(desc);
+  const condReader = domConditionReader(byName);
+  const peerReader = domPeerReader(byName);
+  const summaryEl = findSummaryElement(desc.planId);
+
+  evaluateField(field, desc.formId, container, condReader, peerReader, summaryEl);
+}
+
+// ── Per-field evaluation (shared by validate + revalidateField) ──
+
+function evaluateField(
+  f: ValidationField, formId: string, container: HTMLElement,
+  condReader: ConditionReader, peerReader: PeerReader,
+  summaryEl: HTMLElement | null
+): boolean {
+  // Unenriched: field declared in validator but no component registered.
+  if (!f.fieldId || !f.vendor || !f.readExpr) {
+    if (allRulesConditionallySkipped(f, condReader)) return true;
+    if (f.rules.length > 0 && summaryEl) {
+      addToSummary(summaryEl, f.fieldName, f.rules[0].message);
+    }
+    return false;
+  }
+
+  const el = document.getElementById(f.fieldId);
+
+  // Enriched but element missing from DOM.
+  if (!el) {
+    if (allRulesConditionallySkipped(f, condReader)) return true;
+    if (f.rules.length > 0 && summaryEl) {
+      addToSummary(summaryEl, f.fieldName, f.rules[0].message);
+    }
+    return false;
+  }
+
+  if (!container.contains(el)) {
+    log.trace("field outside form, skipping", { fieldName: f.fieldName, formId });
+    return true;
+  }
+
+  const errorSpan = document.getElementById(f.fieldId + "_error");
+  const hidden = errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
+  const root = resolveRoot(el, f.vendor);
+  const value = walk(root, f.readExpr);
+
+  for (const rule of f.rules) {
+    if (rule.when) {
+      const condResult = evalCondition(rule.when, condReader);
+      if (condResult === false) continue;
+      if (condResult === null) {
+        if (summaryEl) {
+          addToSummary(summaryEl, f.fieldName, rule.message);
+        }
+        return false;
+      }
+    }
+
+    if (ruleFails(rule, value, peerReader)) {
+      if (hidden) {
+        if (summaryEl) {
+          addToSummary(summaryEl, f.fieldName, rule.message);
+        }
+      } else {
+        showInline(formId, f, rule.message);
+        if (summaryEl) removeSummaryEntry(summaryEl, f.fieldName);
+      }
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function hasSummaryEntry(summaryEl: HTMLElement | null, fieldName: string): boolean {
+  if (!summaryEl) return false;
+  return summaryEl.querySelector(`[data-valmsg-summary-for="${fieldName}"]`) !== null;
 }
 
 export function showServerErrors(desc: ValidationDescriptor, data: unknown): void {

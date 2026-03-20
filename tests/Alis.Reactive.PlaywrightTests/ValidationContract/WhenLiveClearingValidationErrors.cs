@@ -53,11 +53,10 @@ public class WhenLiveClearingValidationErrors : PlaywrightTestBase
         await Input("ResidentName").FillAsync("Margaret");
         await Expect(ErrorFor("ResidentName")).ToBeHiddenAsync();
 
-        // Step 3: Clear the field again → error SHOULD re-appear without clicking submit
+        // Step 3: Clear the field and blur → error re-appears (re-validate on blur)
         await Input("ResidentName").ClearAsync();
+        await Input("ResidentName").BlurAsync();
 
-        // BUG: error does NOT re-appear — user has to click submit again
-        // This test documents the expected behavior: error should re-evaluate on input
         await Expect(ErrorFor("ResidentName")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
         AssertNoConsoleErrors();

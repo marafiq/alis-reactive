@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom";
 import type { ValidationDescriptor, ValidationField } from "../types";
 
 let validate: typeof import("../validation").validate;
-let wireLiveClearing: typeof import("../validation").wireLiveClearing;
+let wireLiveValidation: typeof import("../validation").wireLiveValidation;
 let resetLiveClearForTests: typeof import("../validation").resetLiveClearForTests;
 
 // ── Helpers ──────────────────────────────────────────────
@@ -63,7 +63,7 @@ describe("when validating array components", () => {
 
       const mod = await import("../validation");
       validate = mod.validate;
-      wireLiveClearing = mod.wireLiveClearing;
+      wireLiveValidation = mod.wireLiveValidation;
       resetLiveClearForTests = mod.resetLiveClearForTests;
       resetLiveClearForTests();
     });
@@ -204,7 +204,7 @@ describe("when validating array components", () => {
 
       const mod = await import("../validation");
       validate = mod.validate;
-      wireLiveClearing = mod.wireLiveClearing;
+      wireLiveValidation = mod.wireLiveValidation;
       resetLiveClearForTests = mod.resetLiveClearForTests;
       resetLiveClearForTests();
     });
@@ -216,7 +216,7 @@ describe("when validating array components", () => {
         ]),
       ]);
 
-      wireLiveClearing(d);
+      wireLiveValidation(d);
       ej2Instance.value = [];
       validate(d);
       expect(hasError("Diet")).toBe(true);
@@ -338,7 +338,7 @@ describe("when validating array components", () => {
 
       const mod = await import("../validation");
       validate = mod.validate;
-      wireLiveClearing = mod.wireLiveClearing;
+      wireLiveValidation = mod.wireLiveValidation;
       resetLiveClearForTests = mod.resetLiveClearForTests;
       resetLiveClearForTests();
     });
@@ -350,7 +350,7 @@ describe("when validating array components", () => {
         ]),
       ]);
 
-      wireLiveClearing(d);
+      wireLiveValidation(d);
       ej2Instance.filesData = [];
       validate(d);
       expect(hasError("Files")).toBe(true);

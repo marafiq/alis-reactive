@@ -5,7 +5,7 @@ import type { ValidationDescriptor, ValidationField } from "../types";
 let validate: typeof import("../validation").validate;
 let showServerErrors: typeof import("../validation").showServerErrors;
 let clearAll: typeof import("../validation").clearAll;
-let wireLiveClearing: typeof import("../validation").wireLiveClearing;
+let wireLiveValidation: typeof import("../validation").wireLiveValidation;
 
 function field(overrides: Partial<ValidationField> & { fieldId: string }): ValidationField {
   return {
@@ -65,7 +65,7 @@ beforeEach(async () => {
   validate = mod.validate;
   showServerErrors = mod.showServerErrors;
   clearAll = mod.clearAll;
-  wireLiveClearing = mod.wireLiveClearing;
+  wireLiveValidation = mod.wireLiveValidation;
   mod.resetLiveClearForTests();
 });
 
@@ -501,7 +501,7 @@ describe("live clearing", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
     ]);
-    wireLiveClearing(desc);
+    wireLiveValidation(desc);
     validate(desc);
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
 
@@ -509,14 +509,29 @@ describe("live clearing", () => {
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(false);
   });
 
-  it("change event clears field error", () => {
+  it("change event re-validates — error stays if field still invalid", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
     ]);
-    wireLiveClearing(desc);
+    wireLiveValidation(desc);
     validate(desc);
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
 
+    // Change on empty field → re-validates → still invalid → error stays
+    document.getElementById("Name")!.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
+  });
+
+  it("change event re-validates — error clears if field becomes valid", () => {
+    const desc = makeDesc("testForm", [
+      field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
+    ]);
+    wireLiveValidation(desc);
+    validate(desc);
+    expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(true);
+
+    // Set value, then change → re-validates → valid → error clears
+    (document.getElementById("Name") as HTMLInputElement).value = "John";
     document.getElementById("Name")!.dispatchEvent(new Event("change", { bubbles: true }));
     expect(document.getElementById("Name")!.classList.contains("alis-has-error")).toBe(false);
   });
@@ -525,8 +540,8 @@ describe("live clearing", () => {
     const desc = makeDesc("testForm", [
       field({ fieldId: "Name", rules: [{ rule: "required", message: "required" }] }),
     ]);
-    wireLiveClearing(desc);
-    wireLiveClearing(desc);
+    wireLiveValidation(desc);
+    wireLiveValidation(desc);
     validate(desc);
 
     document.getElementById("Name")!.dispatchEvent(new Event("input", { bubbles: true }));

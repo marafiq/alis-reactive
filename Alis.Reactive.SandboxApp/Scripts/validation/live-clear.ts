@@ -1,24 +1,29 @@
-// Live Clear — Per-field event wiring to auto-clear validation errors
+// Live Validation — Per-field event wiring for interactive validation
 //
+// After the first form submit shows errors:
+//   input  → clear the error (user is typing, positive feedback)
+//   blur   → re-validate this field (user left the field, check if fix is valid)
+//   change → re-validate this field (radio/checkbox/select/SF — selection IS the action)
+//
+// Standard pattern: jQuery Unobtrusive, React Hook Form, Angular Forms.
 // Vendor-agnostic: uses resolveRoot() for both native and fusion components.
-// Native: listens for "input" + "change" on the DOM element.
-// Fusion: listens for "change" on the ej2 instance (SF callback, not DOM event).
 // Tracks wired fields by ID to prevent double-wiring on partial merge.
 
 import type { ValidationDescriptor, ValidationField } from "../types";
 import { resolveRoot } from "../resolution/component";
 import { clearInline } from "./error-display";
+import { revalidateField } from "./orchestrator";
 
 /** Set of fieldIds already wired — prevents double-wiring on partial reload. */
 const wiredFields = new Set<string>();
 
-export function wireLiveClearing(desc: ValidationDescriptor): void {
+export function wireLiveValidation(desc: ValidationDescriptor): void {
   for (const field of desc.fields) {
-    wireField(desc.formId, field);
+    wireField(desc, field);
   }
 }
 
-function wireField(formId: string, field: ValidationField): void {
+function wireField(desc: ValidationDescriptor, field: ValidationField): void {
   // Only wire enriched fields — unenriched fields have no component to listen on
   if (!field.fieldId || !field.vendor) return;
 
@@ -29,17 +34,22 @@ function wireField(formId: string, field: ValidationField): void {
   const el = document.getElementById(field.fieldId);
   if (!el) return; // Element not in DOM yet (lazy partial)
 
-  const clearHandler = () => clearInline(formId, field);
+  const clearHandler = () => clearInline(desc.formId, field);
+  const revalidateHandler = () => revalidateField(desc, field);
 
   if (field.vendor === "native") {
-    // Native DOM elements fire standard input/change events
+    // input → clear error (typing feedback)
+    // blur → re-validate (left the field)
+    // change → re-validate (radio/checkbox/select — selection is the action)
     el.addEventListener("input", clearHandler);
-    el.addEventListener("change", clearHandler);
+    el.addEventListener("blur", revalidateHandler);
+    el.addEventListener("change", revalidateHandler);
   } else {
     // Fusion (and future vendors): listen on the vendor root
     // SF ej2 instances implement addEventListener for their callbacks
+    // SF "change" fires when user makes a selection — equivalent to blur
     const root = resolveRoot(el, field.vendor);
-    (root as EventTarget).addEventListener("change", clearHandler);
+    (root as EventTarget).addEventListener("change", revalidateHandler);
   }
 }
 

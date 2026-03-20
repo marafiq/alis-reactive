@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom";
 import type { ValidationDescriptor, ValidationField } from "../types";
 
 let validate: typeof import("../validation").validate;
-let wireLiveClearing: typeof import("../validation").wireLiveClearing;
+let wireLiveValidation: typeof import("../validation").wireLiveValidation;
 let resetLiveClearForTests: typeof import("../validation").resetLiveClearForTests;
 
 // ── Helpers ──────────────────────────────────────────────
@@ -76,7 +76,7 @@ describe("when live-clearing validation errors", () => {
 
       const mod = await import("../validation");
       validate = mod.validate;
-      wireLiveClearing = mod.wireLiveClearing;
+      wireLiveValidation = mod.wireLiveValidation;
       resetLiveClearForTests = mod.resetLiveClearForTests;
       resetLiveClearForTests();
     });
@@ -87,7 +87,7 @@ describe("when live-clearing validation errors", () => {
       ]);
 
       // Wire live clearing BEFORE validate
-      wireLiveClearing(d);
+      wireLiveValidation(d);
 
       // Validate with empty field → error shown
       expect(validate(d)).toBe(false);
@@ -106,7 +106,7 @@ describe("when live-clearing validation errors", () => {
         nativeField("Email", "Email", [{ rule: "required", message: "Email required" }]),
       ]);
 
-      wireLiveClearing(d);
+      wireLiveValidation(d);
       validate(d);
 
       // Both fields have errors
@@ -126,7 +126,7 @@ describe("when live-clearing validation errors", () => {
         nativeField("Name", "Name", [{ rule: "required", message: "required" }]),
       ]);
 
-      wireLiveClearing(d);
+      wireLiveValidation(d);
       validate(d);
       expect(hasError("Name")).toBe(true);
 
@@ -139,8 +139,8 @@ describe("when live-clearing validation errors", () => {
         nativeField("Name", "Name", [{ rule: "required", message: "required" }]),
       ]);
 
-      wireLiveClearing(d);
-      wireLiveClearing(d); // second call should be no-op
+      wireLiveValidation(d);
+      wireLiveValidation(d); // second call should be no-op
 
       validate(d);
       typeInto("Name", "John");
@@ -178,7 +178,7 @@ describe("when live-clearing validation errors", () => {
 
       const mod = await import("../validation");
       validate = mod.validate;
-      wireLiveClearing = mod.wireLiveClearing;
+      wireLiveValidation = mod.wireLiveValidation;
       resetLiveClearForTests = mod.resetLiveClearForTests;
       resetLiveClearForTests();
     });
@@ -188,7 +188,7 @@ describe("when live-clearing validation errors", () => {
         nativeField("CareLevel", "CareLevel", [{ rule: "required", message: "Care Level is required" }]),
       ]);
 
-      wireLiveClearing(d);
+      wireLiveValidation(d);
 
       // Validate: hidden input is empty → required fails
       expect(validate(d)).toBe(false);
@@ -247,7 +247,7 @@ describe("when live-clearing validation errors", () => {
 
       const mod = await import("../validation");
       validate = mod.validate;
-      wireLiveClearing = mod.wireLiveClearing;
+      wireLiveValidation = mod.wireLiveValidation;
       resetLiveClearForTests = mod.resetLiveClearForTests;
       resetLiveClearForTests();
     });
@@ -272,7 +272,7 @@ describe("when live-clearing validation errors", () => {
         fusionField("Amount", "Amount", [{ rule: "required", message: "Amount is required" }]),
       ]);
 
-      wireLiveClearing(d);
+      wireLiveValidation(d);
       ej2Instance.value = "";
       validate(d);
       expect(hasError("Amount")).toBe(true);
@@ -319,7 +319,7 @@ describe("when live-clearing validation errors", () => {
 
       const mod = await import("../validation");
       validate = mod.validate;
-      wireLiveClearing = mod.wireLiveClearing;
+      wireLiveValidation = mod.wireLiveValidation;
       resetLiveClearForTests = mod.resetLiveClearForTests;
       resetLiveClearForTests();
     });

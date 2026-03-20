@@ -8,7 +8,7 @@ import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
 import { wireTrigger } from "../execution/trigger";
 import { enrichEntries } from "./enrichment";
-import { wireLiveClearing } from "../validation/live-clear";
+import { wireLiveValidation } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
 import { walkValidationDescriptors } from "./walk-reactions";
 import {
@@ -26,7 +26,7 @@ export function boot(plan: Plan): void {
   log.info("booting", { entries: plan.entries.length });
 
   enrichEntries(plan.entries, plan.components);
-  walkValidationDescriptors(plan.entries, wireLiveClearing);
+  walkValidationDescriptors(plan.entries, wireLiveValidation);
   wireEntries(plan.entries, plan.components, bootAbort.signal);
 
   registerBootedPlan(plan);
@@ -54,7 +54,7 @@ function wireEntries(entries: Entry[], components: Record<string, ComponentEntry
 export function mergePlan(incoming: Plan): void {
   const merged = applyMergedPlan(incoming, { enrichEntries, wireEntries });
 
-  walkValidationDescriptors(merged.entries, wireLiveClearing);
+  walkValidationDescriptors(merged.entries, wireLiveValidation);
   clearSummaryForPlan(merged.planId);
 
   log.info("merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
