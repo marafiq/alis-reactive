@@ -176,7 +176,7 @@
                             .OnSuccess<MedicationSearchResponse>((json, s) =>
                             {
                                 args.UpdateData(s, json, j => j.Medications);
-                                s.Element("filter-status").SetText(args.Text );
+                                s.Element("filter-status").SetText("results loaded");
                             }));
                     })); }
         </div>
