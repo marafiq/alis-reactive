@@ -14,5 +14,10 @@ namespace Alis.Reactive.Fusion.Components
         public TypedEventDescriptor<FusionAutoCompleteChangeArgs> Changed =>
             new TypedEventDescriptor<FusionAutoCompleteChangeArgs>(
                 "change", new FusionAutoCompleteChangeArgs());
+
+        /// <summary>Fires when the user types to filter (SF "filtering" event).</summary>
+        public TypedEventDescriptor<FusionAutoCompleteFilteringArgs> Filtering =>
+            new TypedEventDescriptor<FusionAutoCompleteFilteringArgs>(
+                "filtering", new FusionAutoCompleteFilteringArgs());
     }
 }

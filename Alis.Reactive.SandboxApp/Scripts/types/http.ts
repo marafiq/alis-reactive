@@ -3,10 +3,16 @@ import type { Command } from "./commands";
 import type { Reaction } from "./reactions";
 import type { ValidationDescriptor } from "./validation";
 
-export type GatherItem = ComponentGather | StaticGather | AllGather;
+export type GatherItem = ComponentGather | StaticGather | AllGather | EventGather;
 
 export interface AllGather {
   kind: "all";
+}
+
+export interface EventGather {
+  kind: "event";
+  param: string;
+  path: string;
 }
 
 export interface ComponentGather {

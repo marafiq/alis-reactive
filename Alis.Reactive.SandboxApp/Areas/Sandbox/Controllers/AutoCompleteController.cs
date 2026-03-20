@@ -25,6 +25,36 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
             return View(new AutoCompleteModel());
         }
 
+        [HttpGet]
+        public IActionResult Medications([FromQuery] string? MedicationType)
+        {
+            var all = new List<MedicationTypeItem>
+            {
+                new() { Value = "analgesic", Text = "Analgesic", Category = "Pain" },
+                new() { Value = "antibiotic", Text = "Antibiotic", Category = "Infection" },
+                new() { Value = "antiviral", Text = "Antiviral", Category = "Infection" },
+                new() { Value = "antifungal", Text = "Antifungal", Category = "Infection" },
+                new() { Value = "steroid", Text = "Steroid", Category = "Inflammation" },
+                new() { Value = "statin", Text = "Statin", Category = "Cholesterol" },
+                new() { Value = "ssri", Text = "SSRI", Category = "Mental Health" },
+                new() { Value = "benzodiazepine", Text = "Benzodiazepine", Category = "Anxiety" }
+            };
+
+            // Gather sends the component's selected value (null → "null" string when nothing selected).
+            // Treat "null" same as empty — return all medications.
+            var search = MedicationType == "null" ? null : MedicationType;
+            var filtered = string.IsNullOrEmpty(search)
+                ? all
+                : all.Where(m => m.Text.Contains(search, StringComparison.OrdinalIgnoreCase)
+                              || m.Value.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            return Ok(new MedicationSearchResponse
+            {
+                Medications = filtered,
+                Count = filtered.Count
+            });
+        }
+
         [HttpPost]
         public IActionResult Echo([FromBody] Dictionary<string, object> data)
         {

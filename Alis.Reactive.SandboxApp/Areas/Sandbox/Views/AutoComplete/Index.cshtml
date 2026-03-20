@@ -30,6 +30,9 @@
                 s.Element("gather-result").SetText("gathered");
             }));
     }));
+
+    // ── Section 7: Filtering event with HTTP — Server-filtered Medications ──
+    // (Section 7 plan wiring is inline below via .Reactive on the component)
 }
 
 <div class="space-y-8">
@@ -145,6 +148,40 @@
             }))
         <div class="font-mono text-sm">
             <p>Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
+        </div>
+    </section>
+
+    <!-- Section 7: Filtering Event — Server-Filtered Medications -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">7. Filtering Event (Server-Filtered HTTP)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Type to search medications. The Filtering event fires on each keystroke (debounced 500ms),
+            sends the typed text to the server via HTTP GET, and updates the dropdown DataSource from the response.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.MedicationType, o => o.Label("Medication (Server-Filtered)"))
+                .AutoComplete(b => b
+                    .Fields<MedicationTypeItem>(t => t.Text, v => v.Value)
+                    .Placeholder("Type to search medications...")
+                    .DebounceDelay(500)
+                    .AllowObjectBinding(true)
+                    .AllowCustom(false).ShowPopupButton().Highlight(true)
+                    .Reactive(plan, evt => evt.Filtering, (args, p) =>
+                    {
+                        
+                        args.PreventDefault(p);
+                        p.Get("/Sandbox/AutoComplete/Medications")
+                         .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))
+                         .Response(r => r
+                            .OnSuccess<MedicationSearchResponse>((json, s) =>
+                            {
+                                args.UpdateData(s, json, j => j.Medications);
+                                s.Element("filter-status").SetText(args.Text );
+                            }));
+                    })); }
+        </div>
+        <div class="font-mono text-sm mt-2 space-y-1">
+            <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
         </div>
     </section>
 

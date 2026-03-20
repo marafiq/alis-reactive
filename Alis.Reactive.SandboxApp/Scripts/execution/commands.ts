@@ -1,12 +1,24 @@
-import type { Command, ExecContext } from "../types";
+import type { Command, MethodArg, ExecContext } from "../types";
 import { mutateElement } from "./element";
 import { evaluateGuard, isConfirmGuard } from "../conditions/conditions";
 import { showServerErrors } from "../validation";
 import { injectHtml } from "./inject";
+import { resolveSource, coerce } from "../resolution/resolver";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
 
 const log = scope("command");
+
+function resolveMethodArg(arg: MethodArg, ctx?: ExecContext): unknown {
+  switch (arg.kind) {
+    case "literal": return arg.value;
+    case "source": {
+      const raw = resolveSource(arg.source, ctx);
+      return arg.coerce ? coerce(raw, arg.coerce) : raw;
+    }
+    default: assertNever(arg, "method arg kind");
+  }
+}
 
 /** Execute a single command with per-action When guard support. */
 export function executeCommand(cmd: Command, ctx?: ExecContext): void {
@@ -40,6 +52,28 @@ export function executeCommand(cmd: Command, ctx?: ExecContext): void {
           `Use .Validate<TValidator>(formId) on the request to attach one.`);
       }
       showServerErrors(ctx.validationDesc, ctx.responseBody);
+      break;
+    }
+
+    case "mutate-event": {
+      if (!ctx?.evt) throw new Error("[alis] mutate-event requires event context — was this command used outside an event handler?");
+      const m = cmd.mutation;
+      switch (m.kind) {
+        case "set-prop": {
+          const val = cmd.source ? resolveSource(cmd.source, ctx) : cmd.value;
+          const coerced = m.coerce ? coerce(val, m.coerce) : val;
+          log.trace("mutate-event", { prop: m.prop, val: coerced });
+          (ctx.evt as any)[m.prop] = coerced;
+          break;
+        }
+        case "call": {
+          const resolved = (m.args ?? []).map(a => resolveMethodArg(a, ctx));
+          log.trace("mutate-event", { method: m.method, args: resolved });
+          (ctx.evt as any)[m.method](...resolved);
+          break;
+        }
+        default: assertNever(m, "event mutation kind");
+      }
       break;
     }
 

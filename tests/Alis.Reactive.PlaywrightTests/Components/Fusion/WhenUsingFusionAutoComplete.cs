@@ -18,6 +18,7 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
     // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_AutoCompleteModel";
     private const string PhysicianId = Scope + "__Physician";
+    private const string MedicationId = Scope + "__MedicationType";
 
     private async Task NavigateAndBoot()
     {
@@ -365,6 +366,78 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         await Expect(selectedIndicator).ToHaveTextAsync("selected", new() { Timeout = 3000 });
         await Expect(argsCondition).ToHaveTextAsync("dr smith selected", new() { Timeout = 3000 });
 
+        AssertNoConsoleErrors();
+    }
+
+    // ── Section 7: Filtering Event — Server-Filtered HTTP ──
+
+    /// <summary>
+    /// Types text into the MedicationType AutoComplete using PressSequentially,
+    /// which simulates real keystrokes that trigger SF's filtering event.
+    /// FillAsync won't work — SF listens for keyup/keydown, not synthetic input events.
+    /// </summary>
+    private async Task TypeInMedication(string text)
+    {
+        var input = Page.Locator($"#{MedicationId}");
+        await Expect(input).ToBeVisibleAsync();
+        await input.ClickAsync();
+        await input.PressSequentiallyAsync(text, new() { Delay = 50 });
+    }
+
+    [Test]
+    public async Task filtering_event_fires_http_get_and_updates_datasource()
+    {
+        await NavigateAndBoot();
+
+        // Type "anti" to trigger the SF filtering event → HTTP GET → DataSource update
+        await TypeInMedication("anti");
+
+        // Wait for the HTTP response to update the status element
+        await Expect(Page.Locator("#filter-status"))
+            .ToHaveTextAsync("results loaded", new() { Timeout = 10000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task filtering_http_request_includes_medication_type_query_param()
+    {
+        await NavigateAndBoot();
+
+        var input = Page.Locator($"#{MedicationId}");
+        await Expect(input).ToBeVisibleAsync();
+        await input.ClickAsync();
+
+        // Intercept the HTTP GET request triggered by filtering
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await input.PressSequentiallyAsync("ster", new() { Delay = 50 }),
+            r => r.Url.Contains("/Medications"));
+
+        // Verify the request URL targets the Medications endpoint
+        Assert.That(request.Url, Does.Contain("Medications"),
+            "GET request should target the Medications endpoint");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task filtering_response_populates_autocomplete_dropdown()
+    {
+        await NavigateAndBoot();
+
+        // Type to trigger filtering → HTTP → updateData populates popup
+        await TypeInMedication("anti");
+
+        // Wait for the HTTP response to complete
+        await Expect(Page.Locator("#filter-status"))
+            .ToHaveTextAsync("results loaded", new() { Timeout = 10000 });
+
+        // Verify the popup contains filtered items (updateData renders the popup)
+        var popupItems = Page.Locator(".e-ddl.e-popup .e-list-item");
+        await Expect(popupItems.First).ToBeVisibleAsync(new() { Timeout = 5000 });
+        var count = await popupItems.CountAsync();
+        Assert.That(count, Is.GreaterThan(0),
+            "Popup should contain filtered medication items after updateData");
         AssertNoConsoleErrors();
     }
 }

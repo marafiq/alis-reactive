@@ -7,7 +7,7 @@ using Alis.Reactive.Descriptors.Sources;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Mutation extensions for FusionAutoComplete (SetValue, SetDataSource, DataBind, FocusIn, ShowPopup, etc.).
+    /// Mutation extensions for FusionAutoComplete (SetValue, SetDataSource, FocusIn, ShowPopup, etc.).
     /// </summary>
     public static class FusionAutoCompleteExtensions
     {
@@ -46,8 +46,11 @@ namespace Alis.Reactive.Fusion.Components
             return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
         }
 
-        // ── DataBind (trigger binding after source change) ──
-
+        /// <summary>
+        /// Flushes pending property changes to the SF instance.
+        /// Required after SetDataSource in cascade patterns (Changed event).
+        /// NOT needed with updateData() in filtering patterns.
+        /// </summary>
         public static ComponentRef<FusionAutoComplete, TModel> DataBind<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
@@ -72,6 +75,20 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
             => self.Emit(new CallMutation("hidePopup"));
+
+        // NOTE: showSpinner/hideSpinner have no visible effect on SF AutoComplete.
+        // refresh() causes focus loss mid-typing — not usable during filtering.
+        // Both verified manually. Omitted intentionally.
+
+        public static ComponentRef<FusionAutoComplete, TModel> Enable<TModel>(
+            this ComponentRef<FusionAutoComplete, TModel> self)
+            where TModel : class
+            => self.Emit(new SetPropMutation("enabled"), value: true);
+
+        public static ComponentRef<FusionAutoComplete, TModel> Disable<TModel>(
+            this ComponentRef<FusionAutoComplete, TModel> self)
+            where TModel : class
+            => self.Emit(new SetPropMutation("enabled"), value: false);
 
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)

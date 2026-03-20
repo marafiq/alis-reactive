@@ -41,7 +41,7 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     }
 
     // 2. Gather → freeze
-    const gatherResult = resolveGather(req.gather ?? [], req.verb, ctx?.components ?? {}, req.contentType);
+    const gatherResult = resolveGather(req.gather ?? [], req.verb, ctx?.components ?? {}, req.contentType, ctx?.evt);
     const resolved = buildFetch(req, gatherResult);
 
     log.debug("fetch", { verb: req.verb, url: resolved.url });

@@ -19,4 +19,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Text { get; set; } = "";
         public string Category { get; set; } = "";
     }
+
+    public class MedicationSearchResponse
+    {
+        public List<MedicationTypeItem> Medications { get; set; } = new();
+        public int Count { get; set; }
+    }
 }

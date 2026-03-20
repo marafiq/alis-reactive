@@ -110,6 +110,7 @@
       "oneOf": [
         { "$ref": "#/$defs/DispatchCommand" },
         { "$ref": "#/$defs/MutateElementCommand" },
+        { "$ref": "#/$defs/MutateEventCommand" },
         { "$ref": "#/$defs/ValidationErrorsCommand" },
         { "$ref": "#/$defs/IntoCommand" }
       ]
@@ -352,7 +353,8 @@
       "oneOf": [
         { "$ref": "#/$defs/ComponentGather" },
         { "$ref": "#/$defs/StaticGather" },
-        { "$ref": "#/$defs/AllGather" }
+        { "$ref": "#/$defs/AllGather" },
+        { "$ref": "#/$defs/EventGather" }
       ]
     },
     "AllGather": {
@@ -383,6 +385,16 @@
         "kind": { "const": "static" },
         "param": { "type": "string", "minLength": 1 },
         "value": { "description": "Static value to include in the request" }
+      }
+    },
+    "EventGather": {
+      "type": "object",
+      "required": ["kind", "param", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "event" },
+        "param": { "type": "string", "minLength": 1, "description": "Query parameter or body field name" },
+        "path": { "type": "string", "minLength": 1, "description": "Dot-notation path into event payload (e.g., evt.text)" }
       }
     },
 
@@ -479,6 +491,18 @@
       "properties": {
         "kind": { "const": "validation-errors" },
         "formId": { "type": "string", "minLength": 1 },
+        "when": { "$ref": "#/$defs/Guard" }
+      }
+    },
+    "MutateEventCommand": {
+      "type": "object",
+      "required": ["kind", "mutation"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "mutate-event" },
+        "mutation": { "$ref": "#/$defs/Mutation", "description": "set-prop or call on the event args object (ctx.evt). Same mutation algebra as mutate-element." },
+        "value": { "description": "Static value for set-prop mutations" },
+        "source": { "$ref": "#/$defs/BindSource" },
         "when": { "$ref": "#/$defs/Guard" }
       }
     },
