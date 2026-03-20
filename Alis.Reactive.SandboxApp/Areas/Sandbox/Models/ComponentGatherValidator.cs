@@ -7,8 +7,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ComponentGatherValidator()
         {
-            // Native scalar
-            RuleFor(x => x.ResidentName).NotEmpty().WithMessage("'Resident Name' is required.");
+            // Native scalar — multiple rules on ResidentName
+            RuleFor(x => x.ResidentName)
+                .NotEmpty().WithMessage("'Resident Name' is required.")
+                .MinimumLength(3).WithMessage("'Resident Name' must be at least 3 characters.")
+                .MaximumLength(100).WithMessage("'Resident Name' must be at most 100 characters.");
             RuleFor(x => x.CareNotes).NotEmpty().WithMessage("'Care Notes' is required.");
             RuleFor(x => x.MobilityLevel).NotEmpty().WithMessage("'Mobility Level' is required.");
             RuleFor(x => x.CareLevel).NotEmpty().WithMessage("'Care Level' is required.");

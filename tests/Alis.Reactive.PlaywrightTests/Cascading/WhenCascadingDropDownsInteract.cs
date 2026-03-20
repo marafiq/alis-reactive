@@ -275,6 +275,9 @@ public class WhenCascadingDropDownsInteract : PlaywrightTestBase
         await Expect(Page.Locator("#city-count"))
             .ToHaveTextAsync("2", new() { Timeout = 10000 });
 
+        // Wait for SF to finish clearing the city dropdown after datasource swap
+        await Page.WaitForTimeoutAsync(200);
+
         // Verify the city ej2 instance value is reset (no stale "SEA")
         var cityValue = await Page.EvaluateAsync<string?>(@$"() => {{
             const el = document.getElementById('{CityId}');

@@ -106,6 +106,77 @@ describe("when validating component values", () => {
     });
   });
 
+  describe("fusion numeric (real SF behavior: value is number|null, not string)", () => {
+    // Syncfusion NumericTextBox .value returns null when cleared, 0 when model default.
+    // TestWidget stores string — these tests bypass it to test real numeric behavior.
+
+    function addFusionNumeric(form: HTMLElement, id: string, value: number | null): void {
+      const el = document.createElement("div");
+      el.id = id;
+      // Mimic real SF: ej2_instances[0] is a plain object with numeric .value
+      (el as any).ej2_instances = [{ value }];
+      form.appendChild(el);
+      addErrorSpan(form, id, id);
+    }
+
+    it("required rule: fails when value is null (empty numeric field)", () => {
+      const form = setupForm("fn1");
+      addFusionNumeric(form, "amount", null);
+
+      expect(validate({
+        formId: "fn1",
+        fields: [{ fieldId: "amount", fieldName: "amount", vendor: "fusion",
+          readExpr: "value", rules: [{ rule: "required", message: "Amount is required" }] }],
+      })).toBe(false);
+      expect(errorSpan("fn1", "amount")?.textContent).toBe("Amount is required");
+    });
+
+    it("required rule: passes when value is 0 (user explicitly typed zero)", () => {
+      const form = setupForm("fn2");
+      addFusionNumeric(form, "amount", 0);
+
+      expect(validate({
+        formId: "fn2",
+        fields: [{ fieldId: "amount", fieldName: "amount", vendor: "fusion",
+          readExpr: "value", rules: [{ rule: "required", message: "Amount is required" }] }],
+      })).toBe(true);
+    });
+
+    it("required rule: passes when value is 42 (normal value)", () => {
+      const form = setupForm("fn3");
+      addFusionNumeric(form, "amount", 42);
+
+      expect(validate({
+        formId: "fn3",
+        fields: [{ fieldId: "amount", fieldName: "amount", vendor: "fusion",
+          readExpr: "value", rules: [{ rule: "required", message: "Amount is required" }] }],
+      })).toBe(true);
+    });
+
+    it("min rule: fails when value is below minimum", () => {
+      const form = setupForm("fn4");
+      addFusionNumeric(form, "amount", 5);
+
+      expect(validate({
+        formId: "fn4",
+        fields: [{ fieldId: "amount", fieldName: "amount", vendor: "fusion",
+          readExpr: "value", rules: [{ rule: "min", constraint: 10, message: "Min 10" }] }],
+      })).toBe(false);
+      expect(errorSpan("fn4", "amount")?.textContent).toBe("Min 10");
+    });
+
+    it("min rule: skips when value is null (not required, min only)", () => {
+      const form = setupForm("fn5");
+      addFusionNumeric(form, "amount", null);
+
+      expect(validate({
+        formId: "fn5",
+        fields: [{ fieldId: "amount", fieldName: "amount", vendor: "fusion",
+          readExpr: "value", rules: [{ rule: "min", constraint: 10, message: "Min 10" }] }],
+      })).toBe(true); // min skips empty values — only required catches empty
+    });
+  });
+
   describe("cross-vendor", () => {
     it("equalTo rule: passes when native and fusion values match", () => {
       const form = setupForm("f7");

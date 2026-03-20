@@ -148,6 +148,67 @@ describe("when live-clearing validation errors", () => {
     });
   });
 
+  // ── Native compound component (radio group / checklist) ─
+  //
+  // Radio groups use a hidden input as the canonical element.
+  // Auto-sync sets hiddenInput.value via set-prop mutation when
+  // the user clicks a radio button. set-prop uses bracket notation
+  // (root[prop] = val) which does NOT fire DOM events.
+  // Live-clear listens for "input"/"change" on the hidden input.
+  // BUG: live-clear never fires because set-prop doesn't dispatch events.
+
+  describe("native compound component (radio group backing field)", () => {
+    beforeEach(async () => {
+      const dom = new JSDOM(`<!DOCTYPE html><html><body>
+        <form id="myForm">
+          <div>
+            <input type="hidden" id="CareLevel" value="" />
+            <div>
+              <label><input type="radio" id="CareLevel_r0" name="CareLevel" value="independent" /></label>
+              <label><input type="radio" id="CareLevel_r1" name="CareLevel" value="assisted" /></label>
+            </div>
+            ${errSpan("CareLevel", "CareLevel")}
+          </div>
+        </form>
+      </body></html>`);
+
+      (globalThis as any).document = dom.window.document;
+      (globalThis as any).HTMLElement = dom.window.HTMLElement;
+      (globalThis as any).Event = dom.window.Event;
+
+      const mod = await import("../validation");
+      validate = mod.validate;
+      wireLiveClearing = mod.wireLiveClearing;
+      resetLiveClearForTests = mod.resetLiveClearForTests;
+      resetLiveClearForTests();
+    });
+
+    it("clears error when hidden input value is set via JS (simulating set-prop auto-sync)", () => {
+      const d = desc("myForm", [
+        nativeField("CareLevel", "CareLevel", [{ rule: "required", message: "Care Level is required" }]),
+      ]);
+
+      wireLiveClearing(d);
+
+      // Validate: hidden input is empty → required fails
+      expect(validate(d)).toBe(false);
+      expect(errorText("CareLevel")).toBe("Care Level is required");
+      expect(hasError("CareLevel")).toBe(true);
+
+      // Simulate what auto-sync does: set-prop on hidden input
+      // This is root[prop] = val — no DOM event fires
+      const hidden = document.getElementById("CareLevel") as HTMLInputElement;
+      hidden.value = "independent";
+
+      // Dispatch change event (what the runtime SHOULD do after set-prop)
+      hidden.dispatchEvent(new Event("change", { bubbles: true }));
+
+      // Error should clear
+      expect(errorText("CareLevel")).toBe("");
+      expect(hasError("CareLevel")).toBe(false);
+    });
+  });
+
   // ── Syncfusion component ────────────────────────────────
 
   describe("fusion component", () => {
