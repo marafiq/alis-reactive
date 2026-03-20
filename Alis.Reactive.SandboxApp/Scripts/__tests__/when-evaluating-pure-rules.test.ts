@@ -82,6 +82,27 @@ describe("rule-engine: max", () => {
   it("passes below", () => expect(ruleFails(rule, "200", noPeers)).toBe(false));
 });
 
+describe("rule-engine: gt (strict greater-than, implies required)", () => {
+  const rule = { rule: "gt" as const, message: "must be > 0", constraint: 0 };
+
+  it("fails for empty (implies required)", () => expect(ruleFails(rule, "", noPeers)).toBe(true));
+  it("fails for null (implies required)", () => expect(ruleFails(rule, null, noPeers)).toBe(true));
+  it("fails at boundary (strict)", () => expect(ruleFails(rule, "0", noPeers)).toBe(true));
+  it("fails at boundary (number)", () => expect(ruleFails(rule, 0, noPeers)).toBe(true));
+  it("passes above", () => expect(ruleFails(rule, "1", noPeers)).toBe(false));
+  it("passes well above", () => expect(ruleFails(rule, "4250", noPeers)).toBe(false));
+});
+
+describe("rule-engine: lt (strict less-than, skips empty)", () => {
+  const rule = { rule: "lt" as const, message: "must be < 1000000", constraint: 1000000 };
+
+  it("skips empty", () => expect(ruleFails(rule, "", noPeers)).toBe(false));
+  it("skips null", () => expect(ruleFails(rule, null, noPeers)).toBe(false));
+  it("fails at boundary (strict)", () => expect(ruleFails(rule, "1000000", noPeers)).toBe(true));
+  it("fails above", () => expect(ruleFails(rule, "2000000", noPeers)).toBe(true));
+  it("passes below", () => expect(ruleFails(rule, "999999", noPeers)).toBe(false));
+});
+
 describe("rule-engine: range", () => {
   const rule = { rule: "range" as const, message: "out of range", constraint: [0, 120] as [number, number] };
 

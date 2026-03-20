@@ -257,11 +257,25 @@ namespace Alis.Reactive.FluentValidator
                             customMsg ?? $"'{displayName}' must be at least {cv.ValueToCompare}.",
                             cv.ValueToCompare, ruleCondition));
                     }
+                    else if (cv.Comparison == Comparison.GreaterThan)
+                    {
+                        result.Add(new ExtractedRule(
+                            "gt",
+                            customMsg ?? $"'{displayName}' must be greater than {cv.ValueToCompare}.",
+                            cv.ValueToCompare, ruleCondition));
+                    }
                     else if (cv.Comparison == Comparison.LessThanOrEqual)
                     {
                         result.Add(new ExtractedRule(
                             "max",
                             customMsg ?? $"'{displayName}' must be at most {cv.ValueToCompare}.",
+                            cv.ValueToCompare, ruleCondition));
+                    }
+                    else if (cv.Comparison == Comparison.LessThan)
+                    {
+                        result.Add(new ExtractedRule(
+                            "lt",
+                            customMsg ?? $"'{displayName}' must be less than {cv.ValueToCompare}.",
                             cv.ValueToCompare, ruleCondition));
                     }
                     break;

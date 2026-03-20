@@ -110,6 +110,22 @@ public class MaxComparisonValidator : AbstractValidator<TestModel>
     }
 }
 
+public class StrictGreaterThanValidator : AbstractValidator<TestModel>
+{
+    public StrictGreaterThanValidator()
+    {
+        RuleFor(x => x.Salary).GreaterThan(0m);
+    }
+}
+
+public class StrictLessThanValidator : AbstractValidator<TestModel>
+{
+    public StrictLessThanValidator()
+    {
+        RuleFor(x => x.Salary).LessThan(1000000m);
+    }
+}
+
 // --- Nested validators ---
 
 public class TestAddressValidator : AbstractValidator<TestAddress>

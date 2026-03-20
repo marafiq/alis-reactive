@@ -37,6 +37,10 @@ export function ruleFails(
       return !empty && Number(str) < Number(rule.constraint);
     case "max":
       return !empty && Number(str) > Number(rule.constraint);
+    case "gt":
+      return empty || Number(str) <= Number(rule.constraint);
+    case "lt":
+      return !empty && Number(str) >= Number(rule.constraint);
     case "range": {
       const [lo, hi] = rule.constraint as [number, number];
       const n = Number(str);

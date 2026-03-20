@@ -17,7 +17,7 @@ export interface ValidationField {
 
 export type ValidationRuleType =
   | "required" | "minLength" | "maxLength" | "email" | "regex" | "url"
-  | "range" | "min" | "max" | "equalTo" | "atLeastOne";
+  | "range" | "min" | "max" | "gt" | "lt" | "equalTo" | "atLeastOne";
 
 export interface ValidationRule {
   rule: ValidationRuleType;
