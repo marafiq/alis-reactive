@@ -15,6 +15,18 @@
   <Folder Name="/.claude/skills/onboard-fusion-component/">
     <File Path=".claude/skills/onboard-fusion-component/SKILL.md" />
   </Folder>
+  <Folder Name="/.claude/skills/solid-ts-audit/">
+    <File Path=".claude/skills/solid-ts-audit/SKILL.md" />
+  </Folder>
+  <Folder Name="/.claude/skills/modern-csharp/">
+    <File Path=".claude/skills/modern-csharp/SKILL.md" />
+  </Folder>
+  <Folder Name="/.claude/skills/bdd-testing/">
+    <File Path=".claude/skills/bdd-testing/SKILL.md" />
+  </Folder>
+  <Folder Name="/.claude/skills/validation-rules/">
+    <File Path=".claude/skills/validation-rules/SKILL.md" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj" />
