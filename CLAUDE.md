@@ -532,6 +532,26 @@ layout uses `src=` (not inline `import from`), and ASP.NET's tag helpers compute
 
 Every change goes through all three test layers before it's done. No exceptions.
 
+## Skills — DSL Reference & Onboarding
+
+Framework behavior is documented in skills (grammar-shaped DSL references). **Skills are the
+source of truth for how to USE the framework.** CLAUDE.md is the source of truth for architecture.
+
+| Skill | When to use |
+|-------|------------|
+| `reactive-dsl` | Writing plan code: Html.On, triggers, Element/Dispatch/Component, .Reactive() |
+| `http-pipeline` | HTTP requests: Get/Post, Gather, Response, Chained, Parallel |
+| `conditions-dsl` | Conditions: When/Then/ElseIf/Else, operators, guard composition |
+| `onboard-fusion-component` | Adding SF components, events, methods, or props |
+| `validation-rules-alis-reactive` | Validation rules on TModel |
+
+**Keeping skills accurate:**
+- When adding a new builder method, operator, or pattern → update the relevant skill grammar
+- When onboarding a new component reveals a missing pattern → update the onboard skill
+- Skills must match current source — never document APIs that don't exist
+- Keep skills general (grammar-shaped) to avoid duplication across components
+- When in doubt, read the source before the skill — skills can drift
+
 ## Cross-Layer Changes (C# + TS + CSS + Tests)
 
 **When a change touches both C# and TS (e.g., renaming a data attribute, changing plan shape):**
