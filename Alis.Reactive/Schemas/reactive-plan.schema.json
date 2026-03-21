@@ -24,11 +24,12 @@
   "$defs": {
     "ComponentEntry": {
       "type": "object",
-      "required": ["id", "vendor", "readExpr"],
+      "required": ["id", "vendor", "readExpr", "componentType"],
       "properties": {
         "id": { "type": "string", "description": "DOM element ID" },
         "vendor": { "$ref": "#/$defs/Vendor" },
-        "readExpr": { "type": "string", "description": "Property path from vendor root" }
+        "readExpr": { "type": "string", "description": "Property path from vendor root" },
+        "componentType": { "type": "string", "description": "Component kind — autocomplete, dropdownlist, switch, textbox, etc." }
       },
       "additionalProperties": false
     },

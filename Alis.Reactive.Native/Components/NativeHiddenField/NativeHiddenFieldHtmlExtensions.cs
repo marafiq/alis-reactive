@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native.Components
             var bindingPath = html.NameFor(expression);
 
             plan.AddToComponentsMap(bindingPath, new ComponentRegistration(
-                elementId, _component.Vendor, bindingPath, _component.ReadExpr));
+                elementId, _component.Vendor, bindingPath, _component.ReadExpr, "hiddenfield"));
 
             return new NativeHiddenFieldBuilder<TModel, TProp>(html, expression);
         }

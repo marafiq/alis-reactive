@@ -19,7 +19,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr));
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "datetimepicker"));
 
             var builder = setup.Helper.EJS().DateTimePickerFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });

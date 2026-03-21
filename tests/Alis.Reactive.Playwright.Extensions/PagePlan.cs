@@ -26,7 +26,7 @@ public sealed class PagePlan<TModel> where TModel : class
     private readonly IPage _page;
     private readonly Dictionary<string, ComponentEntry> _components;
 
-    private ReactivePlan(IPage page, Dictionary<string, ComponentEntry> components)
+    private PagePlan(IPage page, Dictionary<string, ComponentEntry> components)
     {
         _page = page;
         _components = components;
@@ -55,7 +55,8 @@ public sealed class PagePlan<TModel> where TModel : class
                     Id: obj.GetProperty("id").GetString()!,
                     Vendor: obj.GetProperty("vendor").GetString()!,
                     ReadExpr: obj.GetProperty("readExpr").GetString()!,
-                    BindingPath: bindingPath);
+                    BindingPath: bindingPath,
+                    ComponentType: obj.GetProperty("componentType").GetString()!);
             }
         }
 
@@ -70,8 +71,36 @@ public sealed class PagePlan<TModel> where TModel : class
     /// <summary>AutoComplete — resolved from plan via model expression.</summary>
     public AutoCompleteLocator AutoComplete(Expression<Func<TModel, object?>> expr)
     {
-        var entry = Resolve(ToBindingPath(expr), "fusion");
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "autocomplete");
         return new AutoCompleteLocator(_page, entry.Id);
+    }
+
+    /// <summary>DropDownList — resolved from plan via model expression.</summary>
+    public DropDownListLocator DropDownList(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "dropdownlist");
+        return new DropDownListLocator(_page, entry.Id);
+    }
+
+    /// <summary>NumericTextBox — resolved from plan via model expression.</summary>
+    public NumericTextBoxLocator NumericTextBox(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "numerictextbox");
+        return new NumericTextBoxLocator(_page, entry.Id);
+    }
+
+    /// <summary>Switch — resolved from plan via model expression.</summary>
+    public SwitchLocator Switch(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "switch");
+        return new SwitchLocator(_page, entry.Id);
+    }
+
+    /// <summary>Native TextBox — resolved from plan via model expression.</summary>
+    public NativeTextBoxLocator TextBox(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "textbox");
+        return new NativeTextBoxLocator(_page, entry.Id);
     }
 
     // ─── String-based overloads (for non-model elements) ───
@@ -79,7 +108,7 @@ public sealed class PagePlan<TModel> where TModel : class
     /// <summary>AutoComplete — by binding path string (when expression isn't available).</summary>
     public AutoCompleteLocator AutoComplete(string bindingPath)
     {
-        var entry = Resolve(bindingPath, "fusion");
+        var entry = Resolve(bindingPath, expectedComponentType: "autocomplete");
         return new AutoCompleteLocator(_page, entry.Id);
     }
 
@@ -96,9 +125,13 @@ public sealed class PagePlan<TModel> where TModel : class
     /// <summary>Any element by raw ID — for status spans, echo divs, results.</summary>
     public ILocator Element(string elementId) => _page.Locator($"#{elementId}");
 
+    /// <summary>Validation error message for a model property. Encapsulates data-valmsg-for selector.</summary>
+    public ILocator ErrorFor(Expression<Func<TModel, object?>> expr)
+        => _page.Locator($"span[data-valmsg-for='{ToBindingPath(expr)}']");
+
     // ─── Internal ───
 
-    private ComponentEntry Resolve(string bindingPath, string expectedVendor)
+    private ComponentEntry Resolve(string bindingPath, string expectedComponentType)
     {
         if (!_components.TryGetValue(bindingPath, out var entry))
         {
@@ -107,10 +140,11 @@ public sealed class PagePlan<TModel> where TModel : class
                 $"Component '{bindingPath}' not found in plan. Available: [{available}]");
         }
 
-        if (entry.Vendor != expectedVendor)
+        if (entry.ComponentType != expectedComponentType)
         {
             throw new InvalidOperationException(
-                $"Component '{bindingPath}' is vendor '{entry.Vendor}', expected '{expectedVendor}'");
+                $"Component '{bindingPath}' is '{entry.ComponentType}', expected '{expectedComponentType}'. " +
+                $"The view uses a different component type than the test expects.");
         }
 
         return entry;
@@ -150,4 +184,5 @@ public sealed record ComponentEntry(
     string Id,
     string Vendor,
     string ReadExpr,
-    string BindingPath);
+    string BindingPath,
+    string ComponentType);

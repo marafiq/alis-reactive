@@ -52,7 +52,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr));
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "autocomplete"));
 
             var builder = setup.Helper.EJS().AutoCompleteFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });

@@ -1,0 +1,139 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.BddExperimentModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    ViewData["Title"] = "BDD Experiment";
+    var plan = Html.ReactivePlan<BddExperimentModel>();
+
+    var physicians = new List<PhysicianOption>
+    {
+        new() { Value = "smith", Text = "Dr. Smith" },
+        new() { Value = "jones", Text = "Dr. Jones" },
+        new() { Value = "patel", Text = "Dr. Patel" },
+        new() { Value = "chen", Text = "Dr. Chen" }
+    };
+
+    var careLevels = new List<CareLevelOption>
+    {
+        new() { Value = "independent", Text = "Independent Living" },
+        new() { Value = "assisted", Text = "Assisted Living" },
+        new() { Value = "memory", Text = "Memory Care" }
+    };
+
+    Html.On(plan, t => t.CustomEvent("do-submit", p =>
+    {
+        p.Post("/Sandbox/BddExperiment/Submit", g => g.IncludeAll())
+         .Validate<BddExperimentValidator>("admission-form")
+         .WhileLoading(l =>
+         {
+             l.Element("submit-status").SetText("Saving...");
+         })
+         .Response(r => r
+            .OnSuccess<BddExperimentResponse>((json, s) =>
+            {
+                s.Element("submit-status").SetText(json, x => x.Message);
+                s.Element("submit-status").AddClass("text-green-600");
+                s.Element("submit-status").RemoveClass("text-red-600");
+            })
+            .OnError(400, e =>
+            {
+                e.Element("submit-status").SetText("Validation failed");
+                e.Element("submit-status").AddClass("text-red-600");
+                e.ValidationErrors("admission-form");
+            }));
+    }));
+}
+
+<form id="admission-form">
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">BDD Experiment — Resident Admission</native-heading>
+        <native-text color="Secondary">6 component types + FluentValidation. Target for Playwright BDD tests.</native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Admission Form</native-heading>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Name"))
+                .NativeTextBox(b => b
+                    .Placeholder("Full name")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("name-echo").SetText(args, x => x.Value);
+                    })); }
+
+            @{ Html.InputField(plan, m => m.Physician, o => o.Required().Label("Physician"))
+                .AutoComplete(b => b
+                    .DataSource(physicians)
+                    .Fields<PhysicianOption>(t => t.Text, v => v.Value)
+                    .Placeholder("Search physician...")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("physician-echo").SetText(args, x => x.Value);
+                    })); }
+
+            @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
+                .DropDownList(b => b
+                    .DataSource(careLevels)
+                    .Fields<CareLevelOption>(t => t.Text, v => v.Value)
+                    .Placeholder("Select care level")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("care-echo").SetText(args, x => x.Value);
+                    })); }
+
+            @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
+                .NumericTextBox(b => b
+                    .Min(0).Max(99999).Step(100)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("rate-echo").SetText(args, x => x.Value);
+                    })); }
+
+            @{ Html.InputField(plan, m => m.IsActive, o => o.Label("Active Status"))
+                .Switch(b => b
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("active-echo").SetText(args, x => x.Checked);
+                    })); }
+
+            @{ Html.InputField(plan, m => m.Notes, o => o.Label("Notes"))
+                .NativeTextBox(b => b
+                    .Placeholder("Additional notes")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("notes-echo").SetText(args, x => x.Value);
+                    })); }
+        </div>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Echo Panel</native-heading>
+        <div class="grid grid-cols-2 gap-2 font-mono text-sm">
+            <p>Name: <span id="name-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Physician: <span id="physician-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Care Level: <span id="care-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Rate: <span id="rate-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Active: <span id="active-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Notes: <span id="notes-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <div class="flex gap-4 items-center">
+        @(Html.NativeButton("submit-btn", "Admit Resident")
+            .CssClass("px-4 py-2 bg-[#7A2E3B] text-white rounded-md text-sm font-medium")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-submit");
+            }))
+        <span id="submit-status" class="text-sm text-text-muted">Ready</span>
+    </div>
+</native-vstack>
+</form>
+
+@Html.RenderPlan(plan)

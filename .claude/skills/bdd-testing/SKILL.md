@@ -4,132 +4,182 @@ description: >
   This skill should be used when writing Playwright browser tests, TS unit tests,
   or adding new test scenarios for Alis.Reactive. Also use when the user asks to
   "write a test", "add Playwright tests", "test this component", "fix a failing test",
-  "add a test for this view", or "why is this test failing". Applies BDD first
-  principles: test behavior not implementation, decouple tests from structure,
-  name tests as sentences.
+  "add a test for this view", or "why is this test failing". Derives tests from
+  user stories using PagePlan<TModel> typed locators.
 ---
 
 # BDD Testing — Alis.Reactive
 
-## First Principle
+## Principle
 
-> Tests must be **sensitive to behavior** and **insensitive to structure**.
-> — Kent Beck
+> Sensitive to behavior, insensitive to structure. — Kent Beck
 
-Refactoring internals must NEVER break tests. If it does, the test is coupled
-to implementation. Rewrite the test, not the code.
+Refactoring internals must NEVER break a Playwright test. If it does, the test
+is coupled to implementation — rewrite the test.
 
-## The Decision: What Kind of Test?
+## Process — Follow in Order
 
-```
-QUESTION                              TEST LAYER
-─────────                             ──────────
-"Does the user see the right thing?"  → Playwright (browser, DOM assertions)
-"Does this pure function compute      → Vitest (jsdom, boundary values)
- correctly at every edge?"
-"Does the C# DSL serialize the         → NUnit + Verify (JSON snapshots)
- correct plan shape?"
-```
-
-Playwright tests own **behavior**. Unit tests own **boundaries**. Snapshot tests own **contracts**.
-
-## Playwright — Behavior Tests
-
-### Shape: Given → When → Then
-
-Every test is ONE user journey, named as a sentence:
+### Step 1: Write the Story BEFORE looking at the view
 
 ```
-Given  the page loads with empty form
-When   user clicks Submit
-Then   inline error appears on Name, no phantom summary
-When   user fills Name and resubmits
-Then   Name error disappears, remaining errors persist
-When   user fills all fields and submits
-Then   success message appears
+As a [role]
+I want [feature]
+So that [business value]
 ```
 
-### What to Assert
+The story comes from the DOMAIN, not from the code.
+
+### Step 2: List criteria the [role] would confirm
+
+Each criterion = ONE sentence the role would say:
 
 ```
-ASSERT                                    NEVER ASSERT
-──────                                    ────────────
-Text content the user reads               Plan JSON shape
-Element visibility (shown/hidden)         Console trace messages
-CSS classes that affect appearance         Internal function return values
-Error message text and placement          Which guard type was used
-HTTP response reflected in DOM            How many commands executed
+✓ "I can search for a physician by name and select them"
+✓ "The system tells me which information is missing"
+✓ "My complete admission reaches the server with correct data"
+
+✗ "echo span updates"               — no role says this
+✗ "componentType validates"          — infrastructure
+✗ "ej2 value equals expected"        — implementation
 ```
 
-### The Decoupling Test
+Ask: would [role] say this sentence? If not, it's not a criterion.
 
-Before writing any assertion, ask:
+### Step 3: Each criterion = one test
 
-> "If I refactored the C# builder or TS runtime internals,
-> would this assertion break?"
+One When. One Then. Multiple cycles = multiple tests.
 
-**YES** → assertion is coupled to structure. Remove it.
-**NO** → assertion is coupled to behavior. Keep it.
-
-### Fixture Design
-
-Each scenario gets its own fixture class, own URL, parallel execution.
-No shared state between fixtures. Helper methods scoped to that page's fields.
-
-See **`references/patterns.md`** for fixture code patterns and locator helpers.
-
-## Vitest — Boundary Tests
-
-Test pure modules (resolver, conditions, rule-engine) at every edge:
+### Step 4: Write using PagePlan\<TModel\>
 
 ```
-INPUT                    EXPECTED          WHY
-─────                    ────────          ───
-"" for required          fail              empty is absence
-null for required        fail              null is absence
-0 for required           pass              zero is a value
-unknown rule type        block (fail-closed)  safety default
-broken regex             block (fail-closed)  safety default
-eq on empty source       false             no intent expressed
+PLAN := await PagePlan<TModel>.FromPage(Page)
+
+COMPONENT :=
+  | _plan.AutoComplete(m => m.Prop)     -- Type, SelectItem, TypeAndSelect, Clear, Focus, Blur
+  | _plan.DropDownList(m => m.Prop)     -- Select("text"), Focus
+  | _plan.NumericTextBox(m => m.Prop)   -- Fill, FillAndBlur, Clear, Focus, Blur
+  | _plan.Switch(m => m.Prop)           -- Toggle
+  | _plan.TextBox(m => m.Prop)          -- Fill, FillAndBlur, Clear, Focus, Blur
+
+SURFACE :=
+  | _plan.Element("explicit-id")        -- status spans, echo divs, results
+  | _plan.ErrorFor(m => m.Prop)         -- validation error for a model property
+  | component.Input                     -- the input element (for value assertions)
+  | component.PopupItems                -- popup suggestions (AutoComplete only)
+
+ASSERTION :=
+  | Expect(SURFACE).ToContainTextAsync(...)
+  | Expect(SURFACE).ToBeVisibleAsync()
+  | Expect(SURFACE).ToHaveValueAsync(...)
+  | Assert.That(request.PostData, Does.Contain(...))   -- framework tests only
 ```
 
-DOM setup in jsdom must match production structure. See **`references/patterns.md`**.
+**Always** `_plan.ComponentType(m => m.Prop)` — never `Page.Locator("#hardcoded-id")`.
+**Always** `_plan.ErrorFor(m => m.Prop)` — never raw `span[data-valmsg-for]` selectors.
+**Always** gestures — never `EvaluateAsync` or `ej2_instances`.
 
-## NUnit + Verify — Contract Tests
+### Step 5: Verify outcomes
 
-Snapshot-verify the JSON plan shape. These tests own the **contract** between
-C# DSL and JS runtime. A snapshot diff means the contract changed — review
-whether the change is intentional.
+```
+FRAMEWORK TESTS (testing the gather pipeline):
+  Verify POST body — Assert.That(request.PostData, Does.Contain(...))
 
-## Domain — Senior Living
+APP TESTS (testing real application behavior):
+  Verify server response on screen — the round-trip proves data reached server
+```
 
-All models use realistic entities: `ResidentModel`, `CareLevel`, `VeteranId`,
-`FacilityModel`. Never generic "TestModel" or "User". Labels and error messages
-use domain language ("Resident name", "Care Level", not "Username", "Category").
+Happy path without verifying what was sent/received is INCOMPLETE.
 
-## When a Test Fails
+### Step 6: Validate
 
-1. **STOP.** Read the failure message. Do not touch code.
-2. **Trace** the full path from trigger (click, event) to outcome (DOM state).
-3. **Identify the exact line** producing the wrong result.
-4. **Ask WHY** — it may be correct for a different scenario.
-5. **Fix root cause**, not symptom. If unsure, **ask the user**.
+```
+- [ ] Traces to a criterion from the story
+- [ ] Name is ONE sentence the [role] would say
+- [ ] Uses PagePlan<TModel> — no hardcoded IDs
+- [ ] Uses gestures — no ej2, no EvaluateAsync
+- [ ] Framework: verifies POST body. App: verifies screen after round-trip
+- [ ] Survives refactoring of internals
+```
 
-See **`references/patterns.md`** for common symptom → root cause mappings.
+## Stop and Check
 
-## Validation Criteria
+**"I'll write one test that fills everything and submits"**
+→ Multiple behaviors. Split.
 
-Before merging any test:
+**"I'll test that the echo span updates"**
+→ No role cares. Test the behavior the echo serves.
 
-- [ ] **Behavior-named**: test name is a sentence describing user-visible outcome
-- [ ] **Full journey**: covers error state → correction → success (not just one assertion)
-- [ ] **Decoupled**: would survive a refactoring of builder internals or runtime modules
-- [ ] **Observable**: asserts only what the user can see (text, visibility, placement)
-- [ ] **No implementation leakage**: never asserts plan JSON, trace output, or internal types
-- [ ] **Parallel-safe**: own fixture, own URL, no shared state
-- [ ] **Domain-realistic**: senior living entities, not test stubs
+**"I'll use Page.Locator('#some-id')"**
+→ Use `_plan.TextBox(m => m.Field)`. Hardcoded IDs break on rename.
 
-## Additional Resources
+**"I'll check ej2_instances[0].value"**
+→ Implementation. Assert what the user sees or what the server received.
 
-- **`references/patterns.md`** — Fixture code, locator helpers, validator scoping, AJAX lifecycle, root cause table
-- **`references/first-principles.md`** — Dan North, Kent Beck, Ian Cooper, Gojko Adzic research
+**"The test name describes the framework action"**
+→ Name it as the role would. "incomplete_admission_tells_user_which_fields_are_missing."
+
+**"I'll assert raw POST body in an app test"**
+→ POST format is implementation. Assert the screen after round-trip.
+
+**"The popup click doesn't work, let me hack the selector"**
+→ STOP. Use the proven gesture for that component. See `references/locators.md`.
+
+## When a Test Fails — Triage in Order
+
+```
+1. Is the test testing the correct thing?
+   → Does the criterion match a real user need?
+
+2. Is the test arranged correctly? (Arrange-Act-Assert)
+   → Right state? Right action? Right outcome?
+
+3. Is the test using the right tools?
+   → PagePlan locators? Correct gestures? No hardcoded selectors?
+
+4. ALL YES → the test is correct. Do NOT hack it.
+
+5. Verify manually in browser.
+   → Open the page, do what the test does, see what happens.
+   → This determines: locator bug vs app bug.
+
+6. Classify:
+   LOCATOR BUG: gesture doesn't work reliably
+     → Fix the locator in Playwright.Extensions.
+     → Verify with isolated test + browser experiment first.
+
+   APP BUG: behavior genuinely broken
+     → Fix the app. Use systematic-debugging skill.
+     → The test caught a real bug. Celebrate.
+
+7. NEVER hack the test to make it pass.
+```
+
+## Fixture Shape
+
+```csharp
+[TestFixture]
+public class WhenDoing{Feature} : PlaywrightTestBase
+{
+    private PagePlan<TModel> _plan = null!;
+
+    private async Task NavigateAndBoot()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 10000);
+        _plan = await PagePlan<TModel>.FromPage(Page);
+    }
+}
+```
+
+## Test Layers
+
+```
+"Does the role see the right thing?"    → Playwright + PagePlan<TModel>
+"Does this function compute correctly?" → Vitest (boundary values)
+"Does the DSL produce correct JSON?"    → NUnit + Verify (snapshots)
+```
+
+## References
+
+- **`references/patterns.md`** — Fixture code, validation errors, POST interception
+- **`references/first-principles.md`** — Dan North, Kent Beck, Ian Cooper research

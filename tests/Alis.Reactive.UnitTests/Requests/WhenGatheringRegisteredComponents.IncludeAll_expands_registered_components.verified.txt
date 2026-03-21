@@ -4,12 +4,14 @@
     Name: {
       id: comp1,
       vendor: native,
-      readExpr: value
+      readExpr: value,
+      componentType: textbox
     },
     Amount: {
       id: comp2,
       vendor: fusion,
-      readExpr: value
+      readExpr: value,
+      componentType: numerictextbox
     }
   },
   entries: [

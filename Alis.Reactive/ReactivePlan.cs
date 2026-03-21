@@ -43,7 +43,8 @@ namespace Alis.Reactive
             {
                 if (existing.ComponentId == entry.ComponentId
                     && existing.Vendor == entry.Vendor
-                    && existing.ReadExpr == entry.ReadExpr)
+                    && existing.ReadExpr == entry.ReadExpr
+                    && existing.ComponentType == entry.ComponentType)
                     return;
 
                 throw new InvalidOperationException(
@@ -87,7 +88,8 @@ namespace Alis.Reactive
                 {
                     id = kvp.Value.ComponentId,
                     vendor = kvp.Value.Vendor,
-                    readExpr = kvp.Value.ReadExpr
+                    readExpr = kvp.Value.ReadExpr,
+                    componentType = kvp.Value.ComponentType
                 };
             }
             return result;

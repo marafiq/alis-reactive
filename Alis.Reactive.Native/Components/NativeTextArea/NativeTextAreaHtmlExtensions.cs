@@ -16,7 +16,7 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr));
+                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr, "textarea"));
 
             var builder = new NativeTextAreaBuilder<TModel, TProp>(setup.Helper, setup.Expression);
             configure(builder);

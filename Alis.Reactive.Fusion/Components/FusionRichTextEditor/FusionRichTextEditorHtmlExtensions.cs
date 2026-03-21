@@ -25,7 +25,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr));
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "richtexteditor"));
 
             var builder = setup.Helper.EJS().RichTextEditorFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["name"] = setup.BindingPath });

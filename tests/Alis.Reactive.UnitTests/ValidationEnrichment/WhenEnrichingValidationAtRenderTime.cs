@@ -37,8 +37,8 @@ public class WhenEnrichingValidationAtRenderTime
     {
         var plan = new ReactivePlan<EnrichmentTestModel>();
 
-        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "native", "Name", "value"));
-        plan.AddToComponentsMap("Email", new ComponentRegistration("email-input", "native", "Email", "value"));
+        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "native", "Name", "value", "textbox"));
+        plan.AddToComponentsMap("Email", new ComponentRegistration("email-input", "native", "Email", "value", "textbox"));
 
         var trigger = new Builders.TriggerBuilder<EnrichmentTestModel>(plan);
         trigger.DomReady(p =>
@@ -103,7 +103,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Enriched_fields_serialize_with_fieldId_vendor_readExpr()
     {
         var plan = new ReactivePlan<EnrichmentTestModel>();
-        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "fusion", "Name", "value"));
+        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "fusion", "Name", "value", "autocomplete"));
 
         var trigger = new Builders.TriggerBuilder<EnrichmentTestModel>(plan);
         trigger.DomReady(p =>

@@ -41,11 +41,11 @@ public sealed class AutoCompleteLocator
     /// <summary>The text input field.</summary>
     public ILocator Input => _page.Locator($"#{_componentId}");
 
-    /// <summary>The dropdown popup container.</summary>
-    public ILocator Popup => _page.Locator(".e-ddl.e-popup");
+    /// <summary>The currently visible SF dropdown popup.</summary>
+    public ILocator Popup => _page.Locator(".e-ddl.e-popup.e-popup-open");
 
-    /// <summary>All suggestion items in the popup.</summary>
-    public ILocator PopupItems => _page.Locator(".e-ddl.e-popup .e-list-item");
+    /// <summary>All suggestion items in the visible popup.</summary>
+    public ILocator PopupItems => _page.Locator(".e-ddl.e-popup.e-popup-open .e-list-item");
 
     /// <summary>A specific suggestion item by visible text.</summary>
     public ILocator PopupItem(string text) =>

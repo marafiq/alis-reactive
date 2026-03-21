@@ -4,7 +4,8 @@
     Status: {
       id: comp1,
       vendor: native,
-      readExpr: value
+      readExpr: value,
+      componentType: textbox
     }
   },
   entries: [
