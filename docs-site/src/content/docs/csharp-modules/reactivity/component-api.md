@@ -36,6 +36,8 @@ pipeline.Component<NativeCheckBox>(m => m.IsActive).SetChecked(true);
 
 ### Property writes — .Set{Prop}(value)
 
+A component's initial value comes from model binding — `@Model.Country` prefills the dropdown when the page renders. `.SetValue()` changes it dynamically at runtime, in response to a trigger or event. Both are correct for their stage: model binding sets the initial state, pipeline mutations change it after.
+
 Each component type defines which properties can be written. The value type is enforced by the compiler.
 
 ```csharp
