@@ -485,25 +485,4 @@ And the save button's pipeline:
 
 This single pipeline handles confirmation, validation, loading state, success notification, and error display. Every step is described in the plan. The runtime executes it exactly as written.
 
-## Quick reference
-
-| Method | Purpose | Chainable? |
-|--------|---------|------------|
-| `Get(url)` | Start a GET request | Yes |
-| `Post(url)` | Start a POST request | Yes |
-| `Post(url, gather)` | POST with inline gather | Yes |
-| `Put(url, gather)` | PUT with inline gather | Yes |
-| `Delete(url)` | Start a DELETE request | Yes |
-| `.Gather(g => { })` | Configure request data | Yes |
-| `.AsFormData()` | Use multipart content type | Yes |
-| `.WhileLoading(l => { })` | Commands during request flight | Yes |
-| `.Validate<T>("formId")` | Client-side validation pre-flight | Yes |
-| `.Response(r => { })` | Configure response handlers | Yes |
-| `.OnSuccess(pipeline => { })` | Handle 2xx response | Yes |
-| `.OnSuccess<T>((json, pipeline) => { })` | Handle typed JSON response | Yes |
-| `.OnError(code, e => { })` | Handle specific error status | Yes |
-| `.Chained(c => { })` | Sequential follow-up request | Yes |
-| `Parallel(a, b, ...)` | Concurrent requests | Yes |
-| `.OnAllSettled(pipeline => { })` | After all parallel branches complete | Yes |
-
 **Previous:** [Conditions](/csharp-modules/reactivity/conditions/) -- runtime branching with When/Then/ElseIf/Else and guard composition.

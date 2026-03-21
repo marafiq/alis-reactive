@@ -67,22 +67,11 @@ export default defineConfig({
 								{ label: 'Syncfusion', slug: 'components/fusion-components' },
 							],
 						},
-						{
-							label: 'Testing',
-							items: [
-								{ label: 'Strategy', slug: 'testing/strategy' },
-								{ label: 'Writing Tests', slug: 'testing/writing-tests' },
-							],
-						},
 					],
 				},
 				{
 					label: 'Architecture',
 					autogenerate: { directory: 'architecture' },
-				},
-				{
-					label: 'Runtime',
-					autogenerate: { directory: 'runtime' },
 				},
 				{
 					label: 'Reference',
