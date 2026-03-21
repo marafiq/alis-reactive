@@ -1,4 +1,21 @@
 <Solution>
+  <Folder Name="/.claude/">
+    <File Path=".claude/settings.json" />
+    <Folder Name="/.claude/skills/">
+      <Folder Name="/.claude/skills/reactive-dsl/">
+        <File Path=".claude/skills/reactive-dsl/SKILL.md" />
+      </Folder>
+      <Folder Name="/.claude/skills/http-pipeline/">
+        <File Path=".claude/skills/http-pipeline/SKILL.md" />
+      </Folder>
+      <Folder Name="/.claude/skills/conditions-dsl/">
+        <File Path=".claude/skills/conditions-dsl/SKILL.md" />
+      </Folder>
+      <Folder Name="/.claude/skills/onboard-fusion-component/">
+        <File Path=".claude/skills/onboard-fusion-component/SKILL.md" />
+      </Folder>
+    </Folder>
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj" />
