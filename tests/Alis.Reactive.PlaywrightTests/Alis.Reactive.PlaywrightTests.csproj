@@ -14,4 +14,8 @@
         <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="../Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
+    </ItemGroup>
+
 </Project>
