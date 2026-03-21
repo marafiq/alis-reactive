@@ -2,7 +2,7 @@
 title: HTTP Pipeline
 description: GET/POST/PUT/DELETE requests, gather strategies, loading states, typed responses, chained and parallel requests, and validation integration.
 sidebar:
-  order: 6
+  order: 4
 ---
 
 HTTP requests live inside a `.Reactive()` or `Html.On()` pipeline — typically triggered by a button click or a component event. You gather input values, validate, post, and handle the response in one fluent chain.
@@ -506,4 +506,4 @@ This single pipeline handles confirmation, validation, loading state, success no
 | `Parallel(a, b, ...)` | Concurrent requests | Yes |
 | `.OnAllSettled(pipeline => { })` | After all parallel branches complete | Yes |
 
-**Previous:** [Conditions](/csharp-modules/conditions/) -- runtime branching with When/Then/ElseIf/Else and guard composition.
+**Previous:** [Conditions](/csharp-modules/reactivity/conditions/) -- runtime branching with When/Then/ElseIf/Else and guard composition.

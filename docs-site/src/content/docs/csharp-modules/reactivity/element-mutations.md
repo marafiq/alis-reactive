@@ -1,8 +1,8 @@
 ---
-title: Element and Component Mutations
-description: Targeting DOM elements and components for class manipulation, content binding, visibility, and source-bound expressions.
+title: Element Mutations
+description: Targeting DOM elements for text, HTML, classes, and visibility changes.
 sidebar:
-  order: 3
+  order: 1
 ---
 
 Inside a `.Reactive()` or `Html.On()` pipeline, `pipeline` gives you access to mutations — ways to change what's on the page. You target an element or a component, then call methods that describe what should change.
@@ -148,4 +148,4 @@ Html.On(plan, t => t.CustomEvent("data-ready", pipeline =>
 
 When you write `pipeline.Element("city").SetText(payload, x => x.Address.City)`, the expression is walked at build time: `Address` → `address`, `City` → `city`, prefixed to `"evt.address.city"`. At runtime, the event payload is walked at that path and the value is set as text. The same mechanism works for response body paths (`"responseBody.fullName"`) and component sources.
 
-**Next:** [Component API](/csharp-modules/component-api/) — targeting input components, app-level singletons, and reading values for conditions.
+**Next:** [Component API](/csharp-modules/reactivity/component-api/) — targeting input components, app-level singletons, and reading values for conditions.

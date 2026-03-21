@@ -2,7 +2,7 @@
 title: Conditions
 description: Runtime branching with When/Then/ElseIf/Else, comparison and text operators, guard composition with And/Or/Not, and confirm dialogs.
 sidebar:
-  order: 5
+  order: 3
 ---
 
 Conditions live inside a `.Reactive()` or `Html.On()` pipeline. They let you branch based on values that only exist in the browser — an event payload, a component's current state.
@@ -375,4 +375,4 @@ At runtime, automatic coercion is applied based on the C# type:
 
 You never specify coercion manually -- it is derived from the C# property type.
 
-**Next:** [HTTP Pipeline](/csharp-modules/http-pipeline/) -- GET/POST/PUT/DELETE, gather, loading states, typed responses, and chained/parallel requests.
+**Next:** [HTTP Pipeline](/csharp-modules/reactivity/http-pipeline/) -- GET/POST/PUT/DELETE, gather, loading states, typed responses, and chained/parallel requests.

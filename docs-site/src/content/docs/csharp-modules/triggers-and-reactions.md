@@ -97,4 +97,4 @@ Html.On(plan, t => t.CustomEvent("loaded", pipeline =>
 }));
 ```
 
-Next: [Mutations](/csharp-modules/element-mutations/) — what you can do inside a pipeline.
+Next: [Element Mutations](/csharp-modules/reactivity/element-mutations/) — what you can do inside a pipeline.

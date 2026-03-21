@@ -2,7 +2,7 @@
 title: Component API
 description: Targeting input components, non-input components, and app-level singletons in the pipeline — write properties, call methods, read values.
 sidebar:
-  order: 4
+  order: 2
 ---
 
 Components are targeted through `pipeline.Component<TComponent>()` inside any pipeline. Unlike `pipeline.Element("id")` which targets raw DOM elements, `Component<TComponent>` gives you typed access — IntelliSense constrains exactly which operations are available for each component type.
@@ -208,4 +208,4 @@ pipeline.Component<NativeLoader>().Hide();
 
 `.SetTarget("elementId")` scopes the overlay to a specific section instead of the full page.
 
-**Next:** [Conditions](/csharp-modules/conditions/) — runtime branching with When/Then/ElseIf/Else and guard composition.
+**Next:** [Conditions](/csharp-modules/reactivity/conditions/) — runtime branching with When/Then/ElseIf/Else and guard composition.
