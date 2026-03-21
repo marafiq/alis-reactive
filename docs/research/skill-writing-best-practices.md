@@ -211,7 +211,67 @@ judgment, not just syntax.
 
 ---
 
-## 9. Applicability to Alis.Reactive Skills
+## 9. From the 33-Page PDF — Additional Rules
+
+### YAML Frontmatter Rules
+
+- `name`: **kebab-case only**, no spaces, no underscores, no capitals. Should match folder name.
+- `description`: **under 1024 characters**. Must include BOTH what it does AND when to use it.
+- No XML angle brackets (`<` or `>`) in frontmatter — appears in system prompt, could inject.
+- No `README.md` inside skill folder — all docs in SKILL.md or `references/`.
+- `SKILL.md` must be **exactly** `SKILL.md` (case-sensitive).
+
+### Description Formula
+
+```
+[What it does] + [When to use it] + [Key capabilities]
+```
+
+Good: "Analyzes Figma files and generates handoff docs. Use when user uploads .fig files, asks for 'design specs' or 'component documentation'."
+
+Bad: "Helps with projects." / "Creates sophisticated documentation systems."
+
+### Instruction Body — Recommended Structure
+
+```markdown
+# Skill Name
+
+## Instructions
+
+### Step 1: [First Major Step]
+Clear explanation of what happens.
+
+### Step 2: [Next Step]
+Run `python scripts/validate.py --input {filename}` to check format.
+
+## Examples
+Example 1: [common scenario]
+User says: "Set up a new marketing campaign"
+Actions: 1. Fetch existing... 2. Create new...
+
+## Troubleshooting
+Error: [Common error message]
+Cause: [Why it happens]
+Solution: [How to fix]
+```
+
+### Testing — Three Areas
+
+1. **Triggering tests** — Does skill load on relevant queries? Does it NOT load on unrelated?
+2. **Functional tests** — Does it produce correct outputs, handle errors, cover edge cases?
+3. **Performance comparison** — Compare tokens/tool-calls with vs without skill.
+
+Target: skill triggers on **90% of relevant queries** without explicit invocation.
+
+### Security
+
+- No `claude` or `anthropic` in skill name (reserved).
+- Audit all bundled files for unusual operations.
+- Be cautious with external dependencies (URLs, APIs).
+
+---
+
+## 10. Applicability to Alis.Reactive Skills
 
 ### Current State
 
