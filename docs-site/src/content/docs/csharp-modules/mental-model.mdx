@@ -1,0 +1,405 @@
+---
+title: Reactive Mental Model
+description: How to think about Reactive if you already know ASP.NET MVC.
+sidebar:
+  order: 0
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Before we jump into the mental model of Reactive, let's refresh how a traditional MVC app looks like.
+
+## Traditional MVC App
+
+A traditional .NET 10 MVC application looks like this:
+
+```
+MyApp/
+├── Program.cs                           ← DI, middleware, routing
+├── Controllers/
+│   └── HomeController.cs                ← root-level actions
+├── Views/
+│   ├── Home/
+│   │   └── Index.cshtml                 ← landing page
+│   └── Shared/
+│       ├── _Layout.cshtml               ← <head>, nav, scripts, shared chrome
+│       └── _ValidationScriptsPartial.cshtml
+├── Features/
+│   └── Residents/
+│       ├── Controllers/
+│       │   └── ResidentController.cs    ← actions: Index, Save
+│       ├── Models/
+│       │   └── ResidentModel.cs         ← POCO with properties
+│       └── Views/
+│           └── Resident/
+│               ├── Index.cshtml         ← @model, Html helpers, <form>, <script>
+│               └── _AddressPartial.cshtml
+├── Scripts/
+│   ├── site.ts                          ← app entry point
+│   └── validation.ts                    ← custom validators
+├── Styles/
+│   ├── site.css                         ← global styles
+│   └── components.css                   ← component overrides
+└── wwwroot/
+    ├── js/
+    │   └── site.js                      ← bundled output
+    └── css/
+        └── site.css                     ← compiled output
+```
+
+You know this shape. A model, a controller, a view. The view has `@model` at the top, `@Html.TextBoxFor(m => m.Name)` for inputs, tag helpers, partials, and a `<form>` that posts back to the controller.
+
+When you need client-side interactivity — show a panel on checkbox toggle, cascade a dropdown, validate before submit — you add a `<script>` block at the bottom. Or you use unobtrusive `data-*` attributes like `data-ajax-url`, `data-ajax-method`, and a small runtime reads those attributes and handles the rest.
+
+This works well for basic scenarios. But as your app grows — conditional visibility across fields, cascading dropdowns that fetch from the server, client + server validation on the same rules, Syncfusion components alongside native inputs — the `<script>` blocks multiply and the `data-*` attributes run out of vocabulary.
+
+## Reactive Mental Model
+
+With Reactive, the project structure stays familiar. You add references to these projects:
+
+```xml
+<PackageReference Include="Alis.Reactive.Native" />
+<PackageReference Include="Alis.Reactive.Fusion" />
+<PackageReference Include="Alis.Reactive.FluentValidator" />
+```
+
+And your vertical slices now include a validator alongside the model:
+
+```
+MyApp/
+├── Program.cs                               ← DI, middleware, validation setup
+├── Controllers/
+│   └── HomeController.cs                    ← root-level actions
+├── Views/
+│   ├── Home/
+│   │   └── Index.cshtml                     ← landing page
+│   └── Shared/
+│       └── _Layout.cshtml                   ← loads runtime: <script type="module" src="~/js/alis-reactive.js">
+├── Features/
+│   └── Residents/
+│       ├── Controllers/
+│       │   └── ResidentController.cs        ← Index (GET), Save (POST with server validation)
+│       ├── Models/
+│       │   ├── ResidentModel.cs             ← plain POCO
+│       │   └── ResidentValidator.cs         ← FluentValidation rules
+│       └── Views/
+│           └── Resident/
+│               ├── Index.cshtml             ← Html.ReactivePlan<ResidentModel>(), Html.InputField, .Reactive()
+│               └── _AddressPartial.cshtml   ← Html.ResolvePlan<ResidentModel>() (merges into parent plan)
+└── wwwroot/
+    ├── js/
+    │   └── alis-reactive.js                 ← framework runtime (you don't edit this)
+    └── css/
+        └── design-system.css                ← design tokens and component styles
+```
+
+The view still has `@model` at the top and HTML in the body. But instead of a `<script>` block at the bottom, you write fluent C# in the code block and call `@Html.RenderPlan(plan)` — which produces a structured JSON plan that a runtime executes.
+
+```d2
+direction: right
+
+builders: "C# Fluent Builders\nExpress intent" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 20
+}
+plan: "JSON Plan\nThe contract" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 20
+}
+runtime: "JS Runtime\nExecutes intent" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+
+builders -> plan: plan.Render() {
+  style.font-size: 16
+  style.stroke: "#4285f4"
+}
+plan -> runtime: boot {
+  style.font-size: 16
+  style.stroke: "#34a853"
+}
+```
+
+As a developer, you work with the first box — **C# Fluent Builders**. That's your API. The JSON plan and the runtime are infrastructure you don't touch. But knowing the flow helps — it explains why everything is type-safe, why there's no JavaScript, and why adding components doesn't break anything.
+
+<Aside type="tip">
+A good way to think about it: unobtrusive AJAX puts `data-*` attributes on HTML elements and a small runtime reads them. Reactive does the same thing — but instead of flat `data-*` attributes, the fluent builders produce a structured JSON plan, and a custom runtime knows how to execute it.
+</Aside>
+
+## The Grammar Tree
+
+Everything in Reactive starts from `Html.` and flows through a discoverable tree. IntelliSense will show what is available at every stage.
+
+**Legends:**
+- **§** Grammar — naming pattern, overload variation, or source type
+- **↻** Pipeline — same `pipeline` with Element, Component, Dispatch, When, HTTP
+- **↺** Recursive — full HTTP chain repeats (Gather, Validate, Response, Chained)
+
+### The View Tree
+
+Every view starts from `Html.` — plan setup at the top, triggers and components in the body, `RenderPlan` at the bottom. This is the shape of every `.cshtml` file you write.
+
+```
+Html.
+├── ReactivePlan<TModel>()                          create a plan
+├── ResolvePlan<TModel>()                           partial plan (merges into parent)
+├── RenderPlan(plan)                                emit at bottom of view
+│
+├── On(plan, t => ...)                              § Triggers (what fires the pipeline)
+│   ├── t.DomReady(pipeline => { ... })             on page load
+│   ├── t.CustomEvent("name", pipeline => { ... })  on named event
+│   └── t.CustomEvent<T>("name", (payload, pipeline) => { ... })
+│                                                   on named event with typed payload
+│
+├── InputField(plan, m => m.Prop, o => ...)          § Components — model-bound inputs
+│   ├── o.Label("...") / o.Required()               field options (Required adds *)
+│   ├── .Native{Name}(nativeBuilder => ...)           HTML elements
+│   ├── .Fusion{Name}(fusionBuilder => ...)          Syncfusion EJ2
+│   └── .Reactive(plan, evt => evt.{EventName}, (args, pipeline) => {}) every componentBuilder exposes this
+│
+├── NativeButton("id", "text")                      button (no model binding)
+│   ├── .Type("submit") / .CssClass("...")
+│   └── .Reactive(plan, evt => evt.{EventName}, (args, pipeline) => {}) supports .Reactive too
+├── NativeActionLink("text", "url", pipeline => {}) link with inline pipeline
+│   └── .CssClass("...") / .Attr("name", "value")
+├── NativeHiddenField(plan, m => m.Prop)              hidden input
+│   └── .Reactive(plan, evt => evt.{EventName}, (args, pipeline) => {}) supports .Reactive too
+│
+│   App-level components (live in _Layout, shared and accessible across views):
+├── NativeDrawer()                                  slide-out drawer
+├── NativeLoader()                                  loading overlay
+├── FusionConfirmDialog()                           confirm dialog
+└── FusionToast()                                   toast notifications
+```
+
+Notice `pipeline => { ... }` inside `On()` and `.Reactive()` — that's where all behavior lives. What can you do inside it?
+
+### The Pipeline
+
+A pipeline is a series of behaviors that progressively reveals what is available at each stage of the composition tree. These stages give you a `pipeline`:
+
+1. `t.DomReady(pipeline => { ... })` — on page load
+2. `t.CustomEvent("name", pipeline => { ... })` — on named event
+3. `t.CustomEvent<T>("name", (payload, pipeline) => { ... })` — on typed event
+4. `.Reactive(plan, evt, (args, pipeline) => { ... })` — on component event
+5. `.Then(pipeline => { ... })` — condition branch
+6. `.Else(pipeline => { ... })` — condition fallback
+7. `.OnSuccess(pipeline => { ... })` — HTTP 200
+8. `.OnSuccess<T>((json, pipeline) => { ... })` — typed HTTP 200
+9. `.OnError(statusCode, pipeline => { ... })` — HTTP error
+10. `.WhileLoading(pipeline => { ... })` — during HTTP request
+11. `.OnAllSettled(pipeline => { ... })` — after parallel requests
+
+Each stage is documented at an abstract level in the trees below.
+
+#### Element Mutations
+
+When you need to update parts of the page that aren't components — a status label, a section heading, a summary panel — `Element` targets any DOM element by its `id` and changes its text, HTML, classes, or visibility.
+
+```
+pipeline.Element("id")                               target a DOM element by ID
+├── .SetText("x") / .SetText(source, s => s.Prop)   static or source-bound text
+├── .SetHtml("x") / .SetHtml(source, s => s.Prop)   static or source-bound HTML
+├── .AddClass("x") / .RemoveClass("x") / .ToggleClass("x")
+├── .Show() / .Hide()                                visibility (hidden attribute)
+```
+
+#### Input Components API in Views
+
+When you need to programmatically change a component's value, refresh its data, or read its current state for a condition — `Component<TComponent>(m => m.Prop)` gives you typed access. You target the same model expression you used to render it with `InputField`, so the binding is natural. `TComponent` is the component type, so IntelliSense constrains exactly which mutations are available. Three patterns: write a property, call a method, or read a value for conditions.
+
+```
+pipeline.Component<TComponent>(m => m.Prop)             § TModel inferred from plan
+│
+│   Property writes — .Set{Prop}(value):
+├── .SetValue(value)                                 typed per component (string, decimal, DateTime, ...)
+├── .SetValue(source, s => s.Prop)                   from event payload
+├── .SetChecked(bool)                                boolean components
+├── ...                                              (more: SetText, SetDataSource, SetMin, ...)
+│
+│   Method calls — .{Method}():
+├── .DataBind()                                      refresh after SetDataSource
+├── .FocusIn() / .FocusOut()                         focus management
+├── ...                                              (more: ShowPopup, HidePopup, Increment, Decrement, Enable, Disable, ...)
+│
+│   Reads — returns TypedComponentSource<TProp> for conditions:
+├── .Value()                                         every component — typed per component
+│                                                    (string, string[], bool, decimal, DateTime)
+├── .StartDate() / .EndDate()                        FusionDateRangePicker — two reads
+│
+│   IntelliSense on Component<T> shows exactly which methods T supports.
+```
+
+#### Non-Input Components
+
+Components that live directly on the view, not inside `InputField`. NativeButton is accessed by string ID, NativeHiddenField is model-bound.
+
+```
+pipeline.Component<NativeButton>("save-btn")         § by string ID
+├── .SetText("Saving...")                            change button text
+├── .FocusIn()                                       set focus
+
+pipeline.Component<NativeHiddenField>(m => m.Prop)   § model-bound (same as input components)
+├── .SetValue("value")                               set hidden value
+├── .Value()                                         read for conditions
+```
+
+#### App-Level Components
+
+Singletons that live in `_Layout.cshtml` — toasts, drawers, loaders, confirm dialogs. No model binding — they're resolved by their well-known ID.
+
+```
+pipeline.Component<TComponent>()                     § app-level (no model binding)
+│
+├── Component<FusionToast>()                         toast notifications
+│   ├── .SetTitle("...").SetContent("...").Success().Show()
+│   ├── ...                                          (more: SetTimeout, ShowCloseButton, ShowProgressBar,
+│   │                                                 Warning, Danger, Info, Hide)
+│
+├── Component<FusionConfirm>()                       confirm dialog
+│   └── .SetContent("...").Show() / .Hide()
+│
+├── Component<NativeDrawer>()                        slide-out drawer
+│   └── .SetSize(DrawerSize.Sm | .Md | .Lg).Open() / .Close()
+│
+└── Component<NativeLoader>()                        loading overlay
+    └── .SetTarget("id").SetTimeout(ms).Show() / .Hide()
+```
+
+#### Dispatch
+
+Fire a named event that other triggers are listening for. This is how dom-ready chains into custom events, and how components communicate across the page.
+
+```
+pipeline.Dispatch("event-name")                      fire a named event
+pipeline.Dispatch<TPayload>("name", new TPayload { ... })
+                                                     fire with typed data
+```
+
+#### Conditions
+
+A condition reads like a sentence: *When this value meets this test, do this, otherwise do that.*
+
+```
+§ From event args — args comes from .Reactive(), x selects the property:
+
+pipeline.When(args, x => x.Value).Eq("Medical")     test args property against a literal
+    .Then(then =>
+    {
+        then.Element("notice").SetText("selected");  ↻ full pipeline — mutations, HTTP, ...
+    })
+    .Else(otherwise =>
+    {
+        otherwise.Element("notice").SetText("—");    ↻ same pipeline available
+    });
+
+§ From component read — read a component's current value on the page:
+
+var comp = pipeline.Component<FusionNumericTextBox>(m => m.Temperature);
+pipeline.When(comp.Value()).Gt(0m)                   test component value against a literal
+    .Then(then => { ... })
+    .Else(otherwise => { ... });
+
+§ Operators — 21 total, typed to the source:
+├── .Eq(val) / .NotEq(val)                           equality
+├── .Truthy() / .Falsy()                             presence (no operand)
+├── .Eq(comp.Value())                                compare against another component
+├── ...                                              (more: Gt, Gte, Lt, Lte, IsNull, NotNull, IsEmpty,
+│                                                     NotEmpty, In, NotIn, Between, Contains,
+│                                                     StartsWith, EndsWith, Matches, MinLength, ArrayContains)
+
+§ Compose — combine conditions before .Then():
+├── .And(args, x => x.OtherProp).{Op}()              both must match
+├── .Or(comp.Value()).{Op}()                          either must match
+├── .Not()                                           invert
+
+§ Branch — chain additional paths after .Then():
+├── .ElseIf(args, x => x.Prop).{Op}().Then(...)      ↻ additional branch
+├── .ElseIf(comp.Value()).{Op}().Then(...)            ↻ branch on component
+└── .Else(otherwise => { ... })                      ↻ fallback
+
+pipeline.Confirm("message")                          § ask user before proceeding
+└── .Then(then => { ... }) / .Else(otherwise => { ... })
+
+Conditions also integrate with:
+├── Element("id").{Mutation}().When(...)              per-command guard on element mutations
+└── .And(inner => inner.Confirm("..."))              confirm inside guard composition
+```
+
+#### HTTP
+
+Talk to the server. Gather collects values from components and event args into the request body. Validate gates the request behind client-side FluentValidation rules. Response handlers give you a fresh pipeline to update the page with the result.
+
+```
+pipeline.Get(url)                                    § HTTP verbs
+pipeline.Post(url) / .Post(url, g => { ... })        POST — optional inline gather
+pipeline.Put(url, g => { ... })                      PUT with inline gather
+pipeline.Delete(url)
+│
+├── .Gather(g => ...)                                collect values for request body
+│   ├── g.IncludeAll()                               all registered components
+│   ├── g.Include<T, TModel>(m => m.Prop)             specific component
+│   ├── g.Static("key", value) / g.FromEvent(args, a => a.Prop, "param")
+│   └── ...                                          (more: Include by string ref)
+│
+├── .AsJson() (default) / .AsFormData()               content type
+├── .Validate<TValidator>("formId")                  client-side validation gate
+├── .WhileLoading(pipeline => { ... })               ↻ loading state
+│
+└── .Response(r => ...)                              handle result
+    ├── r.OnSuccess(pipeline => { ... })             ↻ 200 — untyped
+    │   └── pipeline.Into("elementId")               inject response HTML into element
+    ├── r.OnSuccess<TResponse>((json, pipeline) => { ... })
+    │                                                ↻ 200 — json.{Prop} typed
+    ├── r.OnError(statusCode, pipeline => { ... })   ↻ error by status code
+    │   └── pipeline.ValidationErrors("formId")      route server errors to fields
+    └── r.Chained(c => ...)                          ↺ follow-up request
+        └── c.Get(url) / .Post(url) / ...            ↺ full HTTP API repeats
+
+pipeline.Parallel(                                   § concurrent requests
+    a => a.Get(url).Gather(...).Response(...),        each branch is a full HTTP unit ↺
+    b => b.Post(url).Gather(...).Response(...)
+)
+└── .OnAllSettled(pipeline => { ... })               ↻ after all complete
+```
+
+### Events and Typed Args
+
+`.Reactive()` wires a component event to a pipeline. `evt` selects which event — `args` gives you typed access to what happened. You can read properties, write back to the event, or call methods on it. The `pipeline` inside is the same API you saw above.
+
+```
+.Reactive(plan, evt => evt.{EventName}, (args, pipeline) => { ... })
+│
+│   evt.{EventName} — property (no args), IntelliSense shows what's available:
+├── evt.Changed                                      most — value or checked changed
+├── evt.Click                                        NativeButton
+├── evt.Filtering                                    FusionAutoComplete, FusionMultiSelect
+│
+│   args supports three operations — typed per event, IntelliSense shows what's available:
+├── args.{Prop}                                      read — use in conditions or pipelines
+├── args.{SetProp}(pipeline)                         write — set a property on the event
+├── args.{Method}(pipeline)                          call — no args
+└── args.{Method}<TResponse>(pipeline, ResponseBody<TResponse>, r => r.Prop)
+                                                     call — with response data
+```
+
+---
+
+The following pages cover each module in detail:
+
+| | Module | What it addresses |
+|-|--------|------------------|
+| 📋 | [**Plans and Rendering**](/csharp-modules/plan-and-entries/) | Setting up a view, rendering the JSON contract |
+| ⚡ | [**Triggers**](/csharp-modules/triggers-and-reactions/) | When something happens — page load, user action, dispatched event |
+| 🔧 | [**Mutations**](/csharp-modules/element-mutations/) | Changing the page — element text, classes, component values, visibility |
+| 🔀 | [**Conditions**](/csharp-modules/conditions/) | Branching — show/hide, enable/disable based on state |
+| 🌐 | [**HTTP Pipeline**](/csharp-modules/http-pipeline/) | Talking to the server — gather, validate, post, handle response |
+| 🧩 | [**Components**](/components/overview/) | Input rendering — native HTML, Syncfusion, labels, validation slots |
+| 🏷️ | **Tag Helpers** | Layout primitives — headings, cards, stacks, grids — clean HTML without CSS classes |
