@@ -2,7 +2,7 @@
 title: Element Mutations
 description: Targeting DOM elements for text, HTML, classes, and visibility changes.
 sidebar:
-  order: 1
+  order: 2
 ---
 
 Inside a `.Reactive()` or `Html.On()` pipeline, `pipeline` gives you access to mutations — ways to change what's on the page. You target an element or a component, then call methods that describe what should change.

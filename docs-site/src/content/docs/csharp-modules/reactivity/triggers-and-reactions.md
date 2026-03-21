@@ -2,7 +2,7 @@
 title: Triggers
 description: DomReady, CustomEvent, typed payloads, and component events with .Reactive().
 sidebar:
-  order: 2
+  order: 1
 ---
 
 A trigger defines *when* a pipeline executes. Every reactive behavior starts with one — page load, a named event, or a component interaction.

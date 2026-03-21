@@ -1,0 +1,119 @@
+---
+title: The JSON Plan Contract
+description: How the plan is structured, and why it matters.
+sidebar:
+  order: 2
+---
+
+You've seen the fluent C# — `.Reactive()`, `.Post()`, `.When()`. You know the builders capture intent into a JSON plan. But what does that plan actually look like? Is it just a blob of JSON, or is there structure?
+
+It's structured. Every piece has a `"kind"` field that tells the runtime exactly what to do. Let's trace a few examples you've already seen.
+
+## What does a checkbox toggle look like in the plan?
+
+You wrote this:
+
+```csharp
+p.When(args, a => a.Checked).Truthy()
+    .Then(t => t.Element("due-date-section").Show())
+    .Else(e => e.Element("due-date-section").Hide());
+```
+
+The plan captures it as a conditional with two branches:
+
+```json
+{
+  "kind": "conditional",
+  "branches": [
+    {
+      "guard": { "kind": "value", "source": { "kind": "event", "path": "evt.checked" }, "op": "truthy" },
+      "reaction": { "kind": "sequential", "commands": [{ "kind": "mutate-element", "target": "due-date-section" }] }
+    },
+    {
+      "reaction": { "kind": "sequential", "commands": [{ "kind": "mutate-element", "target": "due-date-section" }] }
+    }
+  ]
+}
+```
+
+Notice: `"kind": "conditional"`, `"kind": "value"`, `"kind": "event"`, `"kind": "sequential"`, `"kind": "mutate-element"`. Every object declares what it is. The runtime switches on `kind` — no guessing, no inference.
+
+The second branch has no guard — that's the `Else`.
+
+## What does `.SetText("Ready")` become?
+
+```csharp
+p.Element("status").SetText("Ready");
+```
+
+```json
+{ "kind": "mutate-element", "target": "status",
+  "mutation": { "kind": "set-prop", "prop": "textContent" },
+  "value": "Ready" }
+```
+
+The runtime reads this and does: `element.textContent = "Ready"`. The plan told it which element, which property, which value.
+
+## What about `.AddClass("active")`?
+
+```csharp
+p.Element("status").AddClass("active");
+```
+
+```json
+{ "kind": "mutate-element", "target": "status",
+  "mutation": { "kind": "call", "method": "add", "chain": "classList",
+    "args": [{ "kind": "literal", "value": "active" }] } }
+```
+
+Two mutation kinds — `set-prop` for property assignment, `call` for method invocation. That's it. Every DOM operation and every component operation maps to one of these two.
+
+## What about a Syncfusion component?
+
+```csharp
+p.Component<FusionDropDownList>(m => m.Facility).SetValue("Sunrise");
+```
+
+```json
+{ "kind": "mutate-element", "target": "...__Facility",
+  "mutation": { "kind": "set-prop", "prop": "value" },
+  "value": "Sunrise",
+  "vendor": "fusion" }
+```
+
+Same shape. The only difference is `"vendor": "fusion"` — which tells the runtime to resolve `el.ej2_instances[0]` instead of the raw element. Same two mutation kinds, same bracket notation, different root.
+
+## How does the runtime know about the components?
+
+The plan carries a `components` registry — populated when you write `Html.InputField`:
+
+```json
+{
+  "components": {
+    "Title":    { "vendor": "native", "readExpr": "value",   "componentType": "textbox" },
+    "IsUrgent": { "vendor": "native", "readExpr": "checked", "componentType": "checkbox" },
+    "DueDate":  { "vendor": "fusion", "readExpr": "value",   "componentType": "datepicker" }
+  }
+}
+```
+
+When `IncludeAll()` gathers values, or `Validate<T>` checks a field, the runtime looks up the component here — finds its vendor, its readExpr, and knows how to read its value. You registered each component once in C#. The plan carries the metadata. The runtime uses it.
+
+## Why does structure matter?
+
+Because it's validated. Every plan is checked against a JSON Schema in unit tests. If a builder produces a shape the schema doesn't allow — wrong `kind`, missing field, invalid combination — the test fails before any browser is involved.
+
+The schema defines what the runtime can execute:
+
+| Concept | Valid kinds |
+|---------|-----------|
+| Triggers | `dom-ready`, `custom-event`, `component-event` |
+| Reactions | `sequential`, `conditional`, `http`, `parallel-http` |
+| Mutations | `set-prop`, `call` |
+| Sources | `event`, `component` |
+
+If you need a new capability — say a new mutation kind — it goes into the schema first. The schema is the gatekeeper. The plan is the contract. Both sides (C# and JS) agree on its shape, and neither reaches beyond it.
+
+## Next
+
+- [Component Model](/architecture/component-model/) — how vendor-agnostic components work in detail

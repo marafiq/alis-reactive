@@ -2,7 +2,7 @@
 title: HTTP Pipeline
 description: GET/POST/PUT/DELETE requests, gather strategies, loading states, typed responses, chained and parallel requests, and validation integration.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 HTTP requests live inside a `.Reactive()` or `Html.On()` pipeline — typically triggered by a button click or a component event. You gather input values, validate, post, and handle the response in one fluent chain.

@@ -2,7 +2,7 @@
 title: Component API
 description: Targeting input components, non-input components, and app-level singletons in the pipeline — write properties, call methods, read values.
 sidebar:
-  order: 2
+  order: 3
 ---
 
 Components are targeted through `pipeline.Component<TComponent>()` inside any pipeline. Unlike `pipeline.Element("id")` which targets raw DOM elements, `Component<TComponent>` gives you typed access — IntelliSense constrains exactly which operations are available for each component type.

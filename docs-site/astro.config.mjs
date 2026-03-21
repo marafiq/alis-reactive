@@ -49,10 +49,10 @@ export default defineConfig({
 					items: [
 						{ label: 'Reactive Mental Model', slug: 'csharp-modules/mental-model' },
 						{ label: 'Plans and Rendering', slug: 'csharp-modules/plan-and-entries' },
-						{ label: 'Triggers', slug: 'csharp-modules/triggers-and-reactions' },
 						{
 							label: 'Reactivity',
 							items: [
+								{ label: 'Triggers', slug: 'csharp-modules/reactivity/triggers-and-reactions' },
 								{ label: 'Element Mutations', slug: 'csharp-modules/reactivity/element-mutations' },
 								{ label: 'Component API', slug: 'csharp-modules/reactivity/component-api' },
 								{ label: 'Conditions', slug: 'csharp-modules/reactivity/conditions' },

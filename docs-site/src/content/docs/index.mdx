@@ -1,0 +1,60 @@
+---
+title: Reactive
+description: Plan-driven reactive framework for ASP.NET MVC.
+template: splash
+hero:
+  tagline: Developers write fluent C# to express reactivity intent. It produces a JSON plan. The JS runtime executes it. No bespoke JavaScript in views. Ever.
+  actions:
+    - text: Why Alis.Reactive?
+      link: /why/
+      icon: right-arrow
+    - text: Architecture
+      link: /architecture/the-contract/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Core Principles
+
+<CardGrid>
+	<Card title="Plan Is the Contract" icon="document">
+		The JSON plan is the **only** contract between C# and JS. No shortcuts, no manual JS in views.
+	</Card>
+	<Card title="Three Test Layers" icon="approve-check">
+		Every primitive is tested at C# unit (snapshots + schema), TS unit (jsdom), and Playwright (browser). ~1,800 tests total.
+	</Card>
+	<Card title="Vertical Slices" icon="puzzle">
+		Each component is a self-contained 7-file slice. Duplication over abstraction. Zero shared base classes.
+	</Card>
+	<Card title="Zero Runtime Changes" icon="rocket">
+		Adding a new component requires only a new C# vertical slice. The 2KB JS runtime never changes.
+	</Card>
+</CardGrid>
+
+## Documentation Guide
+
+<CardGrid>
+	<Card title="Getting Started" icon="star">
+		[Why Alis.Reactive?](/why/) -- the problem and the solution.
+		[Your First Plan](/getting-started/your-first-plan/) -- build a Todo app step by step.
+	</Card>
+	<Card title="Architecture" icon="setting">
+		[The Contract](/architecture/the-contract/) -- JSON plan deep dive.
+		[Three Layers](/architecture/three-layers/) -- C#, JSON, JS.
+		[Two-Phase Boot](/architecture/two-phase-boot/) -- why event order matters.
+	</Card>
+	<Card title="Features" icon="seti:csharp">
+		[Plans](/csharp-modules/plan-and-entries/) -- create and render a plan.
+		[Triggers](/csharp-modules/triggers-and-reactions/) -- DomReady, CustomEvent, .Reactive().
+		[Mutations](/csharp-modules/element-mutations/) -- Element, Component, source binding.
+		[Conditions](/csharp-modules/conditions/) -- When/Then/Else with 21 operators.
+		[HTTP](/csharp-modules/http-pipeline/) -- GET/POST, Gather, Response, Parallel.
+	</Card>
+	<Card title="Components" icon="puzzle">
+		[Architecture](/components/overview/) -- vendor-agnostic model.
+		[Native](/components/native-components/) -- 8 HTML input components.
+		[Fusion](/components/fusion-components/) -- 15 Syncfusion EJ2 components.
+	</Card>
+</CardGrid>

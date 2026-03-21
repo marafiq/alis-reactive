@@ -1,0 +1,151 @@
+---
+title: Testing Strategy
+description: Three layers of tests, what each catches, and why all three are mandatory.
+sidebar:
+  order: 1
+---
+
+Every feature is tested at three layers. Each layer catches a different category of bug.
+
+```d2
+direction: down
+
+layer1: "C# Unit Tests\nJSON plan correctness\n~500 tests, milliseconds" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 20
+}
+
+layer2: "TypeScript Unit Tests\nRuntime execution in jsdom\n~944 tests, seconds" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 20
+}
+
+layer3: "Playwright Tests\nReal browser behavior\n~483 tests, ~75 seconds" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+
+layer1 -> layer2: "Plan JSON is correct.\nDoes the runtime execute it?" {
+  style.font-size: 16
+  style.stroke: "#f9ab00"
+}
+layer2 -> layer3: "Runtime logic works.\nDoes it work in a real browser?" {
+  style.font-size: 16
+  style.stroke: "#34a853"
+}
+```
+
+---
+
+## What does each layer catch?
+
+### Layer 1 -- C# Unit Tests
+
+The C# DSL builds intent objects and serializes them to a JSON plan. These tests verify that the rendered JSON is correct.
+
+**Tools:** NUnit + Verify.NUnit + JsonSchema.Net
+
+Two patterns:
+- **Snapshot verification** -- `VerifyJson(plan.Render())` locks down exact JSON output.
+- **Schema validation** -- `AssertSchemaValid(plan.Render())` confirms the plan conforms to `reactive-plan.schema.json`.
+
+**Catches:** Serialization regressions, missing `camelCase` mappings, schema violations after adding new kinds, builder methods producing wrong output after refactoring.
+
+**Projects:**
+
+| Project | Covers |
+|---------|--------|
+| `Alis.Reactive.UnitTests` | Core plan rendering and schema validation |
+| `Alis.Reactive.Native.UnitTests` | Native component vertical slices |
+| `Alis.Reactive.Fusion.UnitTests` | Syncfusion component vertical slices |
+| `Alis.Reactive.FluentValidator.UnitTests` | Validation rule extraction |
+
+### Layer 2 -- TypeScript Unit Tests
+
+The runtime reads a JSON plan and executes it against the DOM. These tests construct a plan object, set up a minimal DOM in jsdom, call `boot()`, and assert the result.
+
+**Tools:** Vitest + jsdom
+
+**Catches:** Mutation handlers writing to the wrong property, dot-path resolution stopping one level early, `"false"` coercing to `true`, two-phase boot regressions (listeners wired after dom-ready fires), guard evaluation comparing strings when it should compare numbers.
+
+### Layer 3 -- Playwright Tests
+
+The full system running in a real browser. Tests start the SandboxApp on localhost, navigate to pages, interact with components, and assert DOM state and console trace output.
+
+**Tools:** Playwright.NUnit against a live Kestrel server (port 5220)
+
+**Catches:** Integration bugs between C# server and JS runtime, real browser timing and event propagation, Syncfusion component initialization, CSS layout regressions, end-to-end workflows.
+
+---
+
+## Why not just Playwright?
+
+Speed and precision trade off against realism:
+
+| Layer | Speed | Diagnostic precision | Realism |
+|-------|-------|---------------------|---------|
+| C# Unit | Fastest (milliseconds) | Pinpoints exact serialization issue | No runtime |
+| TS Unit | Fast (seconds) | Pinpoints exact runtime logic issue | No real browser |
+| Playwright | Slowest (~75s total) | Confirms end-to-end, harder to isolate | Full browser stack |
+
+When a Playwright test fails, you know something is wrong but not *where*. Is the plan JSON wrong? Is a mutation handler broken? Is a component not initialized? The lower layers answer that question in milliseconds.
+
+---
+
+## One feature across three layers
+
+Here is `AddClass` tested at every layer:
+
+**C# Unit Test** -- plan JSON contains the correct mutation:
+
+```csharp
+[Test]
+public Task AddClass_produces_mutate_element_command() =>
+    VerifyJson(Build(p => p.Element("status").AddClass("active")).Render());
+```
+
+**TS Unit Test** -- runtime applies the class to the DOM:
+
+```typescript
+it("adds a class to an element", () => {
+  boot({
+    planId: "Test.Model", components: {},
+    entries: [{
+      trigger: { kind: "dom-ready" },
+      reaction: { kind: "sequential", commands: [{
+        kind: "mutate-element", target: "status",
+        mutation: { kind: "call", method: "add", chain: "classList",
+          args: [{ kind: "literal", value: "active" }] }
+      }]}
+    }]
+  });
+  expect(document.getElementById("status")!.classList.contains("active")).toBe(true);
+});
+```
+
+**Playwright Test** -- the class appears in a real browser:
+
+```csharp
+[Test]
+public async Task all_three_steps_have_green_class_after_chain_completes()
+{
+    await NavigateTo("/Sandbox/Events");
+    await WaitForTraceMessage("booted", 5000);
+
+    await Expect(Page.Locator("#step-1"))
+        .ToHaveClassAsync(new Regex("text-green-600"));
+    AssertNoConsoleErrors();
+}
+```
+
+---
+
+## The rule
+
+Every new primitive (command kind, trigger kind, component, validation rule) needs tests at all three layers. No exceptions. All ~1,900 tests must pass before every commit.

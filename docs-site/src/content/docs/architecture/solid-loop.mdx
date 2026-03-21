@@ -1,0 +1,80 @@
+---
+title: The SOLID Loop
+description: How descriptors, plan JSON, and the JS runtime form the architecture contract.
+sidebar:
+  order: 11
+---
+
+Every change flows through three layers. Each layer has its own test strategy.
+
+```d2
+direction: right
+
+layer1: "Layer 1 — C# DSL\nIntent + Builders\nUnit Tests (Verify snapshots)" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 20
+}
+layer2: "Layer 2 — JSON Plan\nSchema-validated structure\nSchema Tests (JSON Schema)" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 20
+}
+layer3: "Layer 3 — JS Runtime\nBrowser-verified behavior\nPlaywright Tests (DOM assertions)" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+
+layer1 -> layer2: serializes intent {
+  style.font-size: 16
+  style.stroke: "#4285f4"
+}
+layer2 -> layer3: boot discovers plan {
+  style.font-size: 16
+  style.stroke: "#34a853"
+}
+```
+
+## Layer 1: C# DSL
+
+The developer writes C# in `.cshtml` views. Every call builds a **descriptor** and adds it to
+the `ReactivePlan`. Nothing executes at this point.
+
+## Layer 2: JSON Plan
+
+`plan.Render()` serializes all entries to JSON using `System.Text.Json` with `camelCase`
+naming and polymorphic type discriminators (`"kind"` property).
+
+## Layer 3: JS Runtime
+
+ESM module bundled by esbuild. The runtime reads the plan JSON and executes it. Nothing more.
+
+## Two-Phase Boot
+
+Custom-event listeners **must** be wired before dom-ready reactions execute. This ensures event chains work regardless of entry order in the plan.
+
+```d2
+direction: right
+
+phase1: "Phase 1\nWire all non-dom-ready triggers" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 20
+}
+phase2: "Phase 2\nExecute dom-ready triggers" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+
+phase1 -> phase2: then {
+  style.font-size: 16
+  style.stroke: "#34a853"
+}
+```

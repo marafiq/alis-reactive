@@ -1,0 +1,216 @@
+---
+title: Architecture
+description: The goals and building blocks of Reactive.
+sidebar:
+  order: 1
+---
+
+## Goals
+
+Reactive is designed around five goals:
+
+| Goal | What it means |
+|------|--------------|
+| **Compile-time safety** | Model bindings, event args, and response types are expression-based. Rename a property → compiler error. |
+| **Vendor-agnostic components** | Native HTML inputs and Syncfusion EJ2 components use the same fluent API. Adding a new component requires zero runtime changes. |
+| **Reactive event handling** | When a checkbox changes, when a dropdown selects, when the page loads — express the reaction in C#, not JavaScript. |
+| **HTTP orchestration** | Gather component values, validate, post, handle success and errors, cascade — all in one fluent chain. |
+| **Conditional logic** | Show/hide, enable/disable, branch on values — 21 operators, composable with And/Or/Not. |
+
+```d2
+direction: right
+
+builders: "C# Fluent Builders\nExpress intent" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 20
+}
+plan: "JSON Plan\nThe contract" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 20
+}
+runtime: "JS Runtime\nExecutes intent" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+
+builders -> plan: plan.Render() {
+  style.font-size: 16
+  style.stroke: "#4285f4"
+}
+plan -> runtime: boot {
+  style.font-size: 16
+  style.stroke: "#34a853"
+}
+```
+
+You write C# fluent builders in `.cshtml` views. They produce a JSON plan. The runtime executes it in the browser. You never write JavaScript.
+
+Let's explore how these goals come together. We'll start with **Reactive Event Handling** — the most common module you'll use.
+
+## Reactive Event Handling
+
+How do you react when a user checks a checkbox? In plain MVC, you write a `<script>` block with `addEventListener`. In Reactive, you express it in C#:
+
+```csharp
+Html.InputField(plan, m => m.IsUrgent, o => o.Label("Urgent"))
+    .NativeCheckBox(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+    {
+        p.Element("due-date-section").Show();
+    }));
+```
+
+Notice the fluent chain: `Html.InputField` → `.NativeCheckBox` → `.Reactive()` → `evt.Changed` → `(args, p) => { ... }`. Each step narrows the context. IntelliSense guides you — `evt.` shows `Changed`, `args.` shows `Checked` (typed as `bool?`). You don't look up event names or property paths. The API tells you what's available.
+
+How does `.Reactive()` actually wire to the DOM? That's the JSON plan's job — we'll get to it in [The Contract](/architecture/the-contract/). For now, what matters: the syntax is discoverable, the types are checked, and you express intent without writing JavaScript.
+
+Let's see a few more examples. What if you want to react to the page loading?
+
+```csharp
+Html.On(plan, t => t.DomReady(p =>
+{
+    p.Element("status").SetText("Ready");
+}));
+```
+
+What if you'd like some other part of the page to know something happened?
+
+```csharp
+// When the save button is clicked, post and notify
+Html.NativeButton("save-btn", "Save")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post("/api/save", g => g.IncludeAll())
+         .Response(r => r.OnSuccess(s =>
+         {
+             s.Dispatch("intake-saved");
+         }));
+    });
+
+// Somewhere else on the page, listen for it
+Html.On(plan, t => t.CustomEvent("intake-saved", p =>
+{
+    p.Element("banner").SetText("Saved successfully");
+    p.Element("banner").AddClass("text-green-600");
+}));
+```
+
+Three trigger types, three sources of "when": page lifecycle, user interaction, and coordination between parts of the page.
+
+## So What Happens When You Write This?
+
+Remember unobtrusive `data-*` attributes? `data-ajax-url="/api/save"`, `data-ajax-method="POST"` — flat attributes that a small runtime reads and acts on. The idea was right — express intent as data.
+
+The fluent C# above does the same thing, but instead of flat attributes, the builders capture your intent into a structured JSON plan. When the view renders, `plan.Render()` serializes it. The runtime reads it and executes exactly what you described.
+
+We'll look at the plan structure in [The Contract](/architecture/the-contract/). For now: fluent C# in, structured JSON out, runtime executes. No JavaScript.
+
+But events are just one module. What else can you express this way? Well, the more interesting challenge is how we talk to the server. Let's see.
+
+## HTTP Orchestration
+
+You have a form. The user clicks Save. You want to validate client-side first — if invalid, show errors without hitting the server. If valid, post. On success, show a toast. If the server returns 400 (its own validation), route those errors to the right fields too.
+
+```csharp
+Html.NativeButton("save-btn", "Save")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post("/api/save", g => g.IncludeAll())
+         .Validate<TodoValidator>("form")
+         .Response(r => r
+            .OnSuccess(s => s.Component<FusionToast>()
+                .SetContent("Saved").Success().Show())
+            .OnError(400, e => e.ValidationErrors("form")));
+    });
+```
+
+`IncludeAll()` gathers every registered component's value. `Validate<TodoValidator>` runs your FluentValidation rules client-side — the request only fires if they pass. `OnSuccess` shows a toast. `OnError(400)` handles server-side validation errors and routes them to the matching fields.
+
+What about cascading dropdowns — where one dropdown's selection fetches data for another?
+
+```csharp
+.Reactive(plan, evt => evt.Changed, (args, p) =>
+{
+    p.Get("/api/cities")
+     .Gather(g => g.Include<FusionDropDownList, Model>(m => m.Country))
+     .Response(r => r.OnSuccess<CityResponse>((json, s) =>
+     {
+         s.Component<FusionDropDownList>(m => m.City)
+             .SetDataSource(json, j => j.Cities)
+             .DataBind();
+     }));
+});
+```
+
+Country changes → gather its value → GET cities → set the city dropdown's data source. All typed. All in C#.
+
+Same pattern as events: fluent C# captures intent, the plan carries it, the runtime executes it. No `fetch`, no manual DOM updates, no `<script>` block.
+
+## Vendor-Agnostic Components
+
+Your form has a native `<input type="checkbox">` and a Syncfusion `DatePicker`. How does the framework read both their values without vendor-specific code?
+
+Each component registers itself in the plan with three pieces of metadata:
+
+| Component | Vendor | ReadExpr | Runtime reads |
+|-----------|--------|----------|--------------|
+| `NativeCheckBox` | `native` | `"checked"` | `el.checked` |
+| `NativeTextBox` | `native` | `"value"` | `el.value` |
+| `FusionDatePicker` | `fusion` | `"value"` | `el.ej2_instances[0].value` |
+| `FusionDropDownList` | `fusion` | `"value"` | `el.ej2_instances[0].value` |
+
+The runtime resolves the correct root object from the vendor, then reads the property from the readExpr. Your C# code uses `Component<T>(m => m.Property)` for all of them — same API, any vendor.
+
+But how does a component get registered? When you write `Html.InputField`:
+
+```csharp
+Html.InputField(plan, m => m.DueDate, o => o.Label("Due Date"))
+    .DatePicker(b => b.Placeholder("Select date")); // Syncfusion EJ2 DatePicker (FusionDatePicker)
+```
+
+`.DatePicker()` is the factory for `FusionDatePicker`. It renders the Syncfusion HTML and registers itself in the plan — vendor `"fusion"`, readExpr `"value"`. When `.IncludeAll()` gathers values later, or `.Validate<T>()` checks a field, the plan already knows which element to find, which vendor root to resolve, and which property to read. You declared the component once. Everything else flows from that.
+
+Adding a new component type? Write a C# vertical slice that declares its vendor and readExpr. The runtime doesn't change. Same mantra: fluent C# captures intent, the plan carries it, the runtime executes it.
+
+## Compile-Time Safety
+
+What's checked at compile time?
+
+```csharp
+// Model binding — rename IsUrgent and this breaks at build
+p.Component<NativeCheckBox>(m => m.IsUrgent).SetChecked(true);
+
+// Event args — args.Checked is bool?, not object
+p.When(args, a => a.Checked).Truthy();
+
+// Response typing — json.Cities is checked against CityResponse
+s.Component<FusionDropDownList>(m => m.City)
+    .SetDataSource(json, j => j.Cities);
+```
+
+Element IDs (`p.Element("status")`) are strings — they target non-model-bound display elements and don't need expression-based access. Model bindings, event args, response bodies, and component access are all expression-based.
+
+## Recap
+
+You've seen four modules — each one follows the same pattern:
+
+| Module | You write | Plan carries | Runtime executes |
+|--------|-----------|-------------|-----------------|
+| **Events** | `.Reactive(evt => evt.Changed)` | Trigger + reaction | Wires DOM listener, runs commands |
+| **HTTP** | `.Post()`, `.Gather()`, `.Response()` | Request + handlers | Fetches, routes response |
+| **Components** | `Html.InputField().DatePicker()` | Vendor + readExpr | Resolves root, reads/writes value |
+| **Conditions** | `.When(args, a => a.Checked).Truthy()` | Guard + branches | Evaluates, picks branch |
+
+The architecture is one idea applied everywhere: **fluent C# expresses intent → the plan carries it as structured data → the runtime executes it**. No JavaScript in your views. No vendor-specific code.
+
+We showed some features here — enough to see the pattern. The complete reference is covered under Features. Next, let's look at what the plan actually looks like.
+
+## Next
+
+- [The JSON Plan Contract](/architecture/the-contract/) — what the plan actually looks like
+- [Component Model](/architecture/component-model/) — how vendor-agnostic components work in detail

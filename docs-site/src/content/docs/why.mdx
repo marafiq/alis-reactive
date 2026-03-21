@@ -1,0 +1,165 @@
+---
+title: Why Alis.Reactive?
+description: The problem Reactive solves, and how a plan-driven architecture eliminates bespoke JavaScript from ASP.NET MVC views.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Problem 1: Bespoke JavaScript
+
+In traditional ASP.NET MVC, client-side interactivity means writing JavaScript. Show a panel on checkbox toggle, filter a dropdown, validate before submit -- each one is bespoke JS reaching into the DOM.
+
+<details>
+<summary>Duplicated logic, scattered scripts, no compile-time safety, separate test infrastructure</summary>
+
+- **Duplicated logic.** C# validates on the server, then you rewrite the same rules in JS for instant feedback. Two languages, one truth that drifts.
+- **Scattered scripts.** Each view grows its own `<script>` block -- some jQuery, some vanilla, some both.
+- **No compile-time safety.** Rename an element ID and nothing warns you. The bug ships as a silent no-op.
+- **Separate test infrastructure.** C# has NUnit. JS needs its own runner, assertions, CI step. Most teams skip it.
+
+</details>
+
+At scale -- a resident intake form with 40 fields, conditional visibility, cascading dropdowns, multi-step validation -- the JavaScript is not a few event handlers. It is a parallel application living inside your views.
+
+## Problem 2: Unobtrusive Got Halfway There
+
+ASP.NET's unobtrusive validation and AJAX recognized this pain. `data-val-required`, `data-ajax-update` -- express some behaviors declaratively without raw JS. For basic cases, it worked. But it hits hard limits:
+
+<details>
+<summary>No type safety, limited validators, no reactivity, vendor components break it, not discoverable</summary>
+
+- **No type safety.** `data-val-*` attributes are strings. Rename a property and they silently break.
+- **Limited validators.** "Required when another field is checked" or "greater than that field's value" means custom JS.
+- **No reactivity.** Cascading dropdowns, conditional panels, inter-field reactions -- you intercept jQuery Validation internals or hand-wire `$(document).on("change")` alongside the declarative attributes.
+- **Vendor components break it.** Syncfusion, Telerik, and others have their own lifecycle and APIs (`el.ej2_instances[0].value`). Unobtrusive attributes cannot express "read from a Syncfusion AutoComplete."
+- **Not discoverable.** New developers see `data-val-*`, `data-ajax-*`, inline scripts, and separate `.js` files. No single place describes what the page does.
+
+</details>
+
+Yet unobtrusive proved something important: **expressing intent as data works.** `data-val-required="true"` is not code -- it is a declaration. A small runtime reads it and enforces it. The idea is sound. The format is just too limited.
+
+<Aside type="tip" title="Idea">
+What if you kept that principle -- intent as data -- but replaced flat attributes with a structured plan? Conditions, HTTP calls, component mutations across vendors. All from C#, with full type safety.
+</Aside>
+
+## The Insight
+
+Every piece of client-side behavior in a view boils down to three things:
+
+1. **React to events.** A checkbox changes, a page loads, a dropdown selects -- *when* something happens, *do* something to the DOM.
+2. **Talk to the server.** Post a form, fetch filtered data, validate against server rules -- HTTP over the wire, then update the UI with the response.
+3. **Orchestrate components.** Read a value from one component, write it to another, show or hide a section based on state -- coordinate across the page.
+
+If every behavior is one of these three, you do not need to hand-write the execution. You need to **describe** what should happen, and let a runtime execute it.
+
+## The Solution
+
+Reactive replaces bespoke JavaScript with a three-layer architecture:
+
+```d2
+direction: right
+
+csharp: "C# Fluent Builders\nExpress intent" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 22
+}
+plan: "JSON Plan\nThe contract" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 22
+}
+runtime: "JS Runtime\nExecutes the plan" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 22
+}
+
+csharp -> plan: plan.Render() {
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+plan -> runtime: boot {
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+```
+
+1. **C# fluent builders** express your intent. You write C# in your `.cshtml` views -- `Element("panel").Show()`, `Component<NativeCheckBox>(m => m.IsActive).SetChecked(true)` -- and the builders capture what should happen.
+
+2. **The JSON plan** is the contract. `plan.Render()` serializes your intent to JSON. This plan is schema-validated and carries every trigger, every condition, every mutation.
+
+3. **The JS runtime** executes the plan. A 2kb ESM module reads the JSON and executes the intents as expressed.
+
+## What It Looks Like
+
+Here are the three things from The Insight, expressed in C#. No JavaScript anywhere.
+
+### 1. React to events
+
+A checkbox toggles a panel:
+
+```csharp
+Html.InputField(plan, m => m.IsEmergencyContact, o => o.Label("Emergency Contact"))
+    .NativeCheckBox(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+    {
+        p.When(args, a => a.Checked).Truthy()
+            .Then(t => t.Element("phone-section").Show())
+            .Else(e => e.Element("phone-section").Hide());
+    }));
+```
+
+### 2. Talk to the server
+
+A button click posts form data and handles the response:
+
+```csharp
+Html.NativeButton("save-btn", "Save Resident")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post("/api/residents/save", g => g.IncludeAll())
+         .Validate<ResidentValidator>("intake-form")
+         .Response(r => r
+            .OnSuccess(s => s.Component<FusionToast>()
+                .SetContent("Resident saved").Success().Show())
+            .OnError(400, e => e.ValidationErrors("intake-form")));
+    });
+```
+
+### 3. Orchestrate components
+
+A country dropdown cascades into a city dropdown:
+
+```csharp
+Html.InputField(plan, m => m.Country, o => o.Required().Label("Country"))
+    .DropDownList(b => b.Fields<CountryItem>(t => t.Text, v => v.Value)
+        .Reactive(plan, evt => evt.Changed, (args, p) =>
+        {
+            p.Get("/Sandbox/Cascading/Cities")
+             .Gather(g => g.Include<FusionDropDownList, CascadingModel>(m => m.Country))
+             .Response(r => r.OnSuccess<CityLookupResponse>((json, s) =>
+             {
+                 s.Component<FusionDropDownList>(m => m.City)
+                     .SetDataSource(json, j => j.Cities)
+                     .DataBind();
+             }));
+        }));
+```
+
+All three produce a JSON plan. The runtime reads it and executes the intents. Zero JavaScript in the view.
+
+## Key Features
+
+**Everything that matters is typed.** `Html.InputField(plan, m => m.Country)`, `p.Component<FusionDropDownList>(m => m.City)`, `args.Checked`, `json.Cities` -- model properties, component access, event args, and response bodies are all expression-based. Rename a property and the compiler catches it. IntelliSense shows what's available. A typo is a build error, not a runtime surprise.
+
+**Vendor-agnostic components.** Native HTML inputs and Syncfusion EJ2 components work through the same API. `p.Component<NativeCheckBox>(m => m.IsActive)` and `p.Component<FusionDropDownList>(m => m.City)` use the same fluent chain. Adding a new component type requires zero runtime changes.
+
+**Zero inline scripts.** Views contain C# plan code and HTML. The layout loads the runtime once via `<script type="module" src>`. Individual views never emit `<script>` blocks.
+
+## Next Steps
+
+- [Your First Reactive Plan](/getting-started/your-first-plan/) -- build a real interactive page step by step
+- [The Architecture](/architecture/the-contract/) -- how the JSON plan contract works

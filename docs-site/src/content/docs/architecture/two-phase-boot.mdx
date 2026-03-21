@@ -1,0 +1,285 @@
+---
+title: Two-Phase Boot
+description: Why custom-event listeners must be wired before dom-ready reactions execute, and how the runtime guarantees it.
+sidebar:
+  order: 10
+---
+
+Two-phase boot is an architectural invariant. It solves a specific problem that emerges whenever event chains span multiple plan entries.
+
+## The problem
+
+Consider a plan with two entries:
+
+1. **On dom-ready**: dispatch `"resident-loaded"` with payload `{ name: "Margaret Chen" }`
+2. **On custom-event `"resident-loaded"`**: set the text of `#resident-name` to the payload's `name`
+
+Entry order in the plan is determined by the order `Html.On()` calls appear in the view. But the developer shouldn't need to think about ordering. Both entries are declarations of behavior --- "when this happens, do that" --- and they should work regardless of which appears first.
+
+If the runtime processes entries sequentially --- wire trigger, then execute --- the dom-ready entry fires immediately. It dispatches `"resident-loaded"`. But the custom-event listener hasn't been wired yet. The event vanishes. The resident's name never appears.
+
+```d2
+direction: down
+
+title: "Naive sequential boot (BROKEN)" {
+  shape: text
+  style.font-size: 20
+  style.bold: true
+}
+
+entry1: "Entry 1: dom-ready" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 20
+}
+dispatch: 'dispatch("resident-loaded")' {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 20
+}
+lost: "Event lost — no listener yet" {
+  shape: rectangle
+  style.fill: "#f4cccc"
+  style.stroke: "#ea4335"
+  style.font-color: "#990000"
+  style.font-size: 20
+}
+entry2: 'Entry 2: wire "resident-loaded" listener' {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 20
+}
+never: "Never fires" {
+  shape: rectangle
+  style.fill: "#f4cccc"
+  style.stroke: "#ea4335"
+  style.font-color: "#990000"
+  style.font-size: 20
+}
+
+entry1 -> dispatch: executes {
+  style.font-size: 16
+  style.stroke: "#ea4335"
+}
+dispatch -> lost: fires into void {
+  style.font-size: 16
+  style.stroke: "#ea4335"
+}
+lost -> entry2: too late {
+  style.font-size: 16
+  style.stroke: "#ea4335"
+}
+entry2 -> never {
+  style.stroke: "#ea4335"
+}
+```
+
+This is not a theoretical concern. Event chains are the primary composition mechanism in Reactive. A dom-ready trigger loads data from the server. The response handler dispatches an event with the data. Downstream listeners update the UI. If the listeners aren't ready, the chain breaks silently.
+
+## The solution
+
+The runtime boots in two phases:
+
+**Phase 1** --- Wire all non-dom-ready triggers. Custom-event listeners and component-event listeners are attached to the document. Nothing executes yet.
+
+**Phase 2** --- Execute dom-ready triggers. These may dispatch events, which phase 1 listeners are now ready to catch.
+
+```d2
+direction: down
+
+title: "Two-phase boot (CORRECT)" {
+  shape: text
+  style.font-size: 20
+  style.bold: true
+}
+
+phase1_label: "Phase 1 — Wire listeners" {
+  shape: text
+  style.font-size: 18
+  style.bold: true
+  style.font-color: "#1a73e8"
+}
+wire: 'Wire "resident-loaded" listener' {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 20
+}
+phase2_label: "Phase 2 — Execute dom-ready" {
+  shape: text
+  style.font-size: 18
+  style.bold: true
+  style.font-color: "#137333"
+}
+exec: "Execute dom-ready entry" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+dispatch: 'dispatch("resident-loaded")' {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+caught: "Listener catches event" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+result: '"Margaret Chen" appears in #resident-name' {
+  shape: rectangle
+  style.fill: "#d4edda"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+
+phase1_label -> wire {
+  style.stroke: "#4285f4"
+}
+wire -> phase2_label: "all listeners ready" {
+  style.font-size: 16
+  style.stroke: "#4285f4"
+}
+phase2_label -> exec {
+  style.stroke: "#34a853"
+}
+exec -> dispatch: fires {
+  style.font-size: 16
+  style.stroke: "#34a853"
+}
+dispatch -> caught: listener exists {
+  style.font-size: 16
+  style.stroke: "#34a853"
+}
+caught -> result {
+  style.stroke: "#34a853"
+}
+```
+
+## The implementation
+
+The boot function collects dom-ready entries into a deferred list, wires everything else first, then processes the deferred entries:
+
+```typescript
+function wireEntries(
+  entries: Entry[],
+  components: Record<string, ComponentEntry>,
+  signal?: AbortSignal
+): void {
+  // Phase 1: wire all non-dom-ready listeners
+  const deferred: Entry[] = [];
+  for (const entry of entries) {
+    if (entry.trigger.kind === "dom-ready") {
+      deferred.push(entry);
+    } else {
+      wireTrigger(entry.trigger, entry.reaction, components, signal);
+    }
+  }
+
+  // Phase 2: execute dom-ready triggers
+  for (const entry of deferred) {
+    wireTrigger(entry.trigger, entry.reaction, components, signal);
+  }
+}
+```
+
+`wireTrigger` handles dom-ready entries by executing their reaction immediately (there's nothing to "listen" for --- the DOM is already ready). For custom-event and component-event entries, it attaches an event listener that will execute the reaction when the event fires.
+
+The separation is deliberate: phase 1 entries register callbacks. Phase 2 entries invoke callbacks. By the time phase 2 runs, every callback is in place.
+
+## Event chains of any depth
+
+Two-phase boot doesn't just handle one hop. It handles chains of arbitrary depth:
+
+```
+dom-ready
+  → dispatch("data-loaded")
+    → custom-event("data-loaded")
+      → dispatch("ui-ready")
+        → custom-event("ui-ready")
+          → mutate elements
+```
+
+This works because `dispatch` fires a synchronous `CustomEvent` on `document`. The listener wired in phase 1 receives it immediately. If that listener's reaction also dispatches, the next listener (also wired in phase 1) receives that event immediately too. The entire chain completes synchronously within the phase 2 execution.
+
+```d2
+direction: right
+
+domready: "dom-ready" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+dispatch1: 'dispatch("data-loaded")' {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 20
+}
+listener1: 'listener: "data-loaded"' {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 20
+}
+dispatch2: 'dispatch("ui-ready")' {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 20
+}
+listener2: 'listener: "ui-ready"' {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 20
+}
+mutate: "mutate DOM" {
+  shape: rectangle
+  style.fill: "#d4edda"
+  style.stroke: "#34a853"
+  style.font-size: 20
+}
+
+domready -> dispatch1: "phase 2" {
+  style.font-size: 16
+  style.stroke: "#34a853"
+}
+dispatch1 -> listener1: "synchronous" {
+  style.font-size: 16
+  style.stroke: "#f9ab00"
+}
+listener1 -> dispatch2 {
+  style.stroke: "#4285f4"
+}
+dispatch2 -> listener2: "synchronous" {
+  style.font-size: 16
+  style.stroke: "#f9ab00"
+}
+listener2 -> mutate {
+  style.stroke: "#4285f4"
+}
+```
+
+## What about async reactions?
+
+HTTP reactions (`kind: "http"`) are asynchronous --- the fetch completes later. But the event chain still works. The HTTP reaction's response handler dispatches an event when the response arrives. By that time, all listeners from phase 1 are long since wired. Two-phase boot guarantees listener availability at boot time; it doesn't need to guarantee it during async continuations because the listeners persist for the lifetime of the page.
+
+## Verification at all three layers
+
+This invariant is too important to verify at just one level.
+
+**C# unit tests** verify that the plan structure is correct --- dom-ready triggers and custom-event triggers serialize properly, and a plan can contain both.
+
+**TS unit tests** (`when-dom-ready-chains-into-custom-event.test.ts`) create a plan where dom-ready dispatches an event and a custom-event listener mutates the DOM. The test calls `boot()` directly and asserts that the DOM mutation occurred. If two-phase boot breaks, this test fails.
+
+**Playwright tests** (`WhenEventChainFires.cs`) navigate to a real page in the sandbox app where a three-hop dispatch chain runs on page load. The test waits for trace messages in the browser console and asserts that all hops completed in chronological order. If the runtime script changes and breaks the boot order, the browser test catches it.
+
+Three layers, one invariant: **listeners are wired before dispatches fire**. Every commit verifies this.

@@ -2,7 +2,7 @@
 title: Conditions
 description: Runtime branching with When/Then/ElseIf/Else, comparison and text operators, guard composition with And/Or/Not, and confirm dialogs.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 Conditions live inside a `.Reactive()` or `Html.On()` pipeline. They let you branch based on values that only exist in the browser — an event payload, a component's current state.
