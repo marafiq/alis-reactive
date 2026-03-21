@@ -24,6 +24,9 @@
   <Folder Name="/.claude/skills/bdd-testing/">
     <File Path=".claude/skills/bdd-testing/SKILL.md" />
   </Folder>
+  <Folder Name="/.claude/skills/bdd-testing/references/">
+    <File Path=".claude/skills/bdd-testing/references/patterns.md" />
+  </Folder>
   <Folder Name="/.claude/skills/validation-rules/">
     <File Path=".claude/skills/validation-rules/SKILL.md" />
   </Folder>
