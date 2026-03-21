@@ -1,40 +1,44 @@
 using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
-/// Plan-driven locators: the plan JSON tells us every component ID.
-/// Zero hardcoded IDs. Zero knowledge of IdGenerator pattern.
-/// The test writer only needs the MODEL PROPERTY NAME.
+/// Strongly-typed plan-driven locators.
+///
+/// View:  Html.InputField(plan, m => m.Physician, ...)
+/// Test:  plan.AutoComplete(m => m.Physician)
+///
+/// Same expression. Same compile-time safety.
+/// Rename Physician → PrimaryPhysician: both break at build.
 /// </summary>
 [TestFixture]
 public class WhenUsingPlanDrivenLocators : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/AutoComplete";
 
-    private ReactivePlan _plan = null!;
+    private PagePlan<AutoCompleteModel> _plan = null!;
 
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        _plan = await ReactivePlan.FromPage(Page);
+        _plan = await PagePlan<AutoCompleteModel>.FromPage(Page);
     }
 
     [Test]
-    public async Task plan_discovers_all_components_on_page()
+    public async Task plan_discovers_components_by_model_expression()
     {
         await NavigateAndBoot();
 
-        // Plan knows every component — no hardcoded IDs
-        Assert.That(_plan.ComponentNames, Does.Contain("Physician"));
-        Assert.That(_plan.ComponentNames, Does.Contain("MedicationType"));
-
-        // Each component has full metadata
-        var physician = _plan.FindComponent("Physician")!;
-        Assert.That(physician.Vendor, Is.EqualTo("fusion"));
+        // Expression-based lookup — compile-time checked
+        var physician = _plan.FindComponent(m => m.Physician);
+        Assert.That(physician, Is.Not.Null);
+        Assert.That(physician!.Vendor, Is.EqualTo("fusion"));
         Assert.That(physician.ReadExpr, Is.EqualTo("value"));
-        Assert.That(physician.Id, Does.Contain("Physician"));
+
+        var medication = _plan.FindComponent(m => m.MedicationType);
+        Assert.That(medication, Is.Not.Null);
 
         AssertNoConsoleErrors();
     }
@@ -44,13 +48,12 @@ public class WhenUsingPlanDrivenLocators : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var physician = _plan.AutoComplete("Physician");
+        // Same expression as the view: m => m.Physician
+        var physician = _plan.AutoComplete(m => m.Physician);
 
-        // User gesture: open popup → select
         await Page.Locator("#show-popup-btn").ClickAsync();
         await physician.SelectItem("Dr. Johnson");
 
-        // Assert what user sees
         await Expect(_plan.Element("change-value"))
             .ToContainTextAsync("johnson", new() { Timeout = 5000 });
 
@@ -62,7 +65,7 @@ public class WhenUsingPlanDrivenLocators : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var medication = _plan.AutoComplete("MedicationType");
+        var medication = _plan.AutoComplete(m => m.MedicationType);
 
         await medication.Type("anti");
 
@@ -75,11 +78,11 @@ public class WhenUsingPlanDrivenLocators : PlaywrightTestBase
     }
 
     [Test]
-    public async Task condition_fires_correctly_for_smith()
+    public async Task smith_condition_fires_then_branch()
     {
         await NavigateAndBoot();
 
-        var physician = _plan.AutoComplete("Physician");
+        var physician = _plan.AutoComplete(m => m.Physician);
 
         await Page.Locator("#show-popup-btn").ClickAsync();
         await physician.SelectItem("Dr. Smith");
