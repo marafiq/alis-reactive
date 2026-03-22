@@ -46,13 +46,9 @@ export function wireServerPush(
   const es = getOrCreate(trigger.url, signal);
 
   const handler = (e: MessageEvent) => {
-    let evt: Record<string, unknown>;
-    try {
-      evt = JSON.parse(e.data);
-    } catch (err) {
-      log.error("failed to parse SSE message", { url: trigger.url, error: String(err) });
-      return;
-    }
+    // Framework only supports JSON payloads — non-JSON is a server-side bug.
+    // Throw immediately so the developer fixes their SSE endpoint.
+    const evt: Record<string, unknown> = JSON.parse(e.data);
     log.debug("message", { url: trigger.url, eventType: trigger.eventType });
     executeReaction(reaction, { evt, components }).catch(err =>
       log.error("reaction failed", { error: String(err) }));
