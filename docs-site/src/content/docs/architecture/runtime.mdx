@@ -1,0 +1,242 @@
+---
+title: Runtime
+description: How the JS runtime discovers plans, boots in two phases, and executes commands through its module structure.
+sidebar:
+  order: 4
+---
+
+The runtime is a plan interpreter. It reads the JSON plan that C# builders produce and executes the described behavior. It does not invent behavior — it follows instructions.
+
+## Module structure
+
+```
+Scripts/
+├── root.ts                          entry point — discovers [data-reactive-plan], calls boot()
+│
+├── lifecycle/                       boot, merge, enrichment
+│   ├── boot.ts                      two-phase boot — wire listeners, then execute DomReady
+│   ├── enrichment.ts                resolves component refs to IDs, vendors, readExprs
+│   ├── merge-plan.ts                composes partial plans (ResolvePlan merges into parent)
+│   └── walk-reactions.ts            traverses reaction tree for validation + live-clear wiring
+│
+├── execution/                       where behavior happens
+│   ├── execute.ts                   reaction dispatcher — sequential, conditional, http, parallel
+│   ├── commands.ts                  command dispatcher — dispatch, mutate-element, mutate-event, into
+│   ├── element.ts                   bracket notation — root[prop] = val, root[method](args)
+│   ├── trigger.ts                   wires dom-ready, custom-event, component-event listeners
+│   ├── gather.ts                    collects component + event values for HTTP requests
+│   ├── http.ts                      builds and executes fetch(), routes responses
+│   ├── pipeline.ts                  orchestrates: pre-fetch → validate → request → parallel
+│   └── inject.ts                    injects HTML into containers, merges embedded plans
+│
+├── resolution/                      where values come from
+│   ├── resolver.ts                  walks BindSource — event paths or component reads
+│   └── component.ts                 vendor root resolution — the ONLY module with ej2_instances
+│
+├── conditions/
+│   └── conditions.ts                evaluates guards — value, all, any, not, confirm
+│
+├── validation/                      client-side validation from plan descriptors
+│   ├── orchestrator.ts              entry point — reads fields, evaluates rules, displays errors
+│   ├── rule-engine.ts               pure rule evaluation — required, minLength, email, regex, ...
+│   ├── condition.ts                 conditional rules (e.g., "required when ContactMethod is Phone")
+│   ├── error-display.ts             renders inline + summary errors
+│   └── live-clear.ts               clears field errors when user corrects input
+│
+├── components/                      component-specific side effects
+│   ├── native/                      drawer, loader, action-link
+│   └── fusion/                      confirm dialog
+│
+├── core/                            pure utilities, zero side effects
+│   ├── walk.ts                      dot-path traversal — walk(root, "a.b.c") → root.a.b.c
+│   ├── coerce.ts                    type coercion — string, number, boolean, date, array, raw
+│   ├── trace.ts                     scoped logging — [alis:scope] message {"data":"here"}
+│   └── assert-never.ts             exhaustive switch helper
+│
+└── types/                           TypeScript interfaces mirroring the JSON plan schema
+    ├── plan.ts, triggers.ts, reactions.ts, commands.ts
+    ├── sources.ts, guards.ts, context.ts, http.ts, validation.ts
+    └── index.ts                     barrel export
+```
+
+## Boot activity — from page load to execution
+
+```d2
+direction: right
+
+discover: "root.ts\nquerySelectorAll\n[data-reactive-plan]" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+parse: "Parse JSON\nplan + components" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+enrich: "enrichment.ts\nResolve component refs\nto IDs, vendors, readExprs" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+phase1: "Phase 1\nWire CustomEvent +\ncomponent-event listeners" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+phase2: "Phase 2\nExecute DomReady\nreactions" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+
+discover -> parse {
+  style.stroke: "#4285f4"
+}
+parse -> enrich {
+  style.stroke: "#f9ab00"
+}
+enrich -> phase1 {
+  style.stroke: "#f9ab00"
+}
+phase1 -> phase2: listeners ready {
+  style.stroke: "#4285f4"
+}
+```
+
+## Two-phase boot — why it matters
+
+A plan has two entries: DomReady dispatches `"resident-loaded"`, and a CustomEvent listener displays the resident name. Without two-phase boot, the dispatch fires before the listener exists — the event vanishes silently.
+
+```d2
+direction: right
+
+phase1: "Phase 1\nWire 'resident-loaded' listener" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+phase2: "Phase 2\nRun DomReady → dispatch event" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+caught: "Listener catches it\n'Margaret Chen' appears" {
+  shape: rectangle
+  style.fill: "#d4edda"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+
+phase1 -> phase2: all listeners ready {
+  style.stroke: "#4285f4"
+}
+phase2 -> caught: dispatch lands {
+  style.stroke: "#34a853"
+}
+```
+
+This works for chains of any depth. `dispatch` fires a synchronous `CustomEvent` on `document`. The listener (wired in Phase 1) receives it immediately. If that listener also dispatches, the next listener catches it synchronously too. The entire chain completes within Phase 2 execution.
+
+## Command execution flow
+
+When a trigger fires, the runtime walks the reaction tree:
+
+```d2
+direction: right
+
+trigger: "Trigger fires\ndom-ready, custom-event,\nor component-event" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 18
+}
+execute: "execute.ts\nDispatches by\nreaction kind" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+commands: "commands.ts\nDispatches by\ncommand kind" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+element: "element.ts\nBracket notation\nroot[prop] = val\nroot[method](args)" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+
+trigger -> execute {
+  style.stroke: "#ea4335"
+}
+execute -> commands {
+  style.stroke: "#f9ab00"
+}
+commands -> element {
+  style.stroke: "#4285f4"
+}
+```
+
+| Reaction kind | What happens |
+|---------------|-------------|
+| `sequential` | Executes each command in order |
+| `conditional` | Evaluates guard, picks matching branch, executes its commands |
+| `http` | Validates → gathers → fetches → routes response to handlers |
+| `parallel-http` | Fires multiple requests via `Promise.all`, then `OnAllSettled` |
+
+| Command kind | What it does |
+|-------------|-------------|
+| `dispatch` | Fires a `CustomEvent` on `document` |
+| `mutate-element` | Applies `set-prop` or `call` via bracket notation |
+| `mutate-event` | Modifies the event args in the execution context |
+| `validation-errors` | Displays server-side errors at form fields |
+| `into` | Injects response HTML into a container element |
+
+## Value resolution
+
+Commands often need dynamic values. The plan expresses these as structured sources:
+
+```d2
+direction: right
+
+event_source: "Event source\npath: 'evt.address.city'" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+component_source: "Component source\ncomponentId + vendor + readExpr" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+resolver: "resolver.ts\nwalks the source\nreturns the value" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+
+event_source -> resolver: walk(ctx, path) {
+  style.stroke: "#4285f4"
+}
+component_source -> resolver: resolveRoot + walk(readExpr) {
+  style.stroke: "#f9ab00"
+}
+```
+
+Event sources walk a dot-path against the execution context (`ctx.evt.address.city`). Component sources resolve the vendor root first, then walk the readExpr. Both return a value that the command uses — to set text, compare in a condition, or send in an HTTP request.
+
+**Previous:** [Component Model](/architecture/component-model/) — how vendor-agnostic components work
