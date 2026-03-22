@@ -73,6 +73,7 @@ export default defineConfig({
 								{ label: 'Overview', slug: 'components/overview' },
 								{ label: 'Native', slug: 'components/native-components' },
 								{ label: 'Syncfusion', slug: 'components/fusion-components' },
+								{ label: 'Design System', slug: 'components/design-system' },
 							],
 						},
 					],
