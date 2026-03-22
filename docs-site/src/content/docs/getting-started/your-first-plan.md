@@ -187,5 +187,5 @@ You can see this example running in the sandbox at `/Sandbox/Todo`.
 
 ## Next Steps
 
-- [The Contract](/alis-reactive/architecture/the-contract/) -- how the JSON plan works
-- [Features](/alis-reactive/csharp-modules/plan-and-entries/) -- full reference for plans, triggers, conditions, and HTTP
+- [The Contract](../../architecture/the-contract/) -- how the JSON plan works
+- [Features](../../csharp-modules/plan-and-entries/) -- full reference for plans, triggers, conditions, and HTTP

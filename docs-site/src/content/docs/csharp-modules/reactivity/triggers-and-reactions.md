@@ -7,7 +7,7 @@ sidebar:
 
 A trigger defines *when* a pipeline executes. Every reactive behavior starts with one — page load, a named event, or a component interaction.
 
-From the [Grammar Tree](/alis-reactive/csharp-modules/mental-model/#the-grammar-tree) — the trigger-related API:
+From the [Grammar Tree](../../mental-model/#the-grammar-tree) — the trigger-related API:
 
 ```
 Html.On(plan, t => ...)                              § Triggers (what fires the pipeline)
@@ -97,4 +97,4 @@ Html.On(plan, t => t.CustomEvent("loaded", pipeline =>
 }));
 ```
 
-Next: [Element Mutations](/alis-reactive/csharp-modules/reactivity/element-mutations/) — what you can do inside a pipeline.
+Next: [Element Mutations](../element-mutations/) — what you can do inside a pipeline.

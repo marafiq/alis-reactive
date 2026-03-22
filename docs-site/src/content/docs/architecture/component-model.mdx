@@ -7,7 +7,7 @@ sidebar:
 
 A native checkbox is `el.checked`. A Syncfusion date picker is `el.ej2_instances[0].value`. The runtime handles both through one code path. This page explains how.
 
-For the general execution model (bracket notation, command dispatch), see [Runtime](/alis-reactive/architecture/runtime/).
+For the general execution model (bracket notation, command dispatch), see [Runtime](../runtime/).
 
 ## Three metadata fields
 
@@ -68,7 +68,7 @@ fusion_root -> bracket {
 }
 ```
 
-`component.ts` is the module that resolves vendor roots (`ej2_instances`). `trigger.ts` also has vendor-aware logic for constructing event detail objects — native components read `readExpr` from the element, while fusion components pass the event object directly. After resolving the root, every operation flows through bracket notation — the same two primitives (`set-prop`, `call`) described in [Runtime](/alis-reactive/architecture/runtime/).
+`component.ts` is the module that resolves vendor roots (`ej2_instances`). `trigger.ts` also has vendor-aware logic for constructing event detail objects — native components read `readExpr` from the element, while fusion components pass the event object directly. After resolving the root, every operation flows through bracket notation — the same two primitives (`set-prop`, `call`) described in [Runtime](../runtime/).
 
 ## Every interaction, one pattern
 
@@ -81,6 +81,6 @@ fusion_root -> bracket {
 
 ## Adding a new component — zero runtime changes
 
-The component declares its vendor and readExpr. The runtime already knows how to resolve vendors and walk readExprs. No new `if` branches, no new switch cases, no runtime deployment. For the full 7-file pattern, see [The Vertical Slice](/alis-reactive/architecture/vertical-slice/).
+The component declares its vendor and readExpr. The runtime already knows how to resolve vendors and walk readExprs. No new `if` branches, no new switch cases, no runtime deployment. For the full 7-file pattern, see [The Vertical Slice](../vertical-slice/).
 
-**Previous:** [Runtime](/alis-reactive/architecture/runtime/)
+**Previous:** [Runtime](../runtime/)

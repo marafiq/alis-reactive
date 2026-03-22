@@ -107,4 +107,4 @@ They must be rendered once in your layout:
 
 Every component -- native or Syncfusion -- follows the same pattern: a sealed C# class declares `Vendor` and `ReadExpr`, the plan carries that metadata as JSON, and the runtime executes via vendor-neutral bracket notation. Adding a new component requires zero runtime changes.
 
-For the full architecture -- `walk.ts`, `component.ts`, `resolver.ts`, the vertical slice shape, and `ComponentsMap` -- see [Component Model](/alis-reactive/architecture/component-model/).
+For the full architecture -- `walk.ts`, `component.ts`, `resolver.ts`, the vertical slice shape, and `ComponentsMap` -- see [Component Model](../../architecture/component-model/).

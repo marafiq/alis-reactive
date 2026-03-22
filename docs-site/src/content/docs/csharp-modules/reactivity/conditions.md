@@ -7,7 +7,7 @@ sidebar:
 
 Conditions live inside a `.Reactive()` or `Html.On()` pipeline. They let you branch based on values that only exist in the browser — an event payload, a component's current state.
 
-From the [Grammar Tree](/alis-reactive/csharp-modules/mental-model/#the-grammar-tree) — the conditions subset:
+From the [Grammar Tree](../../mental-model/#the-grammar-tree) — the conditions subset:
 
 ```
 pipeline.When(source).OPERATOR                    § start a condition
@@ -375,4 +375,4 @@ At runtime, automatic coercion is applied based on the C# type:
 
 You never specify coercion manually -- it is derived from the C# property type.
 
-**Next:** [HTTP Pipeline](/alis-reactive/csharp-modules/reactivity/http-pipeline/) -- GET/POST/PUT/DELETE, gather, loading states, typed responses, and chained/parallel requests.
+**Next:** [HTTP Pipeline](../http-pipeline/) -- GET/POST/PUT/DELETE, gather, loading states, typed responses, and chained/parallel requests.

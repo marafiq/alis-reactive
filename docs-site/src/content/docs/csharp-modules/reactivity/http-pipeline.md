@@ -7,7 +7,7 @@ sidebar:
 
 HTTP requests live inside a `.Reactive()` or `Html.On()` pipeline — typically triggered by a button click or a component event. You gather input values, validate, post, and handle the response in one fluent chain.
 
-From the [Grammar Tree](/alis-reactive/csharp-modules/mental-model/#the-grammar-tree) — the HTTP subset:
+From the [Grammar Tree](../../mental-model/#the-grammar-tree) — the HTTP subset:
 
 ```
 pipeline.Get(url) / .Post(url) / .Put(url) / .Delete(url)  § start a request
@@ -485,4 +485,4 @@ And the save button's pipeline:
 
 This single pipeline handles confirmation, validation, loading state, success notification, and error display. Every step is described in the plan. The runtime executes it exactly as written.
 
-**Previous:** [Conditions](/alis-reactive/csharp-modules/reactivity/conditions/) -- runtime branching with When/Then/ElseIf/Else and guard composition.
+**Previous:** [Conditions](../conditions/) -- runtime branching with When/Then/ElseIf/Else and guard composition.

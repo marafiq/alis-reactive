@@ -29,7 +29,7 @@ One page, zero JavaScript — every behavior below is expressed entirely in C# f
 14. **Event decoupling** — the "View Summary" button fires `Dispatch("intake-saved")`; a separate `CustomEvent` handler catches it, loads a partial into a drawer via `Into()`, and opens it — trigger and action are fully decoupled
 15. **Server validation fallback** — if the server returns 400, `ValidationErrors("intake-form")` routes field-level errors to the correct input components
 
-![Resident Intake form demo — all 15 behaviors in action](/alis-reactive/downloads/resident-intake-demo.gif)
+<img src="/alis-reactive/downloads/resident-intake-demo.gif" alt="Resident Intake form demo — all 15 behaviors in action" />
 
 ## What does this example cover?
 

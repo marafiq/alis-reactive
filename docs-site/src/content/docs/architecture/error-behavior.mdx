@@ -78,4 +78,4 @@ If a new `kind` is added to the C# descriptors without a corresponding runtime h
 - **No silent skipping.** If `walk()` hits undefined midway through a path, it returns `undefined` — but this is not an error. The calling code (resolver, conditions) handles undefined as a valid "no value" result.
 - **No global error handler.** Errors surface through browser console via the `.catch()` boundary in `trigger.ts`. There is no `window.onerror` hook or custom error reporting.
 
-**Previous:** [Component Model](/alis-reactive/architecture/component-model/)
+**Previous:** [Component Model](../component-model/)

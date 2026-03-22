@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-This page covers the conventions, base classes, and patterns for each test layer. Read [Testing Strategy](/alis-reactive/testing/strategy/) first for the overall approach.
+This page covers the conventions, base classes, and patterns for each test layer. Read [Testing Strategy](../strategy/) first for the overall approach.
 
 ---
 

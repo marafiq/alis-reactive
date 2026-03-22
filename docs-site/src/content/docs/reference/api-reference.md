@@ -5,7 +5,7 @@ sidebar:
   order: 0
 ---
 
-Complete public API for Alis.Reactive. Every method listed here exists in the source code. For usage and examples, see the [Grammar Tree](/alis-reactive/csharp-modules/mental-model/#the-grammar-tree) and the [Reactivity](/alis-reactive/csharp-modules/reactivity/triggers-and-reactions/) pages.
+Complete public API for Alis.Reactive. Every method listed here exists in the source code. For usage and examples, see the [Grammar Tree](../../csharp-modules/mental-model/#the-grammar-tree) and the [Reactivity](../../csharp-modules/reactivity/triggers-and-reactions/) pages.
 
 ## Html Extensions
 
