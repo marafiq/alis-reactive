@@ -1,19 +1,17 @@
 ---
-title: Component Model in Runtime
-description: How the runtime resolves vendor roots, reads values, and executes mutations for any component — native or Syncfusion.
+title: Component Model
+description: How the runtime resolves vendor roots and executes component operations — native or Syncfusion — through one code path.
 sidebar:
-  order: 3
+  order: 5
 ---
 
-A native checkbox is `el.checked`. A Syncfusion date picker is `el.ej2_instances[0].value`. Different DOM structures, different vendor APIs. But in Reactive, the developer uses the same fluent API for both. How?
+A native checkbox is `el.checked`. A Syncfusion date picker is `el.ej2_instances[0].value`. The runtime handles both through one code path. This page explains how.
 
-## The problem
+For the general execution model (bracket notation, command dispatch), see [Runtime](/architecture/runtime/).
 
-If the runtime had `if (vendor === "fusion") { ... }` scattered through its code, every new component or vendor would require runtime changes. That doesn't scale.
+## Three metadata fields
 
-## The solution — three metadata fields
-
-Each component declares three things. That's all the runtime needs.
+Each component declares three things in C#. The plan carries them. The runtime uses them.
 
 | Field | Purpose | Example |
 |-------|---------|---------|
@@ -21,48 +19,9 @@ Each component declares three things. That's all the runtime needs.
 | **ReadExpr** | Which property to read | `"value"`, `"checked"` |
 | **ComponentType** | What kind of component | `"textbox"`, `"datepicker"` |
 
-```d2
-direction: right
-
-register: "Developer writes\nHtml.InputField(plan, m => m.DueDate)\n.FusionDatePicker(...)" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 18
-}
-plan: "Plan carries metadata\n{ vendor: 'fusion', readExpr: 'value', componentType: 'datepicker' }" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 18
-}
-resolve: "Runtime resolves root\nel.ej2_instances[0]" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 18
-}
-read: "Runtime walks readExpr\nroot['value'] → the date" {
-  shape: rectangle
-  style.fill: "#d4edda"
-  style.stroke: "#34a853"
-  style.font-size: 18
-}
-
-register -> plan: Render() {
-  style.stroke: "#4285f4"
-}
-plan -> resolve: boot {
-  style.stroke: "#f9ab00"
-}
-resolve -> read: bracket notation {
-  style.stroke: "#34a853"
-}
-```
+When you write `Html.InputField(plan, m => m.DueDate).FusionDatePicker(...)`, the builder registers `{ vendor: "fusion", readExpr: "value", componentType: "datepicker" }` in the plan's component registry.
 
 ## Vendor resolution — one function, any vendor
-
-The runtime has exactly one function that knows about vendor differences:
 
 ```d2
 direction: right
@@ -74,31 +33,31 @@ element: "DOM Element" {
   style.font-size: 18
 }
 
-native_root: "vendor: native\nroot = element itself" {
+native_root: "native\nroot = element" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 18
 }
 
-fusion_root: "vendor: fusion\nroot = el.ej2_instances[0]" {
+fusion_root: "fusion\nroot = el.ej2_instances[0]" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
 
-bracket: "root[readExpr]\nSame code path for both" {
+bracket: "root[prop] = val\nroot[method](args)\nSame code path" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 18
 }
 
-element -> native_root: native {
+element -> native_root: vendor {
   style.stroke: "#4285f4"
 }
-element -> fusion_root: fusion {
+element -> fusion_root: vendor {
   style.stroke: "#f9ab00"
 }
 native_root -> bracket {
@@ -109,39 +68,37 @@ fusion_root -> bracket {
 }
 ```
 
-After resolving the root, every operation — reading values, writing properties, calling methods — flows through bracket notation. The runtime never asks "is this a checkbox?" or "is this Syncfusion?". It resolves the root, then executes what the plan says.
+`component.ts` is the **only module** in the runtime that knows about `ej2_instances`. After resolving the root, every operation flows through bracket notation — the same two primitives (`set-prop`, `call`) described in [Runtime](/architecture/runtime/).
 
-## How this applies to every interaction
+## Every interaction, one pattern
 
-| Interaction | What the plan carries | What the runtime does |
-|-------------|----------------------|----------------------|
-| **Read value** (gather, conditions) | vendor + readExpr | `resolveRoot(el, vendor)[readExpr]` |
-| **Write property** (SetValue, SetChecked) | vendor + prop name | `resolveRoot(el, vendor)[prop] = val` |
-| **Call method** (DataBind, ShowPopup) | vendor + method name | `resolveRoot(el, vendor)[method]()` |
-| **Wire event** (.Reactive) | vendor + jsEvent name | `resolveRoot(el, vendor).addEventListener(jsEvent)` |
-
-Same pattern, four times. One vendor resolution, then bracket notation.
+| Interaction | Plan carries | Runtime does |
+|-------------|-------------|-------------|
+| **Read** (gather, conditions) | vendor + readExpr | `resolveRoot(el, vendor)[readExpr]` |
+| **Write** (SetValue, SetChecked) | vendor + prop | `resolveRoot(el, vendor)[prop] = val` |
+| **Call** (DataBind, ShowPopup) | vendor + method | `resolveRoot(el, vendor)[method]()` |
+| **Wire event** (.Reactive) | vendor + jsEvent | `resolveRoot(el, vendor).addEventListener(jsEvent)` |
 
 ## Adding a new component — zero runtime changes
 
 ```d2
 direction: right
 
-csharp: "New C# vertical slice\nsealed class FusionTimePicker\nVendor = 'fusion'\nReadExpr = 'value'" {
+csharp: "New C# vertical slice\nVendor + ReadExpr" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 18
 }
 
-plan: "Plan carries it\nSame shape as every\nother component" {
+plan: "Plan carries metadata\nSame shape as every component" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
 
-runtime: "Runtime unchanged\nAlready knows 'fusion'\nAlready knows bracket notation" {
+runtime: "Runtime unchanged\nAlready knows the vendor\nAlready knows bracket notation" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
@@ -156,6 +113,6 @@ plan -> runtime: same execution {
 }
 ```
 
-The component declares its vendor and readExpr. The builder renders the HTML and registers the metadata. The runtime resolves and executes — using the same code paths it uses for every other component. No new `if` branches, no new switch cases, no runtime deployment.
+No new `if` branches, no new switch cases, no runtime deployment. The component declares its vendor and readExpr. The runtime resolves and executes.
 
-**Previous:** [The JSON Plan Contract](/architecture/the-contract/) — what the plan actually looks like
+**Previous:** [Runtime](/architecture/runtime/)

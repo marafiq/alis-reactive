@@ -169,62 +169,6 @@ route -> mutate: matched handler {
 
 Every step in this flow is described in the plan. The runtime follows the instructions. If validation fails, the request never fires. If the server returns 400, the error handler runs. All decided by the plan, not by JavaScript logic.
 
-## Two-phase boot
-
-The runtime boots in two phases to guarantee that event chains work regardless of declaration order.
-
-```d2
-direction: right
-
-phase1: "Phase 1 — Wire listeners\nCustomEvent and component-event listeners attach" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 18
-}
-phase2: "Phase 2 — Execute DomReady\nDomReady reactions run, may dispatch events" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 18
-}
-caught: "Dispatched events land on Phase 1 listeners\nChains of any depth work synchronously" {
-  shape: rectangle
-  style.fill: "#d4edda"
-  style.stroke: "#34a853"
-  style.font-size: 18
-}
-
-phase1 -> phase2: all listeners ready {
-  style.stroke: "#4285f4"
-}
-phase2 -> caught: dispatch fires {
-  style.stroke: "#34a853"
-}
-```
-
-**Why this matters — a concrete example.** On page load, you fetch a resident and dispatch the result. Another part of the page listens for that event and displays the name:
-
-```csharp
-// Entry 1: fetch and dispatch on page load
-Html.On(plan, t => t.DomReady(pipeline =>
-{
-    pipeline.Get("/api/resident/42")
-        .Response(r => r.OnSuccess<ResidentResponse>((json, pipeline) =>
-        {
-            pipeline.Dispatch("resident-loaded", new ResidentPayload { Name = "Margaret Chen" });
-        }));
-}));
-
-// Entry 2: display the name when the event arrives
-Html.On(plan, t => t.CustomEvent<ResidentPayload>("resident-loaded", (payload, pipeline) =>
-{
-    pipeline.Element("resident-name").SetText(payload, x => x.Name);
-}));
-```
-
-Without two-phase boot, Entry 1 runs immediately → dispatches `"resident-loaded"` → Entry 2's listener doesn't exist yet → event vanishes → name never appears. With two-phase boot, Phase 1 wires Entry 2's listener first → Phase 2 runs Entry 1 → dispatch lands on the listener → "Margaret Chen" appears.
-
 ## Bracket notation — the execution model
 
 The runtime does not have a catalog of operations. It has two primitives:
