@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -26,12 +26,16 @@
         <None Include="../README.md" Pack="true" PackagePath="/" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
       <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="32.2.8" />
+      <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <ItemGroup>
-      <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+      <PackageReference Include="Syncfusion.EJ2.MVC5" Version="32.2.8" />
+      <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+      <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+      <Reference Include="System.Web" />
     </ItemGroup>
 
     <ItemGroup>

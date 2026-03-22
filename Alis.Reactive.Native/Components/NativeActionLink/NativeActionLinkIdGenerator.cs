@@ -1,4 +1,8 @@
+#if NET48
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Components
 {
@@ -12,7 +16,11 @@ namespace Alis.Reactive.Native.Components
             var counterKey = CounterKeyPrefix + scope;
             var next = 1;
 
+#if NET48
+            if (viewContext.HttpContext.Items.Contains(counterKey) && viewContext.HttpContext.Items[counterKey] is int current)
+#else
             if (viewContext.HttpContext.Items.TryGetValue(counterKey, out var value) && value is int current)
+#endif
             {
                 next = current + 1;
             }
