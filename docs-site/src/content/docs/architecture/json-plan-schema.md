@@ -2,7 +2,7 @@
 title: JSON Plan Schema
 description: Complete reference for the reactive plan JSON structure — every kind, every field.
 sidebar:
-  order: 5
+  order: 9
 ---
 
 The plan JSON is the contract between the C# DSL and the JS runtime. Every plan is validated against the schema at `Alis.Reactive/Schemas/reactive-plan.schema.json`.
