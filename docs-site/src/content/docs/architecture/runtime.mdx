@@ -161,14 +161,22 @@ Each command can carry an optional `when` guard. If the guard fails, that comman
 
 ### Decision 3 — Mutation kind (`element.ts`)
 
-For `mutate-element` commands, the runtime makes one final decision. First it resolves the vendor root — for native HTML it's the DOM element, for Syncfusion it's `el.ej2_instances[0]`. Then it reads `mutation.kind`:
+Both `mutate-element` and `mutate-event` carry a `Mutation` with the same two primitives. The difference is the target — `mutate-element` targets a DOM element or component, `mutate-event` targets the event args object in the execution context. The mutation itself is identical:
 
-- **`set-prop`** — `root[prop] = val` — handles SetText, SetValue, SetChecked, Show, Hide
-- **`call`** — `root[method](args)` — handles AddClass, DataBind, ShowPopup, Focus
+- **`set-prop`** — `root[prop] = val`
+- **`call`** — `root[method](args)`
 
-The plan carries the property or method name as a string. The runtime applies it via bracket notation. No catalog of operations. No switch on method names. This is why adding a new component method requires zero runtime changes — the C# extension puts the name in the plan, the runtime executes it verbatim.
+| Target | Resolves root from | Example |
+|--------|-------------------|---------|
+| DOM element | `getElementById(target)` | `pipeline.Element("status").SetText("Ready")` |
+| Component | `resolveRoot(el, vendor)` | `pipeline.Component<T>(m => m.Prop).SetValue("x")` |
+| Event args | `ctx.evt` | `args.PreventDefault(pipeline)` |
 
-How does the vendor root resolution work for different component types? That's covered in [Component Model](/architecture/component-model/).
+Three targets, one mutation grammar. The plan carries the property or method name as a string. The runtime applies it via bracket notation — no catalog, no switch on method names.
+
+This is why adding a new component method requires zero runtime changes. The C# extension puts the name in the plan. The runtime executes it verbatim.
+
+How does `resolveRoot` work for different vendors? That's covered in [Component Model](/architecture/component-model/).
 
 For a step-by-step trace through the actual module files, see [Key Modules](/architecture/runtime-key-modules/).
 
