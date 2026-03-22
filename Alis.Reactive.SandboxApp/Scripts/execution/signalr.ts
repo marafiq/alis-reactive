@@ -39,7 +39,11 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
     }
   }
 
+  // All retries exhausted — inject retry icons so the user can retry manually.
+  // The connection is in Disconnected state; handlers persist for restart.
   log.error("start failed after all retries", { hubUrl, attempts: maxAttempts });
+  const managed = hubs.get(hubUrl);
+  if (managed) injectRetryIcons(hubUrl, managed.targetIds);
 }
 
 function injectRetryIcons(hubUrl: string, targetIds: Set<string>): void {
@@ -89,10 +93,17 @@ function removeRetryIcons(hubUrl: string): void {
 
 function retryConnection(hubUrl: string): void {
   const managed = hubs.get(hubUrl);
-  if (!managed) return;
+  if (!managed) {
+    log.warn("retry requested but no connection found", { hubUrl });
+    removeRetryIcons(hubUrl);
+    return;
+  }
 
   const { connection } = managed;
-  if (connection.state !== signalR.HubConnectionState.Disconnected) return;
+  if (connection.state !== signalR.HubConnectionState.Disconnected) {
+    log.debug("retry skipped — not disconnected", { hubUrl, state: connection.state });
+    return;
+  }
 
   log.info("manual retry", { hubUrl });
   removeRetryIcons(hubUrl);
@@ -182,6 +193,13 @@ export function wireSignalR(
   // Handlers registered via .on() persist across automatic reconnects —
   // no re-registration needed (per Microsoft docs).
   connection.on(trigger.methodName, (...args: unknown[]) => {
+    if (args.length !== 1 || typeof args[0] !== "object" || args[0] === null) {
+      log.warn("unexpected payload shape — expected single object argument", {
+        hubUrl: trigger.hubUrl, method: trigger.methodName,
+        argCount: args.length, firstArgType: typeof args[0]
+      });
+    }
+
     const evt: Record<string, unknown> = args.length === 1 && typeof args[0] === "object" && args[0] !== null
       ? (args[0] as Record<string, unknown>)
       : Object.fromEntries(args.map((a, i) => [`arg${i}`, a]));

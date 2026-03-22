@@ -27,6 +27,10 @@ namespace Alis.Reactive.Descriptors.Triggers
 
         public ServerPushTrigger(string url, string? eventType = null)
         {
+            if (string.IsNullOrWhiteSpace(url))
+                throw new System.ArgumentException("url is required", nameof(url));
+            if (eventType != null && string.IsNullOrWhiteSpace(eventType))
+                throw new System.ArgumentException("eventType cannot be empty when provided", nameof(eventType));
             Url = url;
             EventType = eventType;
         }

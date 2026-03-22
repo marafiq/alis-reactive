@@ -25,6 +25,10 @@ namespace Alis.Reactive.Descriptors.Triggers
 
         public SignalRTrigger(string hubUrl, string methodName)
         {
+            if (string.IsNullOrWhiteSpace(hubUrl))
+                throw new System.ArgumentException("hubUrl is required", nameof(hubUrl));
+            if (string.IsNullOrWhiteSpace(methodName))
+                throw new System.ArgumentException("methodName is required", nameof(methodName));
             HubUrl = hubUrl;
             MethodName = methodName;
         }

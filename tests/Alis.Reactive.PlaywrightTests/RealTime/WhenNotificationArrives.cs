@@ -20,7 +20,7 @@ public class WhenNotificationArrives : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("connected", 10000);
+        await WaitForTraceMessage("[alis:signalr] connected", 10000);
 
         await PushBtn.ClickAsync();
 
@@ -35,7 +35,7 @@ public class WhenNotificationArrives : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("connected", 10000);
+        await WaitForTraceMessage("[alis:signalr] connected", 10000);
 
         await PushBtn.ClickAsync();
 
@@ -50,7 +50,7 @@ public class WhenNotificationArrives : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("connected", 10000);
+        await WaitForTraceMessage("[alis:signalr] connected", 10000);
 
         await PushBtn.ClickAsync();
         await Expect(NotifCount).ToContainTextAsync("99", new() { Timeout = 5000 });

@@ -20,7 +20,7 @@ public class WhenResidentStatusChanges : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("connected", 10000);
+        await WaitForTraceMessage("[alis:signalr] connected", 10000);
 
         await PushStatusBtn.ClickAsync();
 
@@ -37,7 +37,7 @@ public class WhenResidentStatusChanges : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("connected", 10000);
+        await WaitForTraceMessage("[alis:signalr] connected", 10000);
 
         // Push to Hub 2 only
         await PushStatusBtn.ClickAsync();

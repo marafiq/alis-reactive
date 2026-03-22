@@ -231,4 +231,40 @@ public class AllPlansConformToSchema : PlanTestBase
         });
         AssertSchemaValid(plan.Render());
     }
+
+    // -- Real-time triggers --
+
+    [Test]
+    public void Server_push_trigger()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).ServerPush("/api/stream", p => p.Dispatch("update"));
+        AssertSchemaValid(plan.Render());
+    }
+
+    [Test]
+    public void Server_push_trigger_with_event_type()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).ServerPush("/api/stream", "notification", p =>
+            p.Element("msg").SetText("received"));
+        AssertSchemaValid(plan.Render());
+    }
+
+    [Test]
+    public void SignalR_trigger()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).SignalR("/hubs/data", "ReceiveUpdate", p => p.Dispatch("update"));
+        AssertSchemaValid(plan.Render());
+    }
+
+    [Test]
+    public void SignalR_trigger_with_typed_payload()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).SignalR<TestModel>("/hubs/data", "ReceiveData", (payload, p) =>
+            p.Element("value").SetText(payload, x => x.Id));
+        AssertSchemaValid(plan.Render());
+    }
 }
