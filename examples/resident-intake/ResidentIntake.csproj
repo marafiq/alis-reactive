@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="32.2.8" />
+    <PackageReference Include="FluentValidation" Version="12.*" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Alis.Reactive">
+      <HintPath>lib/Alis.Reactive.dll</HintPath>
+    </Reference>
+    <Reference Include="Alis.Reactive.Native">
+      <HintPath>lib/Alis.Reactive.Native.dll</HintPath>
+    </Reference>
+    <Reference Include="Alis.Reactive.Fusion">
+      <HintPath>lib/Alis.Reactive.Fusion.dll</HintPath>
+    </Reference>
+    <Reference Include="Alis.Reactive.FluentValidator">
+      <HintPath>lib/Alis.Reactive.FluentValidator.dll</HintPath>
+    </Reference>
+    <Reference Include="Alis.Reactive.NativeTagHelpers">
+      <HintPath>lib/Alis.Reactive.NativeTagHelpers.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

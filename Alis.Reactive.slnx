@@ -31,6 +31,53 @@
   <Folder Name="/.claude/skills/validation-rules/">
     <File Path=".claude/skills/validation-rules/SKILL.md" />
   </Folder>
+  <Folder Name="/docs-site/">
+    <File Path="docs-site/astro.config.mjs" />
+    <File Path="docs-site/package.json" />
+    <File Path="docs-site/tsconfig.json" />
+    <File Path="docs-site/.gitignore" />
+  </Folder>
+  <Folder Name="/docs-site/content/">
+    <File Path="docs-site/src/content/docs/index.mdx" />
+    <File Path="docs-site/src/content/docs/why.mdx" />
+  </Folder>
+  <Folder Name="/docs-site/content/getting-started/">
+    <File Path="docs-site/src/content/docs/getting-started/your-first-plan.md" />
+    <File Path="docs-site/src/content/docs/getting-started/running-the-sandbox.md" />
+  </Folder>
+  <Folder Name="/docs-site/content/architecture/">
+    <File Path="docs-site/src/content/docs/architecture/the-problem.md" />
+    <File Path="docs-site/src/content/docs/architecture/the-contract.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/three-layers.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/two-phase-boot.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/solid-loop.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/component-model.md" />
+  </Folder>
+  <Folder Name="/docs-site/content/csharp-modules/">
+    <File Path="docs-site/src/content/docs/csharp-modules/plan-and-entries.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/triggers-and-reactions.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/element-mutations.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/conditions.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/http-pipeline.md" />
+  </Folder>
+  <Folder Name="/docs-site/content/runtime/">
+    <File Path="docs-site/src/content/docs/runtime/overview.md" />
+    <File Path="docs-site/src/content/docs/runtime/modules.md" />
+  </Folder>
+  <Folder Name="/docs-site/content/components/">
+    <File Path="docs-site/src/content/docs/components/overview.md" />
+    <File Path="docs-site/src/content/docs/components/native-components.md" />
+    <File Path="docs-site/src/content/docs/components/fusion-components.md" />
+  </Folder>
+  <Folder Name="/docs-site/content/testing/">
+    <File Path="docs-site/src/content/docs/testing/strategy.mdx" />
+    <File Path="docs-site/src/content/docs/testing/writing-tests.md" />
+  </Folder>
+  <Folder Name="/docs-site/content/reference/">
+    <File Path="docs-site/src/content/docs/reference/json-schema.md" />
+    <File Path="docs-site/src/content/docs/reference/guard-operators.md" />
+    <File Path="docs-site/src/content/docs/reference/build-commands.md" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj" />
@@ -48,4 +95,7 @@
   <Project Path="Alis.Reactive/Alis.Reactive.csproj" />
   <Project Path="Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" />
   <Project Path="Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj" />
+  <Folder Name="/examples/">
+    <Project Path="examples/resident-intake/ResidentIntake.csproj" />
+  </Folder>
 </Solution>

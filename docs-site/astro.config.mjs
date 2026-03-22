@@ -45,6 +45,12 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'Examples',
+					items: [
+						{ label: 'Resident Intake Form', slug: 'examples/resident-intake' },
+					],
+				},
+				{
 					label: 'Features',
 					items: [
 						{ label: 'Reactive Mental Model', slug: 'csharp-modules/mental-model' },

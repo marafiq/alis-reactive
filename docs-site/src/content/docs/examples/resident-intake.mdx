@@ -1,0 +1,879 @@
+---
+title: "Resident Intake Form"
+description: "End-to-end worked example — 7 component types, cascading dropdowns, conditions, validation, HTTP pipeline, dynamic partials, toast notifications, and a summary drawer — in one cohesive form."
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+A facility coordinator needs to admit a new resident. One form, one page, one save — and the framework handles cascading lookups, dynamic partial loading, conditional sections, client-side validation, HTTP orchestration, confirmation dialogs, toast notifications, and a slide-out summary drawer.
+
+**No JavaScript written.** Every behavior is expressed in C# fluent builders, serialized to a JSON plan, and executed by the runtime.
+
+## What this form does
+
+One page, zero JavaScript — every behavior below is expressed entirely in C# fluent builders.
+
+1. **Parallel data loading** — on page load, facility and care level lookups fire as concurrent GET requests; the form reveals itself only when both complete
+2. **Cascading dropdowns** — selecting a facility triggers three parallel requests: available units populate a child dropdown, a facility info card appears, and a requirements section loads with its own input fields and validation
+3. **Dynamic partial with plan merging** — the facility requirements section is a server-rendered partial (`ResolvePlan`) injected via `Into()`; its components merge into the parent plan at runtime, enriching validation rules that were declared but unenriched at initial render
+4. **Conditional visibility** — care level "Memory Care" reveals a cognitive assessment date field; the medication management checkbox reveals a physician field; both toggle via `When().Then().Else()`
+5. **Masked input** — the phone field uses `FusionInputMask` with pattern `(000) 000-0000` — only digits pass through
+6. **Client-side validation** — `ReactiveValidator<T>` rules run before any POST fires; errors appear inline on every required field without a round trip
+7. **Conditional validation** — `WhenField` rules fire only when their condition is met: physician is required only when medication management is checked; cognitive assessment is required only when care level is "Memory Care"
+8. **Cross-partial validation** — dynamically loaded fields (Room Preference, Move-in Deposit) validate alongside static fields because plan merging enriched them with component metadata
+9. **Confirmation guard** — `Confirm()` shows a dialog before the POST; canceling aborts the entire pipeline
+10. **HTTP POST with gather** — `IncludeAll()` collects every registered component value — including fields from merged partials — and sends them as JSON
+11. **Loading overlay** — `WhileLoading()` shows a full-page loader during the save request
+12. **Toast notification** — on success, `FusionToast` shows a styled notification
+13. **Chained request** — after save succeeds, a follow-up GET fetches a confirmation number and displays it via `SetText(json, j => j.Number)` — typed response body access
+14. **Event decoupling** — the "View Summary" button fires `Dispatch("intake-saved")`; a separate `CustomEvent` handler catches it, loads a partial into a drawer via `Into()`, and opens it — trigger and action are fully decoupled
+15. **Server validation fallback** — if the server returns 400, `ValidationErrors("intake-form")` routes field-level errors to the correct input components
+
+## What does this example cover?
+
+| Category | Features |
+|----------|----------|
+| **Triggers** | DomReady, CustomEvent, Component `.Reactive()` |
+| **Components** | NativeTextBox, NativeCheckBox, FusionDropDownList, FusionDatePicker, FusionNumericTextBox, FusionInputMask, NativeButton |
+| **HTTP** | Parallel GET (DomReady + facility change), cascading GET, POST with `IncludeAll`, Chained requests |
+| **Conditions** | `When().Eq()` on dropdown, `When().Truthy()` on checkbox |
+| **Validation** | `ReactiveValidator<T>`, `WhenField` conditional rules, `ValidationErrors` routing, validation across merged partials |
+| **Dynamic partials** | `ResolvePlan` + `Into()` — load form fields at runtime, plan merging enriches validation automatically |
+| **App-level** | FusionConfirm, FusionToast, NativeLoader, NativeDrawer |
+| **Content** | `Into()` for display partials and reactive partials, `Dispatch` for event decoupling |
+
+## The model
+
+Every form starts with a model. Properties map to sections: personal info, placement, medical, emergency contact — plus facility-specific fields loaded dynamically.
+
+```csharp title="Models/ResidentIntakeModel.cs"
+public class ResidentIntakeModel
+{
+    // Personal Info
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public DateTime? DateOfBirth { get; set; }
+
+    // Placement
+    public string? FacilityId { get; set; }
+    public string? UnitId { get; set; }
+    public string? CareLevel { get; set; }
+    public DateTime? AdmissionDate { get; set; }
+    public decimal? MonthlyRate { get; set; }
+
+    // Medical
+    public bool RequiresMedicationManagement { get; set; }
+    public string? PrimaryPhysician { get; set; }
+    public DateTime? CognitiveAssessmentDate { get; set; }
+
+    // Emergency Contact
+    public string? EmergencyContactName { get; set; }
+    public string? EmergencyContactPhone { get; set; }
+
+    // Facility-specific (loaded dynamically via partial + ResolvePlan)
+    public string? RoomPreference { get; set; }
+    public decimal? DepositAmount { get; set; }
+}
+```
+
+## How does the form load its data?
+
+Dropdowns need options. On page load, we fire two independent GET requests in parallel — one for facilities, one for care levels. When both complete, we hide the loading message and show the form.
+
+```csharp title="DomReady — Parallel HTTP"
+Html.On(plan, t => t.DomReady(pipeline =>
+{
+    pipeline.Parallel(
+        a => a.Get("/Intake/Facilities")
+              .Response(r => r.OnSuccess<FacilitiesResponse>((json, s) =>
+              {
+                  s.Component<FusionDropDownList>(m => m.FacilityId)
+                      .SetDataSource(json, j => j.Facilities)
+                      .DataBind();
+              })),
+        b => b.Get("/Intake/CareLevels")
+              .Response(r => r.OnSuccess<CareLevelsResponse>((json, s) =>
+              {
+                  s.Component<FusionDropDownList>(m => m.CareLevel)
+                      .SetDataSource(json, j => j.Levels)
+                      .DataBind();
+              }))
+    ).OnAllSettled(s =>
+    {
+        s.Element("loading-message").Hide();
+        s.Element("intake-form").Show();
+        s.Element("form-actions").Show();
+    });
+}));
+```
+
+`Parallel()` fires both requests at once. `OnAllSettled()` runs after both complete — success or failure. The typed `OnSuccess<FacilitiesResponse>()` gives you a phantom `json` object with compile-time property access: `json, j => j.Facilities`.
+
+## What happens when you pick a facility?
+
+Three things happen in parallel when the coordinator selects a facility: the unit dropdown cascades, facility details load, and a requirements partial with input fields appears.
+
+```csharp title="Facility Changed — Parallel: cascade + info + requirements"
+.Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+{
+    pipeline.Parallel(
+        a => a.Get("/Intake/Units")
+            .Gather(g => g
+                .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+            .Response(r => r
+                .OnSuccess<UnitsResponse>((json, s) =>
+                {
+                    s.Component<FusionDropDownList>(m => m.UnitId)
+                        .SetDataSource(json, j => j.Units)
+                        .DataBind();
+                })),
+        b => b.Get("/Intake/FacilityInfo")
+            .Gather(g => g
+                .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+            .Response(r => r
+                .OnSuccess(s => s.Into("facility-info"))),
+        c => c.Get("/Intake/FacilityRequirements")
+            .Gather(g => g
+                .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+            .Response(r => r
+                .OnSuccess(s => s.Into("facility-requirements")))
+    );
+})
+```
+
+Three parallel branches, one event:
+1. **Cascade** — JSON response populates the Unit dropdown via `SetDataSource()` + `DataBind()`
+2. **Facility info** — display partial injected via `Into("facility-info")`
+3. **Facility requirements** — partial with reactive input fields injected via `Into("facility-requirements")`
+
+## How do dynamic form fields work?
+
+The facility requirements partial uses `Html.ResolvePlan<T>()` — a partial plan that merges into the parent at runtime. The fields register as components, validation rules get enriched, and `IncludeAll()` gathers them on save.
+
+<Tabs>
+<TabItem label="Partial view">
+```csharp title="Views/Intake/_FacilityRequirements.cshtml"
+@model ResidentIntakeModel
+@{
+    var plan = Html.ResolvePlan<ResidentIntakeModel>();
+}
+
+<native-vstack gap="Base">
+    <native-heading level="H4">Facility Requirements</native-heading>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        @{ Html.InputField(plan, m => m.RoomPreference,
+            o => o.Required().Label("Room Preference"))
+            .NativeTextBox(b => b
+                .Placeholder("e.g., Ground floor, near garden")); }
+
+        @{ Html.InputField(plan, m => m.DepositAmount,
+            o => o.Required().Label("Move-in Deposit ($)"))
+            .NumericTextBox(b => b
+                .Min(0).Step(500)); }
+    </div>
+</native-vstack>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)
+```
+</TabItem>
+<TabItem label="How it works">
+1. `ResolvePlan<T>()` creates a partial plan (same model type = same `planId`)
+2. `RenderPlan()` emits only the plan JSON script tag (no validation summary — that's on the parent)
+3. `ScriptManager()` initializes Syncfusion components in the partial (NumericTextBox)
+4. When loaded via `Into()`, the runtime extracts the plan JSON and calls `mergePlan()`
+5. Components merge into the parent plan — validation fields get enriched with `fieldId`, `vendor`, `readExpr`
+6. Validation rules that were unenriched at boot time (no component yet) now fire correctly
+7. `IncludeAll()` on save gathers the partial's fields alongside the parent's fields
+</TabItem>
+</Tabs>
+
+The key insight: the parent plan's validator already has rules for `RoomPreference` and `DepositAmount`. At initial render those rules are *unenriched* (no component exists yet). When the partial loads and merges, the runtime enriches those validation fields — and validation just works.
+
+## How do conditional sections work?
+
+Two sections appear conditionally:
+
+**1. Care Level = "Memory Care"** — shows a cognitive assessment date field.
+
+```csharp title="Condition — Dropdown value"
+pipeline.When(args, a => a.Value).Eq("memory-care")
+    .Then(t => t.Element("cognitive-section").Show())
+    .Else(e => e.Element("cognitive-section").Hide());
+```
+
+**2. "Requires Medication Management" checkbox** — shows the physician field.
+
+```csharp title="Condition — Checkbox boolean"
+pipeline.When(args, a => a.Checked).Truthy()
+    .Then(t => t.Element("physician-section").Show())
+    .Else(e => e.Element("physician-section").Hide());
+```
+
+Both use `When().Then().Else()`. The difference is the operator — `.Eq("memory-care")` for string comparison, `.Truthy()` for boolean.
+
+## What about validation?
+
+The validator declares rules — some always active, some conditional, some for dynamically loaded fields. `WhenField` creates rules that fire only when a condition is met, both on the client and the server.
+
+```csharp title="Validators/IntakeValidator.cs"
+public class IntakeValidator : ReactiveValidator<ResidentIntakeModel>
+{
+    public IntakeValidator()
+    {
+        RuleFor(x => x.FirstName).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.LastName).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.DateOfBirth).NotEmpty();
+        RuleFor(x => x.FacilityId).NotEmpty()
+            .WithMessage("Please select a facility");
+        RuleFor(x => x.CareLevel).NotEmpty()
+            .WithMessage("Please select a care level");
+        RuleFor(x => x.AdmissionDate).NotEmpty();
+        RuleFor(x => x.MonthlyRate).NotEmpty()
+            .GreaterThan(0).WithMessage("Monthly rate must be greater than zero");
+        RuleFor(x => x.EmergencyContactName).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.EmergencyContactPhone).NotEmpty().MaximumLength(20);
+
+        // Conditional: medication management → physician required
+        WhenField(x => x.RequiresMedicationManagement, () =>
+        {
+            RuleFor(x => x.PrimaryPhysician).NotEmpty()
+                .WithMessage("Physician is required when medication management is needed");
+        });
+
+        // Conditional: care level = memory-care → cognitive assessment required
+        WhenField(x => x.CareLevel, "memory-care", () =>
+        {
+            RuleFor(x => x.CognitiveAssessmentDate).NotEmpty()
+                .WithMessage("Cognitive assessment date is required for memory care residents");
+        });
+
+        // Facility-specific fields (unenriched until partial merges)
+        RuleFor(x => x.RoomPreference).NotEmpty()
+            .WithMessage("Room preference is required for this facility")
+            .MaximumLength(200);
+        RuleFor(x => x.DepositAmount).NotEmpty()
+            .WithMessage("Move-in deposit is required");
+    }
+}
+```
+
+The framework extracts these rules at render time and embeds them in the plan JSON. Rules for `RoomPreference` and `DepositAmount` start unenriched — no component exists yet. When the facility requirements partial loads via `Into()`, the merge enriches those validation fields, and the rules fire correctly.
+
+## The phone field — FusionInputMask
+
+The emergency contact phone uses `FusionInputMask` with a phone number mask. The mask enforces the format — no free-text entry.
+
+```csharp title="InputMask — formatted phone input"
+Html.InputField(plan, m => m.EmergencyContactPhone,
+    o => o.Required().Label("Contact Phone"))
+    .InputMask(b => b
+        .Mask("(000) 000-0000")
+        .Placeholder("(555) 123-4567"));
+```
+
+## The save flow
+
+The submit button orchestrates five framework features in one pipeline:
+
+```csharp title="Submit — Confirm → POST → Validate → Toast → Chained"
+pipeline.Confirm("Submit this resident intake?")
+    .Then(t =>
+    {
+        t.Post("/Intake/Save", g => g.IncludeAll())
+         .Validate<IntakeValidator>("intake-form")
+         .WhileLoading(l => l.Component<NativeLoader>().Show())
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Component<NativeLoader>().Hide();
+                s.Component<FusionToast>()
+                    .SetTitle("Resident Intake")
+                    .SetContent("Intake submitted successfully")
+                    .Success()
+                    .Show();
+                s.Element("post-save-section").Show();
+                s.Element("submit-intake").Hide();
+            })
+            .OnError(400, e =>
+            {
+                e.Component<NativeLoader>().Hide();
+                e.ValidationErrors("intake-form");
+            })
+            .Chained(c => c
+                .Get("/Intake/ConfirmationNumber")
+                .Response(r2 => r2
+                    .OnSuccess<ConfirmationResponse>((json, s2) =>
+                    {
+                        s2.Element("confirmation-number")
+                            .SetText(json, j => j.Number);
+                    }))));
+    });
+```
+
+When the coordinator clicks "Submit Intake":
+
+1. **`Confirm()`** — A dialog asks "Are you sure?" If canceled, nothing happens.
+2. **`Validate<IntakeValidator>()`** — Client-side rules run first. If invalid, errors appear inline — the POST never fires.
+3. **`Post()` + `IncludeAll()`** — All registered form components are gathered and sent as JSON — including fields from merged partials.
+4. **`WhileLoading()`** — The loader overlay shows during the request.
+5. **`OnSuccess()`** — Hide loader, show toast, reveal confirmation section.
+6. **`OnError(400)`** — Hide loader, route server validation errors to fields.
+7. **`Chained()`** — After save succeeds, a follow-up GET fetches a confirmation number and displays it.
+
+## The summary drawer
+
+After saving, a "View Summary" button appears. Clicking it dispatches a custom event, and a separate `CustomEvent` handler loads the summary into a drawer.
+
+<Tabs>
+<TabItem label="Dispatch (button)">
+```csharp
+Html.NativeButton("view-summary", "View Summary")
+    .Reactive(plan, evt => evt.Click, (args, pipeline) =>
+    {
+        pipeline.Dispatch("intake-saved");
+    })
+```
+</TabItem>
+<TabItem label="Handle (CustomEvent)">
+```csharp
+Html.On(plan, t => t.CustomEvent("intake-saved", pipeline =>
+{
+    pipeline.Get("/Intake/Summary")
+        .Gather(g => g.IncludeAll())
+        .Response(r => r.OnSuccess(s =>
+        {
+            s.Into("alis-drawer-content");
+        }));
+    pipeline.Element("alis-drawer-title").SetText("Intake Summary");
+    pipeline.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+    pipeline.Component<NativeDrawer>().Open();
+}));
+```
+</TabItem>
+</Tabs>
+
+`Dispatch("intake-saved")` fires a custom DOM event. The handler loads the summary partial into the drawer via `Into()`, sets the title and size, and opens it. This pattern decouples the trigger from the action — the button doesn't know about drawers.
+
+## What is the plan?
+
+Every C# fluent call above compiles down to a JSON plan. The plan is the **only** contract between server and browser. No C# code reaches the browser, no JavaScript was hand-written.
+
+The view renders the plan at the bottom of the page so you can inspect it:
+
+```csharp
+<pre><code>@Html.Raw(plan.RenderFormatted())</code></pre>
+```
+
+Run the example and scroll to the "Plan JSON" card to see the full rendered output.
+
+## Complete source
+
+Every file in the project, for reference.
+
+<Tabs>
+<TabItem label="Index.cshtml">
+```cshtml
+@model ResidentIntakeModel
+@{
+    ViewData["Title"] = "New Resident Intake";
+    var plan = Html.ReactivePlan<ResidentIntakeModel>();
+
+    Html.On(plan, t => t.DomReady(pipeline =>
+    {
+        pipeline.Parallel(
+            a => a.Get("/Intake/Facilities")
+                  .Response(r => r.OnSuccess<FacilitiesResponse>((json, s) =>
+                  {
+                      s.Component<FusionDropDownList>(m => m.FacilityId)
+                          .SetDataSource(json, j => j.Facilities).DataBind();
+                  })),
+            b => b.Get("/Intake/CareLevels")
+                  .Response(r => r.OnSuccess<CareLevelsResponse>((json, s) =>
+                  {
+                      s.Component<FusionDropDownList>(m => m.CareLevel)
+                          .SetDataSource(json, j => j.Levels).DataBind();
+                  }))
+        ).OnAllSettled(s =>
+        {
+            s.Element("loading-message").Hide();
+            s.Element("intake-form").Show();
+            s.Element("form-actions").Show();
+        });
+    }));
+
+    Html.On(plan, t => t.CustomEvent("intake-saved", pipeline =>
+    {
+        pipeline.Get("/Intake/Summary")
+            .Gather(g => g.IncludeAll())
+            .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+        pipeline.Element("alis-drawer-title").SetText("Intake Summary");
+        pipeline.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+        pipeline.Component<NativeDrawer>().Open();
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">New Resident Intake</native-heading>
+        <native-text color="Secondary">
+            Complete all sections below. Fields marked with * are required.
+        </native-text>
+    </div>
+
+    <p id="loading-message" class="text-sm text-text-muted">Loading form data...</p>
+
+    <native-card>
+    <native-card-body>
+        <form id="intake-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4" hidden>
+
+            <div class="col-span-full">
+                <native-heading level="H3">Personal Information</native-heading>
+            </div>
+
+            @{ Html.InputField(plan, m => m.FirstName, o => o.Required().Label("First Name"))
+                .NativeTextBox(b => b
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("Jane")); }
+
+            @{ Html.InputField(plan, m => m.LastName, o => o.Required().Label("Last Name"))
+                .NativeTextBox(b => b
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("Doe")); }
+
+            @{ Html.InputField(plan, m => m.DateOfBirth, o => o.Required().Label("Date of Birth"))
+                .DatePicker(b => b.Placeholder("Select date of birth")); }
+
+            <div class="col-span-full mt-2">
+                <native-heading level="H3">Placement</native-heading>
+            </div>
+
+            @{ Html.InputField(plan, m => m.FacilityId, o => o.Required().Label("Facility"))
+                .DropDownList(b => b
+                    .Placeholder("Select facility")
+                    .Fields<LookupItem>(t => t.Name, v => v.Id)
+                    .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+                    {
+                        pipeline.Parallel(
+                            a => a.Get("/Intake/Units")
+                                .Gather(g => g.Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                                .Response(r => r.OnSuccess<UnitsResponse>((json, s) =>
+                                {
+                                    s.Component<FusionDropDownList>(m => m.UnitId)
+                                        .SetDataSource(json, j => j.Units).DataBind();
+                                })),
+                            b => b.Get("/Intake/FacilityInfo")
+                                .Gather(g => g.Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                                .Response(r => r.OnSuccess(s => s.Into("facility-info"))),
+                            c => c.Get("/Intake/FacilityRequirements")
+                                .Gather(g => g.Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                                .Response(r => r.OnSuccess(s => s.Into("facility-requirements")))
+                        );
+                    })); }
+
+            <div id="facility-info" class="col-span-full"></div>
+            <div id="facility-requirements" class="col-span-full"></div>
+
+            @{ Html.InputField(plan, m => m.UnitId, o => o.Label("Unit"))
+                .DropDownList(b => b
+                    .Placeholder("Select unit — pick a facility first")
+                    .Fields<LookupItem>(t => t.Name, v => v.Id)); }
+
+            @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
+                .DropDownList(b => b
+                    .Placeholder("Select care level")
+                    .Fields<LookupItem>(t => t.Name, v => v.Id)
+                    .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+                    {
+                        pipeline.When(args, a => a.Value).Eq("memory-care")
+                            .Then(t => t.Element("cognitive-section").Show())
+                            .Else(e => e.Element("cognitive-section").Hide());
+                    })); }
+
+            @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
+                .DatePicker(b => b.Placeholder("Select admission date")); }
+
+            @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
+                .NumericTextBox(b => b.Min(0).Step(100)); }
+
+            <div id="cognitive-section" class="col-span-full" hidden>
+                @{ Html.InputField(plan, m => m.CognitiveAssessmentDate,
+                    o => o.Label("Last Cognitive Assessment"))
+                    .DatePicker(b => b.Placeholder("Assessment date")); }
+            </div>
+
+            <div class="col-span-full mt-2">
+                <native-heading level="H3">Medical</native-heading>
+            </div>
+
+            <div class="col-span-full">
+                @{ Html.InputField(plan, m => m.RequiresMedicationManagement,
+                    o => o.Label("Requires Medication Management"))
+                    .NativeCheckBox(b => b
+                        .CssClass("h-4 w-4 rounded border-border text-accent")
+                        .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+                        {
+                            pipeline.When(args, a => a.Checked).Truthy()
+                                .Then(t => t.Element("physician-section").Show())
+                                .Else(e => e.Element("physician-section").Hide());
+                        })); }
+            </div>
+
+            <div id="physician-section" class="col-span-full" hidden>
+                @{ Html.InputField(plan, m => m.PrimaryPhysician, o => o.Label("Primary Physician"))
+                    .NativeTextBox(b => b
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("Dr. Smith")); }
+            </div>
+
+            <div class="col-span-full mt-2">
+                <native-heading level="H3">Emergency Contact</native-heading>
+            </div>
+
+            @{ Html.InputField(plan, m => m.EmergencyContactName,
+                o => o.Required().Label("Contact Name"))
+                .NativeTextBox(b => b
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("John Doe")); }
+
+            @{ Html.InputField(plan, m => m.EmergencyContactPhone,
+                o => o.Required().Label("Contact Phone"))
+                .InputMask(b => b.Mask("(000) 000-0000").Placeholder("(555) 123-4567")); }
+        </form>
+
+        <div id="form-actions" class="mt-6 flex items-center gap-3" hidden>
+            @(Html.NativeButton("submit-intake", "Submit Intake")
+                .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, pipeline) =>
+                {
+                    pipeline.Confirm("Submit this resident intake?")
+                        .Then(t =>
+                        {
+                            t.Post("/Intake/Save", g => g.IncludeAll())
+                             .Validate<IntakeValidator>("intake-form")
+                             .WhileLoading(l => l.Component<NativeLoader>().Show())
+                             .Response(r => r
+                                .OnSuccess(s =>
+                                {
+                                    s.Component<NativeLoader>().Hide();
+                                    s.Component<FusionToast>()
+                                        .SetTitle("Resident Intake")
+                                        .SetContent("Intake submitted successfully")
+                                        .Success().Show();
+                                    s.Element("post-save-section").Show();
+                                    s.Element("submit-intake").Hide();
+                                })
+                                .OnError(400, e =>
+                                {
+                                    e.Component<NativeLoader>().Hide();
+                                    e.ValidationErrors("intake-form");
+                                })
+                                .Chained(c => c
+                                    .Get("/Intake/ConfirmationNumber")
+                                    .Response(r2 => r2
+                                        .OnSuccess<ConfirmationResponse>((json, s2) =>
+                                        {
+                                            s2.Element("confirmation-number")
+                                                .SetText(json, j => j.Number);
+                                        }))));
+                        });
+                }))
+        </div>
+
+        <div id="post-save-section" class="mt-6 p-4 rounded-md border border-border bg-surface-alt" hidden>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-sm font-medium text-text-primary">Intake Submitted</span>
+            </div>
+            <p class="text-sm text-text-secondary">
+                Confirmation: <strong id="confirmation-number" class="text-text-primary"></strong>
+            </p>
+            <div class="mt-3">
+                @(Html.NativeButton("view-summary", "View Summary")
+                    .CssClass("rounded-md border border-border px-4 py-1.5 text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, pipeline) =>
+                    {
+                        pipeline.Dispatch("intake-saved");
+                    }))
+            </div>
+        </div>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
+```
+</TabItem>
+<TabItem label="IntakeController.cs">
+```csharp
+using Microsoft.AspNetCore.Mvc;
+using ResidentIntake.Models;
+using ResidentIntake.Validators;
+
+namespace ResidentIntake.Controllers;
+
+public class IntakeController : Controller
+{
+    public IActionResult Index() => View(new ResidentIntakeModel());
+
+    [HttpGet]
+    public IActionResult Facilities()
+    {
+        return Ok(new FacilitiesResponse
+        {
+            Facilities =
+            [
+                new("sunrise", "Sunrise Senior Living"),
+                new("oakwood", "Oakwood Care Center"),
+                new("maple", "Maple Grove Residence")
+            ]
+        });
+    }
+
+    [HttpGet]
+    public IActionResult CareLevels()
+    {
+        return Ok(new CareLevelsResponse
+        {
+            Levels =
+            [
+                new("independent", "Independent Living"),
+                new("assisted", "Assisted Living"),
+                new("memory-care", "Memory Care")
+            ]
+        });
+    }
+
+    [HttpGet]
+    public IActionResult Units([FromQuery] string? facilityId)
+    {
+        var units = (facilityId ?? "").ToLowerInvariant() switch
+        {
+            "sunrise" => new List<LookupItem>
+            {
+                new("s-101", "Suite 101 — Garden View"),
+                new("s-102", "Suite 102 — Garden View"),
+                new("s-201", "Suite 201 — Courtyard"),
+                new("s-202", "Suite 202 — Courtyard")
+            },
+            "oakwood" => new List<LookupItem>
+            {
+                new("o-a1", "Wing A — Room 1"),
+                new("o-a2", "Wing A — Room 2"),
+                new("o-b1", "Wing B — Room 1")
+            },
+            "maple" => new List<LookupItem>
+            {
+                new("m-10", "Cottage 10"),
+                new("m-11", "Cottage 11"),
+                new("m-12", "Cottage 12"),
+                new("m-13", "Cottage 13"),
+                new("m-14", "Cottage 14")
+            },
+            _ => new List<LookupItem>()
+        };
+        return Ok(new UnitsResponse { Units = units });
+    }
+
+    [HttpGet]
+    public IActionResult FacilityInfo([FromQuery] string? facilityId)
+    {
+        var (name, address, phone, capacity) = (facilityId ?? "").ToLowerInvariant() switch
+        {
+            "sunrise" => ("Sunrise Senior Living", "123 Garden Lane, Springfield, IL 62701", "(555) 234-5678", 48),
+            "oakwood" => ("Oakwood Care Center", "456 Oak Avenue, Riverside, CA 92501", "(555) 345-6789", 36),
+            "maple"   => ("Maple Grove Residence", "789 Maple Drive, Madison, WI 53703", "(555) 456-7890", 60),
+            _         => ("", "", "", 0)
+        };
+        if (string.IsNullOrEmpty(name)) return Content("");
+        ViewBag.FacilityName = name;
+        ViewBag.Address = address;
+        ViewBag.Phone = phone;
+        ViewBag.Capacity = capacity;
+        return PartialView("_FacilityInfo");
+    }
+
+    [HttpGet]
+    public IActionResult FacilityRequirements([FromQuery] string? facilityId)
+    {
+        if (string.IsNullOrEmpty(facilityId)) return Content("");
+        return PartialView("_FacilityRequirements", new ResidentIntakeModel());
+    }
+
+    [HttpPost]
+    public IActionResult Save([FromBody] ResidentIntakeModel? model)
+    {
+        if (model == null)
+            return BadRequest(new { errors = new Dictionary<string, string[]>
+                { ["FirstName"] = ["Request body is required."] } });
+
+        var validator = new IntakeValidator();
+        var result = validator.Validate(model);
+        if (!result.IsValid)
+        {
+            var errors = result.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+            return BadRequest(new { errors });
+        }
+        return Ok(new { message = "Intake saved successfully" });
+    }
+
+    [HttpGet]
+    public IActionResult ConfirmationNumber()
+    {
+        var number = $"RES-{DateTime.Now:yyyyMMdd}-{Random.Shared.Next(1000, 9999)}";
+        return Ok(new ConfirmationResponse { Number = number });
+    }
+
+    [HttpGet]
+    public IActionResult Summary([FromQuery] string? firstName,
+        [FromQuery] string? lastName, [FromQuery] string? facilityId,
+        [FromQuery] string? careLevel, [FromQuery] string? admissionDate,
+        [FromQuery] decimal? monthlyRate)
+    {
+        ViewBag.FirstName = firstName ?? "—";
+        ViewBag.LastName = lastName ?? "—";
+        ViewBag.FacilityId = facilityId ?? "—";
+        ViewBag.CareLevel = careLevel ?? "—";
+        ViewBag.AdmissionDate = admissionDate ?? "—";
+        ViewBag.MonthlyRate = monthlyRate?.ToString("C") ?? "—";
+        return PartialView("_Summary");
+    }
+}
+```
+</TabItem>
+<TabItem label="_FacilityRequirements.cshtml">
+```cshtml
+@model ResidentIntakeModel
+@{
+    var plan = Html.ResolvePlan<ResidentIntakeModel>();
+}
+
+<native-vstack gap="Base">
+    <native-heading level="H4">Facility Requirements</native-heading>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        @{ Html.InputField(plan, m => m.RoomPreference,
+            o => o.Required().Label("Room Preference"))
+            .NativeTextBox(b => b
+                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                .Placeholder("e.g., Ground floor, near garden")); }
+
+        @{ Html.InputField(plan, m => m.DepositAmount,
+            o => o.Required().Label("Move-in Deposit ($)"))
+            .NumericTextBox(b => b.Min(0).Step(500)); }
+    </div>
+</native-vstack>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)
+```
+</TabItem>
+<TabItem label="_FacilityInfo.cshtml">
+```html
+<div class="p-3 rounded-md bg-blue-50 border border-blue-200 text-sm">
+    <p class="font-medium text-blue-900">@ViewBag.FacilityName</p>
+    <p class="text-blue-700 mt-1">@ViewBag.Address · @ViewBag.Phone</p>
+    <p class="mt-1 text-blue-800">
+        <span class="font-medium">@ViewBag.Capacity units</span> available
+    </p>
+</div>
+```
+</TabItem>
+<TabItem label="_Summary.cshtml">
+```html
+<div class="space-y-4 p-2">
+    <div class="border-b border-border pb-3">
+        <h4 class="text-sm font-semibold text-text-primary mb-2">Resident</h4>
+        <p class="text-sm">@ViewBag.FirstName @ViewBag.LastName</p>
+    </div>
+    <div class="border-b border-border pb-3">
+        <h4 class="text-sm font-semibold text-text-primary mb-2">Placement</h4>
+        <dl class="grid grid-cols-2 gap-2 text-sm">
+            <dt class="text-text-muted">Facility</dt>
+            <dd>@ViewBag.FacilityId</dd>
+            <dt class="text-text-muted">Care Level</dt>
+            <dd>@ViewBag.CareLevel</dd>
+            <dt class="text-text-muted">Admission</dt>
+            <dd>@ViewBag.AdmissionDate</dd>
+            <dt class="text-text-muted">Monthly Rate</dt>
+            <dd>@ViewBag.MonthlyRate</dd>
+        </dl>
+    </div>
+</div>
+```
+</TabItem>
+<TabItem label="_Layout.cshtml">
+```html
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] — Resident Intake</title>
+    <link rel="stylesheet"
+          href="https://cdn.syncfusion.com/ej2/32.2.8/tailwind3.css"/>
+    <link rel="stylesheet"
+          href="~/css/design-system.css" asp-append-version="true"/>
+</head>
+<body class="alis-root h-full">
+<div class="min-h-full flex flex-col">
+    <header class="border-b border-border bg-white">
+        <native-container>
+            <div class="flex items-center h-16 gap-4">
+                <span class="w-8 h-8 rounded-lg bg-gradient-to-br
+                      from-[#7A2E3B] to-[#9B4A57]
+                      flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">A</span>
+                </span>
+                <span class="text-lg font-bold tracking-tight text-[#7A2E3B]">
+                    Resident Intake
+                </span>
+            </div>
+        </native-container>
+    </header>
+
+    <main class="flex-1">
+        <native-container class="py-10">
+            @RenderBody()
+        </native-container>
+    </main>
+</div>
+
+<script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+@Html.FusionToast()
+@Html.EJS().ScriptManager()
+@Html.FusionConfirmDialog()
+@Html.NativeLoader()
+@Html.NativeDrawer()
+<script type="module"
+        src="~/js/alis-reactive.js" asp-append-version="true"></script>
+</body>
+</html>
+```
+</TabItem>
+</Tabs>
+
+## Download and run
+
+:::note[Prerequisites]
+- .NET 10 SDK
+- Syncfusion EJ2 community or commercial license ([free trial](https://www.syncfusion.com/downloads))
+:::
+
+<a href="/downloads/resident-intake.zip">Download resident-intake.zip</a>
+
+```bash
+unzip resident-intake.zip
+cd resident-intake
+dotnet run
+# Open http://localhost:5000
+```
+
+The ZIP includes:
+- Framework DLLs in `lib/` (Alis.Reactive, Native, Fusion, FluentValidator, NativeTagHelpers)
+- Runtime JS bundle in `wwwroot/js/alis-reactive.js`
+- Design system CSS in `wwwroot/css/design-system.css`
+- Complete source: Model, Validator, Controller, Views (including dynamic partials)

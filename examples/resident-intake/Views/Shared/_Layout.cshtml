@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] — Resident Intake</title>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/tailwind3.css"/>
+    <link rel="stylesheet" href="~/css/design-system.css" asp-append-version="true"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet" media="print" onload="this.media='all'"/>
+</head>
+<body class="alis-root h-full">
+<div class="min-h-full flex flex-col">
+    <div class="h-1 bg-gradient-to-r from-[#7A2E3B] via-[#9B4A57] to-[#D4A053]"></div>
+
+    <header class="border-b border-border bg-white">
+        <native-container>
+            <div class="flex items-center h-16 gap-4">
+                <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7A2E3B] to-[#9B4A57]
+                             flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">A</span>
+                </span>
+                <span class="text-lg font-bold tracking-tight text-[#7A2E3B]">
+                    Resident Intake
+                </span>
+                <span class="text-sm text-text-muted ml-auto">Powered by Alis.Reactive</span>
+            </div>
+        </native-container>
+    </header>
+
+    <main class="flex-1">
+        <native-container class="py-10">
+            @RenderBody()
+        </native-container>
+    </main>
+
+    <footer class="border-t border-border bg-white mt-auto">
+        <native-container class="py-6">
+            <p class="text-xs text-text-muted">&copy; 2026 Alis.Reactive Example</p>
+        </native-container>
+    </footer>
+</div>
+
+<script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+@Html.FusionToast()
+@Html.EJS().ScriptManager()
+@Html.FusionConfirmDialog()
+@Html.NativeLoader()
+@Html.NativeDrawer()
+<script type="module" src="~/js/alis-reactive.js" asp-append-version="true"></script>
+</body>
+</html>
