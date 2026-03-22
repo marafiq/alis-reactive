@@ -8,3 +8,9 @@ node_modules/
 *.DotSettings.user
 .worktrees/
 tools/
+
+# docs-site (Starlight)
+docs-site/node_modules/
+docs-site/dist/
+docs-site/.astro/
+docs-site/public/d2/
