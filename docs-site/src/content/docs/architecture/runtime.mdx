@@ -159,26 +159,17 @@ Inside the chosen reaction, the runtime iterates the command list. Each command 
 
 Each command can carry an optional `when` guard. If the guard fails, that command is skipped — but the pipeline continues with the next command. This is how per-command conditions work without wrapping everything in When/Then.
 
-### Decision 3 — Mutation kind (`element.ts`)
+### Decision 3 — Mutation kind (`element.ts` and `commands.ts`)
 
-`element.ts` handles writes and calls — the two mutation primitives. It does not handle reads. Reads flow through a separate path (`resolver.ts` → `component.ts` → `walk.ts`) used by gather and conditions.
+Two mutation primitives, applied to three targets:
 
-**Writes and calls** — two modules handle mutations:
+- **`set-prop`** — `root[prop] = val` — handles SetText, SetValue, SetChecked
+- **`call`** — `root[method](args)` — handles AddClass, DataBind, ShowPopup
 
-| Target | Module | How root is resolved | set-prop | call |
-|--------|--------|---------------------|----------|------|
-| DOM element | `element.ts` | `getElementById(target)` | `el[prop] = val` | `el[method](args)` |
-| Component | `element.ts` | `resolveRoot(el, vendor)` | `root[prop] = val` | `root[method](args)` |
-| Event args | `commands.ts` | `ctx.evt` (execution context) | `evt[prop] = val` | `evt[method](args)` |
+DOM elements and components are mutated by `element.ts` (with vendor root resolution). Event args are mutated by `commands.ts` directly. Reads flow through a separate path: `resolver.ts` → `walk.ts`.
 
-**Reads** — `resolver.ts` dispatches by `source.kind`, then uses `walk()`:
-- **`event`** source → `walk(ctx, "evt.address.city")` — walks the execution context
-- **`component`** source → `evalRead(id, vendor, readExpr)` in `component.ts` → `resolveRoot()` then `walk(root, readExpr)`
+The plan carries every name as a string. The runtime applies it via bracket notation — no catalog, no switch on method names. This is why adding a new component requires zero runtime changes.
 
-Two separate paths, one shared primitive (`walk`). The plan carries every name as a string — the runtime applies it verbatim. This is why adding a new component requires zero runtime changes.
-
-How does `resolveRoot` work for different vendors? That's covered in [Component Model](/architecture/component-model/).
-
-For a step-by-step trace through the actual module files, see [Key Modules](/architecture/runtime-key-modules/).
+For the full module-by-module trace, see [Key Modules](/architecture/runtime-key-modules/). For vendor resolution details, see [Component Model](/architecture/component-model/).
 
 **Previous:** [The JSON Plan Contract](/architecture/the-contract/)

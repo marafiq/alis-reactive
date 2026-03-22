@@ -79,16 +79,11 @@ export default defineConfig({
 								{ label: 'Overview', slug: 'architecture/fluent-builders' },
 								{ label: 'The Builders', slug: 'architecture/the-builders' },
 								{ label: 'Descriptors & Plan', slug: 'architecture/descriptors-and-plan' },
+								{ label: 'The JSON Plan Contract', slug: 'architecture/the-contract' },
 								{ label: 'The Vertical Slice', slug: 'architecture/vertical-slice' },
 							],
 						},
-						{
-							label: 'The JSON Plan',
-							items: [
-								{ label: 'The Contract', slug: 'architecture/the-contract' },
-								{ label: 'JSON Plan Schema', slug: 'architecture/json-plan-schema' },
-							],
-						},
+						{ label: 'JSON Plan Schema', slug: 'architecture/json-plan-schema' },
 						{
 							label: 'Runtime',
 							items: [

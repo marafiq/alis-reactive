@@ -168,6 +168,41 @@ response -> chained: .Chained() {
 
 ## Condition builders — guard composition
 
-`pipeline.When()` enters a condition chain: `ConditionSourceBuilder` (pick operator) → `GuardBuilder` (compose with And/Or/Not) → `BranchBuilder` (Then/ElseIf/Else). Each branch's `Then` receives a new `PipelineBuilder` — full composition power inside every branch.
+`pipeline.When()` enters a condition chain. Each step narrows context, just like the main builder chain:
+
+```d2
+direction: right
+
+when: "PipelineBuilder\n.When(source)" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+op: "ConditionSourceBuilder\n.Eq() .Truthy() .Gt()\n21 operators" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+guard: "GuardBuilder\n.And() .Or() .Not()\ncompose guards" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+branch: "BranchBuilder\n.Then(pipeline => {})\n.ElseIf() .Else()" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+
+when -> op: pick source
+op -> guard: pick operator
+guard -> branch: .Then()
+```
+
+Each branch's `Then` receives a new `PipelineBuilder` — full composition power inside every branch. `Else` is terminal. `ElseIf` opens a new source → operator → guard chain.
 
 **Next:** [Descriptors & Plan](/architecture/descriptors-and-plan/) — what the builders actually produce

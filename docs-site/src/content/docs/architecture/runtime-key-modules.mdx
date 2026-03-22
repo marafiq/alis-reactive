@@ -400,6 +400,6 @@ component -> walk
 conditions -> resolver
 ```
 
-Every arrow is a function call. No circular dependencies. The graph flows in one direction: discovery → boot → trigger → execution → resolution → mutation.
+Every arrow is a function call. No circular dependencies. The checkbox trace we walked (steps 1–10) follows exactly this graph: `root.ts` → `boot.ts` → `trigger.ts` → `execute.ts` → `commands.ts` → `element.ts` → `component.ts` → `walk.ts`. Any user action in the framework follows the same path — only the reaction kind and command kind change.
 
 **Previous:** [Runtime Overview](/architecture/runtime/)
