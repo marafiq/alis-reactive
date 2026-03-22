@@ -93,38 +93,138 @@ jobs:
             /p:Platform=AnyCPU `
             /verbosity:minimal
 
-      - name: Verify smoke test output
+      - name: Verify DLLs in build output
         working-directory: tests/Alis.Reactive.Net48.SmokeTest
         run: |
-          Write-Host "=== Build output — all DLLs in bin ==="
+          Write-Host "=== Build output ==="
           Get-ChildItem bin/*.dll | ForEach-Object { Write-Host "$($_.Name)  $($_.Length) bytes" }
-
-          Write-Host ""
-          Write-Host "=== Verifying Alis.Reactive DLLs present ==="
-          $core = Test-Path "bin\Alis.Reactive.dll"
-          $native = Test-Path "bin\Alis.Reactive.Native.dll"
-          $stj = Test-Path "bin\System.Text.Json.dll"
-          Write-Host "Alis.Reactive.dll: $core"
-          Write-Host "Alis.Reactive.Native.dll: $native"
-          Write-Host "System.Text.Json.dll: $stj"
-
-          if (-not $core -or -not $native) {
-            Write-Error "Framework DLLs missing from build output!"
+          if (-not (Test-Path "bin\Alis.Reactive.dll") -or -not (Test-Path "bin\Alis.Reactive.Native.dll")) {
+            Write-Error "Framework DLLs missing!"
             exit 1
           }
 
-          Write-Host ""
-          Write-Host "=== Loading assemblies ==="
-          $asm = [System.Reflection.Assembly]::LoadFrom("$PWD\bin\Alis.Reactive.dll")
-          Write-Host "Core: $($asm.FullName)"
-          Write-Host "Core runtime: $($asm.ImageRuntimeVersion)"
-          $asm2 = [System.Reflection.Assembly]::LoadFrom("$PWD\bin\Alis.Reactive.Native.dll")
-          Write-Host "Native: $($asm2.FullName)"
-          Write-Host "Native runtime: $($asm2.ImageRuntimeVersion)"
+      - name: Start IIS Express and test the page
+        working-directory: tests/Alis.Reactive.Net48.SmokeTest
+        run: |
+          $appPath = (Resolve-Path .).Path
+          $port = 5599
+          $iis = "${env:ProgramFiles}\IIS Express\iisexpress.exe"
+          if (-not (Test-Path $iis)) { $iis = "${env:ProgramFiles(x86)}\IIS Express\iisexpress.exe" }
 
-          Write-Host ""
-          Write-Host "=== Assembly references (Native) ==="
-          $asm2.GetReferencedAssemblies() | Where-Object { $_.Name -match "System.Web|Alis" } | ForEach-Object { Write-Host $_.FullName }
+          Write-Host "Starting IIS Express at $appPath on port $port"
+          $proc = Start-Process -FilePath $iis -ArgumentList "/path:$appPath /port:$port" -PassThru -WindowStyle Hidden
+          Start-Sleep -Seconds 5
 
-          Write-Host ""
-          Write-Host "=== SMOKE TEST PASSED — net48 MVC 5 app compiled with Alis.Reactive ==="
+          try {
+            Write-Host ""
+            Write-Host "=== Requesting http://localhost:$port/ ==="
+            $response = Invoke-WebRequest -Uri "http://localhost:$port/" -UseBasicParsing -TimeoutSec 15
+            $status = $response.StatusCode
+            $html = $response.Content
+            Write-Host "Status: $status"
+            Write-Host "HTML length: $($html.Length) chars"
+
+            # Save the full HTML for inspection
+            $html | Out-File -FilePath "rendered-page.html" -Encoding utf8
+            Write-Host ""
+
+            # === ASSERTION 1: Page rendered successfully ===
+            if ($status -ne 200) {
+              Write-Error "FAIL: Expected 200, got $status"
+              exit 1
+            }
+            Write-Host "PASS: Page returned 200"
+
+            # === ASSERTION 2: Plan JSON is present ===
+            if ($html -notmatch 'data-reactive-plan') {
+              Write-Error "FAIL: No data-reactive-plan element found in HTML"
+              Write-Host $html
+              exit 1
+            }
+            Write-Host "PASS: data-reactive-plan element found"
+
+            # === ASSERTION 3: DomReady trigger exists in plan ===
+            if ($html -notmatch '"kind"\s*:\s*"dom-ready"') {
+              Write-Error "FAIL: No dom-ready trigger in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: dom-ready trigger found in plan"
+
+            # === ASSERTION 4: CustomEvent trigger exists ===
+            if ($html -notmatch '"kind"\s*:\s*"custom-event"') {
+              Write-Error "FAIL: No custom-event trigger in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: custom-event trigger found in plan"
+
+            # === ASSERTION 5: Dispatch command exists ===
+            if ($html -notmatch '"kind"\s*:\s*"dispatch"') {
+              Write-Error "FAIL: No dispatch command in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: dispatch command found in plan"
+
+            # === ASSERTION 6: Mutate-element command exists ===
+            if ($html -notmatch '"kind"\s*:\s*"mutate-element"') {
+              Write-Error "FAIL: No mutate-element command in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: mutate-element command found in plan"
+
+            # === ASSERTION 7: Into command exists ===
+            if ($html -notmatch '"kind"\s*:\s*"into"') {
+              Write-Error "FAIL: No into command in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: into command found in plan"
+
+            # === ASSERTION 8: Components registered ===
+            if ($html -notmatch '"components"\s*:\s*\{') {
+              Write-Error "FAIL: No components map in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: components map found in plan"
+
+            # === ASSERTION 9: NativeTextBox input field rendered ===
+            if ($html -notmatch 'placeholder="Enter your name"') {
+              Write-Error "FAIL: NativeTextBox input not rendered"
+              exit 1
+            }
+            Write-Host "PASS: NativeTextBox rendered with placeholder"
+
+            # === ASSERTION 10: NativeButton rendered ===
+            if ($html -notmatch 'btn-drawer') {
+              Write-Error "FAIL: NativeButton for drawer not rendered"
+              exit 1
+            }
+            Write-Host "PASS: NativeButton (drawer) rendered"
+
+            # === ASSERTION 11: NativeDrawer element rendered ===
+            if ($html -notmatch 'alis-drawer') {
+              Write-Error "FAIL: NativeDrawer element not rendered"
+              exit 1
+            }
+            Write-Host "PASS: NativeDrawer element rendered"
+
+            Write-Host ""
+            Write-Host "=== Extract plan JSON snippet ==="
+            if ($html -match '<script[^>]*data-reactive-plan[^>]*>(.*?)</script>') {
+              $planJson = $Matches[1]
+              Write-Host "Plan JSON (first 500 chars):"
+              Write-Host $planJson.Substring(0, [Math]::Min(500, $planJson.Length))
+            }
+
+            Write-Host ""
+            Write-Host "=== ALL 11 ASSERTIONS PASSED — net48 MVC 5 app renders Alis.Reactive plan ==="
+
+          } finally {
+            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+            Write-Host "IIS Express stopped"
+          }
+
+      - name: Upload rendered HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: net48-rendered-html
+          path: tests/Alis.Reactive.Net48.SmokeTest/rendered-page.html
