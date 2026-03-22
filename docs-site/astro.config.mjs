@@ -93,6 +93,7 @@ export default defineConfig({
 							label: 'Runtime',
 							items: [
 								{ label: 'Overview', slug: 'architecture/runtime' },
+								{ label: 'Key Modules', slug: 'architecture/runtime-key-modules' },
 								{ label: 'Component Model', slug: 'architecture/component-model' },
 							],
 						},

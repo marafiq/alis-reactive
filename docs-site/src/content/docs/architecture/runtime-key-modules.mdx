@@ -1,0 +1,321 @@
+---
+title: Key Modules
+description: Tracing a user action through the runtime — from plan discovery to DOM mutation.
+sidebar:
+  order: 5
+---
+
+This page traces a single user action — checking a checkbox — through every runtime module. Each module has one job. Together they form the execution pipeline.
+
+## The full trace
+
+```d2
+direction: right
+
+discover: "root.ts\nDiscover plans" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+boot: "boot.ts\nEnrich + wire" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+trigger: "trigger.ts\nAttach listener" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+user: "User checks\ncheckbox" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 16
+}
+execute: "execute.ts\nReaction dispatch" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+conditions: "conditions.ts\nGuard evaluation" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+element: "element.ts\nBracket notation" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+
+discover -> boot -> trigger -> user -> execute -> conditions -> element
+```
+
+## 1. Discovery — `Scripts/root.ts`
+
+The ESM entry point. Runs on every page load. Finds all `[data-reactive-plan]` elements, parses their JSON, composes partial plans, and calls `boot()` for each.
+
+No global state. No `window.alis`. The layout loads the runtime once via `<script type="module" src>`. Discovery handles the rest.
+
+## 2. Boot — `Scripts/lifecycle/boot.ts`
+
+Orchestrates the plan lifecycle in three steps:
+
+```d2
+direction: right
+
+enrich: "enrichment.ts\nResolve component refs\nto IDs, vendors, readExprs" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+validation: "walk-reactions.ts\nFind validation descriptors\nWire live-clear listeners" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+wire: "wireEntries()\nTwo-phase trigger wiring" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+
+enrich -> validation -> wire
+```
+
+**Two-phase wiring:** Non-dom-ready listeners attach first (Phase 1). Then dom-ready reactions execute (Phase 2). This guarantees dispatched events land on existing listeners — regardless of declaration order in the view.
+
+Also handles `mergePlan()` for partial views loaded via AJAX — same enrichment + wiring, applied to the incoming entries.
+
+## 3. Trigger wiring — `Scripts/execution/trigger.ts`
+
+Attaches event listeners based on `trigger.kind`. Each listener creates an execution context and calls `executeReaction()`.
+
+| Trigger kind | What it wires | Context created |
+|-------------|---------------|-----------------|
+| `dom-ready` | Immediate execution (or `DOMContentLoaded`) | `{ components }` |
+| `custom-event` | `document.addEventListener(eventName)` | `{ evt: detail, components }` |
+| `component-event` | `resolveRoot(el, vendor).addEventListener(jsEvent)` | `{ evt: payload, components }` |
+
+For component events, `resolveRoot()` from `Scripts/resolution/component.ts` determines whether to listen on the DOM element (native) or the Syncfusion instance (fusion).
+
+All listeners use `AbortSignal` for clean teardown during plan merges and test resets.
+
+## 4. User checks the checkbox
+
+The `change` event fires on the native checkbox element. The listener wired in step 3 creates `{ evt: { checked: true }, components }` and calls `executeReaction()`.
+
+## 5. Reaction dispatch — `Scripts/execution/execute.ts`
+
+Switches on `reaction.kind`:
+
+| Kind | Behavior |
+|------|----------|
+| `sequential` | Executes each command in order |
+| `conditional` | Runs pre-commands, evaluates guards, executes first matching branch |
+| `http` | Delegates to `Scripts/execution/pipeline.ts` — validate, gather, fetch, route response |
+| `parallel-http` | `Promise.all` on multiple requests, then `OnAllSettled` commands |
+
+Fully async — any branch may contain an HTTP reaction. The execution context (`evt`, `components`) threads through recursively.
+
+## 6. Command dispatch — `Scripts/execution/commands.ts`
+
+Switches on `command.kind`:
+
+| Kind | Handler |
+|------|---------|
+| `dispatch` | Fires `new CustomEvent(name, { detail })` on `document` |
+| `mutate-element` | Delegates to `Scripts/execution/element.ts` |
+| `mutate-event` | Modifies `ctx.evt` properties (used by filtering args) |
+| `validation-errors` | Delegates to `Scripts/validation/error-display.ts` |
+| `into` | Injects response HTML, merges any embedded plans |
+
+Supports optional per-command `when` guards — evaluated before the command executes. If the guard fails, the command is skipped but the pipeline continues.
+
+## 7. Condition evaluation — `Scripts/conditions/conditions.ts`
+
+Evaluates guard expressions. Five guard kinds:
+
+```d2
+direction: right
+
+value: "value\n20+ operators\neq, gt, contains, ..." {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+all: "all\nLogical AND\nall guards must pass" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+any: "any\nLogical OR\none guard must pass" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+not: "not\nInvert\nwraps inner guard" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+confirm: "confirm\nAsync dialog\npauses pipeline" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 16
+}
+```
+
+Value guards resolve their source (event path or component read) via `Scripts/resolution/resolver.ts`, coerce both sides to the declared type, then apply the operator. Source-vs-source comparisons resolve both sides before comparing.
+
+Both sync and async evaluation paths exist — `confirm` is the only async guard (shows a browser dialog and waits for user response).
+
+## 8. Element mutation — `Scripts/execution/element.ts`
+
+The execution endpoint. Looks up the DOM element by ID, resolves the vendor root, and applies one of two mutation primitives:
+
+```d2
+direction: right
+
+lookup: "getElementById(target)" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+resolve: "resolveRoot(el, vendor)\nScripts/resolution/component.ts" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+setprop: "set-prop\nroot[prop] = val" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+call: "call\nroot[method](args)" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+
+lookup -> resolve -> setprop
+resolve -> call
+```
+
+Method arguments are resolved individually — each `MethodArg` is either a `literal` (pass-through) or a `source` (resolved via `resolver.ts` with optional coercion).
+
+`resolveRoot()` in `Scripts/resolution/component.ts` is the **only function** in the runtime that knows about `ej2_instances`. Everything upstream and downstream is vendor-agnostic.
+
+## 9. Value resolution — `Scripts/resolution/resolver.ts`
+
+Dispatches by `source.kind`:
+
+| Source kind | Resolution |
+|------------|-----------|
+| `event` | `walk(ctx, "evt.address.city")` — dot-path into execution context |
+| `component` | `evalRead(id, vendor, readExpr)` — vendor root + dot-path walk |
+
+Both use `walk()` from `Scripts/core/walk.ts` — a 7-line pure function that splits on dots and traverses the object graph. Null-safe: returns `undefined` if any segment is missing.
+
+## Module dependency graph
+
+```d2
+direction: right
+
+root: "root.ts" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+boot: "boot.ts" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+trigger: "trigger.ts" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+execute: "execute.ts" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+commands: "commands.ts" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+element: "element.ts" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+component: "component.ts" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 16
+}
+resolver: "resolver.ts" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 16
+}
+walk: "walk.ts" {
+  shape: rectangle
+  style.fill: "#f0f0f0"
+  style.stroke: "#666"
+  style.font-size: 16
+}
+conditions: "conditions.ts" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+
+root -> boot
+boot -> trigger
+trigger -> execute
+execute -> commands
+execute -> conditions
+commands -> element
+element -> component
+element -> resolver
+resolver -> component
+resolver -> walk
+component -> walk
+conditions -> resolver
+```
+
+Every arrow is a function call. No circular dependencies. The graph flows in one direction: discovery → boot → trigger → execution → resolution → mutation.
+
+**Previous:** [Runtime Overview](/architecture/runtime/)
