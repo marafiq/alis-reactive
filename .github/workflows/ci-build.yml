@@ -118,13 +118,20 @@ jobs:
           try {
             Write-Host ""
             Write-Host "=== Requesting http://localhost:$port/ ==="
-            $response = Invoke-WebRequest -Uri "http://localhost:$port/" -UseBasicParsing -TimeoutSec 15
-            $status = $response.StatusCode
-            $html = $response.Content
+            try {
+              $response = Invoke-WebRequest -Uri "http://localhost:$port/" -UseBasicParsing -TimeoutSec 15
+              $status = $response.StatusCode
+              $html = $response.Content
+            } catch {
+              $status = [int]$_.Exception.Response.StatusCode
+              $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
+              $html = $reader.ReadToEnd()
+              $reader.Close()
+            }
             Write-Host "Status: $status"
             Write-Host "HTML length: $($html.Length) chars"
 
-            # Save the full HTML for inspection
+            # Save the full HTML for inspection (even error pages)
             $html | Out-File -FilePath "rendered-page.html" -Encoding utf8
             Write-Host ""
 
