@@ -88,120 +88,88 @@ phase1 -> phase2: listeners ready {
 
 **Two-phase boot** guarantees that event chains work regardless of declaration order. Phase 1 wires all CustomEvent and component-event listeners. Phase 2 runs DomReady reactions — which may dispatch events that Phase 1 listeners catch. Without this separation, a DomReady dispatch would fire before the listener exists and the event would vanish silently. Chains of any depth work because `dispatch` fires synchronous `CustomEvent`s on `document`.
 
-At this point, the page is live. Listeners are attached. The runtime is waiting. What happens when the user actually does something?
+At this point, the page is live. Listeners are attached. The runtime is waiting.
 
-## Command execution
+## When a trigger fires
 
-Three dispatch layers fire in sequence — each one narrowing from abstract to concrete. A trigger fires a reaction. The reaction contains commands. Each command applies a mutation. This layering is what makes the runtime extensible without becoming complex.
+The user checks a checkbox. The `change` listener fires. Now what?
 
-### Layer 1 — Reaction dispatch
-
-When a trigger fires, `execute.ts` reads `reaction.kind` and picks the execution strategy:
+Read the execution from left to right — each step narrows the scope until the DOM changes. The runtime makes exactly three decisions: what kind of reaction, what kind of command, what kind of mutation.
 
 ```d2
 direction: right
 
-trigger: "Trigger fires\nchange event on checkbox" {
+trigger: "Trigger fires\nchange event" {
   shape: rectangle
   style.fill: "#fce8e6"
   style.stroke: "#ea4335"
-  style.font-size: 18
+  style.font-size: 16
 }
-sequential: "sequential\nRun commands in order" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 18
-}
-conditional: "conditional\nEvaluate guards\nPick first matching branch" {
-  shape: rectangle
+reaction: "What kind\nof reaction?" {
+  shape: diamond
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
-  style.font-size: 18
+  style.font-size: 16
 }
-http: "http\nValidate → Gather →\nFetch → Route response" {
-  shape: rectangle
+command: "What kind\nof command?" {
+  shape: diamond
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
-  style.font-size: 18
+  style.font-size: 16
 }
-parallel: "parallel-http\nPromise.all on branches\nthen OnAllSettled" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 18
-}
-
-trigger -> sequential: kind {
-  style.stroke: "#ea4335"
-}
-trigger -> conditional: kind {
-  style.stroke: "#ea4335"
-}
-trigger -> http: kind {
-  style.stroke: "#ea4335"
-}
-trigger -> parallel: kind {
-  style.stroke: "#ea4335"
-}
-```
-
-A conditional reaction can contain an HTTP reaction inside its branch. An HTTP response handler can contain a conditional. The reaction tree is recursive — but at each node, the dispatch is a flat switch on `kind`.
-
-### Layer 2 — Command dispatch
-
-Inside a reaction, `commands.ts` iterates the command list and dispatches each one by `command.kind`:
-
-| Command kind | What it does | Module |
-|-------------|-------------|--------|
-| `dispatch` | Fires `CustomEvent` on `document` | inline |
-| `mutate-element` | Sets a property or calls a method | `element.ts` |
-| `mutate-event` | Modifies event args in execution context | inline |
-| `validation-errors` | Displays server-side errors at form fields | `validation/` |
-| `into` | Injects response HTML into container | `inject.ts` |
-
-Each command can carry an optional `when` guard — evaluated before the command runs. If the guard fails, that command is skipped but the rest of the pipeline continues.
-
-### Layer 3 — Mutation execution
-
-`element.ts` is where the plan meets the DOM. It has exactly two primitives:
-
-```d2
-direction: right
-
-resolve: "Resolve root\nnative → el\nfusion → el.ej2_instances[0]" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 18
-}
-setprop: "set-prop\nroot[prop] = val" {
-  shape: rectangle
+mutation: "What kind\nof mutation?" {
+  shape: diamond
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
-  style.font-size: 18
+  style.font-size: 16
 }
-call: "call\nroot[method](args)" {
+dom: "DOM changes" {
   shape: rectangle
-  style.fill: "#e6f4ea"
+  style.fill: "#d4edda"
   style.stroke: "#34a853"
-  style.font-size: 18
+  style.font-size: 16
 }
 
-resolve -> setprop: mutation.kind {
-  style.stroke: "#f9ab00"
-}
-resolve -> call: mutation.kind {
-  style.stroke: "#f9ab00"
-}
+trigger -> reaction
+reaction -> command
+command -> mutation
+mutation -> dom
 ```
 
-`root[prop] = val` handles `SetText`, `SetValue`, `SetChecked`. `root[method](args)` handles `AddClass`, `DataBind`, `ShowPopup`. The plan carries the property or method name — the runtime executes it verbatim via bracket notation. No catalog of operations, no switch on method names.
+### Decision 1 — Reaction kind (`execute.ts`)
 
-This is why adding a new component method requires zero runtime changes. The C# extension method puts the name in the plan. The runtime applies it.
+The trigger carries a reaction. The runtime reads `reaction.kind` and picks the strategy:
 
-How does `resolveRoot` know which root to return? That's the vendor resolution pattern — covered in [Component Model](/architecture/component-model/).
+- **`sequential`** — walk the command list, execute each one in order
+- **`conditional`** — evaluate guards on each branch, execute the first match, skip the rest
+- **`http`** — validate the form, gather component values, fetch, route the response to handlers
+- **`parallel-http`** — fire multiple requests concurrently via `Promise.all`, then run `OnAllSettled`
 
-For a detailed trace of how these three layers connect through the actual module files, see [Key Modules](/architecture/runtime-key-modules/).
+A conditional branch can contain an HTTP reaction. An HTTP response handler can contain a conditional. The tree is recursive, but at each node the decision is a flat switch on `kind`.
+
+### Decision 2 — Command kind (`commands.ts`)
+
+Inside the chosen reaction, the runtime iterates the command list. Each command declares its `kind`:
+
+- **`dispatch`** — fires a `CustomEvent` on `document` (other listeners may catch it)
+- **`mutate-element`** — changes a DOM element or component (next decision)
+- **`mutate-event`** — modifies the event args in the execution context
+- **`validation-errors`** — routes server-side errors to form fields
+- **`into`** — injects HTTP response HTML into a container element
+
+Each command can carry an optional `when` guard. If the guard fails, that command is skipped — but the pipeline continues with the next command. This is how per-command conditions work without wrapping everything in When/Then.
+
+### Decision 3 — Mutation kind (`element.ts`)
+
+For `mutate-element` commands, the runtime makes one final decision. First it resolves the vendor root — for native HTML it's the DOM element, for Syncfusion it's `el.ej2_instances[0]`. Then it reads `mutation.kind`:
+
+- **`set-prop`** — `root[prop] = val` — handles SetText, SetValue, SetChecked, Show, Hide
+- **`call`** — `root[method](args)` — handles AddClass, DataBind, ShowPopup, Focus
+
+The plan carries the property or method name as a string. The runtime applies it via bracket notation. No catalog of operations. No switch on method names. This is why adding a new component method requires zero runtime changes — the C# extension puts the name in the plan, the runtime executes it verbatim.
+
+How does the vendor root resolution work for different component types? That's covered in [Component Model](/architecture/component-model/).
+
+For a step-by-step trace through the actual module files, see [Key Modules](/architecture/runtime-key-modules/).
 
 **Previous:** [The JSON Plan Contract](/architecture/the-contract/)
