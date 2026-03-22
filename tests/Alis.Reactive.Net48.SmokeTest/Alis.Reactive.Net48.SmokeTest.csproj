@@ -87,6 +87,9 @@
     <Reference Include="System.Threading.Tasks.Extensions">
       <HintPath>packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.IO.Pipelines">
+      <HintPath>packages\System.IO.Pipelines.9.0.14\lib\net462\System.IO.Pipelines.dll</HintPath>
+    </Reference>
     <!-- Alis.Reactive framework DLLs (built from source, net48 target) -->
     <Reference Include="Alis.Reactive">
       <HintPath>..\..\Alis.Reactive\bin\Release\net48\Alis.Reactive.dll</HintPath>
