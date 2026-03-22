@@ -71,6 +71,19 @@ jobs:
         working-directory: tests/Alis.Reactive.Net48.SmokeTest
         run: nuget restore packages.config -PackagesDirectory packages
 
+      - name: Install VS Web Application targets
+        run: |
+          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe" modify `
+            --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" `
+            --add Microsoft.VisualStudio.Component.WebDeploy `
+            --add Microsoft.VisualStudio.ComponentGroup.Web `
+            --quiet --norestart 2>&1 | Out-Null
+          # Fallback: install MSBuild web targets via NuGet if VS installer doesn't have them
+          if (-not (Test-Path "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets")) {
+            nuget install MSBuild.Microsoft.VisualStudio.Web.targets -Version 14.0.0.3 -OutputDirectory packages
+            $env:VSToolsPath = "$PWD\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\tools\VSToolsPath"
+          }
+
       - name: Build smoke test with MSBuild
         working-directory: tests/Alis.Reactive.Net48.SmokeTest
         run: |
