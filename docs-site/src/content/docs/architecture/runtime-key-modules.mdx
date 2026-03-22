@@ -257,7 +257,58 @@ Dispatches by `source.kind`:
 | `event` | `walk(ctx, "evt.address.city")` — dot-path into execution context |
 | `component` | `evalRead(id, vendor, readExpr)` — vendor root + dot-path walk |
 
-Both use `walk()` from `Scripts/core/walk.ts` — a 7-line pure function that splits on dots and traverses the object graph. Null-safe: returns `undefined` if any segment is missing.
+Both converge on one primitive.
+
+## 10. walk — `Scripts/core/walk.ts`
+
+This is the most important function in the runtime. Every read, every source resolution, every condition evaluation flows through it. 7 lines, zero side effects:
+
+```d2
+direction: right
+
+path: "path = 'evt.address.city'" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+split: "split('.')\n['evt', 'address', 'city']" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+step1: "root['evt']\n→ event payload" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+step2: "payload['address']\n→ address object" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+step3: "address['city']\n→ 'Portland'" {
+  shape: rectangle
+  style.fill: "#d4edda"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+
+path -> split -> step1 -> step2 -> step3
+```
+
+Split the path on dots. Walk each segment with bracket notation: `current = current[part]`. If any segment is null, return `undefined`. That's it.
+
+This is how the C# expression `x => x.Address.City` reaches the browser value. `ExpressionPathHelper` converts it to `"evt.address.city"` at build time. The plan carries the string. `walk()` traverses it at runtime. The two layers never meet — the dot-path is the contract between them.
+
+`walk` is used by:
+- **resolver.ts** — walk event payloads (`ctx.evt.address.city`)
+- **component.ts** — walk component readExpr (`root.value`, `root.checked`)
+- **conditions.ts** — resolve guard source values before comparing
+- **gather.ts** — read component values for HTTP request bodies
 
 ## Module dependency graph
 
