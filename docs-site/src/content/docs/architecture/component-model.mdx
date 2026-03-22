@@ -68,7 +68,7 @@ fusion_root -> bracket {
 }
 ```
 
-`component.ts` is the **only module** in the runtime that knows about `ej2_instances`. After resolving the root, every operation flows through bracket notation — the same two primitives (`set-prop`, `call`) described in [Runtime](/architecture/runtime/).
+`component.ts` is the module that resolves vendor roots (`ej2_instances`). `trigger.ts` also has vendor-aware logic for constructing event detail objects — native components read `readExpr` from the element, while fusion components pass the event object directly. After resolving the root, every operation flows through bracket notation — the same two primitives (`set-prop`, `call`) described in [Runtime](/architecture/runtime/).
 
 ## Every interaction, one pattern
 

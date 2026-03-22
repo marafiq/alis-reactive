@@ -101,7 +101,7 @@ wire: "wireEntries()\nTwo-phase trigger wiring" {
 enrich -> validation -> wire
 ```
 
-**Enrichment** runs first: it walks all plan entries and resolves abstract component references — gather placeholders and validation field refs — to concrete IDs, vendors, and readExprs from the ComponentsMap. After enrichment, every entry is fully resolved and ready for trigger wiring. No late-binding remains.
+**Enrichment** runs first: it walks validation descriptors in the plan and fills in `fieldId`, `vendor`, and `readExpr` on each validation field from the ComponentsMap. This is the only runtime enrichment — gather placeholders and component trigger refs are already resolved at C# render time by `GatherResolver` and the component builders.
 
 **Two-phase wiring:** Non-dom-ready listeners attach first (Phase 1). Then dom-ready reactions execute (Phase 2). This guarantees dispatched events land on existing listeners — regardless of declaration order in the view.
 
@@ -117,7 +117,7 @@ Attaches event listeners based on `trigger.kind`. Each listener creates an execu
 | `custom-event` | `document.addEventListener(eventName)` | `{ evt: detail, components }` |
 | `component-event` | `resolveRoot(el, vendor).addEventListener(jsEvent)` | `{ evt: payload, components }` |
 
-For component events, `resolveRoot()` from `Scripts/resolution/component.ts` determines whether to listen on the DOM element (native) or the Syncfusion instance (fusion).
+For component events, `resolveRoot()` from `Scripts/resolution/component.ts` determines whether to listen on the DOM element (native) or the Syncfusion instance (fusion). Note: `trigger.ts` also contains vendor-specific logic for constructing the event detail — native components read `readExpr` from the element and package it into the detail, while fusion components pass the event object directly. This is the second place (alongside `component.ts`) where vendor differences are handled.
 
 All listeners use `AbortSignal` for clean teardown during plan merges and test resets.
 
@@ -136,7 +136,7 @@ Switches on `reaction.kind`:
 | `http` | Delegates to `Scripts/execution/pipeline.ts` — validate, gather, fetch, route response |
 | `parallel-http` | `Promise.all` on multiple requests, then `OnAllSettled` commands |
 
-Fully async — any branch may contain an HTTP reaction. The execution context (`evt`, `components`) threads through recursively.
+`sequential` commands execute synchronously (no `await`). `conditional`, `http`, and `parallel-http` are async — they await guard evaluation, fetch, and `Promise.all` respectively. The execution context (`evt`, `components`) threads through recursively.
 
 ## 6. Command dispatch — `Scripts/execution/commands.ts`
 
@@ -390,6 +390,8 @@ trigger -> execute
 execute -> commands
 execute -> conditions
 commands -> element
+commands -> resolver
+commands -> conditions
 element -> component
 element -> resolver
 resolver -> component

@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-The fluent builders are Layer 1 of the architecture — the developer's API surface. Every method call creates a **descriptor** (a data structure), not a side effect. The plan collects descriptors. `Render()` serializes them to JSON. The runtime executes the JSON.
+The fluent builders are Layer 1 of the architecture — the developer's API surface. Every method call creates a **descriptor** (a data structure), not a side effect. The plan collects descriptors. `Html.RenderPlan(plan)` serializes them to JSON. The runtime executes the JSON.
 
 ```d2
 direction: right
@@ -28,7 +28,7 @@ plan: "Plan collects\nEntries + ComponentsMap" {
   style.stroke: "#34a853"
   style.font-size: 18
 }
-json: "plan.Render()\nJSON in the page" {
+json: "Html.RenderPlan(plan)\nJSON in the page" {
   shape: rectangle
   style.fill: "#d4edda"
   style.stroke: "#34a853"
@@ -51,6 +51,12 @@ plan -> json: serializes {
 The C# side builds descriptors. It never touches the DOM, never calls `fetch`, never evaluates conditions. The JS side reads the plan and executes it. It never creates new commands, never extends the schema, never invents behavior.
 
 If a feature can't be expressed as a plan descriptor, it doesn't exist in the framework. The plan is the only contract.
+
+## Why descriptors instead of direct execution?
+
+Because the server and browser are different environments. C# runs on the server during Razor view rendering — the DOM doesn't exist yet. The browser runs JavaScript after the page loads — the C# code is long gone. Descriptors bridge this gap: the C# side captures *what* should happen, serializes it as JSON, and the runtime executes it later.
+
+This also means the C# API is compile-time checked. Rename a model property → every `m => m.Name` expression breaks at build. Wire a condition on `args.Checked` → the compiler enforces that `Checked` is `bool?`, not `object`. The type safety lives in the builders. The runtime just follows instructions.
 
 ## What's inside
 
