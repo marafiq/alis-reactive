@@ -55,7 +55,15 @@ element: "element.ts\nBracket notation" {
   style.font-size: 16
 }
 
-discover -> boot -> trigger -> user -> execute -> conditions -> element
+discover -> boot -> trigger -> user -> execute -> element
+execute -> conditions: if conditional {
+  style.stroke: "#4285f4"
+  style.stroke-dash: 3
+}
+conditions -> element: branch selected {
+  style.stroke: "#4285f4"
+  style.stroke-dash: 3
+}
 ```
 
 ## 1. Discovery — `Scripts/root.ts`
@@ -122,7 +130,7 @@ Switches on `reaction.kind`:
 | Kind | Behavior |
 |------|----------|
 | `sequential` | Executes each command in order |
-| `conditional` | Runs pre-commands, evaluates guards, executes first matching branch |
+| `conditional` | Executes commands that pass conditions. Supports if/elseif/else |
 | `http` | Delegates to `Scripts/execution/pipeline.ts` — validate, gather, fetch, route response |
 | `parallel-http` | `Promise.all` on multiple requests, then `OnAllSettled` commands |
 
@@ -205,8 +213,6 @@ confirm -> result
 ```
 
 `value` guards resolve their source via `resolver.ts` (event path or component read), coerce both sides, then apply the operator. `all`/`any`/`not` are recursive — they compose inner guards. `confirm` is the only async guard — it pauses the pipeline and waits for user response.
-
-Both sync and async evaluation paths exist — `confirm` is the only async guard (shows a browser dialog and waits for user response).
 
 ## 8. Element mutation — `Scripts/execution/element.ts`
 
