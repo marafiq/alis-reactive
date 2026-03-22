@@ -73,6 +73,7 @@ export default defineConfig({
 					label: 'Architecture',
 					items: [
 						{ label: 'Overview', slug: 'architecture/three-layers' },
+						{ label: 'Fluent Builders', slug: 'architecture/fluent-builders' },
 						{
 							label: 'The JSON Plan',
 							items: [

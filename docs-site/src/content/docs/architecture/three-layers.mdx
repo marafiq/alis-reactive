@@ -169,19 +169,6 @@ route -> mutate: matched handler {
 
 Every step in this flow is described in the plan. The runtime follows the instructions. If validation fails, the request never fires. If the server returns 400, the error handler runs. All decided by the plan, not by JavaScript logic.
 
-## Bracket notation — the execution model
-
-The runtime does not have a catalog of operations. It has two primitives:
-
-| Mutation | Runtime executes |
-|----------|-----------------|
-| `set-prop` | `root[prop] = value` |
-| `call` | `root[method](args)` |
-
-`root` is resolved from the vendor — for native HTML it's the DOM element, for Syncfusion it's `el.ej2_instances[0]`. After that, bracket notation handles everything: setting text, adding classes, calling component methods. The plan carries the property/method name. The runtime applies it.
-
-This is why adding a new component requires zero runtime changes — the C# vertical slice puts the right names in the plan. The runtime executes them verbatim.
-
 ## The architecture applied everywhere
 
 Every feature follows the same three-layer pattern:
@@ -198,5 +185,6 @@ One idea, five features, zero JavaScript in your views.
 
 ## Next
 
-- [The JSON Plan Contract](/architecture/the-contract/) — what the plan actually looks like
-- [Component Model](/architecture/component-model/) — how vendor-agnostic components work
+- [Fluent Builders](/architecture/fluent-builders/) — how descriptors, builders, and the plan compose
+- [The JSON Plan Contract](/architecture/the-contract/) — what the serialized plan looks like
+- [Runtime](/architecture/runtime/) — how the runtime boots and executes commands

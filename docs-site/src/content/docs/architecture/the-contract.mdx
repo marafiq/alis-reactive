@@ -14,9 +14,9 @@ It's structured. Every piece has a `"kind"` field that tells the runtime exactly
 You wrote this:
 
 ```csharp
-p.When(args, a => a.Checked).Truthy()
-    .Then(t => t.Element("due-date-section").Show())
-    .Else(e => e.Element("due-date-section").Hide());
+pipeline.When(args, a => a.Checked).Truthy()
+    .Then(then => t.Element("due-date-section").Show())
+    .Else(otherwise => e.Element("due-date-section").Hide());
 ```
 
 The plan captures it as a conditional with two branches:
@@ -43,7 +43,7 @@ The second branch has no guard — that's the `Else`.
 ## What does `.SetText("Ready")` become?
 
 ```csharp
-p.Element("status").SetText("Ready");
+pipeline.Element("status").SetText("Ready");
 ```
 
 ```json
@@ -57,7 +57,7 @@ The runtime reads this and does: `element.textContent = "Ready"`. The plan told 
 ## What about `.AddClass("active")`?
 
 ```csharp
-p.Element("status").AddClass("active");
+pipeline.Element("status").AddClass("active");
 ```
 
 ```json
@@ -71,7 +71,7 @@ Two mutation kinds — `set-prop` for property assignment, `call` for method inv
 ## What about a Syncfusion component?
 
 ```csharp
-p.Component<FusionDropDownList>(m => m.Facility).SetValue("Sunrise");
+pipeline.Component<FusionDropDownList>(m => m.Facility).SetValue("Sunrise");
 ```
 
 ```json
@@ -116,4 +116,6 @@ If you need a new capability — say a new mutation kind — it goes into the sc
 
 ## Next
 
-- [Component Model](/architecture/component-model/) — how vendor-agnostic components work in detail
+- [Runtime](/architecture/runtime/) — how the runtime boots, executes commands, and resolves values
+- [Component Model](/architecture/component-model/) — how vendor resolution works for any component
+- [JSON Plan Schema](/architecture/json-plan-schema/) — every kind, every field, every coercion type
