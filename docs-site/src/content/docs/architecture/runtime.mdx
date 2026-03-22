@@ -161,18 +161,25 @@ Each command can carry an optional `when` guard. If the guard fails, that comman
 
 ### Decision 3 — Mutation kind (`element.ts`)
 
-Both `mutate-element` and `mutate-event` carry a `Mutation` with the same two primitives. The difference is the target — `mutate-element` targets a DOM element or component, `mutate-event` targets the event args object in the execution context. The mutation itself is identical:
+The runtime performs three operations on a resolved root — read, write, and call.
 
-- **`set-prop`** — `root[prop] = val`
-- **`call`** — `root[method](args)`
+- **read** — `walk(root, readExpr)` — used by gather and conditions to read component/event values
+- **set-prop** — `root[prop] = val` — used by `mutate-element` and `mutate-event` commands
+- **call** — `root[method](args)` — used by `mutate-element` and `mutate-event` commands
 
-| Target | Resolves root from | Example |
-|--------|-------------------|---------|
-| DOM element | `getElementById(target)` | `pipeline.Element("status").SetText("Ready")` |
-| Component | `resolveRoot(el, vendor)` | `pipeline.Component<T>(m => m.Prop).SetValue("x")` |
-| Event args | `ctx.evt` | `args.PreventDefault(pipeline)` |
+Reads flow through `resolver.ts` which dispatches by `source.kind`:
+- **`event`** source → `walk(ctx, "evt.address.city")` — walks the execution context
+- **`component`** source → `resolveRoot(el, vendor)` then `walk(root, readExpr)` — via `evalRead()` in `component.ts`
 
-Three targets, one mutation grammar. The plan carries the property or method name as a string. The runtime applies it via bracket notation — no catalog, no switch on method names.
+Writes and calls flow through `element.ts` which resolves the target, then applies bracket notation:
+
+| Target | How root is resolved | set-prop | call |
+|--------|---------------------|----------|------|
+| DOM element | `getElementById(target)` | `el[prop] = val` | `el[method](args)` |
+| Component | `resolveRoot(el, vendor)` | `root[prop] = val` | `root[method](args)` |
+| Event args | `ctx.evt` (execution context) | `evt[prop] = val` | `evt[method](args)` |
+
+Three operations, two dispatch paths (reads via `resolver.ts`, writes/calls via `element.ts`), one bracket notation grammar. The plan carries every name as a string — the runtime applies it verbatim.
 
 This is why adding a new component method requires zero runtime changes. The C# extension puts the name in the plan. The runtime executes it verbatim.
 
