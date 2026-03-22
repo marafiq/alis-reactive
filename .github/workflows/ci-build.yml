@@ -118,21 +118,17 @@ jobs:
           try {
             Write-Host ""
             Write-Host "=== Requesting http://localhost:$port/ ==="
-            try {
-              $response = Invoke-WebRequest -Uri "http://localhost:$port/" -UseBasicParsing -TimeoutSec 15
-              $status = $response.StatusCode
-              $html = $response.Content
-            } catch {
-              $status = [int]$_.Exception.Response.StatusCode
-              $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
-              $html = $reader.ReadToEnd()
-              $reader.Close()
-            }
+            & curl.exe -s -o rendered-page.html -w "%{http_code}" "http://localhost:$port/" | Out-Null
+            $status = (& curl.exe -s -o nul -w "%{http_code}" "http://localhost:$port/")
+            $html = Get-Content -Path "rendered-page.html" -Raw -ErrorAction SilentlyContinue
+            if (-not $html) { $html = "" }
             Write-Host "Status: $status"
             Write-Host "HTML length: $($html.Length) chars"
 
-            # Save the full HTML for inspection (even error pages)
-            $html | Out-File -FilePath "rendered-page.html" -Encoding utf8
+            if ($status -ne "200") {
+              Write-Host "=== ERROR PAGE CONTENT (first 2000 chars) ==="
+              Write-Host $html.Substring(0, [Math]::Min(2000, $html.Length))
+            }
             Write-Host ""
 
             # === ASSERTION 1: Page rendered successfully ===
