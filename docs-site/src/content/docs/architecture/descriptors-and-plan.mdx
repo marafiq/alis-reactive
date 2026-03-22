@@ -1,0 +1,152 @@
+---
+title: Descriptors & Plan
+description: The descriptor hierarchy — Entry, Trigger, Reaction, Command, Mutation — and how the plan collects and serializes them.
+sidebar:
+  order: 4
+---
+
+Every fluent builder call creates a **descriptor** — a plain C# object that describes what should happen without executing it. The plan collects these descriptors and serializes them to JSON. This page explains the descriptor hierarchy and the plan's role.
+
+## Entry — the atomic unit
+
+An `Entry` pairs a `Trigger` with a `Reaction`. The plan is a list of entries.
+
+```d2
+direction: right
+
+trigger: "Trigger\ndom-ready | custom-event |\ncomponent-event" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+reaction: "Reaction\nsequential | conditional |\nhttp | parallel-http" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+entry: "Entry\ntrigger + reaction" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+
+trigger -> entry {
+  style.stroke: "#4285f4"
+}
+reaction -> entry {
+  style.stroke: "#f9ab00"
+}
+```
+
+## Descriptor hierarchy
+
+Every descriptor is polymorphic — serialized with a `"kind"` discriminator. The runtime switches on `kind` to decide what to do.
+
+```
+Trigger (kind)
+├── DomReadyTrigger              "dom-ready"
+├── CustomEventTrigger           "custom-event"    + event name
+└── ComponentEventTrigger        "component-event" + componentId, jsEvent, vendor
+
+Reaction (kind)
+├── SequentialReaction           "sequential"       + commands[]
+├── ConditionalReaction          "conditional"      + branches[] (guard + reaction)
+├── HttpReaction                 "http"             + request descriptor
+└── ParallelHttpReaction         "parallel-http"    + request descriptors[]
+
+Command (kind)
+├── DispatchCommand              "dispatch"         + event name, payload?
+├── MutateElementCommand         "mutate-element"   + target, mutation, value?, source?, vendor?
+├── MutateEventCommand           "mutate-event"     + mutation (modifies event args)
+├── ValidationErrorsCommand      "validation-errors" + formId
+└── IntoCommand                  "into"             + target (injects HTML)
+
+Mutation (kind)
+├── SetPropMutation              "set-prop"         + prop, coerce?
+└── CallMutation                 "call"             + method, chain?, args[]
+
+MethodArg (kind)
+├── LiteralArg                   "literal"          + value
+└── SourceArg                    "source"           + BindSource, coerce?
+
+BindSource (kind)
+├── EventSource                  "event"            + path (dot-notation)
+└── ComponentSource              "component"        + componentId, vendor, readExpr
+```
+
+Every object in the plan is self-describing. The runtime never guesses — it reads `kind` and dispatches.
+
+## The plan — collector and serializer
+
+`IReactivePlan<TModel>` has two responsibilities:
+
+**Collecting entries** — `Html.On()` calls `plan.AddEntry()`. `Html.InputField()` calls `plan.AddToComponentsMap()`. By the time `RenderPlan` is called, the plan holds every entry and every component registration.
+
+**Serializing to JSON** — `plan.Render()` produces the complete JSON plan:
+
+```d2
+direction: right
+
+entries: "Entries\ntrigger + reaction pairs" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+components: "ComponentsMap\nbindingPath → vendor,\nreadExpr, componentType" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+render: "plan.Render()\nSerializes both\nto JSON" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+
+entries -> render {
+  style.stroke: "#4285f4"
+}
+components -> render {
+  style.stroke: "#f9ab00"
+}
+```
+
+At render time, two late-binding resolutions happen:
+- **IncludeAll** gather items expand to concrete component references from the ComponentsMap
+- **Validate\<T\>** rules are extracted from the FluentValidation validator and attached to the HTTP request descriptor
+
+## Expression paths — compile-time to runtime
+
+C# expressions like `m => m.Address.City` are walked by `ExpressionPathHelper` at build time. Each member is camelCased and joined with dots. A prefix identifies the source context:
+
+| Source | Prefix | Example expression | Plan path |
+|--------|--------|-------------------|-----------|
+| Event payload | `evt.` | `x => x.Address.City` | `evt.address.city` |
+| Response body | `responseBody.` | `x => x.FullName` | `responseBody.fullName` |
+| Component read | (none) | `ReadExpr = "value"` | `value` |
+| Model ID | (none) | `m => m.Address.City` | Element ID `Address_City` |
+
+The expression tree gives compile-time type safety. The dot-path gives the runtime a way to walk the object. The plan bridges the two.
+
+## ComponentsMap — the component registry
+
+When `Html.InputField(plan, m => m.Country).FusionDropDownList(...)` runs, the builder registers:
+
+| Binding Path | Component ID | Vendor | ReadExpr | ComponentType |
+|-------------|-------------|--------|----------|---------------|
+| `Country` | `Country` | `fusion` | `value` | `dropdownlist` |
+
+The runtime uses this registry for:
+- **Gather** — `IncludeAll()` iterates the map, resolves each component's value
+- **Validation** — maps field names to component IDs for error display
+- **Enrichment** — resolves component references in plan entries before trigger wiring
+
+The developer registers once. Every downstream consumer reads from the registry.
+
+**Next:** [The Vertical Slice](/architecture/vertical-slice/) — how a component is structured as a self-contained unit

@@ -1,0 +1,145 @@
+---
+title: The Vertical Slice
+description: How each component is structured as a self-contained unit — 7 files, zero cross-slice dependencies, zero runtime changes.
+sidebar:
+  order: 5
+---
+
+Every component in Reactive is a **vertical slice** — a self-contained set of files that owns everything about that component: its type metadata, events, mutations, builder, and view integration. No shared base classes for behavior. No cross-slice dependencies.
+
+## The 7-file pattern
+
+Each component follows the same structure. Here's NativeTextBox as a concrete example:
+
+```
+NativeTextBox/
+├── NativeTextBox.cs                  component class — Vendor + ReadExpr
+├── NativeTextBoxEvents.cs            event registry — Changed, Focus, Blur
+├── Events/
+│   └── NativeTextBoxOnChanged.cs     event args — { string? Value }
+├── NativeTextBoxExtensions.cs        mutation extensions — SetValue, FocusIn, Value
+├── NativeTextBoxReactiveExtensions.cs .Reactive() wiring
+├── NativeTextBoxBuilder.cs           renders HTML, config methods (Placeholder, Type, CssClass)
+└── NativeTextBoxHtmlExtensions.cs    Html.InputField().NativeTextBox() factory
+```
+
+```d2
+direction: right
+
+component: "Component Class\nsealed, IInputComponent\nVendor + ReadExpr" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+events: "Events + Args\nTypedEventDescriptor\ntyped arg properties" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+extensions: "Extensions\nSetValue, FocusIn, Value\nuses Emit() on ComponentRef" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+reactive: "Reactive Extensions\n.Reactive(plan, evt, args)\ncreates ComponentEventTrigger" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 16
+}
+builder: "Builder + Html Factory\nrenders HTML\nregisters in ComponentsMap" {
+  shape: rectangle
+  style.fill: "#f3e8fd"
+  style.stroke: "#9334e6"
+  style.font-size: 16
+}
+
+component -> events: defines {
+  style.stroke: "#4285f4"
+}
+component -> extensions: constrains {
+  style.stroke: "#4285f4"
+}
+events -> reactive: used by {
+  style.stroke: "#f9ab00"
+}
+extensions -> builder: {
+  style.stroke: "#34a853"
+}
+reactive -> builder: {
+  style.stroke: "#ea4335"
+}
+```
+
+## What each file does
+
+### 1. Component class — the phantom type
+
+A `sealed class` with a parameterless constructor. Implements `IInputComponent` (or `IAppLevelComponent`). Declares `Vendor` and `ReadExpr` as instance properties. Has zero state — it exists only as a type parameter to constrain extension methods.
+
+### 2. Events registry — what the component can fire
+
+A singleton class with `TypedEventDescriptor<TArgs>` properties. The `.Reactive()` lambda `evt => evt.Changed` resolves to this descriptor, which carries the JS event name and the typed args class.
+
+### 3. Event args — typed payload properties
+
+A class with properties like `Value : string?`, `Checked : bool?`, `IsInteracted : bool`. The compiler enforces which properties exist on `args` inside the `.Reactive()` lambda. Filtering args may also have extension methods (`PreventDefault`, `UpdateData`).
+
+### 4. Mutation extensions — what you can do in the pipeline
+
+Static extension methods on `ComponentRef<TComponent, TModel>`. Each method creates a structured `Mutation` (SetPropMutation or CallMutation) and calls `ref.Emit()` to add it to the pipeline. `.Value()` returns a `TypedComponentSource<TProp>` for conditions.
+
+### 5. Reactive extensions — wiring events to pipelines
+
+A static extension method on the builder that takes `plan`, an event selector, and a pipeline lambda. Creates a `ComponentEventTrigger` with the component's vendor, jsEvent, and bindingPath, then adds the entry to the plan.
+
+### 6. Builder — renders HTML and accepts configuration
+
+Implements `IHtmlContent`. Configuration methods (`Placeholder()`, `CssClass()`, `Items()`) are fluent. `WriteTo()` renders the HTML element. The constructor is internal — devs use the Html factory.
+
+### 7. Html factory — the entry point
+
+Extension method on `InputFieldSetup<TModel, TProp>`. Creates the builder, registers the component in `plan.ComponentsMap`, and calls `setup.Render(builder)` to emit the HTML with label and validation slot.
+
+## Why vertical slices?
+
+**Isolation.** Each slice owns its behavior completely. Adding FusionTimePicker doesn't touch NativeTextBox. Changing NativeCheckBox's events doesn't affect FusionDropDownList.
+
+**Zero runtime changes.** The slice declares Vendor and ReadExpr. The runtime already knows how to resolve vendors and walk readExprs. The plan carries the metadata. No new switch cases, no new if branches.
+
+**Duplication is intentional.** Each slice has its own extensions file, its own reactive extensions, its own builder. The code looks similar across slices — that's by design. Shared abstractions would couple slices and make each one harder to understand in isolation.
+
+```d2
+direction: right
+
+new_slice: "New component\nsealed class\nVendor + ReadExpr\n+ 6 more files" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+plan: "Plan carries\nsame shape\nas every component" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+runtime: "Runtime unchanged\nSame resolveRoot\nSame bracket notation" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+
+new_slice -> plan: metadata {
+  style.stroke: "#4285f4"
+}
+plan -> runtime: executes {
+  style.stroke: "#34a853"
+}
+```
+
+**Previous:** [Descriptors & Plan](/architecture/descriptors-and-plan/)

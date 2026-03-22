@@ -1,0 +1,173 @@
+---
+title: The Builders
+description: How TriggerBuilder, PipelineBuilder, ElementBuilder, and ComponentRef form a type-safe chain that narrows context at every step.
+sidebar:
+  order: 3
+---
+
+Builders are the developer's API. Each one represents a stage of the composition — triggers, pipelines, elements, components. The chain narrows context at every step: the compiler tells you what's available, and prevents what isn't.
+
+## The builder chain
+
+```d2
+direction: right
+
+trigger: "TriggerBuilder\nDomReady, CustomEvent" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+pipeline: "PipelineBuilder\nElement, Component,\nDispatch, When, HTTP" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+element: "ElementBuilder\nSetText, AddClass,\nShow, Hide" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+compref: "ComponentRef<T>\nSetValue, FocusIn,\nValue — constrained by T" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 18
+}
+
+trigger -> pipeline: gives you pipeline {
+  style.stroke: "#4285f4"
+}
+pipeline -> element: .Element("id") {
+  style.stroke: "#f9ab00"
+}
+pipeline -> compref: .Component<T>() {
+  style.stroke: "#f9ab00"
+}
+element -> pipeline: returns pipeline {
+  style.stroke: "#34a853"
+}
+compref -> pipeline: returns pipeline {
+  style.stroke: "#ea4335"
+}
+```
+
+## TriggerBuilder — what fires the pipeline
+
+`Html.On(plan, t => ...)` gives you a `TriggerBuilder`. It has three methods — each one takes a pipeline lambda and adds an `Entry` (trigger + reaction) to the plan.
+
+| Method | Trigger created | Lambda receives |
+|--------|----------------|-----------------|
+| `t.DomReady(pipeline => {...})` | `DomReadyTrigger` | `PipelineBuilder` |
+| `t.CustomEvent("name", pipeline => {...})` | `CustomEventTrigger` | `PipelineBuilder` |
+| `t.CustomEvent<T>("name", (payload, pipeline) => {...})` | `CustomEventTrigger` | Phantom `T` + `PipelineBuilder` |
+
+TriggerBuilder returns itself — you can chain multiple triggers in one `Html.On` call.
+
+## PipelineBuilder — the composition core
+
+The pipeline accumulates commands. It operates in one of four modes, determined by the first structural call:
+
+| Mode | Activated by | What it builds |
+|------|-------------|---------------|
+| Sequential | `Element()`, `Dispatch()`, `Component()` | `SequentialReaction` |
+| Conditional | `When()`, `Confirm()` | `ConditionalReaction` |
+| HTTP | `Get()`, `Post()`, `Put()`, `Delete()` | `HttpReaction` |
+| Parallel | `Parallel()` | `ParallelHttpReaction` |
+
+Once a mode is set, mixing modes throws at build time — you can't call `When()` after `Post()` in the same pipeline. Each `↻` (Then, OnSuccess, WhileLoading) creates a **new** PipelineBuilder for that scope, so modes don't conflict across nesting levels.
+
+## ElementBuilder — DOM element mutations
+
+`pipeline.Element("id")` creates an `ElementBuilder`. Every method on it adds a `MutateElementCommand` to the pipeline's command list, then returns either the pipeline (for terminal calls like `SetText("x")`) or the builder itself (for chaining like `SetText(source).When(...)`).
+
+The builder is internal — devs can't construct it directly. It exists only as the return of `pipeline.Element()`.
+
+## ComponentRef — type-constrained mutations
+
+`pipeline.Component<T>(m => m.Prop)` creates a `ComponentRef<T, TModel>`. It caches a static instance of `T` to read `Vendor` and `ReadExpr` — resolved once, reused for every descriptor.
+
+Extension methods on `ComponentRef` are constrained by `T`. A `ComponentRef<FusionDropDownList>` has `SetValue(string?)`, `DataBind()`, `ShowPopup()`. A `ComponentRef<NativeCheckBox>` has `SetChecked(bool)`. The compiler enforces this — you can't call `ShowPopup()` on a checkbox.
+
+```d2
+direction: right
+
+ref: "ComponentRef<FusionDropDownList>\ncaches Vendor='fusion'\ncaches ReadExpr='value'" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+ext: "Extension method\n.SetValue('US')\ncreates SetPropMutation" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+emit: "ref.Emit(mutation, value)\nAdds MutateElementCommand\nto pipeline with vendor" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+
+ref -> ext: .SetValue("US") {
+  style.stroke: "#4285f4"
+}
+ext -> emit: calls Emit() {
+  style.stroke: "#f9ab00"
+}
+```
+
+All extension methods call `Emit()` internally — they never add commands to the pipeline directly. `Emit()` wraps the mutation with the cached vendor string and target element ID.
+
+## HTTP builders — a sub-chain
+
+`pipeline.Get(url)` returns `HttpRequestBuilder`, which has its own chain: `.Gather()`, `.Validate()`, `.WhileLoading()`, `.Response()`. Response gives `ResponseBuilder` with `.OnSuccess()`, `.OnError()`, `.Chained()`. Chained gives another `HttpRequestBuilder` — the full HTTP chain recurses.
+
+```d2
+direction: right
+
+pipeline: "PipelineBuilder\n.Post(url)" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+http: "HttpRequestBuilder\n.Gather().Validate()\n.WhileLoading().Response()" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+response: "ResponseBuilder\n.OnSuccess().OnError()\n.Chained()" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+chained: "HttpRequestBuilder\nFull HTTP chain\nrepeats ↺" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+
+pipeline -> http {
+  style.stroke: "#4285f4"
+}
+http -> response: .Response() {
+  style.stroke: "#f9ab00"
+}
+response -> chained: .Chained() {
+  style.stroke: "#34a853"
+}
+```
+
+## Condition builders — guard composition
+
+`pipeline.When()` enters a condition chain: `ConditionSourceBuilder` (pick operator) → `GuardBuilder` (compose with And/Or/Not) → `BranchBuilder` (Then/ElseIf/Else). Each branch's `Then` receives a new `PipelineBuilder` — full composition power inside every branch.
+
+**Next:** [Descriptors & Plan](/architecture/descriptors-and-plan/) — what the builders actually produce

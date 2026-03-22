@@ -1,34 +1,36 @@
 ---
 title: Fluent Builders
-description: How descriptors, builders, and the plan compose to capture intent without executing behavior.
+description: How C# fluent builders capture intent as descriptors without executing behavior.
 sidebar:
   order: 2
 ---
 
-The C# fluent builders are Layer 1 of the architecture. They are the developer's API surface — the only layer you interact with directly. This page explains how they work internally: what a descriptor is, how builders compose them, and how the plan collects everything for serialization.
-
-## Descriptors — data, not behavior
-
-Every fluent method call creates a **descriptor** — a plain C# object that describes what should happen. It does not execute anything. A descriptor is a data structure with fields like `target`, `mutation`, `value`, `vendor`.
+The fluent builders are Layer 1 of the architecture — the developer's API surface. Every method call creates a **descriptor** (a data structure), not a side effect. The plan collects descriptors. `Render()` serializes them to JSON. The runtime executes the JSON.
 
 ```d2
 direction: right
 
-call: "Developer writes\npipeline.Element('status').SetText('Ready')" {
+call: "Developer writes\nfluent C# in .cshtml" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-descriptor: "Descriptor created\nMutateElementCommand\ntarget: 'status'\nmutation: set-prop 'textContent'\nvalue: 'Ready'" {
+descriptor: "Descriptors created\nTrigger, Reaction,\nCommand, Mutation" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
-plan: "Added to plan\nEntries list grows" {
+plan: "Plan collects\nEntries + ComponentsMap" {
   shape: rectangle
   style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+json: "plan.Render()\nJSON in the page" {
+  shape: rectangle
+  style.fill: "#d4edda"
   style.stroke: "#34a853"
   style.font-size: 18
 }
@@ -37,167 +39,21 @@ call -> descriptor: builds {
   style.stroke: "#4285f4"
 }
 descriptor -> plan: collects {
+  style.stroke: "#f9ab00"
+}
+plan -> json: serializes {
   style.stroke: "#34a853"
 }
 ```
-
-The descriptor knows what to mutate and how. It does not know how to find the DOM element or how to set the property. That's the runtime's job.
-
-## Builder chain — narrowing context
-
-Each builder returns the next builder in the chain, narrowing what's available at each step. The compiler enforces this — you can't call `.Show()` before calling `.Element("id")`, and you can't call `.SetChecked()` on a `FusionDropDownList`.
-
-```d2
-direction: right
-
-pipeline: "PipelineBuilder\nElement, Component,\nDispatch, When, HTTP" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 18
-}
-element: "ElementBuilder\nSetText, SetHtml,\nAddClass, Show, Hide" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 18
-}
-back: "Returns PipelineBuilder\nChain continues" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 18
-}
-
-pipeline -> element: .Element("id") {
-  style.stroke: "#4285f4"
-}
-element -> back: .SetText("x") {
-  style.stroke: "#f9ab00"
-}
-```
-
-For components, the chain adds a type constraint:
-
-```d2
-direction: right
-
-pipeline: "PipelineBuilder\n.Component<T>(m => m.Prop)" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 18
-}
-ref: "ComponentRef<T, TModel>\nT constrains which\nextension methods appear" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 18
-}
-emit: "Extension method\n.SetValue() emits descriptor\nwith vendor from T" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 18
-}
-
-pipeline -> ref: creates {
-  style.stroke: "#4285f4"
-}
-ref -> emit: .SetValue("x") {
-  style.stroke: "#f9ab00"
-}
-```
-
-`ComponentRef<T, TModel>` caches a static instance of `T` to read its `Vendor` and `ReadExpr` — resolved once, used for every descriptor the ref emits. The developer never sees this. They see `.SetValue("x")` and IntelliSense tells them what's available for that component type.
-
-## The plan — a collector
-
-`IReactivePlan<TModel>` is a list of entries. Each entry pairs a trigger with a reaction. Builders add entries to the plan through `Html.On()`, and components register themselves in the plan's `ComponentsMap` through `Html.InputField()`.
-
-```d2
-direction: right
-
-on: "Html.On(plan, t => ...)\nAdds Entry to plan" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 18
-}
-field: "Html.InputField(plan, ...)\nRegisters in ComponentsMap\nAdds to plan" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 18
-}
-render: "plan.Render()\nSerializes entries +\nComponentsMap to JSON" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 18
-}
-
-on -> render {
-  style.stroke: "#4285f4"
-}
-field -> render {
-  style.stroke: "#f9ab00"
-}
-```
-
-At render time:
-- **Entries** serialize to the `entries` array — triggers + reactions with their commands
-- **ComponentsMap** serializes to the `components` registry — vendor, readExpr, componentType per field
-- **Validation** rules are extracted from the FluentValidation validator and attached to the relevant HTTP request descriptors
-- **Gather placeholders** (`IncludeAll`) are expanded to concrete component references from the registry
-
-The output is a single JSON `<script type="application/json">` element. The runtime reads it. Nothing else crosses the boundary.
-
-## Expression paths — compile-time to runtime
-
-When you write `pipeline.Element("name").SetText(payload, x => x.Address.City)`, the expression `x => x.Address.City` is walked at build time by `ExpressionPathHelper`:
-
-```d2
-direction: right
-
-expr: "x => x.Address.City\nC# expression tree" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 18
-}
-walk: "ExpressionPathHelper\nAddress → address\nCity → city" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 18
-}
-path: "evt.address.city\nDot-path in the plan" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 18
-}
-
-expr -> walk: walks members {
-  style.stroke: "#4285f4"
-}
-walk -> path: camelCase + prefix {
-  style.stroke: "#34a853"
-}
-```
-
-The same mechanism works for:
-- **Event payloads** — prefix `evt.` → `evt.address.city`
-- **Response bodies** — prefix `responseBody.` → `responseBody.fullName`
-- **Component reads** — no prefix, uses `readExpr` directly → `value`, `checked`
-
-The expression tree gives you compile-time type safety. The dot-path gives the runtime a way to walk the object at execution time. The plan bridges the two.
 
 ## The boundary rule
 
 The C# side builds descriptors. It never touches the DOM, never calls `fetch`, never evaluates conditions. The JS side reads the plan and executes it. It never creates new commands, never extends the schema, never invents behavior.
 
-If a feature can't be expressed as a plan descriptor, it doesn't exist in the framework. The plan is the only contract. Both sides respect it.
+If a feature can't be expressed as a plan descriptor, it doesn't exist in the framework. The plan is the only contract.
 
-**Next:** [The JSON Plan Contract](/architecture/the-contract/) — what the serialized plan looks like
+## What's inside
+
+- [**The Builders**](/architecture/the-builders/) — TriggerBuilder, PipelineBuilder, ElementBuilder, ComponentRef — the type-safe chain that narrows context at every step
+- [**Descriptors & Plan**](/architecture/descriptors-and-plan/) — Entry, Trigger, Reaction, Command, Mutation — the descriptor hierarchy and how the plan serializes them
+- [**The Vertical Slice**](/architecture/vertical-slice/) — the 7-file pattern for adding a component with zero runtime changes
