@@ -72,16 +72,16 @@ export default defineConfig({
 				{
 					label: 'Architecture',
 					items: [
-						{ label: 'Architecture', slug: 'architecture/three-layers' },
-						{ label: 'The JSON Plan Contract', slug: 'architecture/the-contract' },
-						{ label: 'Component Model', slug: 'architecture/component-model' },
+						{ label: 'Overview', slug: 'architecture/three-layers' },
 						{
-							label: 'Runtime',
+							label: 'The JSON Plan',
 							items: [
-								{ label: 'Overview', slug: 'architecture/runtime' },
+								{ label: 'The Contract', slug: 'architecture/the-contract' },
 								{ label: 'JSON Plan Schema', slug: 'architecture/json-plan-schema' },
 							],
 						},
+						{ label: 'Component Model', slug: 'architecture/component-model' },
+						{ label: 'Runtime', slug: 'architecture/runtime' },
 					],
 				},
 				{
