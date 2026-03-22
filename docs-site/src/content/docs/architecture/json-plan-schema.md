@@ -202,4 +202,4 @@ Used in `when` conditions and conditional reaction branches:
 | `not` | `inner` | Inverts the inner guard |
 | `confirm` | `message` | Shows a confirmation dialog, blocks on user response |
 
-See the [Guard Operators](/reference/guard-operators/) page for the full operator reference.
+See the [Guard Operators](/alis-reactive/reference/guard-operators/) page for the full operator reference.

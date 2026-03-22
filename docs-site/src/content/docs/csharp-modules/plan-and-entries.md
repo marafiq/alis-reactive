@@ -7,7 +7,7 @@ sidebar:
 
 A plan is the container for all reactive behavior in a view. You create it at the top, wire triggers and components into it throughout the body, and render it at the bottom. The runtime discovers the rendered JSON on page load and boots it automatically.
 
-From the [Grammar Tree](/csharp-modules/mental-model/#the-grammar-tree) — the plan-related API:
+From the [Grammar Tree](/alis-reactive/csharp-modules/mental-model/#the-grammar-tree) — the plan-related API:
 
 ```
 Html.
@@ -58,7 +58,7 @@ Every `Html.On`, `Html.InputField`, and `.Reactive()` call adds entries to the p
 3. HTML with element IDs and components
 4. `RenderPlan` at the bottom — serializes everything to JSON
 
-See the full [Grammar Tree](/csharp-modules/mental-model/#the-grammar-tree) for what's available inside `pipeline`.
+See the full [Grammar Tree](/alis-reactive/csharp-modules/mental-model/#the-grammar-tree) for what's available inside `pipeline`.
 
 ## Partial views
 
@@ -82,4 +82,4 @@ See the full [Grammar Tree](/csharp-modules/mental-model/#the-grammar-tree) for 
 
 Never on the server. `ReactivePlan` collects descriptors, `RenderPlan` serializes them. The JSON is inert until the runtime reads it in the browser. This separation is why there's no JavaScript in your views — the C# fluent builders describe intent, the runtime executes it.
 
-Next: [Triggers](/csharp-modules/reactivity/triggers-and-reactions/) — the different ways to say *when* something should happen.
+Next: [Triggers](/alis-reactive/csharp-modules/reactivity/triggers-and-reactions/) — the different ways to say *when* something should happen.

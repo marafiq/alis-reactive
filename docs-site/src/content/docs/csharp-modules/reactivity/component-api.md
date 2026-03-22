@@ -7,7 +7,7 @@ sidebar:
 
 Components are targeted through `pipeline.Component<TComponent>()` inside any pipeline. Unlike `pipeline.Element("id")` which targets raw DOM elements, `Component<TComponent>` gives you typed access — IntelliSense constrains exactly which operations are available for each component type.
 
-From the [Grammar Tree](/csharp-modules/mental-model/#the-grammar-tree) — the component API:
+From the [Grammar Tree](/alis-reactive/csharp-modules/mental-model/#the-grammar-tree) — the component API:
 
 ```
 pipeline.Component<TComponent>(m => m.Prop)             § input components (TModel inferred)
@@ -210,4 +210,4 @@ pipeline.Component<NativeLoader>().Hide();
 
 `.SetTarget("elementId")` scopes the overlay to a specific section instead of the full page.
 
-**Next:** [Conditions](/csharp-modules/reactivity/conditions/) — runtime branching with When/Then/ElseIf/Else and guard composition.
+**Next:** [Conditions](/alis-reactive/csharp-modules/reactivity/conditions/) — runtime branching with When/Then/ElseIf/Else and guard composition.
