@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
@@ -27,8 +27,14 @@
         <None Include="../README.md" Pack="true" PackagePath="/" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+        <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+        <Reference Include="System.Web" />
     </ItemGroup>
 
     <ItemGroup>

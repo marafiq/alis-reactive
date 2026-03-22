@@ -380,7 +380,11 @@ namespace Alis.Reactive.FluentValidator
                 t == typeof(double) || t == typeof(float) || t == typeof(byte) || t == typeof(short) ||
                 t == typeof(uint) || t == typeof(ushort) || t == typeof(ulong))
                 return "number";
-            if (t == typeof(DateTime) || t == typeof(DateTimeOffset) || t == typeof(DateOnly))
+            if (t == typeof(DateTime) || t == typeof(DateTimeOffset)
+#if NET6_0_OR_GREATER
+                || t == typeof(DateOnly)
+#endif
+                )
                 return "date";
             return null;
         }
