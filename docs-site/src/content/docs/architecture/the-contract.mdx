@@ -1,124 +1,260 @@
 ---
 title: The JSON Plan Contract
-description: How the plan is structured, and why it matters.
+description: What the plan looks like — every trigger, reaction, command, and source shape with real examples.
 sidebar:
   order: 5
 ---
 
-You've seen the fluent C# — `.Reactive()`, `.Post()`, `.When()`. You know the builders capture intent into a JSON plan. But what does that plan actually look like? Is it just a blob of JSON, or is there structure?
+You've seen the fluent C# — `.Reactive()`, `.Post()`, `.When()`. You know the builders capture intent into a JSON plan. But what does that plan actually look like?
 
-It's structured. Every piece has a `"kind"` field that tells the runtime exactly what to do. Let's trace a few examples you've already seen.
+It's structured. Every piece has a `"kind"` field that tells the runtime exactly what to do. Let's trace through every plan shape the framework produces.
 
-## What does a checkbox toggle look like in the plan?
+## The top-level structure
 
-You wrote this:
+Every plan has three sections:
 
-```csharp
-pipeline.When(args, a => a.Checked).Truthy()
-    .Then(then => then.Element("due-date-section").Show())
-    .Else(otherwise => otherwise.Element("due-date-section").Hide());
+```json
+{
+  "planId": "MyApp.Models.ResidentModel",
+  "components": { ... },
+  "entries": [ ... ]
+}
 ```
 
-The plan captures it as a conditional with two branches:
+`planId` is the model's full type name — used as the merge key for partial views. `components` is the registry of all input components. `entries` is the list of trigger + reaction pairs.
+
+## Triggers — what fires
+
+### dom-ready
+
+```json
+{ "kind": "dom-ready" }
+```
+
+Fires once when the page loads. The simplest trigger.
+
+### custom-event
+
+```json
+{ "kind": "custom-event", "event": "resident-loaded" }
+```
+
+Fires when `pipeline.Dispatch("resident-loaded")` is called from any pipeline.
+
+### component-event
+
+```json
+{
+  "kind": "component-event",
+  "componentId": "IsUrgent",
+  "jsEvent": "change",
+  "vendor": "native",
+  "bindingPath": "IsUrgent",
+  "readExpr": "checked"
+}
+```
+
+Fires when the component's DOM event fires. The trigger carries the vendor and readExpr so the runtime knows how to construct the execution context — for native components it reads the element property, for fusion it passes the event object directly.
+
+## Reactions — what happens
+
+### sequential
+
+The simplest reaction — run commands in order:
+
+```json
+{
+  "kind": "sequential",
+  "commands": [
+    { "kind": "mutate-element", "target": "status",
+      "mutation": { "kind": "set-prop", "prop": "textContent" },
+      "value": "Ready" }
+  ]
+}
+```
+
+### conditional
+
+Evaluate guards, pick the first matching branch:
 
 ```json
 {
   "kind": "conditional",
   "branches": [
     {
-      "guard": { "kind": "value", "source": { "kind": "event", "path": "evt.checked" }, "op": "truthy" },
+      "guard": { "kind": "value",
+        "source": { "kind": "event", "path": "evt.checked" },
+        "op": "truthy" },
       "reaction": { "kind": "sequential", "commands": [
-        { "kind": "mutate-element", "target": "due-date-section",
+        { "kind": "mutate-element", "target": "section",
           "mutation": { "kind": "call", "method": "removeAttribute",
             "args": [{ "kind": "literal", "value": "hidden" }] } }
       ] }
     },
     {
       "reaction": { "kind": "sequential", "commands": [
-        { "kind": "mutate-element", "target": "due-date-section",
+        { "kind": "mutate-element", "target": "section",
           "mutation": { "kind": "call", "method": "setAttribute",
-            "args": [{ "kind": "literal", "value": "hidden" }, { "kind": "literal", "value": "" }] } }
+            "args": [{ "kind": "literal", "value": "hidden" },
+                     { "kind": "literal", "value": "" }] } }
       ] }
     }
   ]
 }
 ```
 
-Notice: `"kind": "conditional"`, `"kind": "value"`, `"kind": "event"`, `"kind": "sequential"`, `"kind": "mutate-element"`. Every object declares what it is. The runtime switches on `kind` — no guessing, no inference.
+A branch with no `guard` is the else — always matches if reached. The optional top-level `commands` field (not shown here) runs before branch evaluation.
 
-The second branch has no guard — that's the `Else`.
+### http
 
-## What does `.SetText("Ready")` become?
-
-```csharp
-pipeline.Element("status").SetText("Ready");
-```
-
-```json
-{ "kind": "mutate-element", "target": "status",
-  "mutation": { "kind": "set-prop", "prop": "textContent" },
-  "value": "Ready" }
-```
-
-The runtime reads this and does: `element.textContent = "Ready"`. The plan told it which element, which property, which value.
-
-## What about `.AddClass("active")`?
-
-```csharp
-pipeline.Element("status").AddClass("active");
-```
-
-```json
-{ "kind": "mutate-element", "target": "status",
-  "mutation": { "kind": "call", "method": "add", "chain": "classList",
-    "args": [{ "kind": "literal", "value": "active" }] } }
-```
-
-Two mutation kinds — `set-prop` for property assignment, `call` for method invocation. That's it. Every DOM operation and every component operation maps to one of these two.
-
-## What about a Syncfusion component?
-
-```csharp
-pipeline.Component<FusionDropDownList>(m => m.Facility).SetValue("Sunrise");
-```
-
-```json
-{ "kind": "mutate-element", "target": "...__Facility",
-  "mutation": { "kind": "set-prop", "prop": "value" },
-  "value": "Sunrise",
-  "vendor": "fusion" }
-```
-
-Same shape. The only difference is `"vendor": "fusion"` — which tells the runtime to resolve `el.ej2_instances[0]` instead of the raw element. Same two mutation kinds, same bracket notation, different root.
-
-## How does the runtime know about the components?
-
-The plan carries a `components` registry — populated when you write `Html.InputField`:
+A single HTTP request with gather, validation, and response handlers:
 
 ```json
 {
-  "components": {
-    "Title":    { "vendor": "native", "readExpr": "value",   "componentType": "textbox" },
-    "IsUrgent": { "vendor": "native", "readExpr": "checked", "componentType": "checkbox" },
-    "DueDate":  { "vendor": "fusion", "readExpr": "value",   "componentType": "datepicker" }
+  "kind": "http",
+  "request": {
+    "verb": "POST",
+    "url": "/api/save",
+    "gather": [
+      { "kind": "all" }
+    ],
+    "validation": {
+      "formId": "intake-form",
+      "planId": "MyApp.Models.ResidentModel",
+      "fields": [
+        {
+          "fieldName": "Name",
+          "rules": [
+            { "rule": "required", "message": "Name is required" }
+          ]
+        },
+        {
+          "fieldName": "Email",
+          "rules": [
+            { "rule": "required", "message": "Email is required" },
+            { "rule": "email", "message": "Must be a valid email" }
+          ]
+        }
+      ]
+    },
+    "onSuccess": [
+      {
+        "commands": [
+          { "kind": "mutate-element", "target": "status",
+            "mutation": { "kind": "set-prop", "prop": "textContent" },
+            "value": "Saved" }
+        ]
+      }
+    ],
+    "onError": [
+      {
+        "statusCode": 400,
+        "commands": [
+          { "kind": "validation-errors", "formId": "intake-form" }
+        ]
+      }
+    ]
   }
 }
 ```
 
-When `IncludeAll()` gathers values, or `Validate<T>` checks a field, the runtime looks up the component here — finds its vendor, its readExpr, and knows how to read its value. You registered each component once in C#. The plan carries the metadata. The runtime uses it.
+The request carries everything: HTTP verb, URL, what to gather, how to validate, what to do on success, what to do on error. The runtime follows the instructions — it never decides what to post or how to handle errors.
 
-## Why does structure matter?
+### parallel-http
 
-Because it's validated. Every plan is checked against a JSON Schema in unit tests. If a builder produces a shape the schema doesn't allow — wrong `kind`, missing field, invalid combination — the test fails before any browser is involved.
+Multiple requests fired concurrently:
 
-The schema defines what the runtime can execute:
+```json
+{
+  "kind": "parallel-http",
+  "requests": [
+    {
+      "verb": "GET",
+      "url": "/api/facilities",
+      "onSuccess": [{ "commands": [ ... ] }]
+    },
+    {
+      "verb": "GET",
+      "url": "/api/care-levels",
+      "onSuccess": [{ "commands": [ ... ] }]
+    }
+  ],
+  "onAllSettled": [
+    { "kind": "mutate-element", "target": "spinner",
+      "mutation": { "kind": "call", "method": "setAttribute",
+        "args": [{ "kind": "literal", "value": "hidden" },
+                 { "kind": "literal", "value": "" }] } }
+  ]
+}
+```
+
+Each request has its own response handlers. `onAllSettled` fires after all requests complete — regardless of individual success or failure.
+
+## Commands — what to do
+
+Five command kinds:
+
+| Kind | Purpose | Key fields |
+|------|---------|-----------|
+| `mutate-element` | Change a DOM element or component | `target`, `mutation`, `value?`, `source?`, `vendor?` |
+| `dispatch` | Fire a custom event | `event`, `payload?` |
+| `mutate-event` | Modify the event args | `mutation` |
+| `validation-errors` | Route server errors to form fields | `formId` |
+| `into` | Inject response HTML into container | `target` |
+
+## Mutations — how to change
+
+Two primitives, applied by bracket notation:
+
+| Kind | Plan shape | Runtime executes |
+|------|-----------|-----------------|
+| `set-prop` | `{ "prop": "textContent" }` | `root.textContent = val` |
+| `call` | `{ "method": "add", "chain": "classList", "args": [...] }` | `root.classList.add("active")` |
+
+## Sources — where values come from
+
+| Kind | Plan shape | Runtime resolves |
+|------|-----------|-----------------|
+| `event` | `{ "path": "evt.address.city" }` | `walk(ctx, "evt.address.city")` |
+| `component` | `{ "componentId": "Country", "vendor": "fusion", "readExpr": "value" }` | `walk(resolveRoot(el, "fusion"), "value")` |
+
+## Gather — what goes in the request
+
+| Kind | Plan shape | What it collects |
+|------|-----------|-----------------|
+| `all` | `{ "kind": "all" }` | Every registered component's value |
+| `static` | `{ "kind": "static", "param": "action", "value": "create" }` | Fixed value |
+| `component` | `{ "kind": "component", "componentId": "...", "vendor": "...", "readExpr": "..." }` | One component's live value |
+| `event` | `{ "kind": "event", "param": "q", "path": "evt.text" }` | Value from event payload |
+
+`all` is a placeholder — expanded at C# render time to concrete `component` items from the plan's ComponentsMap.
+
+## Components registry — what's on the page
+
+```json
+{
+  "components": {
+    "Name":      { "id": "Name", "vendor": "native", "readExpr": "value", "componentType": "textbox" },
+    "IsUrgent":  { "id": "IsUrgent", "vendor": "native", "readExpr": "checked", "componentType": "checkbox" },
+    "DueDate":   { "id": "DueDate", "vendor": "fusion", "readExpr": "value", "componentType": "datepicker" }
+  }
+}
+```
+
+Every `Html.InputField` call registers here. The runtime uses this for gather (`IncludeAll`), validation (field → component lookup), and enrichment (filling validation field metadata).
+
+## Why structure matters
+
+Every plan is checked against a JSON Schema in unit tests. If a builder produces a shape the schema doesn't allow — wrong `kind`, missing field, invalid combination — the test fails before any browser is involved.
 
 | Concept | Valid kinds |
 |---------|-----------|
 | Triggers | `dom-ready`, `custom-event`, `component-event` |
 | Reactions | `sequential`, `conditional`, `http`, `parallel-http` |
+| Commands | `mutate-element`, `dispatch`, `mutate-event`, `validation-errors`, `into` |
 | Mutations | `set-prop`, `call` |
 | Sources | `event`, `component` |
+| Gather | `all`, `static`, `component`, `event` |
 
 If you need a new capability — say a new mutation kind — it goes into the schema first. The schema is the gatekeeper. The plan is the contract. Both sides (C# and JS) agree on its shape, and neither reaches beyond it.
 
