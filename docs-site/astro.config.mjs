@@ -71,7 +71,18 @@ export default defineConfig({
 				},
 				{
 					label: 'Architecture',
-					autogenerate: { directory: 'architecture' },
+					items: [
+						{ label: 'Architecture', slug: 'architecture/three-layers' },
+						{ label: 'The JSON Plan Contract', slug: 'architecture/the-contract' },
+						{ label: 'Component Model', slug: 'architecture/component-model' },
+						{
+							label: 'Runtime',
+							items: [
+								{ label: 'Overview', slug: 'architecture/runtime' },
+								{ label: 'JSON Plan Schema', slug: 'architecture/json-plan-schema' },
+							],
+						},
+					],
 				},
 				{
 					label: 'Reference',
