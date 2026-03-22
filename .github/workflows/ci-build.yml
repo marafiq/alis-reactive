@@ -196,7 +196,7 @@ jobs:
             Write-Host "PASS: NativeTextBox rendered with placeholder"
 
             # === ASSERTION 10: NativeButton rendered ===
-            if ($html -notmatch 'btn-drawer') {
+            if ($html -notmatch 'btn-open-drawer') {
               Write-Error "FAIL: NativeButton for drawer not rendered"
               exit 1
             }
