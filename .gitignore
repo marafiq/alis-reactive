@@ -24,3 +24,4 @@ TestResults/
 # SonarQube
 .sonarqube/
 .scannerwork/
+nupkgs/

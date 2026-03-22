@@ -6,6 +6,26 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <PackageId>Alis.Reactive.Fusion</PackageId>
+        <Version>1.0.0-preview.1</Version>
+        <Authors>Adnan Rafiq</Authors>
+        <Company>Alis Technologies</Company>
+        <Description>Syncfusion EJ2 component integration (DropDownList, DatePicker, NumericTextBox, Toast, Confirm) for Alis.Reactive.</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://marafiq.github.io/alis-reactive/</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/marafiq/alis-reactive</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>reactive;aspnet;mvc;json-plan;zero-javascript;syncfusion</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
     <ItemGroup>
       <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="32.2.8" />
     </ItemGroup>

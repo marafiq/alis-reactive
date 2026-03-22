@@ -7,6 +7,26 @@
         <ImplicitUsings>disable</ImplicitUsings>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <PackageId>Alis.Reactive</PackageId>
+        <Version>1.0.0-preview.1</Version>
+        <Authors>Adnan Rafiq</Authors>
+        <Company>Alis Technologies</Company>
+        <Description>Plan-driven reactive framework for ASP.NET MVC — C# fluent builders produce JSON plans executed by a browser runtime. Zero JavaScript in views.</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://marafiq.github.io/alis-reactive/</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/marafiq/alis-reactive</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>reactive;aspnet;mvc;json-plan;zero-javascript</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
     <ItemGroup>
         <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
