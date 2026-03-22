@@ -5,16 +5,69 @@ template: splash
 hero:
   tagline: Developers write fluent C# to express reactivity intent. It produces a JSON plan. The JS runtime executes it. No bespoke JavaScript in views. Ever.
   actions:
-    - text: Why Alis.Reactive?
-      link: /why/
+    - text: See It In Action
+      link: /alis-reactive/examples/resident-intake/
       icon: right-arrow
     - text: Architecture
-      link: /architecture/the-contract/
+      link: /alis-reactive/architecture/three-layers/
       icon: open-book
       variant: minimal
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What It Looks Like
+
+<CardGrid>
+	<Card title="Cascading Dropdowns" icon="random">
+		Pick a facility — units populate automatically. Two parallel GETs, zero JavaScript.
+		```csharp
+		pipeline.Get("/Intake/Units")
+		    .Gather(g => g.Include<FusionDropDownList,
+		        Model>(m => m.FacilityId))
+		    .Response(r => r.OnSuccess<UnitsResponse>(
+		        (json, s) => s.Component<FusionDropDownList>(
+		            m => m.UnitId)
+		            .SetDataSource(json, j => j.Units)
+		            .DataBind()));
+		```
+		[See full example](/alis-reactive/examples/resident-intake/)
+	</Card>
+	<Card title="Conditional Visibility" icon="approve-check">
+		Check a box — a section appears. Pick a value — another section appears. All declarative.
+		```csharp
+		pipeline.When(args, a => a.Checked).Truthy()
+		    .Then(t => t.Element("section").Show())
+		    .Else(e => e.Element("section").Hide());
+		```
+		[Conditions reference](/alis-reactive/csharp-modules/reactivity/conditions/)
+	</Card>
+	<Card title="HTTP + Validation + Toast" icon="rocket">
+		One pipeline: confirm, validate, POST, loading overlay, toast, chained follow-up request.
+		```csharp
+		pipeline.Confirm("Submit?")
+		    .Then(t => t
+		        .Post("/save", g => g.IncludeAll())
+		        .Validate<MyValidator>("form")
+		        .Response(r => r.OnSuccess(s =>
+		            s.Component<FusionToast>()
+		                .SetContent("Saved!")
+		                .Success().Show())));
+		```
+		[HTTP pipeline](/alis-reactive/csharp-modules/reactivity/http-pipeline/)
+	</Card>
+	<Card title="Dynamic Partials" icon="puzzle">
+		Load a server-rendered partial with input fields via `Into()`. Plan merging enriches validation automatically.
+		```csharp
+		// Partial uses ResolvePlan — merges into parent
+		var plan = Html.ResolvePlan<Model>();
+		Html.InputField(plan, m => m.Room,
+		    o => o.Required().Label("Room"))
+		    .NativeTextBox(b => b.Placeholder("..."));
+		```
+		[Worked example](/alis-reactive/examples/resident-intake/)
+	</Card>
+</CardGrid>
 
 ## Core Principles
 
@@ -33,28 +86,29 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 	</Card>
 </CardGrid>
 
-## Documentation Guide
+## Explore
 
 <CardGrid>
 	<Card title="Getting Started" icon="star">
-		[Why Alis.Reactive?](/why/) -- the problem and the solution.
-		[Your First Plan](/getting-started/your-first-plan/) -- build a Todo app step by step.
+		[Why Alis.Reactive?](/alis-reactive/why/) — the problem and the solution.
+		[Your First Plan](/alis-reactive/getting-started/your-first-plan/) — build a Todo app step by step.
+		[Resident Intake Example](/alis-reactive/examples/resident-intake/) — full worked example with 25+ features.
 	</Card>
 	<Card title="Architecture" icon="setting">
-		[The Contract](/architecture/the-contract/) -- JSON plan deep dive.
-		[Three Layers](/architecture/three-layers/) -- C#, JSON, JS.
-		[Two-Phase Boot](/architecture/two-phase-boot/) -- why event order matters.
+		[Three Layers](/alis-reactive/architecture/three-layers/) — C#, JSON, JS.
+		[The Contract](/alis-reactive/architecture/the-contract/) — JSON plan deep dive.
+		[Fluent Builders](/alis-reactive/architecture/fluent-builders/) — how the DSL works.
+		[Vertical Slice](/alis-reactive/architecture/vertical-slice/) — component architecture.
 	</Card>
 	<Card title="Features" icon="seti:csharp">
-		[Plans](/csharp-modules/plan-and-entries/) -- create and render a plan.
-		[Triggers](/csharp-modules/triggers-and-reactions/) -- DomReady, CustomEvent, .Reactive().
-		[Mutations](/csharp-modules/element-mutations/) -- Element, Component, source binding.
-		[Conditions](/csharp-modules/conditions/) -- When/Then/Else with 21 operators.
-		[HTTP](/csharp-modules/http-pipeline/) -- GET/POST, Gather, Response, Parallel.
+		[Triggers](/alis-reactive/csharp-modules/reactivity/triggers-and-reactions/) — DomReady, CustomEvent, .Reactive().
+		[Mutations](/alis-reactive/csharp-modules/reactivity/element-mutations/) — Element, Component, source binding.
+		[Conditions](/alis-reactive/csharp-modules/reactivity/conditions/) — When/Then/Else with 21 operators.
+		[HTTP Pipeline](/alis-reactive/csharp-modules/reactivity/http-pipeline/) — GET/POST, Gather, Response, Parallel.
 	</Card>
 	<Card title="Components" icon="puzzle">
-		[Architecture](/components/overview/) -- vendor-agnostic model.
-		[Native](/components/native-components/) -- 8 HTML input components.
-		[Fusion](/components/fusion-components/) -- 15 Syncfusion EJ2 components.
+		[Overview](/alis-reactive/components/overview/) — vendor-agnostic component model.
+		[Native](/alis-reactive/components/native-components/) — 8 HTML input components.
+		[Syncfusion](/alis-reactive/components/fusion-components/) — 15 Syncfusion EJ2 components.
 	</Card>
 </CardGrid>
