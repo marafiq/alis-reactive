@@ -5,6 +5,8 @@ import astroD2 from 'astro-d2';
 
 // https://astro.build/config
 export default defineConfig({
+	site: 'https://marafiq.github.io',
+	base: '/alis-reactive',
 	integrations: [
 		starlight({
 			title: 'Alis.Reactive',
