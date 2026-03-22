@@ -88,66 +88,120 @@ phase1 -> phase2: listeners ready {
 
 **Two-phase boot** guarantees that event chains work regardless of declaration order. Phase 1 wires all CustomEvent and component-event listeners. Phase 2 runs DomReady reactions — which may dispatch events that Phase 1 listeners catch. Without this separation, a DomReady dispatch would fire before the listener exists and the event would vanish silently. Chains of any depth work because `dispatch` fires synchronous `CustomEvent`s on `document`.
 
+At this point, the page is live. Listeners are attached. The runtime is waiting. What happens when the user actually does something?
+
 ## Command execution
 
-When a trigger fires, the runtime walks the reaction tree. Each reaction dispatches by `kind`, each command dispatches by `kind`, and mutations execute via bracket notation on the resolved root.
+Three dispatch layers fire in sequence — each one narrowing from abstract to concrete. A trigger fires a reaction. The reaction contains commands. Each command applies a mutation. This layering is what makes the runtime extensible without becoming complex.
+
+### Layer 1 — Reaction dispatch
+
+When a trigger fires, `execute.ts` reads `reaction.kind` and picks the execution strategy:
 
 ```d2
 direction: right
 
-trigger: "Trigger fires" {
+trigger: "Trigger fires\nchange event on checkbox" {
   shape: rectangle
   style.fill: "#fce8e6"
   style.stroke: "#ea4335"
   style.font-size: 18
 }
-reaction: "execute.ts\nDispatch by\nreaction kind" {
+sequential: "sequential\nRun commands in order" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+conditional: "conditional\nEvaluate guards\nPick first matching branch" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
-command: "commands.ts\nDispatch by\ncommand kind" {
+http: "http\nValidate → Gather →\nFetch → Route response" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-bracket: "element.ts\nroot[prop] = val\nroot[method](args)" {
+parallel: "parallel-http\nPromise.all on branches\nthen OnAllSettled" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 18
+}
+
+trigger -> sequential: kind {
+  style.stroke: "#ea4335"
+}
+trigger -> conditional: kind {
+  style.stroke: "#ea4335"
+}
+trigger -> http: kind {
+  style.stroke: "#ea4335"
+}
+trigger -> parallel: kind {
+  style.stroke: "#ea4335"
+}
+```
+
+A conditional reaction can contain an HTTP reaction inside its branch. An HTTP response handler can contain a conditional. The reaction tree is recursive — but at each node, the dispatch is a flat switch on `kind`.
+
+### Layer 2 — Command dispatch
+
+Inside a reaction, `commands.ts` iterates the command list and dispatches each one by `command.kind`:
+
+| Command kind | What it does | Module |
+|-------------|-------------|--------|
+| `dispatch` | Fires `CustomEvent` on `document` | inline |
+| `mutate-element` | Sets a property or calls a method | `element.ts` |
+| `mutate-event` | Modifies event args in execution context | inline |
+| `validation-errors` | Displays server-side errors at form fields | `validation/` |
+| `into` | Injects response HTML into container | `inject.ts` |
+
+Each command can carry an optional `when` guard — evaluated before the command runs. If the guard fails, that command is skipped but the rest of the pipeline continues.
+
+### Layer 3 — Mutation execution
+
+`element.ts` is where the plan meets the DOM. It has exactly two primitives:
+
+```d2
+direction: right
+
+resolve: "Resolve root\nnative → el\nfusion → el.ej2_instances[0]" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 18
+}
+setprop: "set-prop\nroot[prop] = val" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 18
+}
+call: "call\nroot[method](args)" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 18
 }
 
-trigger -> reaction {
-  style.stroke: "#ea4335"
-}
-reaction -> command {
+resolve -> setprop: mutation.kind {
   style.stroke: "#f9ab00"
 }
-command -> bracket {
-  style.stroke: "#4285f4"
+resolve -> call: mutation.kind {
+  style.stroke: "#f9ab00"
 }
 ```
 
-| Reaction kind | What happens |
-|---------------|-------------|
-| `sequential` | Executes each command in order |
-| `conditional` | Evaluates guard, picks matching branch |
-| `http` | Validates → gathers → fetches → routes response |
-| `parallel-http` | `Promise.all` on multiple requests, then `OnAllSettled` |
+`root[prop] = val` handles `SetText`, `SetValue`, `SetChecked`. `root[method](args)` handles `AddClass`, `DataBind`, `ShowPopup`. The plan carries the property or method name — the runtime executes it verbatim via bracket notation. No catalog of operations, no switch on method names.
 
-| Command kind | What it does |
-|-------------|-------------|
-| `dispatch` | Fires `CustomEvent` on `document` |
-| `mutate-element` | Bracket notation on DOM element or component root |
-| `mutate-event` | Modifies event args in execution context |
-| `validation-errors` | Displays server-side errors at form fields |
-| `into` | Injects response HTML into container element |
+This is why adding a new component method requires zero runtime changes. The C# extension method puts the name in the plan. The runtime applies it.
 
-The runtime has two mutation primitives: `set-prop` (`root[prop] = val`) and `call` (`root[method](args)`). Every DOM operation and every component operation maps to one of these. The plan carries the property or method name — the runtime executes it verbatim.
+How does `resolveRoot` know which root to return? That's the vendor resolution pattern — covered in [Component Model](/architecture/component-model/).
 
-For how the runtime resolves `root` differently for native vs Syncfusion components, see [Component Model](/architecture/component-model/).
+For a detailed trace of how these three layers connect through the actual module files, see [Key Modules](/architecture/runtime-key-modules/).
 
 **Previous:** [The JSON Plan Contract](/architecture/the-contract/)
