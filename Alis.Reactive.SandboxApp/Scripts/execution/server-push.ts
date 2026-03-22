@@ -8,14 +8,16 @@ const log = scope("server-push");
 const sources = new Map<string, EventSource>();
 
 function getOrCreate(url: string, signal?: AbortSignal): EventSource {
-  let es = sources.get(url);
-  if (es) return es;
+  const cached = sources.get(url);
+  if (cached) return cached;
 
-  es = new EventSource(url);
+  const es = new EventSource(url);
   sources.set(url, es);
 
+  es.onopen = () => log.debug("connected", { url });
+
   es.onerror = () => {
-    if (es!.readyState === EventSource.CLOSED) {
+    if (es.readyState === EventSource.CLOSED) {
       log.error("connection closed permanently", { url });
       sources.delete(url);
     } else {
@@ -25,13 +27,13 @@ function getOrCreate(url: string, signal?: AbortSignal): EventSource {
 
   if (signal) {
     signal.addEventListener("abort", () => {
-      es!.close();
+      es.close();
       sources.delete(url);
       log.debug("closed", { url });
     });
   }
 
-  log.debug("connected", { url });
+  log.debug("created", { url });
   return es;
 }
 

@@ -6,7 +6,7 @@ namespace Alis.Reactive.Builders
 {
     /// <summary>
     /// Builds trigger–reaction entries and adds them to the plan.
-    /// Entry point for wiring DomReady and CustomEvent triggers via <c>Html.On()</c>.
+    /// Entry point for wiring triggers via <c>Html.On()</c>.
     /// </summary>
     public sealed class TriggerBuilder<TModel> where TModel : class
     {

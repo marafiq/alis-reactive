@@ -46,7 +46,7 @@ public class WhenFacilityAlertArrives : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:server-push]", 10000);
+        await WaitForTraceMessage("[alis:server-push] connected", 10000);
 
         AssertTraceContains("server-push", "connected");
         AssertNoConsoleErrors();

@@ -162,19 +162,17 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
 }
 
 /**
- * Extracts the first mutate-element target ID from a reaction.
- * Used to anchor the retry indicator on a visible DOM element.
+ * Extracts the first mutate-element target ID from a reaction's top-level commands.
+ * Only inspects sequential and conditional reactions. HTTP/parallel-http reactions
+ * are skipped (their preFetch commands are not inspected).
  */
 export function firstMutationTarget(reaction: Reaction): string | undefined {
-  if (reaction.kind === "sequential") {
-    const cmd = reaction.commands.find(c => c.kind === "mutate-element");
-    return cmd?.kind === "mutate-element" ? cmd.target : undefined;
-  }
-  if (reaction.kind === "conditional" && reaction.commands) {
-    const cmd = reaction.commands.find(c => c.kind === "mutate-element");
-    return cmd?.kind === "mutate-element" ? cmd.target : undefined;
-  }
-  return undefined;
+  let commands: import("../types").Command[] | undefined;
+  if (reaction.kind === "sequential") commands = reaction.commands;
+  else if (reaction.kind === "conditional") commands = reaction.commands;
+
+  const cmd = commands?.find(c => c.kind === "mutate-element");
+  return cmd?.kind === "mutate-element" ? cmd.target : undefined;
 }
 
 export function wireSignalR(
