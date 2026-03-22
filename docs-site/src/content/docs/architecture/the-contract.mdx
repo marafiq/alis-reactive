@@ -15,8 +15,8 @@ You wrote this:
 
 ```csharp
 pipeline.When(args, a => a.Checked).Truthy()
-    .Then(then => t.Element("due-date-section").Show())
-    .Else(otherwise => e.Element("due-date-section").Hide());
+    .Then(then => then.Element("due-date-section").Show())
+    .Else(otherwise => otherwise.Element("due-date-section").Hide());
 ```
 
 The plan captures it as a conditional with two branches:

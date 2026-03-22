@@ -74,7 +74,7 @@ fusion_root -> bracket {
 
 | Interaction | Plan carries | Runtime does |
 |-------------|-------------|-------------|
-| **Read** (gather, conditions) | vendor + readExpr | `resolveRoot(el, vendor)[readExpr]` |
+| **Read** (gather, conditions) | vendor + readExpr | `walk(resolveRoot(el, vendor), readExpr)` |
 | **Write** (SetValue, SetChecked) | vendor + prop | `resolveRoot(el, vendor)[prop] = val` |
 | **Call** (DataBind, ShowPopup) | vendor + method | `resolveRoot(el, vendor)[method]()` |
 | **Wire event** (.Reactive) | vendor + jsEvent | `resolveRoot(el, vendor).addEventListener(jsEvent)` |
