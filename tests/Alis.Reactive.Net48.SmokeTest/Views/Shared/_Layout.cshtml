@@ -1,0 +1,37 @@
+@using Alis.Reactive.Native.AppLevel
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Net48 Smoke Test</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; color: #1a1a2e; }
+        .container { max-width: 960px; margin: 0 auto; padding: 20px; }
+        h1 { color: #7A2E3B; border-bottom: 2px solid #D4A053; padding-bottom: 8px; }
+        h2 { color: #333; margin-top: 24px; }
+        h3 { color: #555; }
+        .status { padding: 12px; border-radius: 6px; background: #f0f0f0; font-family: monospace; margin: 8px 0; }
+        .loaded { background: #d4edda !important; color: #155724 !important; font-weight: bold; }
+        button { padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; margin: 4px; font-size: 14px; }
+        button:hover { background: #e8e8e8; }
+        .btn-primary { background: #7A2E3B; color: white; border-color: #7A2E3B; }
+        .btn-primary:hover { background: #5E1F2C; }
+        .field-wrapper { margin: 12px 0; }
+        .field-wrapper label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+        .field-wrapper input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 400px; box-sizing: border-box; }
+        pre { background: #1a1a2e; color: #4ade80; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
+        [hidden] { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Alis.Reactive &mdash; .NET Framework 4.8 Smoke Test</h1>
+        @RenderBody()
+    </div>
+
+    @Html.NativeLoader()
+    @Html.NativeDrawer()
+    <script src="/js/alis-reactive.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-pack:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
           dotnet restore Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj
           dotnet restore Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj
 
-      - name: Build all targets
+      - name: Build all targets (net48 + net10.0)
         run: |
           dotnet build Alis.Reactive/Alis.Reactive.csproj -c Release --no-restore
           dotnet build Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release --no-restore
@@ -31,16 +31,13 @@ jobs:
           dotnet build Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj -c Release --no-restore
           dotnet build Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj -c Release --no-restore
 
-      - name: Pack
+      - name: Pack NuGet packages
         run: |
           dotnet pack Alis.Reactive/Alis.Reactive.csproj -c Release --no-build -o ./nupkgs
           dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release --no-build -o ./nupkgs
           dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj -c Release --no-build -o ./nupkgs
           dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj -c Release --no-build -o ./nupkgs
           dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj -c Release --no-build -o ./nupkgs
-
-      - name: List packages
-        run: ls -lh nupkgs/
 
       - name: Verify dual targets in packages
         run: |
@@ -54,3 +51,47 @@ jobs:
         with:
           name: nupkgs
           path: nupkgs/*.nupkg
+
+  smoke-test-net48:
+    needs: build-and-pack
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build framework net48 DLLs
+        run: |
+          dotnet build Alis.Reactive/Alis.Reactive.csproj -c Release
+          dotnet build Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release
+
+      - name: Restore MVC 5 NuGet packages
+        working-directory: tests/Alis.Reactive.Net48.SmokeTest
+        run: nuget restore packages.config -PackagesDirectory packages
+
+      - name: Build smoke test with MSBuild
+        working-directory: tests/Alis.Reactive.Net48.SmokeTest
+        run: |
+          & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" `
+            Alis.Reactive.Net48.SmokeTest.csproj `
+            /p:Configuration=Release `
+            /p:Platform=AnyCPU `
+            /verbosity:minimal
+
+      - name: Verify smoke test output
+        working-directory: tests/Alis.Reactive.Net48.SmokeTest
+        run: |
+          Write-Host "=== Build output ==="
+          Get-ChildItem bin/*.dll | ForEach-Object { Write-Host $_.Name $_.Length }
+          Write-Host ""
+          Write-Host "=== Alis.Reactive DLLs loaded ==="
+          $asm = [System.Reflection.Assembly]::LoadFrom("$PWD\bin\Alis.Reactive.dll")
+          Write-Host "Core: $($asm.FullName)"
+          $asm2 = [System.Reflection.Assembly]::LoadFrom("$PWD\bin\Alis.Reactive.Native.dll")
+          Write-Host "Native: $($asm2.FullName)"
+          Write-Host ""
+          Write-Host "=== Key types available ==="
+          $asm.GetTypes() | Where-Object { $_.IsPublic -and $_.Name -match "ReactivePlan|PipelineBuilder|ElementBuilder|TriggerBuilder" } | ForEach-Object { Write-Host $_.FullName }
+          $asm2.GetTypes() | Where-Object { $_.IsPublic -and $_.Name -match "NativeButton|NativeTextBox|NativeDrawer|NativeLoader|HtmlExtensions|InputField" } | ForEach-Object { Write-Host $_.FullName }

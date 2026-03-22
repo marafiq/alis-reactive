@@ -1,0 +1,104 @@
+@model Alis.Reactive.Net48.SmokeTest.Models.SmokeTestModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@{
+    ViewBag.Title = "Smoke Test";
+
+    var plan = Html.ReactivePlan<Alis.Reactive.Net48.SmokeTest.Models.SmokeTestModel>();
+
+    // ── 1. DomReady → SetText + AddClass ──
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Element("status").SetText("Framework loaded on net48!");
+        p.Element("status").AddClass("loaded");
+    }));
+
+    // ── 2. CustomEvent handler → Show hidden section ──
+    Html.On(plan, t => t.CustomEvent("show-section", p =>
+    {
+        p.Element("hidden-section").Show();
+        p.Element("section-status").SetText("Section visible — custom event handled.");
+        p.Element("section-status").AddClass("loaded");
+    }));
+
+    // ── 3. CustomEvent handler → Open drawer with Into() ──
+    Html.On(plan, t => t.CustomEvent("open-drawer", p =>
+    {
+        p.Element("alis-drawer-title").SetText("Net48 Drawer");
+        p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+        p.Get("/Home/DrawerContent")
+         .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+        p.Component<NativeDrawer>().Open();
+    }));
+
+    // ── 4. CustomEvent handler → Close drawer ──
+    Html.On(plan, t => t.CustomEvent("close-drawer", p =>
+    {
+        p.Component<NativeDrawer>().Close();
+    }));
+
+    // ── 5. CustomEvent handler → Hide section ──
+    Html.On(plan, t => t.CustomEvent("hide-section", p =>
+    {
+        p.Element("hidden-section").Hide();
+        p.Element("section-status").SetText("Section hidden.");
+        p.Element("section-status").RemoveClass("loaded");
+    }));
+}
+
+<h2>1. DomReady &rarr; SetText</h2>
+<p>On page load, the plan sets text and adds a CSS class:</p>
+<p id="status" class="status">Waiting for DomReady...</p>
+
+<h2>2. InputField &mdash; NativeTextBox with validation</h2>
+@{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+    .NativeTextBox(b => b
+        .Placeholder("Enter your name")); }
+
+@{ Html.InputField(plan, m => m.Email, o => o.Label("Email"))
+    .NativeTextBox(b => b
+        .Placeholder("user@example.com")); }
+
+<h2>3. NativeButton &rarr; Show / Hide section</h2>
+@(Html.NativeButton("btn-show", "Show Section")
+    .CssClass("btn-primary")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Dispatch("show-section");
+    }))
+
+@(Html.NativeButton("btn-hide", "Hide Section")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Dispatch("hide-section");
+    }))
+
+<p id="section-status" class="status">Section hidden.</p>
+
+<div id="hidden-section" hidden>
+    <div style="padding: 16px; background: #e8f4fd; border-radius: 6px; border: 1px solid #b3d7f2; margin: 8px 0;">
+        <strong>Success!</strong> This section was shown by a button click &rarr; dispatch &rarr; custom event &rarr; Show().
+    </div>
+</div>
+
+<h2>4. NativeDrawer &mdash; Open / Close + Into()</h2>
+@(Html.NativeButton("btn-open-drawer", "Open Drawer")
+    .CssClass("btn-primary")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Dispatch("open-drawer");
+    }))
+
+@(Html.NativeButton("btn-close-drawer", "Close Drawer")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Dispatch("close-drawer");
+    }))
+
+<h2>5. Rendered Plan JSON</h2>
+<p>This is the JSON contract the JS runtime executes &mdash; same schema on net48 and net10:</p>
+<pre>@Html.Raw(plan.RenderFormatted())</pre>
+
+@Html.RenderPlan(plan)
