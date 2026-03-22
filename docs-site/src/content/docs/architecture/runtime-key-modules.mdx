@@ -70,7 +70,7 @@ conditions -> element: branch selected {
 
 The ESM entry point. Runs on every page load. Finds all `[data-reactive-plan]` elements, parses their JSON, composes partial plans, and calls `boot()` for each.
 
-No global state. No `window.alis`. The layout loads the runtime once via `<script type="module" src>`. Discovery handles the rest.
+No global state. No `window.alis` (with one exception: `window.alis.confirm` is exposed so the `confirm` guard can show a browser confirmation dialog — this is the only global surface). The layout loads the runtime once via `<script type="module" src>`. Discovery handles the rest.
 
 ## 2. Boot — `Scripts/lifecycle/boot.ts`
 
@@ -100,6 +100,8 @@ wire: "wireEntries()\nTwo-phase trigger wiring" {
 
 enrich -> validation -> wire
 ```
+
+**Enrichment** runs first: it walks all plan entries and resolves abstract component references — gather placeholders and validation field refs — to concrete IDs, vendors, and readExprs from the ComponentsMap. After enrichment, every entry is fully resolved and ready for trigger wiring. No late-binding remains.
 
 **Two-phase wiring:** Non-dom-ready listeners attach first (Phase 1). Then dom-ready reactions execute (Phase 2). This guarantees dispatched events land on existing listeners — regardless of declaration order in the view.
 

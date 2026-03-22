@@ -27,10 +27,18 @@ The plan captures it as a conditional with two branches:
   "branches": [
     {
       "guard": { "kind": "value", "source": { "kind": "event", "path": "evt.checked" }, "op": "truthy" },
-      "reaction": { "kind": "sequential", "commands": [{ "kind": "mutate-element", "target": "due-date-section" }] }
+      "reaction": { "kind": "sequential", "commands": [
+        { "kind": "mutate-element", "target": "due-date-section",
+          "mutation": { "kind": "call", "method": "removeAttribute",
+            "args": [{ "kind": "literal", "value": "hidden" }] } }
+      ] }
     },
     {
-      "reaction": { "kind": "sequential", "commands": [{ "kind": "mutate-element", "target": "due-date-section" }] }
+      "reaction": { "kind": "sequential", "commands": [
+        { "kind": "mutate-element", "target": "due-date-section",
+          "mutation": { "kind": "call", "method": "setAttribute",
+            "args": [{ "kind": "literal", "value": "hidden" }, { "kind": "literal", "value": "" }] } }
+      ] }
     }
   ]
 }

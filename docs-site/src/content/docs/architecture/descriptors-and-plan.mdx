@@ -53,7 +53,7 @@ Trigger (kind)
 
 Reaction (kind)
 ├── SequentialReaction           "sequential"       + commands[]
-├── ConditionalReaction          "conditional"      + branches[] (guard + reaction)
+├── ConditionalReaction          "conditional"      + commands? + branches[] (guard + reaction)
 ├── HttpReaction                 "http"             + request descriptor
 └── ParallelHttpReaction         "parallel-http"    + request descriptors[]
 
