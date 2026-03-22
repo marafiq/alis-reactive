@@ -80,8 +80,13 @@ export default defineConfig({
 								{ label: 'JSON Plan Schema', slug: 'architecture/json-plan-schema' },
 							],
 						},
-						{ label: 'Component Model', slug: 'architecture/component-model' },
-						{ label: 'Runtime', slug: 'architecture/runtime' },
+						{
+							label: 'Runtime',
+							items: [
+								{ label: 'Overview', slug: 'architecture/runtime' },
+								{ label: 'Component Model', slug: 'architecture/component-model' },
+							],
+						},
 					],
 				},
 				{
