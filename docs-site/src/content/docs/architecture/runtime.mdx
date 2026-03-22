@@ -152,7 +152,7 @@ A conditional branch can contain an HTTP reaction. An HTTP response handler can 
 Inside the chosen reaction, the runtime iterates the command list. Each command declares its `kind`:
 
 - **`dispatch`** — fires a `CustomEvent` on `document` (other listeners may catch it)
-- **`mutate-element`** — changes a DOM element or component (next decision)
+- **`mutate-element`** — single command for both `pipeline.Element()` and `pipeline.Component<T>()`. When `vendor` is present, resolves the component root first. Same command, same code path (next decision)
 - **`mutate-event`** — modifies the event args in the execution context
 - **`validation-errors`** — routes server-side errors to form fields
 - **`into`** — injects HTTP response HTML into a container element
