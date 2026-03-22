@@ -141,7 +141,7 @@ mutation -> dom
 The trigger carries a reaction. The runtime reads `reaction.kind` and picks the strategy:
 
 - **`sequential`** — walk the command list, execute each one in order
-- **`conditional`** — evaluate guards on each branch, execute the first match, skip the rest
+- **`conditional`** — run any pre-commands, then evaluate branches in order (if/elseif/else). First matching guard wins. Commands after the block continue as a separate segment
 - **`http`** — validate the form, gather component values, fetch, route the response to handlers
 - **`parallel-http`** — fire multiple requests concurrently via `Promise.all`, then run `OnAllSettled`
 
