@@ -203,7 +203,27 @@ phase2 -> caught: dispatch fires {
 }
 ```
 
-Without this, a DomReady that dispatches an event would fire before the listener exists. The event would vanish silently. Two-phase boot prevents this — listeners first, execution second.
+**Why this matters — a concrete example.** On page load, you fetch a resident and dispatch the result. Another part of the page listens for that event and displays the name:
+
+```csharp
+// Entry 1: fetch and dispatch on page load
+Html.On(plan, t => t.DomReady(pipeline =>
+{
+    pipeline.Get("/api/resident/42")
+        .Response(r => r.OnSuccess<ResidentResponse>((json, pipeline) =>
+        {
+            pipeline.Dispatch("resident-loaded", new ResidentPayload { Name = "Margaret Chen" });
+        }));
+}));
+
+// Entry 2: display the name when the event arrives
+Html.On(plan, t => t.CustomEvent<ResidentPayload>("resident-loaded", (payload, pipeline) =>
+{
+    pipeline.Element("resident-name").SetText(payload, x => x.Name);
+}));
+```
+
+Without two-phase boot, Entry 1 runs immediately → dispatches `"resident-loaded"` → Entry 2's listener doesn't exist yet → event vanishes → name never appears. With two-phase boot, Phase 1 wires Entry 2's listener first → Phase 2 runs Entry 1 → dispatch lands on the listener → "Margaret Chen" appears.
 
 ## Bracket notation — the execution model
 
