@@ -144,44 +144,67 @@ Supports optional per-command `when` guards — evaluated before the command exe
 
 ## 7. Condition evaluation — `Scripts/conditions/conditions.ts`
 
-Evaluates guard expressions. Five guard kinds:
+Evaluates guard expressions. The runtime reads `guard.kind` and follows one of five paths:
 
 ```d2
 direction: right
 
-value: "value\n20+ operators\neq, gt, contains, ..." {
+guard: "guard.kind?" {
+  shape: diamond
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+value: "value\nResolve source →\ncoerce → apply operator\n(20+ operators)" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 16
 }
-all: "all\nLogical AND\nall guards must pass" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-any: "any\nLogical OR\none guard must pass" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-not: "not\nInvert\nwraps inner guard" {
+all: "all\nEvaluate each guard\nall must pass (AND)" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 16
 }
-confirm: "confirm\nAsync dialog\npauses pipeline" {
+any: "any\nEvaluate each guard\none must pass (OR)" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+not: "not\nEvaluate inner guard\ninvert result" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+confirm: "confirm\nShow browser dialog\nawait user response" {
   shape: rectangle
   style.fill: "#fce8e6"
   style.stroke: "#ea4335"
   style.font-size: 16
 }
+result: "true / false\nBranch selected" {
+  shape: rectangle
+  style.fill: "#d4edda"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+
+guard -> value: value
+guard -> all: all
+guard -> any: any
+guard -> not: not
+guard -> confirm: confirm
+value -> result
+all -> result
+any -> result
+not -> result
+confirm -> result
 ```
 
-Value guards resolve their source (event path or component read) via `Scripts/resolution/resolver.ts`, coerce both sides to the declared type, then apply the operator. Source-vs-source comparisons resolve both sides before comparing.
+`value` guards resolve their source via `resolver.ts` (event path or component read), coerce both sides, then apply the operator. `all`/`any`/`not` are recursive — they compose inner guards. `confirm` is the only async guard — it pauses the pipeline and waits for user response.
 
 Both sync and async evaluation paths exist — `confirm` is the only async guard (shows a browser dialog and waits for user response).
 
