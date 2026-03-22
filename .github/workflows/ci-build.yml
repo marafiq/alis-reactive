@@ -96,15 +96,35 @@ jobs:
       - name: Verify smoke test output
         working-directory: tests/Alis.Reactive.Net48.SmokeTest
         run: |
-          Write-Host "=== Build output ==="
-          Get-ChildItem bin/*.dll | ForEach-Object { Write-Host $_.Name $_.Length }
+          Write-Host "=== Build output — all DLLs in bin ==="
+          Get-ChildItem bin/*.dll | ForEach-Object { Write-Host "$($_.Name)  $($_.Length) bytes" }
+
           Write-Host ""
-          Write-Host "=== Alis.Reactive DLLs loaded ==="
+          Write-Host "=== Verifying Alis.Reactive DLLs present ==="
+          $core = Test-Path "bin\Alis.Reactive.dll"
+          $native = Test-Path "bin\Alis.Reactive.Native.dll"
+          $stj = Test-Path "bin\System.Text.Json.dll"
+          Write-Host "Alis.Reactive.dll: $core"
+          Write-Host "Alis.Reactive.Native.dll: $native"
+          Write-Host "System.Text.Json.dll: $stj"
+
+          if (-not $core -or -not $native) {
+            Write-Error "Framework DLLs missing from build output!"
+            exit 1
+          }
+
+          Write-Host ""
+          Write-Host "=== Loading assemblies ==="
           $asm = [System.Reflection.Assembly]::LoadFrom("$PWD\bin\Alis.Reactive.dll")
           Write-Host "Core: $($asm.FullName)"
+          Write-Host "Core runtime: $($asm.ImageRuntimeVersion)"
           $asm2 = [System.Reflection.Assembly]::LoadFrom("$PWD\bin\Alis.Reactive.Native.dll")
           Write-Host "Native: $($asm2.FullName)"
+          Write-Host "Native runtime: $($asm2.ImageRuntimeVersion)"
+
           Write-Host ""
-          Write-Host "=== Key types available ==="
-          $asm.GetTypes() | Where-Object { $_.IsPublic -and $_.Name -match "ReactivePlan|PipelineBuilder|ElementBuilder|TriggerBuilder" } | ForEach-Object { Write-Host $_.FullName }
-          $asm2.GetTypes() | Where-Object { $_.IsPublic -and $_.Name -match "NativeButton|NativeTextBox|NativeDrawer|NativeLoader|HtmlExtensions|InputField" } | ForEach-Object { Write-Host $_.FullName }
+          Write-Host "=== Assembly references (Native) ==="
+          $asm2.GetReferencedAssemblies() | Where-Object { $_.Name -match "System.Web|Alis" } | ForEach-Object { Write-Host $_.FullName }
+
+          Write-Host ""
+          Write-Host "=== SMOKE TEST PASSED — net48 MVC 5 app compiled with Alis.Reactive ==="
