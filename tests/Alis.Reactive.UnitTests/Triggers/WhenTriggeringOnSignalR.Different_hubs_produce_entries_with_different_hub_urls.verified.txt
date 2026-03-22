@@ -1,0 +1,37 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: signalr,
+        hubUrl: /hubs/notifications,
+        methodName: Receive
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: dispatch,
+            event: notif
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: signalr,
+        hubUrl: /hubs/live-data,
+        methodName: StatusChanged
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: dispatch,
+            event: status
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 using Alis.Reactive;
 using Alis.Reactive.FluentValidator;
+using Alis.Reactive.SandboxApp.Hubs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -14,6 +15,11 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
+
+// Broadcast service pushes updates every 2s for demo — disabled during Playwright tests
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ALIS_NO_BROADCAST")))
+    builder.Services.AddHostedService<RealTimeBroadcastService>();
 
 ReactivePlanConfig.UseValidationExtractor(
     new FluentValidationAdapter(type => (FluentValidation.IValidator?)Activator.CreateInstance(type)));
@@ -30,6 +36,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
+
+app.MapHub<NotificationHub>("/hubs/notifications");
+app.MapHub<ResidentStatusHub>("/hubs/resident-status");
 
 app.MapControllerRoute(
         name: "areas",

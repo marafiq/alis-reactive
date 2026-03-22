@@ -32,7 +32,8 @@ public class WebServerFixture
                 Environment =
                 {
                     ["ASPNETCORE_ENVIRONMENT"] = "Development",
-                    ["DOTNET_URLS"] = BaseUrl
+                    ["DOTNET_URLS"] = BaseUrl,
+                    ["ALIS_NO_BROADCAST"] = "1"
                 }
             }
         };
