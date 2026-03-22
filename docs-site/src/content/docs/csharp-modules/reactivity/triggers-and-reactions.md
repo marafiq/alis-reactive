@@ -7,6 +7,33 @@ sidebar:
 
 A trigger defines *when* a pipeline executes. Every reactive behavior starts with one — page load, a named event, a component interaction, or a real-time server push.
 
+### Placement — anywhere in the view
+
+`Html.On()` builds a **descriptor** and adds it to the plan. It does not execute anything. You can call it anywhere in the `.cshtml` — top, middle, bottom, inside conditionals, in loops. Order doesn't matter. The calls just accumulate entries in the plan object, and `@Html.RenderPlan(plan)` serializes them all to JSON at the end.
+
+```csharp
+@{
+    // These three calls can appear in any order — they all just add entries to `plan`
+    Html.On(plan, t => t.DomReady(p => p.Dispatch("init")));
+    Html.On(plan, t => t.SignalR("/hubs/alerts", "Receive", p => p.Element("x").Show()));
+    Html.On(plan, t => t.CustomEvent("init", p => p.Element("status").SetText("ready")));
+}
+
+<!-- HTML here — the triggers above don't care about their position relative to markup -->
+
+@Html.RenderPlan(plan)  @* Serializes all entries to JSON — nothing connects until the browser boots *@
+```
+
+### Lazy connections — no connection until the browser boots
+
+Writing `t.SignalR(...)` or `t.ServerPush(...)` in C# does **not** open a WebSocket or EventSource. It produces a JSON descriptor — data, not execution. The actual connection only happens when the browser loads the page and the JS runtime processes the plan during boot.
+
+- **No page load = no connection.** If the view is never rendered, no resources are consumed.
+- **Partial views are lazy too.** A partial loaded via `.Into()` only connects when the partial arrives and its plan merges.
+- **Connection pooling is automatic.** Multiple triggers on the same URL share one connection — the runtime deduplicates.
+
+This means real-time triggers are safe to declare unconditionally. They cost nothing until the page actually loads in a browser.
+
 From the [Grammar Tree](../../mental-model/#the-grammar-tree) — the trigger-related API:
 
 ```
