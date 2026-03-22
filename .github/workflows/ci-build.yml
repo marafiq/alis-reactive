@@ -15,20 +15,39 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - run: dotnet restore
+      - name: Restore library projects
+        run: |
+          dotnet restore Alis.Reactive/Alis.Reactive.csproj
+          dotnet restore Alis.Reactive.Native/Alis.Reactive.Native.csproj
+          dotnet restore Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj
+          dotnet restore Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj
+          dotnet restore Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj
 
-      - run: dotnet build -c Release --no-restore
+      - name: Build all targets
+        run: |
+          dotnet build Alis.Reactive/Alis.Reactive.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj -c Release --no-restore
 
-      - run: dotnet pack -c Release --no-build -o ./nupkgs
+      - name: Pack
+        run: |
+          dotnet pack Alis.Reactive/Alis.Reactive.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj -c Release --no-build -o ./nupkgs
 
       - name: List packages
         run: ls -lh nupkgs/
 
-      - name: Verify dual targets
+      - name: Verify dual targets in packages
         run: |
           for pkg in nupkgs/*.nupkg; do
             echo "=== $(basename $pkg) ==="
             unzip -l "$pkg" | grep -E "lib/net(48|10)" | head -10
+            echo ""
           done
 
       - uses: actions/upload-artifact@v4
