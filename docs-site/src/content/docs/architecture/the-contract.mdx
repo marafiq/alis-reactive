@@ -204,19 +204,21 @@ Five command kinds:
 
 ## Mutations — how to change
 
-Two primitives, applied by bracket notation:
+Two primitives. The [Runtime](/architecture/runtime/) page explains how they execute via bracket notation.
 
-| Kind | Plan shape | Runtime executes |
-|------|-----------|-----------------|
-| `set-prop` | `{ "prop": "textContent" }` | `root.textContent = val` |
-| `call` | `{ "method": "add", "chain": "classList", "args": [...] }` | `root.classList.add("active")` |
+| Kind | Plan shape |
+|------|-----------|
+| `set-prop` | `{ "prop": "textContent" }` |
+| `call` | `{ "method": "add", "chain": "classList", "args": [...] }` |
 
 ## Sources — where values come from
 
-| Kind | Plan shape | Runtime resolves |
-|------|-----------|-----------------|
-| `event` | `{ "path": "evt.address.city" }` | `walk(ctx, "evt.address.city")` |
-| `component` | `{ "componentId": "Country", "vendor": "fusion", "readExpr": "value" }` | `walk(resolveRoot(el, "fusion"), "value")` |
+| Kind | Plan shape |
+|------|-----------|
+| `event` | `{ "path": "evt.address.city" }` |
+| `component` | `{ "componentId": "Country", "vendor": "fusion", "readExpr": "value" }` |
+
+How these resolve at runtime is covered in [Runtime — Value resolution](/architecture/runtime/#value-resolution--resolverts--walkts).
 
 ## Gather — what goes in the request
 
@@ -258,7 +260,9 @@ Every plan is checked against a JSON Schema in unit tests. If a builder produces
 
 If you need a new capability — say a new mutation kind — it goes into the schema first. The schema is the gatekeeper. The plan is the contract. Both sides (C# and JS) agree on its shape, and neither reaches beyond it.
 
+Now that you know what the plan looks like, the next question is: how do you add new things to it?
+
 ## Next
 
-- [The Vertical Slice](/architecture/vertical-slice/) — how a component is structured as a self-contained unit
+- [The Vertical Slice](/architecture/vertical-slice/) — the 7-file pattern for adding a component
 - [Runtime](/architecture/runtime/) — how the runtime boots, executes commands, and resolves values
