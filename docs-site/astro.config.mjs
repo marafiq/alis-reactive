@@ -89,6 +89,13 @@ export default defineConfig({
 							items: [
 								{ label: 'Overview', slug: 'architecture/runtime' },
 								{ label: 'Component Model', slug: 'architecture/component-model' },
+								{ label: 'Error Behavior', slug: 'architecture/error-behavior' },
+							],
+						},
+						{
+							label: 'Plan Lifecycle',
+							items: [
+								{ label: 'Plan Composition', slug: 'architecture/plan-composition' },
 							],
 						},
 					],

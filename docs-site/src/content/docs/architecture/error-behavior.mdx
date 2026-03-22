@@ -1,0 +1,81 @@
+---
+title: Error Behavior
+description: How the runtime handles failures — fail-fast, error boundaries, and exhaustiveness checks.
+sidebar:
+  order: 9
+---
+
+The runtime follows one principle: **fail fast, no fallbacks.** If something is wrong — a missing element, an unknown vendor, a corrupted plan — the runtime throws immediately with a clear message. It never guesses, never silently skips, never falls back to a default.
+
+## Error boundaries
+
+The runtime has exactly one error boundary: `trigger.ts`. Every event listener wraps `executeReaction()` in `.catch()`:
+
+```d2
+direction: right
+
+listener: "Event fires\n(change, click, DomReady)" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+execute: "executeReaction()\nRuns the full pipeline" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+catch: ".catch()\nLogs error, continues\nOther listeners unaffected" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 16
+}
+
+listener -> execute
+execute -> catch: if rejected {
+  style.stroke: "#ea4335"
+  style.stroke-dash: 3
+}
+```
+
+This means: if one reaction fails (a target element is missing, a vendor root isn't initialized), that reaction's error is logged but **other listeners continue to work**. A broken conditional on field A does not prevent field B's cascade from firing.
+
+## Fail-fast errors
+
+Every error throws with an `[alis]` prefix and a specific message. Here's what triggers each:
+
+| Module | Condition | Error message |
+|--------|-----------|--------------|
+| `element.ts` | Target element not in DOM | `[alis] target not found: {id}` |
+| `component.ts` | Syncfusion instance not initialized | `[alis] no vendor root for "{id}" (vendor: fusion) — is the component initialized?` |
+| `component.ts` | Unknown vendor string | `[alis] unknown vendor: "{vendor}"` |
+| `component.ts` | Component element not in DOM | `[alis] element not found: {id}` |
+| `trigger.ts` | Component element not in DOM at wire time | `[alis] element not found: {componentId}` |
+| `root.ts` | Malformed plan JSON | `[alis] failed to parse plan JSON from [data-reactive-plan] element: {parseError}` |
+
+These errors are actionable — each one tells the developer exactly what's missing and where to look.
+
+## Exhaustiveness checks
+
+The runtime uses `assertNever()` from `core/assert-never.ts` to catch unhandled `kind` values at both compile time (TypeScript) and runtime:
+
+| Module | What it checks |
+|--------|---------------|
+| `execute.ts` | `reaction.kind` — must be sequential, conditional, http, or parallel-http |
+| `commands.ts` | `command.kind` — must be dispatch, mutate-element, mutate-event, validation-errors, or into |
+| `element.ts` | `mutation.kind` — must be set-prop or call |
+| `element.ts` | `arg.kind` — must be literal or source |
+| `trigger.ts` | `trigger.kind` — must be dom-ready, custom-event, or component-event |
+
+If a new `kind` is added to the C# descriptors without a corresponding runtime handler, `assertNever()` throws: `[alis] Unhandled {context}: {kind}`.
+
+## What the runtime does NOT do
+
+- **No retry logic.** A failed `fetch()` is not retried. The `OnError` handler fires once.
+- **No partial recovery.** One malformed plan element in `root.ts` stops the entire boot. Plans are all-or-nothing.
+- **No silent skipping.** If `walk()` hits undefined midway through a path, it returns `undefined` — but this is not an error. The calling code (resolver, conditions) handles undefined as a valid "no value" result.
+- **No global error handler.** Errors surface through browser console via the `.catch()` boundary in `trigger.ts`. There is no `window.onerror` hook or custom error reporting.
+
+**Previous:** [Component Model](/architecture/component-model/)

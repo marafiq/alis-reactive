@@ -1,0 +1,133 @@
+---
+title: Plan Composition
+description: How multiple plans coexist on a page, how partial views merge, and how AJAX-loaded content integrates.
+sidebar:
+  order: 10
+---
+
+A page can have multiple plans. A form might use `ReactivePlan<ResidentModel>`. A sidebar might use `ReactivePlan<NotesModel>`. A partial view might use `ResolvePlan<ResidentModel>` to merge into the parent. Each pattern works differently.
+
+## Multiple independent plans
+
+Each `ReactivePlan<TModel>()` call creates a separate plan with its own `planId` (the model's full type name). At page load, `root.ts` discovers all `[data-reactive-plan]` elements and boots each one independently.
+
+```d2
+direction: right
+
+page: "Page load\nroot.ts discovers all\n[data-reactive-plan] elements" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+plan1: "Plan A\nResidentModel\nOwn entries + components" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+plan2: "Plan B\nNotesModel\nOwn entries + components" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+
+page -> plan1: boot()
+page -> plan2: boot()
+```
+
+Plans with different `planId` values are completely independent — different ComponentsMaps, different entries, different event scopes. A `Dispatch("save")` in Plan A fires a `CustomEvent` on `document`, so Plan B can listen for it via `CustomEvent("save")`. This is the only cross-plan communication mechanism.
+
+## Partial view merging — same model
+
+When a partial view shares the parent's model, use `Html.ResolvePlan<TModel>()`. Multiple plan elements with the same `planId` are composed before boot via `composeInitialPlans()` in `root.ts`:
+
+```d2
+direction: right
+
+parent: "Parent view\nReactivePlan<ResidentModel>\nEntries A + Components A" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+partial: "Partial view\nResolvePlan<ResidentModel>\nEntries B + Components B" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+merged: "Composed plan\nplanId: ResidentModel\nEntries A+B, Components A+B" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+boot: "boot()\nOne plan, all entries" {
+  shape: rectangle
+  style.fill: "#d4edda"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+
+parent -> merged: same planId
+partial -> merged: same planId
+merged -> boot
+```
+
+`composeInitialPlans()` merges entries and components from all plan elements sharing the same `planId`. The result is one plan with all entries and a unified ComponentsMap. Boot runs once.
+
+This is why `IncludeAll()` gathers values from components declared in both the parent and the partial — they share one ComponentsMap after composition.
+
+## AJAX-loaded partial views — runtime merging
+
+When a partial view is loaded via AJAX (the `into` command injects HTML), the injected content may contain its own `[data-reactive-plan]` element. `inject.ts` discovers it and calls `mergePlan()` in `boot.ts`:
+
+```d2
+direction: right
+
+fetch: "HTTP response\nHTML with embedded\n[data-reactive-plan]" {
+  shape: rectangle
+  style.fill: "#e8f0fe"
+  style.stroke: "#4285f4"
+  style.font-size: 16
+}
+inject: "inject.ts\nInsert HTML into container\nDiscover embedded plan" {
+  shape: rectangle
+  style.fill: "#fef7e0"
+  style.stroke: "#f9ab00"
+  style.font-size: 16
+}
+merge: "mergePlan()\nEnrich + wire new entries\nMerge into booted plan" {
+  shape: rectangle
+  style.fill: "#e6f4ea"
+  style.stroke: "#34a853"
+  style.font-size: 16
+}
+
+fetch -> inject -> merge
+```
+
+`mergePlan()` applies the same enrichment and trigger wiring as the initial boot — just on the new entries. Existing listeners are not re-wired. The booted plan's ComponentsMap grows to include the new components.
+
+## How plans stay isolated
+
+| Concern | Behavior |
+|---------|----------|
+| Component IDs | Unique per `Html.InputField` expression — `m => m.Name` produces `"Name"`, `m => m.Address.City` produces `"Address_City"` |
+| Event scope | `Dispatch` fires `CustomEvent` on `document` — visible to all plans |
+| Gather scope | `IncludeAll` gathers from the plan's own ComponentsMap only |
+| Validation scope | `Validate<T>` operates on the plan's own validation descriptors |
+| Listener teardown | `AbortSignal` from `boot.ts` — `resetBootStateForTests()` aborts all listeners |
+
+## When to use which
+
+| Scenario | API | Result |
+|----------|-----|--------|
+| Main view form | `Html.ReactivePlan<TModel>()` | New plan with own planId |
+| Partial view, same model | `Html.ResolvePlan<TModel>()` | Merges into parent plan |
+| Partial view, different model | `Html.ReactivePlan<TOtherModel>()` | Independent plan |
+| AJAX-loaded content | `into` command | Runtime merge via `mergePlan()` |
+
+**Previous:** [Error Behavior](/architecture/error-behavior/)
