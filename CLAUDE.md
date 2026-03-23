@@ -477,7 +477,7 @@ Read and write are two sides of the same property:
 3. Events singleton (TypedEventDescriptor registry)
 4. Extensions (structured prop/method fields for property writes, method calls, read expressions)
 5. Builder (IHtmlContent, renders HTML, registers component in ComponentsMap)
-6. Reactive extension (.Reactive() creates ComponentEventTrigger)
+6. Reactive extension (.Reactive() calls `ReactiveWiringHelper.Wire<TModel, TComponent, TArgs>()` — 3-line wrapper)
 7. Gather extension (uses TComponent.ReadExpr via `new()` constraint)
 8. Tests at all 3 layers
 
