@@ -253,4 +253,228 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Scenario 10: Void method call focuses fusion widget on dom-ready ──
+    // WHY: proves CallMutation with method:"focus" and no args resolves through resolveRoot
+    // and calls ej2_instances[0].focus(). The TestWidget sets _focused=true and calls
+    // input.focus(). If resolveRoot or bracket notation is broken, the input won't be focused.
+
+    [Test]
+    public async Task void_method_call_focuses_fusion_widget_inner_input_on_boot()
+    {
+        await NavigateAndBoot();
+
+        // The dom-ready plan calls focus() on the fusion-focus TestWidget.
+        // TestWidget.focus() calls this._input.focus(), so the inner input should be focused.
+        await Expect(Page.Locator("#fusion-focus input")).ToBeFocusedAsync();
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 11: Required validation blocks submission when both vendor fields are empty ──
+    // WHY: proves validation reads both vendor roots and enforces required on each independently.
+    // If validation skips the fusion vendor root, only the native error would appear.
+    // Both validation error spans must become visible when submitting empty fields.
+
+    [Test]
+    public async Task required_validation_shows_errors_on_both_empty_vendor_fields()
+    {
+        await NavigateAndBoot();
+
+        // Click validate with both fields empty — both must show "Required"
+        await Page.Locator("#validate-btn").ClickAsync();
+
+        await Expect(Page.Locator("[data-valmsg-for='native-val-field']"))
+            .ToContainTextAsync("Required", new() { Timeout = 3000 });
+        await Expect(Page.Locator("[data-valmsg-for='fusion-val-field']"))
+            .ToContainTextAsync("Required", new() { Timeout = 3000 });
+
+        // Validation error spans must be visible (hidden attribute removed)
+        await Expect(Page.Locator("[data-valmsg-for='native-val-field']"))
+            .ToBeVisibleAsync();
+        await Expect(Page.Locator("[data-valmsg-for='fusion-val-field']"))
+            .ToBeVisibleAsync();
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 12: Required validation passes when both vendor fields are filled ──
+    // WHY: proves evalRead works for both vendors to read non-empty values during validation.
+    // The success handler sets "Both fields passed!" text — confirming the POST was not
+    // blocked by client-side validation and the response pipeline ran.
+
+    [Test]
+    public async Task required_validation_passes_when_both_vendor_fields_are_filled()
+    {
+        await NavigateAndBoot();
+
+        // Fill native input
+        await Page.Locator("#native-val-field").FillAsync("native-value");
+
+        // Fill fusion TestWidget's inner input
+        await Page.Locator("#fusion-val-field input").FillAsync("fusion-value");
+
+        // Click validate — both fields have values, validation must pass
+        await Page.Locator("#validate-btn").ClickAsync();
+        await Expect(Page.Locator("#val-result"))
+            .ToHaveTextAsync("Both fields passed!", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 13: Live-clear removes native field error when user types ──
+    // WHY: proves live-clear wiring works for native vendor. After a validation error,
+    // typing in the native field must clear the error message. If live-clear doesn't
+    // wire for native fields, the error stays visible even after the user corrects input.
+
+    [Test]
+    public async Task live_clear_removes_native_validation_error_when_user_types()
+    {
+        await NavigateAndBoot();
+
+        // Trigger validation error by clicking with empty fields
+        await Page.Locator("#validate-btn").ClickAsync();
+        await Expect(Page.Locator("[data-valmsg-for='native-val-field']"))
+            .ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Type in native field — error must clear via live-clear
+        await Page.Locator("#native-val-field").FillAsync("corrected");
+        await Expect(Page.Locator("[data-valmsg-for='native-val-field']"))
+            .ToBeHiddenAsync(new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 14: Live-clear removes fusion field error when user types ──
+    // WHY: proves live-clear wiring works for fusion vendor. The fusion TestWidget fires
+    // a "change" event when the inner input changes. Live-clear must detect this and hide
+    // the validation error. If resolveRoot is broken for live-clear, the error persists.
+
+    [Test]
+    public async Task live_clear_removes_fusion_validation_error_when_user_types()
+    {
+        await NavigateAndBoot();
+
+        // Trigger validation error by clicking with empty fields
+        await Page.Locator("#validate-btn").ClickAsync();
+        await Expect(Page.Locator("[data-valmsg-for='fusion-val-field']"))
+            .ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        // Type in fusion widget's inner input — error must clear via live-clear
+        await Page.Locator("#fusion-val-field input").FillAsync("corrected");
+        await Expect(Page.Locator("[data-valmsg-for='fusion-val-field']"))
+            .ToBeHiddenAsync(new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 15: Mixed vendor gather POST body contains values from both vendors ──
+    // WHY: proves that a single POST gather reads BOTH vendor roots and includes both
+    // values in the request body. If gather only reads one vendor, the other value is
+    // missing from the POST. This intercepts the actual HTTP request to verify payload.
+
+    [Test]
+    public async Task mixed_vendor_gather_post_body_contains_both_native_and_fusion_values()
+    {
+        await NavigateAndBoot();
+
+        // Section 8: native-both has pre-filled value "n-both", fusion-both has "f-both"
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#both-vendors-btn").ClickAsync(),
+            "**/Sandbox/AllModulesTogether/Architecture/Echo");
+
+        var body = request.PostData ?? "";
+        Assert.That(body, Does.Contain("n-both"),
+            "Gather POST must include the native vendor's value");
+        Assert.That(body, Does.Contain("f-both"),
+            "Gather POST must include the fusion vendor's value");
+
+        // Confirm the round-trip completes
+        await Expect(Page.Locator("#both-vendors-result"))
+            .ToHaveTextAsync("both-gathered", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 16: EqualTo validation shows required error on empty password ──
+    // WHY: proves the native-password field's "required" rule fires independently of the
+    // equalTo rule on fusion-confirm. Both fields have required rules. Submitting with
+    // both empty must show required errors on both, not just the equalTo error.
+
+    [Test]
+    public async Task equalto_form_shows_required_errors_when_both_fields_empty()
+    {
+        await NavigateAndBoot();
+
+        // Click validate with both password and confirm empty
+        await Page.Locator("#cross-validate-btn").ClickAsync();
+
+        // Native password must show "Required"
+        await Expect(Page.Locator("[data-valmsg-for='native-password']"))
+            .ToContainTextAsync("Required", new() { Timeout = 3000 });
+
+        // Fusion confirm must show "Required" (required fires before equalTo)
+        await Expect(Page.Locator("[data-valmsg-for='fusion-confirm']"))
+            .ToContainTextAsync("Required", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 17: Page renders plan JSON for debugging ──
+    // WHY: proves the plan JSON is serialized and visible on the page for developer inspection.
+    // The plan contains entries with triggers and reactions — if serialization is broken,
+    // the #plan-json element would be empty or malformed.
+
+    [Test]
+    public async Task page_displays_serialized_plan_json_with_entries()
+    {
+        await NavigateAndBoot();
+
+        // The plan JSON element must contain "entries" — proving serialization worked
+        var planText = await Page.Locator("#plan-json").TextContentAsync();
+        Assert.That(planText, Does.Contain("\"entries\""),
+            "Plan JSON must contain the entries array");
+        Assert.That(planText, Does.Contain("\"dom-ready\""),
+            "Plan JSON must contain dom-ready trigger kind");
+        Assert.That(planText, Does.Contain("\"custom-event\""),
+            "Plan JSON must contain custom-event trigger kind");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario 18: Mixed vendor gather with user-modified values sends current state ──
+    // WHY: proves that when BOTH native AND fusion values are changed before a mixed gather,
+    // the POST body reflects the CURRENT state of both vendors — not the pre-filled values.
+    // This is the strongest test of live gather: two vendors, both modified, single POST.
+
+    [Test]
+    public async Task mixed_vendor_gather_sends_current_values_after_both_modified()
+    {
+        await NavigateAndBoot();
+
+        // Modify both vendor fields from their pre-filled values
+        await Page.Locator("#native-both").FillAsync("native-updated");
+        await Page.Locator("#fusion-both input").FillAsync("fusion-updated");
+
+        // Intercept the POST to verify both current values are sent
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#both-vendors-btn").ClickAsync(),
+            "**/Sandbox/AllModulesTogether/Architecture/Echo");
+
+        var body = request.PostData ?? "";
+        Assert.That(body, Does.Contain("native-updated"),
+            "Mixed gather must send the CURRENT native value, not 'n-both'");
+        Assert.That(body, Does.Contain("fusion-updated"),
+            "Mixed gather must send the CURRENT fusion value, not 'f-both'");
+        Assert.That(body, Does.Not.Contain("n-both"),
+            "Mixed gather must NOT send the stale native pre-filled value");
+        Assert.That(body, Does.Not.Contain("f-both"),
+            "Mixed gather must NOT send the stale fusion pre-filled value");
+
+        // Confirm the round-trip completes
+        await Expect(Page.Locator("#both-vendors-result"))
+            .ToHaveTextAsync("both-gathered", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }

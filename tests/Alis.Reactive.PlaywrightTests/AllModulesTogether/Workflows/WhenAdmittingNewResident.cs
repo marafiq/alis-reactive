@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -24,6 +25,8 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator Status => _plan.Element("submit-status");
 
+    // ─── Physician Search ───
+
     [Test]
     public async Task searching_physician_by_name_shows_matching_results_to_pick_from()
     {
@@ -40,6 +43,21 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
     }
 
     [Test]
+    public async Task searching_physician_filters_to_matching_names_only()
+    {
+        await NavigateAndBoot();
+        var physician = _plan.AutoComplete(m => m.Physician);
+
+        await physician.Type("chen");
+        await Expect(physician.PopupItem("Dr. Chen")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(physician.PopupItem("Dr. Smith")).Not.ToBeVisibleAsync();
+
+        AssertNoConsoleErrors();
+    }
+
+    // ─── Care Level Selection ───
+
+    [Test]
     public async Task choosing_care_level_confirms_selection()
     {
         await NavigateAndBoot();
@@ -50,6 +68,58 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
             .ToContainTextAsync("memory", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
+
+    // ─── Echo Panel — Live Feedback ───
+
+    [Test]
+    public async Task typing_resident_name_echoes_to_the_feedback_panel()
+    {
+        await NavigateAndBoot();
+
+        await _plan.TextBox(m => m.ResidentName).FillAndBlur("Eleanor Rigby");
+
+        await Expect(_plan.Element("name-echo"))
+            .ToContainTextAsync("Eleanor Rigby", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task entering_monthly_rate_echoes_to_the_feedback_panel()
+    {
+        await NavigateAndBoot();
+
+        await _plan.NumericTextBox(m => m.MonthlyRate).FillAndBlur("3200");
+
+        await Expect(_plan.Element("rate-echo"))
+            .ToContainTextAsync("3200", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task toggling_active_switch_echoes_to_the_feedback_panel()
+    {
+        await NavigateAndBoot();
+
+        await _plan.Switch(m => m.IsActive).Toggle();
+
+        await Expect(_plan.Element("active-echo"))
+            .ToContainTextAsync("true", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task typing_notes_echoes_to_the_feedback_panel()
+    {
+        await NavigateAndBoot();
+
+        await _plan.TextBox(m => m.Notes).FillAndBlur("Allergic to penicillin");
+
+        await Expect(_plan.Element("notes-echo"))
+            .ToContainTextAsync("Allergic to penicillin", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ─── Validation — Required Fields ───
 
     [Test]
     public async Task submitting_without_required_fields_tells_admin_what_is_missing()
@@ -69,6 +139,76 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
     }
 
     [Test]
+    public async Task optional_fields_do_not_show_errors_on_empty_submit()
+    {
+        await NavigateAndBoot();
+
+        await SubmitBtn.ClickAsync();
+
+        // Wait for required errors to appear first (proves validation ran)
+        await Expect(_plan.ErrorFor(m => m.ResidentName))
+            .ToContainTextAsync("required", new() { Timeout = 5000 });
+
+        // CareLevel and Notes are optional — no error messages
+        await Expect(_plan.ErrorFor(m => m.CareLevel)).ToBeHiddenAsync();
+        await Expect(_plan.ErrorFor(m => m.Notes)).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task status_remains_ready_when_validation_blocks_submission()
+    {
+        await NavigateAndBoot();
+
+        await Expect(Status).ToHaveTextAsync("Ready");
+
+        await SubmitBtn.ClickAsync();
+
+        // Validation blocks the HTTP post — status should NOT change to "Saving..."
+        // and should NOT change to "Resident admitted"
+        await Expect(_plan.ErrorFor(m => m.ResidentName))
+            .ToContainTextAsync("required", new() { Timeout = 5000 });
+        await Expect(Status).ToHaveTextAsync("Ready");
+        AssertNoConsoleErrors();
+    }
+
+    // ─── Validation — Live Clear ───
+
+    [Test]
+    public async Task resident_name_error_clears_when_admin_types_a_name()
+    {
+        await NavigateAndBoot();
+
+        await SubmitBtn.ClickAsync();
+        await Expect(_plan.ErrorFor(m => m.ResidentName))
+            .ToContainTextAsync("required", new() { Timeout = 5000 });
+
+        await _plan.TextBox(m => m.ResidentName).FillAndBlur("Margaret Thompson");
+
+        await Expect(_plan.ErrorFor(m => m.ResidentName))
+            .ToBeHiddenAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task monthly_rate_error_clears_when_admin_enters_a_rate()
+    {
+        await NavigateAndBoot();
+
+        await SubmitBtn.ClickAsync();
+        await Expect(_plan.ErrorFor(m => m.MonthlyRate))
+            .ToContainTextAsync("required", new() { Timeout = 5000 });
+
+        await _plan.NumericTextBox(m => m.MonthlyRate).FillAndBlur("2500");
+
+        await Expect(_plan.ErrorFor(m => m.MonthlyRate))
+            .ToBeHiddenAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ─── Fix and Resubmit ───
+
+    [Test]
     public async Task fixing_missing_fields_and_resubmitting_admits_the_resident()
     {
         await NavigateAndBoot();
@@ -84,6 +224,44 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         await _plan.NumericTextBox(m => m.MonthlyRate).FillAndBlur("4500");
 
         await SubmitBtn.ClickAsync();
+        await Expect(Status).ToContainTextAsync("Resident admitted", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ─── Successful Admission ───
+
+    [Test]
+    public async Task successful_admission_shows_green_confirmation()
+    {
+        await NavigateAndBoot();
+
+        await _plan.TextBox(m => m.ResidentName).FillAndBlur("Dorothy Williams");
+        var physician = _plan.AutoComplete(m => m.Physician);
+        await physician.Type("jones");
+        await physician.SelectItem("Dr. Jones");
+        await _plan.NumericTextBox(m => m.MonthlyRate).FillAndBlur("3800");
+
+        await SubmitBtn.ClickAsync();
+
+        await Expect(Status).ToContainTextAsync("Resident admitted", new() { Timeout = 5000 });
+        await Expect(Status).ToHaveClassAsync(new Regex("text-green-600"));
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task admission_without_optional_fields_still_succeeds()
+    {
+        await NavigateAndBoot();
+
+        // Fill only the three required fields — skip CareLevel, IsActive, Notes
+        await _plan.TextBox(m => m.ResidentName).FillAndBlur("Harold Jenkins");
+        var physician = _plan.AutoComplete(m => m.Physician);
+        await physician.Type("patel");
+        await physician.SelectItem("Dr. Patel");
+        await _plan.NumericTextBox(m => m.MonthlyRate).FillAndBlur("5200");
+
+        await SubmitBtn.ClickAsync();
+
         await Expect(Status).ToContainTextAsync("Resident admitted", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }

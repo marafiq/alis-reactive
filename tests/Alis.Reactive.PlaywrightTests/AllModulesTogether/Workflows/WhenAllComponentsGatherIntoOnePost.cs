@@ -77,13 +77,33 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         }}");
     }
 
+    private async Task SubmitJsonAndWaitForEcho()
+    {
+        await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#submit-json-btn").ClickAsync(),
+            "**/AllModulesTogether/ComponentGather/EchoJson");
+        // Wait for the echo response to populate
+        await Expect(Page.Locator("#echo-resident-name"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+    }
+
+    private async Task SubmitFormDataAndWaitForEcho()
+    {
+        await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#submit-form-btn").ClickAsync(),
+            "**/AllModulesTogether/ComponentGather/EchoFormData");
+        // Wait for the echo response to populate
+        await Expect(Page.Locator("#echo-resident-name"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+    }
+
     // ── Page loads ──
 
     [Test]
     public async Task page_loads_without_errors()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("ComponentGather — Alis.Reactive Sandbox");
+        await Expect(Page).ToHaveTitleAsync("ComponentGather \u2014 Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
     }
 
@@ -127,9 +147,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
         await FillAllRequiredFields();
 
-        await Page.RunAndWaitForRequestAsync(
-            async () => await Page.Locator("#submit-json-btn").ClickAsync(),
-            "**/AllModulesTogether/ComponentGather/EchoJson");
+        await SubmitJsonAndWaitForEcho();
 
         var fieldCount = Page.Locator("#echo-field-count");
         await Expect(fieldCount).Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
@@ -142,10 +160,366 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
         await FillAllRequiredFields();
 
-        await Page.RunAndWaitForRequestAsync(
-            async () => await Page.Locator("#submit-json-btn").ClickAsync(),
-            "**/AllModulesTogether/ComponentGather/EchoJson");
+        await SubmitJsonAndWaitForEcho();
 
+        await Expect(Page.Locator("#submit-mode"))
+            .ToHaveTextAsync("JSON", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ── JSON POST — individual field echo verification ──
+
+    [Test]
+    public async Task json_post_echo_shows_hidden_fields_from_server_seed()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-resident-id"))
+            .ToContainTextAsync("RES-1042", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-form-token"))
+            .ToContainTextAsync("csrf-abc123", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_native_text_fields()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-resident-name"))
+            .ToContainTextAsync("Margaret Thompson", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-care-notes"))
+            .ToContainTextAsync("Initial assessment", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_native_dropdown_value()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-mobility-level"))
+            .ToContainTextAsync("wheelchair", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_native_radio_group_value()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-care-level"))
+            .ToContainTextAsync("assisted", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_fusion_facility_dropdown()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-facility-id"))
+            .ToContainTextAsync("fac-1", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_fusion_autocomplete_value()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-physician-name"))
+            .ToContainTextAsync("Dr. Smith", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_fusion_insurance_provider()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-insurance-provider"))
+            .ToContainTextAsync("blue-cross", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_fusion_phone_number()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-phone-number"))
+            .ToContainTextAsync("555", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_numeric_monthly_rate()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-monthly-rate"))
+            .ToContainTextAsync("4250", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_date_fields()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-admission-date"))
+            .ToContainTextAsync("2024", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-medication-time"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-appointment-time"))
+            .ToContainTextAsync("2024", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-stay-start"))
+            .ToContainTextAsync("2024", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_care_plan_content()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-care-plan"))
+            .ToContainTextAsync("Care plan content", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_shows_all_20_fields_received()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-field-count"))
+            .ToHaveTextAsync("20", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task json_post_echo_result_shows_success_styling()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitJsonAndWaitForEcho();
+
+        var echoResult = Page.Locator("#echo-result");
+        await Expect(echoResult).ToHaveClassAsync(
+            new Regex("text-green-600"), new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ── FormData POST ──
+
+    [Test]
+    public async Task form_data_post_echo_shows_submit_mode()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitFormDataAndWaitForEcho();
+
+        await Expect(Page.Locator("#submit-mode"))
+            .ToHaveTextAsync("FormData", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task form_data_post_gathers_all_fields()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+
+        var request = await Page.RunAndWaitForRequestAsync(
+            async () => await Page.Locator("#submit-form-btn").ClickAsync(),
+            "**/AllModulesTogether/ComponentGather/EchoFormData");
+
+        var body = request.PostData ?? "";
+        Assert.That(body, Does.Contain("Margaret Thompson"), "FormData body must contain ResidentName");
+        Assert.That(body, Does.Contain("fac-1"), "FormData body must contain FacilityId");
+
+        await Expect(Page.Locator("#echo-resident-name"))
+            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task form_data_post_echo_shows_hidden_fields()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitFormDataAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-resident-id"))
+            .ToContainTextAsync("RES-1042", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-form-token"))
+            .ToContainTextAsync("csrf-abc123", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task form_data_post_echo_shows_resident_name()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitFormDataAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-resident-name"))
+            .ToContainTextAsync("Margaret Thompson", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task form_data_post_echo_shows_facility_id()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitFormDataAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-facility-id"))
+            .ToContainTextAsync("fac-1", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task form_data_post_echo_shows_all_20_fields_received()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitFormDataAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-field-count"))
+            .ToHaveTextAsync("20", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task form_data_post_echo_shows_success_styling()
+    {
+        await NavigateAndBoot();
+        await FillAllRequiredFields();
+        await SubmitFormDataAndWaitForEcho();
+
+        var echoResult = Page.Locator("#echo-result");
+        await Expect(echoResult).ToHaveClassAsync(
+            new Regex("text-green-600"), new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    // ── Validation ──
+
+    [Test]
+    public async Task submitting_empty_form_does_not_post_to_server()
+    {
+        await NavigateAndBoot();
+
+        // Clear seeded values so validation will fail
+        await Page.Locator($"#{Scope}ResidentName").FillAsync("");
+        await Page.Locator($"#{Scope}CareNotes").FillAsync("");
+        await Page.EvaluateAsync(@$"() => {{
+            const ntb = document.getElementById('{Scope}MonthlyRate');
+            if (ntb && ntb.ej2_instances) {{ ntb.ej2_instances[0].value = 0; ntb.ej2_instances[0].dataBind(); }}
+        }}");
+
+        await Page.Locator("#submit-json-btn").ClickAsync();
+
+        // Echo should remain in its default state (em dash)
+        await Expect(Page.Locator("#echo-resident-name"))
+            .ToHaveTextAsync("\u2014", new() { Timeout = 3000 });
+        // Submit mode should still be the default em dash
+        await Expect(Page.Locator("#submit-mode"))
+            .ToHaveTextAsync("\u2014", new() { Timeout = 3000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task validation_shows_resident_name_required_error()
+    {
+        await NavigateAndBoot();
+
+        // Clear the seeded resident name
+        await Page.Locator($"#{Scope}ResidentName").FillAsync("");
+
+        await Page.Locator("#submit-json-btn").ClickAsync();
+
+        // Validation error message should appear for ResidentName
+        var errorSlot = Page.Locator($"span[data-valmsg-for='ResidentName']");
+        await Expect(errorSlot).ToContainTextAsync("required", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task validation_shows_care_notes_required_error()
+    {
+        await NavigateAndBoot();
+
+        // Clear the seeded care notes
+        await Page.Locator($"#{Scope}CareNotes").FillAsync("");
+
+        await Page.Locator("#submit-json-btn").ClickAsync();
+
+        var errorSlot = Page.Locator($"span[data-valmsg-for='CareNotes']");
+        await Expect(errorSlot).ToContainTextAsync("required", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task validation_shows_mobility_level_required_error()
+    {
+        await NavigateAndBoot();
+
+        // MobilityLevel is not seeded — submit without selecting it
+        await Page.Locator("#submit-json-btn").ClickAsync();
+
+        var errorSlot = Page.Locator($"span[data-valmsg-for='MobilityLevel']");
+        await Expect(errorSlot).ToContainTextAsync("required", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task fixing_validation_errors_and_resubmitting_succeeds()
+    {
+        await NavigateAndBoot();
+
+        // First submit — validation should block (missing required fields)
+        await Page.Locator("#submit-json-btn").ClickAsync();
+        await Expect(Page.Locator($"span[data-valmsg-for='MobilityLevel']"))
+            .ToContainTextAsync("required", new() { Timeout = 5000 });
+
+        // Now fill all required fields
+        await FillAllRequiredFields();
+
+        // Resubmit — should succeed this time
+        await SubmitJsonAndWaitForEcho();
+
+        await Expect(Page.Locator("#echo-resident-name"))
+            .ToContainTextAsync("Margaret Thompson", new() { Timeout = 5000 });
         await Expect(Page.Locator("#submit-mode"))
             .ToHaveTextAsync("JSON", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
