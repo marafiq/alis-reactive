@@ -45,7 +45,23 @@ const planRoute = createRoute({
   component: PlanView,
 });
 
-// ── /board → Board (kanban) ──
+// ── /plans/$planId/stories/$storyId → StoryDetail (plan-scoped) ──
+
+const planStoryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/plans/$planId/stories/$storyId',
+  component: StoryDetail,
+});
+
+// ── /plans/$planId/board → Board (plan-scoped) ──
+
+const planBoardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/plans/$planId/board',
+  component: Board,
+});
+
+// ── /board → Board (kanban, all stories) ──
 
 const boardRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -53,7 +69,7 @@ const boardRoute = createRoute({
   component: Board,
 });
 
-// ── /stories/$storyId → StoryDetail ──
+// ── /stories/$storyId → StoryDetail (global) ──
 
 const storyRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -83,6 +99,8 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   plansRoute,
   planRoute,
+  planStoryRoute,
+  planBoardRoute,
   boardRoute,
   storyRoute,
   knowledgeRoute,

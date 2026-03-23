@@ -1,11 +1,12 @@
 import { useMemo, useState, type FormEvent } from 'react';
-import { useParams, Link } from '@tanstack/react-router';
+import { useParams, useRouterState, Link } from '@tanstack/react-router';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
-import { Pencil } from 'lucide-react';
+import { ChevronRight, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useStory, useReviews, useDispatchReview, useComments, useCreateComment, useDecisions, useCreateDecision, useUpdateStory, useCreateVerdict, usePlanAgents, useInvestSummary, useInvestAssessments } from '@/hooks/queries';
+import { useStory, usePlan, useReviews, useDispatchReview, useComments, useCreateComment, useDecisions, useCreateDecision, useUpdateStory, useCreateVerdict, usePlanAgents, useInvestSummary, useInvestAssessments } from '@/hooks/queries';
 import { useWS } from '@/App';
+import { usePlanContext } from '@/hooks/usePlanContext';
 import { useReviewPanel } from '@/components/layout/reviewPanelContext';
 import { ReviewSection } from '@/components/reviews/ReviewSection';
 import { SizeBadge, StatusBadge } from '@/components/ui/badges';
@@ -114,7 +115,17 @@ function AgentProgress({ progress, agents }: { progress: Record<string, { status
 // ── StoryDetail ──
 
 export function StoryDetail() {
-  const { storyId } = useParams({ from: '/stories/$storyId' });
+  // Extract storyId from the URL path (works for both /stories/$storyId and /plans/$planId/stories/$storyId)
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const storyId = useMemo(() => {
+    const match = pathname.match(/\/stories\/([^/]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  }, [pathname]);
+
+  // Plan context: available when route is /plans/$planId/stories/$storyId
+  const planId = usePlanContext();
+  const { data: planData } = usePlan(planId);
+
   const { setReviewPanelData } = useReviewPanel();
   const { data: story, isLoading: storyLoading } = useStory(storyId);
   const { data: rawReviews = [] } = useReviews(storyId);
@@ -265,6 +276,23 @@ export function StoryDetail() {
   return (
     <>
       <div className="max-w-4xl mx-auto px-8 py-8 space-y-8">
+        {/* Breadcrumb (when plan-scoped) */}
+        {planId && planData && (
+          <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Link
+              to="/plans/$planId"
+              params={{ planId }}
+              className="hover:text-primary transition-colors font-medium"
+            >
+              {planData.title}
+            </Link>
+            <ChevronRight size={14} className="text-muted-foreground/50" />
+            <span className="text-foreground font-medium truncate">
+              {story?.title ?? 'Story'}
+            </span>
+          </nav>
+        )}
+
         {/* Title + Edit button */}
         {isEditing ? (
           <Card>
@@ -384,8 +412,8 @@ export function StoryDetail() {
               {deps.map((dep) => (
                 <Link
                   key={dep.id}
-                  to="/stories/$storyId"
-                  params={{ storyId: dep.blocked_by_id }}
+                  to={planId ? '/plans/$planId/stories/$storyId' : '/stories/$storyId'}
+                  params={planId ? { planId, storyId: dep.blocked_by_id } : { storyId: dep.blocked_by_id }}
                   className={cn(
                     'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border',
                     'hover:bg-muted transition-colors',
@@ -638,13 +666,13 @@ export function StoryDetail() {
           totalAgents={planAgents.length || parsedReviews.length}
           investHealth={investHealth}
           onVerdict={(verdict) => {
-            createVerdict.mutate({ storyId, verdict });
+            createVerdict.mutate({ storyId: story.id, verdict });
             if (verdict === 'approve' && parsedReviews.length > 0) {
               const findingTitles = parsedReviews.flatMap((r) =>
                 r.findings.map((f) => `[${r.agent_display_name || r.agent_template_id}] ${f.title}`),
               );
               createDecision.mutate({
-                storyId,
+                storyId: story.id,
                 summary: 'Story approved',
                 keyDecisions: findingTitles.length > 0 ? findingTitles : ['Approved with no findings'],
               });

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, Link } from '@tanstack/react-router';
 import {
   DndContext,
   DragOverlay,
@@ -19,12 +19,13 @@ import {
 import { useDroppable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
-import { useStories, useUpdateStoryStatus } from '@/hooks/queries';
+import { useStories, usePlan, useUpdateStoryStatus } from '@/hooks/queries';
+import { usePlanContext } from '@/hooks/usePlanContext';
 import { SizeBadge } from '@/components/ui/badges';
 import { InvestHealthBar } from '@/components/invest/InvestHealthBar';
 import { storyToInvestHealth } from '@/components/invest/invest-utils';
 import { Card } from '@/components/ui/card';
-import { Columns3 } from 'lucide-react';
+import { ChevronRight, Columns3 } from 'lucide-react';
 import type { Story } from '@/lib/types';
 
 // ── Column config ──
@@ -171,7 +172,9 @@ function DroppableColumn({
 
 export function Board() {
   const navigate = useNavigate();
-  const { data: stories = [], isLoading } = useStories();
+  const planId = usePlanContext();
+  const { data: planData } = usePlan(planId);
+  const { data: stories = [], isLoading } = useStories(planId ?? undefined);
   const updateStatus = useUpdateStoryStatus();
   const [activeStory, setActiveStory] = useState<Story | null>(null);
   const [overColumn, setOverColumn] = useState<string | null>(null);
@@ -254,7 +257,11 @@ export function Board() {
   }
 
   function handleSelectStory(storyId: string) {
-    navigate({ to: '/stories/$storyId', params: { storyId } });
+    if (planId) {
+      navigate({ to: '/plans/$planId/stories/$storyId', params: { planId, storyId } });
+    } else {
+      navigate({ to: '/stories/$storyId', params: { storyId } });
+    }
   }
 
   if (isLoading) {
@@ -281,13 +288,30 @@ export function Board() {
 
   return (
     <div className="h-full px-8 py-8 overflow-x-auto">
+      {/* Breadcrumb (when plan-scoped) */}
+      {planId && planData && (
+        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
+          <Link
+            to="/plans/$planId"
+            params={{ planId }}
+            className="hover:text-primary transition-colors font-medium"
+          >
+            {planData.title}
+          </Link>
+          <ChevronRight size={14} className="text-muted-foreground/50" />
+          <span className="text-foreground font-medium">Board</span>
+        </nav>
+      )}
+
       {/* Page header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
           <Columns3 className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-xl font-semibold text-foreground">Story Board</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {planId && planData ? `${planData.title} Board` : 'Story Board'}
+          </h1>
           <p className="text-sm text-muted-foreground">
             {stories.length} {stories.length === 1 ? 'story' : 'stories'} across {COLUMNS.length} stages
             <span className="text-muted-foreground/50"> &middot; drag to move</span>

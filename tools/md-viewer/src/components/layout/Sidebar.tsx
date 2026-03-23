@@ -3,6 +3,7 @@ import { Link, useRouterState } from '@tanstack/react-router';
 import { LayoutDashboard, Columns3, Network, FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePlans, useStories, useConcepts } from '@/hooks/queries';
+import { usePlanContext } from '@/hooks/usePlanContext';
 import { SizeBadge } from '@/components/ui/badges';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,9 @@ function useActiveTab(): TabKey {
   const path = location.pathname;
   if (path.startsWith('/board')) return 'board';
   if (path.startsWith('/stories')) return 'board';
+  // Plan-scoped board and stories routes
+  if (/^\/plans\/[^/]+\/board/.test(path)) return 'board';
+  if (/^\/plans\/[^/]+\/stories/.test(path)) return 'board';
   if (path.startsWith('/knowledge')) return 'knowledge';
   return 'plans';
 }
@@ -49,10 +53,16 @@ function useSelectedIds() {
   let selectedStoryId: string | null = null;
   let selectedConceptName: string | null = null;
 
-  const planMatch = path.match(/^\/plans\/(.+)$/);
+  // Match /plans/:planId (but not /plans/:planId/stories/... or /plans/:planId/board)
+  const planMatch = path.match(/^\/plans\/([^/]+)$/);
   if (planMatch) selectedPlanId = decodeURIComponent(planMatch[1]);
 
-  const storyMatch = path.match(/^\/stories\/(.+)$/);
+  // Also highlight plan in sidebar when inside plan-scoped story/board routes
+  const planScopedMatch = path.match(/^\/plans\/([^/]+)\/(stories|board)/);
+  if (planScopedMatch) selectedPlanId = decodeURIComponent(planScopedMatch[1]);
+
+  // Match /stories/:storyId or /plans/:planId/stories/:storyId
+  const storyMatch = path.match(/\/stories\/([^/]+)$/);
   if (storyMatch) selectedStoryId = decodeURIComponent(storyMatch[1]);
 
   const conceptMatch = path.match(/^\/knowledge\/(.+)$/);
@@ -67,11 +77,20 @@ export function Sidebar() {
   const [searchQuery, setSearchQuery] = useState('');
   const activeTab = useActiveTab();
   const { selectedPlanId, selectedStoryId, selectedConceptName } = useSelectedIds();
+  const scopedPlanId = usePlanContext();
   const { data: plans = [] } = usePlans();
-  const { data: stories = [] } = useStories();
+  // When in plan context, filter stories to that plan; otherwise show all
+  const { data: stories = [] } = useStories(scopedPlanId ?? undefined);
   const { data: concepts = [] } = useConcepts();
 
   const q = searchQuery.toLowerCase();
+
+  // Resolve nav item destinations based on plan context
+  function getNavTo(key: TabKey): string {
+    if (key === 'board' && scopedPlanId) return `/plans/${scopedPlanId}/board`;
+    const item = NAV_ITEMS.find((n) => n.key === key);
+    return item?.to ?? '/plans';
+  }
 
   return (
     <aside className="w-[260px] flex-shrink-0 bg-sidebar text-sidebar-foreground flex flex-col h-screen select-none">
@@ -90,10 +109,10 @@ export function Sidebar() {
 
       {/* ── Nav ── */}
       <nav className="px-3 mb-2 space-y-0.5">
-        {NAV_ITEMS.map(({ key, icon: Icon, label, to }) => (
+        {NAV_ITEMS.map(({ key, icon: Icon, label }) => (
           <Link
             key={key}
-            to={to}
+            to={getNavTo(key)}
             className={cn(
               'flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150',
               activeTab === key
@@ -134,7 +153,7 @@ export function Sidebar() {
           <PlansList plans={plans} selectedId={selectedPlanId} query={q} />
         )}
         {activeTab === 'board' && (
-          <StoriesList stories={stories} selectedId={selectedStoryId} query={q} />
+          <StoriesList stories={stories} selectedId={selectedStoryId} query={q} planId={scopedPlanId} />
         )}
         {activeTab === 'knowledge' && (
           <ConceptsList concepts={concepts} selectedId={selectedConceptName} query={q} />
@@ -215,10 +234,12 @@ function StoriesList({
   stories,
   selectedId,
   query,
+  planId,
 }: {
   stories: Story[];
   selectedId: string | null;
   query: string;
+  planId: string | null;
 }) {
   const filtered = stories.filter((s) => !query || s.title.toLowerCase().includes(query));
 
@@ -244,8 +265,8 @@ function StoriesList({
             return (
               <Link
                 key={story.id}
-                to="/stories/$storyId"
-                params={{ storyId: story.id }}
+                to={planId ? '/plans/$planId/stories/$storyId' : '/stories/$storyId'}
+                params={planId ? { planId, storyId: story.id } : { storyId: story.id }}
                 className={cn(
                   'w-full text-left px-3 py-1.5 rounded-lg transition-all duration-150 group block',
                   isSelected

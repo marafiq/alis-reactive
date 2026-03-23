@@ -508,7 +508,18 @@ export function PlanView() {
 
       {/* Story Table */}
       <section>
-        <SectionHeading count={stories.length}>Stories</SectionHeading>
+        <div className="flex items-center justify-between mb-3">
+          <SectionHeading count={stories.length} className="mb-0">Stories</SectionHeading>
+          {stories.length > 0 && (
+            <Link
+              to="/plans/$planId/board"
+              params={{ planId: plan.id }}
+              className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              View Board
+            </Link>
+          )}
+        </div>
 
         {stories.length === 0 ? (
           <p className="text-sm text-muted-foreground">No stories yet.</p>
@@ -542,8 +553,8 @@ export function PlanView() {
                   >
                     <td className="px-4 py-2.5">
                       <Link
-                        to="/stories/$storyId"
-                        params={{ storyId: story.id }}
+                        to="/plans/$planId/stories/$storyId"
+                        params={{ planId: plan.id, storyId: story.id }}
                         className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
                       >
                         {story.id.length > 10
@@ -553,8 +564,8 @@ export function PlanView() {
                     </td>
                     <td className="px-4 py-2.5">
                       <Link
-                        to="/stories/$storyId"
-                        params={{ storyId: story.id }}
+                        to="/plans/$planId/stories/$storyId"
+                        params={{ planId: plan.id, storyId: story.id }}
                         className="font-medium text-foreground hover:text-primary transition-colors"
                       >
                         {story.title}
