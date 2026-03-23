@@ -10,11 +10,14 @@ import {
   useCreatePlan,
   useD2Render,
 } from '@/hooks/queries';
-import { InvestBadges, SizeBadge, StatusBadge } from '@/components/ui/badges';
+import { SizeBadge, StatusBadge } from '@/components/ui/badges';
+import { InvestHealthBar } from '@/components/invest/InvestHealthBar';
+import { storyToInvestHealth } from '@/components/invest/invest-utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
+import { SectionHeading } from '@/components/ui/section-heading';
 import type { Plan, Story, Goal } from '@/lib/types';
 import { parseJson } from '@/lib/types';
 
@@ -244,9 +247,7 @@ export function PlanView() {
       {/* Goals */}
       {goals.length > 0 && (
         <section>
-          <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-3">
-            Goals
-          </h2>
+          <SectionHeading count={goals.length}>Goals</SectionHeading>
           <ul className="space-y-1.5">
             {goals.map((goal, idx) => (
               <li key={idx} className="flex items-start gap-2.5">
@@ -288,9 +289,7 @@ export function PlanView() {
       {/* Constraints */}
       {constraints.length > 0 && (
         <section>
-          <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-3">
-            Constraints
-          </h2>
+          <SectionHeading count={constraints.length}>Constraints</SectionHeading>
           <ul className="space-y-1">
             {constraints.map((c, idx) => (
               <li key={idx} className="flex items-start gap-2 text-sm">
@@ -304,9 +303,7 @@ export function PlanView() {
 
       {/* Architecture (D2 Diagram) */}
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-3">
-          Architecture
-        </h2>
+        <SectionHeading>Architecture</SectionHeading>
         {plan.d2_diagram ? (
           <D2Diagram source={plan.d2_diagram} />
         ) : (
@@ -328,9 +325,7 @@ export function PlanView() {
 
       {/* Story Table */}
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-3">
-          Stories ({stories.length})
-        </h2>
+        <SectionHeading count={stories.length}>Stories</SectionHeading>
 
         {stories.length === 0 ? (
           <p className="text-sm text-muted-foreground">No stories yet.</p>
@@ -389,7 +384,7 @@ export function PlanView() {
                       <StatusBadge status={story.status} />
                     </td>
                     <td className="px-4 py-2.5 text-center">
-                      <InvestBadges story={story} />
+                      <InvestHealthBar investHealth={storyToInvestHealth(story)} variant="compact" />
                     </td>
                   </tr>
                 ))}

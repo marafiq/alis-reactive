@@ -1,43 +1,4 @@
 import { cn } from '@/lib/utils';
-import { investScores, INVEST_LABELS, type Story } from '@/lib/types';
-
-// ── INVEST Badges ──
-
-const INVEST_PASS = 'bg-emerald-100 text-emerald-700 border border-emerald-200';
-const INVEST_FAIL = 'bg-red-100 text-red-600 border border-red-200';
-const INVEST_MISSING = 'bg-gray-100 text-gray-400 border border-gray-200';
-
-interface InvestBadgesProps {
-  story: Story;
-  /** 'sm' = 14x14 for board cards, 'md' = 18x18 for tables & detail */
-  size?: 'sm' | 'md';
-}
-
-export function InvestBadges({ story, size = 'md' }: InvestBadgesProps) {
-  const scores = investScores(story);
-  const dim = size === 'sm' ? 'w-3.5 h-3.5 text-[8px]' : 'w-[18px] h-[18px] text-[10px]';
-  return (
-    <span className="inline-flex gap-0.5">
-      {(Object.entries(scores) as [string, boolean | undefined][]).map(([letter, pass]) => (
-        <span
-          key={letter}
-          title={INVEST_LABELS[letter]}
-          className={cn(
-            'inline-flex items-center justify-center rounded-sm font-bold leading-none',
-            dim,
-            pass === true
-              ? INVEST_PASS
-              : pass === false
-                ? INVEST_FAIL
-                : INVEST_MISSING,
-          )}
-        >
-          {letter}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 // ── Size Badge ──
 

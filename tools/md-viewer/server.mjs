@@ -19,7 +19,7 @@ import {
   getAgentWorkLog, createAgentLogEntry,
   getAllAgentTemplates, getAgentTemplate, createAgentTemplate, updateAgentTemplate,
   getPlanAgents, assignAgentToPlan, updatePlanAgent, removeAgentFromPlan,
-  getInvestSummary, getEvidenceScore,
+  getInvestSummary, getInvestAssessments, getEvidenceScore,
 } from './db.mjs';
 import { dispatchReview, ROLE_PROMPTS } from './agents.mjs';
 import { validateINVEST, validateTransition } from './invest.mjs';
@@ -411,6 +411,11 @@ app.delete('/api/plans/:id/agents/:agentId', (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 app.get('/api/stories/:id/invest-summary', (req, res) => {
   try { res.json(getInvestSummary(req.params.id)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/stories/:id/invest-assessments', (req, res) => {
+  try { res.json(getInvestAssessments(req.params.id)); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 

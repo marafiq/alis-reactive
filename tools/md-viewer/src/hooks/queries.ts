@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Plan, Story, Review, Concept, ConceptLink, HumanVerdict, InvestValidation, Comment, AgentTemplate, PlanAgent, InvestHealth } from '@/lib/types';
+import type { Plan, Story, Review, Concept, ConceptLink, HumanVerdict, InvestValidation, Comment, AgentTemplate, PlanAgent, InvestHealth, InvestAssessment } from '@/lib/types';
 
 // ── API helper ──
 async function api<T>(path: string, opts?: Omit<RequestInit, 'body'> & { body?: unknown }): Promise<T> {
@@ -214,6 +214,14 @@ export function useInvestSummary(storyId: string | null) {
   return useQuery({
     queryKey: ['invest-summary', storyId],
     queryFn: () => api<InvestHealth[]>(`/stories/${storyId}/invest-summary`),
+    enabled: !!storyId,
+  });
+}
+
+export function useInvestAssessments(storyId: string | null) {
+  return useQuery({
+    queryKey: ['invest-assessments', storyId],
+    queryFn: () => api<InvestAssessment[]>(`/stories/${storyId}/invest-assessments`),
     enabled: !!storyId,
   });
 }

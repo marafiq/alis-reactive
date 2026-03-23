@@ -127,7 +127,7 @@ export interface InvestHealth {
   criterion: string;
   pass_count: number;
   total_agents: number;
-  verdict: 'pass' | 'fail' | 'contested';
+  verdict: 'pass' | 'fail' | 'contested' | 'pending';
 }
 
 export interface ReviewData {

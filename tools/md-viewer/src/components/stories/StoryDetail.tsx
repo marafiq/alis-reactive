@@ -4,11 +4,12 @@ import { marked } from 'marked';
 import hljs from 'highlight.js';
 import { Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useStory, useReviews, useDispatchReview, useComments, useCreateComment, useDecisions, useCreateDecision, useUpdateStory, useCreateVerdict, usePlanAgents } from '@/hooks/queries';
+import { useStory, useReviews, useDispatchReview, useComments, useCreateComment, useDecisions, useCreateDecision, useUpdateStory, useCreateVerdict, usePlanAgents, useInvestSummary, useInvestAssessments } from '@/hooks/queries';
 import { useWS } from '@/App';
 import { useReviewPanel } from '@/components/layout/reviewPanelContext';
 import { ReviewSection } from '@/components/reviews/ReviewSection';
-import { InvestBadges, SizeBadge, StatusBadge } from '@/components/ui/badges';
+import { SizeBadge, StatusBadge } from '@/components/ui/badges';
+import { InvestScorecard } from '@/components/invest/InvestScorecard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,7 +20,6 @@ import type { ParsedReview, Dependency, PlanAgent } from '@/lib/types';
 import {
   parseJson,
   parseReview,
-  investScores,
   verdictLabel,
   type Story,
 } from '@/lib/types';
@@ -121,6 +121,8 @@ export function StoryDetail() {
   const { data: comments = [] } = useComments(storyId);
   const { data: decisions = [] } = useDecisions(storyId);
   const { data: planAgents = [] } = usePlanAgents(story?.plan_id ?? null);
+  const { data: investHealth = [] } = useInvestSummary(storyId);
+  const { data: investAssessments = [] } = useInvestAssessments(storyId);
   const dispatchReview = useDispatchReview();
   const createComment = useCreateComment();
   const createDecision = useCreateDecision();
@@ -260,9 +262,6 @@ export function StoryDetail() {
     );
   }
 
-  const investAll = investScores(story);
-  const allPass = Object.values(investAll).every(Boolean);
-
   return (
     <>
       <div className="max-w-4xl mx-auto px-8 py-8 space-y-8">
@@ -373,15 +372,6 @@ export function StoryDetail() {
             <div className="flex flex-wrap items-center gap-2.5">
               <StatusBadge status={story.status} />
               <SizeBadge size={story.size} />
-              <InvestBadges story={story} />
-              {allPass && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
-                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  INVEST Validated
-                </span>
-              )}
             </div>
           </>
         )}
@@ -435,6 +425,15 @@ export function StoryDetail() {
             </div>
           </section>
         )}
+
+        {/* INVEST Scorecard */}
+        <section>
+          <InvestScorecard
+            story={story}
+            investAssessments={investAssessments}
+            investHealth={investHealth}
+          />
+        </section>
 
         {/* Story body (markdown) */}
         {story.body && (
@@ -637,6 +636,7 @@ export function StoryDetail() {
           reviews={parsedReviews}
           story={story}
           totalAgents={planAgents.length || parsedReviews.length}
+          investHealth={investHealth}
           onVerdict={(verdict) => {
             createVerdict.mutate({ storyId, verdict });
             if (verdict === 'approve' && parsedReviews.length > 0) {
