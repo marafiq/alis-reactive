@@ -289,6 +289,7 @@ commands: "commands.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke:
 element: "element.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
 component: "component.ts" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
 resolver: "resolver.ts" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
+coerce: "coerce.ts" { shape: rectangle; style.fill: "#f0f0f0"; style.stroke: "#666"; style.font-size: 14 }
 walk: "walk.ts" { shape: rectangle; style.fill: "#f0f0f0"; style.stroke: "#666"; style.font-size: 14 }
 conditions: "conditions.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
 
@@ -300,12 +301,16 @@ execute -> conditions
 commands -> element
 commands -> resolver
 commands -> conditions
+commands -> coerce
 element -> component
 element -> resolver
+element -> coerce
 resolver -> component
 resolver -> walk
+resolver -> coerce
 component -> walk
 conditions -> resolver
+conditions -> coerce
 ```
 
 Every arrow is a function call. No circular dependencies. Any user action follows this graph — only the reaction kind and command kind change.
