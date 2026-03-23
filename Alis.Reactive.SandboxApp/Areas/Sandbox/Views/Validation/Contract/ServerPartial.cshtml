@@ -56,10 +56,10 @@
         </div>
 
         <h2 class="text-base font-semibold mb-2 mt-6">Address (Server Partial)</h2>
-        @await Html.PartialAsync("_AddressPartial", Model)
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Validation/Contract/_AddressPartial.cshtml", Model)
 
         <h2 class="text-base font-semibold mb-2 mt-6">Emergency Contact (Server Partial)</h2>
-        @await Html.PartialAsync("_EmergencyPartial", Model)
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Validation/Contract/_EmergencyPartial.cshtml", Model)
 
         <div class="mt-6 flex items-center gap-4">
             @(Html.NativeButton("submit-btn", "Submit Admission")

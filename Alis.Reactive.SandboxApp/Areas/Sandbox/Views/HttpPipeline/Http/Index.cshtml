@@ -375,7 +375,7 @@
         <native-heading level="H2">10. NativeActionLink &rarr; Repeated Row Actions</native-heading>
         <p class="text-sm text-text-secondary mb-3">Each row renders a normal anchor with a single serialized request chain. On success the delete action dispatches a refresh event, and the page-level listener reloads the same grid route back into the container.</p>
         <div id="native-action-link-grid">
-            @await Html.PartialAsync("_NativeActionLinkGrid", Model.ActionRows)
+            @await Html.PartialAsync("~/Areas/Sandbox/Views/HttpPipeline/Http/_NativeActionLinkGrid.cshtml", Model.ActionRows)
         </div>
         <div class="mt-3 space-y-2 font-mono text-sm">
             <p id="native-action-link-status" class="text-text-muted">No row action yet</p>
