@@ -307,13 +307,26 @@ dotnet build                                                 # All C# projects
 
 ## Rules
 
-### 1. Plan Is the Only Contract
+### 1. Always Use Git Worktrees for Feature Work
+
+Every feature branch MUST be created in a git worktree under `.worktrees/`. Never work
+directly on the `main` branch. This ensures parallel sessions don't collide.
+
+```bash
+git worktree add .worktrees/<feature-name> -b feature/<feature-name>
+cd .worktrees/<feature-name>
+```
+
+The `.worktrees/` directory is gitignored. Each session gets its own isolated copy of the repo
+with its own branch. Run all builds and tests from within the worktree directory.
+
+### 2. Plan Is the Only Contract
 
 The C# DSL builds descriptors → `plan.Render()` serializes to JSON → JS runtime executes.
 No shortcuts. No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
 No inline `<script>` blocks in views — `auto-boot.ts` handles discovery and boot automatically.
 
-### 2. Every New Primitive Needs All Three Layers
+### 3. Every New Primitive Needs All Three Layers
 
 Adding a new command, trigger, or action requires:
 1. **C# descriptor** — new `Command` subclass with `[JsonDerivedType]`
@@ -326,30 +339,30 @@ Adding a new command, trigger, or action requires:
 8. **Playwright test** — browser behavior verification
 9. **Sandbox view usage** — demonstrate in Events page (or new page)
 
-### 3. Two-Phase Boot Is Inviolable
+### 4. Two-Phase Boot Is Inviolable
 
 Custom-event listeners wire before dom-ready reactions execute. This ensures event chains
 (`dom-ready → dispatch → custom-event → dispatch → ...`) work regardless of entry order in
 the plan. Tests verify this at all three layers.
 
-### 4. Trace Output Is Deterministic
+### 5. Trace Output Is Deterministic
 
 `trace.ts` serializes to a single `JSON.stringify` string per message: `[alis:scope] msg {"key":"val"}`.
 This makes trace output testable in Playwright via string matching. No separate `console.log`
 arguments (browser-dependent formatting).
 
-### 5. Verified Files Are Co-Located
+### 6. Verified Files Are Co-Located
 
 `.verified.txt` snapshot files live in the same folder as their test class. Tests must call
 `VerifyJson()` directly (not through a base method) so `[CallerFilePath]` resolves correctly.
 
-### 6. Vertical Slices
+### 7. Vertical Slices
 
 Each runtime module (`element.ts`, `trigger.ts`, `execute.ts`) is a self-contained unit.
 Each C# builder (`ElementBuilder`, `PipelineBuilder`, `TriggerBuilder`) is a self-contained unit.
 No shared base classes for behavior. Duplication between slices is intentional.
 
-### 7. Component Architecture (3 Foundational Modules — Never Violate)
+### 8. Component Architecture (3 Foundational Modules — Never Violate)
 
 Every component interaction flows through three TS runtime modules. No module reinvents
 vendor-specific behavior. No module writes `ej2_instances` inline. Adding a new component
@@ -477,7 +490,7 @@ The runtime resolves root, walks paths, and executes via bracket notation. That'
 to exercise ALL interaction types end-to-end. Playwright tests verify every module path.
 If any module breaks vendor-agnostic architecture, these tests catch it immediately.
 
-### 8. Fixing Bugs — Root Cause, Not Patch
+### 9. Fixing Bugs — Root Cause, Not Patch
 
 When a behavior is wrong:
 1. **STOP.** Do not apply the first fix that comes to mind.
@@ -496,7 +509,7 @@ When a behavior is wrong:
 "unenriched fields block with summary" and you see phantom errors, the problem is
 upstream (wrong validator scope, wrong condition semantics) — not the blocking behavior.
 
-### 9. No Fallbacks — Fail Fast
+### 10. No Fallbacks — Fail Fast
 
 Never use fallback defaults for missing data. If a component is not registered in the plan,
 if a vendor string is unknown, if a readExpr is missing — **throw immediately** with a clear
@@ -504,7 +517,7 @@ error message telling the developer what they forgot to register. Fallbacks hide
 In UI code, a silent fallback means the wrong component gets read, the wrong vendor gets
 resolved, or the wrong field gets validated — all silently. Throw, don't guess.
 
-### 10. ESM Only + Cache Busting
+### 11. ESM Only + Cache Busting
 
 The runtime is bundled as ESM (`--format=esm`). The layout loads it via
 `<script type="module" src="~/js/alis-reactive.js" asp-append-version="true">`.
