@@ -378,7 +378,7 @@ export async function dispatchReview(storyId, onProgress) {
 
     // Check for existing reviews this round
     const existing = getReviews(storyId, round);
-    const existingRoles = new Set(existing.map(r => r.agent_role));
+    const existingRoles = new Set(existing.map(r => r.agent_template_id));
 
     // Dispatch all agents in parallel
     const promises = ALL_ROLES
@@ -399,11 +399,13 @@ export async function dispatchReview(storyId, onProgress) {
           // Save to DB
           createReview({
             storyId,
-            agentRole: role,
+            agentTemplateId: role,
             round,
             verdict: review.verdict,
             confidence: review.confidence || 'medium',
             reviewJson: { roleName: roleConfig.roleName, ...review },
+            promptSnapshot: roleConfig.prompt,
+            rubricSnapshot: JSON.stringify([]),
           });
 
           completed.push(role);

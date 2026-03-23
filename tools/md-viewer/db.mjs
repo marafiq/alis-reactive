@@ -3,6 +3,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { randomUUID } from 'crypto';
+import { ROLE_PROMPTS } from './agents.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -60,41 +61,31 @@ CREATE TABLE IF NOT EXISTS dependencies (
     CHECK (story_id != blocked_by_id)
 );
 
+-- Agent templates (global registry)
+CREATE TABLE IF NOT EXISTS agent_templates (
+    id            TEXT PRIMARY KEY,
+    display_name  TEXT NOT NULL,
+    system_prompt TEXT NOT NULL,
+    rubric        TEXT NOT NULL DEFAULT '[]',
+    default_round_cap INTEGER NOT NULL DEFAULT 2 CHECK (default_round_cap BETWEEN 1 AND 3),
+    is_active     INTEGER NOT NULL DEFAULT 1,
+    created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Agent reviews
 CREATE TABLE IF NOT EXISTS reviews (
-    id TEXT PRIMARY KEY,
-    story_id TEXT NOT NULL REFERENCES stories(id) ON DELETE CASCADE,
-    agent_role TEXT NOT NULL
-        CHECK (agent_role IN ('architect', 'csharp', 'bdd', 'pm', 'ui', 'human-proxy')),
-    round INTEGER NOT NULL DEFAULT 1 CHECK (round BETWEEN 1 AND 3),
-    verdict TEXT NOT NULL CHECK (verdict IN ('approve', 'object', 'approve-with-notes')),
-    confidence TEXT NOT NULL CHECK (confidence IN ('high', 'medium', 'low')),
-    review_json TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    UNIQUE (story_id, agent_role, round)
-);
-
--- Round 3 secret ballot
-CREATE TABLE IF NOT EXISTS votes (
-    id TEXT PRIMARY KEY,
-    story_id TEXT NOT NULL REFERENCES stories(id) ON DELETE CASCADE,
-    agent_role TEXT NOT NULL,
-    vote TEXT NOT NULL CHECK (vote IN ('approve', 'reject')),
-    rationale TEXT NOT NULL,
-    conditions TEXT NOT NULL DEFAULT '[]',
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    UNIQUE (story_id, agent_role)
-);
-
--- Conflict summaries
-CREATE TABLE IF NOT EXISTS conflict_summaries (
-    id TEXT PRIMARY KEY,
-    story_id TEXT NOT NULL UNIQUE REFERENCES stories(id) ON DELETE CASCADE,
-    total_rounds INTEGER NOT NULL,
-    blocking_issues TEXT NOT NULL DEFAULT '[]',
-    recommended_action TEXT NOT NULL
-        CHECK (recommended_action IN ('approve-as-is', 'approve-with-conditions',
-               'revise-and-resubmit', 'human-decides'))
+    id                TEXT PRIMARY KEY,
+    story_id          TEXT NOT NULL REFERENCES stories(id) ON DELETE CASCADE,
+    agent_template_id TEXT NOT NULL REFERENCES agent_templates(id),
+    round             INTEGER NOT NULL DEFAULT 1,
+    verdict           TEXT NOT NULL CHECK (verdict IN ('approve','object','approve-with-notes')),
+    confidence        TEXT NOT NULL CHECK (confidence IN ('high','medium','low')),
+    review_json       TEXT NOT NULL,
+    prompt_snapshot   TEXT NOT NULL,
+    rubric_snapshot   TEXT NOT NULL,
+    created_at        TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (story_id, agent_template_id, round)
 );
 
 -- Human verdicts
@@ -160,6 +151,42 @@ CREATE TABLE IF NOT EXISTS agent_work_log (
     session_id TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Plan-level agent assignments
+CREATE TABLE IF NOT EXISTS plan_agents (
+    plan_id           TEXT NOT NULL REFERENCES plans(id) ON DELETE CASCADE,
+    agent_template_id TEXT NOT NULL REFERENCES agent_templates(id),
+    prompt_override   TEXT,
+    rubric_override   TEXT,
+    sort_order        INTEGER NOT NULL DEFAULT 0,
+    is_active         INTEGER NOT NULL DEFAULT 1,
+    assigned_at       TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (plan_id, agent_template_id)
+);
+
+-- Evidence quality scores per review
+CREATE TABLE IF NOT EXISTS evidence_scores (
+    id                TEXT PRIMARY KEY,
+    review_id         TEXT NOT NULL UNIQUE REFERENCES reviews(id) ON DELETE CASCADE,
+    score             INTEGER NOT NULL CHECK (score BETWEEN 0 AND 100),
+    category_points   INTEGER NOT NULL CHECK (category_points BETWEEN 0 AND 50),
+    invest_points     INTEGER NOT NULL CHECK (invest_points BETWEEN 0 AND 30),
+    structural_points INTEGER NOT NULL CHECK (structural_points BETWEEN 0 AND 20),
+    flags             TEXT NOT NULL DEFAULT '[]',
+    breakdown_json    TEXT NOT NULL,
+    created_at        TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Per-criterion agent INVEST assessments
+CREATE TABLE IF NOT EXISTS invest_assessments (
+    id               TEXT PRIMARY KEY,
+    review_id        TEXT NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+    criterion        TEXT NOT NULL CHECK (criterion IN ('I','N','V','E','S','T')),
+    pass             INTEGER NOT NULL CHECK (pass IN (0, 1)),
+    reasoning        TEXT NOT NULL,
+    evidence_quality TEXT NOT NULL DEFAULT 'weak' CHECK (evidence_quality IN ('strong','adequate','weak')),
+    UNIQUE (review_id, criterion)
+);
 `;
 
 const INDEXES = `
@@ -168,13 +195,80 @@ CREATE INDEX IF NOT EXISTS idx_stories_status ON stories(status);
 CREATE INDEX IF NOT EXISTS idx_deps_story ON dependencies(story_id);
 CREATE INDEX IF NOT EXISTS idx_deps_blocked_by ON dependencies(blocked_by_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_story ON reviews(story_id, round);
-CREATE INDEX IF NOT EXISTS idx_votes_story ON votes(story_id);
 CREATE INDEX IF NOT EXISTS idx_comments_plan ON comments(plan_id);
 CREATE INDEX IF NOT EXISTS idx_comments_story ON comments(story_id);
 CREATE INDEX IF NOT EXISTS idx_comments_review ON comments(review_id);
 CREATE INDEX IF NOT EXISTS idx_concept_links_concept ON concept_links(concept_id);
 CREATE INDEX IF NOT EXISTS idx_agent_log_story ON agent_work_log(story_id);
+CREATE INDEX IF NOT EXISTS idx_plan_agents_plan ON plan_agents(plan_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_agent_templates_active ON agent_templates(is_active) WHERE is_active = 1;
+CREATE INDEX IF NOT EXISTS idx_evidence_scores_review ON evidence_scores(review_id);
+CREATE INDEX IF NOT EXISTS idx_invest_assessments_review ON invest_assessments(review_id);
+CREATE INDEX IF NOT EXISTS idx_invest_assessments_criterion ON invest_assessments(criterion);
+CREATE INDEX IF NOT EXISTS idx_reviews_agent ON reviews(agent_template_id);
 `;
+
+// ═══════════════════════════════════════════════════════════════════
+// MIGRATION
+// ═══════════════════════════════════════════════════════════════════
+function migrateReviews(db) {
+  // Check if reviews table still has old agent_role column
+  const columns = db.prepare("PRAGMA table_info(reviews)").all();
+  const hasAgentRole = columns.some(c => c.name === 'agent_role');
+  if (!hasAgentRole) return; // already migrated
+
+  db.exec("PRAGMA foreign_keys = OFF");
+  try {
+    db.exec("ALTER TABLE reviews RENAME TO reviews_old");
+
+    db.exec(`CREATE TABLE reviews (
+      id                TEXT PRIMARY KEY,
+      story_id          TEXT NOT NULL REFERENCES stories(id) ON DELETE CASCADE,
+      agent_template_id TEXT NOT NULL REFERENCES agent_templates(id),
+      round             INTEGER NOT NULL DEFAULT 1,
+      verdict           TEXT NOT NULL CHECK (verdict IN ('approve','object','approve-with-notes')),
+      confidence        TEXT NOT NULL CHECK (confidence IN ('high','medium','low')),
+      review_json       TEXT NOT NULL,
+      prompt_snapshot   TEXT NOT NULL,
+      rubric_snapshot   TEXT NOT NULL,
+      created_at        TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE (story_id, agent_template_id, round)
+    )`);
+
+    db.exec(`INSERT INTO reviews (id, story_id, agent_template_id, round, verdict, confidence, review_json, prompt_snapshot, rubric_snapshot, created_at)
+      SELECT r.id, r.story_id, r.agent_role, r.round, r.verdict, r.confidence, r.review_json,
+        COALESCE(at.system_prompt, '(legacy — no snapshot)'),
+        COALESCE(at.rubric, '[]'),
+        r.created_at
+      FROM reviews_old r
+      LEFT JOIN agent_templates at ON at.id = r.agent_role`);
+
+    db.exec("DROP TABLE reviews_old");
+    db.exec("DROP TABLE IF EXISTS votes");
+    db.exec("DROP TABLE IF EXISTS conflict_summaries");
+  } finally {
+    db.exec("PRAGMA foreign_keys = ON");
+  }
+}
+
+function seedAgentTemplates(db) {
+  const count = db.prepare('SELECT COUNT(*) AS cnt FROM agent_templates').get().cnt;
+  if (count > 0) return;
+
+  const insert = db.prepare(`INSERT INTO agent_templates (id, display_name, system_prompt, rubric)
+    VALUES (?, ?, ?, ?)`);
+
+  const DEFAULT_RUBRIC = [
+    { id: 'file_citations', label: 'Cites specific file paths', weight: 25, scoring: 'binary', description: 'Review references actual files in the codebase' },
+    { id: 'ac_references', label: 'References acceptance criteria', weight: 25, scoring: 'binary', description: 'Review maps findings to specific AC numbers from the story' },
+    { id: 'reasoning_depth', label: 'Substantive reasoning', weight: 30, scoring: 'scaled', scale_max: 3, description: '1=surface, 2=specific concern, 3=traces full code path' },
+    { id: 'actionability', label: 'Actionable feedback', weight: 20, scoring: 'binary', description: 'Each objection includes what to change and where' },
+  ];
+
+  for (const [id, config] of Object.entries(ROLE_PROMPTS)) {
+    insert.run(id, config.roleName, config.prompt, JSON.stringify(DEFAULT_RUBRIC));
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // INIT + SEED
@@ -187,6 +281,10 @@ export function initDatabase(dbPath) {
   // Create tables
   db.exec(SCHEMA);
   db.exec(INDEXES);
+
+  // Migrate reviews table (agent_role → agent_template_id)
+  seedAgentTemplates(db);
+  migrateReviews(db);
 
   // Seed if empty
   const count = db.prepare('SELECT COUNT(*) AS cnt FROM plans').get().cnt;
@@ -274,8 +372,15 @@ function seedData(db) {
       s.deps.forEach(d => insertDep.run(uuid(), s.id, d));
     });
 
+    // ── Plan Agents — assign all active templates to the plan ──
+    const activeTemplates = db.prepare('SELECT id FROM agent_templates WHERE is_active = 1').all();
+    const insertPlanAgent = db.prepare('INSERT INTO plan_agents (plan_id, agent_template_id, sort_order) VALUES (?, ?, ?)');
+    activeTemplates.forEach((t, i) => {
+      insertPlanAgent.run('validation-module-1.0', t.id, i);
+    });
+
     // ── Reviews for V-002 ──
-    const insertReview = db.prepare(`INSERT INTO reviews (id, story_id, agent_role, round, verdict, confidence, review_json) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+    const insertReview = db.prepare(`INSERT INTO reviews (id, story_id, agent_template_id, round, verdict, confidence, review_json, prompt_snapshot, rubric_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 
     const reviewsData = [
       { role: 'architect', roleName: 'Architect', verdict: 'approve', confidence: 'high',
@@ -309,8 +414,10 @@ function seedData(db) {
     ];
 
     reviewsData.forEach(r => {
+      const templatePrompt = ROLE_PROMPTS[r.role]?.prompt || '';
       insertReview.run(uuid(), 'V-002', r.role, 1, r.verdict, r.confidence,
-        JSON.stringify({ roleName: r.roleName, executive: r.executive, findings: r.findings, artifacts: r.artifacts }));
+        JSON.stringify({ roleName: r.roleName, executive: r.executive, findings: r.findings, artifacts: r.artifacts }),
+        templatePrompt, JSON.stringify([]));
     });
 
     // ── Concepts ──
@@ -472,17 +579,19 @@ export function removeDependency(id) {
 
 // Reviews
 export function getReviews(storyId, round) {
-  let sql = 'SELECT * FROM reviews WHERE story_id = ?';
+  let sql = `SELECT r.*, at.display_name AS agent_display_name
+    FROM reviews r JOIN agent_templates at ON at.id = r.agent_template_id
+    WHERE r.story_id = ?`;
   const params = [storyId];
-  if (round != null) { sql += ' AND round = ?'; params.push(round); }
-  sql += ' ORDER BY agent_role';
+  if (round != null) { sql += ' AND r.round = ?'; params.push(round); }
+  sql += ' ORDER BY r.agent_template_id';
   return getDb().prepare(sql).all(params);
 }
 
-export function createReview({ storyId, agentRole, round, verdict, confidence, reviewJson }) {
+export function createReview({ storyId, agentTemplateId, round, verdict, confidence, reviewJson, promptSnapshot, rubricSnapshot }) {
   const id = uuid();
-  getDb().prepare(`INSERT INTO reviews (id, story_id, agent_role, round, verdict, confidence, review_json)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`).run(id, storyId, agentRole, round || 1, verdict, confidence, JSON.stringify(reviewJson));
+  getDb().prepare(`INSERT INTO reviews (id, story_id, agent_template_id, round, verdict, confidence, review_json, prompt_snapshot, rubric_snapshot)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(id, storyId, agentTemplateId, round || 1, verdict, confidence, JSON.stringify(reviewJson), promptSnapshot, rubricSnapshot);
   return id;
 }
 
@@ -606,4 +715,124 @@ export function createAgentLogEntry({ storyId, action, summary, filesTouched, se
   getDb().prepare('INSERT INTO agent_work_log (id, story_id, action, summary, files_touched, session_id) VALUES (?, ?, ?, ?, ?, ?)').run(
     id, storyId, action, summary || '', JSON.stringify(filesTouched || []), sessionId || null);
   return id;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AGENT TEMPLATES
+// ═══════════════════════════════════════════════════════════════════
+export function getAllAgentTemplates(activeOnly = true) {
+  if (activeOnly) {
+    return getDb().prepare('SELECT * FROM agent_templates WHERE is_active = 1 ORDER BY display_name').all();
+  }
+  return getDb().prepare('SELECT * FROM agent_templates ORDER BY display_name').all();
+}
+
+export function getAgentTemplate(id) {
+  return getDb().prepare('SELECT * FROM agent_templates WHERE id = ?').get(id);
+}
+
+export function createAgentTemplate({ id, displayName, systemPrompt, rubric }) {
+  getDb().prepare(`INSERT INTO agent_templates (id, display_name, system_prompt, rubric)
+    VALUES (?, ?, ?, ?)`).run(id, displayName, systemPrompt, JSON.stringify(rubric || []));
+  return getAgentTemplate(id);
+}
+
+const AGENT_TEMPLATE_COLUMN_WHITELIST = new Set(['display_name', 'system_prompt', 'rubric', 'default_round_cap', 'is_active']);
+const AGENT_TEMPLATE_FIELD_MAP = { displayName: 'display_name', systemPrompt: 'system_prompt', defaultRoundCap: 'default_round_cap', isActive: 'is_active' };
+
+export function updateAgentTemplate(id, fields) {
+  const sets = [];
+  const vals = [];
+  for (const [k, v] of Object.entries(fields)) {
+    const col = AGENT_TEMPLATE_FIELD_MAP[k] || k;
+    if (!AGENT_TEMPLATE_COLUMN_WHITELIST.has(col)) continue;
+    const val = col === 'rubric' ? JSON.stringify(v) : v;
+    sets.push(`${col} = ?`);
+    vals.push(val);
+  }
+  if (sets.length === 0) return getAgentTemplate(id);
+  sets.push("updated_at = datetime('now')");
+  vals.push(id);
+  getDb().prepare(`UPDATE agent_templates SET ${sets.join(', ')} WHERE id = ?`).run(...vals);
+  return getAgentTemplate(id);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PLAN AGENTS
+// ═══════════════════════════════════════════════════════════════════
+export function getPlanAgents(planId) {
+  return getDb().prepare(`SELECT pa.*, at.display_name, at.system_prompt, at.rubric
+    FROM plan_agents pa JOIN agent_templates at ON at.id = pa.agent_template_id
+    WHERE pa.plan_id = ? ORDER BY pa.sort_order`).all(planId);
+}
+
+export function assignAgentToPlan(planId, agentTemplateId, sortOrder) {
+  getDb().prepare(`INSERT INTO plan_agents (plan_id, agent_template_id, sort_order)
+    VALUES (?, ?, ?)`).run(planId, agentTemplateId, sortOrder || 0);
+  return { planId, agentTemplateId };
+}
+
+const PLAN_AGENT_COLUMN_WHITELIST = new Set(['prompt_override', 'rubric_override', 'sort_order', 'is_active']);
+const PLAN_AGENT_FIELD_MAP = { promptOverride: 'prompt_override', rubricOverride: 'rubric_override', sortOrder: 'sort_order', isActive: 'is_active' };
+
+export function updatePlanAgent(planId, agentTemplateId, fields) {
+  const sets = [];
+  const vals = [];
+  for (const [k, v] of Object.entries(fields)) {
+    const col = PLAN_AGENT_FIELD_MAP[k] || k;
+    if (!PLAN_AGENT_COLUMN_WHITELIST.has(col)) continue;
+    sets.push(`${col} = ?`);
+    vals.push(v);
+  }
+  if (sets.length === 0) return;
+  vals.push(planId, agentTemplateId);
+  getDb().prepare(`UPDATE plan_agents SET ${sets.join(', ')} WHERE plan_id = ? AND agent_template_id = ?`).run(...vals);
+}
+
+export function removeAgentFromPlan(planId, agentTemplateId) {
+  getDb().prepare('DELETE FROM plan_agents WHERE plan_id = ? AND agent_template_id = ?').run(planId, agentTemplateId);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EVIDENCE SCORES
+// ═══════════════════════════════════════════════════════════════════
+export function getEvidenceScore(reviewId) {
+  return getDb().prepare('SELECT * FROM evidence_scores WHERE review_id = ?').get(reviewId);
+}
+
+export function createEvidenceScore({ reviewId, score, categoryPoints, investPoints, structuralPoints, flags, breakdownJson }) {
+  const id = uuid();
+  getDb().prepare(`INSERT INTO evidence_scores (id, review_id, score, category_points, invest_points, structural_points, flags, breakdown_json)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(id, reviewId, score, categoryPoints, investPoints, structuralPoints, JSON.stringify(flags || []), JSON.stringify(breakdownJson));
+  return id;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INVEST ASSESSMENTS
+// ═══════════════════════════════════════════════════════════════════
+export function getInvestAssessments(storyId) {
+  return getDb().prepare(`SELECT ia.*, r.agent_template_id, r.round
+    FROM invest_assessments ia JOIN reviews r ON r.id = ia.review_id
+    WHERE r.story_id = ? ORDER BY ia.criterion, r.agent_template_id`).all(storyId);
+}
+
+export function createInvestAssessment({ reviewId, criterion, pass, reasoning, evidenceQuality }) {
+  const id = uuid();
+  getDb().prepare(`INSERT INTO invest_assessments (id, review_id, criterion, pass, reasoning, evidence_quality)
+    VALUES (?, ?, ?, ?, ?, ?)`).run(id, reviewId, criterion, pass ? 1 : 0, reasoning, evidenceQuality || 'weak');
+  return id;
+}
+
+export function getInvestSummary(storyId) {
+  return getDb().prepare(`SELECT
+      ia.criterion,
+      SUM(ia.pass) AS pass_count,
+      COUNT(*) AS total_agents,
+      CASE WHEN SUM(ia.pass) = COUNT(*) THEN 'pass'
+           WHEN SUM(ia.pass) = 0 THEN 'fail'
+           ELSE 'mixed' END AS verdict
+    FROM invest_assessments ia JOIN reviews r ON r.id = ia.review_id
+    WHERE r.story_id = ?
+    GROUP BY ia.criterion
+    ORDER BY CASE ia.criterion WHEN 'I' THEN 1 WHEN 'N' THEN 2 WHEN 'V' THEN 3 WHEN 'E' THEN 4 WHEN 'S' THEN 5 WHEN 'T' THEN 6 END`).all(storyId);
 }
