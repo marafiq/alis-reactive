@@ -7,9 +7,9 @@ import { scope } from "../core/trace";
 const log = scope("signalr");
 
 interface ManagedConnection {
-  connection: signalR.HubConnection;
+  readonly connection: signalR.HubConnection;
   startPromise: Promise<void>;
-  targetIds: Set<string>;
+  readonly targetIds: Set<string>;
   stopping: boolean;
 }
 
