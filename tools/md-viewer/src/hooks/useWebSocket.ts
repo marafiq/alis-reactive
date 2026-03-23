@@ -17,7 +17,8 @@ export function useWebSocket() {
   const qc = useQueryClient();
   const wsRef = useRef<WebSocket | null>(null);
   const retriesRef = useRef(0);
-  const [agentProgress, setAgentProgress] = useState<Record<string, { status: string; verdict?: string }>>({});
+  const [agentProgress, setAgentProgress] = useState<Record<string, { status: string; verdict?: string; round?: number }>>({});
+  const [currentRound, setCurrentRound] = useState<number | null>(null);
 
   const connect = useCallback(() => {
     const ws = new WebSocket(`ws://${location.host}`);
@@ -31,21 +32,29 @@ export function useWebSocket() {
       catch { console.error('Malformed WS message:', e.data); return; }
 
       if (msg.type === 'review-progress' && msg.role) {
+        const round = typeof msg.round === 'number' ? msg.round : undefined;
+        if (round !== undefined) setCurrentRound(round);
         setAgentProgress(prev => ({
           ...prev,
-          [msg.role!]: { status: msg.status || 'unknown', verdict: msg.verdict as string },
+          [msg.role!]: { status: msg.status || 'unknown', verdict: msg.verdict as string, round },
         }));
+      }
+
+      if (msg.type === 'round2-starting') {
+        setCurrentRound(2);
       }
 
       if (msg.type === 'review-complete' && msg.storyId) {
         qc.invalidateQueries({ queryKey: ['reviews', msg.storyId] });
         qc.invalidateQueries({ queryKey: ['stories'] });
         setAgentProgress({});
+        setCurrentRound(null);
       }
 
       if (msg.type === 'review-error' && msg.storyId) {
         console.error(`Review failed for ${msg.storyId}:`, msg.error);
         setAgentProgress({});
+        setCurrentRound(null);
       }
     };
 
@@ -59,7 +68,7 @@ export function useWebSocket() {
 
   useEffect(() => { connect(); return () => wsRef.current?.close(); }, [connect]);
 
-  const resetProgress = useCallback(() => setAgentProgress({}), []);
+  const resetProgress = useCallback(() => { setAgentProgress({}); setCurrentRound(null); }, []);
 
-  return { agentProgress, resetProgress };
+  return { agentProgress, currentRound, resetProgress };
 }

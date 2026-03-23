@@ -6,12 +6,14 @@ import { router } from '@/router';
 // ── WebSocket Context ──
 
 interface WSContext {
-  agentProgress: Record<string, { status: string; verdict?: string }>;
+  agentProgress: Record<string, { status: string; verdict?: string; round?: number }>;
+  currentRound: number | null;
   resetProgress: () => void;
 }
 
 const WebSocketContext = createContext<WSContext>({
   agentProgress: {},
+  currentRound: null,
   resetProgress: () => {},
 });
 
