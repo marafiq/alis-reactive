@@ -17,6 +17,9 @@ import {
   findFileOverlaps, syncFileOverlapConcepts,
   getDecisionLog, createDecisionEntry,
   getAgentWorkLog, createAgentLogEntry,
+  getAllAgentTemplates, getAgentTemplate, createAgentTemplate, updateAgentTemplate,
+  getPlanAgents, assignAgentToPlan, updatePlanAgent, removeAgentFromPlan,
+  getInvestSummary, getEvidenceScore,
 } from './db.mjs';
 import { dispatchReview, ALL_ROLES, ROLE_PROMPTS } from './agents.mjs';
 import { validateINVEST, validateTransition } from './invest.mjs';
@@ -333,6 +336,86 @@ app.get('/api/agent-log', (req, res) => {
 app.post('/api/agent-log', (req, res) => {
   try { res.json({ id: createAgentLogEntry(req.body) }); }
   catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// AGENT TEMPLATES API
+// ═══════════════════════════════════════════════════════════════════
+app.get('/api/agent-templates', (req, res) => {
+  try {
+    const activeOnly = req.query.active !== 'false';
+    res.json(getAllAgentTemplates(activeOnly));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/agent-templates/:id', (req, res) => {
+  try {
+    const template = getAgentTemplate(req.params.id);
+    if (!template) return res.status(404).json({ error: 'not found' });
+    res.json(template);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/agent-templates', (req, res) => {
+  try {
+    const { id, displayName, systemPrompt } = req.body;
+    if (!id || typeof id !== 'string') return res.status(400).json({ error: 'id is required and must be a string' });
+    if (!displayName || typeof displayName !== 'string') return res.status(400).json({ error: 'displayName is required and must be a string' });
+    if (!systemPrompt || typeof systemPrompt !== 'string') return res.status(400).json({ error: 'systemPrompt is required and must be a string' });
+    res.json(createAgentTemplate(req.body));
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.put('/api/agent-templates/:id', (req, res) => {
+  try { res.json(updateAgentTemplate(req.params.id, req.body)); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// PLAN AGENTS API
+// ═══════════════════════════════════════════════════════════════════
+app.get('/api/plans/:id/agents', (req, res) => {
+  try {
+    const agents = getPlanAgents(req.params.id);
+    const resolved = agents.map(a => ({
+      ...a,
+      effective_prompt: a.prompt_override || a.system_prompt,
+      effective_rubric: a.rubric_override || a.template_rubric,
+    }));
+    res.json(resolved);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/plans/:id/agents', (req, res) => {
+  try {
+    res.json(assignAgentToPlan(req.params.id, req.body.agentTemplateId, req.body.sortOrder));
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.put('/api/plans/:id/agents/:agentId', (req, res) => {
+  try { res.json(updatePlanAgent(req.params.id, req.params.agentId, req.body)); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.delete('/api/plans/:id/agents/:agentId', (req, res) => {
+  try { removeAgentFromPlan(req.params.id, req.params.agentId); res.json({ ok: true }); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// INVEST SUMMARY + EVIDENCE API
+// ═══════════════════════════════════════════════════════════════════
+app.get('/api/stories/:id/invest-summary', (req, res) => {
+  try { res.json(getInvestSummary(req.params.id)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/reviews/:id/evidence', (req, res) => {
+  try {
+    const evidence = getEvidenceScore(req.params.id);
+    if (!evidence) return res.status(404).json({ error: 'not found' });
+    res.json(evidence);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ═══════════════════════════════════════════════════════════════════
