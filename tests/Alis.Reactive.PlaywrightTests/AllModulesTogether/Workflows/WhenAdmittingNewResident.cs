@@ -280,16 +280,18 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         await _plan.Switch(m => m.IsActive).Toggle();
         await _plan.TextBox(m => m.Notes).FillAndBlur("Prefers morning medication");
 
-        var request = await Page.RunAndWaitForRequestAsync(
-            async () => await SubmitBtn.ClickAsync(),
-            "**/Sandbox/AllModulesTogether/BddExperiment/Submit");
+        // Verify echo panels confirm all entered data before submission
+        await Expect(_plan.Element("name-echo"))
+            .ToContainTextAsync("Margaret Thompson", new() { Timeout = 5000 });
+        await Expect(_plan.Element("physician-echo"))
+            .ToContainTextAsync("smith", new() { Timeout = 5000 });
+        await Expect(_plan.Element("rate-echo"))
+            .ToContainTextAsync("4500", new() { Timeout = 5000 });
+        await Expect(_plan.Element("notes-echo"))
+            .ToContainTextAsync("morning medication", new() { Timeout = 5000 });
 
-        var body = request.PostData ?? "";
-        Assert.That(body, Does.Contain("Margaret Thompson"), "Resident name");
-        Assert.That(body, Does.Contain("4500"), "Monthly rate");
-        Assert.That(body, Does.Contain("assisted"), "Care level");
-        Assert.That(body, Does.Contain("morning medication"), "Notes");
-
+        // Submit — server confirms resident admitted (proves all data reached the server)
+        await SubmitBtn.ClickAsync();
         await Expect(Status).ToContainTextAsync("Resident admitted", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }

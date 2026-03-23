@@ -309,7 +309,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
     }
 
     [Test]
-    public async Task server_form_valid_client_side_sends_to_server_which_returns_400()
+    public async Task server_rejects_incomplete_data_and_shows_errors()
     {
         // Section 2 demonstrates server-side 400 validation. When client validation passes
         // (Name + Email filled), the POST goes to the server which validates the FULL model

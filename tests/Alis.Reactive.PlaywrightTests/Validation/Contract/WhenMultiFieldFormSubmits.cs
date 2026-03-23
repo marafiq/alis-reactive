@@ -227,14 +227,11 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Fill the Fusion NumericTextBox — SF component has the IdGenerator ID
-        // Use EvaluateAsync to set the value via ej2 API (vendor-correct way)
-        await Page.EvaluateAsync($@"() => {{
-            const el = document.getElementById('{R}MemoryAssessmentScore');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = 85;
-            ej2.dataBind();
-        }}");
+        // Fill the Fusion NumericTextBox with a valid assessment score
+        var scoreInput = Page.Locator($"#{R}MemoryAssessmentScore");
+        await scoreInput.ClickAsync();
+        await scoreInput.FillAsync("85");
+        await scoreInput.PressAsync("Tab");
 
         // Submit → all pass → success
         await SubmitBtn.ClickAsync();
@@ -565,12 +562,10 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         // Care details — Memory Care requires physician + assessment
         await Input("PhysicianName").FillAsync("Dr. Martinez");
-        await Page.EvaluateAsync($@"() => {{
-            const el = document.getElementById('{R}MemoryAssessmentScore');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = 72;
-            ej2.dataBind();
-        }}");
+        var assessmentInput = Page.Locator($"#{R}MemoryAssessmentScore");
+        await assessmentInput.ClickAsync();
+        await assessmentInput.FillAsync("72");
+        await assessmentInput.PressAsync("Tab");
 
         // Emergency contact
         await Input("HasEmergencyContact").CheckAsync();

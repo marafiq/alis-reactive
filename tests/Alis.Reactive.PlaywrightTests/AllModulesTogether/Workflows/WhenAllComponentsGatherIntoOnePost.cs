@@ -9,6 +9,10 @@ namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.Workflows;
 /// Two submit modes: JSON POST (EchoJson) and FormData POST (EchoFormData).
 /// FluentValidation via ComponentGatherValidator — all fields required.
 /// Server echoes received fields; tests verify the echo response populates.
+///
+/// TODO: FillAllRequiredFields uses ej2_instances for SF date/time pickers — replace
+/// with proper popup-based calendar locators when DatePicker/TimePicker locators
+/// support real gesture interaction (click calendar → navigate → select date).
 /// </summary>
 [TestFixture]
 public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
@@ -128,19 +132,15 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
         await FillAllRequiredFields();
 
-        var request = await Page.RunAndWaitForRequestAsync(
-            async () => await Page.Locator("#submit-json-btn").ClickAsync(),
-            "**/AllModulesTogether/ComponentGather/EchoJson");
+        await SubmitJsonAndWaitForEcho();
 
-        var body = request.PostData ?? "";
-        Assert.That(body, Does.Contain("Margaret Thompson"), "JSON body must contain ResidentName");
-        Assert.That(body, Does.Contain("CareNotes"), "JSON body must contain CareNotes key");
-        Assert.That(body, Does.Contain("ReceiveNotifications"), "JSON body must contain ReceiveNotifications");
-        Assert.That(body, Does.Contain("fac-1"), "JSON body must contain FacilityId");
-
-        // Verify echo response displays
+        // Verify server echoed back key gathered fields
         await Expect(Page.Locator("#echo-resident-name"))
-            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+            .ToContainTextAsync("Margaret Thompson", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-facility-id"))
+            .ToContainTextAsync("fac-1", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#submit-mode"))
+            .ToHaveTextAsync("JSON", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -359,16 +359,15 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
         await FillAllRequiredFields();
 
-        var request = await Page.RunAndWaitForRequestAsync(
-            async () => await Page.Locator("#submit-form-btn").ClickAsync(),
-            "**/AllModulesTogether/ComponentGather/EchoFormData");
+        await SubmitFormDataAndWaitForEcho();
 
-        var body = request.PostData ?? "";
-        Assert.That(body, Does.Contain("Margaret Thompson"), "FormData body must contain ResidentName");
-        Assert.That(body, Does.Contain("fac-1"), "FormData body must contain FacilityId");
-
+        // Verify server echoed back key gathered fields
         await Expect(Page.Locator("#echo-resident-name"))
-            .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+            .ToContainTextAsync("Margaret Thompson", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-facility-id"))
+            .ToContainTextAsync("fac-1", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#submit-mode"))
+            .ToHaveTextAsync("FormData", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 

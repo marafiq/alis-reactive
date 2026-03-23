@@ -39,7 +39,7 @@ public class WhenErrorsClearOnCorrection : PlaywrightTestBase
     }
 
     [Test]
-    public async Task error_reappears_when_user_clears_field_after_live_clear()
+    public async Task error_reappears_when_user_empties_previously_corrected_field()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
