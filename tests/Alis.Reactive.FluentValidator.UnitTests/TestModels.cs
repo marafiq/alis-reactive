@@ -1,5 +1,7 @@
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
+public enum CareLevel { Independent, Assisted, MemoryCare, Skilled }
+
 public class TestAddress
 {
     public string? Street { get; set; }
@@ -32,6 +34,16 @@ public class TestModel
     public bool IsEmployed { get; set; }
     public string? JobTitle { get; set; }
     public string? ConfirmEmail { get; set; }
+    public CareLevel CareLevel { get; set; }
+    public TimeOnly ShiftStart { get; set; }
+    public TimeOnly ShiftEnd { get; set; }
+}
+
+public class NestedCrossPropertyModel
+{
+    public string? Name { get; set; }
+    public TestAddress? HomeAddress { get; set; }
+    public TestAddress? WorkAddress { get; set; }
 }
 
 public class FullCoverageModel
