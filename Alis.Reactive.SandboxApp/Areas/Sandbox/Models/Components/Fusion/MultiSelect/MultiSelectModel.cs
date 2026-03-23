@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.MultiSelect
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class MultiSelectModel
     {

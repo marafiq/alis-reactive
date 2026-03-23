@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.HttpPipeline.RealTime;
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 public class RealTimeModel { }
 

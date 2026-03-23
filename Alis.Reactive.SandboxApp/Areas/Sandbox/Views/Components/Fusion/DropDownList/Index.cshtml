@@ -22,7 +22,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
-        p.Post("/Sandbox/DropDownList/Echo", g =>
+        p.Post("/Sandbox/Components/DropDownList/Echo", g =>
             g.Include<FusionDropDownList, DropDownListModel>(m => m.Category))
          .Response(r => r
             .OnSuccess(s =>

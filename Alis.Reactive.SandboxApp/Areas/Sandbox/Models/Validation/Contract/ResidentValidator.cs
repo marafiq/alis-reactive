@@ -1,7 +1,7 @@
 using Alis.Reactive.FluentValidator;
 using FluentValidation;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.Contract
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ResidentValidator : ReactiveValidator<ResidentModel>
     {

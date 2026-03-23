@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CoreBehaviors.Payload
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class PayloadShowcaseModel
     {

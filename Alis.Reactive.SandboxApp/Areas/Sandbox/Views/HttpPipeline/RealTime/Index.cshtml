@@ -102,7 +102,7 @@
                     .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post("/Sandbox/RealTime/PushNotification")
+                        p.Post("/Sandbox/HttpPipeline/RealTime/PushNotification")
                          .Gather(g => g
                              .Static("count", 99)
                              .Static("message", "Manual push at " + DateTime.Now.ToString("HH:mm:ss"))
@@ -144,7 +144,7 @@
                     .CssClass("px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post("/Sandbox/RealTime/PushResidentStatus")
+                        p.Post("/Sandbox/HttpPipeline/RealTime/PushResidentStatus")
                          .Gather(g => g
                              .Static("residentName", "Helen Martinez (Manual)")
                              .Static("status", "Under Review")
@@ -170,7 +170,7 @@
                     .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Get("/Sandbox/RealTime/ResidentPanel")
+                        p.Get("/Sandbox/HttpPipeline/RealTime/ResidentPanel")
                          .Response(r => r.OnSuccess(s => s.Into("panel-container")));
                     }))
             </native-hstack>

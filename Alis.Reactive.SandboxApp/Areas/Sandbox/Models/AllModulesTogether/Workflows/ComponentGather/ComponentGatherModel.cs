@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.Workflows.ComponentGather
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ComponentGatherModel
     {

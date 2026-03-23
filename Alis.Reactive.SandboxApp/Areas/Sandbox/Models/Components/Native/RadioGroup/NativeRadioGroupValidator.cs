@@ -1,7 +1,7 @@
 using Alis.Reactive.FluentValidator;
 using FluentValidation;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.RadioGroup
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
     /// Full validator — all fields across all sections.

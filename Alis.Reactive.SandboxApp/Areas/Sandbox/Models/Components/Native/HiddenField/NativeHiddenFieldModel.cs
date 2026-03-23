@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.HiddenField
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class NativeHiddenFieldModel
     {

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.MultiSelect;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {

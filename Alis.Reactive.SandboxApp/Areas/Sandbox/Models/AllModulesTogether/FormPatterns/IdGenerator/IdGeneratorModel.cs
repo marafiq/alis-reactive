@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.FormPatterns.IdGenerator
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class IdGeneratorModel
     {

@@ -31,7 +31,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/DateValidation/ValidateClient")
+                p.Post("/Sandbox/Validation/DateRules/ValidateClient")
                  .Validate<DateValidationValidator>("date-form")
                  .Response(r => r.OnSuccess(s =>
                  {

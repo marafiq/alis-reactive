@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.ReactiveWiring
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
     /// View model for the PlaygroundSyntax page.

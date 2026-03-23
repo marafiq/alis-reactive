@@ -46,7 +46,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Todo/Save", g => g.IncludeAll())
+                p.Post("/Sandbox/AllModulesTogether/Todo/Save", g => g.IncludeAll())
                  .Validate<TodoValidator>("todo-form")
                  .Response(r => r
                     .OnSuccess(s =>

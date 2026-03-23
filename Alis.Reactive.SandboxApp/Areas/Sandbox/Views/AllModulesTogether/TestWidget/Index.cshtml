@@ -35,7 +35,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
-        p.Post("/Sandbox/TestWidget/Echo", g =>
+        p.Post("/Sandbox/AllModulesTogether/TestWidget/Echo", g =>
             g.Include<TestWidgetSyncFusion, TestWidgetModel>("tw-gather", "widgetVal"))
          .Response(r => r
             .OnSuccess(s => { s.Element("gather-result").SetText("gathered"); }));
@@ -208,7 +208,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Get("/Sandbox/TestWidget/DataSource")
+                    p.Get("/Sandbox/AllModulesTogether/TestWidget/DataSource")
                      .Response(r => r
                         .OnSuccess<DataSourceResponse>((json, s) =>
                         {

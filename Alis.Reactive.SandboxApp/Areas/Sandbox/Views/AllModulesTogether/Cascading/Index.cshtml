@@ -13,7 +13,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-save", p =>
     {
-        p.Post("/Sandbox/Cascading/Save", g =>
+        p.Post("/Sandbox/AllModulesTogether/Cascading/Save", g =>
         {
             g.Include<FusionDropDownList, CascadingModel>(m => m.Country);
             g.Include<FusionDropDownList, CascadingModel>(m => m.City);
@@ -53,7 +53,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     // Selective payload — only send country value
-                    p.Get("/Sandbox/Cascading/Cities")
+                    p.Get("/Sandbox/AllModulesTogether/Cascading/Cities")
                      .Gather(g => g.Include<FusionDropDownList, CascadingModel>(m => m.Country))
                      .Response(r => r
                         .OnSuccess<CityLookupResponse>((json, s) =>

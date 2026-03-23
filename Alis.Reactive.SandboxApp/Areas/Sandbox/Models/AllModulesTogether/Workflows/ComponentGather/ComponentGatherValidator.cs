@@ -1,7 +1,7 @@
 using Alis.Reactive.FluentValidator;
 using FluentValidation;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.Workflows.ComponentGather
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ComponentGatherValidator : ReactiveValidator<ComponentGatherModel>
     {

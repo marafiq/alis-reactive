@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.HttpPipeline.ContentType
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ContentTypeModel
     {

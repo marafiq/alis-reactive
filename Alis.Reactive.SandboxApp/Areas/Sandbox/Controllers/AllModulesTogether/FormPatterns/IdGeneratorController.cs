@@ -1,4 +1,4 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.FormPatterns.IdGenerator;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.FormPatterns

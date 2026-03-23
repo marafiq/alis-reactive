@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.CrossVendor.Architecture
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ArchitectureModel
     {

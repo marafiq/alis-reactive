@@ -26,7 +26,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
-        p.Post("/Sandbox/MultiSelect/Echo", g =>
+        p.Post("/Sandbox/Components/MultiSelect/Echo", g =>
             g.Include<FusionMultiSelect, MultiSelectModel>(m => m.Allergies))
          .Response(r => r
             .OnSuccess(s =>
@@ -159,7 +159,7 @@
                     .Reactive(plan, evt => evt.Filtering, (args, p) =>
                     {
                         args.PreventDefault(p);
-                        p.Get("/Sandbox/MultiSelect/Supplies")
+                        p.Get("/Sandbox/Components/MultiSelect/Supplies")
                          .Gather(g => g.FromEvent(args, x => x.Text, "Supplies"))
                          .Response(r => r
                             .OnSuccess<SupplySearchResponse>((json, s) =>

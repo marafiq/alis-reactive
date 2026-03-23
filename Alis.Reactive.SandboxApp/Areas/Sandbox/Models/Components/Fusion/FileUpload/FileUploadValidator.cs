@@ -1,7 +1,7 @@
 using Alis.Reactive.FluentValidator;
 using FluentValidation;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.FileUpload
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class FileUploadValidator : ReactiveValidator<FileUploadModel>
     {

@@ -161,7 +161,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/ComponentGather/EchoJson", g => g.IncludeAll())
+                    p.Post("/Sandbox/AllModulesTogether/ComponentGather/EchoJson", g => g.IncludeAll())
                      .Validate<ComponentGatherValidator>("gather-form")
                      .Response(r => r
                         .OnSuccess<GatherEchoResponse>((json, s) =>
@@ -199,7 +199,7 @@
                 .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/ComponentGather/EchoFormData", g => g.IncludeAll())
+                    p.Post("/Sandbox/AllModulesTogether/ComponentGather/EchoFormData", g => g.IncludeAll())
                      .AsFormData()
                      .Validate<ComponentGatherValidator>("gather-form")
                      .Response(r => r

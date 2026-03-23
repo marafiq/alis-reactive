@@ -41,7 +41,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather-native", p =>
     {
-        p.Post("/Sandbox/Architecture/Echo", g =>
+        p.Post("/Sandbox/AllModulesTogether/Architecture/Echo", g =>
             g.Include<TestWidgetNative, ArchitectureModel>("native-gather", "nativeVal"))
          .Response(r => r
             .OnSuccess(s =>
@@ -52,7 +52,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather-fusion", p =>
     {
-        p.Post("/Sandbox/Architecture/Echo", g =>
+        p.Post("/Sandbox/AllModulesTogether/Architecture/Echo", g =>
             g.Include<TestWidgetSyncFusion, ArchitectureModel>("fusion-gather", "fusionVal"))
          .Response(r => r
             .OnSuccess(s =>
@@ -93,7 +93,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather-both", p =>
     {
-        p.Post("/Sandbox/Architecture/Echo", g =>
+        p.Post("/Sandbox/AllModulesTogether/Architecture/Echo", g =>
         {
             g.Include<TestWidgetNative, ArchitectureModel>("native-both", "nativeVal");
             g.Include<TestWidgetSyncFusion, ArchitectureModel>("fusion-both", "fusionVal");
@@ -268,7 +268,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Architecture/ValidateClient")
+                p.Post("/Sandbox/AllModulesTogether/Architecture/ValidateClient")
                  .Validate(new ValidationDescriptor("arch-val-form", new List<ValidationField>
                  {
                      new ValidationField("native-val-field",
@@ -315,7 +315,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Architecture/ValidateClient")
+                p.Post("/Sandbox/AllModulesTogether/Architecture/ValidateClient")
                  .Validate(new ValidationDescriptor("equalto-form", new List<ValidationField>
                  {
                      new ValidationField("native-password",

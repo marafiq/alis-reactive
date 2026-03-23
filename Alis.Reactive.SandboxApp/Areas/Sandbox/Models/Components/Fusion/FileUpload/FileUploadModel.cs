@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.FileUpload
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class FileUploadModel
     {

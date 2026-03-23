@@ -7,9 +7,9 @@
 
     IReactivePlan<HttpShowcaseModel> plan = new ReactivePlan<HttpShowcaseModel>();
 
-    // Section 1: DomReady → GET /Sandbox/Http/Residents → bind response data to DOM
+    // Section 1: DomReady → GET /Sandbox/HttpPipeline/Http/Residents → bind response data to DOM
     Html.On(plan, t => t.DomReady(p =>
-        p.Get("/Sandbox/Http/Residents")
+        p.Get("/Sandbox/HttpPipeline/Http/Residents")
          .WhileLoading(l => l.Element("load-spinner").Show())
          .Response(r => r
             .OnSuccess<ResidentsResponse>((json, s) =>
@@ -24,7 +24,7 @@
     ));
 
     Html.On(plan, t => t.CustomEvent("native-action-link-grid-refresh", p =>
-        p.Get("/Sandbox/Http/NativeActionLinkGrid")
+        p.Get("/Sandbox/HttpPipeline/Http/NativeActionLinkGrid")
          .Response(r => r.OnSuccess(s => s.Into("native-action-link-grid")))
     ));
 }
@@ -61,7 +61,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Http/Save", g => g.Static("name", "John Doe"))
+                p.Post("/Sandbox/HttpPipeline/Http/Save", g => g.Static("name", "John Doe"))
                  .WhileLoading(l => l.Element("save-spinner").Show())
                  .Response(r => r
                     .OnSuccess<SaveResponse>((json, s) =>
@@ -99,7 +99,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/Http/Residents")
+                p.Get("/Sandbox/HttpPipeline/Http/Residents")
                  .WhileLoading(l => l.Element("chain-spinner").Show())
                  .Response(r => r
                     .OnSuccess<ResidentsResponse>((json, s) =>
@@ -109,7 +109,7 @@
                         s.Element("chain-residents").AddClass("text-green-600");
                     })
                     .Chained(c => c
-                        .Get("/Sandbox/Http/Facilities")
+                        .Get("/Sandbox/HttpPipeline/Http/Facilities")
                         .Response(r2 => r2
                             .OnSuccess<FacilitiesResponse>((json2, s2) =>
                             {
@@ -147,14 +147,14 @@
             {
                 p.Element("parallel-spinner").Show();
                 p.Parallel(
-                    a => a.Get("/Sandbox/Http/Residents")
+                    a => a.Get("/Sandbox/HttpPipeline/Http/Residents")
                           .Response(ra => ra.OnSuccess<ResidentsResponse>((json, sa) =>
                           {
                               sa.Element("parallel-resident-first").SetText(json, x => x.First);
                               sa.Element("parallel-resident-second").SetText(json, x => x.Second);
                               sa.Element("parallel-residents").AddClass("text-green-600");
                           })),
-                    b => b.Get("/Sandbox/Http/Facilities")
+                    b => b.Get("/Sandbox/HttpPipeline/Http/Facilities")
                           .Response(rb => rb.OnSuccess<FacilitiesResponse>((json, sb) =>
                           {
                               sb.Element("parallel-facility-first").SetText(json, x => x.First);
@@ -192,7 +192,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Put("/Sandbox/Http/UpdateResident", g => g
+                p.Put("/Sandbox/HttpPipeline/Http/UpdateResident", g => g
                     .Static("name", "Updated Name")
                     .Static("facilityId", "1"))
                  .WhileLoading(l => l.Element("put-spinner").Show())
@@ -232,7 +232,7 @@
                 p.Confirm("Are you sure you want to delete resident #42?")
                  .Then(t =>
                  {
-                    t.Delete("/Sandbox/Http/DeleteResident/42")
+                    t.Delete("/Sandbox/HttpPipeline/Http/DeleteResident/42")
                      .WhileLoading(l => l.Element("delete-spinner").Show())
                      .Response(r => r
                         .OnSuccess<DeleteResponse>((json, s) =>
@@ -275,7 +275,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Http/SaveFormData", g => g
+                p.Post("/Sandbox/HttpPipeline/Http/SaveFormData", g => g
                     .Static("FirstName", "John")
                     .Static("LastName", "Doe")
                     .Static("Email", "john@example.com"))
@@ -307,7 +307,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Get("/Sandbox/Http/Search")
+                p.Get("/Sandbox/HttpPipeline/Http/Search")
                  .Gather(g => g.Static("q", "John"))
                  .WhileLoading(l => l.Element("search-spinner").Show())
                  .Response(r => r
@@ -337,7 +337,7 @@
             .CssClass("rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Http/ValidateResident", g => g
+                p.Post("/Sandbox/HttpPipeline/Http/ValidateResident", g => g
                     .Static("name", "")
                     .Static("facilityId", ""))
                  .WhileLoading(l => l.Element("multi-err-spinner").Show())
@@ -388,8 +388,8 @@
         <native-heading level="H2">11. NativeActionLink &rarr; Standalone Single Action</native-heading>
         <p class="text-sm text-text-secondary mb-3">A single native action link can also execute one request chain on its own and load a success fragment directly into a local target.</p>
         <div class="flex items-center gap-4">
-            @(Html.NativeActionLink("Run Standalone NativeActionLink", "/Sandbox/Http/StandaloneNativeActionLink", p => p
-                .Post("/Sandbox/Http/StandaloneNativeActionLink", g => g.Static("command", "run"))
+            @(Html.NativeActionLink("Run Standalone NativeActionLink", "/Sandbox/HttpPipeline/Http/StandaloneNativeActionLink", p => p
+                .Post("/Sandbox/HttpPipeline/Http/StandaloneNativeActionLink", g => g.Static("command", "run"))
                 .WhileLoading(x => x.Element("standalone-native-action-link-status").SetText("Running standalone NativeActionLink..."))
                 .Response(r => r
                     .OnSuccess(x =>

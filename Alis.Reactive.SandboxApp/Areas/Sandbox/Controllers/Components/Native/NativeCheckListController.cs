@@ -1,5 +1,5 @@
 using Alis.Reactive.Native.Components;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.CheckList;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native

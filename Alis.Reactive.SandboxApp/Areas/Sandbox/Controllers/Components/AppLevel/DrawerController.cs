@@ -1,4 +1,4 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.AppLevel.Drawer;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel

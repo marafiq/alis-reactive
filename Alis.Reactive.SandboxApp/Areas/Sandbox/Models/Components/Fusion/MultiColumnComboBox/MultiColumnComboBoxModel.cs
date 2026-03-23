@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.MultiColumnComboBox
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class MultiColumnComboBoxModel
     {

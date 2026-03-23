@@ -36,7 +36,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Element("alis-loader-message").SetText("Saving resident...");
-                    p.Post("/Sandbox/Drawer/SubmitResident", g => g.IncludeAll())
+                    p.Post("/Sandbox/Components/Drawer/SubmitResident", g => g.IncludeAll())
                      .Validate<DrawerResidentValidator>("drawer-resident-form")
                      .WhileLoading(loader=> loader.Component<NativeLoader>().SetTarget("drawer-resident-form").SetTimeout(1000).Show())
                      .Response(r => r

@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.Workflows.ResidentAdmission
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class BddExperimentModel
     {

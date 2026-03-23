@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.Button
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
     /// Minimal model for the NativeButton sandbox page.

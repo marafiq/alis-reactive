@@ -1,7 +1,7 @@
 using FluentValidation;
 using Alis.Reactive.FluentValidator.Validators;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.SpecializedRules
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class NewRuleTypesValidator : AbstractValidator<NewRuleTypesModel>
     {

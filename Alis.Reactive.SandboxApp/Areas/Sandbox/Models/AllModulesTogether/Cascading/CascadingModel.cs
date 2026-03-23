@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.Cascading
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class CascadingModel
     {

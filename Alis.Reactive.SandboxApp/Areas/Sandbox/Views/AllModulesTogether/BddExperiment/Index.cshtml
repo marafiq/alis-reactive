@@ -25,7 +25,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-submit", p =>
     {
-        p.Post("/Sandbox/BddExperiment/Submit", g => g.IncludeAll())
+        p.Post("/Sandbox/AllModulesTogether/BddExperiment/Submit", g => g.IncludeAll())
          .Validate<BddExperimentValidator>("admission-form")
          .WhileLoading(l =>
          {

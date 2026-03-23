@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.HttpPipeline.Http
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class HttpShowcaseModel
     {

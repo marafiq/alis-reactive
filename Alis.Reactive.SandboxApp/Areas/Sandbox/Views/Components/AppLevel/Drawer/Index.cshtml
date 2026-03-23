@@ -32,7 +32,7 @@
                 {
                     p.Element("alis-drawer-title").SetText("Resident Details");
                     p.Component<NativeDrawer>().SetSize(DrawerSize.Sm);
-                    p.Get("/Sandbox/Drawer/ResidentDetails")
+                    p.Get("/Sandbox/Components/Drawer/ResidentDetails")
                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
                     p.Component<NativeDrawer>().Open();
                 }))
@@ -43,7 +43,7 @@
                 {
                     p.Element("alis-drawer-title").SetText("Care Plan Notes");
                     p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-                    p.Get("/Sandbox/Drawer/CarePlanNotes")
+                    p.Get("/Sandbox/Components/Drawer/CarePlanNotes")
                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
                     p.Component<NativeDrawer>().Open();
                 }))
@@ -54,7 +54,7 @@
                 {
                     p.Element("alis-drawer-title").SetText("Add Resident");
                     p.Component<NativeDrawer>().SetSize(DrawerSize.Lg);
-                    p.Get("/Sandbox/Drawer/AddResidentForm")
+                    p.Get("/Sandbox/Components/Drawer/AddResidentForm")
                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
                     p.Component<NativeDrawer>().Open();
                 }))

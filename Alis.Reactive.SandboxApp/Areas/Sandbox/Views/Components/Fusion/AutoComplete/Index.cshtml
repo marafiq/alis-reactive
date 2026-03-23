@@ -22,7 +22,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
-        p.Post("/Sandbox/AutoComplete/Echo", g =>
+        p.Post("/Sandbox/Components/AutoComplete/Echo", g =>
             g.Include<FusionAutoComplete, AutoCompleteModel>(m => m.Physician))
          .Response(r => r
             .OnSuccess(s =>
@@ -170,7 +170,7 @@
                     {
                         
                         args.PreventDefault(p);
-                        p.Get("/Sandbox/AutoComplete/Medications")
+                        p.Get("/Sandbox/Components/AutoComplete/Medications")
                          .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))
                          .Response(r => r
                             .OnSuccess<MedicationSearchResponse>((json, s) =>

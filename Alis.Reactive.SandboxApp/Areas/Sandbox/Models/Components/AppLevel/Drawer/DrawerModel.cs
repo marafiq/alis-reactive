@@ -1,7 +1,7 @@
 using Alis.Reactive.FluentValidator;
 using FluentValidation;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.AppLevel.Drawer
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class DrawerModel
     {

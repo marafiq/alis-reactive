@@ -22,7 +22,7 @@
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
-        p.Post("/Sandbox/MultiColumnComboBox/Echo", g =>
+        p.Post("/Sandbox/Components/MultiColumnComboBox/Echo", g =>
             g.Include<FusionMultiColumnComboBox, MultiColumnComboBoxModel>(m => m.Facility))
          .Response(r => r
             .OnSuccess(s =>

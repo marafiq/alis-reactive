@@ -1,5 +1,5 @@
 using Alis.Reactive.Playwright.Extensions;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.Workflows.ResidentAdmission;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.Workflows;
 

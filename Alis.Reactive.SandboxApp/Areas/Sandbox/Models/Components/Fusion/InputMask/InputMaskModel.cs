@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InputMask
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class InputMaskModel
     {

@@ -1,4 +1,4 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AllModulesTogether.Workflows.ComponentGather;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 using Alis.Reactive.Native.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

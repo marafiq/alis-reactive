@@ -60,7 +60,7 @@
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/IdGenerator/SaveJson", g => g
+                p.Post("/Sandbox/AllModulesTogether/IdGenerator/SaveJson", g => g
                     .Include(m => m.Name)
                     .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Amount)
                     .Include(m => m.Status)
@@ -96,7 +96,7 @@
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/IdGenerator/SaveForm", g => g
+                p.Post("/Sandbox/AllModulesTogether/IdGenerator/SaveForm", g => g
                     .Include(m => m.Name)
                     .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Amount)
                     .Include(m => m.Status))

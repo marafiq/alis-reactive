@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.DateRules
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class DateValidationModel
     {

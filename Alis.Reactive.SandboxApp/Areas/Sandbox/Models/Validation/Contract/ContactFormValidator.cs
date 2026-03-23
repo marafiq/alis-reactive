@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.Contract
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ContactFormValidator : AbstractValidator<ContactFormModel>
     {

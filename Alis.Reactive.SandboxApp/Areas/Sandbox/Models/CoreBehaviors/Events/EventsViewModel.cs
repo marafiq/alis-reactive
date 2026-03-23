@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CoreBehaviors.Events
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class EventsViewModel
     {

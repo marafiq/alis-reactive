@@ -9,10 +9,10 @@
                 <span class="font-medium">Resident #@row.Id</span>
                 <span class="text-text-secondary"> - @row.Name</span>
             </div>
-            @(Html.NativeActionLink("Delete", $"/Sandbox/Http/ActionLinkDelete/{row.Id}", p => p
+            @(Html.NativeActionLink("Delete", $"/Sandbox/HttpPipeline/Http/ActionLinkDelete/{row.Id}", p => p
                 .Confirm($"Delete resident #{row.Id}?")
                 .Then(t => t
-                    .Post($"/Sandbox/Http/ActionLinkDelete/{row.Id}", g => g.Static("id", row.Id))
+                    .Post($"/Sandbox/HttpPipeline/Http/ActionLinkDelete/{row.Id}", g => g.Static("id", row.Id))
                     .WhileLoading(x => x.Element("native-action-link-status").SetText($"Deleting resident #{row.Id}..."))
                     .Response(r => r
                         .OnSuccess(x =>

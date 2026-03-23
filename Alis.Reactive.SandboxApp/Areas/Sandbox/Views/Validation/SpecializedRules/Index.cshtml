@@ -63,7 +63,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/NewRuleTypes/ValidateClient")
+                p.Post("/Sandbox/Validation/SpecializedRules/ValidateClient")
                  .Validate<NewRuleTypesValidator>("new-rules-form")
                  .Response(r => r.OnSuccess(s =>
                  {

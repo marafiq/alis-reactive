@@ -1,7 +1,6 @@
 using FluentValidation;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.AllRules;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.Contract
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ValidationMergeHarnessValidator : AbstractValidator<ValidationMergeHarnessModel>
     {
