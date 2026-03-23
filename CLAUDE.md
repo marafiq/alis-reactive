@@ -472,13 +472,13 @@ Read and write are two sides of the same property:
 
 #### Adding a New Component Type (Zero Runtime Changes)
 
-1. C# sealed class implementing `IComponent` + `IInputComponent` (declares Vendor + ReadExpr as instance properties)
-2. Event args class (typed payload properties)
+1. C# sealed class — Native: implements `IComponent` + `IInputComponent` directly. Fusion: extends `FusionComponent` + implements `IInputComponent`. Declares Vendor + ReadExpr as instance properties.
+2. Event args class(es) — one per event type (typed payload properties)
 3. Events singleton (TypedEventDescriptor registry)
 4. Extensions (structured prop/method fields for property writes, method calls, read expressions)
-5. Builder (IHtmlContent, renders HTML, registers component in ComponentsMap)
+5. Builder — Native: `IHtmlContent`, renders HTML. Fusion: extension on `InputFieldSetup<TModel, TProp>`. Both register component in ComponentsMap.
 6. Reactive extension (.Reactive() calls `ReactiveWiringHelper.Wire<TModel, TComponent, TArgs>()` — 3-line wrapper)
-7. Gather extension (uses TComponent.ReadExpr via `new()` constraint)
+7. Gather extension — shared generic per vendor (`NativeGatherExtensions` / `FusionGatherExtensions`), not per-component
 8. Tests at all 3 layers
 
 The runtime does NOT change. The plan JSON carries vendor, readExpr, prop/method, jsEvent.
