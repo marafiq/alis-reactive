@@ -292,14 +292,16 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await FillAllRequiredFields();
         await SubmitJsonAndWaitForEcho();
 
+        // Dates are selected using DateTime.Now (current year), not hardcoded 2024
+        var year = DateTime.Now.Year.ToString();
         await Expect(Page.Locator("#echo-admission-date"))
-            .ToContainTextAsync("2024", new() { Timeout = 5000 });
+            .ToContainTextAsync(year, new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-medication-time"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-appointment-time"))
-            .ToContainTextAsync("2024", new() { Timeout = 5000 });
+            .ToContainTextAsync(year, new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-stay-start"))
-            .ToContainTextAsync("2024", new() { Timeout = 5000 });
+            .ToContainTextAsync(year, new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 

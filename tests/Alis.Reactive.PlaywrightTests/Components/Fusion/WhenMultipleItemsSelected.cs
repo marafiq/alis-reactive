@@ -157,8 +157,9 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Select 3 allergies via popup clicks — Peanuts, Shellfish, Dairy
-        await Allergies.SelectItems("Peanuts", "Shellfish", "Dairy");
+        // Peanuts is already pre-selected via SF builder Value(). Select 2 more items.
+        // In Box mode, selected items get e-hide-listitem so they can't be re-clicked.
+        await Allergies.SelectItems("Shellfish", "Dairy");
 
         // Wait for value to take effect (change event fires)
         await Expect(Page.Locator("#change-value"))
@@ -171,7 +172,7 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
 
         var body = request.PostData ?? "";
         Assert.That(body, Does.Contain("peanuts"),
-            $"Gather must contain peanuts but was '{body}'");
+            $"Gather must contain peanuts (pre-selected) but was '{body}'");
         Assert.That(body, Does.Contain("shellfish"),
             $"Gather must contain shellfish but was '{body}'");
         Assert.That(body, Does.Contain("dairy"),
@@ -193,9 +194,11 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
         // Open the allergies popup by clicking the wrapper
         await Allergies.Open();
 
-        // SF MultiSelect popup — verify items are visible
-        await Expect(Allergies.PopupItems.First).ToBeVisibleAsync(new() { Timeout = 5000 });
-        var popup = Page.Locator("[id$='_popup']");
+        // SF MultiSelect popup — verify at least one non-hidden item is visible.
+        // Pre-selected items (Peanuts) get e-hide-listitem so we filter for visible ones.
+        await Expect(Allergies.Popup.Locator(".e-list-item:not(.e-hide-listitem)").First)
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        var popup = Allergies.Popup;
 
         // Verify group headers are present — SF renders .e-list-group-item for GroupBy
         var groupHeaders = popup.Locator(".e-list-group-item");
@@ -222,18 +225,20 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Select 3 allergies via popup clicks
-        await Allergies.SelectItems("Peanuts", "Shellfish", "Dairy");
+        // Peanuts is pre-selected. Select 2 more: Shellfish, Dairy.
+        await Allergies.SelectItems("Shellfish", "Dairy");
 
         // Wait for change to register
         await Expect(Page.Locator("#change-value"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
 
-        // Now remove Shellfish by clicking it again (toggle off in checkbox mode)
-        await Allergies.SelectItem("Shellfish");
+        // In Box mode, selected items are hidden in the popup (e-hide-listitem).
+        // To remove Shellfish, click the close icon on the Shellfish chip.
+        // SF MultiSelect chips: .e-chips > .e-chipcontent + .e-chips-close
+        var shellChip = Allergies.Wrapper.Locator(".e-chips").Filter(new() { HasText = "Shellfish" });
+        await shellChip.Locator(".e-chips-close").ClickAsync();
 
-        // Verify the change value no longer contains shellfish
-        // The MultiSelect chips should show only Peanuts and Dairy
+        // Verify the MultiSelect chips show only Peanuts and Dairy
         var chipTexts = await Allergies.Wrapper.Locator(".e-chips .e-chipcontent").AllTextContentsAsync();
         Assert.That(chipTexts, Does.Contain("Peanuts"), "Chips must contain Peanuts");
         Assert.That(chipTexts, Does.Contain("Dairy"), "Chips must contain Dairy");

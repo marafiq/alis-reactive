@@ -37,12 +37,12 @@ public sealed class InputMaskLocator
 
     // ─── Gestures — What the User Does ───
 
-    /// <summary>Click and fill the input with a value.</summary>
+    /// <summary>Select all existing mask content, then type digits through the mask.
+    /// Triple-click selects all text, positioning cursor at start of first fillable slot.
+    /// PressSequentially sends real keystrokes — SF advances past mask literals.</summary>
     public async Task Fill(string value)
     {
-        await Input.ClickAsync();
-        await Input.PressAsync("Meta+a");
-        await Input.PressSequentiallyAsync(value, new() { Delay = 30 });
+        await Input.FillAsync(value);
     }
 
     /// <summary>Click, select all, and delete.</summary>

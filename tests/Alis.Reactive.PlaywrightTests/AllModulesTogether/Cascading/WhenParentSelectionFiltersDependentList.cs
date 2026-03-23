@@ -190,14 +190,14 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Intercept the cities GET request
+        // Intercept the cities GET request specifically for Canada
+        // (DDL keyboard navigation may trigger intermediate requests for other countries)
         var requestTask = Page.RunAndWaitForRequestAsync(async () =>
         {
             await SelectCountry("Canada");
-        }, r => r.Url.Contains("/Cities"));
+        }, r => r.Url.Contains("Country=CA"));
 
         var request = await requestTask;
-        // Verify the request URL contains Country=CA
         Assert.That(request.Url, Does.Contain("Country=CA"),
             "GET request should contain Country=CA");
         // Verify it does NOT contain City parameter
@@ -274,6 +274,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await Expect(cityPopup).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(cityPopup.Locator(".e-list-item")).ToHaveCountAsync(2, new() { Timeout = 5000 });
         await Page.Keyboard.PressAsync("Escape");
+        await Page.WaitForTimeoutAsync(300); // allow DDL to fully close before reopening
 
         await SelectCity("London");
         await Expect(Page.Locator("#selected-city"))

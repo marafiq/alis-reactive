@@ -52,12 +52,14 @@ public sealed class DateTimePickerLocator
     /// <summary>The clock icon button that opens the time popup.</summary>
     public ILocator ClockIcon => _page.Locator($"#{_componentId}").Locator("..").Locator(".e-time-icon");
 
-    /// <summary>The popup container — used for both calendar and time list.
-    /// SF DateTimePicker reuses #{id}_options for both popups (only one visible at a time).</summary>
-    public ILocator Popup => _page.Locator($"#{_componentId}_options");
+    /// <summary>The calendar popup container (div[role="dialog"] with the calendar grid).
+    /// SF DateTimePicker creates both a UL (time list) and a DIV (calendar) with the same
+    /// #{id}_options ID — this locator targets only the calendar div to avoid strict mode.</summary>
+    public ILocator CalendarPopup => _page.Locator($"div#{_componentId}_options");
 
-    /// <summary>The time list popup wrapper (different ID from the calendar popup).</summary>
-    public ILocator TimePopup => _page.Locator($"#{_componentId}_timePopup, #{_componentId}_popup").First;
+    /// <summary>The time list popup (UL with .e-list-parent containing time items).
+    /// SF DateTimePicker creates this with the same #{id}_options ID as the calendar.</summary>
+    public ILocator TimeListPopup => _page.Locator($"ul#{_componentId}_options");
 
     // ─── Gestures — What the User Does ───
 
@@ -95,10 +97,10 @@ public sealed class DateTimePickerLocator
     public async Task SelectDate(int year, int month, int day)
     {
         await CalendarIcon.ClickAsync();
-        await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
-        await NavigateToMonth(Popup, year, month);
+        await CalendarPopup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
+        await NavigateToMonth(CalendarPopup, year, month);
 
-        var dayCell = Popup.Locator($"td.e-cell:not(.e-other-month) span.e-day:text-is(\"{day}\")");
+        var dayCell = CalendarPopup.Locator($"td.e-cell:not(.e-other-month) span.e-day:text-is(\"{day}\")");
         await dayCell.ClickAsync();
     }
 
@@ -108,18 +110,21 @@ public sealed class DateTimePickerLocator
     public async Task SelectTime(string timeText)
     {
         await ClockIcon.ClickAsync();
-        // Time popup reuses the same #{id}_options element
-        await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
+        await TimeListPopup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
 
-        var item = Popup.Locator($".e-list-item[data-value='{timeText}']");
+        var item = TimeListPopup.Locator($".e-list-item[data-value='{timeText}']");
         await item.ClickAsync();
     }
 
     /// <summary>Select both date and time via their popups.
-    /// This is the most reliable way to set a full DateTime on the ej2 instance.</summary>
+    /// This is the most reliable way to set a full DateTime on the ej2 instance.
+    /// Waits for the calendar popup to close after date selection before opening
+    /// the time popup — prevents popup collision on consecutive calls.</summary>
     public async Task Select(int year, int month, int day, string timeText)
     {
         await SelectDate(year, month, day);
+        // Wait for calendar popup to fully close before opening time popup
+        await CalendarPopup.WaitForAsync(new() { State = WaitForSelectorState.Hidden, Timeout = 5000 });
         await SelectTime(timeText);
     }
 

@@ -47,8 +47,10 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await ValidateBtn.ClickAsync();
         await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
-        // Set date before 2020
-        await DatePicker("AdmissionDate").SelectDate(2019, 6, 15);
+        // Set date before 2020 using text input instead of calendar navigation.
+        // Calendar navigation to 2019 would require 80+ month clicks from 2026.
+        // FillAndBlur types the date and blurs — SF parses the value.
+        await DatePicker("AdmissionDate").FillAndBlur("06/15/2019");
 
         // Trigger blur/change re-validation by clicking elsewhere
         await ValidateBtn.ClickAsync();
