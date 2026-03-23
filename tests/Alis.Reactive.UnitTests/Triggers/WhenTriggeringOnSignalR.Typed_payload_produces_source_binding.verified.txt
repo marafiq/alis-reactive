@@ -1,0 +1,29 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: signalr,
+        hubUrl: /hubs/data,
+        methodName: ReceiveData
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: value,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            source: {
+              kind: event,
+              path: evt.id
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

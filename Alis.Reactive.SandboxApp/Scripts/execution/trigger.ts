@@ -4,6 +4,8 @@ import { walk } from "../core/walk";
 import { scope } from "../core/trace";
 import { executeReaction } from "./execute";
 import { assertNever } from "../core/assert-never";
+import { wireServerPush } from "./server-push";
+import { wireSignalR } from "./signalr";
 
 const log = scope("trigger");
 
@@ -46,6 +48,14 @@ export function wireTrigger(
       }, opts);
       break;
     }
+
+    case "server-push":
+      wireServerPush(trigger, reaction, components, signal);
+      break;
+
+    case "signalr":
+      wireSignalR(trigger, reaction, components, signal);
+      break;
 
     default:
       assertNever(trigger, "trigger kind");

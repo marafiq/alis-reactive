@@ -1,0 +1,26 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: server-push,
+        url: /api/stream,
+        eventType: notification
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: msg,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: received
+          }
+        ]
+      }
+    }
+  ]
+}

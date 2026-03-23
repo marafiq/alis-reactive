@@ -47,7 +47,9 @@
       "oneOf": [
         { "$ref": "#/$defs/DomReadyTrigger" },
         { "$ref": "#/$defs/CustomEventTrigger" },
-        { "$ref": "#/$defs/ComponentEventTrigger" }
+        { "$ref": "#/$defs/ComponentEventTrigger" },
+        { "$ref": "#/$defs/ServerPushTrigger" },
+        { "$ref": "#/$defs/SignalRTrigger" }
       ]
     },
     "DomReadyTrigger": {
@@ -83,6 +85,26 @@
         "vendor": { "$ref": "#/$defs/Vendor" },
         "bindingPath": { "type": "string", "minLength": 1, "description": "Dot-notation model binding path (e.g. Address.City). Carried for future HTTP gather." },
         "readExpr": { "type": "string", "minLength": 1, "description": "Property path from vendor-determined root for reading the component value in event payload. Examples: 'value', 'checked'. Runtime uses walk(el, readExpr) — plan-driven, no hardcoded property lists." }
+      }
+    },
+    "ServerPushTrigger": {
+      "type": "object",
+      "required": ["kind", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "server-push" },
+        "url": { "type": "string", "minLength": 1, "description": "SSE endpoint URL (e.g. /api/notifications/stream)" },
+        "eventType": { "type": "string", "minLength": 1, "description": "Optional SSE event type filter. Maps to the event: field in the SSE protocol." }
+      }
+    },
+    "SignalRTrigger": {
+      "type": "object",
+      "required": ["kind", "hubUrl", "methodName"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "signalr" },
+        "hubUrl": { "type": "string", "minLength": 1, "description": "Hub URL (e.g. /hubs/notifications). Connection shared across triggers with same hubUrl." },
+        "methodName": { "type": "string", "minLength": 1, "description": "Server method name to listen for (e.g. ReceiveNotification). Maps to connection.on(methodName, handler)." }
       }
     },
 

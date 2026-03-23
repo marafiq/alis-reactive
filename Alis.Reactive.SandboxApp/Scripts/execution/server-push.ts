@@ -1,0 +1,62 @@
+import type { ServerPushTrigger, Reaction, ComponentEntry } from "../types";
+import { executeReaction } from "./execute";
+import { scope } from "../core/trace";
+
+const log = scope("server-push");
+
+// Connection pool — singleton EventSource per URL
+const sources = new Map<string, EventSource>();
+
+function getOrCreate(url: string, signal?: AbortSignal): EventSource {
+  const cached = sources.get(url);
+  if (cached) return cached;
+
+  const es = new EventSource(url);
+  sources.set(url, es);
+
+  es.onopen = () => log.debug("connected", { url });
+
+  es.onerror = () => {
+    if (es.readyState === EventSource.CLOSED) {
+      log.error("connection closed permanently", { url });
+      sources.delete(url);
+    } else {
+      log.warn("connection error (reconnecting)", { url });
+    }
+  };
+
+  if (signal) {
+    signal.addEventListener("abort", () => {
+      es.close();
+      sources.delete(url);
+      log.debug("closed", { url });
+    });
+  }
+
+  log.debug("created", { url });
+  return es;
+}
+
+export function wireServerPush(
+  trigger: ServerPushTrigger,
+  reaction: Reaction,
+  components?: Record<string, ComponentEntry>,
+  signal?: AbortSignal
+): void {
+  const es = getOrCreate(trigger.url, signal);
+
+  const handler = (e: MessageEvent) => {
+    // Framework only supports JSON payloads — non-JSON is a server-side bug.
+    // Throw immediately so the developer fixes their SSE endpoint.
+    const evt: Record<string, unknown> = JSON.parse(e.data);
+    log.debug("message", { url: trigger.url, eventType: trigger.eventType });
+    executeReaction(reaction, { evt, components }).catch(err =>
+      log.error("reaction failed", { error: String(err) }));
+  };
+
+  // Always use addEventListener — onmessage assignment overwrites previous handlers
+  // when multiple triggers share the same URL without an eventType.
+  const eventName = trigger.eventType ?? "message";
+  es.addEventListener(eventName, handler as EventListener);
+  log.debug("listening", { url: trigger.url, eventType: eventName });
+}
