@@ -46,6 +46,8 @@ This mutates a command that was already constructed and added to the list. The c
 
 ## How to solve it
 
+> **Full descriptor-wide review:** [descriptor-encapsulation-review.md](descriptor-encapsulation-review.md) — audits all 34 descriptor classes, identifies 7 mutation methods across 3 classes, and proposes Phase 1 (list freezing via `.ToArray()`) as the safe, actionable fix. Option A below was found to break the fluent API — see the review for details.
+
 **Option A: Constructor-based guard (immutable)**
 
 Commands receive their guard at construction time. The builder creates the command with the guard already attached:

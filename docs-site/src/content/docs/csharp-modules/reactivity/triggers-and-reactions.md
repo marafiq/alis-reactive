@@ -9,10 +9,12 @@ A trigger defines *when* a pipeline executes. Every reactive behavior starts wit
 
 ### Placement — anywhere in the view
 
-`Html.On()` builds a **descriptor** and adds it to the plan. It does not execute anything. You can call it anywhere in the `.cshtml` — top, middle, bottom, inside conditionals, in loops. Order doesn't matter. The calls just accumulate entries in the plan object, and `@Html.RenderPlan(plan)` serializes them all to JSON at the end.
+`Html.On()` builds a **descriptor** and adds it to the plan. It does not execute anything. You can call it anywhere in the `.cshtml` — top, middle, bottom, inside conditionals, in loops. Order doesn't matter. The calls just accumulate entries in the plan object, and `@Html.RenderPlan(plan)` serializes them all to JSON when Razor evaluates that expression.
 
 ```csharp
 @{
+    IReactivePlan<MyModel> plan = new ReactivePlan<MyModel>();
+
     // These three calls can appear in any order — they all just add entries to `plan`
     Html.On(plan, t => t.DomReady(p => p.Dispatch("init")));
     Html.On(plan, t => t.SignalR("/hubs/alerts", "Receive", p => p.Element("x").Show()));
@@ -30,7 +32,7 @@ Writing `t.SignalR(...)` or `t.ServerPush(...)` in C# does **not** open a WebSoc
 
 - **No page load = no connection.** If the view is never rendered, no resources are consumed.
 - **Partial views are lazy too.** A partial loaded via `.Into()` only connects when the partial arrives and its plan merges.
-- **Connection pooling is automatic.** Multiple triggers on the same URL share one connection — the runtime deduplicates.
+- **Connection pooling is automatic.** Multiple triggers on the same SSE URL or SignalR hub URL share one connection — the runtime deduplicates.
 
 This means real-time triggers are safe to declare unconditionally. They cost nothing until the page actually loads in a browser.
 
@@ -42,7 +44,8 @@ Html.On(plan, t => ...)                              § Triggers (what fires the
 ├── t.CustomEvent("name", pipeline => { ... })       on named event — fires each time dispatched
 ├── t.CustomEvent<T>("name", (payload, pipeline) => { ... })
 │                                                    on named event with typed payload
-├── t.ServerPush(url, pipeline => { ... })            on SSE message — native EventSource
+├── t.ServerPush(url, pipeline => { ... })            on SSE message — all messages
+├── t.ServerPush(url, eventType, pipeline => { ... }) on named SSE event type
 ├── t.ServerPush<T>(url, eventType, (payload, p) => { ... })
 │                                                    on named SSE event with typed payload
 ├── t.SignalR(hubUrl, method, pipeline => { ... })    on SignalR hub method invocation
@@ -78,7 +81,15 @@ Html.On(plan, t => t.CustomEvent("page-ready", pipeline =>
 
 ## CustomEvent with typed payload
 
-When the event carries data, use `CustomEvent<TPayload>`. The `payload` parameter gives you compile-time access to the event's properties — `x => x.Name` becomes `"evt.name"` in the plan, resolved from the actual event data at runtime.
+When the event carries data, use `CustomEvent<TPayload>`. The `payload` parameter gives you compile-time access to the event's properties via expressions.
+
+```csharp
+public class ResidentCreatedPayload
+{
+    public string Name { get; set; } = "";
+    public string Facility { get; set; } = "";
+}
+```
 
 ```csharp
 Html.On(plan, t => t.CustomEvent<ResidentCreatedPayload>("resident-created", (payload, pipeline) =>
@@ -86,6 +97,8 @@ Html.On(plan, t => t.CustomEvent<ResidentCreatedPayload>("resident-created", (pa
     pipeline.Element("name-display").SetText(payload, x => x.Name);
 }));
 ```
+
+> **How typed payloads work:** `SetText(payload, x => x.Name)` does not read `payload.Name` at render time. The expression `x => x.Name` is converted to the dot-path `"evt.name"` and embedded in the JSON plan. At runtime, when the event fires, the JS runtime resolves `evt.name` from the actual event data. The `payload` parameter is a compile-time proxy — it exists only for IntelliSense and type checking. The payload type must have a parameterless constructor (`new()` constraint).
 
 Dispatching with data:
 
@@ -99,7 +112,7 @@ pipeline.Dispatch("resident-created", new ResidentCreatedPayload
 
 ## .Reactive() — component events
 
-Components fire their own events — `Changed`, `Click`, `Filtering`. Wire them with `.Reactive()` directly on the component builder. `evt` selects the event, `args` gives you the typed payload.
+Components fire their own events — `Changed`, `Click`, `Filtering`. Wire them with `.Reactive()` directly on the component builder. See [Component API](../component-api/) for full details.
 
 ```csharp
 Html.InputField(plan, m => m.Country, o => o.Required().Label("Country"))
@@ -115,7 +128,7 @@ Html.InputField(plan, m => m.Country, o => o.Required().Label("Country"))
 
 ## ServerPush — Server-Sent Events (SSE)
 
-Fires when the server pushes a message via an SSE endpoint. Uses the browser's native `EventSource` API — zero JS library, automatic reconnection built into the spec.
+Fires when the server pushes a message via an SSE endpoint. Uses the browser's native `EventSource` API — zero JS library, automatic reconnection built into the spec. **SSE data must be valid JSON** — non-JSON data will throw a `SyntaxError`.
 
 ```csharp
 // Listen for all messages from an SSE stream
@@ -149,7 +162,7 @@ Html.On(plan, t => t.ServerPush<FacilityAlert>("/api/alerts/stream", "facility-a
 }));
 ```
 
-The SSE endpoint sends JSON in the `data:` field:
+The SSE endpoint sends camelCase JSON in the `data:` field:
 
 ```csharp
 // ASP.NET Core SSE endpoint — standard, nothing framework-specific
@@ -159,7 +172,10 @@ public async Task AlertStream(CancellationToken ct)
     Response.ContentType = "text/event-stream";
     Response.Headers.CacheControl = "no-cache";
 
-    var json = JsonSerializer.Serialize(new { message = "Fire drill complete", level = "info" });
+    // Use camelCase — the runtime resolves evt.message, evt.level from the plan
+    var json = JsonSerializer.Serialize(
+        new { message = "Fire drill complete", level = "info" },
+        new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
     await Response.WriteAsync($"event: facility-alert\ndata: {json}\n\n", ct);
     await Response.Body.FlushAsync(ct);
 
@@ -169,7 +185,7 @@ public async Task AlertStream(CancellationToken ct)
 
 ## SignalR — Hub method triggers
 
-Fires when the server invokes a Hub method via `IHubContext`. Uses `@microsoft/signalr` — WebSocket with automatic reconnection, connection pooling, and retry indicator on disconnection.
+Fires when the server invokes a Hub method via `IHubContext`. Uses `@microsoft/signalr` — WebSocket with automatic reconnection, connection pooling, and retry indicator on disconnection. **The server must send a single object argument** — primitives and multi-argument sends are rejected.
 
 ```csharp
 Html.On(plan, t => t.SignalR("/hubs/notifications", "ReceiveNotification", pipeline =>
@@ -191,25 +207,29 @@ Html.On(plan, t => t.SignalR<NotificationPayload>("/hubs/notifications", "Receiv
 }));
 ```
 
-### Multiple hubs
+### Multiple hubs and methods
 
-Each `hubUrl` gets one WebSocket connection. Multiple triggers on the same hub share the connection:
+Each `hubUrl` gets one WebSocket connection. Multiple triggers on the same hub share the connection — whether they listen to different methods or the same method:
 
 ```csharp
 Html.On(plan, t => t
-    // Hub 1: notifications
+    // Two methods on the same hub — one WebSocket, two handlers
     .SignalR<NotificationPayload>("/hubs/notifications", "ReceiveAlert", (payload, p) =>
     {
         p.Element("alert-text").SetText(payload, x => x.Message);
     })
-    // Hub 2: resident status (separate connection)
+    .SignalR<NotificationPayload>("/hubs/notifications", "ReceiveUpdate", (payload, p) =>
+    {
+        p.Element("update-count").SetText(payload, x => x.Count);
+    })
+    // Different hub — separate WebSocket
     .SignalR<ResidentStatusPayload>("/hubs/resident-status", "StatusChanged", (payload, p) =>
     {
         p.Element("resident-name").SetText(payload, x => x.ResidentName);
     }));
 ```
 
-### Server side — unchanged
+### Server side — standard ASP.NET Core
 
 Hubs are standard ASP.NET Core SignalR. Nothing about how you write or register hubs changes:
 
@@ -218,6 +238,7 @@ Hubs are standard ASP.NET Core SignalR. Nothing about how you write or register 
 public class NotificationHub : Hub { }
 
 // Push via IHubContext from any service or controller
+// Use a single object argument — the runtime expects one deserialized object
 public class AlertService(IHubContext<NotificationHub> hub)
 {
     public async Task Broadcast(string message, int count)
@@ -237,11 +258,12 @@ app.MapHub<NotificationHub>("/hubs/notifications");
 The runtime handles everything automatically:
 
 - **Auto-reconnect**: `withAutomaticReconnect()` retries at 0s, 2s, 10s, 30s
-- **Initial retry**: If the first connection fails, retries 5 times with backoff
+- **Initial retry**: If the first connection fails, retries 4 times with the same backoff
 - **Connection pooling**: Multiple triggers on the same `hubUrl` share one WebSocket
-- **Retry indicator**: When all retries are exhausted, a subtle retry icon appears on the target element — click to reconnect
+- **Retry indicator**: When all retries are exhausted, a subtle retry icon appears near the first mutated element — click to reconnect
 - **Handler persistence**: `.on()` handlers survive across reconnections — no re-registration needed
 - **Partial view support**: Partials with their own plan reuse the parent's connection via plan merging
+- **Cookie auth**: Connections use `withCredentials: true` by default — cookies are sent automatically
 
 ### SSE vs SignalR — when to use which
 
