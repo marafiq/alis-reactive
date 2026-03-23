@@ -21,7 +21,7 @@ import {
   getPlanAgents, assignAgentToPlan, updatePlanAgent, removeAgentFromPlan,
   getInvestSummary, getEvidenceScore,
 } from './db.mjs';
-import { dispatchReview, ALL_ROLES, ROLE_PROMPTS } from './agents.mjs';
+import { dispatchReview, ROLE_PROMPTS } from './agents.mjs';
 import { validateINVEST, validateTransition } from './invest.mjs';
 import { resolve as resolvePath } from 'path';
 
@@ -205,17 +205,21 @@ app.post('/api/reviews', (req, res) => {
   catch (e) { res.status(400).json({ error: e.message }); }
 });
 
-// Dispatch all 6 agents in parallel
+// Dispatch agents (dynamic from plan_agents) with two-round orchestration
 app.post('/api/stories/:id/review', (req, res) => {
   const story = getStory(req.params.id);
   if (!story) return res.status(404).json({ error: 'Story not found' });
 
+  // Look up plan agents for the response
+  const agents = getPlanAgents(story.plan_id);
+  const agentIds = agents.map(a => a.agent_template_id);
+
   // Respond immediately — reviews happen async
-  res.json({ status: 'dispatching', storyId: story.id, agents: ALL_ROLES });
+  res.json({ status: 'dispatching', storyId: story.id, agents: agentIds });
 
   // Fire-and-forget: dispatch agents with WebSocket progress updates
-  dispatchReview(story.id, (role, status, data) => {
-    broadcast('review-progress', { storyId: story.id, role, status, ...data });
+  dispatchReview(story.id, (agentId, status, data) => {
+    broadcast('review-progress', { storyId: story.id, agentId, status, ...data });
   }).then(result => {
     broadcast('review-complete', { storyId: story.id, ...result });
   }).catch(err => {

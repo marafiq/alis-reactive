@@ -1,6 +1,8 @@
 import { spawn } from 'child_process';
-import { getPlan, getStoriesByPlan, getStory, getReviews, createReview, updateStory, uuid } from './db.mjs';
+import { getPlan, getStoriesByPlan, getStory, getReviews, createReview, updateStory, uuid, getPlanAgents, createEvidenceScore, createInvestAssessment, getEvidenceScore } from './db.mjs';
 import { validateTransition } from './invest.mjs';
+import { computeEvidenceScore } from './evidence.mjs';
+import { detectConflicts } from './conflicts.mjs';
 
 // ═══════════════════════════════════════════════════════════════════
 // SHARED CONTEXT PREAMBLE (~350 tokens — NOT full CLAUDE.md)
@@ -27,7 +29,7 @@ Alis.Reactive.FluentValidator, Alis.Reactive.SandboxApp.
 Domain: Senior living software (residents, facilities, care levels, intake forms).`;
 
 // ═══════════════════════════════════════════════════════════════════
-// ROLE-SPECIFIC SYSTEM PROMPTS
+// ROLE-SPECIFIC SYSTEM PROMPTS (used for DB seeding)
 // ═══════════════════════════════════════════════════════════════════
 const ROLE_PROMPTS = {
   architect: {
@@ -162,9 +164,9 @@ PERSONALITY: Protective. Long-term thinker. Does not compromise. Asks: "Would 50
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// REVIEW OUTPUT SCHEMA (given to each agent)
+// OUTPUT SCHEMAS (Round 1 and Round 2)
 // ═══════════════════════════════════════════════════════════════════
-const OUTPUT_SCHEMA = `OUTPUT FORMAT: You MUST respond with valid JSON matching this schema. No markdown, no explanation — just the JSON object.
+const ROUND1_OUTPUT_SCHEMA = `OUTPUT FORMAT: You MUST respond with valid JSON matching this schema. No markdown, no explanation — just the JSON object.
 
 {
   "verdict": "approve" | "object" | "approve-with-notes",
@@ -193,7 +195,8 @@ const OUTPUT_SCHEMA = `OUTPUT FORMAT: You MUST respond with valid JSON matching 
     "E": { "pass": true/false, "reasoning": "why" },
     "S": { "pass": true/false, "reasoning": "why" },
     "T": { "pass": true/false, "reasoning": "why" }
-  }
+  },
+  "selfAssessment": "Describe the weakest part of your review. Which finding has the thinnest evidence? What did you NOT check?"
 }
 
 RULES:
@@ -201,14 +204,87 @@ RULES:
 - At least 1 artifact required
 - "evidence" must reference specific story content or codebase (never vague)
 - If verdict is "object", at least one finding must be severity "blocker"
-- investScores reasoning must be at least 20 characters`;
+- investScores reasoning must be at least 20 characters
+- selfAssessment is REQUIRED — reviews without it score poorly`;
+
+const ROUND2_OUTPUT_SCHEMA = `OUTPUT FORMAT: You MUST respond with valid JSON matching this schema. No markdown, no explanation — just the JSON object.
+
+{
+  "verdict": "approve" | "object" | "approve-with-notes",
+  "confidence": "high" | "medium" | "low",
+  "executive": "2-3 sentence summary of your review after seeing all round 1 reviews",
+  "findings": [
+    {
+      "severity": "blocker" | "concern" | "observation",
+      "title": "Short title of the finding",
+      "text": "Detailed explanation",
+      "evidence": "Concrete reference (file:line, AC number, pattern name)",
+      "recommendation": "What to do about it",
+      "source": "original" | "strengthened" | "retracted" | "adopted"
+    }
+  ],
+  "artifacts": [
+    {
+      "kind": "d2-diagram" | "csharp-signature" | "test-cases" | "scope-table" | "cshtml-snippet" | "command-sequence",
+      "label": "Human-readable label",
+      "content": "The artifact content (code, diagram, table)"
+    }
+  ],
+  "investScores": {
+    "I": { "pass": true/false, "reasoning": "why (min 20 chars)" },
+    "N": { "pass": true/false, "reasoning": "why" },
+    "V": { "pass": true/false, "reasoning": "why" },
+    "E": { "pass": true/false, "reasoning": "why" },
+    "S": { "pass": true/false, "reasoning": "why" },
+    "T": { "pass": true/false, "reasoning": "why" }
+  },
+  "conflictResponses": {
+    "<conflict-id>": "Your response to this conflict — agree, disagree, or provide new evidence"
+  },
+  "retractions": [
+    "Description of any finding you retract from round 1, and why"
+  ],
+  "selfAssessment": "What changed in your assessment? What are you more/less confident about after reading others?"
+}
+
+RULES:
+- At least 1 finding required
+- At least 1 artifact required
+- "evidence" must reference specific story content or codebase (never vague)
+- If verdict is "object", at least one finding must be severity "blocker"
+- investScores reasoning must be at least 20 characters
+- selfAssessment is REQUIRED
+- Each finding MUST have a "source" field: "original" (unchanged from round 1), "strengthened" (more evidence added), "retracted" (no longer valid), or "adopted" (from another agent)
+- "conflictResponses" should address each conflict you were involved in`;
 
 // ═══════════════════════════════════════════════════════════════════
-// CONTEXT ASSEMBLY
+// ANTI-RUBBER-STAMP PROTOCOL
 // ═══════════════════════════════════════════════════════════════════
-function assemblePrompt(role, story, plan, relatedStories) {
-  const roleConfig = ROLE_PROMPTS[role];
-  if (!roleConfig) throw new Error(`Unknown role: ${role}`);
+const ANTI_RUBBER_STAMP_PROTOCOL = `ANTI-RUBBER-STAMP PROTOCOL (5 steps — complete ALL before writing your verdict):
+
+1. LIST ALL FILE PATHS you reference in your review. If you reference zero files, your review is surface-level.
+2. WRITE ONE SENTENCE PER AC explaining what would break if implemented exactly as written.
+3. IDENTIFY THE EDGE CASE most likely to be missed by the implementer.
+4. RATE YOUR WEAKEST FINDING — which finding has the thinnest evidence? Be honest.
+5. VERIFY YOUR CITATIONS ARE REAL — do not cite files or patterns that don't exist in the codebase.
+
+If you cannot complete all 5 steps, you have not read the story deeply enough. Go back and read again.`;
+
+// ═══════════════════════════════════════════════════════════════════
+// CONTEXT ASSEMBLY — ROUND 1
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * Build the full prompt for a round 1 (independent) review.
+ * @param {object} agent - plan_agents row joined with agent_templates
+ * @param {object} story
+ * @param {object} plan
+ * @param {Array} relatedStories
+ * @returns {string}
+ */
+function assembleRound1Prompt(agent, story, plan, relatedStories) {
+  const effectivePrompt = agent.prompt_override || agent.system_prompt;
+  const effectiveRubric = agent.rubric_override || agent.rubric;
 
   const goals = typeof plan.goals === 'string' ? JSON.parse(plan.goals) : plan.goals;
   const goalsList = goals.map((g, i) => `${i+1}. ${g.done ? '[DONE] ' : ''}${g.text}`).join('\n');
@@ -218,11 +294,29 @@ function assemblePrompt(role, story, plan, relatedStories) {
     .map(s => `- ${s.id}: ${s.title} (${s.status})`)
     .join('\n');
 
+  // Parse rubric and format examples
+  let rubricSection = '';
+  try {
+    const rubricItems = typeof effectiveRubric === 'string' ? JSON.parse(effectiveRubric) : (effectiveRubric || []);
+    if (Array.isArray(rubricItems) && rubricItems.length > 0) {
+      rubricSection = `\n---\n\nRUBRIC — Your review will be scored on these criteria:\n\n` +
+        rubricItems.map(r => `- ${r.label} (weight: ${r.weight}, scoring: ${r.scoring})${r.description ? ': ' + r.description : ''}`).join('\n') +
+        `\n\nExamples of GOOD evidence:\n` +
+        `- File citations: "TriggerBuilder.cs:42 — DomReady() only accepts Action<PipelineBuilder>"\n` +
+        `- AC reference: "AC #3 requires Playwright test, but story doesn't mention sandbox page"\n` +
+        `- Code path trace: "Element() -> MutateElementCommand -> resolveRoot() in element.ts -> bracket notation"\n\n` +
+        `Examples of BAD evidence (will score 0):\n` +
+        `- "Looks fine"\n` +
+        `- "No issues found"\n` +
+        `- "Should be okay"`;
+    }
+  } catch { /* rubric parse failed — skip section */ }
+
   return `${PREAMBLE}
 
 ---
 
-${roleConfig.prompt}
+${effectivePrompt}
 
 ---
 
@@ -236,6 +330,7 @@ ${goalsList}
 
 RELATED STORIES:
 ${related || '(none)'}
+${rubricSection}
 
 ---
 
@@ -250,13 +345,119 @@ ${story.body || '(no body)'}
 
 ---
 
-${OUTPUT_SCHEMA}
+${ROUND1_OUTPUT_SCHEMA}
 
-ANTI-RUBBER-STAMP: Before writing "approve", answer to yourself:
-1. What would break if this story is implemented exactly as written?
-2. What edge case is not covered?
-3. What existing test would fail?
-If you cannot answer all three, you have not read deeply enough.`;
+${ANTI_RUBBER_STAMP_PROTOCOL}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CONTEXT ASSEMBLY — ROUND 2 (CHALLENGE)
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * Build the full prompt for a round 2 (challenge) review.
+ * Includes all round 1 reviews, detected conflicts, and this agent's round 1 score.
+ *
+ * @param {object} agent - plan_agents row joined with agent_templates
+ * @param {object} story
+ * @param {object} plan
+ * @param {Array} round1Reviews - all round 1 review DB rows
+ * @param {Array} conflicts - output of detectConflicts()
+ * @param {object|null} round1Score - this agent's evidence_scores row from round 1
+ * @returns {string}
+ */
+function assembleRound2Prompt(agent, story, plan, round1Reviews, conflicts, round1Score) {
+  const effectivePrompt = agent.prompt_override || agent.system_prompt;
+
+  const goals = typeof plan.goals === 'string' ? JSON.parse(plan.goals) : plan.goals;
+  const goalsList = goals.map((g, i) => `${i+1}. ${g.done ? '[DONE] ' : ''}${g.text}`).join('\n');
+
+  // Format all round 1 reviews for cross-visibility
+  const reviewsSection = round1Reviews.map(r => {
+    const data = typeof r.review_json === 'string' ? JSON.parse(r.review_json) : r.review_json;
+    const investSummary = data.investScores
+      ? Object.entries(data.investScores).map(([k, v]) => `${k}: ${v.pass ? 'PASS' : 'FAIL'}`).join(', ')
+      : '(no INVEST scores)';
+
+    const findingsSummary = Array.isArray(data.findings)
+      ? data.findings.map(f => `  - [${f.severity}] ${f.title}: ${(f.text || '').slice(0, 150)}`).join('\n')
+      : '  (no findings)';
+
+    return `### ${data.roleName || r.agent_template_id} — Verdict: ${r.verdict.toUpperCase()} (${r.confidence || 'medium'})
+Executive: ${data.executive || '(none)'}
+INVEST: ${investSummary}
+Findings:
+${findingsSummary}`;
+  }).join('\n\n');
+
+  // Format conflicts
+  const conflictsSection = conflicts.length > 0
+    ? conflicts.map(c => `- ${c.id} [${c.type}]: ${c.description} (agents: ${c.agents.join(', ')})`).join('\n')
+    : '(no conflicts detected)';
+
+  // Format this agent's round 1 score weaknesses
+  let scoreSection = '';
+  if (round1Score) {
+    const flags = typeof round1Score.flags === 'string' ? JSON.parse(round1Score.flags) : (round1Score.flags || []);
+    scoreSection = `YOUR ROUND 1 EVIDENCE SCORE: ${round1Score.score}/100
+Category: ${round1Score.category_points}/50, INVEST: ${round1Score.invest_points}/30, Structural: ${round1Score.structural_points}/20
+${flags.length > 0 ? 'FLAGS: ' + flags.join(', ') : 'No flags.'}
+
+IMPROVE YOUR SCORE: Address the weakest areas. Add file:line citations. Expand thin reasoning. Remove vague language.`;
+  }
+
+  return `${PREAMBLE}
+
+---
+
+${effectivePrompt}
+
+---
+
+ROUND 2 — CHALLENGE REVIEW
+
+This is round 2. You have now seen ALL round 1 reviews from every agent. Your task:
+1. RECONSIDER your round 1 findings in light of what others found.
+2. RESPOND to any conflicts you're involved in.
+3. STRENGTHEN findings with better evidence, or RETRACT findings you now believe were wrong.
+4. ADOPT valid findings from other agents that you missed.
+5. Be honest about what you got wrong in round 1.
+
+MASTER PLAN: ${plan.title}
+GOALS:
+${goalsList}
+
+---
+
+STORY UNDER REVIEW:
+
+ID: ${story.id}
+Title: ${story.title}
+Size: ${story.size || 'not set'}
+
+${story.body || '(no body)'}
+
+---
+
+ALL ROUND 1 REVIEWS:
+
+${reviewsSection}
+
+---
+
+DETECTED CONFLICTS:
+
+${conflictsSection}
+
+---
+
+${scoreSection}
+
+---
+
+${ROUND2_OUTPUT_SCHEMA}
+
+${ANTI_RUBBER_STAMP_PROTOCOL}`;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -334,21 +535,77 @@ function dispatchAgent(role, prompt) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// REVIEW ORCHESTRATOR
+// EVIDENCE SCORING HELPERS
 // ═══════════════════════════════════════════════════════════════════
 
-const ALL_ROLES = ['architect', 'csharp', 'bdd', 'pm', 'ui', 'human-proxy'];
+/**
+ * Score a review and persist evidence score + invest assessments.
+ * @returns {string} reviewId
+ */
+function scoreAndPersist(reviewId, reviewData, effectiveRubric, adjustedStructuralBonus = 0) {
+  let rubric;
+  try {
+    rubric = typeof effectiveRubric === 'string' ? JSON.parse(effectiveRubric) : (effectiveRubric || []);
+  } catch {
+    rubric = [];
+  }
+
+  const scoreResult = computeEvidenceScore(reviewData, rubric);
+
+  // Apply structural bonus (e.g. challenge round bonus for conflict responses)
+  const adjustedStructural = Math.min(20, scoreResult.structuralPoints + adjustedStructuralBonus);
+  const adjustedScore = Math.min(100, scoreResult.categoryPoints + scoreResult.investPoints + adjustedStructural);
+
+  createEvidenceScore({
+    reviewId,
+    score: adjustedScore,
+    categoryPoints: scoreResult.categoryPoints,
+    investPoints: scoreResult.investPoints,
+    structuralPoints: adjustedStructural,
+    flags: scoreResult.flags,
+    breakdownJson: adjustedStructuralBonus > 0
+      ? { ...scoreResult.breakdown, challengeBonus: true }
+      : scoreResult.breakdown,
+  });
+
+  // Extract invest assessments
+  if (reviewData.investScores) {
+    for (const [criterion, score] of Object.entries(reviewData.investScores)) {
+      createInvestAssessment({
+        reviewId,
+        criterion,
+        pass: score.pass,
+        reasoning: score.reasoning || '',
+        evidenceQuality: adjustedScore >= 80 ? 'strong' : adjustedScore >= 60 ? 'adequate' : 'weak',
+      });
+    }
+  }
+
+  return adjustedScore;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// REVIEW ORCHESTRATOR — TWO-ROUND
+// ═══════════════════════════════════════════════════════════════════
 
 // Guard against concurrent dispatches for the same story
 const _reviewsInProgress = new Set();
 
 /**
- * Dispatch all 6 agents in parallel for a story.
- * Writes results to DB as they complete.
- * Returns { completed, failed } summary.
+ * Dispatch agents for a story in up to two rounds.
+ *
+ * Round 1: Independent reviews — each agent reviews the story without seeing others.
+ * Round 2 (conditional): Challenge round — agents see all round 1 reviews + conflicts.
+ *
+ * Round 2 triggers if ANY of:
+ *   - At least one agent objected
+ *   - Any evidence score < 40 (rubber stamp)
+ *   - INVEST disagreement between agents
+ *   - Average evidence score < 60
  *
  * @param {string} storyId
- * @param {function} onProgress - called with (role, status, data) for WebSocket updates
+ * @param {function} onProgress - called with (agentId, status, data) for WebSocket updates
+ * @returns {Promise<{round1: number, round2: number, skippedRound2?: boolean}>}
  */
 export async function dispatchReview(storyId, onProgress) {
   if (_reviewsInProgress.has(storyId)) {
@@ -363,6 +620,9 @@ export async function dispatchReview(storyId, onProgress) {
     const plan = getPlan(story.plan_id);
     if (!plan) throw new Error(`Plan not found: ${story.plan_id}`);
 
+    const planAgents = getPlanAgents(story.plan_id);
+    if (planAgents.length === 0) throw new Error(`No agents configured for plan ${story.plan_id}`);
+
     const relatedStories = getStoriesByPlan(story.plan_id);
 
     // Validate transition to review status before changing it
@@ -372,56 +632,139 @@ export async function dispatchReview(storyId, onProgress) {
       updateStory(storyId, { status: 'review' });
     }
 
-    const round = 1; // TODO: support rounds 2-3
-    const completed = [];
-    const failed = [];
+    // ── Round 1: Independent Reviews ────────────────────────────────
+    const existing = getReviews(storyId, 1);
+    const existingAgents = new Set(existing.map(r => r.agent_template_id));
 
-    // Check for existing reviews this round
-    const existing = getReviews(storyId, round);
-    const existingRoles = new Set(existing.map(r => r.agent_template_id));
+    const round1Promises = planAgents
+      .filter(agent => !existingAgents.has(agent.agent_template_id))
+      .map(async agent => {
+        const effectivePrompt = agent.prompt_override || agent.system_prompt;
+        const effectiveRubric = agent.rubric_override || agent.rubric;
 
-    // Dispatch all agents in parallel
-    const promises = ALL_ROLES
-      .filter(role => !existingRoles.has(role))
-      .map(async role => {
-        const roleConfig = ROLE_PROMPTS[role];
-        onProgress?.(role, 'started', { roleName: roleConfig.roleName });
+        onProgress?.(agent.agent_template_id, 'started', {
+          roleName: agent.display_name, round: 1,
+        });
 
         try {
-          const prompt = assemblePrompt(role, story, plan, relatedStories);
-          const review = await dispatchAgent(role, prompt);
+          const prompt = assembleRound1Prompt(agent, story, plan, relatedStories);
+          const reviewData = await dispatchAgent(agent.agent_template_id, prompt);
 
-          // Validate minimum structure
-          if (!review.verdict || !review.findings || !review.artifacts) {
-            throw new Error('Missing required fields (verdict, findings, artifacts)');
+          if (!reviewData.verdict || !reviewData.findings) {
+            throw new Error('Missing required fields (verdict, findings)');
           }
 
-          // Save to DB
-          createReview({
+          // Save review with prompt/rubric snapshots
+          const reviewId = createReview({
             storyId,
-            agentTemplateId: role,
-            round,
-            verdict: review.verdict,
-            confidence: review.confidence || 'medium',
-            reviewJson: { roleName: roleConfig.roleName, ...review },
-            promptSnapshot: roleConfig.prompt,
-            rubricSnapshot: JSON.stringify([]),
+            agentTemplateId: agent.agent_template_id,
+            round: 1,
+            verdict: reviewData.verdict,
+            confidence: reviewData.confidence || 'medium',
+            reviewJson: { roleName: agent.display_name, ...reviewData },
+            promptSnapshot: effectivePrompt,
+            rubricSnapshot: effectiveRubric || '[]',
           });
 
-          completed.push(role);
-          onProgress?.(role, 'completed', { verdict: review.verdict, roleName: roleConfig.roleName });
+          // Compute and persist evidence score + invest assessments
+          scoreAndPersist(reviewId, reviewData, effectiveRubric);
+
+          onProgress?.(agent.agent_template_id, 'completed', {
+            verdict: reviewData.verdict, roleName: agent.display_name, round: 1,
+          });
+          return { agent: agent.agent_template_id, success: true };
         } catch (err) {
-          failed.push({ role, error: err.message });
-          onProgress?.(role, 'failed', { error: err.message, roleName: roleConfig.roleName });
+          onProgress?.(agent.agent_template_id, 'failed', {
+            error: err.message, roleName: agent.display_name, round: 1,
+          });
+          return { agent: agent.agent_template_id, success: false, error: err.message };
         }
       });
 
-    await Promise.all(promises);
+    await Promise.all(round1Promises);
 
-    return { completed, failed, total: ALL_ROLES.length };
+    // ── Check Round 2 Trigger Conditions ────────────────────────────
+    const round1Reviews = getReviews(storyId, 1);
+    const hasObjection = round1Reviews.some(r => r.verdict === 'object');
+
+    const scores = round1Reviews
+      .map(r => getEvidenceScore(r.id))
+      .filter(Boolean);
+    const hasRubberStamp = scores.some(s => s.score < 40);
+    const avgScore = scores.length > 0
+      ? scores.reduce((sum, s) => sum + s.score, 0) / scores.length
+      : 0;
+
+    // Check INVEST disagreement
+    const allConflicts = detectConflicts(round1Reviews);
+    const hasInvestDisagreement = allConflicts.some(c => c.type === 'invest_disagreement');
+
+    const shouldChallenge = hasObjection || hasRubberStamp || hasInvestDisagreement || avgScore < 60;
+
+    if (!shouldChallenge) {
+      return { round1: round1Reviews.length, round2: 0, skippedRound2: true };
+    }
+
+    // ── Round 2: Challenge ──────────────────────────────────────────
+    onProgress?.('system', 'round2-starting', { round: 2 });
+
+    const round2Promises = planAgents.map(async agent => {
+      const effectivePrompt = agent.prompt_override || agent.system_prompt;
+      const effectiveRubric = agent.rubric_override || agent.rubric;
+
+      // Get this agent's round 1 score
+      const r1Review = round1Reviews.find(r => r.agent_template_id === agent.agent_template_id);
+      const r1Score = r1Review ? getEvidenceScore(r1Review.id) : null;
+
+      onProgress?.(agent.agent_template_id, 'started', {
+        roleName: agent.display_name, round: 2,
+      });
+
+      try {
+        const prompt = assembleRound2Prompt(agent, story, plan, round1Reviews, allConflicts, r1Score);
+        const reviewData = await dispatchAgent(agent.agent_template_id, prompt);
+
+        if (!reviewData.verdict || !reviewData.findings) {
+          throw new Error('Missing required fields (verdict, findings)');
+        }
+
+        const reviewId = createReview({
+          storyId,
+          agentTemplateId: agent.agent_template_id,
+          round: 2,
+          verdict: reviewData.verdict,
+          confidence: reviewData.confidence || 'medium',
+          reviewJson: { roleName: agent.display_name, ...reviewData },
+          promptSnapshot: effectivePrompt,
+          rubricSnapshot: effectiveRubric || '[]',
+        });
+
+        // Score round 2 with challenge bonus: +5 structural if conflictResponses present
+        const hasConflictResponses = reviewData.conflictResponses
+          && typeof reviewData.conflictResponses === 'object'
+          && Object.keys(reviewData.conflictResponses).length > 0;
+        const challengeBonus = hasConflictResponses ? 5 : 0;
+
+        scoreAndPersist(reviewId, reviewData, effectiveRubric, challengeBonus);
+
+        onProgress?.(agent.agent_template_id, 'completed', {
+          verdict: reviewData.verdict, roleName: agent.display_name, round: 2,
+        });
+        return { agent: agent.agent_template_id, success: true };
+      } catch (err) {
+        onProgress?.(agent.agent_template_id, 'failed', {
+          error: err.message, roleName: agent.display_name, round: 2,
+        });
+        return { agent: agent.agent_template_id, success: false, error: err.message };
+      }
+    });
+
+    await Promise.all(round2Promises);
+
+    return { round1: round1Reviews.length, round2: planAgents.length };
   } finally {
     _reviewsInProgress.delete(storyId);
   }
 }
 
-export { ALL_ROLES, ROLE_PROMPTS };
+export { ROLE_PROMPTS };
