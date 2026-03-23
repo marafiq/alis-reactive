@@ -37,6 +37,7 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
     if (getComputedStyle(anchor).position === "static") anchor.style.position = "relative";
 
     const btn = document.createElement("button");
+    btn.type = "button";
     btn.setAttribute(RETRY_ATTR, key);
     btn.setAttribute("title", "Connection lost — click to reconnect");
     btn.className = "alis-retry-indicator";
