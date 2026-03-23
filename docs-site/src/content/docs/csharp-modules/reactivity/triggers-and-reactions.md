@@ -1,5 +1,5 @@
 ---
-title: Triggers
+title: Triggers & Real-Time
 description: DomReady, CustomEvent, typed payloads, component events, SSE, and SignalR.
 sidebar:
   order: 1
