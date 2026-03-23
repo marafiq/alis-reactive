@@ -1,0 +1,121 @@
+@model DateRangePickerModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "FusionDateRangePicker";
+
+    var plan = Html.ReactivePlan<DateRangePickerModel>();
+
+    // ── Section 1: Property Read — display startDate and endDate in echo elements ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var comp = p.Component<FusionDateRangePicker>(m => m.StayStart);
+        p.Element("start-echo").SetText(comp.StartDate());
+        p.Element("end-echo").SetText(comp.EndDate());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">FusionDateRangePicker — Full API</native-heading>
+        <native-text color="Secondary">
+            Exercises all supported FusionDateRangePicker API: property reads (startDate + endDate),
+            events with typed conditions, and component-read conditions.
+            Senior living domain: resident stay periods.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Property Read (StartDate + EndDate) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Property Read (StartDate + EndDate)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the date range component's <code>startDate</code> and <code>endDate</code>
+            properties and displays them in text elements.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.StayStart, o => o.Label("Stay Period"))
+                .DateRangePicker(b => b
+                    .Placeholder("Select stay period")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("change-start").SetText(args, x => x.StartDate);
+                        p.Element("change-end").SetText(args, x => x.EndDate);
+                        p.When(args, x => x.StartDate).NotNull()
+                            .Then(t => t.Element("args-condition").SetText("stay period selected"))
+                            .Else(e => e.Element("args-condition").SetText("no period"));
+                        var comp = p.Component<FusionDateRangePicker>(m => m.StayStart);
+                        p.When(comp.StartDate()).NotNull()
+                            .Then(then =>
+                            {
+                                then.Element("selected-indicator").Show();
+                                then.Element("selected-indicator").SetText("stay period confirmed");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("selected-indicator").Hide();
+                            });
+                    })); }
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 2: Echo Values -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Property Read (Sources)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the date range component's <code>startDate</code> and <code>endDate</code>
+            via component sources.
+        </p>
+        <div class="font-mono text-sm space-y-1">
+            <p>Start echo: <span id="start-echo" class="text-text-muted">&mdash;</span></p>
+            <p>End echo: <span id="end-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 3: Events — Changed with typed condition -->
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Events (Changed + Typed Condition)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            The stay period field wires a Changed event. Change shows start and end dates.
+            <code>When(args, x =&gt; x.StartDate).NotNull()</code> tests typed event-args condition.
+        </p>
+        <div class="font-mono text-sm space-y-1">
+            <p>Change start: <span id="change-start" class="text-text-muted">&mdash;</span></p>
+            <p>Change end: <span id="change-end" class="text-text-muted">&mdash;</span></p>
+            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
+            <p>Confirmed: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 4: Component-Read Condition -->
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Component Value Condition</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Button reads stay start via <code>When(comp.StartDate()).IsEmpty()</code>
+            and shows a warning or confirmation.
+        </p>
+        <div class="mt-3">
+            @(Html.NativeButton("check-stay-btn", "Check Stay Period")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionDateRangePicker>(m => m.StayStart);
+                    p.When(comp.StartDate()).IsEmpty()
+                        .Then(t => t.Element("stay-warning").SetText("stay period is required"))
+                        .Else(e => e.Element("stay-warning").SetText("stay period set"));
+                }))
+        </div>
+        <div class="font-mono text-sm mt-2">
+            <p>Warning: <span id="stay-warning" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

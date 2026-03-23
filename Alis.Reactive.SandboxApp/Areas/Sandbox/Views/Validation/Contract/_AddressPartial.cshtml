@@ -1,0 +1,40 @@
+@model ResidentModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    var plan = Html.ResolvePlan<ResidentModel>();
+}
+
+<native-grid id="address-section" cols="C2" gap="Base">
+    @{ Html.InputField(plan, m => m.Address.Street, o => o.Required().Label("Street"))
+       .NativeTextBox(b => b
+           .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+           .Placeholder("123 Main St")); }
+
+    @{ Html.InputField(plan, m => m.Address.City, o => o.Required().Label("City"))
+       .NativeTextBox(b => b
+           .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+           .Placeholder("Springfield")); }
+
+    @{ Html.InputField(plan, m => m.Address.ZipCode, o => o.Required().Label("Zip Code"))
+       .NativeTextBox(b => b
+           .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+           .Placeholder("12345")
+           .Reactive(plan, evt => evt.Changed, (args, p) =>
+           {
+               p.Dispatch<NativeTextBoxChangeArgs>("zipcode-validated", args);
+           })); }
+</native-grid>
+
+<div class="mt-2">
+    <span id="zipcode-status" class="text-sm text-text-muted"></span>
+</div>
+
+@{
+    Html.On(plan, t => t.CustomEvent("zipcode-validated", p =>
+    {
+        p.Element("zipcode-status").SetText("Zip validated");
+    }));
+}
+
+@Html.RenderPlan(plan)

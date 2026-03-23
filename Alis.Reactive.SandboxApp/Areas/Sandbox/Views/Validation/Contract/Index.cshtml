@@ -1,0 +1,138 @@
+@model ResidentModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Validation Contract — Scenario 1";
+    var plan = Html.ReactivePlan<ResidentModel>();
+
+    var careLevels = ((string[])ViewBag.CareLevels)
+        .Select(c => new SelectListItem(c, c))
+        .ToList();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Scenario 1 — Single Page, All Fields</native-heading>
+        <native-text color="Secondary">
+            Mixed vendors (Native + Fusion), unconditional + conditional rules (truthy, falsy, eq, neq),
+            equalTo cross-field, nested address, server error routing.
+        </native-text>
+    </div>
+
+    <form id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
+        <h2 class="text-base font-semibold mb-2">Basic Information</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Resident name")); }
+
+            @{ Html.InputField(plan, m => m.Email, o => o.Required().Label("Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("resident@care.com")); }
+
+            @{ Html.InputField(plan, m => m.ConfirmEmail, o => o.Required().Label("Confirm Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Confirm email")); }
+
+            @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
+               .NativeDropDown(b => b
+                   .Items(careLevels)
+                   .Placeholder("-- Select Care Level --")
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
+        </div>
+
+        <h2 class="text-base font-semibold mb-2 mt-6">Veteran Status</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.IsVeteran, o => o.Label("Veteran"))
+               .NativeCheckBox(b => b
+                   .CssClass("rounded border-border")); }
+
+            @{ Html.InputField(plan, m => m.VeteranId, o => o.Label("Veteran ID"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("V12345")); }
+        </div>
+
+        <h2 class="text-base font-semibold mb-2 mt-6">Care Details</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.MemoryAssessmentScore, o => o.Label("Memory Assessment Score"))
+               .NumericTextBox(b => b
+                   .Placeholder("Score")
+                   .CssClass("rounded-md border border-border")); }
+
+            @{ Html.InputField(plan, m => m.PhysicianName, o => o.Label("Physician Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Dr. Smith")); }
+        </div>
+
+        <h2 class="text-base font-semibold mb-2 mt-6">Emergency Contact</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.HasEmergencyContact, o => o.Label("Has Emergency Contact"))
+               .NativeCheckBox(b => b
+                   .CssClass("rounded border-border")); }
+
+            @{ Html.InputField(plan, m => m.EmergencyName, o => o.Label("Emergency Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Contact name")); }
+
+            @{ Html.InputField(plan, m => m.EmergencyPhone, o => o.Label("Emergency Phone"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("555-0123")); }
+
+            @{ Html.InputField(plan, m => m.ReasonForNoContact, o => o.Label("Reason for No Contact"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Explain why no contact")); }
+        </div>
+
+        <h2 class="text-base font-semibold mb-2 mt-6">Address</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.Address.Street, o => o.Required().Label("Street"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("123 Main St")); }
+
+            @{ Html.InputField(plan, m => m.Address.City, o => o.Required().Label("City"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Springfield")); }
+
+            @{ Html.InputField(plan, m => m.Address.ZipCode, o => o.Required().Label("Zip Code"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("12345")); }
+        </div>
+
+        <div class="mt-6 flex items-center gap-4">
+            @(Html.NativeButton("submit-btn", "Submit Admission")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/ValidationContract/Submit", g => g.IncludeAll())
+                     .Validate<ResidentValidator>("resident-form")
+                     .Response(r => r
+                        .OnSuccess(s => s.Element("result").SetText("Admission saved"))
+                        .OnError(400, e =>
+                        {
+                            e.ValidationErrors("resident-form");
+                        }));
+                }))
+
+            <p id="result" class="text-sm text-text-muted"></p>
+        </div>
+    </form>
+</native-vstack>
+
+@Html.RenderPlan(plan)

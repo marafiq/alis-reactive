@@ -1,0 +1,143 @@
+@model IdGeneratorModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@{
+    ViewData["Title"] = "IdGenerator Test";
+
+    var statusItems = new List<SelectListItem>
+    {
+        new("Active", "active"),
+        new("Inactive", "inactive"),
+        new("Pending", "pending")
+    };
+
+    var cityItems = new List<SelectListItem>
+    {
+        new("Seattle", "Seattle"),
+        new("Portland", "Portland"),
+        new("Denver", "Denver")
+    };
+
+    IReactivePlan<IdGeneratorModel> plan = new ReactivePlan<IdGeneratorModel>();
+}
+
+<native-vstack gap="Lg" class="max-w-3xl mx-auto">
+    <div>
+        <native-heading level="H1">IdGenerator — Collision-Free IDs</native-heading>
+        <native-text color="Secondary">
+            Verifies that <code>NumericTextBoxFor</code> and <code>NativeDropDownFor</code>
+            produce unique element IDs while preserving <code>name</code> attributes for MVC posting.
+        </native-text>
+    </div>
+
+    <!-- ── Section 1: JSON POST ── -->
+    <section>
+        <h2 class="text-sm font-semibold mb-2">1. JSON POST — Include (gathers by name)</h2>
+        <form id="json-form" class="grid grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount (SF)"))
+                .NumericTextBox(b => b
+                    .Min(0).Max(99999).Step(1)); }
+            @{ Html.InputField(plan, m => m.Status, o => o.Label("Status (Native)"))
+                .NativeDropDown(b => b
+                    .Items(statusItems)
+                    .Placeholder("-- Select --")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.Address!.City, o => o.Label("City (Native)"))
+                .NativeDropDown(b => b
+                    .Items(cityItems)
+                    .Placeholder("-- Select --")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.Address!.PostalCode, o => o.Label("Postal Code (SF)"))
+                .NumericTextBox(b => b
+                    .Min(10000).Max(99999).Step(1)); }
+        </form>
+        @(Html.NativeButton("json-submit-btn", "Submit JSON")
+            .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/IdGenerator/SaveJson", g => g
+                    .Include(m => m.Name)
+                    .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Amount)
+                    .Include(m => m.Status)
+                    .Include(m => m.Address!.City)
+                    .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Address!.PostalCode))
+                 .Response(r => r
+                    .OnSuccess<IdGeneratorJsonResponse>((json, s) =>
+                    {
+                        s.Element("json-result").SetText(json, j => j.Summary);
+                        s.Element("json-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="json-result" class="mt-2 text-sm font-mono min-h-[1.5rem]"></div>
+    </section>
+
+    <!-- ── Section 2: FormData POST ── -->
+    <section>
+        <h2 class="text-sm font-semibold mb-2">2. FormData POST — Include (gathers by name)</h2>
+        <form id="form-form" class="grid grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
+                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount (SF)"))
+                .NumericTextBox(b => b
+                    .Min(0).Max(99999).Step(1)); }
+            @{ Html.InputField(plan, m => m.Status, o => o.Label("Status (Native)"))
+                .NativeDropDown(b => b
+                    .Items(statusItems)
+                    .Placeholder("-- Select --")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+        </form>
+        @(Html.NativeButton("form-submit-btn", "Submit FormData")
+            .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/IdGenerator/SaveForm", g => g
+                    .Include(m => m.Name)
+                    .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Amount)
+                    .Include(m => m.Status))
+                 .AsFormData()
+                 .Response(r => r
+                    .OnSuccess<IdGeneratorJsonResponse>((json, s) =>
+                    {
+                        s.Element("form-result").SetText(json, j => j.Summary);
+                        s.Element("form-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="form-result" class="mt-2 text-sm font-mono min-h-[1.5rem]"></div>
+    </section>
+
+    <!-- ── Section 3: ID Inspection ── -->
+    <section>
+        <h2 class="text-sm font-semibold mb-2">3. Generated IDs</h2>
+        <div id="id-inspection" class="grid grid-cols-1 gap-2 text-xs font-mono">
+            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+                <span class="text-text-secondary">IdGenerator prefix</span>
+                <span class="text-emerald-700" id="id-prefix">@(IdGenerator.TypeScope(typeof(IdGeneratorModel)))</span>
+            </div>
+            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+                <span class="text-text-secondary">m => m.Amount</span>
+                <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Amount))</span>
+            </div>
+            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+                <span class="text-text-secondary">m => m.Status</span>
+                <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Status))</span>
+            </div>
+            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+                <span class="text-text-secondary">m => m.Address.City</span>
+                <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Address!.City))</span>
+            </div>
+            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+                <span class="text-text-secondary">m => m.Address.PostalCode</span>
+                <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Address!.PostalCode))</span>
+            </div>
+        </div>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,116 @@
+@model RichTextEditorModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "FusionRichTextEditor";
+
+    var plan = Html.ReactivePlan<RichTextEditorModel>();
+
+    // ── Section 1+2: Property Write (SetValue) + Property Read on DomReady ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<FusionRichTextEditor>(m => m.CarePlan).SetValue("<p>Resident requires daily medication review and weekly physical therapy sessions.</p>");
+        var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">FusionRichTextEditor — Full API</native-heading>
+        <native-text color="Secondary">
+            Exercises all supported FusionRichTextEditor API: property writes, property reads,
+            events with typed conditions, and component-read conditions.
+            Senior living domain: care plan documentation, discharge summaries.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Property Write (SetValue) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Property Write (SetValue)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, sets care plan to initial HTML content via structured prop on the Syncfusion ej2 instance.
+        </p>
+        <div class="grid grid-cols-1 gap-4">
+            @{ Html.InputField(plan, m => m.CarePlan, o => o.Label("Care Plan"))
+                .RichTextEditor(b => b
+                    .Placeholder("Enter care plan notes...")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("change-value").SetText(args, x => x.Value);
+                        p.When(args, x => x.Value).NotEmpty()
+                            .Then(t => t.Element("args-condition").SetText("content entered"))
+                            .Else(e => e.Element("args-condition").SetText("no content"));
+                        var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
+                        p.When(comp.Value()).NotEmpty()
+                            .Then(then =>
+                            {
+                                then.Element("selected-indicator").Show();
+                                then.Element("selected-indicator").SetText("care plan on file");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("selected-indicator").Hide();
+                            });
+                    })); }
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 2: Property Read — Echo Value -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the care plan component's <code>value</code> property and displays it in a text element.
+        </p>
+        <div class="font-mono text-sm">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 3: Events — Changed with typed condition -->
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Events (Changed + Typed Condition)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            The care plan field wires a Changed event. Change shows the new value.
+            <code>When(args, x =&gt; x.Value).NotEmpty()</code> tests typed event-args condition.
+        </p>
+        <div class="font-mono text-sm space-y-1">
+            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
+            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
+            <p>On file: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 4: Component-Read Condition -->
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Component Value Condition</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Button reads care plan via <code>When(comp.Value()).IsEmpty()</code>
+            and shows a warning or confirmation.
+        </p>
+        <div class="mt-3">
+            @(Html.NativeButton("check-careplan-btn", "Check Care Plan")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
+                    p.When(comp.Value()).IsEmpty()
+                        .Then(t => t.Element("careplan-warning").SetText("care plan is required"))
+                        .Else(e => e.Element("careplan-warning").SetText("care plan set"));
+                }))
+        </div>
+        <div class="font-mono text-sm mt-2">
+            <p>Warning: <span id="careplan-warning" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

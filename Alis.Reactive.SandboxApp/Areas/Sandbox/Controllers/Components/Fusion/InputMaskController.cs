@@ -1,0 +1,17 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InputMask;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
+{
+    [Area("Sandbox")]
+    [Route("Sandbox/Components/InputMask")]
+    public class InputMaskController : Controller
+    {
+        [HttpGet("")]
+        [HttpGet("Index")]
+        public IActionResult Index()
+        {
+            return View("~/Areas/Sandbox/Views/Components/Fusion/InputMask/Index.cshtml", new InputMaskModel());
+        }
+    }
+}

@@ -1,0 +1,420 @@
+@model HttpShowcaseModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "HTTP Requests";
+
+    IReactivePlan<HttpShowcaseModel> plan = new ReactivePlan<HttpShowcaseModel>();
+
+    // Section 1: DomReady → GET /Sandbox/Http/Residents → bind response data to DOM
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get("/Sandbox/Http/Residents")
+         .WhileLoading(l => l.Element("load-spinner").Show())
+         .Response(r => r
+            .OnSuccess<ResidentsResponse>((json, s) =>
+            {
+                s.Element("load-spinner").Hide();
+                s.Element("load-first").SetText(json, x => x.First);
+                s.Element("load-second").SetText(json, x => x.Second);
+                s.Element("load-count").SetText(json, x => x.Count);
+                s.Element("load-result").AddClass("text-green-600");
+            })
+         )
+    ));
+
+    Html.On(plan, t => t.CustomEvent("native-action-link-grid-refresh", p =>
+        p.Get("/Sandbox/Http/NativeActionLinkGrid")
+         .Response(r => r.OnSuccess(s => s.Into("native-action-link-grid")))
+    ));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">HTTP Requests</native-heading>
+        <native-text color="Secondary">
+            Ten HTTP patterns: DomReady GET, POST with gather, chained, parallel, PUT, DELETE with Confirm,
+            FormData, GET with search params, multi-status error handling, and NativeActionLink row actions.
+        </native-text>
+    </div>
+
+    <!-- Section 1: DomReady GET -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">1. DomReady &rarr; GET Residents</native-heading>
+        <p class="text-sm text-text-secondary mb-3">On page load, fetches residents from the server.</p>
+        <div id="load-result" class="space-y-2 font-mono text-sm text-text-muted">
+            <p id="load-spinner" hidden class="text-amber-600">Loading...</p>
+            <p>First: <span id="load-first">—</span></p>
+            <p>Second: <span id="load-second">—</span></p>
+            <p>Count: <span id="load-count">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 2: POST with Gather -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">2. POST with Gather &rarr; Success/Error</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Click to POST gathered data. Static value &quot;John Doe&quot; is sent.</p>
+        @(Html.NativeButton("save-btn", "Save")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Http/Save", g => g.Static("name", "John Doe"))
+                 .WhileLoading(l => l.Element("save-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess<SaveResponse>((json, s) =>
+                    {
+                        s.Element("save-spinner").Hide();
+                        s.Element("save-message").SetText(json, x => x.Message);
+                        s.Element("save-received-name").SetText(json, x => x.ReceivedName);
+                        s.Element("save-result").AddClass("text-green-600");
+                        s.Element("save-result").RemoveClass("text-red-600");
+                    })
+                    .OnError(400, e =>
+                    {
+                        e.Element("save-spinner").Hide();
+                        e.Element("save-error").SetText("Validation failed: Name is required");
+                        e.Element("save-result").AddClass("text-red-600");
+                        e.Element("save-result").RemoveClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="save-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p id="save-spinner" hidden class="text-amber-600">Saving...</p>
+            <p>Message: <span id="save-message">—</span></p>
+            <p>Received Name: <span id="save-received-name">—</span></p>
+            <p id="save-error"></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 3: Chained Requests -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">3. Chained: GET Residents &rarr; GET Facilities</native-heading>
+        <p class="text-sm text-text-secondary mb-3">First request completes, then the chained request fires.</p>
+        @(Html.NativeButton("chain-btn", "Load Chain")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/Http/Residents")
+                 .WhileLoading(l => l.Element("chain-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess<ResidentsResponse>((json, s) =>
+                    {
+                        s.Element("chain-resident-first").SetText(json, x => x.First);
+                        s.Element("chain-resident-second").SetText(json, x => x.Second);
+                        s.Element("chain-residents").AddClass("text-green-600");
+                    })
+                    .Chained(c => c
+                        .Get("/Sandbox/Http/Facilities")
+                        .Response(r2 => r2
+                            .OnSuccess<FacilitiesResponse>((json2, s2) =>
+                            {
+                                s2.Element("chain-spinner").Hide();
+                                s2.Element("chain-facility-first").SetText(json2, x => x.First);
+                                s2.Element("chain-facility-second").SetText(json2, x => x.Second);
+                                s2.Element("chain-facilities").AddClass("text-green-600");
+                            })
+                        )
+                    )
+                 );
+            }))
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="chain-spinner" hidden class="text-amber-600">Loading chain...</p>
+            <div id="chain-residents" class="text-text-muted">
+                <p>Resident 1: <span id="chain-resident-first">—</span></p>
+                <p>Resident 2: <span id="chain-resident-second">—</span></p>
+            </div>
+            <div id="chain-facilities" class="text-text-muted">
+                <p>Facility 1: <span id="chain-facility-first">—</span></p>
+                <p>Facility 2: <span id="chain-facility-second">—</span></p>
+            </div>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 4: Parallel Requests -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">4. Parallel: Residents + Facilities Concurrently</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Both requests fire at the same time. All-success fires after both complete.</p>
+        @(Html.NativeButton("parallel-btn", "Load Parallel")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Element("parallel-spinner").Show();
+                p.Parallel(
+                    a => a.Get("/Sandbox/Http/Residents")
+                          .Response(ra => ra.OnSuccess<ResidentsResponse>((json, sa) =>
+                          {
+                              sa.Element("parallel-resident-first").SetText(json, x => x.First);
+                              sa.Element("parallel-resident-second").SetText(json, x => x.Second);
+                              sa.Element("parallel-residents").AddClass("text-green-600");
+                          })),
+                    b => b.Get("/Sandbox/Http/Facilities")
+                          .Response(rb => rb.OnSuccess<FacilitiesResponse>((json, sb) =>
+                          {
+                              sb.Element("parallel-facility-first").SetText(json, x => x.First);
+                              sb.Element("parallel-facility-second").SetText(json, x => x.Second);
+                              sb.Element("parallel-facilities").AddClass("text-green-600");
+                          }))
+                ).OnAllSettled(s =>
+                {
+                    s.Element("parallel-spinner").Hide();
+                    s.Element("parallel-all").SetText("All parallel requests completed!");
+                    s.Element("parallel-all").AddClass("text-green-600");
+                });
+            }))
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="parallel-spinner" hidden class="text-amber-600">Loading both...</p>
+            <div id="parallel-residents" class="text-text-muted">
+                <p>Resident 1: <span id="parallel-resident-first">—</span></p>
+                <p>Resident 2: <span id="parallel-resident-second">—</span></p>
+            </div>
+            <div id="parallel-facilities" class="text-text-muted">
+                <p>Facility 1: <span id="parallel-facility-first">—</span></p>
+                <p>Facility 2: <span id="parallel-facility-second">—</span></p>
+            </div>
+            <p id="parallel-all" class="text-text-muted">All: waiting...</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 5: PUT Update -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">5. PUT &rarr; Update Resident</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Sends a PUT request with a JSON body to update a resident.</p>
+        @(Html.NativeButton("put-btn", "Update Resident")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Put("/Sandbox/Http/UpdateResident", g => g
+                    .Static("name", "Updated Name")
+                    .Static("facilityId", "1"))
+                 .WhileLoading(l => l.Element("put-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess<UpdateResponse>((json, s) =>
+                    {
+                        s.Element("put-spinner").Hide();
+                        s.Element("put-received-name").SetText(json, x => x.ReceivedName);
+                        s.Element("put-received-facility").SetText(json, x => x.ReceivedFacilityId);
+                        s.Element("put-result").AddClass("text-green-600");
+                    })
+                    .OnError(400, e =>
+                    {
+                        e.Element("put-spinner").Hide();
+                        e.Element("put-result").SetText("Validation failed");
+                        e.Element("put-result").AddClass("text-red-600");
+                    })
+                 );
+            }))
+        <div id="put-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p id="put-spinner" hidden class="text-amber-600">Updating...</p>
+            <p>Received Name: <span id="put-received-name">—</span></p>
+            <p>Received Facility: <span id="put-received-facility">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 6: DELETE with Confirm -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">6. DELETE with Confirm &rarr; Guarded Deletion</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Shows a confirmation dialog before sending DELETE. Cancel aborts, OK proceeds.</p>
+        @(Html.NativeButton("delete-btn", "Delete Resident #42")
+            .CssClass("rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Confirm("Are you sure you want to delete resident #42?")
+                 .Then(t =>
+                 {
+                    t.Delete("/Sandbox/Http/DeleteResident/42")
+                     .WhileLoading(l => l.Element("delete-spinner").Show())
+                     .Response(r => r
+                        .OnSuccess<DeleteResponse>((json, s) =>
+                        {
+                            s.Element("delete-spinner").Hide();
+                            s.Element("delete-id").SetText(json, x => x.DeletedId);
+                            s.Element("delete-result").AddClass("text-green-600");
+                        })
+                     );
+                 });
+            }))
+        <div id="delete-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p id="delete-spinner" hidden class="text-amber-600">Deleting...</p>
+            <p>Deleted ID: <span id="delete-id">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 7: POST FormData (IncludeAll) -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">7. POST FormData &rarr; IncludeAll Gather</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Gathers all form fields and sends as JSON body (IncludeAll pattern).</p>
+        <form id="formdata-form" class="flex flex-col gap-3 mb-3">
+            @{ Html.InputField(plan, m => m.FirstName, o => o.Label("First Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("First name")); }
+            @{ Html.InputField(plan, m => m.LastName, o => o.Label("Last Name"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Last name")); }
+            @{ Html.InputField(plan, m => m.Email, o => o.Label("Email"))
+               .NativeTextBox(b => b
+                   .Type("email")
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Email")); }
+        </form>
+        @(Html.NativeButton("formdata-btn", "Submit Form")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Http/SaveFormData", g => g
+                    .Static("FirstName", "John")
+                    .Static("LastName", "Doe")
+                    .Static("Email", "john@example.com"))
+                 .WhileLoading(l => l.Element("formdata-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess<FormDataResponse>((json, s) =>
+                    {
+                        s.Element("formdata-spinner").Hide();
+                        s.Element("formdata-count").SetText(json, x => x.Count);
+                        s.Element("formdata-fields").SetText(json, x => x.ReceivedFields);
+                        s.Element("formdata-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="formdata-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p id="formdata-spinner" hidden class="text-amber-600">Submitting...</p>
+            <p>Field Count: <span id="formdata-count">—</span></p>
+            <p>Received Fields: <span id="formdata-fields">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 8: GET with Search Params -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">8. GET with Search Params &rarr; URL Query</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Sends a GET request with gather items appended as ?q=John URL params.</p>
+        @(Html.NativeButton("search-btn", "Search for 'John'")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/Http/Search")
+                 .Gather(g => g.Static("q", "John"))
+                 .WhileLoading(l => l.Element("search-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess<SearchResponse>((json, s) =>
+                    {
+                        s.Element("search-spinner").Hide();
+                        s.Element("search-query").SetText(json, x => x.Query);
+                        s.Element("search-match-count").SetText(json, x => x.MatchCount);
+                        s.Element("search-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="search-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p id="search-spinner" hidden class="text-amber-600">Searching...</p>
+            <p>Query: <span id="search-query">—</span></p>
+            <p>Match Count: <span id="search-match-count">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 9: Multi-Status Error Handling (422 + 500) -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">9. Multi-Status Error Handling &rarr; 422 Route</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Posts empty data to trigger 422 validation errors. Multiple OnError handlers route by status.</p>
+        @(Html.NativeButton("multi-err-btn", "Validate (will fail)")
+            .CssClass("rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Http/ValidateResident", g => g
+                    .Static("name", "")
+                    .Static("facilityId", ""))
+                 .WhileLoading(l => l.Element("multi-err-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Element("multi-err-spinner").Hide();
+                        s.Element("multi-err-result").SetText("Validation passed");
+                        s.Element("multi-err-result").AddClass("text-green-600");
+                    })
+                    .OnError(422, e =>
+                    {
+                        e.Element("multi-err-spinner").Hide();
+                        e.Element("multi-err-summary").SetText("422 — 2 validation error(s): Name, FacilityId");
+                        e.Element("multi-err-result").AddClass("text-amber-600");
+                    })
+                    .OnError(500, e =>
+                    {
+                        e.Element("multi-err-spinner").Hide();
+                        e.Element("multi-err-result").SetText("500 — Server error");
+                        e.Element("multi-err-result").AddClass("text-red-600");
+                    })
+                 );
+            }))
+        <div id="multi-err-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p id="multi-err-spinner" hidden class="text-amber-600">Validating...</p>
+            <p>Error: <span id="multi-err-summary">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 10: NativeActionLink -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">10. NativeActionLink &rarr; Repeated Row Actions</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Each row renders a normal anchor with a single serialized request chain. On success the delete action dispatches a refresh event, and the page-level listener reloads the same grid route back into the container.</p>
+        <div id="native-action-link-grid">
+            @await Html.PartialAsync("_NativeActionLinkGrid", Model.ActionRows)
+        </div>
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="native-action-link-status" class="text-text-muted">No row action yet</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">11. NativeActionLink &rarr; Standalone Single Action</native-heading>
+        <p class="text-sm text-text-secondary mb-3">A single native action link can also execute one request chain on its own and load a success fragment directly into a local target.</p>
+        <div class="flex items-center gap-4">
+            @(Html.NativeActionLink("Run Standalone NativeActionLink", "/Sandbox/Http/StandaloneNativeActionLink", p => p
+                .Post("/Sandbox/Http/StandaloneNativeActionLink", g => g.Static("command", "run"))
+                .WhileLoading(x => x.Element("standalone-native-action-link-status").SetText("Running standalone NativeActionLink..."))
+                .Response(r => r
+                    .OnSuccess(x =>
+                    {
+                        x.Into("standalone-native-action-link-result");
+                        x.Element("standalone-native-action-link-status").SetText("Standalone NativeActionLink succeeded");
+                    })
+                    .OnError(400, x => x.Element("standalone-native-action-link-status").SetText("Standalone NativeActionLink failed"))))
+                .CssClass("text-sm font-medium text-blue-600 hover:text-blue-700")
+                .Attr("data-testid", "standalone-native-action-link"))
+        </div>
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="standalone-native-action-link-status" class="text-text-muted">Standalone link has not run yet</p>
+            <div id="standalone-native-action-link-result" class="text-text-muted">No standalone response yet</div>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Plan JSON -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
