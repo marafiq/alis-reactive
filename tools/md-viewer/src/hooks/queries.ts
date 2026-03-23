@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Plan, Story, Review, Concept, ConceptLink, HumanVerdict, InvestValidation } from '@/lib/types';
+import type { Plan, Story, Review, Concept, ConceptLink, HumanVerdict, InvestValidation, Comment } from '@/lib/types';
 
 // ── API helper ──
 async function api<T>(path: string, opts?: RequestInit & { body?: unknown }): Promise<T> {
@@ -129,6 +129,24 @@ export function useCreateVerdict() {
     mutationFn: (data: { storyId: string; verdict: string; notes?: string }) =>
       api<{ id: string }>('/human-verdicts', { method: 'POST', body: data }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['stories'] }),
+  });
+}
+
+// ── Comments ──
+export function useComments(storyId: string | null) {
+  return useQuery({
+    queryKey: ['comments', storyId],
+    queryFn: () => api<Comment[]>(`/comments?storyId=${storyId}`),
+    enabled: !!storyId,
+  });
+}
+
+export function useCreateComment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { storyId: string; body: string; author: string }) =>
+      api<Comment>('/comments', { method: 'POST', body: data }),
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['comments', vars.storyId] }),
   });
 }
 

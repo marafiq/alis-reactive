@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import { cn } from '@/lib/utils';
-import { useStory, useReviews, useDispatchReview } from '@/hooks/queries';
+import { useStory, useReviews, useDispatchReview, useComments, useCreateComment } from '@/hooks/queries';
 import { useWS } from '@/App';
 import { ReviewSection } from '@/components/reviews/ReviewSection';
 import type { ParsedReview, Dependency } from '@/lib/types';
@@ -197,9 +197,12 @@ export function StoryDetail({
 }: StoryDetailProps) {
   const { data: story, isLoading: storyLoading } = useStory(storyId);
   const { data: reviews = [] } = useReviews(storyId);
+  const { data: comments = [] } = useComments(storyId);
   const dispatchReview = useDispatchReview();
+  const createComment = useCreateComment();
   const { agentProgress } = useWS();
   const [isDispatching, setIsDispatching] = useState(false);
+  const [commentBody, setCommentBody] = useState('');
 
   const concepts: string[] = useMemo(
     () => (story ? parseJson<string>(story.concepts) : []),
@@ -221,6 +224,16 @@ export function StoryDetail({
     dispatchReview.mutate(story.id, {
       onSettled: () => setIsDispatching(false),
     });
+  }
+
+  function handlePostComment(e: FormEvent) {
+    e.preventDefault();
+    const trimmed = commentBody.trim();
+    if (!trimmed || !story) return;
+    createComment.mutate(
+      { storyId: story.id, body: trimmed, author: 'user' },
+      { onSuccess: () => setCommentBody('') },
+    );
   }
 
   if (storyLoading) {
@@ -364,6 +377,76 @@ export function StoryDetail({
           )}
         </section>
       )}
+
+      {/* Comments section */}
+      <section className="border-t border-border pt-6">
+        <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-4">
+          Comments
+        </h2>
+
+        {/* Existing comments */}
+        {comments.length > 0 && (
+          <div className="space-y-3 mb-5">
+            {comments.map((comment) => (
+              <div
+                key={comment.id}
+                className="rounded-lg border border-border bg-muted/30 px-4 py-3"
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span
+                    className={cn(
+                      'inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider',
+                      comment.author === 'user'
+                        ? 'bg-primary/10 text-primary'
+                        : 'bg-changes-light text-changes',
+                    )}
+                  >
+                    {comment.author === 'user' ? 'You' : 'Agent'}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">
+                    {new Date(comment.created_at).toLocaleString()}
+                  </span>
+                </div>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{comment.body}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {comments.length === 0 && (
+          <p className="text-xs text-muted-foreground mb-4">No comments yet.</p>
+        )}
+
+        {/* Add comment form */}
+        <form onSubmit={handlePostComment} className="space-y-2">
+          <textarea
+            value={commentBody}
+            onChange={(e) => setCommentBody(e.target.value)}
+            placeholder="Add a comment..."
+            rows={3}
+            className={cn(
+              'w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground',
+              'placeholder:text-muted-foreground/50',
+              'focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50',
+              'resize-none',
+            )}
+          />
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={!commentBody.trim() || createComment.isPending}
+              className={cn(
+                'px-4 py-2 rounded-lg text-xs font-semibold',
+                'bg-primary text-primary-foreground',
+                'hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed',
+                'transition-colors',
+              )}
+            >
+              {createComment.isPending ? 'Posting...' : 'Post Comment'}
+            </button>
+          </div>
+        </form>
+      </section>
     </div>
   );
 }

@@ -348,10 +348,9 @@ export function PlanView({ planId, onSelectStory }: PlanViewProps) {
           Architecture
         </h2>
         {plan.d2_diagram ? (
-          <div
-            className="prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: marked.parse(plan.d2_diagram) as string }}
-          />
+          <div className="bg-[#1a1614] text-[#e8e2da] rounded-lg p-6 font-mono text-sm leading-relaxed whitespace-pre-wrap">
+            {plan.d2_diagram}
+          </div>
         ) : (
           <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/50 text-center">
             <pre className="font-mono text-xs text-muted-foreground">

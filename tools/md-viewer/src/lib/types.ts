@@ -118,6 +118,14 @@ export interface InvestValidation {
   investCount: number;
 }
 
+export interface Comment {
+  id: string;
+  story_id: string;
+  body: string;
+  author: 'user' | 'agent';
+  created_at: string;
+}
+
 // Helpers
 export function parseJson<T>(val: string | T[] | null | undefined): T[] {
   if (!val) return [];

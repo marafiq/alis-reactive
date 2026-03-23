@@ -1,5 +1,5 @@
 import { useState, createContext, useContext, type ReactNode } from 'react';
-import { usePlans, useStories, useConcepts } from '@/hooks/queries';
+import { usePlans, useStories, useConcepts, useReviews, useCreateVerdict } from '@/hooks/queries';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { ReviewPanel } from '@/components/layout/ReviewPanel';
@@ -9,7 +9,7 @@ import { Board } from '@/components/board/Board';
 import { StoryDetail } from '@/components/stories/StoryDetail';
 import { KnowledgeHome } from '@/components/knowledge/KnowledgeHome';
 import { ConceptDetail } from '@/components/knowledge/ConceptDetail';
-import type { ParsedReview } from '@/lib/types';
+import { parseReview, type ParsedReview } from '@/lib/types';
 
 // ── Views ──
 
@@ -63,6 +63,11 @@ function AppShell() {
   const { data: plans = [] } = usePlans();
   const { data: stories = [] } = useStories();
   const { data: concepts = [] } = useConcepts();
+  const { data: rawReviews = [] } = useReviews(view === 'board' ? selectedStoryId : null);
+  const createVerdict = useCreateVerdict();
+
+  const parsedReviews = rawReviews.map(parseReview);
+  const currentStory = stories.find((s) => s.id === selectedStoryId);
 
   // ── Selection handlers ──
   function handleSelect(id: string) {
@@ -152,6 +157,17 @@ function AppShell() {
           </div>
         )}
       </main>
+
+      {/* Verdict Bar (bottom bar when viewing a story with reviews) */}
+      {view === 'board' && selectedStoryId && currentStory && parsedReviews.length > 0 && (
+        <VerdictBar
+          reviews={parsedReviews}
+          story={currentStory}
+          onVerdict={(verdict) =>
+            createVerdict.mutate({ storyId: selectedStoryId, verdict })
+          }
+        />
+      )}
 
       {/* Review Slide-In Panel */}
       <ReviewPanel
