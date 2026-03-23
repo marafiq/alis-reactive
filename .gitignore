@@ -8,6 +8,9 @@ node_modules/
 *.DotSettings.user
 .worktrees/
 tools/
+!tools/md-viewer/
+tools/md-viewer/node_modules/
+tools/md-viewer-mockup.html
 
 # docs-site (Starlight)
 docs-site/node_modules/

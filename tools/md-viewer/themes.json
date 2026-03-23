@@ -1,0 +1,56 @@
+{
+  "themes": [
+    {
+      "name": "SOLID Architecture Review",
+      "icon": "🔍",
+      "description": "March 2026 deep audit — Core Descriptors, Builders, Vertical Slices",
+      "overview": "docs/architecture-review/overview.md",
+      "items": [
+        { "label": "Command Guard Mutability", "path": "docs/architecture-review/command-guard-mutability-design-issues.md", "severity": "P1" },
+        { "label": "Plan Interface Breadth", "path": "docs/architecture-review/reactive-plan-interface-breadth-design-issues.md", "severity": "P1" },
+        { "label": "Registration Enforcement", "path": "docs/architecture-review/component-registration-enforcement-design-issues.md", "severity": "P0" },
+        { "label": "Guard Composition DRY", "path": "docs/architecture-review/condition-guard-composition-duplication-design-issues.md", "severity": "P2" },
+        { "label": "Gather Vendor Duplication", "path": "docs/architecture-review/gather-extensions-vendor-duplication-design-issues.md", "severity": "P2" }
+      ]
+    },
+    {
+      "name": "Implementation Plans",
+      "icon": "📋",
+      "description": "Step-by-step implementation plans for framework features",
+      "items": [
+        { "label": "Resident Intake Example", "path": "docs/superpowers/plans/2026-03-21-resident-intake-example.md" },
+        { "label": "Validation Completion", "path": "docs/superpowers/plans/2026-03-19-validation-completion.md" },
+        { "label": "HTTP Pipeline Redesign", "path": "docs/superpowers/plans/2026-03-19-http-pipeline-redesign.md" },
+        { "label": "Input Field Migration", "path": "docs/superpowers/plans/2026-03-17-input-field-migration.md" },
+        { "label": "Component Onboarding Batch 2", "path": "docs/superpowers/plans/2026-03-18-component-onboarding-batch-2.md" },
+        { "label": "Fusion File Upload", "path": "docs/superpowers/plans/2026-03-18-fusion-file-upload.md" },
+        { "label": "Multi-Conditional Pipeline", "path": "docs/superpowers/plans/2026-03-19-pipeline-multi-conditional.md" },
+        { "label": "Playwright Extensions", "path": "docs/superpowers/plans/2026-03-20-playwright-extensions-experiment.md" }
+      ]
+    },
+    {
+      "name": "Framework Skills",
+      "icon": "⚡",
+      "description": "DSL grammars and onboarding guides for framework features",
+      "items": [
+        { "label": "Reactive DSL", "path": ".claude/skills/reactive-dsl/SKILL.md" },
+        { "label": "HTTP Pipeline", "path": ".claude/skills/http-pipeline/SKILL.md" },
+        { "label": "Conditions DSL", "path": ".claude/skills/conditions-dsl/SKILL.md" },
+        { "label": "Onboard Fusion Component", "path": ".claude/skills/onboard-fusion-component/SKILL.md" },
+        { "label": "Validation Rules", "path": ".claude/skills/validation-rules/SKILL.md" },
+        { "label": "BDD Testing", "path": ".claude/skills/bdd-testing/SKILL.md" },
+        { "label": "SOLID TS Audit", "path": ".claude/skills/solid-ts-audit/SKILL.md" },
+        { "label": "Modern C#", "path": ".claude/skills/modern-csharp/SKILL.md" }
+      ]
+    },
+    {
+      "name": "Design Specs",
+      "icon": "📐",
+      "description": "Design specifications before implementation",
+      "items": [
+        { "label": "Input Field Refactor", "path": "docs/superpowers/specs/2026-03-17-input-field-refactor-design.md" },
+        { "label": "HTTP Pipeline Redesign", "path": "docs/superpowers/specs/2026-03-19-http-pipeline-redesign.md" }
+      ]
+    }
+  ]
+}

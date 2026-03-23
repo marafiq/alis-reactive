@@ -105,6 +105,8 @@ Add a comment to `Command.cs` making it explicit:
 
 ---
 
+<!-- @comment: how-to-solve-it | when click on document  - getting can not load the file | 3/22/2026, 8:31:34 PM -->
+<!-- @response: how-to-solve-it | Fixed — the file now exists at docs/architecture-review/descriptor-encapsulation-review.md. It contains the full audit: descriptor graph with mutability annotations, 3 issues found (2 post-construction mutations + 11 mutable list properties across 6 classes), proposed strategy per category, concrete code examples for each fix, and a 3-phase implementation plan. 27 of 35 descriptors were already immutable — the remaining 8 need list freezing, guard-via-constructor, and a RequestDescriptor factory method. | 3/23/2026, 10:05:00 AM -->
 ## Revised Approach: Descriptor-Wide Encapsulation Review
 
 > The original Options A/B above addressed `Command.GuardWith()` in isolation.

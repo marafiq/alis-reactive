@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reactive Reader</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css">
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">R</div>
+        <div>
+          <div class="sidebar-title">Reactive Reader</div>
+          <div class="sidebar-subtitle">Plans, reviews, and skills</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-tabs" id="sidebar-tabs"></div>
+    <div class="sidebar-search">
+      <input type="text" id="search" placeholder="Search files..." autocomplete="off">
+    </div>
+    <div id="sidebar-tree"></div>
+  </nav>
+
+  <div class="sidebar-overlay" id="overlay"></div>
+
+  <!-- MAIN -->
+  <main class="main" id="main">
+    <div class="top-bar">
+      <button class="hamburger" id="hamburger">&#9776;</button>
+      <div class="breadcrumb" id="breadcrumb"></div>
+    </div>
+
+    <div id="doc-header" class="doc-header" style="display:none">
+      <div class="theme-ribbon" id="theme-ribbon"></div>
+      <h1 class="doc-title" id="doc-title"></h1>
+      <div class="doc-meta" id="doc-meta"></div>
+      <nav class="doc-nav" id="doc-nav"></nav>
+    </div>
+
+    <div class="content" id="content">
+      <div class="empty-state" id="empty-state">
+        <h2>Reactive Reader</h2>
+        <p>Select a theme and a file to begin reading.</p>
+        <div id="theme-overview"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar" id="status-bar">
+  <span class="status-dot"></span>
+  <span id="status-file">Ready</span>
+  <span>|</span>
+  <span id="status-modified"></span>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
