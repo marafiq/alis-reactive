@@ -86,7 +86,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 
         // ── Section 6: DELETE ────────────────────────────────
 
-        [HttpDelete("DeleteResident")]
+        [HttpDelete("DeleteResident/{id}")]
         public IActionResult DeleteResident(int id)
         {
             return Ok(new { deleted = true, deletedId = id });
