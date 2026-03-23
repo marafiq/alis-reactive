@@ -9,6 +9,10 @@ import {
   useUpdatePlan,
   useCreatePlan,
   useD2Render,
+  usePlanAgents,
+  useAgentTemplates,
+  useAssignAgent,
+  useRemoveAgent,
 } from '@/hooks/queries';
 import { SizeBadge, StatusBadge } from '@/components/ui/badges';
 import { InvestHealthBar } from '@/components/invest/InvestHealthBar';
@@ -18,7 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { SectionHeading } from '@/components/ui/section-heading';
-import type { Plan, Story, Goal } from '@/lib/types';
+import type { Plan, Story, Goal, PlanAgent, AgentTemplate } from '@/lib/types';
 import { parseJson } from '@/lib/types';
 
 // ── Marked config (highlight.js via custom renderer) ──
@@ -146,14 +150,193 @@ function D2Diagram({ source }: { source: string }) {
   );
 }
 
+// ── Agent Settings ──
+
+function AgentCard({
+  agent,
+  planId,
+}: {
+  agent: PlanAgent;
+  planId: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const removeAgent = useRemoveAgent();
+
+  const hasPromptOverride = !!agent.prompt_override;
+  const hasRubricOverride = !!agent.rubric_override;
+
+  function handleRemove() {
+    if (!confirm(`Remove "${agent.display_name}" from this plan?`)) return;
+    removeAgent.mutate({ planId, agentId: agent.agent_template_id });
+  }
+
+  return (
+    <Card size="sm">
+      <CardContent>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className={cn(
+                'w-2 h-2 rounded-full shrink-0',
+                agent.is_active ? 'bg-approve' : 'bg-muted-foreground/40',
+              )}
+              title={agent.is_active ? 'Active' : 'Inactive'}
+            />
+            <div className="min-w-0">
+              <div className="font-medium text-sm text-foreground truncate">
+                {agent.display_name}
+              </div>
+              <div className="font-mono text-xs text-muted-foreground truncate">
+                {agent.agent_template_id}
+              </div>
+            </div>
+            {(hasPromptOverride || hasRubricOverride) && (
+              <span className="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                overridden
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setExpanded(!expanded)}
+              className="text-xs text-muted-foreground"
+            >
+              {expanded ? 'Hide' : 'Details'}
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleRemove}
+              disabled={removeAgent.isPending}
+            >
+              Remove
+            </Button>
+          </div>
+        </div>
+
+        {expanded && (
+          <div className="mt-3 space-y-3 border-t border-border pt-3">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+                  Effective Prompt
+                </label>
+                {hasPromptOverride && (
+                  <span className="text-[10px] text-primary">custom override</span>
+                )}
+              </div>
+              <Textarea
+                readOnly
+                rows={4}
+                value={agent.effective_prompt}
+                className="font-mono text-xs resize-none bg-muted/50"
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+                  Effective Rubric
+                </label>
+                {hasRubricOverride && (
+                  <span className="text-[10px] text-primary">custom override</span>
+                )}
+              </div>
+              <Textarea
+                readOnly
+                rows={4}
+                value={agent.effective_rubric}
+                className="font-mono text-xs resize-none bg-muted/50"
+              />
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function AgentPicker({
+  planId,
+  available,
+}: {
+  planId: string;
+  available: AgentTemplate[];
+}) {
+  const [open, setOpen] = useState(false);
+  const assignAgent = useAssignAgent();
+
+  if (available.length === 0) return null;
+
+  function handleAssign(templateId: string) {
+    assignAgent.mutate(
+      { planId, agentTemplateId: templateId },
+      { onSuccess: () => setOpen(false) },
+    );
+  }
+
+  return (
+    <div className="relative">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setOpen(!open)}
+        disabled={assignAgent.isPending}
+      >
+        + Add Agent
+      </Button>
+      {open && (
+        <div className="absolute left-0 top-full mt-1 z-10 w-72 rounded-lg border border-border bg-card shadow-lg ring-1 ring-foreground/10">
+          <div className="p-2 border-b border-border">
+            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground px-1">
+              Available Agents
+            </p>
+          </div>
+          <ul className="py-1 max-h-64 overflow-y-auto">
+            {available.map((t) => (
+              <li key={t.id}>
+                <button
+                  className="w-full text-left px-3 py-2 hover:bg-muted/60 transition-colors"
+                  onClick={() => handleAssign(t.id)}
+                  disabled={assignAgent.isPending}
+                >
+                  <div className="font-medium text-sm text-foreground">{t.display_name}</div>
+                  <div className="font-mono text-xs text-muted-foreground">{t.id}</div>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="p-2 border-t border-border">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full text-xs text-muted-foreground"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── PlanView ──
 
 export function PlanView() {
   const { planId } = useParams({ from: '/plans/$planId' });
   const { data: plan, isLoading: planLoading } = usePlan(planId);
   const { data: stories = [] } = useStories(planId);
+  const { data: planAgents = [] } = usePlanAgents(planId);
+  const { data: allTemplates = [] } = useAgentTemplates();
   const updatePlan = useUpdatePlan();
   const [showForm, setShowForm] = useState(false);
+
+  const availableAgents = allTemplates.filter(
+    (t) => !planAgents.some((pa) => pa.agent_template_id === t.id),
+  );
 
   const goals: Goal[] = useMemo(
     () => (plan ? parseJson<Goal>(plan.goals) : []),
@@ -390,6 +573,31 @@ export function PlanView() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </section>
+
+      {/* Agent Settings */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <SectionHeading count={planAgents.length} className="mb-0">
+            Agent Configuration
+          </SectionHeading>
+          <AgentPicker planId={plan.id} available={availableAgents} />
+        </div>
+
+        {planAgents.length === 0 ? (
+          <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+            <p className="text-sm text-muted-foreground">No agents assigned to this plan.</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">
+              Use "+ Add Agent" to assign a global agent template.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {planAgents.map((agent) => (
+              <AgentCard key={agent.agent_template_id} agent={agent} planId={plan.id} />
+            ))}
           </div>
         )}
       </section>
