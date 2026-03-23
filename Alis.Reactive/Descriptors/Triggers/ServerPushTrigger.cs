@@ -19,8 +19,8 @@ namespace Alis.Reactive.Descriptors.Triggers
 
         /// <summary>
         /// Optional SSE event type filter. When set, listens for named events
-        /// (es.addEventListener(eventType)). When null, listens for all messages
-        /// (es.onmessage). Maps to the "event:" field in the SSE protocol.
+        /// via addEventListener(eventType). When null, listens for unnamed messages
+        /// via addEventListener("message"). Maps to the "event:" field in the SSE protocol.
         /// </summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? EventType { get; }
