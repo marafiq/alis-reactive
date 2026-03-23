@@ -12,9 +12,6 @@ let _db = null;
 // SCHEMA
 // ═══════════════════════════════════════════════════════════════════
 const SCHEMA = `
-PRAGMA journal_mode = WAL;
-PRAGMA foreign_keys = ON;
-
 -- Master plans
 CREATE TABLE IF NOT EXISTS plans (
     id TEXT PRIMARY KEY,
@@ -194,7 +191,11 @@ export function initDatabase(dbPath) {
   // Seed if empty
   const count = db.prepare('SELECT COUNT(*) AS cnt FROM plans').get().cnt;
   if (count === 0) {
-    seedData(db);
+    try {
+      seedData(db);
+    } catch (e) {
+      console.warn(`Warning: seed data failed (app will run without seed data): ${e.message}`);
+    }
   }
 
   _db = db;
@@ -372,15 +373,20 @@ export function createPlan({ id, title, masterPrompt, goals, constraints, d2Diag
   return getPlan(id);
 }
 
+const PLAN_COLUMN_WHITELIST = new Set(['title', 'master_prompt', 'goals', 'constraints', 'd2_diagram', 'status']);
+const PLAN_FIELD_MAP = { masterPrompt: 'master_prompt', d2Diagram: 'd2_diagram' };
+
 export function updatePlan(id, fields) {
   const sets = [];
   const vals = [];
   for (const [k, v] of Object.entries(fields)) {
-    const col = k === 'masterPrompt' ? 'master_prompt' : k === 'd2Diagram' ? 'd2_diagram' : k;
+    const col = PLAN_FIELD_MAP[k] || k;
+    if (!PLAN_COLUMN_WHITELIST.has(col)) continue; // skip unknown columns
     const val = (col === 'goals' || col === 'constraints') ? JSON.stringify(v) : v;
     sets.push(`${col} = ?`);
     vals.push(val);
   }
+  if (sets.length === 0) return getPlan(id);
   sets.push("updated_at = datetime('now')");
   vals.push(id);
   getDb().prepare(`UPDATE plans SET ${sets.join(', ')} WHERE id = ?`).run(...vals);
@@ -412,19 +418,27 @@ export function createStory({ id, planId, title, size, body, concepts }) {
   return getStory(id);
 }
 
+const STORY_COLUMN_WHITELIST = new Set([
+  'plan_id', 'title', 'file_path', 'size', 'status', 'body', 'concepts',
+  'invest_independent', 'invest_negotiable', 'invest_valuable',
+  'invest_estimable', 'invest_small', 'invest_testable', 'invest_validated', 'sort_order',
+]);
+const STORY_FIELD_MAP = { planId: 'plan_id', filePath: 'file_path', investIndependent: 'invest_independent',
+  investNegotiable: 'invest_negotiable', investValuable: 'invest_valuable',
+  investEstimable: 'invest_estimable', investSmall: 'invest_small',
+  investTestable: 'invest_testable', investValidated: 'invest_validated', sortOrder: 'sort_order' };
+
 export function updateStory(id, fields) {
-  const colMap = { planId: 'plan_id', filePath: 'file_path', investIndependent: 'invest_independent',
-    investNegotiable: 'invest_negotiable', investValuable: 'invest_valuable',
-    investEstimable: 'invest_estimable', investSmall: 'invest_small',
-    investTestable: 'invest_testable', investValidated: 'invest_validated', sortOrder: 'sort_order' };
   const sets = [];
   const vals = [];
   for (const [k, v] of Object.entries(fields)) {
-    const col = colMap[k] || k;
+    const col = STORY_FIELD_MAP[k] || k;
+    if (!STORY_COLUMN_WHITELIST.has(col)) continue; // skip unknown columns
     const val = col === 'concepts' ? JSON.stringify(v) : v;
     sets.push(`${col} = ?`);
     vals.push(val);
   }
+  if (sets.length === 0) return getStory(id);
   sets.push("updated_at = datetime('now')");
   vals.push(id);
   getDb().prepare(`UPDATE stories SET ${sets.join(', ')} WHERE id = ?`).run(...vals);

@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
-import { getPlan, getStoriesByPlan, getReviews, createReview, updateStory, uuid } from './db.mjs';
+import { getPlan, getStoriesByPlan, getStory, getReviews, createReview, updateStory, uuid } from './db.mjs';
+import { validateTransition } from './invest.mjs';
 
 // ═══════════════════════════════════════════════════════════════════
 // SHARED CONTEXT PREAMBLE (~350 tokens — NOT full CLAUDE.md)
@@ -263,6 +264,28 @@ If you cannot answer all three, you have not read deeply enough.`;
 // ═══════════════════════════════════════════════════════════════════
 
 /**
+ * Extract the first balanced JSON object from a string.
+ * Handles nested braces correctly (unlike greedy regex).
+ */
+function extractBalancedJson(text) {
+  const start = text.indexOf('{');
+  if (start === -1) return null;
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    if (escape) { escape = false; continue; }
+    if (ch === '\\' && inString) { escape = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{') depth++;
+    else if (ch === '}') { depth--; if (depth === 0) return text.slice(start, i + 1); }
+  }
+  return null;
+}
+
+/**
  * Dispatch a single agent review via Claude CLI.
  * Returns a Promise that resolves with the parsed review JSON.
  */
@@ -291,16 +314,16 @@ function dispatchAgent(role, prompt) {
       }
 
       // Extract JSON from response (may have markdown wrapping)
-      const jsonMatch = stdout.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
+      const jsonStr = extractBalancedJson(stdout);
+      if (!jsonStr) {
         return reject(new Error(`Agent ${role} did not produce valid JSON. Output: ${stdout.slice(0, 500)}`));
       }
 
       try {
-        const review = JSON.parse(jsonMatch[0]);
+        const review = JSON.parse(jsonStr);
         resolve(review);
       } catch (e) {
-        reject(new Error(`Agent ${role} JSON parse failed: ${e.message}. Raw: ${jsonMatch[0].slice(0, 300)}`));
+        reject(new Error(`Agent ${role} JSON parse failed: ${e.message}. Raw: ${jsonStr.slice(0, 300)}`));
       }
     });
 
@@ -316,6 +339,9 @@ function dispatchAgent(role, prompt) {
 
 const ALL_ROLES = ['architect', 'csharp', 'bdd', 'pm', 'ui', 'human-proxy'];
 
+// Guard against concurrent dispatches for the same story
+const _reviewsInProgress = new Set();
+
 /**
  * Dispatch all 6 agents in parallel for a story.
  * Writes results to DB as they complete.
@@ -325,76 +351,75 @@ const ALL_ROLES = ['architect', 'csharp', 'bdd', 'pm', 'ui', 'human-proxy'];
  * @param {function} onProgress - called with (role, status, data) for WebSocket updates
  */
 export async function dispatchReview(storyId, onProgress) {
-  const { getStory } = await import('./db.mjs');
-  const story = getStory(storyId);
-  if (!story) throw new Error(`Story not found: ${storyId}`);
-
-  const plan = getPlan(story.plan_id);
-  if (!plan) throw new Error(`Plan not found: ${story.plan_id}`);
-
-  const relatedStories = getStoriesByPlan(story.plan_id);
-
-  // Transition to review status
-  if (story.status !== 'review') {
-    updateStory(storyId, { status: 'review' });
+  if (_reviewsInProgress.has(storyId)) {
+    throw new Error(`Review already in progress for story ${storyId}`);
   }
+  _reviewsInProgress.add(storyId);
 
-  const round = 1; // TODO: support rounds 2-3
-  const completed = [];
-  const failed = [];
+  try {
+    const story = getStory(storyId);
+    if (!story) throw new Error(`Story not found: ${storyId}`);
 
-  // Check for existing reviews this round
-  const existing = getReviews(storyId, round);
-  const existingRoles = new Set(existing.map(r => r.agent_role));
+    const plan = getPlan(story.plan_id);
+    if (!plan) throw new Error(`Plan not found: ${story.plan_id}`);
 
-  // Dispatch all agents in parallel
-  const promises = ALL_ROLES
-    .filter(role => !existingRoles.has(role))
-    .map(async role => {
-      const roleConfig = ROLE_PROMPTS[role];
-      onProgress?.(role, 'started', { roleName: roleConfig.roleName });
+    const relatedStories = getStoriesByPlan(story.plan_id);
 
-      try {
-        const prompt = assemblePrompt(role, story, plan, relatedStories);
-        const review = await dispatchAgent(role, prompt);
+    // Validate transition to review status before changing it
+    if (story.status !== 'review') {
+      const result = validateTransition(story, 'review');
+      if (!result.valid) throw new Error(result.error);
+      updateStory(storyId, { status: 'review' });
+    }
 
-        // Validate minimum structure
-        if (!review.verdict || !review.findings || !review.artifacts) {
-          throw new Error('Missing required fields (verdict, findings, artifacts)');
+    const round = 1; // TODO: support rounds 2-3
+    const completed = [];
+    const failed = [];
+
+    // Check for existing reviews this round
+    const existing = getReviews(storyId, round);
+    const existingRoles = new Set(existing.map(r => r.agent_role));
+
+    // Dispatch all agents in parallel
+    const promises = ALL_ROLES
+      .filter(role => !existingRoles.has(role))
+      .map(async role => {
+        const roleConfig = ROLE_PROMPTS[role];
+        onProgress?.(role, 'started', { roleName: roleConfig.roleName });
+
+        try {
+          const prompt = assemblePrompt(role, story, plan, relatedStories);
+          const review = await dispatchAgent(role, prompt);
+
+          // Validate minimum structure
+          if (!review.verdict || !review.findings || !review.artifacts) {
+            throw new Error('Missing required fields (verdict, findings, artifacts)');
+          }
+
+          // Save to DB
+          createReview({
+            storyId,
+            agentRole: role,
+            round,
+            verdict: review.verdict,
+            confidence: review.confidence || 'medium',
+            reviewJson: { roleName: roleConfig.roleName, ...review },
+          });
+
+          completed.push(role);
+          onProgress?.(role, 'completed', { verdict: review.verdict, roleName: roleConfig.roleName });
+        } catch (err) {
+          failed.push({ role, error: err.message });
+          onProgress?.(role, 'failed', { error: err.message, roleName: roleConfig.roleName });
         }
+      });
 
-        // Save to DB
-        createReview({
-          storyId,
-          agentRole: role,
-          round,
-          verdict: review.verdict,
-          confidence: review.confidence || 'medium',
-          reviewJson: { roleName: roleConfig.roleName, ...review },
-        });
+    await Promise.all(promises);
 
-        completed.push(role);
-        onProgress?.(role, 'completed', { verdict: review.verdict, roleName: roleConfig.roleName });
-      } catch (err) {
-        failed.push({ role, error: err.message });
-        onProgress?.(role, 'failed', { error: err.message, roleName: roleConfig.roleName });
-      }
-    });
-
-  await Promise.all(promises);
-
-  return { completed, failed, total: ALL_ROLES.length };
-}
-
-/**
- * Get the assembled prompt for a role (useful for debugging/preview).
- */
-export function getPromptPreview(role, storyId) {
-  const { getStory } = require('./db.mjs');
-  const story = getStory(storyId);
-  const plan = getPlan(story.plan_id);
-  const related = getStoriesByPlan(story.plan_id);
-  return assemblePrompt(role, story, plan, related);
+    return { completed, failed, total: ALL_ROLES.length };
+  } finally {
+    _reviewsInProgress.delete(storyId);
+  }
 }
 
 export { ALL_ROLES, ROLE_PROMPTS };

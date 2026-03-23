@@ -55,7 +55,7 @@ export function validateINVEST(story) {
 // STATUS TRANSITIONS
 // ═══════════════════════════════════════════════════════════════════
 
-const VALID_TRANSITIONS = {
+export const VALID_TRANSITIONS = {
   'draft': ['ready', 'review'],
   'ready': ['in-progress', 'draft'],
   'in-progress': ['review', 'ready'],

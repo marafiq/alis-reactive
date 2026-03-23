@@ -7,7 +7,7 @@ import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import {
-  initDatabase, getAllPlans, getPlan, createPlan, updatePlan,
+  initDatabase, getDb, getAllPlans, getPlan, createPlan, updatePlan,
   getAllStories, getStoriesByPlan, getStory, createStory, updateStory,
   getDependencies, getBlockedBy, addDependency, removeDependency,
   getReviews, createReview,
@@ -19,11 +19,12 @@ import {
   getAgentWorkLog, createAgentLogEntry,
 } from './db.mjs';
 import { dispatchReview, ALL_ROLES, ROLE_PROMPTS } from './agents.mjs';
-import { validateINVEST } from './invest.mjs';
+import { validateINVEST, validateTransition } from './invest.mjs';
+import { resolve as resolvePath } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
-const PORT = process.env.PORT || 4500;
+const PORT = process.env.PORT || 4501;
 
 // ── Source directories to watch ──
 const SOURCES = [
@@ -82,8 +83,12 @@ app.get('/api/plans/:id', (req, res) => {
 });
 
 app.post('/api/plans', (req, res) => {
-  try { res.json(createPlan(req.body)); }
-  catch (e) { res.status(400).json({ error: e.message }); }
+  try {
+    const { id, title } = req.body;
+    if (!id || typeof id !== 'string') return res.status(400).json({ error: 'id is required and must be a string' });
+    if (!title || typeof title !== 'string') return res.status(400).json({ error: 'title is required and must be a string' });
+    res.json(createPlan(req.body));
+  } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
 app.put('/api/plans/:id', (req, res) => {
@@ -112,8 +117,13 @@ app.get('/api/stories/:id', (req, res) => {
 });
 
 app.post('/api/stories', (req, res) => {
-  try { res.json(createStory(req.body)); }
-  catch (e) { res.status(400).json({ error: e.message }); }
+  try {
+    const { id, planId, title } = req.body;
+    if (!id || typeof id !== 'string') return res.status(400).json({ error: 'id is required and must be a string' });
+    if (!planId || typeof planId !== 'string') return res.status(400).json({ error: 'planId is required and must be a string' });
+    if (!title || typeof title !== 'string') return res.status(400).json({ error: 'title is required and must be a string' });
+    res.json(createStory(req.body));
+  } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
 app.put('/api/stories/:id', (req, res) => {
@@ -121,26 +131,15 @@ app.put('/api/stories/:id', (req, res) => {
   catch (e) { res.status(400).json({ error: e.message }); }
 });
 
-// Status transitions with INVEST gate
-const VALID_TRANSITIONS = {
-  'draft': ['ready', 'review'],
-  'ready': ['in-progress', 'draft'],
-  'in-progress': ['review', 'ready'],
-  'review': ['done', 'in-progress'],
-  'done': [],
-};
-
+// Status transitions with INVEST gate (uses validateTransition from invest.mjs)
 app.put('/api/stories/:id/status', (req, res) => {
   try {
     const story = getStory(req.params.id);
     if (!story) return res.status(404).json({ error: 'not found' });
     const { status: newStatus } = req.body;
-    const valid = VALID_TRANSITIONS[story.status] || [];
-    if (!valid.includes(newStatus)) {
-      return res.status(400).json({ error: `Cannot transition from ${story.status} to ${newStatus}. Valid: ${valid.join(', ')}` });
-    }
-    if (newStatus === 'ready' && !story.invest_validated) {
-      return res.status(400).json({ error: 'Story must pass INVEST validation before moving to ready' });
+    const result = validateTransition(story, newStatus);
+    if (!result.valid) {
+      return res.status(400).json({ error: result.error });
     }
     res.json(updateStory(req.params.id, { status: newStatus }));
   } catch (e) { res.status(400).json({ error: e.message }); }
@@ -184,23 +183,22 @@ app.post('/api/reviews', (req, res) => {
 });
 
 // Dispatch all 6 agents in parallel
-app.post('/api/stories/:id/review', async (req, res) => {
-  try {
-    const story = getStory(req.params.id);
-    if (!story) return res.status(404).json({ error: 'Story not found' });
+app.post('/api/stories/:id/review', (req, res) => {
+  const story = getStory(req.params.id);
+  if (!story) return res.status(404).json({ error: 'Story not found' });
 
-    // Respond immediately — reviews happen async
-    res.json({ status: 'dispatching', storyId: story.id, agents: ALL_ROLES });
+  // Respond immediately — reviews happen async
+  res.json({ status: 'dispatching', storyId: story.id, agents: ALL_ROLES });
 
-    // Dispatch agents with WebSocket progress updates
-    const result = await dispatchReview(story.id, (role, status, data) => {
-      broadcast('review-progress', { storyId: story.id, role, status, ...data });
-    });
-
+  // Fire-and-forget: dispatch agents with WebSocket progress updates
+  dispatchReview(story.id, (role, status, data) => {
+    broadcast('review-progress', { storyId: story.id, role, status, ...data });
+  }).then(result => {
     broadcast('review-complete', { storyId: story.id, ...result });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  }).catch(err => {
+    console.error(`Review dispatch failed for story ${story.id}:`, err);
+    broadcast('review-error', { storyId: story.id, error: err.message });
+  });
 });
 
 // INVEST validation
@@ -237,8 +235,12 @@ app.get('/api/comments', (req, res) => {
 });
 
 app.post('/api/comments', (req, res) => {
-  try { res.json({ id: createComment(req.body) }); }
-  catch (e) { res.status(400).json({ error: e.message }); }
+  try {
+    const { body, planId, storyId, reviewId } = req.body;
+    if (!body || typeof body !== 'string') return res.status(400).json({ error: 'body is required and must be a string' });
+    if (!planId && !storyId && !reviewId) return res.status(400).json({ error: 'at least one target (planId, storyId, or reviewId) is required' });
+    res.json({ id: createComment(req.body) });
+  } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -249,6 +251,27 @@ app.get('/api/concepts', (req, res) => {
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// File overlap detection — static routes BEFORE parameterized :name route
+app.get('/api/concepts/overlaps', (req, res) => {
+  try { res.json(findFileOverlaps()); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/concepts/link', (req, res) => {
+  try {
+    const { conceptName, entityType, entityId, source } = req.body;
+    linkConcept(conceptName, entityType, entityId, source);
+    res.json({ ok: true });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// Sync file overlap concepts
+app.post('/api/concepts/sync-overlaps', (req, res) => {
+  try { syncFileOverlapConcepts(); res.json({ ok: true }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Parameterized route AFTER static routes to avoid shadowing
 app.get('/api/concepts/:name', (req, res) => {
   try {
     const links = getConceptLinks(req.params.name);
@@ -261,26 +284,6 @@ app.get('/api/concepts/:name', (req, res) => {
     });
     res.json(enriched);
   } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-app.post('/api/concepts/link', (req, res) => {
-  try {
-    const { conceptName, entityType, entityId, source } = req.body;
-    linkConcept(conceptName, entityType, entityId, source);
-    res.json({ ok: true });
-  } catch (e) { res.status(400).json({ error: e.message }); }
-});
-
-// File overlap detection
-app.get('/api/concepts/overlaps', (req, res) => {
-  try { res.json(findFileOverlaps()); }
-  catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// Sync file overlap concepts
-app.post('/api/concepts/sync-overlaps', (req, res) => {
-  try { syncFileOverlapConcepts(); res.json({ ok: true }); }
-  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -323,7 +326,8 @@ app.get('/api/tree', (req, res) => {
 app.get('/api/file', (req, res) => {
   const filePath = req.query.path;
   if (!filePath) return res.status(400).json({ error: 'path required' });
-  const full = join(ROOT, filePath);
+  const full = resolvePath(join(ROOT, filePath));
+  if (!full.startsWith(ROOT + '/')) return res.status(403).json({ error: 'path traversal denied' });
   if (!existsSync(full)) return res.status(404).json({ error: 'not found' });
   try {
     let content = readFileSync(full, 'utf-8');
@@ -336,7 +340,8 @@ app.get('/api/file', (req, res) => {
 app.post('/api/file', (req, res) => {
   const { path: filePath, content } = req.body;
   if (!filePath || content === undefined) return res.status(400).json({ error: 'path and content required' });
-  const full = join(ROOT, filePath);
+  const full = resolvePath(join(ROOT, filePath));
+  if (!full.startsWith(ROOT + '/')) return res.status(403).json({ error: 'path traversal denied' });
   if (!existsSync(full)) return res.status(404).json({ error: 'not found' });
   try { writeFileSync(full, content, 'utf-8'); res.json({ ok: true, modified: new Date().toISOString() }); }
   catch (e) { res.status(500).json({ error: e.message }); }
@@ -345,7 +350,13 @@ app.post('/api/file', (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 // INIT DATABASE + HTTP + WEBSOCKET
 // ═══════════════════════════════════════════════════════════════════
-initDatabase();
+try {
+  initDatabase();
+} catch (e) {
+  console.error(`Failed to initialize database: ${e.message}`);
+  console.error('Ensure better-sqlite3 is installed and the data directory is writable.');
+  process.exit(1);
+}
 
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
@@ -359,7 +370,9 @@ watcher.on('all', (event, filePath) => {
   const rel = relative(ROOT, filePath);
   const msg = JSON.stringify({ type: 'file-changed', event, path: rel });
   for (const client of wss.clients) {
-    if (client.readyState === 1) client.send(msg);
+    if (client.readyState === 1) {
+      try { client.send(msg); } catch (e) { console.error('WebSocket send error (watcher):', e.message); }
+    }
   }
 });
 
@@ -367,7 +380,9 @@ watcher.on('all', (event, filePath) => {
 export function broadcast(type, data) {
   const msg = JSON.stringify({ type, ...data });
   for (const client of wss.clients) {
-    if (client.readyState === 1) client.send(msg);
+    if (client.readyState === 1) {
+      try { client.send(msg); } catch (e) { console.error('WebSocket send error (broadcast):', e.message); }
+    }
   }
 }
 
@@ -382,3 +397,20 @@ server.listen(PORT, () => {
   });
   console.log('');
 });
+
+// ── Graceful shutdown ──
+function shutdown(signal) {
+  console.log(`\n  ${signal} received — shutting down gracefully...`);
+  watcher.close();
+  wss.close(() => {
+    server.close(() => {
+      try { const db = getDb(); db.close(); } catch { /* db may not be initialized */ }
+      console.log('  Shutdown complete.');
+      process.exit(0);
+    });
+  });
+  // Force exit after 5 seconds if graceful shutdown stalls
+  setTimeout(() => { console.error('  Forced shutdown after timeout.'); process.exit(1); }, 5000);
+}
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
