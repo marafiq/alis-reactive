@@ -1,25 +1,58 @@
 import type { ServerPushTrigger, Reaction, ComponentEntry } from "../types";
 import { executeReaction } from "./execute";
+import { showRetryIndicators, removeRetryIndicators, firstMutationTarget } from "./retry-indicator";
 import { scope } from "../core/trace";
 
 const log = scope("server-push");
 
-// Connection pool — singleton EventSource per URL
-const sources = new Map<string, EventSource>();
+interface WiredEntry {
+  trigger: ServerPushTrigger;
+  reaction: Reaction;
+  components?: Record<string, ComponentEntry>;
+  signal?: AbortSignal;
+}
 
-function getOrCreate(url: string, signal?: AbortSignal): EventSource {
+interface ManagedSource {
+  es: EventSource;
+  targetIds: Set<string>;
+  wired: WiredEntry[];
+}
+
+// Connection pool — singleton EventSource per URL
+const sources = new Map<string, ManagedSource>();
+
+function retrySSE(url: string, entries: WiredEntry[]): void {
+  removeRetryIndicators(url);
+  log.info("manual retry", { url });
+
+  // Re-wire all triggers — creates a fresh EventSource and re-registers handlers
+  for (const entry of entries) {
+    wireServerPush(entry.trigger, entry.reaction, entry.components, entry.signal);
+  }
+}
+
+function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
   const cached = sources.get(url);
   if (cached) return cached;
 
   const es = new EventSource(url);
-  sources.set(url, es);
+  const targetIds = new Set<string>();
+  const wired: WiredEntry[] = [];
 
-  es.onopen = () => log.debug("connected", { url });
+  es.onopen = () => {
+    log.debug("connected", { url });
+    removeRetryIndicators(url);
+  };
 
   es.onerror = () => {
     if (es.readyState === EventSource.CLOSED) {
       log.error("connection closed permanently", { url });
+      const managed = sources.get(url);
       sources.delete(url);
+      if (managed && managed.targetIds.size > 0) {
+        const entries = managed.wired;
+        showRetryIndicators(url, managed.targetIds, () => retrySSE(url, entries));
+      }
     } else {
       log.warn("connection error (reconnecting)", { url });
     }
@@ -33,8 +66,10 @@ function getOrCreate(url: string, signal?: AbortSignal): EventSource {
     });
   }
 
+  const managed: ManagedSource = { es, targetIds, wired };
+  sources.set(url, managed);
   log.debug("created", { url });
-  return es;
+  return managed;
 }
 
 export function wireServerPush(
@@ -43,7 +78,14 @@ export function wireServerPush(
   components?: Record<string, ComponentEntry>,
   signal?: AbortSignal
 ): void {
-  const es = getOrCreate(trigger.url, signal);
+  const managed = getOrCreate(trigger.url, signal);
+
+  // Track the first target element for retry indicator placement
+  const target = firstMutationTarget(reaction);
+  if (target) managed.targetIds.add(target);
+
+  // Store wiring info for retry re-registration
+  managed.wired.push({ trigger, reaction, components, signal });
 
   const handler = (e: MessageEvent) => {
     // Framework only supports JSON payloads — non-JSON is a server-side bug.
@@ -57,6 +99,6 @@ export function wireServerPush(
   // Always use addEventListener — onmessage assignment overwrites previous handlers
   // when multiple triggers share the same URL without an eventType.
   const eventName = trigger.eventType ?? "message";
-  es.addEventListener(eventName, handler as EventListener);
+  managed.es.addEventListener(eventName, handler as EventListener);
   log.debug("listening", { url: trigger.url, eventType: eventName });
 }
