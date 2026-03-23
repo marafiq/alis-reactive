@@ -136,6 +136,41 @@ public class WhenValidatingWithAjaxPartials : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("400");
     }
 
+    // ── Live-clear survives partial reload ───────────────
+
+    [Test]
+    public async Task live_clear_works_on_reloaded_partial_fields()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillParentFields();
+        await SelectCustomAddress();
+
+        // Submit with empty address fields → errors appear
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+
+        // Type into street → error clears (live-clear is working)
+        await Input("Address_Street").FillAsync("123 Sunrise Blvd");
+        await Expect(ErrorFor("Address.Street")).ToBeHiddenAsync();
+
+        // Reload the partial: switch away then back (DOM is replaced)
+        await Input("AddressType").SelectOptionAsync("Facility Address");
+        await Page.WaitForTimeoutAsync(500);
+        await SelectCustomAddress();
+
+        // Submit again with empty fields → errors appear on the NEW DOM elements
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+
+        // Type into the NEW street field → error should clear (live-clear re-wired)
+        await Input("Address_Street").FillAsync("456 Palm Ave");
+        await Expect(ErrorFor("Address.Street")).ToBeHiddenAsync();
+
+        AssertNoConsoleErrors();
+    }
+
     // ── Partial reactive behavior ───────────────────────
 
     [Test]

@@ -530,4 +530,82 @@ describe("when live-clearing validation errors", () => {
       expect(validate(d)).toBe(true);
     });
   });
+
+  describe("partial reload re-wiring", () => {
+    let unwireFields: typeof import("../validation").unwireFields;
+
+    beforeEach(async () => {
+      const dom = new JSDOM(`<!DOCTYPE html><html><body>
+        <form id="myForm">
+          <div>
+            <label for="Name">Name</label>
+            <input id="Name" name="Name" type="text" value="" />
+            ${errSpan("Name", "Name")}
+          </div>
+        </form>
+      </body></html>`);
+
+      (globalThis as any).document = dom.window.document;
+      (globalThis as any).HTMLElement = dom.window.HTMLElement;
+      (globalThis as any).Event = dom.window.Event;
+
+      const mod = await import("../validation");
+      validate = mod.validate;
+      wireLiveValidation = mod.wireLiveValidation;
+      unwireFields = mod.unwireFields;
+      resetLiveClearForTests = mod.resetLiveClearForTests;
+      resetLiveClearForTests();
+    });
+
+    it("re-wires live-clear after unwireFields is called for a partial reload", () => {
+      const d = desc("myForm", [
+        nativeField("Name", "Name", [{ rule: "required", message: "Name is required" }]),
+      ]);
+
+      // Wire live clearing and trigger validation error
+      wireLiveValidation(d);
+      validate(d);
+      expect(hasError("Name")).toBe(true);
+
+      // User types → error clears (live-clear is working)
+      typeInto("Name", "Alice");
+      expect(hasError("Name")).toBe(false);
+
+      // Simulate partial reload: unwire the field (as merge-plan would)
+      unwireFields(["Name"]);
+
+      // Trigger error again
+      (document.getElementById("Name") as HTMLInputElement).value = "";
+      validate(d);
+      expect(hasError("Name")).toBe(true);
+
+      // Re-wire live clearing (as boot.ts would after merge)
+      wireLiveValidation(d);
+
+      // User types again → error should clear (live-clear re-wired successfully)
+      typeInto("Name", "Bob");
+      expect(hasError("Name")).toBe(false);
+    });
+
+    it("without unwireFields, re-wiring is skipped and errors persist", () => {
+      const d = desc("myForm", [
+        nativeField("Name", "Name", [{ rule: "required", message: "Name is required" }]),
+      ]);
+
+      // Wire live clearing
+      wireLiveValidation(d);
+
+      // Call wireLiveValidation again WITHOUT unwireFields first (simulates the old bug)
+      // The second call should be a no-op because the field is already in wiredFields
+      wireLiveValidation(d);
+
+      // Trigger error
+      validate(d);
+      expect(hasError("Name")).toBe(true);
+
+      // This still works because the ORIGINAL wiring is still active on the same DOM element
+      typeInto("Name", "Alice");
+      expect(hasError("Name")).toBe(false);
+    });
+  });
 });

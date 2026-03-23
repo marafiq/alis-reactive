@@ -2,10 +2,12 @@ import type { ComponentEntry, Entry, Plan } from "../types";
 
 type EnrichEntries = (entries: Entry[], components: Record<string, ComponentEntry>) => void;
 type WireEntries = (entries: Entry[], components: Record<string, ComponentEntry>, signal?: AbortSignal) => void;
+type UnwireFields = (fieldIds: string[]) => void;
 
 export interface MergeHooks {
   enrichEntries: EnrichEntries;
   wireEntries: WireEntries;
+  unwireFields: UnwireFields;
 }
 
 export class PlanRegistry {
@@ -26,7 +28,7 @@ export class PlanRegistry {
     const previousPlanId = sourceId ? this.sourceOwners.get(sourceId) : undefined;
 
     if (sourceId && previousPlanId) {
-      this.removeSource(previousPlanId, sourceId);
+      this.removeSource(previousPlanId, sourceId, hooks.unwireFields);
     }
 
     let target = this.plans.get(incoming.planId);
@@ -70,7 +72,7 @@ export class PlanRegistry {
     this.sourceComponentKeys.clear();
   }
 
-  private removeSource(planId: string, sourceId: string): void {
+  private removeSource(planId: string, sourceId: string, unwireFields: UnwireFields): void {
     const plan = this.plans.get(planId);
     if (!plan) {
       this.clearTracking(sourceId);
@@ -89,6 +91,11 @@ export class PlanRegistry {
 
     const oldKeys = this.sourceComponentKeys.get(sourceId);
     if (oldKeys) {
+      // Unwire live-clear for components being removed — their element IDs
+      // must be cleared from wiredFields so re-loaded partials get fresh wiring.
+      const fieldIds = oldKeys.map(key => plan.components[key]?.id).filter((id): id is string => !!id);
+      if (fieldIds.length > 0) unwireFields(fieldIds);
+
       for (const key of oldKeys) delete plan.components[key];
     }
 
