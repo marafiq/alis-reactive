@@ -24,8 +24,9 @@ const RETRY_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" s
  * initial start() failures must be retried manually (per Microsoft docs).
  */
 async function startWithRetry(connection: signalR.HubConnection, hubUrl: string): Promise<void> {
-  const maxAttempts = 5;
-  const delays = [0, 2000, 5000, 10000, 30000];
+  // Aligned with library's withAutomaticReconnect() default: [0, 2000, 10000, 30000]
+  const maxAttempts = 4;
+  const delays = [0, 2000, 10000, 30000];
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
@@ -117,8 +118,14 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
   if (managed) return managed;
 
   const connection = new signalR.HubConnectionBuilder()
-    .withUrl(hubUrl)
+    .withUrl(hubUrl, { withCredentials: true })
     .withAutomaticReconnect()
+    .configureLogging({
+      log: (level: signalR.LogLevel, message: string) => {
+        if (level >= signalR.LogLevel.Warning) log.warn("lib", { message });
+        else if (level >= signalR.LogLevel.Information) log.debug("lib", { message });
+      }
+    })
     .build();
 
   const targetIds = new Set<string>();
@@ -190,18 +197,16 @@ export function wireSignalR(
 
   // Handlers registered via .on() persist across automatic reconnects —
   // no re-registration needed (per Microsoft docs).
+  // Trust the library's JSON deserialization — don't reshape the payload.
   connection.on(trigger.methodName, (...args: unknown[]) => {
     if (args.length !== 1 || typeof args[0] !== "object" || args[0] === null) {
-      log.warn("unexpected payload shape — expected single object argument", {
-        hubUrl: trigger.hubUrl, method: trigger.methodName,
-        argCount: args.length, firstArgType: typeof args[0]
-      });
+      throw new Error(
+        `[alis:signalr] ${trigger.hubUrl}/${trigger.methodName}: ` +
+        `expected single object argument, got ${args.length} args (first: ${typeof args[0]})`
+      );
     }
 
-    const evt: Record<string, unknown> = args.length === 1 && typeof args[0] === "object" && args[0] !== null
-      ? (args[0] as Record<string, unknown>)
-      : Object.fromEntries(args.map((a, i) => [`arg${i}`, a]));
-
+    const evt = args[0] as Record<string, unknown>;
     log.debug("method", { hubUrl: trigger.hubUrl, method: trigger.methodName });
     executeReaction(reaction, { evt, components }).catch(err =>
       log.error("reaction failed", { error: String(err) }));

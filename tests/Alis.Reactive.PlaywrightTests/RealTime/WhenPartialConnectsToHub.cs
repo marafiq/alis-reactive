@@ -71,8 +71,9 @@ public class WhenPartialConnectsToHub : PlaywrightTestBase
         await LoadPanelBtn.ClickAsync();
         await WaitForTraceMessage("merge", 5000);
 
+        // Match only our "connected" trace, not the library's routed "lib" messages
         var connectTraces = _consoleMessages
-            .Where(m => m.Contains("[alis:signalr]") && m.Contains("connected")
+            .Where(m => m.Contains("[alis:signalr] connected")
                         && m.Contains("resident-status"))
             .ToList();
 
