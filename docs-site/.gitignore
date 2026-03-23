@@ -26,3 +26,4 @@ public/d2/
 # editor
 .vscode/
 .idea/
+.worktrees/
