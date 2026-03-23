@@ -8,7 +8,7 @@ import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
 import { wireTrigger } from "../execution/trigger";
 import { enrichEntries } from "./enrichment";
-import { wireLiveValidation } from "../validation/live-clear";
+import { wireLiveValidation, unwireFields } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
 import { walkValidationDescriptors } from "./walk-reactions";
 import {
@@ -52,7 +52,7 @@ function wireEntries(entries: Entry[], components: Record<string, ComponentEntry
 }
 
 export function mergePlan(incoming: Plan): void {
-  const merged = applyMergedPlan(incoming, { enrichEntries, wireEntries });
+  const merged = applyMergedPlan(incoming, { enrichEntries, wireEntries, unwireFields });
 
   walkValidationDescriptors(merged.entries, wireLiveValidation);
   clearSummaryForPlan(merged.planId);

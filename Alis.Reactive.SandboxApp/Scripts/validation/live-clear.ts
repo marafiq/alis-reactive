@@ -13,6 +13,9 @@ import type { ValidationDescriptor, ValidationField } from "../types";
 import { resolveRoot } from "../resolution/component";
 import { clearInline } from "./error-display";
 import { revalidateField } from "./orchestrator";
+import { scope } from "../core/trace";
+
+const log = scope("live-clear");
 
 /** Set of fieldIds already wired — prevents double-wiring on partial reload. */
 const wiredFields = new Set<string>();
@@ -51,6 +54,12 @@ function wireField(desc: ValidationDescriptor, field: ValidationField): void {
     const root = resolveRoot(el, field.vendor);
     (root as EventTarget).addEventListener("change", revalidateHandler);
   }
+}
+
+/** Remove field IDs from the wired set — called when a source is removed during partial reload. */
+export function unwireFields(fieldIds: string[]): void {
+  for (const id of fieldIds) wiredFields.delete(id);
+  if (fieldIds.length > 0) log.debug("unwired", { count: fieldIds.length, fieldIds });
 }
 
 /** Reset for tests — clears the wired set so tests start clean. */
