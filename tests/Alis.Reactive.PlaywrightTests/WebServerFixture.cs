@@ -1,10 +1,13 @@
 using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Alis.Reactive.PlaywrightTests;
 
 /// <summary>
 /// Starts the SandboxApp Kestrel server for Playwright tests.
 /// One instance per test run (assembly-level setup).
+/// Uses a random available port so parallel sessions don't collide.
 /// </summary>
 [SetUpFixture]
 public class WebServerFixture
@@ -15,7 +18,7 @@ public class WebServerFixture
     [OneTimeSetUp]
     public async Task StartServer()
     {
-        var port = 5220;
+        var port = GetAvailablePort();
         BaseUrl = $"http://localhost:{port}";
 
         var projectDir = FindProjectDir();
@@ -68,6 +71,15 @@ public class WebServerFixture
             _server.Kill(entireProcessTree: true);
             _server.Dispose();
         }
+    }
+
+    private static int GetAvailablePort()
+    {
+        using var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return port;
     }
 
     private static string FindProjectDir()

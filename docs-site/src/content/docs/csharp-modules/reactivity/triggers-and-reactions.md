@@ -183,6 +183,16 @@ public async Task AlertStream(CancellationToken ct)
 }
 ```
 
+### Connection lifecycle
+
+The browser handles reconnection automatically via the `EventSource` spec. When the connection drops temporarily, the browser reconnects without any framework intervention. When the connection is permanently closed:
+
+- **Auto-reconnect**: Browser built-in — retries automatically on transient errors
+- **Permanent close**: When the browser determines the connection is unrecoverable, a retry indicator appears near the first mutated element — click to reconnect
+- **Manual retry**: Clicking the retry icon creates a fresh `EventSource` and re-wires all handlers
+- **Connection pooling**: Multiple triggers on the same URL share one `EventSource`
+- **Intentional close**: Abort signals (e.g., page navigation) do not show retry indicators
+
 ## SignalR — Hub method triggers
 
 Fires when the server invokes a Hub method via `IHubContext`. Uses `@microsoft/signalr` — WebSocket with automatic reconnection, connection pooling, and retry indicator on disconnection. **The server must send a single object argument** — primitives and multi-argument sends are rejected.
@@ -272,6 +282,7 @@ The runtime handles everything automatically:
 | **Direction** | Server → Client only | Bidirectional (but DSL exposes server → client) |
 | **Library** | Native `EventSource` (0 bytes) | `@microsoft/signalr` (~50kb bundled) |
 | **Auto-reconnect** | Browser built-in | Library built-in |
+| **Retry indicator** | On permanent close | After 4 retries exhausted |
 | **Server side** | Raw HTTP endpoint | Hub class + `MapHub<T>()` |
 | **Best for** | Simple streams, alerts | Rich notifications, multi-hub, groups |
 
