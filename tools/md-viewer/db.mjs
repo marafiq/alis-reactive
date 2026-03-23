@@ -413,11 +413,37 @@ function seedData(db) {
         artifacts: [{ kind: 'command-sequence', label: 'Pre-work verification', content: '# Verify conditional parity is still intact\ndotnet test tests/Alis.Reactive.FluentValidator.UnitTests\n\n# Verify existing length-related tests\nnpm test -- --grep -i length' }] },
     ];
 
+    // Default INVEST scores per agent (based on their review findings)
+    const defaultInvestScores = {
+      I: { pass: true, reasoning: 'No cross-dependencies identified. MinLength/MaxLength extraction is self-contained within FluentValidator project.' },
+      N: { pass: true, reasoning: 'Acceptance criteria define what behavior is expected, not the implementation approach.' },
+      V: { pass: true, reasoning: 'Clear user-facing value: developers get client-side string length validation matching server rules.' },
+      E: { pass: true, reasoning: 'Size S is accurate. 4 files across 2 projects. Well-established pattern from ComparisonExtractor.' },
+      S: { pass: true, reasoning: 'Fits one focused session based on existing MinLengthExtractor parallel in ComparisonExtractor.cs.' },
+      T: { pass: true, reasoning: 'Concrete verification commands provided: dotnet test + npm test with specific filters.' },
+    };
+
+    // BDD agent objects to T because of missing boundary tests
+    const bddInvestScores = {
+      ...defaultInvestScores,
+      T: { pass: false, reasoning: 'Missing boundary value test cases. AC #1 says "shorter than 3 chars" but does not specify behavior at exactly min length. Also missing empty string behavior and error message format.' },
+      E: { pass: false, reasoning: 'WhenField + MinLength integration may expand scope from S to M. Need to verify conditional parity first.' },
+    };
+
+    const insertAssessment = db.prepare('INSERT INTO invest_assessments (id, review_id, criterion, pass, reasoning, evidence_quality) VALUES (?, ?, ?, ?, ?, ?)');
+
     reviewsData.forEach(r => {
       const templatePrompt = ROLE_PROMPTS[r.role]?.prompt || '';
-      insertReview.run(uuid(), 'V-002', r.role, 1, r.verdict, r.confidence,
-        JSON.stringify({ roleName: r.roleName, executive: r.executive, findings: r.findings, artifacts: r.artifacts }),
+      const investScores = r.role === 'bdd' ? bddInvestScores : defaultInvestScores;
+      const reviewId = uuid();
+      insertReview.run(reviewId, 'V-002', r.role, 1, r.verdict, r.confidence,
+        JSON.stringify({ roleName: r.roleName, executive: r.executive, findings: r.findings, artifacts: r.artifacts, investScores }),
         templatePrompt, JSON.stringify([]));
+
+      // Persist invest_assessments
+      for (const [criterion, score] of Object.entries(investScores)) {
+        insertAssessment.run(uuid(), reviewId, criterion, score.pass ? 1 : 0, score.reasoning, 'weak');
+      }
     });
 
     // ── Concepts ──
@@ -830,7 +856,7 @@ export function getInvestSummary(storyId) {
       COUNT(*) AS total_agents,
       CASE WHEN SUM(ia.pass) = COUNT(*) THEN 'pass'
            WHEN SUM(ia.pass) = 0 THEN 'fail'
-           ELSE 'mixed' END AS verdict
+           ELSE 'contested' END AS verdict
     FROM invest_assessments ia JOIN reviews r ON r.id = ia.review_id
     WHERE r.story_id = ?
     GROUP BY ia.criterion
