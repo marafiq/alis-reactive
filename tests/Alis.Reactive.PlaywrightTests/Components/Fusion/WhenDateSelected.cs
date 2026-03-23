@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -8,9 +10,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// Page under test: /Sandbox/Components/FusionDatePicker
 ///
 /// Syncfusion DatePicker renders an input element inside a wrapper span.
-/// The wrapper element gets the IdGenerator-based ID; the ej2 instance
-/// is attached to this element. Playwright uses the ej2 instance API to
-/// set values and trigger change events reliably.
+/// The wrapper element gets the IdGenerator-based ID. Tests use
+/// DatePickerLocator to interact via real browser gestures (calendar popup
+/// clicks) rather than ej2 instance manipulation.
 /// Senior living domain: resident admission and discharge dates.
 /// </summary>
 [TestFixture]
@@ -23,20 +25,13 @@ public class WhenDateSelected : PlaywrightTestBase
     private const string AdmissionDateId = Scope + "__AdmissionDate";
     private const string DischargeDateId = Scope + "__DischargeDate";
 
+    private DatePickerLocator AdmissionDate => new(Page, AdmissionDateId);
+    private DatePickerLocator DischargeDate => new(Page, DischargeDateId);
+
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-    }
-
-    /// <summary>
-    /// Sets a date on a Syncfusion DatePicker ej2 instance via JS.
-    /// This is the reliable way to interact with SF components in Playwright.
-    /// </summary>
-    private async Task SetDatePickerValue(string elementId, string isoDate)
-    {
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{elementId}'); el.ej2_instances[0].value = new Date('{isoDate}'); el.ej2_instances[0].dataBind(); }}");
     }
 
     // ── Page loads ──
@@ -72,10 +67,9 @@ public class WhenDateSelected : PlaywrightTestBase
 
         // The framework sets ej2.value = "2026-06-15" via set-prop.
         // Verify the value was applied by checking the visible input element's value.
-        // SF DatePicker renders the input inside a wrapper; the input shows the date.
-        var inputValue = await Page.EvaluateAsync<string>(
-            $"() => {{ const el = document.getElementById('{AdmissionDateId}'); if (!el) return 'no-el'; const input = el.tagName === 'INPUT' ? el : el.querySelector('input'); return input ? input.value : 'no-input'; }}");
-        Assert.That(inputValue, Is.Not.Null.And.Not.Empty.And.Not.EqualTo("no-el").And.Not.EqualTo("no-input"),
+        var dp = AdmissionDate;
+        var inputValue = await dp.Input.InputValueAsync();
+        Assert.That(inputValue, Is.Not.Null.And.Not.Empty,
             $"Expected DatePicker input to have a value but got '{inputValue}'");
 
         AssertNoConsoleErrors();
@@ -99,8 +93,8 @@ public class WhenDateSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetDatePickerValue(AdmissionDateId, "2026-07-04");
+        // Select a date via the calendar popup — triggers SF change event
+        await AdmissionDate.SelectDate(2026, 7, 4);
 
         // SF change event payload contains the new value
         await Expect(Page.Locator("#change-value"))
@@ -113,8 +107,8 @@ public class WhenDateSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetDatePickerValue(AdmissionDateId, "2026-07-04");
+        // Select a date via the calendar popup — triggers SF change event
+        await AdmissionDate.SelectDate(2026, 7, 4);
 
         // When(args, x => x.Value).NotNull() => Then branch
         await Expect(Page.Locator("#args-condition"))
@@ -127,8 +121,8 @@ public class WhenDateSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetDatePickerValue(AdmissionDateId, "2026-07-04");
+        // Select a date via the calendar popup — triggers SF change event
+        await AdmissionDate.SelectDate(2026, 7, 4);
 
         // Indicator should appear with text "admission set"
         await Expect(Page.Locator("#selected-indicator"))
@@ -158,8 +152,8 @@ public class WhenDateSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set a discharge date via ej2 instance
-        await SetDatePickerValue(DischargeDateId, "2026-08-01");
+        // Set a discharge date via the calendar popup
+        await DischargeDate.SelectDate(2026, 8, 1);
 
         // Click check button
         await Page.Locator("#check-discharge-btn").ClickAsync();
@@ -179,14 +173,14 @@ public class WhenDateSelected : PlaywrightTestBase
         var argsCondition = Page.Locator("#args-condition");
         var selectedIndicator = Page.Locator("#selected-indicator");
 
-        // Cycle 1: set a date — condition evaluates "date selected", indicator shows
-        await SetDatePickerValue(AdmissionDateId, "2026-07-04");
+        // Cycle 1: select a date — condition evaluates "date selected", indicator shows
+        await AdmissionDate.SelectDate(2026, 7, 4);
         await Expect(argsCondition).ToHaveTextAsync("date selected", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(selectedIndicator).ToHaveTextAsync("admission set", new() { Timeout = 3000 });
 
         // Cycle 2: change to a different date — condition still fires and re-evaluates
-        await SetDatePickerValue(AdmissionDateId, "2026-12-25");
+        await AdmissionDate.SelectDate(2026, 12, 25);
         // args-condition should still say "date selected" (value is still not null)
         await Expect(argsCondition).ToHaveTextAsync("date selected", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
@@ -211,13 +205,13 @@ public class WhenDateSelected : PlaywrightTestBase
         await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
 
         // Step 2: set a discharge date — click check → "discharge date set"
-        await SetDatePickerValue(DischargeDateId, "2026-09-15");
+        await DischargeDate.SelectDate(2026, 9, 15);
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("discharge date set", new() { Timeout = 3000 });
 
         // Step 3: clear the discharge date — click check → "discharge date is required" again
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{DischargeDateId}'); el.ej2_instances[0].value = null; el.ej2_instances[0].dataBind(); }}");
+        await DischargeDate.Clear();
+        await DischargeDate.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
 

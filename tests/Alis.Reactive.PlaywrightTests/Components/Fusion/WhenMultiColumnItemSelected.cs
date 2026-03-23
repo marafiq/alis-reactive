@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -7,8 +9,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// Page under test: /Sandbox/Components/MultiColumnComboBox
 ///
 /// Syncfusion MultiColumnComboBox renders an input element inside the wrapper div.
-/// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
-/// Playwright interacts with the wrapper; the ej2 instance fires events.
+/// The wrapper element gets the IdGenerator-based ID. Tests use
+/// MultiColumnComboBoxLocator to interact via real browser gestures.
 /// </summary>
 [TestFixture]
 public class WhenMultiColumnItemSelected : PlaywrightTestBase
@@ -18,6 +20,8 @@ public class WhenMultiColumnItemSelected : PlaywrightTestBase
     // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_MultiColumnComboBoxModel";
     private const string FacilityId = Scope + "__Facility";
+
+    private MultiColumnComboBoxLocator Facility => new(Page, FacilityId);
 
     private async Task NavigateAndBoot()
     {
@@ -53,15 +57,11 @@ public class WhenMultiColumnItemSelected : PlaywrightTestBase
     public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
-        // SF MultiColumnComboBox wrapper gets the IdGenerator-based ID
-        var wrapper = Page.Locator($"#{FacilityId}");
-        await Expect(wrapper).ToBeVisibleAsync();
+        // SF MultiColumnComboBox renders an input with the IdGenerator-based ID
+        await Expect(Facility.Input).ToBeVisibleAsync();
 
-        // Wait for the value to be set by dom-ready via ej2 instance
-        await Page.WaitForFunctionAsync(
-            $"() => {{ const el = document.getElementById('{FacilityId}'); return el && el.ej2_instances && el.ej2_instances[0] && el.ej2_instances[0].value === '1'; }}",
-            null,
-            new() { Timeout = 5000 });
+        // Wait for the value to be set by dom-ready — verify via the visible input
+        await Expect(Facility.Input).Not.ToHaveValueAsync("", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }

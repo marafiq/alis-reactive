@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.Cascading;
 
 /// <summary>
@@ -9,8 +11,8 @@ namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.Cascading;
 ///
 /// SF DropDownList renders: span.e-ddl wrapping the input element.
 /// Popup divs are created with IDs: {componentId}_popup.
-/// To reliably trigger the SF change event, we use showPopup() via ej2 API
-/// then click the list item — same pattern as the existing DropDownList tests.
+/// Selection uses DropDownListLocator (focus wrapper + type text + Enter) —
+/// real keyboard gestures that fire the SF change event reliably.
 /// </summary>
 [TestFixture]
 public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
@@ -33,34 +35,23 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
     }
 
     /// <summary>
-    /// Opens the country dropdown via ej2 showPopup() API, waits for the popup to be
-    /// fully open, then clicks the matching list item. Using showPopup() is more reliable
-    /// than clicking the wrapper because it guarantees the ej2 popup lifecycle completes.
+    /// Selects a country via real keyboard gestures: focus wrapper, type text, press Enter.
+    /// DropDownListLocator fires the SF change event reliably without any ej2 API calls.
     /// </summary>
     private async Task SelectCountry(string text)
     {
-        // Use ej2 API to open popup (same pattern as existing DropDownList tests)
-        await Page.EvaluateAsync($@"() => {{
-            const el = document.getElementById('{CountryId}');
-            el.ej2_instances[0].showPopup();
-        }}");
-        var popup = Page.Locator($"#{CountryPopupId}");
-        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await popup.Locator(".e-list-item").Filter(new() { HasText = text }).ClickAsync();
+        var country = new DropDownListLocator(Page, CountryId);
+        await country.Select(text);
     }
 
     /// <summary>
-    /// Opens the city dropdown via ej2 showPopup() API, waits for popup, selects item.
+    /// Selects a city via real keyboard gestures: focus wrapper, type text, press Enter.
+    /// DropDownListLocator fires the SF change event reliably without any ej2 API calls.
     /// </summary>
     private async Task SelectCity(string text)
     {
-        await Page.EvaluateAsync($@"() => {{
-            const el = document.getElementById('{CityId}');
-            el.ej2_instances[0].showPopup();
-        }}");
-        var popup = Page.Locator($"#{CityPopupId}");
-        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await popup.Locator(".e-list-item").Filter(new() { HasText = text }).ClickAsync();
+        var city = new DropDownListLocator(Page, CityId);
+        await city.Select(text);
     }
 
     // ── Page loads ──
@@ -92,11 +83,8 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Open the country dropdown popup via ej2 API
-        await Page.EvaluateAsync($@"() => {{
-            const el = document.getElementById('{CountryId}');
-            el.ej2_instances[0].showPopup();
-        }}");
+        // Open the country dropdown — icon click opens popup in Playwright
+        await Page.Locator($"#{CountryId}").Locator("..").Locator(".e-ddl-icon").ClickAsync();
         var popup = Page.Locator($"#{CountryPopupId}");
         await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
 
@@ -275,23 +263,18 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await Expect(Page.Locator("#city-count"))
             .ToHaveTextAsync("2", new() { Timeout = 10000 });
 
-        // Wait for SF to finish clearing the city dropdown after datasource swap
-        await Page.WaitForTimeoutAsync(200);
+        // Verify the city input value is cleared after switching country (no stale "SEA")
+        await Expect(Page.Locator($"#{CityId}"))
+            .ToHaveValueAsync("", new() { Timeout = 5000 });
 
-        // Verify the city ej2 instance value is reset (no stale "SEA")
-        var cityValue = await Page.EvaluateAsync<string?>(@$"() => {{
-            const el = document.getElementById('{CityId}');
-            return el && el.ej2_instances && el.ej2_instances[0] ? el.ej2_instances[0].value : null;
-        }}");
-        Assert.That(cityValue, Is.Null.Or.Empty,
-            $"City value should be cleared after switching country but was '{cityValue}'");
+        // Verify UK cities are available — open popup and confirm 2 items loaded
+        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickAsync();
+        await Page.WaitForTimeoutAsync(300);
+        var cityPopup = Page.Locator($"#{CityPopupId}");
+        await Expect(cityPopup).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(cityPopup.Locator(".e-list-item")).ToHaveCountAsync(2, new() { Timeout = 5000 });
+        await Page.Keyboard.PressAsync("Escape");
 
-        // Verify UK cities are available — wait for DataBind to complete then select London
-        await Page.WaitForFunctionAsync($@"() => {{
-            const el = document.getElementById('{CityId}');
-            return el && el.ej2_instances && el.ej2_instances[0] &&
-                   el.ej2_instances[0].dataSource && el.ej2_instances[0].dataSource.length === 2;
-        }}", null, new() { Timeout = 10000 });
         await SelectCity("London");
         await Expect(Page.Locator("#selected-city"))
             .ToHaveTextAsync("LON", new() { Timeout = 5000 });
@@ -310,16 +293,14 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // City dropdown should have no data source items — it starts empty
-        var itemCount = await Page.EvaluateAsync<int>($@"() => {{
-            const el = document.getElementById('{CityId}');
-            const ds = el && el.ej2_instances && el.ej2_instances[0]
-                ? el.ej2_instances[0].dataSource
-                : [];
-            return Array.isArray(ds) ? ds.length : 0;
-        }}");
-        Assert.That(itemCount, Is.EqualTo(0),
-            "City dropdown should have zero items before any country is selected");
+        // City dropdown should have no data source items — it starts empty.
+        // Open the popup and verify no list items are rendered.
+        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickAsync();
+        await Page.WaitForTimeoutAsync(300);
+        var cityPopup = Page.Locator($"#{CityPopupId}");
+        await Expect(cityPopup).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(cityPopup.Locator(".e-list-item")).ToHaveCountAsync(0, new() { Timeout = 3000 });
+        await Page.Keyboard.PressAsync("Escape");
 
         AssertNoConsoleErrors();
     }
@@ -534,12 +515,14 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await Expect(Page.Locator("#city-count"))
             .ToHaveTextAsync("2", new() { Timeout = 10000 });
 
-        // Final state: Australia cities available, can select Melbourne
-        await Page.WaitForFunctionAsync($@"() => {{
-            const el = document.getElementById('{CityId}');
-            return el && el.ej2_instances && el.ej2_instances[0] &&
-                   el.ej2_instances[0].dataSource && el.ej2_instances[0].dataSource.length === 2;
-        }}", null, new() { Timeout = 10000 });
+        // Final state: Australia cities available — open popup and confirm 2 items loaded
+        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickAsync();
+        await Page.WaitForTimeoutAsync(300);
+        var cityPopup = Page.Locator($"#{CityPopupId}");
+        await Expect(cityPopup).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(cityPopup.Locator(".e-list-item")).ToHaveCountAsync(2, new() { Timeout = 5000 });
+        await Page.Keyboard.PressAsync("Escape");
+
         await SelectCity("Melbourne");
         await Expect(Page.Locator("#selected-city"))
             .ToHaveTextAsync("MEL", new() { Timeout = 5000 });

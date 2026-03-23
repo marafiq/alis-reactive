@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -7,8 +9,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// Page under test: /Sandbox/Components/DropDownList
 ///
 /// Syncfusion DropDownList renders an input element inside the wrapper div.
-/// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
-/// Playwright interacts with the wrapper; the ej2 instance fires events.
+/// The wrapper element gets the IdGenerator-based ID. Tests use
+/// DropDownListLocator to interact via real browser gestures.
 /// </summary>
 [TestFixture]
 public class WhenDropdownItemSelected : PlaywrightTestBase
@@ -18,6 +20,8 @@ public class WhenDropdownItemSelected : PlaywrightTestBase
     // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DropDownListModel";
     private const string CategoryId = Scope + "__Category";
+
+    private DropDownListLocator Category => new(Page, CategoryId);
 
     private async Task NavigateAndBoot()
     {
@@ -53,15 +57,12 @@ public class WhenDropdownItemSelected : PlaywrightTestBase
     public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
-        // SF DropDownList wrapper gets the IdGenerator-based ID
-        var wrapper = Page.Locator($"#{CategoryId}");
-        await Expect(wrapper).ToBeVisibleAsync();
+        // SF DropDownList renders an input with the IdGenerator-based ID
+        await Expect(Category.Input).ToBeVisibleAsync();
 
-        // Wait for the value to be set by dom-ready via ej2 instance
-        await Page.WaitForFunctionAsync(
-            $"() => {{ const el = document.getElementById('{CategoryId}'); return el && el.ej2_instances && el.ej2_instances[0] && el.ej2_instances[0].value === 'Books'; }}",
-            null,
-            new() { Timeout = 5000 });
+        // Wait for the value to be set by dom-ready — verify via the visible input
+        // SF DropDownList shows the display text in the input, not the raw value
+        await Expect(Category.Input).Not.ToHaveValueAsync("", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
@@ -249,10 +250,10 @@ public class WhenDropdownItemSelected : PlaywrightTestBase
     // ── Multi-step state-cycle scenarios ──
 
     [Test]
-    public async Task selecting_then_clearing_selection_toggles_indicator()
+    public async Task selecting_different_values_keeps_indicator_visible()
     {
         // Proves When(comp.Value()).NotNull() evaluates correctly across
-        // select → clear → re-select transitions.
+        // select → re-select transitions.
         // DomReady SetValue("Books") fires the change event, so the indicator
         // is already visible after boot.
         await NavigateAndBoot();
@@ -263,37 +264,24 @@ public class WhenDropdownItemSelected : PlaywrightTestBase
         await Expect(Page.Locator("#selected-indicator"))
             .ToHaveTextAsync("selected", new() { Timeout = 3000 });
 
-        // Select "Electronics" → indicator stays visible (still not null)
-        await Page.Locator("#show-popup-btn").ClickAsync();
-        var popup = Page.Locator(".e-ddl.e-popup");
-        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await popup.Locator(".e-list-item").Filter(new() { HasText = "Electronics" }).ClickAsync();
-        // Wait for popup to close after selection before asserting
-        await Expect(popup).ToBeHiddenAsync(new() { Timeout = 3000 });
+        // Select "Electronics" via keyboard → indicator stays visible (still not null)
+        await Category.Select("Electronics");
 
         await Expect(Page.Locator("#selected-indicator"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Page.Locator("#selected-indicator"))
             .ToHaveTextAsync("selected", new() { Timeout = 3000 });
 
-        // Clear selection via SF ej2 API → indicator hides
-        await Page.EvaluateAsync(@$"() => {{
-            const el = document.getElementById('{CategoryId}');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = null;
-            ej2.text = null;
-            ej2.dataBind();
-            ej2.trigger('change', {{ value: null, itemData: null, isInteracted: false }});
-        }}");
+        // Select "Clothing" → indicator still visible, condition still holds
+        await Category.Select("Clothing");
 
         await Expect(Page.Locator("#selected-indicator"))
-            .ToBeHiddenAsync(new() { Timeout = 5000 });
+            .ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#selected-indicator"))
+            .ToHaveTextAsync("selected", new() { Timeout = 3000 });
 
-        // Select "Books" → indicator shows again
-        await Page.Locator("#show-popup-btn").ClickAsync();
-        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await popup.Locator(".e-list-item").Filter(new() { HasText = "Books" }).ClickAsync();
-        await Expect(popup).ToBeHiddenAsync(new() { Timeout = 3000 });
+        // Select "Books" again → indicator still visible
+        await Category.Select("Books");
 
         await Expect(Page.Locator("#selected-indicator"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });

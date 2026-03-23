@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -8,7 +10,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Syncfusion AutoComplete renders an input element inside the wrapper div.
 /// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
-/// Playwright interacts with the wrapper; the ej2 instance fires events.
+/// Tests use AutoCompleteLocator to interact via real browser gestures.
 /// </summary>
 [TestFixture]
 public class WhenAutoCompleteSuggests : PlaywrightTestBase
@@ -19,6 +21,8 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_AutoCompleteModel";
     private const string PhysicianId = Scope + "__Physician";
     private const string MedicationId = Scope + "__MedicationType";
+
+    private AutoCompleteLocator Physician => new(Page, PhysicianId);
 
     private async Task NavigateAndBoot()
     {
@@ -54,15 +58,12 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
     public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
-        // SF AutoComplete wrapper gets the IdGenerator-based ID
-        var wrapper = Page.Locator($"#{PhysicianId}");
-        await Expect(wrapper).ToBeVisibleAsync();
+        // SF AutoComplete renders an input with the IdGenerator-based ID
+        var ac = Physician;
+        await Expect(ac.Input).ToBeVisibleAsync();
 
-        // Wait for the value to be set by dom-ready via ej2 instance
-        await Page.WaitForFunctionAsync(
-            $"() => {{ const el = document.getElementById('{PhysicianId}'); return el && el.ej2_instances && el.ej2_instances[0] && el.ej2_instances[0].value === 'smith'; }}",
-            null,
-            new() { Timeout = 5000 });
+        // Wait for the value to be set by dom-ready — verify via the visible input
+        await Expect(ac.Input).Not.ToHaveValueAsync("", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
@@ -352,9 +353,9 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
         await Expect(selectedIndicator).ToHaveTextAsync("selected", new() { Timeout = 3000 });
         await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
 
-        // Step 2: clear the selection via ej2 instance → fires change with null value → indicator hides
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{PhysicianId}'); const ej2 = el.ej2_instances[0]; ej2.value = null; ej2.text = null; ej2.dataBind(); }}");
+        // Step 2: clear the selection via real gesture → fires change with null value → indicator hides
+        await Physician.Clear();
+        await Physician.Blur();
         await Expect(selectedIndicator).ToBeHiddenAsync(new() { Timeout = 5000 });
 
         // Step 3: reselect Dr. Smith → indicator shows again, args says "dr smith selected"

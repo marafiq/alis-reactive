@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
@@ -9,11 +10,16 @@ namespace Alis.Reactive.Playwright.Extensions;
 ///
 /// SF DatePicker DOM:
 ///   input#{componentId} (type="text" with date formatting)
+///   .e-date-icon inside parent .e-input-group (opens calendar popup)
+///   #{componentId}_options (calendar popup)
 ///
 /// Usage:
 ///   var dp = plan.DatePicker(m => m.BirthDate);
 ///
-///   // Gesture
+///   // Popup gesture — sets ej2.value reliably
+///   await dp.SelectDate(2026, 3, 21);
+///
+///   // Text gesture (may not set ej2.value — prefer SelectDate)
 ///   await dp.FillAndBlur("03/21/2026");
 ///
 ///   // Surface → test asserts
@@ -34,6 +40,12 @@ public sealed class DatePickerLocator
 
     /// <summary>The date input field.</summary>
     public ILocator Input => _page.Locator($"#{_componentId}");
+
+    /// <summary>The calendar icon button that opens the date popup.</summary>
+    public ILocator CalendarIcon => _page.Locator($"#{_componentId}").Locator("..").Locator(".e-date-icon");
+
+    /// <summary>The calendar popup container (visible after clicking CalendarIcon).</summary>
+    public ILocator Popup => _page.Locator($"#{_componentId}_options");
 
     // ─── Gestures — What the User Does ───
 
@@ -65,5 +77,44 @@ public sealed class DatePickerLocator
     {
         await Fill(dateText);
         await Blur();
+    }
+
+    /// <summary>Open the calendar popup, navigate to the target month/year, and click the day cell.
+    /// This is the reliable way to set ej2.value — typed input does NOT always update the instance.</summary>
+    public async Task SelectDate(int year, int month, int day)
+    {
+        await CalendarIcon.ClickAsync();
+        await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
+        await NavigateToMonth(Popup, year, month);
+
+        var dayCell = Popup.Locator($"td.e-cell:not(.e-other-month) span.e-day:text-is(\"{day}\")");
+        await dayCell.ClickAsync();
+    }
+
+    // ─── Private Helpers ───
+
+    private async Task NavigateToMonth(ILocator popup, int targetYear, int targetMonth)
+    {
+        var target = new DateTime(targetYear, targetMonth, 1);
+
+        for (var i = 0; i < 24; i++) // max 2 years of navigation
+        {
+            var titleText = await popup.Locator(".e-title").TextContentAsync() ?? "";
+
+            if (DateTime.TryParseExact(titleText.Trim(), "MMMM yyyy",
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var current))
+            {
+                var currentMonth = new DateTime(current.Year, current.Month, 1);
+                if (currentMonth == target)
+                    return;
+
+                if (target < currentMonth)
+                    await popup.Locator(".e-prev").ClickAsync();
+                else
+                    await popup.Locator(".e-next").ClickAsync();
+
+                await _page.WaitForTimeoutAsync(100); // allow calendar animation
+            }
+        }
     }
 }

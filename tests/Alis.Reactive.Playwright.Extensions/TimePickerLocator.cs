@@ -9,11 +9,16 @@ namespace Alis.Reactive.Playwright.Extensions;
 ///
 /// SF TimePicker DOM:
 ///   input#{componentId} (type="text" with time formatting)
+///   .e-time-icon inside parent .e-input-group (opens time popup)
+///   #{componentId}_popup (time list popup wrapper)
 ///
 /// Usage:
 ///   var tp = plan.TimePicker(m => m.CheckInTime);
 ///
-///   // Gesture
+///   // Popup gesture — sets ej2.value reliably
+///   await tp.SelectTime("2:30 PM");
+///
+///   // Text gesture (may not set ej2.value — prefer SelectTime)
 ///   await tp.FillAndBlur("2:30 PM");
 ///
 ///   // Surface → test asserts
@@ -34,6 +39,12 @@ public sealed class TimePickerLocator
 
     /// <summary>The time input field.</summary>
     public ILocator Input => _page.Locator($"#{_componentId}");
+
+    /// <summary>The clock icon button that opens the time popup.</summary>
+    public ILocator ClockIcon => _page.Locator($"#{_componentId}").Locator("..").Locator(".e-time-icon");
+
+    /// <summary>The time list popup wrapper (visible after clicking ClockIcon).</summary>
+    public ILocator TimePopup => _page.Locator($"#{_componentId}_popup");
 
     // ─── Gestures — What the User Does ───
 
@@ -64,5 +75,17 @@ public sealed class TimePickerLocator
     {
         await Fill(timeText);
         await Blur();
+    }
+
+    /// <summary>Open the time popup, find the matching time item, and click it.
+    /// This is the reliable way to set ej2.value — typed input does NOT always update the instance.
+    /// Time items use 30-minute intervals (e.g., "8:00 AM", "8:30 AM", ..., "11:30 PM").</summary>
+    public async Task SelectTime(string timeText)
+    {
+        await ClockIcon.ClickAsync();
+        await TimePopup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
+
+        var item = TimePopup.Locator($".e-list-item[data-value='{timeText}']");
+        await item.ClickAsync();
     }
 }

@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.Workflows;
 
@@ -10,9 +11,8 @@ namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.Workflows;
 /// FluentValidation via ComponentGatherValidator — all fields required.
 /// Server echoes received fields; tests verify the echo response populates.
 ///
-/// TODO: FillAllRequiredFields uses ej2_instances for SF date/time pickers — replace
-/// with proper popup-based calendar locators when DatePicker/TimePicker locators
-/// support real gesture interaction (click calendar → navigate → select date).
+/// All Fusion components are filled via real browser gestures (popup clicks,
+/// keyboard typing) through locator classes — no ej2_instances API calls.
 /// </summary>
 [TestFixture]
 public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
@@ -28,6 +28,8 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
 
     private async Task FillAllRequiredFields()
     {
+        var scope = new ComponentScope(Page, Scope);
+
         // Native scalars (ResidentName + CareNotes are seeded, but fill others)
         // MobilityLevel — select an option
         await Page.Locator($"#{Scope}MobilityLevel").SelectOptionAsync("wheelchair");
@@ -38,49 +40,48 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         // NativeCheckList — check Dairy (index 1)
         await Page.Locator($"#{Scope}Allergies_c1").ClickAsync();
 
-        // Fusion components — set via ej2 API
-        await Page.EvaluateAsync(@$"() => {{
-            // NumericTextBox — MonthlyRate (seeded 4250 but ensure it's set)
-            // FacilityId
-            const ddl = document.getElementById('{Scope}FacilityId');
-            if (ddl && ddl.ej2_instances) {{ ddl.ej2_instances[0].value = 'fac-1'; ddl.ej2_instances[0].dataBind(); }}
+        // Fusion components — real browser gestures via locator classes
 
-            // PhysicianName
-            const ac = document.getElementById('{Scope}PhysicianName');
-            if (ac && ac.ej2_instances) {{ ac.ej2_instances[0].value = 'Dr. Smith'; ac.ej2_instances[0].dataBind(); }}
+        // FacilityId (DropDownList) — type "Main Campus" + Enter
+        var facility = scope.DropDownList("FacilityId");
+        await facility.Select("Main Campus");
 
-            // AdmissionDate
-            const dp = document.getElementById('{Scope}AdmissionDate');
-            if (dp && dp.ej2_instances) {{ dp.ej2_instances[0].value = new Date(2024, 2, 15); dp.ej2_instances[0].dataBind(); }}
+        // PhysicianName (AutoComplete) — type partial text, click suggestion
+        var physician = scope.AutoComplete("PhysicianName");
+        await physician.TypeAndSelect("Smith", "Dr. Smith");
 
-            // MedicationTime
-            const tp = document.getElementById('{Scope}MedicationTime');
-            if (tp && tp.ej2_instances) {{ tp.ej2_instances[0].value = new Date(1970, 0, 1, 8, 30, 0); tp.ej2_instances[0].dataBind(); }}
+        // AdmissionDate (DatePicker) — select a date in current month (no navigation needed)
+        var now = DateTime.Now;
+        var admissionDate = scope.DatePicker("AdmissionDate");
+        await admissionDate.SelectDate(now.Year, now.Month, 15);
 
-            // AppointmentTime
-            const dtp = document.getElementById('{Scope}AppointmentTime');
-            if (dtp && dtp.ej2_instances) {{ dtp.ej2_instances[0].value = new Date(2024, 2, 15, 14, 0, 0); dtp.ej2_instances[0].dataBind(); }}
+        // MedicationTime (TimePicker) — open popup, click "8:30 AM"
+        var medTime = scope.TimePicker("MedicationTime");
+        await medTime.SelectTime("8:30 AM");
 
-            // StayStart (DateRangePicker)
-            const drp = document.getElementById('{Scope}StayStart');
-            if (drp && drp.ej2_instances) {{ drp.ej2_instances[0].startDate = new Date(2024, 0, 15); drp.ej2_instances[0].endDate = new Date(2024, 5, 15); drp.ej2_instances[0].dataBind(); }}
+        // AppointmentTime (DateTimePicker) — use current month date + time
+        var aptTime = scope.DateTimePicker("AppointmentTime");
+        await aptTime.Select(now.Year, now.Month, 10, "2:00 PM");
 
-            // InsuranceProvider (MultiColumnComboBox)
-            const mccb = document.getElementById('{Scope}InsuranceProvider');
-            if (mccb && mccb.ej2_instances) {{ mccb.ej2_instances[0].value = 'blue-cross'; mccb.ej2_instances[0].dataBind(); }}
+        // StayStart (DateRangePicker) — current month to next month
+        var stay = scope.DateRangePicker("StayStart");
+        await stay.SelectRange(now.Year, now.Month, 5, now.Year, now.Month, 20);
 
-            // PhoneNumber (InputMask)
-            const mask = document.getElementById('{Scope}PhoneNumber');
-            if (mask && mask.ej2_instances) {{ mask.ej2_instances[0].value = '5551234567'; mask.ej2_instances[0].dataBind(); }}
+        // InsuranceProvider (MultiColumnComboBox) — type "Blue Cross" + Enter
+        var insurance = scope.MultiColumnComboBox("InsuranceProvider");
+        await insurance.Select("Blue Cross");
 
-            // CarePlan (RichTextEditor)
-            const rte = document.getElementById('{Scope}CarePlan');
-            if (rte && rte.ej2_instances) {{ rte.ej2_instances[0].value = '<p>Care plan content</p>'; rte.ej2_instances[0].dataBind(); }}
+        // PhoneNumber (InputMask) — type digits into masked input
+        var phone = scope.InputMask("PhoneNumber");
+        await phone.FillAndBlur("5551234567");
 
-            // DietaryRestrictions (MultiSelect)
-            const ms = document.getElementById('{Scope}DietaryRestrictions');
-            if (ms && ms.ej2_instances) {{ ms.ej2_instances[0].value = ['vegetarian', 'halal']; ms.ej2_instances[0].dataBind(); }}
-        }}");
+        // CarePlan (RichTextEditor) — type into contenteditable area
+        var carePlan = scope.RichTextEditor("CarePlan");
+        await carePlan.FillAndBlur("Care plan content");
+
+        // DietaryRestrictions (MultiSelect) — click each item in popup
+        var dietary = scope.MultiSelect("DietaryRestrictions");
+        await dietary.SelectItems("Vegetarian", "Halal");
     }
 
     private async Task SubmitJsonAndWaitForEcho()
@@ -449,10 +450,9 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         // Clear seeded values so validation will fail
         await Page.Locator($"#{Scope}ResidentName").FillAsync("");
         await Page.Locator($"#{Scope}CareNotes").FillAsync("");
-        await Page.EvaluateAsync(@$"() => {{
-            const ntb = document.getElementById('{Scope}MonthlyRate');
-            if (ntb && ntb.ej2_instances) {{ ntb.ej2_instances[0].value = 0; ntb.ej2_instances[0].dataBind(); }}
-        }}");
+        var monthlyRate = new ComponentScope(Page, Scope).NumericTextBox("MonthlyRate");
+        await monthlyRate.Clear();
+        await monthlyRate.FillAndBlur("0");
 
         await Page.Locator("#submit-json-btn").ClickAsync();
 

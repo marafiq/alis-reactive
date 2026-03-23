@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -8,9 +10,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// Page under test: /Sandbox/Components/Switch
 ///
 /// Syncfusion Switch renders an input element inside a wrapper.
-/// The wrapper element gets the IdGenerator-based ID; the ej2 instance
-/// is attached to this element. Playwright uses the ej2 instance API to
-/// toggle state and trigger change events reliably.
+/// The wrapper element gets the IdGenerator-based ID. Tests use
+/// SwitchLocator.Toggle() to click the wrapper, which reliably
+/// triggers the SF change event via real browser interaction.
 ///
 /// Senior living domain: notification preferences, email/SMS alerts.
 /// </summary>
@@ -25,30 +27,13 @@ public class WhenSwitchToggles : PlaywrightTestBase
     private const string EmailAlertsId = Scope + "__EmailAlerts";
     private const string SmsAlertsId = Scope + "__SmsAlerts";
 
+    private SwitchLocator ReceiveNotifications => new(Page, ReceiveNotificationsId);
+    private SwitchLocator SmsAlerts => new(Page, SmsAlertsId);
+
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-    }
-
-    /// <summary>
-    /// Sets the checked state on a Syncfusion Switch ej2 instance via JS.
-    /// Setting .checked + .dataBind() updates internal state but does NOT fire the
-    /// SF "change" event. We must explicitly trigger the event via the ej2 instance's
-    /// trigger() method — this is the SF event system, not DOM dispatchEvent.
-    /// The event args must include "checked" and "isInteracted" to match the SF contract.
-    /// </summary>
-    private async Task SetSwitchChecked(string elementId, bool isChecked)
-    {
-        var jsChecked = isChecked ? "true" : "false";
-        await Page.EvaluateAsync(
-            $@"() => {{
-                const el = document.getElementById('{elementId}');
-                const ej2 = el.ej2_instances[0];
-                ej2.checked = {jsChecked};
-                ej2.dataBind();
-                ej2.trigger('change', {{ checked: {jsChecked}, isInteracted: true }});
-            }}");
     }
 
     // ── Page loads ──
@@ -82,9 +67,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
         // Expected: switch is unchecked after boot.
         await NavigateAndBoot();
 
-        var isChecked = await Page.EvaluateAsync<bool>(
-            $"() => {{ const el = document.getElementById('{ReceiveNotificationsId}'); return el.ej2_instances[0].checked; }}");
-        Assert.That(isChecked, Is.False, "DomReady SetChecked(false) should uncheck the switch");
+        await Expect(ReceiveNotifications.Input).Not.ToBeCheckedAsync();
         AssertNoConsoleErrors();
     }
 
@@ -106,8 +89,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Toggle the switch on via ej2 instance
-        await SetSwitchChecked(ReceiveNotificationsId, true);
+        // Toggle the switch on by clicking the wrapper
+        await ReceiveNotifications.Toggle();
 
         // SF change event payload contains the new checked state
         await Expect(Page.Locator("#change-value"))
@@ -120,8 +103,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Toggle the switch on via ej2 instance
-        await SetSwitchChecked(ReceiveNotificationsId, true);
+        // Toggle the switch on by clicking the wrapper
+        await ReceiveNotifications.Toggle();
 
         // When(args, x => x.Checked).Truthy() => Then branch
         await Expect(Page.Locator("#args-condition"))
@@ -135,11 +118,11 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         // DomReady already set it to false, toggle on then off to trigger event
-        await SetSwitchChecked(ReceiveNotificationsId, true);
+        await ReceiveNotifications.Toggle();
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("notifications enabled", new() { Timeout = 5000 });
 
-        await SetSwitchChecked(ReceiveNotificationsId, false);
+        await ReceiveNotifications.Toggle();
 
         // When(args, x => x.Checked).Truthy() => Else branch
         await Expect(Page.Locator("#args-condition"))
@@ -152,8 +135,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Toggle the switch on via ej2 instance
-        await SetSwitchChecked(ReceiveNotificationsId, true);
+        // Toggle the switch on by clicking the wrapper
+        await ReceiveNotifications.Toggle();
 
         // Indicator should appear with text "notifications active"
         await Expect(Page.Locator("#selected-indicator"))
@@ -183,8 +166,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Toggle SmsAlerts on
-        await SetSwitchChecked(SmsAlertsId, true);
+        // Toggle SmsAlerts on by clicking the wrapper
+        await SmsAlerts.Toggle();
 
         // Click check button
         await Page.Locator("#check-sms-btn").ClickAsync();
@@ -205,18 +188,18 @@ public class WhenSwitchToggles : PlaywrightTestBase
         var selectedIndicator = Page.Locator("#selected-indicator");
 
         // Cycle 1: toggle on — condition evaluates "notifications enabled", indicator shows
-        await SetSwitchChecked(ReceiveNotificationsId, true);
+        await ReceiveNotifications.Toggle();
         await Expect(argsCondition).ToHaveTextAsync("notifications enabled", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(selectedIndicator).ToHaveTextAsync("notifications active", new() { Timeout = 3000 });
 
         // Cycle 2: toggle off — condition evaluates "notifications disabled", indicator hides
-        await SetSwitchChecked(ReceiveNotificationsId, false);
+        await ReceiveNotifications.Toggle();
         await Expect(argsCondition).ToHaveTextAsync("notifications disabled", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeHiddenAsync(new() { Timeout = 3000 });
 
         // Cycle 3: toggle on again — proves state is not stuck
-        await SetSwitchChecked(ReceiveNotificationsId, true);
+        await ReceiveNotifications.Toggle();
         await Expect(argsCondition).ToHaveTextAsync("notifications enabled", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
 
@@ -236,12 +219,12 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await Expect(warning).ToHaveTextAsync("SMS alerts are disabled", new() { Timeout = 3000 });
 
         // Toggle on -> button should now say "SMS alerts are enabled"
-        await SetSwitchChecked(SmsAlertsId, true);
+        await SmsAlerts.Toggle();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("SMS alerts are enabled", new() { Timeout = 3000 });
 
         // Toggle off again -> button should revert to "SMS alerts are disabled"
-        await SetSwitchChecked(SmsAlertsId, false);
+        await SmsAlerts.Toggle();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("SMS alerts are disabled", new() { Timeout = 3000 });
 

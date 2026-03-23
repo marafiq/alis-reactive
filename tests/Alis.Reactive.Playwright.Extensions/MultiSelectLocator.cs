@@ -39,10 +39,14 @@ public sealed class MultiSelectLocator
     public ILocator Wrapper => _page.Locator($"#{_componentId}").Locator("xpath=ancestor::div[contains(@class,'e-input-group')]");
 
     /// <summary>
-    /// All popup list items. SF MultiSelect creates the popup with a shortened ID
-    /// (property name only), so we use a general visible-popup selector.
+    /// The popup container. SF MultiSelect creates the popup with a shortened ID
+    /// (property name only, e.g., "DietaryRestrictions_popup" not the full scope).
+    /// Extract the property name from the end of the component ID.
     /// </summary>
-    public ILocator PopupItems => _page.Locator("[id$='_popup'] .e-list-item");
+    public ILocator Popup => _page.Locator($"#{_componentId.Split("__").Last()}_popup");
+
+    /// <summary>All popup list items.</summary>
+    public ILocator PopupItems => Popup.Locator(".e-list-item");
 
     /// <summary>A specific popup item by its visible text.</summary>
     public ILocator PopupItem(string text) =>
@@ -51,29 +55,33 @@ public sealed class MultiSelectLocator
     // ─── Gestures — What the User Does ───
 
     /// <summary>Click the wrapper to focus and open the popup.</summary>
-    public async Task Open() => await Wrapper.ClickAsync();
-
-    /// <summary>Open the popup, find the item by text, and click it.</summary>
-    public async Task SelectItem(string itemText, int timeoutMs = 5000)
+    public async Task Open()
     {
-        await Open();
-        var item = PopupItem(itemText);
-        await item.WaitForAsync(new() { Timeout = timeoutMs });
-        await item.ClickAsync();
+        await Wrapper.ClickAsync();
+        await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
     }
 
-    /// <summary>Select multiple items. Opens popup, clicks each, then closes.</summary>
+    /// <summary>Open the popup, find the item by text, and click it.</summary>
+    public async Task SelectItem(string itemText)
+    {
+        await Open();
+        await Popup.Locator(".e-list-item").GetByText(itemText, new() { Exact = true }).ClickAsync();
+    }
+
+    /// <summary>Select multiple items. SF MultiSelect may close popup after each click,
+    /// so we re-open the popup for each subsequent item.</summary>
     public async Task SelectItems(params string[] itemTexts)
     {
         foreach (var text in itemTexts)
         {
-            // Re-open popup for each item (SF may briefly close between selections)
-            await Open();
-            var item = PopupItem(text);
-            await item.WaitForAsync(new() { Timeout = 5000 });
-            await item.ClickAsync();
+            // Click wrapper to open/re-open popup
+            await Wrapper.ClickAsync();
+            await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
+            await Popup.Locator(".e-list-item").GetByText(text, new() { Exact = true }).ClickAsync();
         }
-        await _page.Keyboard.PressAsync("Escape");
+        // Close popup if still open
+        if (await Popup.IsVisibleAsync())
+            await _page.Keyboard.PressAsync("Escape");
     }
 
     /// <summary>Press Escape to close the popup and blur.</summary>

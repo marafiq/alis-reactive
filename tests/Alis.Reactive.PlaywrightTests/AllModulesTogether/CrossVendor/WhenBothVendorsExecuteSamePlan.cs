@@ -284,12 +284,15 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
         // Click validate with both fields empty — validation must block the POST
         await Page.Locator("#validate-btn").ClickAsync();
 
-        // Wait briefly for any async effects to settle
-        await Page.WaitForTimeoutAsync(500);
+        // Validation errors must appear on both fields — proves validation ran and blocked the POST
+        await Expect(Page.Locator("[data-valmsg-for='native-val-field']"))
+            .ToBeVisibleAsync(new() { Timeout = 3000 });
+        await Expect(Page.Locator("[data-valmsg-for='fusion-val-field']"))
+            .ToBeVisibleAsync(new() { Timeout = 3000 });
 
         // The success message must NOT appear — POST was blocked by client validation
         await Expect(Page.Locator("#val-result"))
-            .ToHaveTextAsync("Click to validate", new() { Timeout = 2000 });
+            .ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }

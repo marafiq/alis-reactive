@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -8,9 +10,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// Page under test: /Sandbox/Components/InputMask
 ///
 /// Syncfusion MaskedTextBox renders an input element inside a wrapper span.
-/// The wrapper element gets the IdGenerator-based ID; the ej2 instance
-/// is attached to this element. Playwright uses the ej2 instance API to
-/// set values and trigger change events reliably.
+/// The wrapper element gets the IdGenerator-based ID. Tests use
+/// InputMaskLocator to interact via real browser gestures (typing into
+/// the masked input) rather than ej2 instance manipulation.
 ///
 /// Senior living domain: phone numbers, SSN, insurance IDs.
 /// </summary>
@@ -23,29 +25,12 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_InputMaskModel";
     private const string PhoneNumberId = Scope + "__PhoneNumber";
 
+    private InputMaskLocator PhoneNumber => new(Page, PhoneNumberId);
+
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-    }
-
-    /// <summary>
-    /// Sets a value on a Syncfusion MaskedTextBox ej2 instance via JS.
-    /// This is the reliable way to interact with SF components in Playwright.
-    /// </summary>
-    private async Task SetMaskedValue(string elementId, string value)
-    {
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{elementId}'); el.ej2_instances[0].value = '{value}'; el.ej2_instances[0].dataBind(); }}");
-    }
-
-    /// <summary>
-    /// Clears the masked value by setting it to empty string.
-    /// </summary>
-    private async Task ClearMaskedValue(string elementId)
-    {
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{elementId}'); el.ej2_instances[0].value = ''; el.ej2_instances[0].dataBind(); }}");
     }
 
     // ── Page loads ──
@@ -81,9 +66,8 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
 
         // The framework sets ej2.value = "(555) 123-4567" via set-prop.
         // Verify the value was applied by checking the visible input element's value.
-        var inputValue = await Page.EvaluateAsync<string>(
-            $"() => {{ const el = document.getElementById('{PhoneNumberId}'); if (!el) return 'no-el'; const input = el.tagName === 'INPUT' ? el : el.querySelector('input'); return input ? input.value : 'no-input'; }}");
-        Assert.That(inputValue, Is.Not.Null.And.Not.Empty.And.Not.EqualTo("no-el").And.Not.EqualTo("no-input"),
+        var inputValue = await PhoneNumber.Input.InputValueAsync();
+        Assert.That(inputValue, Is.Not.Null.And.Not.Empty,
             $"Expected InputMask input to have a value but got '{inputValue}'");
 
         AssertNoConsoleErrors();
@@ -107,8 +91,8 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetMaskedValue(PhoneNumberId, "9876543210");
+        // Type phone number and blur — triggers SF change event
+        await PhoneNumber.FillAndBlur("9876543210");
 
         // SF change event payload contains the new value
         await Expect(Page.Locator("#change-value"))
@@ -121,8 +105,8 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetMaskedValue(PhoneNumberId, "9876543210");
+        // Type phone number and blur — triggers SF change event
+        await PhoneNumber.FillAndBlur("9876543210");
 
         // When(args, x => x.Value).NotEmpty() => Then branch
         await Expect(Page.Locator("#args-condition"))
@@ -135,8 +119,8 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetMaskedValue(PhoneNumberId, "9876543210");
+        // Type phone number and blur — triggers SF change event
+        await PhoneNumber.FillAndBlur("9876543210");
 
         // Indicator should appear with text "phone on file"
         await Expect(Page.Locator("#selected-indicator"))
@@ -154,7 +138,8 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Clear the DomReady-set value first
-        await ClearMaskedValue(PhoneNumberId);
+        await PhoneNumber.Clear();
+        await PhoneNumber.Blur();
 
         await Page.Locator("#check-phone-btn").ClickAsync();
 
@@ -168,8 +153,8 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set a phone number via ej2 instance
-        await SetMaskedValue(PhoneNumberId, "5559876543");
+        // Type a phone number and blur
+        await PhoneNumber.FillAndBlur("5559876543");
 
         // Click check button
         await Page.Locator("#check-phone-btn").ClickAsync();
@@ -189,14 +174,14 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         var argsCondition = Page.Locator("#args-condition");
         var selectedIndicator = Page.Locator("#selected-indicator");
 
-        // Cycle 1: set a phone number — condition evaluates "phone entered", indicator shows
-        await SetMaskedValue(PhoneNumberId, "5551234567");
+        // Cycle 1: type a phone number — condition evaluates "phone entered", indicator shows
+        await PhoneNumber.FillAndBlur("5551234567");
         await Expect(argsCondition).ToHaveTextAsync("phone entered", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(selectedIndicator).ToHaveTextAsync("phone on file", new() { Timeout = 3000 });
 
         // Cycle 2: change to a different number — condition still fires and re-evaluates
-        await SetMaskedValue(PhoneNumberId, "5559876543");
+        await PhoneNumber.FillAndBlur("5559876543");
         // args-condition should still say "phone entered" (value is still not empty)
         await Expect(argsCondition).ToHaveTextAsync("phone entered", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
@@ -217,17 +202,19 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         var warning = Page.Locator("#phone-warning");
 
         // Step 1: clear the DomReady-set value, then check — "phone number is required"
-        await ClearMaskedValue(PhoneNumberId);
+        await PhoneNumber.Clear();
+        await PhoneNumber.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("phone number is required", new() { Timeout = 3000 });
 
-        // Step 2: set a phone number — click check — "phone number set"
-        await SetMaskedValue(PhoneNumberId, "5551234567");
+        // Step 2: type a phone number — click check — "phone number set"
+        await PhoneNumber.FillAndBlur("5551234567");
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("phone number set", new() { Timeout = 3000 });
 
         // Step 3: clear the phone number — click check — "phone number is required" again
-        await ClearMaskedValue(PhoneNumberId);
+        await PhoneNumber.Clear();
+        await PhoneNumber.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("phone number is required", new() { Timeout = 3000 });
 

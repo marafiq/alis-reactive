@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -9,9 +11,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Syncfusion RichTextEditor hides the textarea and renders a
 /// contenteditable div inside a wrapper with class e-richtexteditor.
-/// The ej2 instance is attached to the original textarea element.
-/// The wrapper gets a generated ID from SF (different from our element ID).
-/// We use the textarea element's ej2_instances to interact with the component.
+/// Tests use RichTextEditorLocator to interact via real browser gestures
+/// (typing into the contenteditable area) rather than ej2 instance manipulation.
 ///
 /// Senior living domain: care plan documentation, discharge summaries.
 /// </summary>
@@ -24,44 +25,12 @@ public class WhenRichTextEdited : PlaywrightTestBase
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_RichTextEditorModel";
     private const string CarePlanId = Scope + "__CarePlan";
 
+    private RichTextEditorLocator CarePlan => new(Page, CarePlanId);
+
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-    }
-
-    /// <summary>
-    /// Sets a value on a Syncfusion RichTextEditor ej2 instance via JS
-    /// and triggers the change event. Unlike simpler SF inputs, the RTE
-    /// does not fire its change event from dataBind() alone — we must
-    /// programmatically trigger it via the ej2 instance.
-    /// </summary>
-    private async Task SetRichTextValue(string elementId, string htmlValue)
-    {
-        await Page.EvaluateAsync(
-            @$"() => {{
-                const el = document.getElementById('{elementId}');
-                const rte = el.ej2_instances[0];
-                rte.value = '{htmlValue.Replace("'", "\\'")}';
-                rte.dataBind();
-                // SF RTE change event requires explicit trigger after programmatic value set
-                rte.trigger('change', {{ value: rte.value, isInteracted: false }});
-            }}");
-    }
-
-    /// <summary>
-    /// Clears the rich text value and triggers the change event.
-    /// </summary>
-    private async Task ClearRichTextValue(string elementId)
-    {
-        await Page.EvaluateAsync(
-            @$"() => {{
-                const el = document.getElementById('{elementId}');
-                const rte = el.ej2_instances[0];
-                rte.value = '';
-                rte.dataBind();
-                rte.trigger('change', {{ value: '', isInteracted: false }});
-            }}");
     }
 
     // ── Page loads ──
@@ -93,11 +62,9 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // SF RTE hides the textarea — verify the ej2 instance value directly.
-        var value = await Page.EvaluateAsync<string>(
-            $"() => {{ const el = document.getElementById('{CarePlanId}'); if (!el) return 'no-el'; if (!el.ej2_instances || !el.ej2_instances[0]) return 'no-ej2'; return el.ej2_instances[0].value || 'empty'; }}");
-        Assert.That(value, Is.Not.Null.And.Not.Empty.And.Not.EqualTo("no-el").And.Not.EqualTo("no-ej2").And.Not.EqualTo("empty"),
-            $"Expected RichTextEditor to have a value but got '{value}'");
+        // SF RTE hides the textarea — verify the contenteditable editor has content.
+        var rte = CarePlan;
+        await Expect(rte.Editor).Not.ToHaveTextAsync("", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
@@ -120,8 +87,8 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetRichTextValue(CarePlanId, "<p>Discharge ready</p>");
+        // Type into the contenteditable editor and blur — triggers SF change event
+        await CarePlan.FillAndBlur("Discharge ready");
 
         // SF change event payload contains the new value
         await Expect(Page.Locator("#change-value"))
@@ -134,8 +101,8 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetRichTextValue(CarePlanId, "<p>Discharge ready</p>");
+        // Type into the contenteditable editor and blur — triggers SF change event
+        await CarePlan.FillAndBlur("Discharge ready");
 
         // When(args, x => x.Value).NotEmpty() => Then branch
         await Expect(Page.Locator("#args-condition"))
@@ -148,8 +115,8 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetRichTextValue(CarePlanId, "<p>Discharge ready</p>");
+        // Type into the contenteditable editor and blur — triggers SF change event
+        await CarePlan.FillAndBlur("Discharge ready");
 
         // Indicator should appear with text "care plan on file"
         await Expect(Page.Locator("#selected-indicator"))
@@ -167,7 +134,8 @@ public class WhenRichTextEdited : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Clear the DomReady-set value first
-        await ClearRichTextValue(CarePlanId);
+        await CarePlan.Clear();
+        await CarePlan.Blur();
 
         await Page.Locator("#check-careplan-btn").ClickAsync();
 
@@ -181,8 +149,8 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set a care plan value via ej2 instance
-        await SetRichTextValue(CarePlanId, "<p>Physical therapy 3x weekly</p>");
+        // Type care plan content and blur
+        await CarePlan.FillAndBlur("Physical therapy 3x weekly");
 
         // Click check button
         await Page.Locator("#check-careplan-btn").ClickAsync();
@@ -202,14 +170,14 @@ public class WhenRichTextEdited : PlaywrightTestBase
         var argsCondition = Page.Locator("#args-condition");
         var selectedIndicator = Page.Locator("#selected-indicator");
 
-        // Cycle 1: set care plan content — condition evaluates "content entered", indicator shows
-        await SetRichTextValue(CarePlanId, "<p>Initial assessment complete</p>");
+        // Cycle 1: type care plan content — condition evaluates "content entered", indicator shows
+        await CarePlan.FillAndBlur("Initial assessment complete");
         await Expect(argsCondition).ToHaveTextAsync("content entered", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(selectedIndicator).ToHaveTextAsync("care plan on file", new() { Timeout = 3000 });
 
         // Cycle 2: change to different content — condition still fires and re-evaluates
-        await SetRichTextValue(CarePlanId, "<p>Updated: weekly therapy sessions</p>");
+        await CarePlan.FillAndBlur("Updated: weekly therapy sessions");
         // args-condition should still say "content entered" (value is still not empty)
         await Expect(argsCondition).ToHaveTextAsync("content entered", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
@@ -230,17 +198,19 @@ public class WhenRichTextEdited : PlaywrightTestBase
         var warning = Page.Locator("#careplan-warning");
 
         // Step 1: clear the DomReady-set value, then check — "care plan is required"
-        await ClearRichTextValue(CarePlanId);
+        await CarePlan.Clear();
+        await CarePlan.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("care plan is required", new() { Timeout = 3000 });
 
         // Step 2: set a care plan — click check — "care plan set"
-        await SetRichTextValue(CarePlanId, "<p>Medication review scheduled</p>");
+        await CarePlan.FillAndBlur("Medication review scheduled");
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("care plan set", new() { Timeout = 3000 });
 
         // Step 3: clear the care plan — click check — "care plan is required" again
-        await ClearRichTextValue(CarePlanId);
+        await CarePlan.Clear();
+        await CarePlan.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("care plan is required", new() { Timeout = 3000 });
 

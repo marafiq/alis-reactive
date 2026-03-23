@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -8,9 +10,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// Page under test: /Sandbox/Components/DateTimePicker
 ///
 /// Syncfusion DateTimePicker renders an input element inside a wrapper span.
-/// The wrapper element gets the IdGenerator-based ID; the ej2 instance
-/// is attached to this element. Playwright uses the ej2 instance API to
-/// set values and trigger change events reliably.
+/// The wrapper element gets the IdGenerator-based ID. Tests use
+/// DateTimePickerLocator to interact via real browser gestures (calendar
+/// and time popup clicks) rather than ej2 instance manipulation.
 /// Senior living domain: medication schedule times.
 /// </summary>
 [TestFixture]
@@ -22,20 +24,12 @@ public class WhenDateTimeSelected : PlaywrightTestBase
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateTimePickerModel";
     private const string MedicationTimeId = Scope + "__MedicationTime";
 
+    private DateTimePickerLocator MedicationTime => new(Page, MedicationTimeId);
+
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-    }
-
-    /// <summary>
-    /// Sets a date-time on a Syncfusion DateTimePicker ej2 instance via JS.
-    /// This is the reliable way to interact with SF components in Playwright.
-    /// </summary>
-    private async Task SetDateTimePickerValue(string elementId, string isoDateTime)
-    {
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{elementId}'); el.ej2_instances[0].value = new Date('{isoDateTime}'); el.ej2_instances[0].dataBind(); }}");
     }
 
     // ── Page loads ──
@@ -71,9 +65,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
 
         // The framework sets ej2.value = "2026-06-15T14:30" via set-prop.
         // Verify the value was applied by checking the visible input element's value.
-        var inputValue = await Page.EvaluateAsync<string>(
-            $"() => {{ const el = document.getElementById('{MedicationTimeId}'); if (!el) return 'no-el'; const input = el.tagName === 'INPUT' ? el : el.querySelector('input'); return input ? input.value : 'no-input'; }}");
-        Assert.That(inputValue, Is.Not.Null.And.Not.Empty.And.Not.EqualTo("no-el").And.Not.EqualTo("no-input"),
+        var inputValue = await MedicationTime.Input.InputValueAsync();
+        Assert.That(inputValue, Is.Not.Null.And.Not.Empty,
             $"Expected DateTimePicker input to have a value but got '{inputValue}'");
 
         AssertNoConsoleErrors();
@@ -97,8 +90,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetDateTimePickerValue(MedicationTimeId, "2026-07-04T08:00");
+        // Select date+time via the calendar and time popups — triggers SF change event
+        await MedicationTime.Select(2026, 7, 4, "8:00 AM");
 
         // SF change event payload contains the new value
         await Expect(Page.Locator("#change-value"))
@@ -111,8 +104,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetDateTimePickerValue(MedicationTimeId, "2026-07-04T08:00");
+        // Select date+time via the calendar and time popups — triggers SF change event
+        await MedicationTime.Select(2026, 7, 4, "8:00 AM");
 
         // When(args, x => x.Value).NotNull() => Then branch
         await Expect(Page.Locator("#args-condition"))
@@ -125,8 +118,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set value via ej2 instance — triggers SF change event
-        await SetDateTimePickerValue(MedicationTimeId, "2026-07-04T08:00");
+        // Select date+time via the calendar and time popups — triggers SF change event
+        await MedicationTime.Select(2026, 7, 4, "8:00 AM");
 
         // Indicator should appear with text "medication scheduled"
         await Expect(Page.Locator("#selected-indicator"))
@@ -144,8 +137,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Click check without clearing the DomReady-set value — clear it first
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{MedicationTimeId}'); el.ej2_instances[0].value = null; el.ej2_instances[0].dataBind(); }}");
+        await MedicationTime.Clear();
+        await MedicationTime.Blur();
 
         await Page.Locator("#check-medication-btn").ClickAsync();
 
@@ -159,8 +152,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set a medication time via ej2 instance
-        await SetDateTimePickerValue(MedicationTimeId, "2026-08-01T15:45");
+        // Set a medication time via the calendar and time popups
+        await MedicationTime.Select(2026, 8, 1, "3:30 PM");
 
         // Click check button
         await Page.Locator("#check-medication-btn").ClickAsync();
@@ -180,14 +173,14 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         var argsCondition = Page.Locator("#args-condition");
         var selectedIndicator = Page.Locator("#selected-indicator");
 
-        // Cycle 1: set a datetime — condition evaluates "time selected", indicator shows
-        await SetDateTimePickerValue(MedicationTimeId, "2026-07-04T08:00");
+        // Cycle 1: select a datetime — condition evaluates "time selected", indicator shows
+        await MedicationTime.Select(2026, 7, 4, "8:00 AM");
         await Expect(argsCondition).ToHaveTextAsync("time selected", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(selectedIndicator).ToHaveTextAsync("medication scheduled", new() { Timeout = 3000 });
 
         // Cycle 2: change to a different datetime — condition still fires and re-evaluates
-        await SetDateTimePickerValue(MedicationTimeId, "2026-12-25T18:30");
+        await MedicationTime.Select(2026, 12, 25, "6:30 PM");
         // args-condition should still say "time selected" (value is still not null)
         await Expect(argsCondition).ToHaveTextAsync("time selected", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
@@ -208,19 +201,19 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         var warning = Page.Locator("#medication-warning");
 
         // Step 1: clear the DomReady-set value, then check — "medication time is required"
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{MedicationTimeId}'); el.ej2_instances[0].value = null; el.ej2_instances[0].dataBind(); }}");
+        await MedicationTime.Clear();
+        await MedicationTime.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("medication time is required", new() { Timeout = 3000 });
 
         // Step 2: set a medication time — click check — "medication time set"
-        await SetDateTimePickerValue(MedicationTimeId, "2026-09-15T10:00");
+        await MedicationTime.Select(2026, 9, 15, "10:00 AM");
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("medication time set", new() { Timeout = 3000 });
 
         // Step 3: clear the medication time — click check — "medication time is required" again
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{MedicationTimeId}'); el.ej2_instances[0].value = null; el.ej2_instances[0].dataBind(); }}");
+        await MedicationTime.Clear();
+        await MedicationTime.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("medication time is required", new() { Timeout = 3000 });
 

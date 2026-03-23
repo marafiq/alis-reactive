@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -8,9 +10,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// Page under test: /Sandbox/Components/DateRangePicker
 ///
 /// Syncfusion DateRangePicker renders an input element inside a wrapper span.
-/// The wrapper element gets the IdGenerator-based ID; the ej2 instance
-/// is attached to this element. Playwright uses the ej2 instance API to
-/// set values and trigger change events reliably.
+/// The wrapper element gets the IdGenerator-based ID. Tests use
+/// DateRangePickerLocator to interact via real browser gestures (calendar
+/// popup clicks and Apply button) rather than ej2 instance manipulation.
 ///
 /// UNIQUE: This component exposes TWO readable properties (startDate, endDate)
 /// from the ej2 instance. Both are exercised in these tests.
@@ -26,30 +28,12 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateRangePickerModel";
     private const string StayStartId = Scope + "__StayStart";
 
+    private DateRangePickerLocator StayStart => new(Page, StayStartId);
+
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-    }
-
-    /// <summary>
-    /// Sets a date range on a Syncfusion DateRangePicker ej2 instance via JS.
-    /// This is the reliable way to interact with SF DateRangePicker in Playwright.
-    /// Sets both startDate and endDate, then calls dataBind() to trigger the change event.
-    /// </summary>
-    private async Task SetDateRange(string elementId, string isoStart, string isoEnd)
-    {
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{elementId}'); const ej2 = el.ej2_instances[0]; ej2.startDate = new Date('{isoStart}'); ej2.endDate = new Date('{isoEnd}'); ej2.dataBind(); }}");
-    }
-
-    /// <summary>
-    /// Clears the date range by setting both startDate and endDate to null.
-    /// </summary>
-    private async Task ClearDateRange(string elementId)
-    {
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{elementId}'); const ej2 = el.ej2_instances[0]; ej2.startDate = null; ej2.endDate = null; ej2.dataBind(); }}");
     }
 
     // ── Page loads ──
@@ -83,8 +67,8 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set date range via ej2 instance — triggers SF change event
-        await SetDateRange(StayStartId, "2026-07-01", "2026-07-15");
+        // Select date range via the calendar popup — triggers SF change event
+        await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
 
         // SF change event payload contains both dates
         await Expect(Page.Locator("#change-start"))
@@ -99,8 +83,8 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set date range via ej2 instance
-        await SetDateRange(StayStartId, "2026-07-01", "2026-07-15");
+        // Select date range via the calendar popup
+        await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
 
         // When(args, x => x.StartDate).NotNull() => Then branch
         await Expect(Page.Locator("#args-condition"))
@@ -113,8 +97,8 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set date range via ej2 instance
-        await SetDateRange(StayStartId, "2026-07-01", "2026-07-15");
+        // Select date range via the calendar popup
+        await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
 
         // Indicator should appear with text "stay period confirmed"
         await Expect(Page.Locator("#selected-indicator"))
@@ -144,8 +128,8 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set a stay period via ej2 instance
-        await SetDateRange(StayStartId, "2026-08-01", "2026-08-31");
+        // Set a stay period via the calendar popup
+        await StayStart.SelectRange(2026, 8, 1, 2026, 8, 31);
 
         // Click check button
         await Page.Locator("#check-stay-btn").ClickAsync();
@@ -165,14 +149,14 @@ public class WhenDateRangeSelected : PlaywrightTestBase
         var argsCondition = Page.Locator("#args-condition");
         var selectedIndicator = Page.Locator("#selected-indicator");
 
-        // Cycle 1: set a date range — condition evaluates "stay period selected", indicator shows
-        await SetDateRange(StayStartId, "2026-07-01", "2026-07-15");
+        // Cycle 1: select a date range — condition evaluates "stay period selected", indicator shows
+        await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
         await Expect(argsCondition).ToHaveTextAsync("stay period selected", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(selectedIndicator).ToHaveTextAsync("stay period confirmed", new() { Timeout = 3000 });
 
         // Cycle 2: change to a different date range — condition still fires
-        await SetDateRange(StayStartId, "2026-12-01", "2026-12-31");
+        await StayStart.SelectRange(2026, 12, 1, 2026, 12, 31);
         await Expect(argsCondition).ToHaveTextAsync("stay period selected", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
 
@@ -198,12 +182,13 @@ public class WhenDateRangeSelected : PlaywrightTestBase
         await Expect(warning).ToHaveTextAsync("stay period is required", new() { Timeout = 3000 });
 
         // Step 2: set a stay period — click check — "stay period set"
-        await SetDateRange(StayStartId, "2026-09-01", "2026-09-30");
+        await StayStart.SelectRange(2026, 9, 1, 2026, 9, 30);
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("stay period set", new() { Timeout = 3000 });
 
         // Step 3: clear the stay period — click check — "stay period is required" again
-        await ClearDateRange(StayStartId);
+        await StayStart.Clear();
+        await StayStart.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("stay period is required", new() { Timeout = 3000 });
 

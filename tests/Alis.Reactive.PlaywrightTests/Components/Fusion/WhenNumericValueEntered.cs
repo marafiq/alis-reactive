@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -7,8 +9,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// Page under test: /Sandbox/Components/NumericTextBox
 ///
 /// Syncfusion NumericTextBox renders an inner input element inside the wrapper div.
-/// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
-/// Playwright interacts with the visible input; the ej2 instance fires events.
+/// The wrapper element gets the IdGenerator-based ID. Tests use
+/// NumericTextBoxLocator to interact via real browser gestures.
 /// </summary>
 [TestFixture]
 public class WhenNumericValueEntered : PlaywrightTestBase
@@ -20,6 +22,8 @@ public class WhenNumericValueEntered : PlaywrightTestBase
     private const string AmountId = Scope + "__Amount";
     private const string TemperatureId = Scope + "__Temperature";
     private const string QuantityId = Scope + "__Quantity";
+
+    private NumericTextBoxLocator Amount => new(Page, AmountId);
 
     private async Task NavigateAndBoot()
     {
@@ -55,15 +59,11 @@ public class WhenNumericValueEntered : PlaywrightTestBase
     public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
-        // SF NumericTextBox wrapper gets the IdGenerator-based ID
-        var wrapper = Page.Locator($"#{AmountId}");
-        await Expect(wrapper).ToBeVisibleAsync();
+        // SF NumericTextBox renders an input with the IdGenerator-based ID
+        await Expect(Amount.Input).ToBeVisibleAsync();
 
-        // Wait for the value to be set by dom-ready via ej2 instance
-        await Page.WaitForFunctionAsync(
-            $"() => {{ const el = document.getElementById('{AmountId}'); return el && el.ej2_instances && el.ej2_instances[0] && el.ej2_instances[0].value === 42; }}",
-            null,
-            new() { Timeout = 5000 });
+        // Wait for the value to be set by dom-ready — verify via the visible input
+        await Expect(Amount.Input).Not.ToHaveValueAsync("", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }

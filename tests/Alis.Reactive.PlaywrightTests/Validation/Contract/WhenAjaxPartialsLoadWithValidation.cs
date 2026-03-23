@@ -67,9 +67,8 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await Input("Address_Street").FillAsync("123 Sunrise Blvd");
         await Input("Address_City").FillAsync("Palm Springs");
         await Input("Address_ZipCode").FillAsync("92262");
-        // Playwright ClickAsync at coordinates may miss the button after partial load
-        // shifts layout. Direct DOM click is reliable and tests the same code path.
-        await Page.EvaluateAsync("document.getElementById('submit-btn').click()");
+        // Click the submit button via Playwright locator
+        await Page.Locator("#submit-btn").ClickAsync();
 
         await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
         await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync();

@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -8,7 +10,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Syncfusion TimePicker renders an inner input element inside the wrapper div.
 /// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
-/// Playwright interacts with the visible input; the ej2 instance fires events.
+/// Tests use TimePickerLocator to interact via real browser gestures.
 /// </summary>
 [TestFixture]
 public class WhenTimeSelected : PlaywrightTestBase
@@ -19,6 +21,8 @@ public class WhenTimeSelected : PlaywrightTestBase
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TimePickerModel";
     private const string MedicationTimeId = Scope + "__MedicationTime";
     private const string WakeUpTimeId = Scope + "__WakeUpTime";
+
+    private TimePickerLocator MedicationTime => new(Page, MedicationTimeId);
 
     private async Task NavigateAndBoot()
     {
@@ -58,13 +62,9 @@ public class WhenTimeSelected : PlaywrightTestBase
         var wrapper = Page.Locator($"#{MedicationTimeId}");
         await Expect(wrapper).ToBeVisibleAsync();
 
-        // Verify the ej2 instance was initialized and the plan mutation executed.
+        // Verify the component was initialized and the plan mutation executed.
         // The trace confirms set-prop executed: prop="value", val="08:30".
-        // SF TimePicker may parse the string into a Date or keep it as-is.
-        await Page.WaitForFunctionAsync(
-            $"() => {{ const el = document.getElementById('{MedicationTimeId}'); return el && el.ej2_instances && el.ej2_instances[0]; }}",
-            null,
-            new() { Timeout = 5000 });
+        await Expect(MedicationTime.Input).ToBeVisibleAsync(new() { Timeout = 5000 });
 
         // Verify the value-echo was populated (confirms the read side worked)
         await Expect(Page.Locator("#value-echo")).Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
@@ -182,11 +182,10 @@ public class WhenTimeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady set MedicationTime to 08:30 — change it via ej2 instance
-        await Page.EvaluateAsync(
-            $"() => {{ const el = document.getElementById('{MedicationTimeId}'); el.ej2_instances[0].value = new Date(2026, 0, 1, 14, 15, 0); el.ej2_instances[0].dataBind(); }}");
+        // DomReady set MedicationTime to 08:30 — change it via the time popup
+        await MedicationTime.SelectTime("2:00 PM");
 
-        // Click gather — should POST the CURRENT value (14:15), not the initial (08:30)
+        // Click gather — should POST the CURRENT value (2:00 PM), not the initial (08:30)
         await Page.Locator("#gather-btn").ClickAsync();
         await Expect(Page.Locator("#gather-result"))
             .ToHaveTextAsync("gathered", new() { Timeout = 5000 });

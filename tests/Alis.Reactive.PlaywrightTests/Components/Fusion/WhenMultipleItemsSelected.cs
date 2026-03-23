@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
@@ -12,9 +14,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// SF MultiSelect uses array-based values (unlike DropDownList which uses scalar values).
 /// Pre-selection is done via SF builder Value() at render time, not via DomReady SetValue.
 ///
-/// MultiSelect popup interaction differs from DropDownList — items have checkboxes and
-/// the change event fires when the value array changes. Tests use the ej2 API to
-/// programmatically select items and trigger events for reliable behavior.
+/// Tests use MultiSelectLocator to interact via real browser gestures
+/// (clicking items in the popup) rather than ej2 instance manipulation.
 /// </summary>
 [TestFixture]
 public class WhenMultipleItemsSelected : PlaywrightTestBase
@@ -25,6 +26,9 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_MultiSelectModel";
     private const string AllergiesId = Scope + "__Allergies";
     private const string DietaryRestrictionsId = Scope + "__DietaryRestrictions";
+
+    private MultiSelectLocator Allergies => new(Page, AllergiesId);
+    private MultiSelectLocator DietaryRestrictions => new(Page, DietaryRestrictionsId);
 
     private async Task NavigateAndBoot()
     {
@@ -61,15 +65,9 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Verify the ej2 instances exist
-        await Page.WaitForFunctionAsync(
-            $"() => {{ const el = document.getElementById('{AllergiesId}'); return el && el.ej2_instances && el.ej2_instances[0]; }}",
-            null,
-            new() { Timeout = 5000 });
-        await Page.WaitForFunctionAsync(
-            $"() => {{ const el = document.getElementById('{DietaryRestrictionsId}'); return el && el.ej2_instances && el.ej2_instances[0]; }}",
-            null,
-            new() { Timeout = 5000 });
+        // Verify both components are rendered and visible
+        await Expect(Allergies.Wrapper).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(DietaryRestrictions.Wrapper).ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -96,14 +94,8 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Use ej2 API to change value and trigger the change event
-        // SF MultiSelect value is an array, and the change event fires with the new value
-        await Page.EvaluateAsync(@$"() => {{
-            const el = document.getElementById('{AllergiesId}');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = ['shellfish'];
-            ej2.dataBind();
-        }}");
+        // Select an allergy item via the popup
+        await Allergies.SelectItem("Shellfish");
 
         // SF change event payload contains the selected value
         await Expect(Page.Locator("#change-value"))
@@ -118,13 +110,8 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Use ej2 API to change value
-        await Page.EvaluateAsync(@$"() => {{
-            const el = document.getElementById('{DietaryRestrictionsId}');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = ['vegetarian'];
-            ej2.dataBind();
-        }}");
+        // Select a dietary restriction via the popup
+        await DietaryRestrictions.SelectItem("Vegetarian");
 
         // SF change event fires
         await Expect(Page.Locator("#dietary-change-value"))
@@ -139,13 +126,8 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Use ej2 API to change value — triggers change event which fires condition
-        await Page.EvaluateAsync(@$"() => {{
-            const el = document.getElementById('{AllergiesId}');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = ['dairy'];
-            ej2.dataBind();
-        }}");
+        // Select an allergy item via the popup — triggers change event which fires condition
+        await Allergies.SelectItem("Dairy");
 
         // Indicator should appear with text "selected"
         await Expect(Page.Locator("#selected-indicator"))
@@ -175,13 +157,8 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Select 3 allergies via ej2 API — peanuts, shellfish, dairy
-        await Page.EvaluateAsync(@$"() => {{
-            const el = document.getElementById('{AllergiesId}');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = ['peanuts', 'shellfish', 'dairy'];
-            ej2.dataBind();
-        }}");
+        // Select 3 allergies via popup clicks — Peanuts, Shellfish, Dairy
+        await Allergies.SelectItems("Peanuts", "Shellfish", "Dairy");
 
         // Wait for value to take effect (change event fires)
         await Expect(Page.Locator("#change-value"))
@@ -213,15 +190,12 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Open the allergies popup via ej2 showPopup()
-        await Page.EvaluateAsync(@$"() => {{
-            const el = document.getElementById('{AllergiesId}');
-            el.ej2_instances[0].showPopup();
-        }}");
+        // Open the allergies popup by clicking the wrapper
+        await Allergies.Open();
 
-        // SF MultiSelect popup uses .e-ddl.e-popup (same as DropDownList)
-        var popup = Page.Locator(".e-ddl.e-popup");
-        await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
+        // SF MultiSelect popup — verify items are visible
+        await Expect(Allergies.PopupItems.First).ToBeVisibleAsync(new() { Timeout = 5000 });
+        var popup = Page.Locator("[id$='_popup']");
 
         // Verify group headers are present — SF renders .e-list-group-item for GroupBy
         var groupHeaders = popup.Locator(".e-list-group-item");
@@ -248,35 +222,22 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Select 3 allergies via ej2 API
-        await Page.EvaluateAsync(@$"() => {{
-            const el = document.getElementById('{AllergiesId}');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = ['peanuts', 'shellfish', 'dairy'];
-            ej2.dataBind();
-        }}");
+        // Select 3 allergies via popup clicks
+        await Allergies.SelectItems("Peanuts", "Shellfish", "Dairy");
 
         // Wait for change to register
         await Expect(Page.Locator("#change-value"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
 
-        // Now remove one item — set to 2 items only
-        await Page.EvaluateAsync(@$"() => {{
-            const el = document.getElementById('{AllergiesId}');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = ['peanuts', 'dairy'];
-            ej2.dataBind();
-        }}");
+        // Now remove Shellfish by clicking it again (toggle off in checkbox mode)
+        await Allergies.SelectItem("Shellfish");
 
-        // The ej2 value should now have exactly 2 items (no stale shellfish)
-        var currentValue = await Page.EvaluateAsync<string>(@$"() => {{
-            const el = document.getElementById('{AllergiesId}');
-            const ej2 = el.ej2_instances[0];
-            return JSON.stringify(ej2.value);
-        }}");
-        Assert.That(currentValue, Does.Contain("peanuts"), "Value must contain peanuts");
-        Assert.That(currentValue, Does.Contain("dairy"), "Value must contain dairy");
-        Assert.That(currentValue, Does.Not.Contain("shellfish"), "Value must NOT contain removed shellfish");
+        // Verify the change value no longer contains shellfish
+        // The MultiSelect chips should show only Peanuts and Dairy
+        var chipTexts = await Allergies.Wrapper.Locator(".e-chips .e-chipcontent").AllTextContentsAsync();
+        Assert.That(chipTexts, Does.Contain("Peanuts"), "Chips must contain Peanuts");
+        Assert.That(chipTexts, Does.Contain("Dairy"), "Chips must contain Dairy");
+        Assert.That(chipTexts, Does.Not.Contain("Shellfish"), "Chips must NOT contain removed Shellfish");
         AssertNoConsoleErrors();
     }
 

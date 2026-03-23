@@ -5,15 +5,15 @@ namespace Alis.Reactive.Playwright.Extensions;
 /// <summary>
 /// User interaction primitives for Syncfusion DropDownList.
 ///
-/// Verified: keyboard typing + Enter reliably selects items and fires change event.
-/// Text-based, not position-based — immune to item reordering.
+/// Verified: click input to open popup, click list item to select.
+/// SF DDL popup: #{componentId}_popup contains .e-list-item elements.
 /// </summary>
 public sealed class DropDownListLocator
 {
     private readonly IPage _page;
     private readonly string _componentId;
 
-    internal DropDownListLocator(IPage page, string componentId)
+    public DropDownListLocator(IPage page, string componentId)
     {
         _page = page;
         _componentId = componentId;
@@ -24,19 +24,46 @@ public sealed class DropDownListLocator
     public ILocator Input => _page.Locator($"#{_componentId}");
     public ILocator Wrapper => Input.Locator("xpath=..");
 
+    /// <summary>The dropdown arrow icon that opens the popup.</summary>
+    public ILocator DropdownIcon => _page.Locator($"#{_componentId}").Locator("..").Locator(".e-ddl-icon");
+
+    /// <summary>The popup container (visible after opening the dropdown).</summary>
+    public ILocator Popup => _page.Locator($"#{_componentId}_popup");
+
     // ─── Gestures ───
 
-    /// <summary>Focus the dropdown.</summary>
-    public async Task Focus() => await Wrapper.ClickAsync();
+    /// <summary>Click the dropdown icon to open the popup.</summary>
+    public async Task Open() => await DropdownIcon.ClickAsync();
+
+    /// <summary>Click the input to focus it.</summary>
+    public async Task Focus() => await Input.ClickAsync();
 
     /// <summary>
-    /// Select by typing text then Enter. SF highlights the match, Enter confirms.
-    /// Text-based — immune to item reordering. Fires change event reliably.
+    /// Open the popup via the dropdown icon, navigate with ArrowDown to the item, press Enter.
+    /// SF DDL responds to keyboard navigation natively — ArrowDown highlights items,
+    /// Enter confirms the selection and fires the change event.
     /// </summary>
     public async Task Select(string text)
     {
-        await Focus();
-        await _page.Keyboard.TypeAsync(text);
+        await DropdownIcon.ClickAsync();
+        await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
+
+        // Navigate with ArrowDown until the highlighted item matches the target text
+        var items = Popup.Locator(".e-list-item");
+        var count = await items.CountAsync();
+        for (var i = 0; i < count; i++)
+        {
+            await _page.Keyboard.PressAsync("ArrowDown");
+            var active = Popup.Locator(".e-list-item.e-active, .e-list-item.e-item-focus");
+            var activeText = await active.TextContentAsync();
+            if (activeText?.Trim() == text)
+            {
+                await _page.Keyboard.PressAsync("Enter");
+                return;
+            }
+        }
+
+        // Fallback: if exact match not found, just press Enter on whatever is highlighted
         await _page.Keyboard.PressAsync("Enter");
     }
 }
