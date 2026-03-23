@@ -10,9 +10,10 @@ describe("when showing retry indicators", () => {
     document.body.innerHTML = `<div><span id="target">text</span></div>`;
     showRetryIndicators("test-key", new Set(["target"]), vi.fn());
 
-    const btn = document.querySelector("[data-alis-retry]");
+    const btn = document.querySelector("[data-alis-retry]") as HTMLButtonElement;
     expect(btn).toBeTruthy();
-    expect(btn?.getAttribute("data-alis-retry")).toBe("test-key");
+    expect(btn.getAttribute("data-alis-retry")).toBe("test-key");
+    expect(btn.type).toBe("button");
   });
 
   it("anchors the button on the target's parent element", () => {

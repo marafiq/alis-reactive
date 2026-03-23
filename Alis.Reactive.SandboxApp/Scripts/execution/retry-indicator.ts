@@ -50,7 +50,7 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
   }
 
   if (anchored.size > 0) {
-    log.debug("shown", { key, placed: anchored.size });
+    log.info("shown", { key, placed: anchored.size });
   } else if (targetIds.size > 0) {
     log.error("no indicators placed — all targets missing", { key, targets: [...targetIds] });
   }
