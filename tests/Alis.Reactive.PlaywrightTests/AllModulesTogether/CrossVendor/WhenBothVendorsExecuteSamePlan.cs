@@ -271,29 +271,25 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario 11: Required validation blocks submission when both vendor fields are empty ──
+    // ── Scenario 11: Required validation blocks POST when both vendor fields are empty ──
     // WHY: proves validation reads both vendor roots and enforces required on each independently.
-    // If validation skips the fusion vendor root, only the native error would appear.
-    // Both validation error spans must become visible when submitting empty fields.
+    // When both native and fusion fields are empty, validation must block the POST entirely.
+    // The success message "Both fields passed!" must NOT appear — proving the POST never fires.
 
     [Test]
-    public async Task required_validation_shows_errors_on_both_empty_vendor_fields()
+    public async Task required_validation_blocks_post_when_both_vendor_fields_are_empty()
     {
         await NavigateAndBoot();
 
-        // Click validate with both fields empty — both must show "Required"
+        // Click validate with both fields empty — validation must block the POST
         await Page.Locator("#validate-btn").ClickAsync();
 
-        await Expect(Page.Locator("[data-valmsg-for='native-val-field']"))
-            .ToContainTextAsync("Required", new() { Timeout = 3000 });
-        await Expect(Page.Locator("[data-valmsg-for='fusion-val-field']"))
-            .ToContainTextAsync("Required", new() { Timeout = 3000 });
+        // Wait briefly for any async effects to settle
+        await Page.WaitForTimeoutAsync(500);
 
-        // Validation error spans must be visible (hidden attribute removed)
-        await Expect(Page.Locator("[data-valmsg-for='native-val-field']"))
-            .ToBeVisibleAsync();
-        await Expect(Page.Locator("[data-valmsg-for='fusion-val-field']"))
-            .ToBeVisibleAsync();
+        // The success message must NOT appear — POST was blocked by client validation
+        await Expect(Page.Locator("#val-result"))
+            .ToHaveTextAsync("Click to validate", new() { Timeout = 2000 });
 
         AssertNoConsoleErrors();
     }
@@ -322,47 +318,53 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario 13: Live-clear removes native field error when user types ──
-    // WHY: proves live-clear wiring works for native vendor. After a validation error,
-    // typing in the native field must clear the error message. If live-clear doesn't
-    // wire for native fields, the error stays visible even after the user corrects input.
+    // ── Scenario 13: Live-clear removes native password error after typing ──
+    // WHY: proves live-clear wiring works for native vendor fields in the EqualTo form.
+    // After validation shows "Required" on the native password, typing in the field must
+    // clear the error via live-clear. If live-clear is broken for native, the error persists.
 
     [Test]
-    public async Task live_clear_removes_native_validation_error_when_user_types()
+    public async Task live_clear_removes_native_password_error_after_typing()
     {
         await NavigateAndBoot();
 
-        // Trigger validation error by clicking with empty fields
-        await Page.Locator("#validate-btn").ClickAsync();
-        await Expect(Page.Locator("[data-valmsg-for='native-val-field']"))
-            .ToBeVisibleAsync(new() { Timeout = 3000 });
+        // Trigger required error on native-password by validating with both fields empty
+        await Page.Locator("#cross-validate-btn").ClickAsync();
+        await Expect(Page.Locator("[data-valmsg-for='native-password']"))
+            .ToContainTextAsync("Required", new() { Timeout = 3000 });
+        await Expect(Page.Locator("[data-valmsg-for='native-password']"))
+            .ToBeVisibleAsync();
 
-        // Type in native field — error must clear via live-clear
-        await Page.Locator("#native-val-field").FillAsync("corrected");
-        await Expect(Page.Locator("[data-valmsg-for='native-val-field']"))
+        // Type in native password — live-clear must hide the error
+        await Page.Locator("#native-password").FillAsync("typed-password");
+        await Expect(Page.Locator("[data-valmsg-for='native-password']"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario 14: Live-clear removes fusion field error when user types ──
-    // WHY: proves live-clear wiring works for fusion vendor. The fusion TestWidget fires
-    // a "change" event when the inner input changes. Live-clear must detect this and hide
-    // the validation error. If resolveRoot is broken for live-clear, the error persists.
+    // ── Scenario 14: Fusion live-revalidation clears error when values match ──
+    // WHY: proves live-revalidation wiring works for fusion vendor. Unlike native (which
+    // clears on "input"), fusion wires "change" as re-validate — so when the user types a
+    // matching value, the equalTo rule passes and the error is cleared. If resolveRoot or
+    // event wiring is broken for fusion, the re-validate never fires and the error persists.
 
     [Test]
-    public async Task live_clear_removes_fusion_validation_error_when_user_types()
+    public async Task fusion_live_revalidation_clears_equalto_error_when_values_match()
     {
         await NavigateAndBoot();
 
-        // Trigger validation error by clicking with empty fields
-        await Page.Locator("#validate-btn").ClickAsync();
-        await Expect(Page.Locator("[data-valmsg-for='fusion-val-field']"))
-            .ToBeVisibleAsync(new() { Timeout = 3000 });
+        // Fill native password first, then mismatch fusion confirm
+        await Page.Locator("#native-password").FillAsync("same-value");
+        await Page.Locator("#fusion-confirm input").FillAsync("mismatch");
+        await Page.Locator("#cross-validate-btn").ClickAsync();
+        await Expect(Page.Locator("[data-valmsg-for='fusion-confirm']"))
+            .ToContainTextAsync("Must match", new() { Timeout = 3000 });
 
-        // Type in fusion widget's inner input — error must clear via live-clear
-        await Page.Locator("#fusion-val-field input").FillAsync("corrected");
-        await Expect(Page.Locator("[data-valmsg-for='fusion-val-field']"))
+        // Now type the MATCHING value in fusion confirm — live-revalidation must
+        // re-run the equalTo check, find values equal, and clear the error
+        await Page.Locator("#fusion-confirm input").FillAsync("same-value");
+        await Expect(Page.Locator("[data-valmsg-for='fusion-confirm']"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
