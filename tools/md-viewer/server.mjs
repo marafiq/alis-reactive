@@ -384,7 +384,7 @@ app.get('/api/plans/:id/agents', (req, res) => {
     const resolved = agents.map(a => ({
       ...a,
       effective_prompt: a.prompt_override || a.system_prompt,
-      effective_rubric: a.rubric_override || a.template_rubric,
+      effective_rubric: a.rubric_override || a.rubric,
     }));
     res.json(resolved);
   } catch (e) { res.status(500).json({ error: e.message }); }

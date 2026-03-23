@@ -48,7 +48,7 @@ export function storyToInvestHealth(story: Story): InvestHealth[] {
   return (Object.entries(scores) as [string, boolean][]).map(([criterion, pass]) => ({
     criterion,
     pass_count: pass ? 1 : 0,
-    total_agents: pass !== null ? 1 : 0,
+    total_agents: 1,
     verdict: pass ? 'pass' as const : 'pending' as const,
   }));
 }

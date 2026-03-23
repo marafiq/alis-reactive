@@ -59,16 +59,18 @@ export function ReviewSection({
     [reviews],
   );
 
-  const round = parsed.length > 0 ? parsed[0].round : 1;
+  // Group reviews by round number
+  const roundGroups = useMemo(() => {
+    const groups = new Map<number, typeof parsed>();
+    for (const r of parsed) {
+      const round = r.round ?? 1;
+      if (!groups.has(round)) groups.set(round, []);
+      groups.get(round)!.push(r);
+    }
+    return Array.from(groups.entries()).sort(([a], [b]) => a - b);
+  }, [parsed]);
 
-  const approveCount = parsed.filter(
-    (r) => r.verdict === 'approve' || r.verdict === 'approve-with-notes',
-  ).length;
-  const objectCount = parsed.filter((r) => r.verdict === 'object').length;
-  const total = parsed.length;
-  const { label: strengthLabel, color: strengthColor } = consensusStrength(approveCount, total);
-
-  // Collect all blockers across reviews
+  // Collect all blockers across all reviews
   const blockers = useMemo(() => {
     const items: { agent: string; finding: { title: string; text: string } }[] = [];
     for (const r of parsed) {
@@ -82,97 +84,114 @@ export function ReviewSection({
     return items;
   }, [parsed]);
 
-  const totalAgents = Math.max(total, 1);
-  const approvePct = total > 0 ? (approveCount / totalAgents) * 100 : 0;
-
   return (
-    <div className="space-y-6">
-      {/* Section title */}
-      <SectionHeading>Agent Review &mdash; Round {round}</SectionHeading>
+    <div className="space-y-8">
+      {roundGroups.map(([round, roundParsed]) => {
+        const approveCount = roundParsed.filter(
+          (r) => r.verdict === 'approve' || r.verdict === 'approve-with-notes',
+        ).length;
+        const objectCount = roundParsed.filter((r) => r.verdict === 'object').length;
+        const total = roundParsed.length;
+        const totalAgents = Math.max(total, 1);
+        const approvePct = total > 0 ? (approveCount / totalAgents) * 100 : 0;
+        const { label: strengthLabel, color: strengthColor } = consensusStrength(approveCount, total);
 
-      {/* Consensus bar */}
-      <div className="space-y-2">
-        <div className="h-2 w-full rounded-full bg-muted overflow-hidden flex">
-          <div
-            className="h-full bg-approve transition-all duration-500"
-            style={{ width: `${approvePct}%` }}
-          />
-          {objectCount > 0 && (
-            <div
-              className="h-full bg-changes transition-all duration-500"
-              style={{ width: `${(objectCount / totalAgents) * 100}%` }}
-            />
-          )}
-        </div>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">
-            {approveCount} approve, {objectCount} object &mdash; {total}/{totalAgents} agents reviewed
-          </span>
-          <span className={cn('font-bold uppercase tracking-wider text-[10px]', strengthColor)}>
-            {strengthLabel}
-          </span>
-        </div>
-      </div>
+        return (
+          <div key={round} className="space-y-6">
+            {/* Section title */}
+            <div>
+              <SectionHeading>Agent Review &mdash; Round {round}</SectionHeading>
+              {round === 2 && (
+                <p className="text-xs text-muted-foreground -mt-3 mb-2">Challenge Round</p>
+              )}
+            </div>
 
-      {/* Agent cards grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        {parsed.map((review) => {
-          const roleName = review.agent_display_name || review.agent_template_id;
-          const blockerCount = (review.findings ?? []).filter(
-            (f) => f.severity === 'blocker',
-          ).length;
-          const concernCount = (review.findings ?? []).filter(
-            (f) => f.severity === 'concern',
-          ).length;
+            {/* Consensus bar */}
+            <div className="space-y-2">
+              <div className="h-2 w-full rounded-full bg-muted overflow-hidden flex">
+                <div
+                  className="h-full bg-approve transition-all duration-500"
+                  style={{ width: `${approvePct}%` }}
+                />
+                {objectCount > 0 && (
+                  <div
+                    className="h-full bg-changes transition-all duration-500"
+                    style={{ width: `${(objectCount / totalAgents) * 100}%` }}
+                  />
+                )}
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">
+                  {approveCount} approve, {objectCount} object &mdash; {total}/{totalAgents} agents reviewed
+                </span>
+                <span className={cn('font-bold uppercase tracking-wider text-[10px]', strengthColor)}>
+                  {strengthLabel}
+                </span>
+              </div>
+            </div>
 
-          return (
-            <button
-              key={review.id}
-              onClick={() => onSelectReview(review)}
-              className="text-left focus:outline-none focus:ring-2 focus:ring-ring rounded-xl"
-            >
-              <Card className="h-full transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md hover:ring-primary/30 hover:ring-1">
-                <div className="px-4 py-3.5 space-y-2.5">
-                  {/* Role + verdict */}
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-sm font-semibold text-foreground leading-snug">
-                      {roleName}
-                    </span>
-                    <VerdictBadge verdict={review.verdict} label={verdictLabel(review.verdict)} />
-                  </div>
+            {/* Agent cards grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+              {roundParsed.map((review) => {
+                const roleName = review.agent_display_name || review.agent_template_id;
+                const blockerCount = (review.findings ?? []).filter(
+                  (f) => f.severity === 'blocker',
+                ).length;
+                const concernCount = (review.findings ?? []).filter(
+                  (f) => f.severity === 'concern',
+                ).length;
 
-                  {/* Counts */}
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                    {blockerCount > 0 && (
-                      <span className="flex items-center gap-1 text-blocker font-medium">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blocker" />
-                        {blockerCount} blocker{blockerCount !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                    {concernCount > 0 && (
-                      <span className="flex items-center gap-1 text-changes font-medium">
-                        <span className="w-1.5 h-1.5 rounded-full bg-changes" />
-                        {concernCount} concern{concernCount !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                    {blockerCount === 0 && concernCount === 0 && (
-                      <span className="text-approve font-medium">No issues</span>
-                    )}
-                  </div>
+                return (
+                  <button
+                    key={review.id}
+                    onClick={() => onSelectReview(review)}
+                    className="text-left focus:outline-none focus:ring-2 focus:ring-ring rounded-xl"
+                  >
+                    <Card className="h-full transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md hover:ring-primary/30 hover:ring-1">
+                      <div className="px-4 py-3.5 space-y-2.5">
+                        {/* Role + verdict */}
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-sm font-semibold text-foreground leading-snug">
+                            {roleName}
+                          </span>
+                          <VerdictBadge verdict={review.verdict} label={verdictLabel(review.verdict)} />
+                        </div>
 
-                  {/* Confidence */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                      Confidence
-                    </span>
-                    <ConfidenceDots level={confidenceLevel(review.confidence)} />
-                  </div>
-                </div>
-              </Card>
-            </button>
-          );
-        })}
-      </div>
+                        {/* Counts */}
+                        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                          {blockerCount > 0 && (
+                            <span className="flex items-center gap-1 text-blocker font-medium">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blocker" />
+                              {blockerCount} blocker{blockerCount !== 1 ? 's' : ''}
+                            </span>
+                          )}
+                          {concernCount > 0 && (
+                            <span className="flex items-center gap-1 text-changes font-medium">
+                              <span className="w-1.5 h-1.5 rounded-full bg-changes" />
+                              {concernCount} concern{concernCount !== 1 ? 's' : ''}
+                            </span>
+                          )}
+                          {blockerCount === 0 && concernCount === 0 && (
+                            <span className="text-approve font-medium">No issues</span>
+                          )}
+                        </div>
+
+                        {/* Confidence */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                            Confidence
+                          </span>
+                          <ConfidenceDots level={confidenceLevel(review.confidence)} />
+                        </div>
+                      </div>
+                    </Card>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
 
       {/* Attention section (blockers only) */}
       {blockers.length > 0 && (

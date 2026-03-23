@@ -246,7 +246,7 @@ function AgentCard({
               <Textarea
                 readOnly
                 rows={4}
-                value={agent.effective_rubric}
+                value={(() => { try { return JSON.stringify(JSON.parse(agent.effective_rubric), null, 2); } catch { return agent.effective_rubric; } })()}
                 className="font-mono text-xs resize-none bg-muted/50"
               />
             </div>

@@ -706,6 +706,11 @@ export async function dispatchReview(storyId, onProgress) {
     }
 
     // ── Round 2: Challenge ──────────────────────────────────────────
+    const existingRound2 = getReviews(storyId, 2);
+    if (existingRound2.length > 0) {
+      return { round1: round1Reviews.length, round2: existingRound2.length, skippedRound2: true, reason: 'already exists' };
+    }
+
     onProgress?.('system', 'round2-starting', { round: 2 });
 
     const round2Promises = planAgents.map(async agent => {

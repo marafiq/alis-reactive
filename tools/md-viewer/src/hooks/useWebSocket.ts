@@ -4,12 +4,12 @@ import { useQueryClient } from '@tanstack/react-query';
 interface WSMessage {
   type: string;
   storyId?: string;
-  role?: string;
+  agentId?: string;
   status?: string;
   verdict?: string;
   error?: string;
   completed?: string[];
-  failed?: { role: string; error: string }[];
+  failed?: { agentId: string; error: string }[];
   [key: string]: unknown;
 }
 
@@ -31,17 +31,16 @@ export function useWebSocket() {
       try { msg = JSON.parse(e.data); }
       catch { console.error('Malformed WS message:', e.data); return; }
 
-      if (msg.type === 'review-progress' && msg.role) {
+      if (msg.type === 'review-progress' && msg.agentId) {
         const round = typeof msg.round === 'number' ? msg.round : undefined;
         if (round !== undefined) setCurrentRound(round);
+        if (msg.status === 'round2-starting') {
+          setCurrentRound(2);
+        }
         setAgentProgress(prev => ({
           ...prev,
-          [msg.role!]: { status: msg.status || 'unknown', verdict: msg.verdict as string, round },
+          [msg.agentId!]: { status: msg.status || 'unknown', verdict: msg.verdict as string, round },
         }));
-      }
-
-      if (msg.type === 'round2-starting') {
-        setCurrentRound(2);
       }
 
       if (msg.type === 'review-complete' && msg.storyId) {

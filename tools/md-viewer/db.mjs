@@ -611,7 +611,7 @@ export function getReviews(storyId, round) {
   const params = [storyId];
   if (round != null) { sql += ' AND r.round = ?'; params.push(round); }
   sql += ' ORDER BY r.agent_template_id';
-  return getDb().prepare(sql).all(params);
+  return getDb().prepare(sql).all(...params);
 }
 
 export function createReview({ storyId, agentTemplateId, round, verdict, confidence, reviewJson, promptSnapshot, rubricSnapshot }) {
