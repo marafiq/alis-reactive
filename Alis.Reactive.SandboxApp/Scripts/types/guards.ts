@@ -1,5 +1,5 @@
 import type { BindSource } from "./sources";
-import type { CoercionType } from "./context";
+import type { CoercionType } from "../core/coerce";
 
 export type GuardOp =
   | "eq" | "neq"

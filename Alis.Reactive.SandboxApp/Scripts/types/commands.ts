@@ -1,5 +1,6 @@
 import type { BindSource } from "./sources";
-import type { Vendor, CoercionType, EventPayload } from "./context";
+import type { Vendor, EventPayload } from "./context";
+import type { CoercionType } from "../core/coerce";
 import type { Guard } from "./guards";
 
 export type Command = DispatchCommand | MutateElementCommand | MutateEventCommand | ValidationErrorsCommand | IntoCommand;
