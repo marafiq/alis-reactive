@@ -88,25 +88,23 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* ── Nav Tabs ── */}
-      <nav className="px-3 mb-2">
-        <div className="flex gap-1 bg-white/5 rounded-lg p-0.5">
-          {NAV_ITEMS.map(({ key, icon: Icon, label, to }) => (
-            <Link
-              key={key}
-              to={to}
-              className={cn(
-                'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-1.5 rounded-md text-[11px] font-medium transition-all duration-150',
-                activeTab === key
-                  ? 'bg-white/10 text-white shadow-sm'
-                  : 'text-[#6b5f54] hover:text-sidebar-foreground hover:bg-white/5',
-              )}
-            >
-              <Icon size={16} className="shrink-0" />
-              <span className="truncate">{label}</span>
-            </Link>
-          ))}
-        </div>
+      {/* ── Nav ── */}
+      <nav className="px-3 mb-2 space-y-0.5">
+        {NAV_ITEMS.map(({ key, icon: Icon, label, to }) => (
+          <Link
+            key={key}
+            to={to}
+            className={cn(
+              'flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150',
+              activeTab === key
+                ? 'bg-white/10 text-white'
+                : 'text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5',
+            )}
+          >
+            <Icon size={15} className="shrink-0" />
+            <span>{label}</span>
+          </Link>
+        ))}
       </nav>
 
       {/* ── Search ── */}

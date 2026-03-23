@@ -3,20 +3,20 @@ import { useConceptLinks } from '@/hooks/queries';
 import type { ConceptLink } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { ArrowLeft, Loader2, AlertCircle, Link2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 const TYPE_BADGE_STYLES: Record<ConceptLink['entity_type'], string> = {
   plan: 'bg-purple-100 text-purple-800',
   story: 'bg-violet-100 text-violet-800',
   review: 'bg-amber-100 text-amber-800',
-  file: 'bg-gray-100 text-gray-700',
+  file: 'bg-muted text-muted-foreground',
 };
 
 function TypeBadge({ type }: { type: ConceptLink['entity_type'] }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide',
+        'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
         TYPE_BADGE_STYLES[type],
       )}
     >
@@ -46,35 +46,34 @@ function TimelineCard({
     <div className="relative flex gap-4">
       {/* Timeline line + dot */}
       <div className="flex flex-col items-center">
-        <div className="h-3 w-3 shrink-0 rounded-full border-2 border-[#7A2E3B] bg-white" />
-        {!isLast && <div className="w-px grow bg-gray-200" />}
+        <div className="h-3 w-3 shrink-0 rounded-full border-2 border-primary bg-card" />
+        {!isLast && <div className="w-px grow bg-border" />}
       </div>
 
       {/* Card */}
       <button
         type="button"
         onClick={handleClick}
-        className={cn(
-          'mb-4 flex w-full flex-col gap-2 rounded-lg border border-gray-200 bg-white p-4',
-          'text-left transition-all duration-150',
-          'hover:border-[#7A2E3B]/30 hover:shadow-sm',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7A2E3B]',
-        )}
+        className="mb-4 w-full text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
-        <div className="flex items-center gap-2">
-          <TypeBadge type={link.entity_type} />
-          {link.source && (
-            <span className="text-[11px] text-gray-400">{link.source}</span>
-          )}
-        </div>
+        <Card className="transition-all duration-150 hover:border-primary/30 hover:shadow-sm">
+          <div className="px-4 py-3.5 flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <TypeBadge type={link.entity_type} />
+              {link.source && (
+                <span className="text-[10px] text-muted-foreground/60">{link.source}</span>
+              )}
+            </div>
 
-        <span className="text-sm font-bold text-gray-900">
-          {link.title || 'Untitled'}
-        </span>
+            <span className="text-sm font-semibold text-foreground">
+              {link.title || 'Untitled'}
+            </span>
 
-        <span className="font-mono text-xs text-gray-400">
-          {link.entity_id}
-        </span>
+            <span className="font-mono text-xs text-muted-foreground">
+              {link.entity_id}
+            </span>
+          </div>
+        </Card>
       </button>
     </div>
   );
@@ -87,30 +86,26 @@ export function ConceptDetail() {
   const referenceCount = links?.length ?? 0;
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8">
+    <div className="mx-auto max-w-3xl px-8 py-8">
       {/* Header */}
       <div className="mb-8">
         <Link
           to="/knowledge"
-          className={cn(
-            'mb-4 inline-flex items-center gap-1.5 text-sm text-gray-500',
-            'transition-colors hover:text-[#7A2E3B]',
-            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7A2E3B]',
-          )}
+          className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           <ArrowLeft className="h-4 w-4" />
           All concepts
         </Link>
 
         <div className="flex items-start gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#7A2E3B]/10">
-            <Link2 className="h-5 w-5 text-[#7A2E3B]" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <Link2 className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               {conceptName}
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-muted-foreground">
               {isLoading
                 ? 'Loading references...'
                 : `${referenceCount} ${referenceCount === 1 ? 'reference' : 'references'}`}
@@ -122,29 +117,31 @@ export function ConceptDetail() {
       {/* Loading state */}
       {isLoading && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-[#7A2E3B]" />
-          <span className="ml-2 text-sm text-gray-500">Loading links...</span>
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          <span className="ml-2 text-sm text-muted-foreground">Loading links...</span>
         </div>
       )}
 
       {/* Error state */}
       {error && (
-        <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
-          <p className="text-sm text-red-700">
-            Failed to load concept links: {error.message}
-          </p>
-        </div>
+        <Card className="border-destructive/30 bg-destructive/5">
+          <div className="flex items-center gap-3 px-4 py-3">
+            <AlertCircle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">
+              Failed to load concept links: {error.message}
+            </p>
+          </div>
+        </Card>
       )}
 
       {/* Empty state */}
       {!isLoading && !error && referenceCount === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Link2 className="h-10 w-10 text-gray-300" />
-          <p className="mt-3 text-sm font-medium text-gray-500">
+          <Link2 className="h-10 w-10 text-muted-foreground/30" />
+          <p className="mt-3 text-sm font-medium text-muted-foreground">
             No references found
           </p>
-          <p className="mt-1 text-xs text-gray-400">
+          <p className="mt-1 text-xs text-muted-foreground/60">
             This concept has no linked entities yet.
           </p>
         </div>
