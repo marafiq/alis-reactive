@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import { type ParsedReview, type Story, investScores, INVEST_LABELS } from '@/lib/types';
 
 // ── Props ──
@@ -6,13 +7,14 @@ import { type ParsedReview, type Story, investScores, INVEST_LABELS } from '@/li
 interface VerdictBarProps {
   reviews: ParsedReview[];
   story: Story;
+  totalAgents: number;
   onVerdict: (verdict: 'approve' | 'request-changes' | 'defer') => void;
 }
 
 // ── Component ──
 
-export function VerdictBar({ reviews, story, onVerdict }: VerdictBarProps) {
-  const total = 6; // total agent roles
+export function VerdictBar({ reviews, story, totalAgents, onVerdict }: VerdictBarProps) {
+  const total = Math.max(totalAgents, 1);
   const reviewed = reviews.length;
   const blockers = reviews.reduce(
     (acc, r) => acc + r.findings.filter((f) => f.severity === 'blocker').length,
@@ -94,36 +96,36 @@ export function VerdictBar({ reviews, story, onVerdict }: VerdictBarProps) {
 
       {/* ── Right: Action Buttons ── */}
       <div className="flex items-center gap-2">
-        {/* Defer */}
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onVerdict('defer')}
-          className="px-4 py-2 rounded-lg text-[12px] font-medium text-muted-foreground bg-muted hover:bg-muted/80 transition-colors"
         >
           Defer
-        </button>
+        </Button>
 
-        {/* Request Changes */}
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => onVerdict('request-changes')}
-          className="px-4 py-2 rounded-lg text-[12px] font-medium text-changes border border-changes/30 hover:bg-changes/10 transition-colors"
+          className="text-changes border-changes/30 hover:bg-changes/10 hover:text-changes"
         >
           Request Changes
-        </button>
+        </Button>
 
-        {/* Approve */}
-        <button
+        <Button
+          size="sm"
           onClick={() => onVerdict('approve')}
           disabled={hasBlockers}
           className={cn(
-            'px-5 py-2 rounded-lg text-[12px] font-semibold transition-all',
             hasBlockers
-              ? 'bg-approve/20 text-approve/40 cursor-not-allowed'
-              : 'bg-approve text-white hover:bg-approve/90 shadow-sm hover:shadow-md',
+              ? 'bg-approve/20 text-approve/40'
+              : 'bg-approve text-white hover:bg-approve/90 shadow-sm',
           )}
           title={hasBlockers ? `Cannot approve with ${blockers} active blocker${blockers > 1 ? 's' : ''}` : undefined}
         >
           Approve
-        </button>
+        </Button>
       </div>
     </div>
   );

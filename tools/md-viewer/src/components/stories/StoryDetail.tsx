@@ -4,7 +4,7 @@ import { marked } from 'marked';
 import hljs from 'highlight.js';
 import { Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useStory, useReviews, useDispatchReview, useComments, useCreateComment, useDecisions, useCreateDecision, useUpdateStory, useCreateVerdict } from '@/hooks/queries';
+import { useStory, useReviews, useDispatchReview, useComments, useCreateComment, useDecisions, useCreateDecision, useUpdateStory, useCreateVerdict, usePlanAgents } from '@/hooks/queries';
 import { useWS } from '@/App';
 import { useReviewPanel } from '@/components/layout/reviewPanelContext';
 import { ReviewSection } from '@/components/reviews/ReviewSection';
@@ -12,15 +12,15 @@ import { InvestBadges, SizeBadge, StatusBadge } from '@/components/ui/badges';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/ui/card';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { VerdictBar } from '@/components/layout/VerdictBar';
-import type { ParsedReview, Dependency } from '@/lib/types';
+import type { ParsedReview, Dependency, PlanAgent } from '@/lib/types';
 import {
   parseJson,
   parseReview,
   investScores,
-  ROLE_NAMES,
   verdictLabel,
-  type AgentRole,
   type Story,
 } from '@/lib/types';
 
@@ -60,59 +60,51 @@ function DepStatusIcon({ status }: { status?: string }) {
 
 // ── Agent progress row (during review dispatch) ──
 
-const ALL_ROLES: AgentRole[] = ['architect', 'csharp', 'bdd', 'pm', 'ui', 'human-proxy'];
-
-interface AgentProgressProps {
-  progress: Record<string, { status: string; verdict?: string }>;
-}
-
-function AgentProgress({ progress }: AgentProgressProps) {
+function AgentProgress({ progress, agents }: { progress: Record<string, { status: string; verdict?: string }>; agents: PlanAgent[] }) {
   return (
     <div className="space-y-2 mt-4">
-      {ALL_ROLES.map((role) => {
-        const entry = progress[role];
-        const roleName = ROLE_NAMES[role];
+      {agents.map((agent) => {
+        const entry = progress[agent.agent_template_id];
         const status = entry?.status ?? 'waiting';
         const verdict = entry?.verdict;
 
         return (
-          <div
-            key={role}
-            className="flex items-center gap-3 px-3 py-2 rounded-md bg-muted/50 border border-border"
-          >
-            {/* Status dot */}
-            <span
-              className={cn(
-                'w-2 h-2 rounded-full shrink-0',
-                status === 'done' && 'bg-approve',
-                status === 'reviewing' && 'bg-changes animate-pulse',
-                status === 'waiting' && 'bg-muted-foreground/30',
-                status === 'error' && 'bg-blocker',
-              )}
-            />
-
-            {/* Role name */}
-            <span className="text-sm font-medium text-foreground flex-1">{roleName}</span>
-
-            {/* Status label */}
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              {status}
-            </span>
-
-            {/* Verdict (if done) */}
-            {verdict && (
+          <Card key={agent.agent_template_id}>
+            <div className="px-4 py-2.5 flex items-center gap-3">
+              {/* Status dot */}
               <span
                 className={cn(
-                  'px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider',
-                  verdict === 'approve' && 'bg-emerald-100 text-emerald-700',
-                  verdict === 'object' && 'bg-red-100 text-red-600',
-                  verdict === 'approve-with-notes' && 'bg-amber-100 text-amber-700',
+                  'w-2 h-2 rounded-full shrink-0',
+                  status === 'done' && 'bg-approve',
+                  status === 'reviewing' && 'bg-changes animate-pulse',
+                  status === 'waiting' && 'bg-muted-foreground/30',
+                  status === 'error' && 'bg-blocker',
                 )}
-              >
-                {verdictLabel(verdict)}
+              />
+
+              {/* Agent name */}
+              <span className="text-sm font-medium text-foreground flex-1">{agent.display_name}</span>
+
+              {/* Status label */}
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                {status}
               </span>
-            )}
-          </div>
+
+              {/* Verdict (if done) */}
+              {verdict && (
+                <span
+                  className={cn(
+                    'px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider',
+                    verdict === 'approve' && 'bg-emerald-100 text-emerald-700',
+                    verdict === 'object' && 'bg-red-100 text-red-600',
+                    verdict === 'approve-with-notes' && 'bg-amber-100 text-amber-700',
+                  )}
+                >
+                  {verdictLabel(verdict)}
+                </span>
+              )}
+            </div>
+          </Card>
         );
       })}
     </div>
@@ -128,6 +120,7 @@ export function StoryDetail() {
   const { data: rawReviews = [] } = useReviews(storyId);
   const { data: comments = [] } = useComments(storyId);
   const { data: decisions = [] } = useDecisions(storyId);
+  const { data: planAgents = [] } = usePlanAgents(story?.plan_id ?? null);
   const dispatchReview = useDispatchReview();
   const createComment = useCreateComment();
   const createDecision = useCreateDecision();
@@ -275,95 +268,97 @@ export function StoryDetail() {
       <div className="max-w-4xl mx-auto px-8 py-8 space-y-8">
         {/* Title + Edit button */}
         {isEditing ? (
-          <form onSubmit={handleSaveEdit} className="space-y-6">
-            <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">Title</label>
-              <Input
-                type="text"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                className="text-lg font-semibold"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">Body (Markdown)</label>
-              <Textarea
-                value={editBody}
-                onChange={(e) => setEditBody(e.target.value)}
-                rows={12}
-                className="font-mono"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <Card>
+            <form onSubmit={handleSaveEdit} className="px-5 py-5 space-y-5">
               <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1">Size</label>
-                <select
-                  value={editSize}
-                  onChange={(e) => setEditSize(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  <option value="">--</option>
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1">Concepts (comma-separated)</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Title</label>
                 <Input
                   type="text"
-                  value={editConcepts}
-                  onChange={(e) => setEditConcepts(e.target.value)}
-                  placeholder="concept1, concept2"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="text-lg font-semibold"
                 />
               </div>
-            </div>
 
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-3">INVEST Criteria</h3>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Body (Markdown)</label>
+                <Textarea
+                  value={editBody}
+                  onChange={(e) => setEditBody(e.target.value)}
+                  rows={12}
+                  className="font-mono"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Independent</label>
-                  <Textarea value={editIndependent} onChange={(e) => setEditIndependent(e.target.value)} rows={2} />
+                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Size</label>
+                  <select
+                    value={editSize}
+                    onChange={(e) => setEditSize(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="">--</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                  </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Negotiable</label>
-                  <Textarea value={editNegotiable} onChange={(e) => setEditNegotiable(e.target.value)} rows={2} />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Valuable</label>
-                  <Textarea value={editValuable} onChange={(e) => setEditValuable(e.target.value)} rows={2} />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Estimable</label>
-                  <Textarea value={editEstimable} onChange={(e) => setEditEstimable(e.target.value)} rows={2} />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Small</label>
-                  <Textarea value={editSmall} onChange={(e) => setEditSmall(e.target.value)} rows={2} />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Testable</label>
-                  <Textarea value={editTestable} onChange={(e) => setEditTestable(e.target.value)} rows={2} />
+                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Concepts (comma-separated)</label>
+                  <Input
+                    type="text"
+                    value={editConcepts}
+                    onChange={(e) => setEditConcepts(e.target.value)}
+                    placeholder="concept1, concept2"
+                  />
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-2 justify-end">
-              <Button type="button" variant="outline" size="sm" onClick={cancelEditing}>
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                disabled={updateStory.isPending || !editTitle.trim()}
-              >
-                {updateStory.isPending ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </div>
-          </form>
+              <div>
+                <SectionHeading>INVEST Criteria</SectionHeading>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Independent</label>
+                    <Textarea value={editIndependent} onChange={(e) => setEditIndependent(e.target.value)} rows={2} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Negotiable</label>
+                    <Textarea value={editNegotiable} onChange={(e) => setEditNegotiable(e.target.value)} rows={2} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Valuable</label>
+                    <Textarea value={editValuable} onChange={(e) => setEditValuable(e.target.value)} rows={2} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Estimable</label>
+                    <Textarea value={editEstimable} onChange={(e) => setEditEstimable(e.target.value)} rows={2} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Small</label>
+                    <Textarea value={editSmall} onChange={(e) => setEditSmall(e.target.value)} rows={2} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Testable</label>
+                    <Textarea value={editTestable} onChange={(e) => setEditTestable(e.target.value)} rows={2} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 justify-end pt-2">
+                <Button type="button" variant="outline" size="sm" onClick={cancelEditing}>
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={updateStory.isPending || !editTitle.trim()}
+                >
+                  {updateStory.isPending ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </form>
+          </Card>
         ) : (
           <>
             <div className="flex items-start justify-between gap-4">
@@ -394,9 +389,7 @@ export function StoryDetail() {
         {/* Dependencies */}
         {deps.length > 0 && (
           <section>
-            <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-2">
-              Dependencies
-            </h2>
+            <SectionHeading count={deps.length}>Dependencies</SectionHeading>
             <div className="flex flex-wrap gap-2">
               {deps.map((dep) => (
                 <Link
@@ -424,9 +417,7 @@ export function StoryDetail() {
         {/* Concepts */}
         {concepts.length > 0 && (
           <section>
-            <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-2">
-              Concepts
-            </h2>
+            <SectionHeading count={concepts.length}>Concepts</SectionHeading>
             <div className="flex flex-wrap gap-1.5">
               {concepts.map((name) => (
                 <Link
@@ -475,13 +466,11 @@ export function StoryDetail() {
               </Button>
             ) : (
               <div>
-                <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground mb-1">
-                  Review In Progress
-                </h2>
+                <SectionHeading>Review In Progress</SectionHeading>
                 <p className="text-xs text-muted-foreground mb-3">
                   Agents are reviewing this story against INVEST criteria.
                 </p>
-                <AgentProgress progress={agentProgress} />
+                <AgentProgress progress={agentProgress} agents={planAgents} />
               </div>
             )}
           </section>
@@ -489,35 +478,32 @@ export function StoryDetail() {
 
         {/* Comments section */}
         <section className="border-t border-border pt-6">
-          <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-4">
-            Comments
-          </h2>
+          <SectionHeading count={comments.length}>Comments</SectionHeading>
 
           {/* Existing comments */}
           {comments.length > 0 && (
-            <div className="space-y-3 mb-5">
+            <div className="space-y-2.5 mb-5">
               {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="rounded-lg border border-border bg-muted/30 px-4 py-3"
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span
-                      className={cn(
-                        'inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider',
-                        comment.author === 'user'
-                          ? 'bg-primary/10 text-primary'
-                          : 'bg-amber-100 text-amber-700',
-                      )}
-                    >
-                      {comment.author === 'user' ? 'You' : 'Agent'}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground">
-                      {new Date(comment.created_at).toLocaleString()}
-                    </span>
+                <Card key={comment.id}>
+                  <div className="px-4 py-3">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span
+                        className={cn(
+                          'inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider',
+                          comment.author === 'user'
+                            ? 'bg-primary/10 text-primary'
+                            : 'bg-amber-100 text-amber-700',
+                        )}
+                      >
+                        {comment.author === 'user' ? 'You' : 'Agent'}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {new Date(comment.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-sm text-foreground whitespace-pre-wrap">{comment.body}</p>
                   </div>
-                  <p className="text-sm text-foreground whitespace-pre-wrap">{comment.body}</p>
-                </div>
+                </Card>
               ))}
             </div>
           )}
@@ -527,34 +513,35 @@ export function StoryDetail() {
           )}
 
           {/* Add comment form */}
-          <form onSubmit={handlePostComment} className="space-y-2">
-            <Textarea
-              value={commentBody}
-              onChange={(e) => setCommentBody(e.target.value)}
-              placeholder="Add a comment..."
-              rows={3}
-            />
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                size="sm"
-                disabled={!commentBody.trim() || createComment.isPending}
-              >
-                {createComment.isPending ? 'Posting...' : 'Post Comment'}
-              </Button>
-            </div>
-          </form>
+          <Card>
+            <form onSubmit={handlePostComment} className="px-4 py-3 space-y-2.5">
+              <Textarea
+                value={commentBody}
+                onChange={(e) => setCommentBody(e.target.value)}
+                placeholder="Add a comment..."
+                rows={3}
+                className="border-0 shadow-none p-0 focus-visible:ring-0 resize-none"
+              />
+              <div className="flex justify-end border-t border-border pt-2.5">
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={!commentBody.trim() || createComment.isPending}
+                >
+                  {createComment.isPending ? 'Posting...' : 'Post Comment'}
+                </Button>
+              </div>
+            </form>
+          </Card>
         </section>
 
         {/* Decisions section (only for done stories) */}
         {story.status === 'done' && (
           <section className="border-t border-border pt-6">
-            <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-4">
-              Key Decisions
-            </h2>
+            <SectionHeading count={decisions.length}>Key Decisions</SectionHeading>
 
             {decisions.length > 0 && (
-              <div className="space-y-4 mb-5">
+              <div className="space-y-2.5 mb-5">
                 {decisions.map((decision) => {
                   let keyItems: string[] = [];
                   try {
@@ -564,24 +551,21 @@ export function StoryDetail() {
                   } catch { keyItems = []; }
 
                   return (
-                    <div
-                      key={decision.id}
-                      className="rounded-lg border border-border bg-muted/30 px-4 py-3"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[11px] text-muted-foreground">
+                    <Card key={decision.id}>
+                      <div className="px-4 py-3">
+                        <span className="text-[10px] text-muted-foreground">
                           {new Date(decision.created_at).toLocaleString()}
                         </span>
+                        <p className="text-sm font-medium text-foreground mt-1">{decision.summary}</p>
+                        {keyItems.length > 0 && (
+                          <ul className="list-disc list-inside space-y-0.5 mt-2">
+                            {keyItems.map((item, idx) => (
+                              <li key={idx} className="text-sm text-foreground/80">{item}</li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
-                      <p className="text-sm font-medium text-foreground mb-2">{decision.summary}</p>
-                      {keyItems.length > 0 && (
-                        <ul className="list-disc list-inside space-y-1">
-                          {keyItems.map((item, idx) => (
-                            <li key={idx} className="text-sm text-foreground/80">{item}</li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+                    </Card>
                   );
                 })}
               </div>
@@ -603,43 +587,45 @@ export function StoryDetail() {
             )}
 
             {showDecisionForm && (
-              <form onSubmit={handleSaveDecision} className="space-y-3 border border-border rounded-lg p-4 bg-card">
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Summary</label>
-                  <Textarea
-                    value={decisionSummary}
-                    onChange={(e) => setDecisionSummary(e.target.value)}
-                    rows={2}
-                    placeholder="What was decided?"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Key Decisions (one per line)</label>
-                  <Textarea
-                    value={decisionItems}
-                    onChange={(e) => setDecisionItems(e.target.value)}
-                    rows={4}
-                    placeholder={"Decision 1\nDecision 2\nDecision 3"}
-                  />
-                </div>
-                <div className="flex items-center gap-2 justify-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => { setShowDecisionForm(false); setDecisionSummary(''); setDecisionItems(''); }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    size="sm"
-                    disabled={!decisionSummary.trim() || createDecision.isPending}
-                  >
-                    {createDecision.isPending ? 'Saving...' : 'Save Decision'}
-                  </Button>
-                </div>
-              </form>
+              <Card>
+                <form onSubmit={handleSaveDecision} className="px-4 py-4 space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Summary</label>
+                    <Textarea
+                      value={decisionSummary}
+                      onChange={(e) => setDecisionSummary(e.target.value)}
+                      rows={2}
+                      placeholder="What was decided?"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Key Decisions (one per line)</label>
+                    <Textarea
+                      value={decisionItems}
+                      onChange={(e) => setDecisionItems(e.target.value)}
+                      rows={4}
+                      placeholder={"Decision 1\nDecision 2\nDecision 3"}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 justify-end pt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setShowDecisionForm(false); setDecisionSummary(''); setDecisionItems(''); }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={!decisionSummary.trim() || createDecision.isPending}
+                    >
+                      {createDecision.isPending ? 'Saving...' : 'Save Decision'}
+                    </Button>
+                  </div>
+                </form>
+              </Card>
             )}
           </section>
         )}
@@ -650,11 +636,12 @@ export function StoryDetail() {
         <VerdictBar
           reviews={parsedReviews}
           story={story}
+          totalAgents={planAgents.length || parsedReviews.length}
           onVerdict={(verdict) => {
             createVerdict.mutate({ storyId, verdict });
             if (verdict === 'approve' && parsedReviews.length > 0) {
               const findingTitles = parsedReviews.flatMap((r) =>
-                r.findings.map((f) => `[${r.agent_role}] ${f.title}`),
+                r.findings.map((f) => `[${r.agent_display_name || r.agent_template_id}] ${f.title}`),
               );
               createDecision.mutate({
                 storyId,

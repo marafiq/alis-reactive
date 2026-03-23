@@ -4,7 +4,6 @@ import {
   type ParsedReview,
   type Finding,
   type Artifact,
-  ROLE_NAMES,
   verdictLabel,
   confidenceLevel,
 } from '@/lib/types';
@@ -60,7 +59,7 @@ export function ReviewPanel({ review, onClose }: ReviewPanelProps) {
 }
 
 function ReviewPanelContent({ review, onClose }: { review: ParsedReview; onClose: () => void }) {
-  const role = ROLE_NAMES[review.agent_role] || review.agent_role;
+  const role = review.agent_display_name || review.agent_template_id;
   const dots = confidenceLevel(review.confidence);
 
   return (

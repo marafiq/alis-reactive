@@ -49,19 +49,85 @@ export interface Dependency {
   reason: string;
 }
 
-export type AgentRole = 'architect' | 'csharp' | 'bdd' | 'pm' | 'ui' | 'human-proxy';
 export type Verdict = 'approve' | 'object' | 'approve-with-notes';
 export type Confidence = 'high' | 'medium' | 'low';
 
 export interface Review {
   id: string;
   story_id: string;
-  agent_role: AgentRole;
+  agent_template_id: string;
   round: number;
   verdict: Verdict;
   confidence: Confidence;
   review_json: string; // JSON
+  prompt_snapshot: string;
+  rubric_snapshot: string;
   created_at: string;
+  agent_display_name?: string; // from JOIN
+}
+
+// ── Agent Templates ──
+
+export interface AgentTemplate {
+  id: string;
+  display_name: string;
+  system_prompt: string;
+  rubric: string;
+  default_round_cap: number;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Plan Agents ──
+
+export interface PlanAgent {
+  plan_id: string;
+  agent_template_id: string;
+  prompt_override: string | null;
+  rubric_override: string | null;
+  sort_order: number;
+  is_active: number;
+  assigned_at: string;
+  display_name: string;
+  effective_prompt: string;
+  effective_rubric: string;
+}
+
+// ── Evidence Scores ──
+
+export interface EvidenceScore {
+  id: string;
+  review_id: string;
+  score: number;
+  category_points: number;
+  invest_points: number;
+  structural_points: number;
+  flags: string;
+  breakdown_json: string;
+  created_at: string;
+}
+
+// ── INVEST Assessments ──
+
+export interface InvestAssessment {
+  id: string;
+  review_id: string;
+  criterion: InvestLetter;
+  pass: number;
+  reasoning: string;
+  evidence_quality: 'strong' | 'adequate' | 'weak';
+  agent_template_id?: string;
+  round?: number;
+}
+
+export type InvestLetter = 'I' | 'N' | 'V' | 'E' | 'S' | 'T';
+
+export interface InvestHealth {
+  criterion: string;
+  pass_count: number;
+  total_agents: number;
+  verdict: 'pass' | 'fail' | 'contested';
 }
 
 export interface ReviewData {
@@ -139,15 +205,6 @@ export function parseReview(r: Review): ParsedReview {
     : (r.review_json as unknown as ReviewData) ?? { executive: '', findings: [], artifacts: [] };
   return { ...r, ...data };
 }
-
-export const ROLE_NAMES: Record<AgentRole, string> = {
-  architect: 'Architect',
-  csharp: 'C# Expert',
-  bdd: 'BDD Tester',
-  pm: 'PM/Collaborator',
-  ui: 'UI Expert',
-  'human-proxy': 'Human Proxy (Adnan)',
-};
 
 export const INVEST_LABELS: Record<string, string> = {
   I: 'Independent', N: 'Negotiable', V: 'Valuable',

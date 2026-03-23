@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Plan, Story, Review, Concept, ConceptLink, HumanVerdict, InvestValidation, Comment } from '@/lib/types';
+import type { Plan, Story, Review, Concept, ConceptLink, HumanVerdict, InvestValidation, Comment, AgentTemplate, PlanAgent, InvestHealth } from '@/lib/types';
 
 // ── API helper ──
-async function api<T>(path: string, opts?: RequestInit & { body?: unknown }): Promise<T> {
+async function api<T>(path: string, opts?: Omit<RequestInit, 'body'> & { body?: unknown }): Promise<T> {
   const res = await fetch(`/api${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...opts,
@@ -193,6 +193,46 @@ export function useCreateDecision() {
     mutationFn: (data: { storyId: string; summary: string; keyDecisions: string[] }) =>
       api<{ id: string }>('/decisions', { method: 'POST', body: data }),
     onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['decisions', vars.storyId] }),
+  });
+}
+
+// ── Agent Templates ──
+
+export function useAgentTemplates() {
+  return useQuery({ queryKey: ['agent-templates'], queryFn: () => api<AgentTemplate[]>('/agent-templates') });
+}
+
+export function usePlanAgents(planId: string | null) {
+  return useQuery({
+    queryKey: ['plan-agents', planId],
+    queryFn: () => api<PlanAgent[]>(`/plans/${planId}/agents`),
+    enabled: !!planId,
+  });
+}
+
+export function useInvestSummary(storyId: string | null) {
+  return useQuery({
+    queryKey: ['invest-summary', storyId],
+    queryFn: () => api<InvestHealth[]>(`/stories/${storyId}/invest-summary`),
+    enabled: !!storyId,
+  });
+}
+
+export function useAssignAgent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ planId, agentTemplateId }: { planId: string; agentTemplateId: string }) =>
+      api(`/plans/${planId}/agents`, { method: 'POST', body: { agentTemplateId } }),
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['plan-agents', vars.planId] }),
+  });
+}
+
+export function useRemoveAgent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ planId, agentId }: { planId: string; agentId: string }) =>
+      api(`/plans/${planId}/agents/${agentId}`, { method: 'DELETE' }),
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['plan-agents', vars.planId] }),
   });
 }
 

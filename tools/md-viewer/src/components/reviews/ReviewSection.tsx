@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { VerdictBadge } from '@/components/ui/badges';
+import { Card } from '@/components/ui/card';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { AlertTriangle } from 'lucide-react';
 import type { Review, Story, ParsedReview } from '@/lib/types';
 import {
   parseReview,
-  ROLE_NAMES,
   verdictLabel,
   confidenceLevel,
-  type AgentRole,
 } from '@/lib/types';
 
 // ── Confidence dots ──
@@ -20,7 +21,7 @@ function ConfidenceDots({ level }: { level: number }) {
           key={i}
           className={cn(
             'w-1.5 h-1.5 rounded-full',
-            i < level ? 'bg-primary' : 'bg-muted',
+            i < level ? 'bg-primary' : 'bg-border',
           )}
         />
       ))}
@@ -71,24 +72,23 @@ export function ReviewSection({
   const blockers = useMemo(() => {
     const items: { agent: string; finding: { title: string; text: string } }[] = [];
     for (const r of parsed) {
-      const roleName = ROLE_NAMES[r.agent_role as AgentRole] || r.agent_role;
+      const agentName = r.agent_display_name || r.agent_template_id;
       for (const f of r.findings ?? []) {
         if (f.severity === 'blocker') {
-          items.push({ agent: roleName, finding: f });
+          items.push({ agent: agentName, finding: f });
         }
       }
     }
     return items;
   }, [parsed]);
 
-  const approvePct = total > 0 ? (approveCount / 6) * 100 : 0;
+  const totalAgents = Math.max(total, 1);
+  const approvePct = total > 0 ? (approveCount / totalAgents) * 100 : 0;
 
   return (
     <div className="space-y-6">
       {/* Section title */}
-      <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-        Agent Review &mdash; Round {round}
-      </h2>
+      <SectionHeading>Agent Review &mdash; Round {round}</SectionHeading>
 
       {/* Consensus bar */}
       <div className="space-y-2">
@@ -100,13 +100,13 @@ export function ReviewSection({
           {objectCount > 0 && (
             <div
               className="h-full bg-changes transition-all duration-500"
-              style={{ width: `${(objectCount / 6) * 100}%` }}
+              style={{ width: `${(objectCount / totalAgents) * 100}%` }}
             />
           )}
         </div>
         <div className="flex items-center justify-between text-xs">
           <span className="text-muted-foreground">
-            {approveCount} approve, {objectCount} object &mdash; {total}/6 agents reviewed
+            {approveCount} approve, {objectCount} object &mdash; {total}/{totalAgents} agents reviewed
           </span>
           <span className={cn('font-bold uppercase tracking-wider text-[10px]', strengthColor)}>
             {strengthLabel}
@@ -117,7 +117,7 @@ export function ReviewSection({
       {/* Agent cards grid */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         {parsed.map((review) => {
-          const roleName = ROLE_NAMES[review.agent_role as AgentRole] || review.agent_role;
+          const roleName = review.agent_display_name || review.agent_template_id;
           const blockerCount = (review.findings ?? []).filter(
             (f) => f.severity === 'blocker',
           ).length;
@@ -129,52 +129,46 @@ export function ReviewSection({
             <button
               key={review.id}
               onClick={() => onSelectReview(review)}
-              className={cn(
-                'text-left shadow-sm border border-border rounded-lg p-3.5 space-y-2.5',
-                'bg-card hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-150',
-                'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring',
-              )}
+              className="text-left focus:outline-none focus:ring-2 focus:ring-ring rounded-xl"
             >
-              {/* Role + verdict */}
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-sm font-semibold text-foreground leading-snug">
-                  {roleName}
-                </span>
-                <VerdictBadge verdict={review.verdict} label={verdictLabel(review.verdict)} />
-              </div>
+              <Card className="h-full transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md hover:ring-primary/30 hover:ring-1">
+                <div className="px-4 py-3.5 space-y-2.5">
+                  {/* Role + verdict */}
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-sm font-semibold text-foreground leading-snug">
+                      {roleName}
+                    </span>
+                    <VerdictBadge verdict={review.verdict} label={verdictLabel(review.verdict)} />
+                  </div>
 
-              {/* Counts */}
-              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                {blockerCount > 0 && (
-                  <span className="flex items-center gap-1 text-blocker">
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                      <circle cx="8" cy="8" r="8" opacity="0.15" />
-                      <path d="M8 4v5M8 11h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                    {blockerCount} blocker{blockerCount !== 1 ? 's' : ''}
-                  </span>
-                )}
-                {concernCount > 0 && (
-                  <span className="flex items-center gap-1 text-changes">
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                      <circle cx="8" cy="8" r="8" opacity="0.15" />
-                      <path d="M8 5v4M8 11h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                    {concernCount} concern{concernCount !== 1 ? 's' : ''}
-                  </span>
-                )}
-                {blockerCount === 0 && concernCount === 0 && (
-                  <span className="text-approve">No issues</span>
-                )}
-              </div>
+                  {/* Counts */}
+                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                    {blockerCount > 0 && (
+                      <span className="flex items-center gap-1 text-blocker font-medium">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blocker" />
+                        {blockerCount} blocker{blockerCount !== 1 ? 's' : ''}
+                      </span>
+                    )}
+                    {concernCount > 0 && (
+                      <span className="flex items-center gap-1 text-changes font-medium">
+                        <span className="w-1.5 h-1.5 rounded-full bg-changes" />
+                        {concernCount} concern{concernCount !== 1 ? 's' : ''}
+                      </span>
+                    )}
+                    {blockerCount === 0 && concernCount === 0 && (
+                      <span className="text-approve font-medium">No issues</span>
+                    )}
+                  </div>
 
-              {/* Confidence */}
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                  Confidence
-                </span>
-                <ConfidenceDots level={confidenceLevel(review.confidence)} />
-              </div>
+                  {/* Confidence */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                      Confidence
+                    </span>
+                    <ConfidenceDots level={confidenceLevel(review.confidence)} />
+                  </div>
+                </div>
+              </Card>
             </button>
           );
         })}
@@ -182,44 +176,28 @@ export function ReviewSection({
 
       {/* Attention section (blockers only) */}
       {blockers.length > 0 && (
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-blocker flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" className="shrink-0">
-              <path d="M8 1l7 14H1L8 1z" fill="none" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M8 6v4M8 12h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            Requires Attention
-          </h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-3.5 w-3.5 text-blocker" />
+            <h3 className="section-heading !mb-0 !text-blocker">Requires Attention</h3>
+          </div>
           <div className="space-y-2">
             {blockers.map((item, idx) => (
-              <div
-                key={idx}
-                className="flex items-start gap-3 rounded-lg bg-blocker-light/50 border border-blocker/20 p-3"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  className="shrink-0 mt-0.5 text-blocker"
-                >
-                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M8 4.5v4M8 11h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
+              <Card key={idx} className="border-l-[3px] border-l-blocker bg-blocker-light/30">
+                <div className="px-4 py-3 flex items-start gap-3">
+                  <div className="min-w-0">
                     <span className="text-xs font-semibold text-blocker">
                       {item.agent}
                     </span>
+                    <div className="text-sm font-medium text-foreground mt-0.5">
+                      {item.finding.title}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                      {item.finding.text}
+                    </p>
                   </div>
-                  <div className="text-sm font-medium text-foreground">
-                    {item.finding.title}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                    {item.finding.text}
-                  </p>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         </div>
