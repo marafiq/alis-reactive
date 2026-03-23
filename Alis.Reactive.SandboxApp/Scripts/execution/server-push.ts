@@ -6,28 +6,30 @@ import { scope } from "../core/trace";
 const log = scope("server-push");
 
 interface WiredEntry {
-  trigger: ServerPushTrigger;
-  reaction: Reaction;
-  components?: Record<string, ComponentEntry>;
-  signal?: AbortSignal;
+  readonly trigger: ServerPushTrigger;
+  readonly reaction: Reaction;
+  readonly components?: Record<string, ComponentEntry>;
 }
 
 interface ManagedSource {
-  es: EventSource;
-  targetIds: Set<string>;
-  wired: WiredEntry[];
+  readonly es: EventSource;
+  readonly targetIds: Set<string>;
+  readonly wired: WiredEntry[];
+  stopping: boolean;
 }
 
 // Connection pool — singleton EventSource per URL
 const sources = new Map<string, ManagedSource>();
 
-function retrySSE(url: string, entries: WiredEntry[]): void {
+function retrySSE(url: string, entries: readonly WiredEntry[]): void {
   removeRetryIndicators(url);
   log.info("manual retry", { url });
 
-  // Re-wire all triggers — creates a fresh EventSource and re-registers handlers
+  // Re-wire all triggers — creates a fresh EventSource and re-registers handlers.
+  // Signal is intentionally omitted — the original abort context is no longer
+  // meaningful for a fresh connection after manual retry.
   for (const entry of entries) {
-    wireServerPush(entry.trigger, entry.reaction, entry.components, entry.signal);
+    wireServerPush(entry.trigger, entry.reaction, entry.components);
   }
 }
 
@@ -45,9 +47,11 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
   };
 
   es.onerror = () => {
+    const managed = sources.get(url);
+    if (managed?.stopping) return;
+
     if (es.readyState === EventSource.CLOSED) {
       log.error("connection closed permanently", { url });
-      const managed = sources.get(url);
       sources.delete(url);
       if (managed && managed.targetIds.size > 0) {
         const entries = managed.wired;
@@ -58,16 +62,18 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
     }
   };
 
+  const managed: ManagedSource = { es, targetIds, wired, stopping: false };
+  sources.set(url, managed);
+
   if (signal) {
     signal.addEventListener("abort", () => {
+      managed.stopping = true;
       es.close();
       sources.delete(url);
       log.debug("closed", { url });
     });
   }
 
-  const managed: ManagedSource = { es, targetIds, wired };
-  sources.set(url, managed);
   log.debug("created", { url });
   return managed;
 }
@@ -84,8 +90,8 @@ export function wireServerPush(
   const target = firstMutationTarget(reaction);
   if (target) managed.targetIds.add(target);
 
-  // Store wiring info for retry re-registration
-  managed.wired.push({ trigger, reaction, components, signal });
+  // Store wiring info for retry re-registration (signal omitted — see retrySSE)
+  managed.wired.push({ trigger, reaction, components });
 
   const handler = (e: MessageEvent) => {
     // Framework only supports JSON payloads — non-JSON is a server-side bug.

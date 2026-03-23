@@ -76,6 +76,22 @@ describe("when showing retry indicators", () => {
     const btn = document.querySelector("[data-alis-retry]") as HTMLElement;
     expect(btn.getAttribute("title")).toBe("Connection lost — click to reconnect");
   });
+
+  it("is a no-op with empty target set", () => {
+    showRetryIndicators("key", new Set(), vi.fn());
+    expect(document.querySelectorAll("[data-alis-retry]")).toHaveLength(0);
+  });
+
+  it("skips a parent that already has an indicator from a different key", () => {
+    document.body.innerHTML = `<div id="parent"><span id="target">text</span></div>`;
+    showRetryIndicators("signalr-key", new Set(["target"]), vi.fn());
+    showRetryIndicators("sse-key", new Set(["target"]), vi.fn());
+
+    // One icon per parent — first key wins, second is intentionally skipped
+    const icons = document.querySelectorAll("[data-alis-retry]");
+    expect(icons).toHaveLength(1);
+    expect(icons[0].getAttribute("data-alis-retry")).toBe("signalr-key");
+  });
 });
 
 describe("when removing retry indicators", () => {
