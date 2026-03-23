@@ -59,12 +59,19 @@ const seq = (event: string): Reaction => ({
   commands: [{ kind: "dispatch", event }],
 });
 
+/** Reaction with a mutate-element command — provides a target for retry indicator anchoring. */
+const mutating = (target: string): Reaction => ({
+  kind: "sequential",
+  commands: [{ kind: "mutate-element", target, mutation: { kind: "set-prop", prop: "textContent" } }],
+});
+
 let wireServerPush: typeof import("../execution/server-push").wireServerPush;
 let executeReaction: typeof import("../execution/execute").executeReaction;
 
 beforeEach(async () => {
   vi.clearAllMocks();
   MockEventSource.reset();
+  document.body.innerHTML = "";
   // Reset module cache so vi.mock(executeReaction) takes effect
   vi.resetModules();
   const sseModule = await import("../execution/server-push");
@@ -155,5 +162,141 @@ describe("when triggering on server push (SSE)", () => {
     const es = MockEventSource.instances[0];
     controller.abort();
     expect(es.close).toHaveBeenCalled();
+  });
+});
+
+describe("when SSE connection closes permanently", () => {
+  it("shows retry indicator on the mutation target's parent", () => {
+    document.body.innerHTML = `<div id="parent"><span id="status">ok</span></div>`;
+    wireServerPush(
+      { kind: "server-push", url: "/api/retry-test" },
+      mutating("status")
+    );
+
+    const es = MockEventSource.instances[0];
+    // Simulate permanent close
+    (es as any).readyState = MockEventSource.CLOSED;
+    es.onerror!();
+
+    const indicator = document.querySelector("[data-alis-retry]");
+    expect(indicator).toBeTruthy();
+    expect(indicator?.getAttribute("data-alis-retry")).toBe("/api/retry-test");
+  });
+
+  it("re-creates EventSource and re-wires handlers on retry click", () => {
+    document.body.innerHTML = `<div><span id="target">text</span></div>`;
+    wireServerPush(
+      { kind: "server-push", url: "/api/retry-rewire" },
+      mutating("target")
+    );
+
+    expect(MockEventSource.instances).toHaveLength(1);
+    const es = MockEventSource.instances[0];
+
+    // Simulate permanent close
+    (es as any).readyState = MockEventSource.CLOSED;
+    es.onerror!();
+
+    // Click retry
+    const btn = document.querySelector("[data-alis-retry]") as HTMLElement;
+    btn.click();
+
+    // A new EventSource should have been created for the same URL
+    expect(MockEventSource.instances).toHaveLength(2);
+    expect(MockEventSource.instances[1].url).toBe("/api/retry-rewire");
+
+    // Retry indicator should be removed
+    expect(document.querySelector("[data-alis-retry]")).toBeNull();
+  });
+
+  it("does not show retry indicator when there are no mutation targets", () => {
+    wireServerPush(
+      { kind: "server-push", url: "/api/no-target" },
+      seq("out")
+    );
+
+    const es = MockEventSource.instances[0];
+    (es as any).readyState = MockEventSource.CLOSED;
+    es.onerror!();
+
+    expect(document.querySelector("[data-alis-retry]")).toBeNull();
+  });
+
+  it("removes stale retry indicators when onopen fires after reconnect", () => {
+    document.body.innerHTML = `<div><span id="target">text</span></div>`;
+    wireServerPush(
+      { kind: "server-push", url: "/api/reconnect" },
+      mutating("target")
+    );
+
+    const es = MockEventSource.instances[0];
+
+    // Simulate permanent close — indicator appears
+    (es as any).readyState = MockEventSource.CLOSED;
+    es.onerror!();
+    expect(document.querySelector("[data-alis-retry]")).toBeTruthy();
+
+    // Click retry — creates new EventSource
+    const btn = document.querySelector("[data-alis-retry]") as HTMLElement;
+    btn.click();
+
+    // New EventSource connects — onopen should clean up any stale indicators
+    const newEs = MockEventSource.instances[1];
+    newEs.onopen!();
+    expect(document.querySelector("[data-alis-retry]")).toBeNull();
+  });
+
+  it("re-wires all handlers when multiple triggers share a URL and retry fires", () => {
+    document.body.innerHTML = `<div><span id="target">text</span></div>`;
+    wireServerPush(
+      { kind: "server-push", url: "/api/multi-retry" },
+      mutating("target")
+    );
+    wireServerPush(
+      { kind: "server-push", url: "/api/multi-retry", eventType: "alert" },
+      seq("other")
+    );
+
+    expect(MockEventSource.instances).toHaveLength(1);
+    const es = MockEventSource.instances[0];
+    expect(es.handlerCount("message")).toBe(1);
+    expect(es.handlerCount("alert")).toBe(1);
+
+    // Simulate permanent close
+    (es as any).readyState = MockEventSource.CLOSED;
+    es.onerror!();
+
+    // Click retry
+    const btn = document.querySelector("[data-alis-retry]") as HTMLElement;
+    btn.click();
+
+    // New EventSource created with both handlers re-registered (not doubled)
+    expect(MockEventSource.instances).toHaveLength(2);
+    const newEs = MockEventSource.instances[1];
+    expect(newEs.handlerCount("message")).toBe(1);
+    expect(newEs.handlerCount("alert")).toBe(1);
+  });
+
+  it("does not show retry indicator when abort signal closes the connection", () => {
+    document.body.innerHTML = `<div><span id="target">text</span></div>`;
+    const controller = new AbortController();
+    wireServerPush(
+      { kind: "server-push", url: "/api/abort-no-retry" },
+      mutating("target"),
+      undefined,
+      controller.signal
+    );
+
+    const es = MockEventSource.instances[0];
+
+    // Abort triggers close — sets stopping flag
+    controller.abort();
+
+    // onerror fires after close (browser behavior)
+    (es as any).readyState = MockEventSource.CLOSED;
+    es.onerror!();
+
+    // No retry indicator — this was an intentional shutdown
+    expect(document.querySelector("[data-alis-retry]")).toBeNull();
   });
 });

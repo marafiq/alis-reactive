@@ -1,22 +1,20 @@
 import * as signalR from "@microsoft/signalr";
 import type { SignalRTrigger, Reaction, ComponentEntry } from "../types";
 import { executeReaction } from "./execute";
+import { showRetryIndicators, removeRetryIndicators, firstMutationTarget } from "./retry-indicator";
 import { scope } from "../core/trace";
 
 const log = scope("signalr");
 
 interface ManagedConnection {
-  connection: signalR.HubConnection;
+  readonly connection: signalR.HubConnection;
   startPromise: Promise<void>;
-  targetIds: Set<string>;
+  readonly targetIds: Set<string>;
   stopping: boolean;
 }
 
 // Connection pool — singleton HubConnection per hubUrl
 const hubs = new Map<string, ManagedConnection>();
-
-const RETRY_ATTR = "data-alis-retry";
-const RETRY_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>`;
 
 /**
  * Starts the connection with retry for initial connection failures.
@@ -40,63 +38,18 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
     }
   }
 
-  // All retries exhausted — inject retry icons so the user can retry manually.
+  // All retries exhausted — show retry indicators so the user can retry manually.
   // The connection is in Disconnected state; handlers persist for restart.
   log.error("start failed after all retries", { hubUrl, attempts: maxAttempts });
   const managed = hubs.get(hubUrl);
-  if (managed) injectRetryIcons(hubUrl, managed.targetIds);
-}
-
-function injectRetryIcons(hubUrl: string, targetIds: Set<string>): void {
-  const anchored = new Set<HTMLElement>();
-
-  for (const id of targetIds) {
-    const el = document.getElementById(id);
-    if (!el) continue;
-
-    // Use the target's parent as anchor — it's the direct container (e.g., <div> wrapping <dt>+<dd>).
-    // One icon per parent to avoid duplicates when multiple targets share a parent.
-    const anchor = el.parentElement ?? el;
-    if (anchored.has(anchor) || anchor.querySelector(`[${RETRY_ATTR}]`)) continue;
-    anchored.add(anchor);
-
-    if (getComputedStyle(anchor).position === "static") anchor.style.position = "relative";
-
-    const btn = document.createElement("button");
-    btn.setAttribute(RETRY_ATTR, hubUrl);
-    btn.setAttribute("title", "Connection lost — click to reconnect");
-    btn.style.cssText = `
-      position: absolute; top: -2px; right: -2px; z-index: 10;
-      width: 22px; height: 22px; padding: 3px;
-      border: 1px solid rgba(239,68,68,0.3); border-radius: 50%; cursor: pointer;
-      background: rgba(239,68,68,0.08); color: #ef4444;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
-    `;
-    btn.innerHTML = RETRY_SVG;
-    btn.addEventListener("mouseenter", () => { btn.style.background = "rgba(239,68,68,0.18)"; });
-    btn.addEventListener("mouseleave", () => { btn.style.background = "rgba(239,68,68,0.08)"; });
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      retryConnection(hubUrl);
-    });
-
-    anchor.appendChild(btn);
-  }
-  log.debug("retry icons shown", { hubUrl, targets: [...targetIds] });
-}
-
-function removeRetryIcons(hubUrl: string): void {
-  const icons = document.querySelectorAll(`[${RETRY_ATTR}="${hubUrl}"]`);
-  icons.forEach(icon => icon.remove());
-  if (icons.length > 0) log.debug("retry icons removed", { hubUrl });
+  if (managed) showRetryIndicators(hubUrl, managed.targetIds, () => retryConnection(hubUrl));
 }
 
 function retryConnection(hubUrl: string): void {
   const managed = hubs.get(hubUrl);
   if (!managed) {
     log.warn("retry requested but no connection found", { hubUrl });
-    removeRetryIcons(hubUrl);
+    removeRetryIndicators(hubUrl);
     return;
   }
 
@@ -107,7 +60,7 @@ function retryConnection(hubUrl: string): void {
   }
 
   log.info("manual retry", { hubUrl });
-  removeRetryIcons(hubUrl);
+  removeRetryIndicators(hubUrl);
 
   // Handlers persist on the connection — just restart it
   managed.startPromise = startWithRetry(connection, hubUrl);
@@ -137,7 +90,7 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
 
   connection.onreconnected(connectionId => {
     log.info("reconnected", { hubUrl, connectionId });
-    removeRetryIcons(hubUrl);
+    removeRetryIndicators(hubUrl);
   });
 
   connection.onclose(err => {
@@ -149,7 +102,7 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
       hubs.delete(hubUrl);
     } else {
       log.warn("disconnected", { hubUrl, error: err ? String(err) : undefined });
-      injectRetryIcons(hubUrl, targetIds);
+      showRetryIndicators(hubUrl, targetIds, () => retryConnection(hubUrl));
     }
   });
 
@@ -166,20 +119,6 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
   }
 
   return managed;
-}
-
-/**
- * Extracts the first mutate-element target ID from a reaction's top-level commands.
- * Only inspects sequential and conditional reactions. HTTP/parallel-http reactions
- * are skipped (their preFetch commands are not inspected).
- */
-export function firstMutationTarget(reaction: Reaction): string | undefined {
-  let commands: import("../types").Command[] | undefined;
-  if (reaction.kind === "sequential") commands = reaction.commands;
-  else if (reaction.kind === "conditional") commands = reaction.commands;
-
-  const cmd = commands?.find(c => c.kind === "mutate-element");
-  return cmd?.kind === "mutate-element" ? cmd.target : undefined;
 }
 
 export function wireSignalR(

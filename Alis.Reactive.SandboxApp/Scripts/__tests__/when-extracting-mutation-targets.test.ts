@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { firstMutationTarget } from "../execution/signalr";
+import { firstMutationTarget } from "../execution/retry-indicator";
 import type { Reaction } from "../types";
 
 describe("when extracting mutation targets from reactions", () => {
