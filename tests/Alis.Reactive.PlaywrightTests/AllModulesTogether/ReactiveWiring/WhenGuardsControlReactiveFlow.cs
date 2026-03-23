@@ -300,4 +300,248 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Scenario: Denver city autofills CO + 80201 ──
+
+    /// <summary>
+    /// Selecting "denver" in the City dropdown auto-fills State=CO and PostalCode=80201.
+    /// The existing tests cover seattle (WA/98101) and portland (OR/97201) but NOT denver.
+    /// Denver is the third ElseIf branch — testing it proves the condition chain evaluates
+    /// past the first two branches when neither matches.
+    ///
+    /// WHY: proves the third ElseIf branch in a multi-branch condition chain fires correctly,
+    /// catching regressions where only the first two branches are evaluated
+    /// </summary>
+    [Test]
+    public async Task selecting_denver_autofills_state_co_and_postal_80201()
+    {
+        await NavigateAndBoot();
+
+        var citySelect = Page.Locator($"#{S}__Address_City");
+        var stateSelect = Page.Locator($"#{S}__Address_State");
+        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
+        var autoText = Page.Locator("#city-auto");
+
+        await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "denver" });
+
+        await Expect(stateSelect).ToHaveValueAsync("CO", new() { Timeout = 3000 });
+        await Expect(postalInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex("80.?201"), new() { Timeout = 3000 });
+        await Expect(autoText).ToContainTextAsync("CO, 80201");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario: City else branch clears state and resets postal code ──
+
+    /// <summary>
+    /// After selecting a city (which auto-fills State and PostalCode), selecting the
+    /// empty "-- Select City --" option must trigger the Else branch, which clears
+    /// State to "" and sets PostalCode to 0. Because the Fusion NumericTextBox has
+    /// Min(10000), it clamps the 0 to 10000 — that's Syncfusion enforcing its range.
+    /// The auto-fill text resets to "Select a city".
+    ///
+    /// WHY: proves the Else branch of the City condition chain fires on non-matching
+    /// values, resets the State dropdown, and the auto-fill text reverts to default
+    /// </summary>
+    [Test]
+    public async Task selecting_empty_city_clears_state_and_resets_auto_text()
+    {
+        await NavigateAndBoot();
+
+        var citySelect = Page.Locator($"#{S}__Address_City");
+        var stateSelect = Page.Locator($"#{S}__Address_State");
+        var autoText = Page.Locator("#city-auto");
+
+        // First, select a city to fill sibling fields
+        await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "seattle" });
+        await Expect(stateSelect).ToHaveValueAsync("WA", new() { Timeout = 3000 });
+        await Expect(autoText).ToContainTextAsync("WA, 98101");
+
+        // Now select the empty option — Else branch should clear State and reset auto text
+        await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "" });
+
+        await Expect(stateSelect).ToHaveValueAsync("", new() { Timeout = 3000 });
+        await Expect(autoText).ToHaveTextAsync("Select a city", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario: Initial page state before any interaction ──
+
+    /// <summary>
+    /// On load, all echo elements display their default text: status-result and
+    /// amount-tier show em-dash, city-auto shows "Select a city". No conditions
+    /// have fired, no mutations have occurred. The address section is visible by default.
+    ///
+    /// WHY: proves the page renders in a clean initial state — if any dom-ready pipeline
+    /// accidentally pre-fills echoes, this test catches it
+    /// </summary>
+    [Test]
+    public async Task page_loads_with_all_echoes_at_default_values()
+    {
+        await NavigateAndBoot();
+
+        await Expect(Page.Locator("#status-result")).ToHaveTextAsync("\u2014");
+        await Expect(Page.Locator("#amount-tier")).ToHaveTextAsync("\u2014");
+        await Expect(Page.Locator("#city-auto")).ToHaveTextAsync("Select a city");
+
+        // Address section is visible by default (not hidden until "inactive" branch)
+        await Expect(Page.Locator("#address-section")).ToBeVisibleAsync();
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario: Amount tier boundary values ──
+
+    /// <summary>
+    /// The tier ladder uses Gte (>=) comparisons:
+    ///   >= 5000 → "High value order"
+    ///   >= 1000 → "Standard order"
+    ///   else    → "Small order"
+    ///
+    /// Entering exactly 5000 must land in "High value order" (not "Standard order").
+    /// Entering exactly 1000 must land in "Standard order" (not "Small order").
+    /// Entering 999 must land in "Small order".
+    ///
+    /// WHY: proves boundary values evaluate correctly in ElseIf chains with Gte() —
+    /// off-by-one errors in numeric comparisons would cause wrong branch to fire
+    /// </summary>
+    [Test]
+    public async Task amount_tier_boundary_values_evaluate_correctly()
+    {
+        await NavigateAndBoot();
+
+        var input = Page.Locator($"#{S}__Amount").First;
+        var tier = Page.Locator("#amount-tier");
+
+        // Exactly 5000 → High value (>= 5000)
+        await input.ClickAsync();
+        await input.FillAsync("5000");
+        await input.PressAsync("Tab");
+        await Expect(tier).ToHaveTextAsync("High value order", new() { Timeout = 3000 });
+        await Expect(tier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-rose-600"));
+
+        // Exactly 1000 → Standard (>= 1000 but < 5000)
+        await input.ClickAsync();
+        await input.FillAsync("1000");
+        await input.PressAsync("Tab");
+        await Expect(tier).ToHaveTextAsync("Standard order", new() { Timeout = 3000 });
+        await Expect(tier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-sky-600"));
+
+        // 999 → Small (< 1000)
+        await input.ClickAsync();
+        await input.FillAsync("999");
+        await input.PressAsync("Tab");
+        await Expect(tier).ToHaveTextAsync("Small order", new() { Timeout = 3000 });
+        await Expect(tier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario: Pending status (Else branch) fires directly ──
+
+    /// <summary>
+    /// Selecting "pending" as the first interaction (without first going through
+    /// "active" or "inactive") must fire the Else branch directly. The full lifecycle
+    /// test exercises pending after other branches; this test proves the Else branch
+    /// works in isolation from a clean state.
+    ///
+    /// WHY: proves the Else branch evaluates correctly on first interaction —
+    /// not just as a fallback after other branches have set prior state
+    /// </summary>
+    [Test]
+    public async Task selecting_pending_directly_fires_else_branch()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "pending" });
+
+        var result = Page.Locator("#status-result");
+        await Expect(result).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
+        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
+
+        // Address section stays visible (Else branch calls Show())
+        await Expect(Page.Locator("#address-section")).ToBeVisibleAsync();
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario: All three cities in sequence ──
+
+    /// <summary>
+    /// Selecting seattle → portland → denver exercises every ElseIf branch of the City
+    /// condition chain in sequence. Each city must correctly set State and PostalCode.
+    /// The auto-fill text must update each time with the correct state and postal code.
+    ///
+    /// WHY: proves the City condition chain evaluates all three branches correctly in
+    /// sequence, and that state from a prior branch (e.g., WA from seattle) is fully
+    /// replaced by the next branch (OR from portland, CO from denver)
+    /// </summary>
+    [Test]
+    public async Task all_three_cities_autofill_correctly_in_sequence()
+    {
+        await NavigateAndBoot();
+
+        var citySelect = Page.Locator($"#{S}__Address_City");
+        var stateSelect = Page.Locator($"#{S}__Address_State");
+        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
+        var autoText = Page.Locator("#city-auto");
+
+        // Seattle → WA, 98101
+        await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "seattle" });
+        await Expect(stateSelect).ToHaveValueAsync("WA", new() { Timeout = 3000 });
+        await Expect(postalInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex("98.?101"), new() { Timeout = 3000 });
+        await Expect(autoText).ToContainTextAsync("WA, 98101");
+
+        // Portland → OR, 97201
+        await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "portland" });
+        await Expect(stateSelect).ToHaveValueAsync("OR", new() { Timeout = 3000 });
+        await Expect(postalInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex("97.?201"), new() { Timeout = 3000 });
+        await Expect(autoText).ToContainTextAsync("OR, 97201");
+
+        // Denver → CO, 80201
+        await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "denver" });
+        await Expect(stateSelect).ToHaveValueAsync("CO", new() { Timeout = 3000 });
+        await Expect(postalInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex("80.?201"), new() { Timeout = 3000 });
+        await Expect(autoText).ToContainTextAsync("CO, 80201");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Scenario: Programmatic Amount set cascades into tier pipeline ──
+
+    /// <summary>
+    /// When Status "active" programmatically sets Amount to 100 via SetValue on the
+    /// Fusion NumericTextBox, Syncfusion fires a change event on the component. This
+    /// triggers Amount's .Reactive() tier pipeline, which evaluates 100 as "Small order"
+    /// (< 1000). The tier text and color update as a cascading side effect of the
+    /// Status change.
+    ///
+    /// WHY: proves that Fusion SetValue fires the component's change event, creating
+    /// a cascading reactive chain (Status change -> Amount SetValue -> tier update).
+    /// This is real Syncfusion behavior — programmatic property writes fire events.
+    /// </summary>
+    [Test]
+    public async Task programmatic_amount_set_cascades_into_tier_pipeline()
+    {
+        await NavigateAndBoot();
+
+        var amountTier = Page.Locator("#amount-tier");
+
+        // Confirm initial state
+        await Expect(amountTier).ToHaveTextAsync("\u2014");
+
+        // Select active → programmatically sets Amount=100 → triggers tier pipeline
+        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
+
+        // Wait for status branch to complete
+        await Expect(Page.Locator("#status-result")).ToContainTextAsync("Active", new() { Timeout = 3000 });
+
+        // Amount was set to 100 and Fusion fires the change event, which triggers
+        // the tier pipeline. 100 < 1000 = "Small order"
+        await Expect(amountTier).ToHaveTextAsync("Small order", new() { Timeout = 3000 });
+        await Expect(amountTier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
+
+        AssertNoConsoleErrors();
+    }
 }

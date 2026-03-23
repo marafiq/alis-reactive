@@ -298,4 +298,281 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ══════════════════════════════════════════════════════════
+    // Status indicators — initial state and CSS class mutations
+    // ══════════════════════════════════════════════════════════
+
+    // ── City dropdown starts empty before any country selection ──
+
+    [Test]
+    public async Task city_dropdown_has_no_items_before_country_selection()
+    {
+        await NavigateAndBoot();
+
+        // City dropdown should have no data source items — it starts empty
+        var itemCount = await Page.EvaluateAsync<int>($@"() => {{
+            const el = document.getElementById('{CityId}');
+            const ds = el && el.ej2_instances && el.ej2_instances[0]
+                ? el.ej2_instances[0].dataSource
+                : [];
+            return Array.isArray(ds) ? ds.length : 0;
+        }}");
+        Assert.That(itemCount, Is.EqualTo(0),
+            "City dropdown should have zero items before any country is selected");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Status indicators show placeholder text on initial load ──
+
+    [Test]
+    public async Task status_indicators_show_placeholder_text_on_initial_load()
+    {
+        await NavigateAndBoot();
+
+        // All three indicators start with an em-dash placeholder
+        var cascadeStatus = await Page.Locator("#cascade-status").TextContentAsync();
+        Assert.That(cascadeStatus, Does.Contain("\u2014"),
+            "Cascade status should show em-dash placeholder initially");
+
+        var cityCount = await Page.Locator("#city-count").TextContentAsync();
+        Assert.That(cityCount, Does.Contain("\u2014"),
+            "City count should show em-dash placeholder initially");
+
+        var selectedCity = await Page.Locator("#selected-city").TextContentAsync();
+        Assert.That(selectedCity, Does.Contain("\u2014"),
+            "Selected city should show em-dash placeholder initially");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Cascade status turns green after cities load ──
+
+    [Test]
+    public async Task cascade_status_turns_green_after_cities_load()
+    {
+        await NavigateAndBoot();
+
+        // Initially the cascade-status has the muted class
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-text-muted"));
+
+        // Select a country to trigger cascade
+        await SelectCountry("United States");
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
+
+        // After cascade, the muted class is removed and green class is added
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"), new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // All country-to-city cascades — every country produces correct cities
+    // ══════════════════════════════════════════════════════════
+
+    // ── Canada selection loads Toronto and Vancouver ──
+
+    [Test]
+    public async Task selecting_canada_loads_two_cities()
+    {
+        await NavigateAndBoot();
+
+        await SelectCountry("Canada");
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#city-count"))
+            .ToHaveTextAsync("2", new() { Timeout = 3000 });
+
+        // Verify specific cities are selectable
+        await SelectCity("Toronto");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("TOR", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Australia selection loads Sydney and Melbourne ──
+
+    [Test]
+    public async Task selecting_australia_loads_two_cities()
+    {
+        await NavigateAndBoot();
+
+        await SelectCountry("Australia");
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#city-count"))
+            .ToHaveTextAsync("2", new() { Timeout = 3000 });
+
+        // Verify specific cities are selectable
+        await SelectCity("Sydney");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("SYD", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Save edge cases
+    // ══════════════════════════════════════════════════════════
+
+    // ── Save with country but no city sends empty city to server ──
+
+    [Test]
+    public async Task saving_with_country_but_no_city_shows_empty_city_in_result()
+    {
+        await NavigateAndBoot();
+
+        // Select a country but do NOT select a city
+        await SelectCountry("United States");
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
+
+        // Click Save without selecting a city
+        await Page.Locator("#save-btn").ClickAsync();
+
+        // Server responds with the message — city is empty
+        await Expect(Page.Locator("#save-result"))
+            .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
+
+        // The server echoes "Saved: {city} in {country}" — city will be empty or "(empty)"
+        var saveText = await Page.Locator("#save-result").TextContentAsync();
+        Assert.That(saveText, Does.Contain("US"),
+            $"Save result should contain country 'US' but was '{saveText}'");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Save result turns green on successful save ──
+
+    [Test]
+    public async Task save_result_turns_green_on_success()
+    {
+        await NavigateAndBoot();
+
+        // Save result starts muted
+        await Expect(Page.Locator("#save-result"))
+            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-text-muted"));
+
+        // Select country + city, then save
+        await SelectCountry("United Kingdom");
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
+        await SelectCity("Manchester");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("MAN", new() { Timeout = 5000 });
+
+        await Page.Locator("#save-btn").ClickAsync();
+        await Expect(Page.Locator("#save-result"))
+            .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
+
+        // After successful save, text turns green
+        await Expect(Page.Locator("#save-result"))
+            .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"), new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Multi-step workflow variations
+    // ══════════════════════════════════════════════════════════
+
+    // ── Full workflow with Canada — different country exercises same pipeline ──
+
+    [Test]
+    public async Task full_cascading_workflow_with_canada()
+    {
+        await NavigateAndBoot();
+
+        // Step 1: Select Canada
+        await SelectCountry("Canada");
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
+        await Expect(Page.Locator("#city-count"))
+            .ToHaveTextAsync("2", new() { Timeout = 3000 });
+
+        // Step 2: Select Vancouver
+        await SelectCity("Vancouver");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("VAN", new() { Timeout = 5000 });
+
+        // Step 3: Save — verify both values echo
+        await Page.Locator("#save-btn").ClickAsync();
+        await Expect(Page.Locator("#save-result"))
+            .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
+
+        var saveText = await Page.Locator("#save-result").TextContentAsync();
+        Assert.That(saveText, Does.Contain("VAN"),
+            $"Save result should contain city 'VAN' but was '{saveText}'");
+        Assert.That(saveText, Does.Contain("CA"),
+            $"Save result should contain country 'CA' but was '{saveText}'");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Rapid country switching — three countries in sequence stabilizes correctly ──
+
+    [Test]
+    public async Task rapid_country_switching_stabilizes_with_correct_city_count()
+    {
+        await NavigateAndBoot();
+
+        // Switch through US → UK → AU rapidly
+        await SelectCountry("United States");
+        await Expect(Page.Locator("#city-count"))
+            .ToHaveTextAsync("3", new() { Timeout = 10000 });
+
+        await SelectCountry("United Kingdom");
+        await Expect(Page.Locator("#city-count"))
+            .ToHaveTextAsync("2", new() { Timeout = 10000 });
+
+        await SelectCountry("Australia");
+        await Expect(Page.Locator("#city-count"))
+            .ToHaveTextAsync("2", new() { Timeout = 10000 });
+
+        // Final state: Australia cities available, can select Melbourne
+        await Page.WaitForFunctionAsync($@"() => {{
+            const el = document.getElementById('{CityId}');
+            return el && el.ej2_instances && el.ej2_instances[0] &&
+                   el.ej2_instances[0].dataSource && el.ej2_instances[0].dataSource.length === 2;
+        }}", null, new() { Timeout = 10000 });
+        await SelectCity("Melbourne");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("MEL", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Selecting different city after first selection updates display ──
+
+    [Test]
+    public async Task selecting_different_city_updates_selected_city_display()
+    {
+        await NavigateAndBoot();
+
+        await SelectCountry("United States");
+        await Expect(Page.Locator("#cascade-status"))
+            .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
+
+        // Select Seattle first
+        await SelectCity("Seattle");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("SEA", new() { Timeout = 5000 });
+
+        // Change to New York — the display updates to the new selection
+        await SelectCity("New York");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("NYC", new() { Timeout = 5000 });
+
+        // Change to Chicago — still updates
+        await SelectCity("Chicago");
+        await Expect(Page.Locator("#selected-city"))
+            .ToHaveTextAsync("CHI", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }

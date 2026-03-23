@@ -419,4 +419,226 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ══════════════════════════════════════════════════════════
+    // Additional BDD Scenarios — Untested Behaviors
+    // ══════════════════════════════════════════════════════════
+
+    // ── Plan JSON rendered on page ──
+
+    [Test]
+    public async Task plan_json_is_rendered_on_page()
+    {
+        await NavigateAndBoot();
+        var planJson = await Page.Locator("#plan-json").TextContentAsync();
+        Assert.That(planJson, Does.Contain("mutate-element"),
+            "Plan must contain mutate-element commands");
+        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
+            "Plan must contain fusion vendor for TestWidget components");
+        AssertNoConsoleErrors();
+    }
+
+    // ── Focus preserves existing component value ──
+
+    [Test]
+    public async Task focus_does_not_alter_component_value()
+    {
+        // Proves that calling the Focus void method only changes focus state,
+        // not the component's value. The tw-focus component starts empty;
+        // after typing a value and clicking Focus again, the value must persist.
+        await NavigateAndBoot();
+
+        // Type a value into the focus widget
+        await Page.Locator("#tw-focus input").FillAsync("preserve-me");
+        await Expect(Page.Locator("#tw-focus input"))
+            .ToHaveValueAsync("preserve-me", new() { Timeout = 3000 });
+
+        // Click somewhere else to lose focus
+        await Page.Locator("#tw-write input").ClickAsync();
+        await Expect(Page.Locator("#tw-focus input"))
+            .Not.ToBeFocusedAsync();
+
+        // Click Focus button — should re-focus without changing value
+        await Page.Locator("#btn-focus").ClickAsync();
+        await Expect(Page.Locator("#tw-focus input"))
+            .ToBeFocusedAsync(new() { Timeout = 3000 });
+        await Expect(Page.Locator("#tw-focus input"))
+            .ToHaveValueAsync("preserve-me", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Gather sends user-modified value, not just the initial value ──
+
+    [Test]
+    public async Task gather_sends_user_modified_value()
+    {
+        // Proves that gather reads the CURRENT component value at gather time,
+        // not a cached initial value. User changes "gather-me" → "custom-val" → POST.
+        await NavigateAndBoot();
+
+        // Initial value is "gather-me"
+        await Expect(Page.Locator("#tw-gather input"))
+            .ToHaveValueAsync("gather-me", new() { Timeout = 3000 });
+
+        // User changes the value
+        await Page.Locator("#tw-gather input").FillAsync("custom-val");
+        await Expect(Page.Locator("#tw-gather input"))
+            .ToHaveValueAsync("custom-val", new() { Timeout = 3000 });
+
+        // Gather and verify the POST succeeds with the user-modified value
+        await Page.Locator("#btn-gather").ClickAsync();
+        await Expect(Page.Locator("#gather-result"))
+            .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Repeated datasource fetch replaces previous data correctly ──
+
+    [Test]
+    public async Task repeated_datasource_fetch_replaces_items_each_time()
+    {
+        // Proves that clicking "Fetch DataSource" twice produces the same stable result.
+        // The second fetch replaces the first — items and value are idempotent.
+        await NavigateAndBoot();
+
+        // First fetch
+        await Page.Locator("#btn-datasource").ClickAsync();
+        await Expect(Page.Locator("#tw-ds-target input"))
+            .ToHaveValueAsync("beta", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#tw-ds-target .test-widget-item"))
+            .ToHaveCountAsync(3, new() { Timeout = 5000 });
+
+        // Second fetch — same stable result
+        await Page.Locator("#btn-datasource").ClickAsync();
+
+        // Still 3 items with value "beta" — not doubled, not corrupted
+        await Expect(Page.Locator("#tw-ds-target input"))
+            .ToHaveValueAsync("beta", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#tw-ds-target .test-widget-item"))
+            .ToHaveCountAsync(3, new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── SetItems via dispatch then HTTP: second call replaces first ──
+
+    [Test]
+    public async Task http_setitems_replaces_dispatch_setitems()
+    {
+        // Proves that items from two different sources (dispatch payload vs HTTP response)
+        // replace each other correctly. First: dispatch loads ["x","y","z"], then HTTP
+        // response loads ["alpha","beta","gamma"] — the final state has the HTTP items.
+        await NavigateAndBoot();
+
+        // Step 1: Load items via dispatch — tw-items gets ["x","y","z"]
+        await Page.Locator("#btn-load-items").ClickAsync();
+        await Expect(Page.Locator("#tw-items .test-widget-item"))
+            .ToHaveCountAsync(3, new() { Timeout = 5000 });
+        await Expect(Page.Locator("#tw-items .test-widget-item").Nth(0))
+            .ToHaveTextAsync("x");
+
+        // Step 2: Load items via HTTP — tw-ds-target gets ["alpha","beta","gamma"]
+        await Page.Locator("#btn-datasource").ClickAsync();
+        await Expect(Page.Locator("#tw-ds-target .test-widget-item"))
+            .ToHaveCountAsync(3, new() { Timeout = 5000 });
+        await Expect(Page.Locator("#tw-ds-target .test-widget-item").Nth(0))
+            .ToHaveTextAsync("alpha");
+
+        // tw-items still has its own items — different components, independent state
+        await Expect(Page.Locator("#tw-items .test-widget-item"))
+            .ToHaveCountAsync(3);
+        await Expect(Page.Locator("#tw-items .test-widget-item").Nth(0))
+            .ToHaveTextAsync("x");
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Component read shows "read-me" specifically on DomReady ──
+
+    [Test]
+    public async Task component_read_echoes_exact_initial_value()
+    {
+        // Proves that DomReady reads the component's InitialValue("read-me")
+        // and writes it to the #read-echo element. The read is live at boot time.
+        await NavigateAndBoot();
+
+        // The read echo should show exactly the initial value
+        await Expect(Page.Locator("#read-echo"))
+            .ToHaveTextAsync("read-me", new() { Timeout = 3000 });
+
+        // The source component still has the value it was read from
+        await Expect(Page.Locator("#tw-read input"))
+            .ToHaveValueAsync("read-me", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Cross-component sync: target starts empty before source types ──
+
+    [Test]
+    public async Task cross_component_target_starts_empty_before_source_input()
+    {
+        // Proves that the target widget has no value until the source fires a change event.
+        // No premature sync, no stale initial value leak.
+        await NavigateAndBoot();
+
+        // Target should start empty — no cross-sync has happened yet
+        await Expect(Page.Locator("#tw-target input"))
+            .ToHaveValueAsync("", new() { Timeout = 3000 });
+
+        // Source also starts empty
+        await Expect(Page.Locator("#tw-source input"))
+            .ToHaveValueAsync("", new() { Timeout = 3000 });
+
+        // Only after source input does target get a value
+        await Page.Locator("#tw-source input").FillAsync("sync-now");
+        await Expect(Page.Locator("#tw-target input"))
+            .ToHaveValueAsync("sync-now", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Gather result starts with placeholder before any gather ──
+
+    [Test]
+    public async Task gather_result_shows_placeholder_before_any_gather()
+    {
+        // Proves the gather result displays "not gathered" initially, not stale data.
+        await NavigateAndBoot();
+
+        await Expect(Page.Locator("#gather-result"))
+            .ToHaveTextAsync("not gathered", new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Condition indicator stays hidden after multiple empty inputs ──
+
+    [Test]
+    public async Task condition_indicator_stays_hidden_after_repeated_empty_fills()
+    {
+        // Proves that repeatedly filling with empty string does not accidentally
+        // trigger the Then branch. The Else branch (hide) must remain stable.
+        await NavigateAndBoot();
+
+        await Expect(Page.Locator("#comp-cond-ind")).ToBeHiddenAsync();
+
+        // Fill empty multiple times — indicator should remain hidden each time
+        await Page.Locator("#tw-comp-cond input").FillAsync("");
+        await Expect(Page.Locator("#comp-cond-ind"))
+            .ToBeHiddenAsync(new() { Timeout = 3000 });
+
+        await Page.Locator("#tw-comp-cond input").FillAsync("");
+        await Expect(Page.Locator("#comp-cond-ind"))
+            .ToBeHiddenAsync(new() { Timeout = 3000 });
+
+        // Now fill with a value — Then branch activates
+        await Page.Locator("#tw-comp-cond input").FillAsync("finally");
+        await Expect(Page.Locator("#comp-cond-ind"))
+            .ToBeVisibleAsync(new() { Timeout = 3000 });
+
+        AssertNoConsoleErrors();
+    }
 }

@@ -422,4 +422,225 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // ── Address validation ─────────────────────────────────
+
+    [Test]
+    public async Task empty_address_street_shows_required_error()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillAllRequired();
+        await Input("Address_Street").FillAsync(""); // Clear street
+        await Input("ReasonForNoContact").FillAsync("No relatives");
+
+        await SubmitBtn.ClickAsync();
+
+        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task empty_address_city_shows_required_error()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillAllRequired();
+        await Input("Address_City").FillAsync(""); // Clear city
+        await Input("ReasonForNoContact").FillAsync("No relatives");
+
+        await SubmitBtn.ClickAsync();
+
+        await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.City")).ToBeVisibleAsync();
+        await Expect(SummaryDiv).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // ── Email format validation ────────────────────────────
+
+    [Test]
+    public async Task invalid_email_format_shows_format_error()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillAllRequired();
+        await Input("Email").FillAsync("not-an-email");
+
+        await SubmitBtn.ClickAsync();
+
+        await Expect(ErrorFor("Email")).ToContainTextAsync("valid email");
+        await Expect(Input("Email")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(SummaryDiv).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    // ── Live-clear (blur clears error after fix) ───────────
+
+    [Test]
+    public async Task name_error_clears_on_blur_after_valid_input()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        // Submit empty → Name error
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("Name")).ToBeVisibleAsync();
+        await Expect(Input("Name")).ToHaveClassAsync(new Regex("alis-has-error"));
+
+        // Type valid name, blur → error clears
+        await Input("Name").FillAsync("Robert Thompson");
+        await Input("Name").BlurAsync();
+
+        await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync(new() { Timeout = 2000 });
+        await Expect(Input("Name")).Not.ToHaveClassAsync(new Regex("alis-has-error"), new() { Timeout = 2000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task email_error_clears_on_blur_after_valid_input()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        // Submit empty → Email error
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("Email")).ToBeVisibleAsync();
+
+        // Type valid email, blur → error clears
+        await Input("Email").FillAsync("robert@care.com");
+        await Input("Email").BlurAsync();
+
+        await Expect(ErrorFor("Email")).Not.ToBeVisibleAsync(new() { Timeout = 2000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task zipcode_error_clears_on_blur_after_valid_input()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillAllRequired();
+        await Input("Address_ZipCode").FillAsync("abc"); // invalid
+        await SubmitBtn.ClickAsync();
+
+        await Expect(ErrorFor("Address.ZipCode")).ToBeVisibleAsync();
+
+        // Fix with valid 5-digit zip, blur → error clears
+        await Input("Address_ZipCode").FillAsync("62704");
+        await Input("Address_ZipCode").BlurAsync();
+
+        await Expect(ErrorFor("Address.ZipCode")).Not.ToBeVisibleAsync(new() { Timeout = 2000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Full success path with all conditions met ──────────
+
+    [Test]
+    public async Task complete_form_with_all_conditional_fields_succeeds()
+    {
+        // Fill every field on the page, including all conditional branches,
+        // and verify the server accepts the complete submission.
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        // Basic
+        await Input("Name").FillAsync("Eleanor Davis");
+        await Input("Email").FillAsync("eleanor@care.com");
+        await Input("ConfirmEmail").FillAsync("eleanor@care.com");
+        await Input("CareLevel").SelectOptionAsync("Memory Care");
+
+        // Veteran
+        await Input("IsVeteran").CheckAsync();
+        await Input("VeteranId").FillAsync("V99999");
+
+        // Care details — Memory Care requires physician + assessment
+        await Input("PhysicianName").FillAsync("Dr. Martinez");
+        await Page.EvaluateAsync($@"() => {{
+            const el = document.getElementById('{R}MemoryAssessmentScore');
+            const ej2 = el.ej2_instances[0];
+            ej2.value = 72;
+            ej2.dataBind();
+        }}");
+
+        // Emergency contact
+        await Input("HasEmergencyContact").CheckAsync();
+        await Input("EmergencyName").FillAsync("Michael Davis");
+        await Input("EmergencyPhone").FillAsync("555-9876");
+
+        // Address
+        await Input("Address_Street").FillAsync("456 Oak Lane");
+        await Input("Address_City").FillAsync("Portland");
+        await Input("Address_ZipCode").FillAsync("97201");
+
+        await SubmitBtn.ClickAsync();
+
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        await Expect(SummaryDiv).ToBeHiddenAsync();
+
+        // No inline errors should be visible
+        await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync();
+        await Expect(ErrorFor("Email")).Not.ToBeVisibleAsync();
+        await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
+        await Expect(ErrorFor("PhysicianName")).Not.ToBeVisibleAsync();
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Confirm email live-clear ───────────────────────────
+
+    [Test]
+    public async Task confirm_email_error_clears_on_blur_when_corrected()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillAllRequired();
+        await Input("Email").FillAsync("test@care.com");
+        await Input("ConfirmEmail").FillAsync("wrong@care.com");
+
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
+
+        // Fix confirm email to match, blur → error clears
+        await Input("ConfirmEmail").FillAsync("test@care.com");
+        await Input("ConfirmEmail").BlurAsync();
+
+        await Expect(ErrorFor("ConfirmEmail")).Not.ToBeVisibleAsync(new() { Timeout = 2000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── CareLevel transitions: memory assessment visibility ──
+
+    [Test]
+    public async Task switching_care_level_away_from_memory_care_removes_assessment_error()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillAllRequired();
+        await Input("CareLevel").SelectOptionAsync("Memory Care");
+        await Input("PhysicianName").FillAsync("Dr. Smith");
+
+        // Submit → MemoryAssessmentScore required
+        await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
+
+        // Switch to Assisted Living → MemoryAssessmentScore no longer required
+        await Input("CareLevel").SelectOptionAsync("Assisted Living");
+        await SubmitBtn.ClickAsync();
+
+        await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
+        AssertNoConsoleErrorsExcept("400");
+    }
 }
