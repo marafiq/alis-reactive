@@ -57,7 +57,11 @@ public class WhenDiscoveringPolymorphicTypes
                 $"{subclass.Name} is a sealed subclass of {baseType.Name} but has no Kind property");
 
             var instance = RuntimeHelpers.GetUninitializedObject(subclass);
-            var kind = (string)kindProp!.GetValue(instance)!;
+            var kind = (string?)kindProp!.GetValue(instance);
+            Assert.That(kind, Is.Not.Null,
+                $"{subclass.Name}.Kind returned null — Kind must be an expression-bodied " +
+                $"property (e.g. public string Kind => \"my-kind\"), not constructor-initialized. " +
+                $"GetUninitializedObject bypasses constructors, so constructor-set Kind will be null.");
 
             Assert.That(schemaKinds, Does.Contain(kind),
                 $"{subclass.Name} has Kind=\"{kind}\" but no matching definition exists in " +

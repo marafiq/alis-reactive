@@ -22,6 +22,13 @@ namespace Alis.Reactive
             where TModel : class
             where TComponent : IComponent, new()
         {
+            if (string.IsNullOrEmpty(componentId))
+                throw new InvalidOperationException(
+                    $"{typeof(TComponent).Name} has no element ID. " +
+                    "Ensure the component builder sets an id — for Native builders use " +
+                    "the factory method (e.g. Html.NativeTextBoxFor), for Fusion builders " +
+                    "ensure HtmlAttributes contains 'id'.");
+
             var pb = new PipelineBuilder<TModel>();
             pipeline(descriptor.Args, pb);
 
