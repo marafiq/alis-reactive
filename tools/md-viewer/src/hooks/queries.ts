@@ -150,6 +150,52 @@ export function useCreateComment() {
   });
 }
 
+// ── D2 Rendering ──
+function hashString(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + ch;
+    hash |= 0; // Convert to 32-bit int
+  }
+  return hash.toString(36);
+}
+
+export function useD2Render(source: string | null | undefined) {
+  return useQuery({
+    queryKey: ['d2-render', source ? hashString(source) : ''],
+    queryFn: () => api<{ svg: string }>('/d2/render', { method: 'POST', body: { source } }).then(r => r.svg),
+    enabled: !!source,
+    staleTime: Infinity, // SVG won't change for same source
+  });
+}
+
+// ── Decisions ──
+export interface DecisionEntry {
+  id: string;
+  story_id: string;
+  summary: string;
+  key_decisions: string; // JSON array
+  created_at: string;
+}
+
+export function useDecisions(storyId: string | null) {
+  return useQuery({
+    queryKey: ['decisions', storyId],
+    queryFn: () => api<DecisionEntry[]>(`/decisions?story_id=${storyId}`),
+    enabled: !!storyId,
+  });
+}
+
+export function useCreateDecision() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { storyId: string; summary: string; keyDecisions: string[] }) =>
+      api<{ id: string }>('/decisions', { method: 'POST', body: data }),
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['decisions', vars.storyId] }),
+  });
+}
+
 // ── Concepts ──
 export function useConcepts() {
   return useQuery({ queryKey: ['concepts'], queryFn: () => api<Concept[]>('/concepts') });

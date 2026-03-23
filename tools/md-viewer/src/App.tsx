@@ -1,5 +1,5 @@
 import { useState, createContext, useContext, type ReactNode } from 'react';
-import { usePlans, useStories, useConcepts, useReviews, useCreateVerdict } from '@/hooks/queries';
+import { usePlans, useStories, useConcepts, useReviews, useCreateVerdict, useCreateDecision } from '@/hooks/queries';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { ReviewPanel } from '@/components/layout/ReviewPanel';
@@ -65,6 +65,7 @@ function AppShell() {
   const { data: concepts = [] } = useConcepts();
   const { data: rawReviews = [] } = useReviews(view === 'board' ? selectedStoryId : null);
   const createVerdict = useCreateVerdict();
+  const createDecision = useCreateDecision();
 
   const parsedReviews = rawReviews.map(parseReview);
   const currentStory = stories.find((s) => s.id === selectedStoryId);
@@ -163,9 +164,19 @@ function AppShell() {
         <VerdictBar
           reviews={parsedReviews}
           story={currentStory}
-          onVerdict={(verdict) =>
-            createVerdict.mutate({ storyId: selectedStoryId, verdict })
-          }
+          onVerdict={(verdict) => {
+            createVerdict.mutate({ storyId: selectedStoryId, verdict });
+            if (verdict === 'approve' && parsedReviews.length > 0) {
+              const findingTitles = parsedReviews.flatMap((r) =>
+                r.findings.map((f) => `[${r.agent_role}] ${f.title}`),
+              );
+              createDecision.mutate({
+                storyId: selectedStoryId,
+                summary: 'Story approved',
+                keyDecisions: findingTitles.length > 0 ? findingTitles : ['Approved with no findings'],
+              });
+            }
+          }}
         />
       )}
 

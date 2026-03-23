@@ -67,6 +67,26 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.static(join(__dirname, 'public')));
 
 // ═══════════════════════════════════════════════════════════════════
+// D2 RENDERING API
+// ═══════════════════════════════════════════════════════════════════
+app.post('/api/d2/render', (req, res) => {
+  const { source } = req.body;
+  if (!source || typeof source !== 'string') {
+    return res.status(400).json({ error: 'source is required and must be a string' });
+  }
+  try {
+    const svg = execSync('/opt/homebrew/bin/d2 --theme 1 -', {
+      input: source,
+      encoding: 'utf-8',
+      timeout: 5000,
+    });
+    res.json({ svg });
+  } catch (e) {
+    res.status(422).json({ error: e.message || 'D2 rendering failed' });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
 // PLANS API
 // ═══════════════════════════════════════════════════════════════════
 app.get('/api/plans', (req, res) => {

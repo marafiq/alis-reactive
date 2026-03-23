@@ -7,6 +7,7 @@ import {
   useStories,
   useUpdatePlan,
   useCreatePlan,
+  useD2Render,
 } from '@/hooks/queries';
 import type { Plan, Story, Goal } from '@/lib/types';
 import { parseJson, investScores, INVEST_LABELS } from '@/lib/types';
@@ -176,6 +177,41 @@ function PlanForm({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ── D2 Diagram (renders via server-side d2 CLI) ──
+
+function D2Diagram({ source }: { source: string }) {
+  const { data: svg, isLoading, isError } = useD2Render(source);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center rounded-lg border border-border bg-white p-12">
+        <div className="flex items-center gap-2 text-muted-foreground text-sm">
+          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          Rendering D2 diagram...
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !svg) {
+    return (
+      <div className="bg-[#1a1614] text-[#e8e2da] rounded-lg p-6 font-mono text-sm leading-relaxed whitespace-pre-wrap">
+        {source}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="rounded-lg border border-border bg-white p-6 overflow-auto"
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  );
+}
+
 // ── PlanView ──
 
 interface PlanViewProps {
@@ -342,15 +378,13 @@ export function PlanView({ planId, onSelectStory }: PlanViewProps) {
         </section>
       )}
 
-      {/* Architecture (D2 Placeholder) */}
+      {/* Architecture (D2 Diagram) */}
       <section>
         <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mb-3">
           Architecture
         </h2>
         {plan.d2_diagram ? (
-          <div className="bg-[#1a1614] text-[#e8e2da] rounded-lg p-6 font-mono text-sm leading-relaxed whitespace-pre-wrap">
-            {plan.d2_diagram}
-          </div>
+          <D2Diagram source={plan.d2_diagram} />
         ) : (
           <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/50 text-center">
             <pre className="font-mono text-xs text-muted-foreground">
