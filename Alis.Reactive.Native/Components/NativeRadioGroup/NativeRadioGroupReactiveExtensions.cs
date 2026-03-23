@@ -1,7 +1,5 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -17,8 +15,6 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeRadioGroupReactiveExtensions
     {
-        private static readonly NativeRadioGroup _component = new NativeRadioGroup();
-
         public static NativeRadioGroupBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeRadioGroupBuilder<TModel, TProp> builder,
             IReactivePlan<TModel> plan,
@@ -27,21 +23,12 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var descriptor = eventSelector(NativeRadioGroupEvents.Instance);
-
             for (int i = 0; i < builder.Options.Count; i++)
             {
-                var pb = new PipelineBuilder<TModel>();
-                pipeline(descriptor.Args, pb);
-
-                var radioId = $"{builder.ElementId}_r{i}";
-                var trigger = new ComponentEventTrigger(
-                    radioId, descriptor.JsEvent, _component.Vendor,
-                    builder.BindingPath, _component.ReadExpr);
-
-                foreach (var reaction in pb.BuildReactions())
-                    plan.AddEntry(new Entry(trigger, reaction));
+                ReactiveWiringHelper.Wire<TModel, NativeRadioGroup, TArgs>(
+                    plan, $"{builder.ElementId}_r{i}", builder.BindingPath,
+                    descriptor, pipeline);
             }
-
             return builder;
         }
     }

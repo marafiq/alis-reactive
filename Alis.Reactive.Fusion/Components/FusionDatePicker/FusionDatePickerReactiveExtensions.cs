@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 using Syncfusion.EJ2.Calendars;
 
 namespace Alis.Reactive.Fusion.Components
@@ -20,8 +18,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class FusionDatePickerReactiveExtensions
     {
-        private static readonly FusionDatePicker Component = new FusionDatePicker();
-
         public static DatePickerBuilder Reactive<TModel, TArgs>(
             this DatePickerBuilder builder,
             IReactivePlan<TModel> plan,
@@ -29,18 +25,10 @@ namespace Alis.Reactive.Fusion.Components
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(FusionDatePickerEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
-
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
-            var componentId = (string)attrs["id"];
-            var bindingPath = (string)attrs["name"];
-
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, Component.Vendor, bindingPath, Component.ReadExpr);
-            foreach (var reaction in pb.BuildReactions())
-                plan.AddEntry(new Entry(trigger, reaction));
-
+            ReactiveWiringHelper.Wire<TModel, FusionDatePicker, TArgs>(
+                plan, (string)attrs["id"], (string)attrs["name"],
+                eventSelector(FusionDatePickerEvents.Instance), pipeline);
             return builder;
         }
     }

@@ -44,5 +44,19 @@ namespace Alis.Reactive.Descriptors.Triggers
             BindingPath = bindingPath;
             ReadExpr = readExpr;
         }
+
+        /// <summary>
+        /// Factory that resolves Vendor and ReadExpr from TComponent's interface declarations.
+        /// Centralizes trigger construction — all .Reactive() extensions call this instead of
+        /// manually assembling 5 constructor args.
+        /// </summary>
+        public static ComponentEventTrigger For<TComponent>(
+            string componentId, string jsEvent, string? bindingPath = null)
+            where TComponent : IComponent, new()
+        {
+            var component = new TComponent();
+            var readExpr = (component is IInputComponent input) ? input.ReadExpr : null;
+            return new ComponentEventTrigger(componentId, jsEvent, component.Vendor, bindingPath, readExpr);
+        }
     }
 }
