@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useParams, Link } from '@tanstack/react-router';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import { cn } from '@/lib/utils';
@@ -9,8 +10,13 @@ import {
   useCreatePlan,
   useD2Render,
 } from '@/hooks/queries';
+import { InvestBadges, SizeBadge, StatusBadge } from '@/components/ui/badges';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
 import type { Plan, Story, Goal } from '@/lib/types';
-import { parseJson, investScores, INVEST_LABELS } from '@/lib/types';
+import { parseJson } from '@/lib/types';
 
 // ── Marked config (highlight.js via custom renderer) ──
 
@@ -23,75 +29,6 @@ renderer.code = function ({ text, lang }: { text: string; lang?: string }) {
   return `<pre><code class="hljs${language ? ` language-${language}` : ''}">${highlighted}</code></pre>`;
 };
 marked.use({ renderer });
-
-// ── INVEST badge (inline, reusable) ──
-
-function InvestBadges({ story }: { story: Story }) {
-  const scores = investScores(story);
-  return (
-    <span className="inline-flex gap-0.5">
-      {(Object.entries(scores) as [string, boolean][]).map(([letter, pass]) => (
-        <span
-          key={letter}
-          title={INVEST_LABELS[letter]}
-          className={cn(
-            'inline-flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold leading-none',
-            pass
-              ? 'bg-approve-light text-approve'
-              : 'bg-muted text-muted-foreground',
-          )}
-        >
-          {letter}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-// ── Size badge ──
-
-const SIZE_COLORS: Record<string, string> = {
-  S: 'bg-approve-light text-approve',
-  M: 'bg-changes-light text-changes',
-  L: 'bg-blocker-light text-blocker',
-};
-
-function SizeBadge({ size }: { size: string | null }) {
-  if (!size) return <span className="text-muted-foreground text-xs">--</span>;
-  return (
-    <span
-      className={cn(
-        'inline-block px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider',
-        SIZE_COLORS[size] ?? 'bg-muted text-muted-foreground',
-      )}
-    >
-      {size}
-    </span>
-  );
-}
-
-// ── Status badge ──
-
-const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-muted text-muted-foreground',
-  ready: 'bg-blue-100 text-blue-700',
-  'in-progress': 'bg-changes-light text-changes',
-  review: 'bg-conflict-light text-conflict',
-  done: 'bg-approve-light text-approve',
-};
-
-function StatusBadge({ status }: { status: string }) {
-  return (
-    <span
-      className={cn(
-        'inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider',
-        STATUS_COLORS[status] ?? 'bg-muted text-muted-foreground',
-      )}
-    >
-      {status}
-    </span>
-  );
-}
 
 // ── Plan Form ──
 
@@ -111,69 +48,63 @@ function PlanForm({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="border border-border rounded-lg p-4 bg-card space-y-3"
-    >
-      <h3 className="text-sm font-semibold text-foreground">New Plan</h3>
+    <Card>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <h3 className="text-sm font-semibold text-foreground">New Plan</h3>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground mb-1">
-            Plan ID
-          </label>
-          <input
-            type="text"
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            placeholder="e.g. reactive-reader-v3"
-            className="w-full px-3 py-1.5 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground mb-1">
-            Title
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Reactive Reader v3"
-            className="w-full px-3 py-1.5 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-          />
-        </div>
-      </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                Plan ID
+              </label>
+              <Input
+                type="text"
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+                placeholder="e.g. reactive-reader-v3"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                Title
+              </label>
+              <Input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Reactive Reader v3"
+              />
+            </div>
+          </div>
 
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-1">
-          Master Prompt
-        </label>
-        <textarea
-          value={masterPrompt}
-          onChange={(e) => setMasterPrompt(e.target.value)}
-          rows={3}
-          placeholder="Describe the plan's mission..."
-          className="w-full px-3 py-1.5 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-        />
-      </div>
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">
+              Master Prompt
+            </label>
+            <Textarea
+              value={masterPrompt}
+              onChange={(e) => setMasterPrompt(e.target.value)}
+              rows={3}
+              placeholder="Describe the plan's mission..."
+            />
+          </div>
 
-      <div className="flex items-center gap-2 justify-end">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-3 py-1.5 text-xs rounded-md border border-border text-muted-foreground hover:bg-muted transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={createPlan.isPending || !id.trim() || !title.trim()}
-          className="px-3 py-1.5 text-xs rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
-        >
-          {createPlan.isPending ? 'Creating...' : 'Create Plan'}
-        </button>
-      </div>
-    </form>
+          <div className="flex items-center gap-2 justify-end">
+            <Button type="button" variant="outline" size="sm" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={createPlan.isPending || !id.trim() || !title.trim()}
+            >
+              {createPlan.isPending ? 'Creating...' : 'Create Plan'}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -214,12 +145,8 @@ function D2Diagram({ source }: { source: string }) {
 
 // ── PlanView ──
 
-interface PlanViewProps {
-  planId: string;
-  onSelectStory: (storyId: string) => void;
-}
-
-export function PlanView({ planId, onSelectStory }: PlanViewProps) {
+export function PlanView() {
+  const { planId } = useParams({ from: '/plans/$planId' });
   const { data: plan, isLoading: planLoading } = usePlan(planId);
   const { data: stories = [] } = useStories(planId);
   const updatePlan = useUpdatePlan();
@@ -271,12 +198,9 @@ export function PlanView({ planId, onSelectStory }: PlanViewProps) {
           <h1 className="text-2xl font-semibold text-foreground">{plan.title}</h1>
           <div className="flex items-center gap-2 shrink-0">
             <StatusBadge status={plan.status} />
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="px-3 py-1 text-xs rounded-md border border-border text-muted-foreground hover:bg-muted transition-colors"
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowForm(!showForm)}>
               + New Plan
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -388,12 +312,12 @@ export function PlanView({ planId, onSelectStory }: PlanViewProps) {
         ) : (
           <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/50 text-center">
             <pre className="font-mono text-xs text-muted-foreground">
-              {`┌─────────────────────────┐
-│   D2 Architecture       │
-│   Diagram Placeholder   │
-│                         │
-│   d2_diagram is null    │
-└─────────────────────────┘`}
+              {`\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510
+\u2502   D2 Architecture       \u2502
+\u2502   Diagram Placeholder   \u2502
+\u2502                         \u2502
+\u2502   d2_diagram is null    \u2502
+\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518`}
             </pre>
             <p className="mt-3 text-xs text-muted-foreground">
               Add a D2 diagram to the plan to render it here.
@@ -427,7 +351,7 @@ export function PlanView({ planId, onSelectStory }: PlanViewProps) {
                   <th className="text-center px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground w-[100px]">
                     Status
                   </th>
-                  <th className="text-center px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground w-[100px]">
+                  <th className="text-center px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground w-[120px]">
                     INVEST
                   </th>
                 </tr>
@@ -436,16 +360,27 @@ export function PlanView({ planId, onSelectStory }: PlanViewProps) {
                 {stories.map((story) => (
                   <tr
                     key={story.id}
-                    onClick={() => onSelectStory(story.id)}
-                    className="border-t border-border hover:bg-muted/40 cursor-pointer transition-colors"
+                    className="border-t border-border hover:bg-muted/40 transition-colors"
                   >
-                    <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">
-                      {story.id.length > 10
-                        ? story.id.slice(0, 10) + '...'
-                        : story.id}
+                    <td className="px-4 py-2.5">
+                      <Link
+                        to="/stories/$storyId"
+                        params={{ storyId: story.id }}
+                        className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        {story.id.length > 10
+                          ? story.id.slice(0, 10) + '...'
+                          : story.id}
+                      </Link>
                     </td>
-                    <td className="px-4 py-2.5 font-medium text-foreground">
-                      {story.title}
+                    <td className="px-4 py-2.5">
+                      <Link
+                        to="/stories/$storyId"
+                        params={{ storyId: story.id }}
+                        className="font-medium text-foreground hover:text-primary transition-colors"
+                      >
+                        {story.title}
+                      </Link>
                     </td>
                     <td className="px-4 py-2.5 text-center">
                       <SizeBadge size={story.size} />

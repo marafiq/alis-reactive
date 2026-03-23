@@ -1,14 +1,23 @@
+import { useState } from 'react';
+import { Link, useRouterState } from '@tanstack/react-router';
+import { LayoutDashboard, Columns3, Network, FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { usePlans, useStories, useConcepts } from '@/hooks/queries';
+import { SizeBadge } from '@/components/ui/badges';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { parseJson, type Plan, type Story, type Concept, type Goal } from '@/lib/types';
-import type { View } from '@/App';
 
 // ── Nav items ──
 
-const NAV_ITEMS: { view: View; icon: string; label: string }[] = [
-  { view: 'plans', icon: '\u25C7', label: 'Plans' },
-  { view: 'board', icon: '\u2592', label: 'Board' },
-  { view: 'knowledge', icon: '\u25CE', label: 'Knowledge' },
-  { view: 'files', icon: '\u2261', label: 'Files' },
+type TabKey = 'plans' | 'board' | 'knowledge' | 'files';
+
+const NAV_ITEMS: { key: TabKey; icon: React.ElementType; label: string; to: string }[] = [
+  { key: 'plans', icon: LayoutDashboard, label: 'Plans', to: '/plans' },
+  { key: 'board', icon: Columns3, label: 'Board', to: '/board' },
+  { key: 'knowledge', icon: Network, label: 'Knowledge', to: '/knowledge' },
+  { key: 'files', icon: FolderOpen, label: 'Files', to: '/plans' },
 ];
 
 const STATUS_COLORS: Record<string, string> = {
@@ -19,39 +28,49 @@ const STATUS_COLORS: Record<string, string> = {
   done:          'bg-emerald-400',
 };
 
-const SIZE_STYLES: Record<string, string> = {
-  S: 'bg-emerald-500/20 text-emerald-300',
-  M: 'bg-amber-500/20 text-amber-300',
-  L: 'bg-rose-500/20 text-rose-300',
-};
+// ── Determine active tab from current route ──
 
-// ── Props ──
+function useActiveTab(): TabKey {
+  const location = useRouterState({ select: (s) => s.location });
+  const path = location.pathname;
+  if (path.startsWith('/board')) return 'board';
+  if (path.startsWith('/stories')) return 'board';
+  if (path.startsWith('/knowledge')) return 'knowledge';
+  return 'plans';
+}
 
-interface SidebarProps {
-  view: View;
-  plans: Plan[];
-  stories: Story[];
-  concepts: Concept[];
-  selectedId: string | null;
-  searchQuery: string;
-  onSwitchView: (view: View) => void;
-  onSelect: (id: string) => void;
-  onSearch: (query: string) => void;
+// ── Determine selected IDs from current route ──
+
+function useSelectedIds() {
+  const location = useRouterState({ select: (s) => s.location });
+  const path = location.pathname;
+
+  let selectedPlanId: string | null = null;
+  let selectedStoryId: string | null = null;
+  let selectedConceptName: string | null = null;
+
+  const planMatch = path.match(/^\/plans\/(.+)$/);
+  if (planMatch) selectedPlanId = decodeURIComponent(planMatch[1]);
+
+  const storyMatch = path.match(/^\/stories\/(.+)$/);
+  if (storyMatch) selectedStoryId = decodeURIComponent(storyMatch[1]);
+
+  const conceptMatch = path.match(/^\/knowledge\/(.+)$/);
+  if (conceptMatch) selectedConceptName = decodeURIComponent(conceptMatch[1]);
+
+  return { selectedPlanId, selectedStoryId, selectedConceptName };
 }
 
 // ── Component ──
 
-export function Sidebar({
-  view,
-  plans,
-  stories,
-  concepts,
-  selectedId,
-  searchQuery,
-  onSwitchView,
-  onSelect,
-  onSearch,
-}: SidebarProps) {
+export function Sidebar() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const activeTab = useActiveTab();
+  const { selectedPlanId, selectedStoryId, selectedConceptName } = useSelectedIds();
+  const { data: plans = [] } = usePlans();
+  const { data: stories = [] } = useStories();
+  const { data: concepts = [] } = useConcepts();
+
   const q = searchQuery.toLowerCase();
 
   return (
@@ -71,21 +90,21 @@ export function Sidebar({
 
       {/* ── Nav Tabs ── */}
       <nav className="px-3 mb-2">
-        <div className="flex gap-0.5 bg-white/5 rounded-lg p-0.5">
-          {NAV_ITEMS.map(({ view: v, icon, label }) => (
-            <button
-              key={v}
-              onClick={() => onSwitchView(v)}
+        <div className="flex gap-1 bg-white/5 rounded-lg p-0.5">
+          {NAV_ITEMS.map(({ key, icon: Icon, label, to }) => (
+            <Link
+              key={key}
+              to={to}
               className={cn(
-                'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-[11px] font-medium transition-all duration-150',
-                view === v
-                  ? 'bg-sidebar-active text-white shadow-sm'
-                  : 'text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5',
+                'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-1.5 rounded-md text-[11px] font-medium transition-all duration-150',
+                activeTab === key
+                  ? 'bg-white/10 text-white shadow-sm'
+                  : 'text-[#6b5f54] hover:text-sidebar-foreground hover:bg-white/5',
               )}
             >
-              <span className="text-xs">{icon}</span>
-              <span>{label}</span>
-            </button>
+              <Icon size={16} className="shrink-0" />
+              <span className="truncate">{label}</span>
+            </Link>
           ))}
         </div>
       </nav>
@@ -93,19 +112,19 @@ export function Sidebar({
       {/* ── Search ── */}
       <div className="px-3 mb-3">
         <div className="relative">
-          <input
+          <Input
             type="text"
             value={searchQuery}
-            onChange={(e) => onSearch(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search..."
-            className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-1.5 text-[12px] text-sidebar-foreground placeholder:text-sidebar-muted/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors"
+            className="w-full bg-white/5 border-white/10 text-[12px] text-sidebar-foreground placeholder:text-sidebar-muted/60 h-7 focus-visible:border-primary/50 focus-visible:ring-primary/30"
           />
           {searchQuery && (
             <button
-              onClick={() => onSearch('')}
+              onClick={() => setSearchQuery('')}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-sidebar-muted hover:text-sidebar-foreground text-xs"
             >
-              \u2715
+              {'\u2715'}
             </button>
           )}
         </div>
@@ -113,16 +132,16 @@ export function Sidebar({
 
       {/* ── Content ── */}
       <div className="flex-1 overflow-y-auto px-3 pb-3">
-        {view === 'plans' && (
-          <PlansList plans={plans} selectedId={selectedId} query={q} onSelect={onSelect} />
+        {activeTab === 'plans' && (
+          <PlansList plans={plans} selectedId={selectedPlanId} query={q} />
         )}
-        {view === 'board' && (
-          <StoriesList stories={stories} selectedId={selectedId} query={q} onSelect={onSelect} />
+        {activeTab === 'board' && (
+          <StoriesList stories={stories} selectedId={selectedStoryId} query={q} />
         )}
-        {view === 'knowledge' && (
-          <ConceptsList concepts={concepts} selectedId={selectedId} query={q} onSelect={onSelect} />
+        {activeTab === 'knowledge' && (
+          <ConceptsList concepts={concepts} selectedId={selectedConceptName} query={q} />
         )}
-        {view === 'files' && (
+        {activeTab === 'files' && (
           <div className="px-2 py-8 text-center">
             <p className="text-sidebar-muted text-[12px]">File browser coming soon.</p>
           </div>
@@ -138,12 +157,10 @@ function PlansList({
   plans,
   selectedId,
   query,
-  onSelect,
 }: {
   plans: Plan[];
   selectedId: string | null;
   query: string;
-  onSelect: (id: string) => void;
 }) {
   const filtered = plans.filter((p) => !query || p.title.toLowerCase().includes(query));
 
@@ -157,11 +174,12 @@ function PlansList({
         const isSelected = selectedId === plan.id;
 
         return (
-          <button
+          <Link
             key={plan.id}
-            onClick={() => onSelect(plan.id)}
+            to="/plans/$planId"
+            params={{ planId: plan.id }}
             className={cn(
-              'w-full text-left px-3 py-2 rounded-lg transition-all duration-150 group',
+              'w-full text-left px-3 py-2 rounded-lg transition-all duration-150 group block',
               isSelected
                 ? 'bg-sidebar-active text-white'
                 : 'hover:bg-white/5 text-sidebar-foreground',
@@ -180,12 +198,12 @@ function PlansList({
                 </div>
               </div>
               {goals.length > 0 && (
-                <span className="flex-shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/10 text-sidebar-foreground tabular-nums">
+                <Badge variant="secondary" className="flex-shrink-0 text-[10px] font-medium bg-white/10 text-sidebar-foreground border-0 h-auto py-0.5 px-1.5 tabular-nums">
                   {doneCount}/{goals.length}
-                </span>
+                </Badge>
               )}
             </div>
-          </button>
+          </Link>
         );
       })}
       <NewItemLink label="+ New Plan" />
@@ -199,12 +217,10 @@ function StoriesList({
   stories,
   selectedId,
   query,
-  onSelect,
 }: {
   stories: Story[];
   selectedId: string | null;
   query: string;
-  onSelect: (id: string) => void;
 }) {
   const filtered = stories.filter((s) => !query || s.title.toLowerCase().includes(query));
 
@@ -218,43 +234,39 @@ function StoriesList({
       {groups.length === 0 && <EmptyState text="No stories found" />}
       {groups.map(([status, items]) => (
         <div key={status} className="space-y-0.5">
-          <div className="flex items-center gap-2 px-2 mb-1">
+          <div className="flex items-center gap-2 px-2 mt-2 mb-1.5">
             <span className={cn('w-2 h-2 rounded-full', STATUS_COLORS[status])} />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-muted">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-sidebar-muted">
               {status.replace('-', ' ')}
             </span>
-            <span className="text-[10px] text-sidebar-muted/60">{items.length}</span>
+            <span className="text-[9px] text-sidebar-muted/60">{items.length}</span>
           </div>
           {items.map((story) => {
             const isSelected = selectedId === story.id;
             return (
-              <button
+              <Link
                 key={story.id}
-                onClick={() => onSelect(story.id)}
+                to="/stories/$storyId"
+                params={{ storyId: story.id }}
                 className={cn(
-                  'w-full text-left px-3 py-1.5 rounded-lg transition-all duration-150 group',
+                  'w-full text-left px-3 py-1.5 rounded-lg transition-all duration-150 group block',
                   isSelected
                     ? 'bg-sidebar-active text-white'
                     : 'hover:bg-white/5 text-sidebar-foreground',
                 )}
               >
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-start justify-between gap-2">
                   <span className={cn(
-                    'text-[12px] leading-snug truncate',
+                    'text-[12px] leading-snug line-clamp-2',
                     isSelected ? 'text-white font-medium' : 'group-hover:text-white',
                   )}>
                     {story.title}
                   </span>
                   {story.size && (
-                    <span className={cn(
-                      'flex-shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded',
-                      SIZE_STYLES[story.size] ?? 'bg-white/10 text-sidebar-foreground',
-                    )}>
-                      {story.size}
-                    </span>
+                    <SizeBadge size={story.size} className="shrink-0 mt-0.5" />
                   )}
                 </div>
-              </button>
+              </Link>
             );
           })}
         </div>
@@ -270,12 +282,10 @@ function ConceptsList({
   concepts,
   selectedId,
   query,
-  onSelect,
 }: {
   concepts: Concept[];
   selectedId: string | null;
   query: string;
-  onSelect: (id: string) => void;
 }) {
   const filtered = concepts.filter((c) => !query || c.name.toLowerCase().includes(query));
   const sorted = [...filtered].sort((a, b) => b.link_count - a.link_count);
@@ -287,11 +297,12 @@ function ConceptsList({
       {sorted.map((concept) => {
         const isSelected = selectedId === concept.name;
         return (
-          <button
+          <Link
             key={concept.id}
-            onClick={() => onSelect(concept.name)}
+            to="/knowledge/$concept"
+            params={{ concept: concept.name }}
             className={cn(
-              'w-full text-left px-3 py-1.5 rounded-lg transition-all duration-150 group',
+              'w-full text-left px-3 py-1.5 rounded-lg transition-all duration-150 group block',
               isSelected
                 ? 'bg-sidebar-active text-white'
                 : 'hover:bg-white/5 text-sidebar-foreground',
@@ -308,7 +319,7 @@ function ConceptsList({
                 {concept.link_count} link{concept.link_count !== 1 ? 's' : ''}
               </span>
             </div>
-          </button>
+          </Link>
         );
       })}
     </div>

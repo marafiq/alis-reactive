@@ -1,13 +1,9 @@
+import { useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useConceptLinks } from '@/hooks/queries';
 import type { ConceptLink } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { ArrowLeft, Loader2, AlertCircle, Link2 } from 'lucide-react';
-
-interface ConceptDetailProps {
-  conceptName: string;
-  onBack?: () => void;
-  onNavigate: (type: ConceptLink['entity_type'], id: string) => void;
-}
+import { Button } from '@/components/ui/button';
 
 const TYPE_BADGE_STYLES: Record<ConceptLink['entity_type'], string> = {
   plan: 'bg-purple-100 text-purple-800',
@@ -31,13 +27,21 @@ function TypeBadge({ type }: { type: ConceptLink['entity_type'] }) {
 
 function TimelineCard({
   link,
-  onClick,
   isLast,
 }: {
   link: ConceptLink;
-  onClick: () => void;
   isLast: boolean;
 }) {
+  const navigate = useNavigate();
+
+  function handleClick() {
+    if (link.entity_type === 'plan') {
+      navigate({ to: '/plans/$planId', params: { planId: link.entity_id } });
+    } else if (link.entity_type === 'story') {
+      navigate({ to: '/stories/$storyId', params: { storyId: link.entity_id } });
+    }
+  }
+
   return (
     <div className="relative flex gap-4">
       {/* Timeline line + dot */}
@@ -49,7 +53,7 @@ function TimelineCard({
       {/* Card */}
       <button
         type="button"
-        onClick={onClick}
+        onClick={handleClick}
         className={cn(
           'mb-4 flex w-full flex-col gap-2 rounded-lg border border-gray-200 bg-white p-4',
           'text-left transition-all duration-150',
@@ -76,11 +80,8 @@ function TimelineCard({
   );
 }
 
-export function ConceptDetail({
-  conceptName,
-  onBack,
-  onNavigate,
-}: ConceptDetailProps) {
+export function ConceptDetail() {
+  const { concept: conceptName } = useParams({ from: '/knowledge/$concept' });
   const { data: links, isLoading, error } = useConceptLinks(conceptName);
 
   const referenceCount = links?.length ?? 0;
@@ -89,20 +90,17 @@ export function ConceptDetail({
     <div className="mx-auto max-w-3xl px-6 py-8">
       {/* Header */}
       <div className="mb-8">
-        {onBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            className={cn(
-              'mb-4 inline-flex items-center gap-1.5 text-sm text-gray-500',
-              'transition-colors hover:text-[#7A2E3B]',
-              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7A2E3B]',
-            )}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            All concepts
-          </button>
-        )}
+        <Link
+          to="/knowledge"
+          className={cn(
+            'mb-4 inline-flex items-center gap-1.5 text-sm text-gray-500',
+            'transition-colors hover:text-[#7A2E3B]',
+            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7A2E3B]',
+          )}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          All concepts
+        </Link>
 
         <div className="flex items-start gap-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#7A2E3B]/10">
@@ -159,7 +157,6 @@ export function ConceptDetail({
             <TimelineCard
               key={`${link.entity_type}-${link.entity_id}`}
               link={link}
-              onClick={() => onNavigate(link.entity_type, link.entity_id)}
               isLast={index === links.length - 1}
             />
           ))}

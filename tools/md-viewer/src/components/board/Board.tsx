@@ -1,64 +1,20 @@
 import { useMemo } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
 import { useStories } from '@/hooks/queries';
+import { InvestBadges, SizeBadge } from '@/components/ui/badges';
+import { Card, CardContent } from '@/components/ui/card';
 import type { Story } from '@/lib/types';
-import { investScores, INVEST_LABELS } from '@/lib/types';
 
 // ── Column config ──
 
 const COLUMNS = [
-  { key: 'draft', label: 'Draft', color: 'text-muted-foreground' },
-  { key: 'ready', label: 'Ready', color: 'text-blue-600' },
-  { key: 'in-progress', label: 'In Progress', color: 'text-changes' },
-  { key: 'review', label: 'Review', color: 'text-conflict' },
-  { key: 'done', label: 'Done', color: 'text-approve' },
+  { key: 'draft', label: 'Draft', countColor: 'bg-gray-200 text-gray-600' },
+  { key: 'ready', label: 'Ready', countColor: 'bg-blue-100 text-blue-700' },
+  { key: 'in-progress', label: 'In Progress', countColor: 'bg-amber-100 text-amber-700' },
+  { key: 'review', label: 'Review', countColor: 'bg-violet-100 text-violet-700' },
+  { key: 'done', label: 'Done', countColor: 'bg-emerald-100 text-emerald-700' },
 ] as const;
-
-// ── INVEST badges (tiny) ──
-
-function InvestBadgesTiny({ story }: { story: Story }) {
-  const scores = investScores(story);
-  return (
-    <span className="inline-flex gap-px">
-      {(Object.entries(scores) as [string, boolean][]).map(([letter, pass]) => (
-        <span
-          key={letter}
-          title={INVEST_LABELS[letter]}
-          className={cn(
-            'inline-flex items-center justify-center w-3.5 h-3.5 rounded-sm text-[8px] font-bold leading-none',
-            pass
-              ? 'bg-approve-light text-approve'
-              : 'bg-muted text-muted-foreground',
-          )}
-        >
-          {letter}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-// ── Size badge (compact) ──
-
-const SIZE_COLORS: Record<string, string> = {
-  S: 'bg-approve-light text-approve',
-  M: 'bg-changes-light text-changes',
-  L: 'bg-blocker-light text-blocker',
-};
-
-function SizeBadge({ size }: { size: string | null }) {
-  if (!size) return null;
-  return (
-    <span
-      className={cn(
-        'inline-block px-1 py-px rounded text-[9px] font-bold uppercase tracking-wider',
-        SIZE_COLORS[size] ?? 'bg-muted text-muted-foreground',
-      )}
-    >
-      {size}
-    </span>
-  );
-}
 
 // ── Story card ──
 
@@ -72,21 +28,21 @@ function StoryCard({ story, onClick }: StoryCardProps) {
     <button
       onClick={onClick}
       className={cn(
-        'w-full text-left bg-card border border-border rounded-lg p-3 space-y-2',
-        'hover:shadow-md hover:-translate-y-0.5 transition-all duration-150',
+        'w-full text-left bg-card shadow-sm border border-border rounded-lg p-3 space-y-2',
+        'hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-150',
         'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring',
       )}
     >
-      <div className="font-medium text-sm text-foreground leading-snug">
+      <div className="font-semibold text-sm text-foreground leading-snug">
         {story.title}
       </div>
       <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-[10px] text-muted-foreground truncate">
+        <span className="font-mono text-xs text-muted-foreground truncate">
           {story.id}
         </span>
         <div className="flex items-center gap-1.5 shrink-0">
           <SizeBadge size={story.size} />
-          <InvestBadgesTiny story={story} />
+          <InvestBadges story={story} size="sm" />
         </div>
       </div>
     </button>
@@ -97,25 +53,23 @@ function StoryCard({ story, onClick }: StoryCardProps) {
 
 interface ColumnProps {
   label: string;
-  color: string;
+  countColor: string;
   stories: Story[];
   onSelectStory: (storyId: string) => void;
 }
 
-function Column({ label, color, stories, onSelectStory }: ColumnProps) {
+function Column({ label, countColor, stories, onSelectStory }: ColumnProps) {
   return (
-    <div className="flex flex-col min-w-[220px] flex-1">
+    <div className="flex flex-col min-w-[200px] flex-1">
       {/* Column header */}
       <div className="flex items-center gap-2 mb-3 px-1">
-        <h3
-          className={cn(
-            'text-[10px] font-bold uppercase tracking-[0.15em]',
-            color,
-          )}
-        >
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
           {label}
         </h3>
-        <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-muted text-muted-foreground text-[10px] font-semibold px-1">
+        <span className={cn(
+          'inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full text-[10px] font-semibold px-1',
+          countColor,
+        )}>
           {stories.length}
         </span>
       </div>
@@ -123,8 +77,8 @@ function Column({ label, color, stories, onSelectStory }: ColumnProps) {
       {/* Cards */}
       <div className="flex-1 space-y-2 min-h-[120px]">
         {stories.length === 0 && (
-          <div className="border border-dashed border-border rounded-lg p-4 flex items-center justify-center">
-            <span className="text-[11px] text-muted-foreground">No stories</span>
+          <div className="border border-dashed border-border rounded-lg p-4 flex items-center justify-center min-h-[80px]">
+            <span className="text-sm text-muted-foreground">No stories</span>
           </div>
         )}
         {stories.map((story) => (
@@ -141,13 +95,9 @@ function Column({ label, color, stories, onSelectStory }: ColumnProps) {
 
 // ── Board ──
 
-interface BoardProps {
-  planId?: string;
-  onSelectStory: (storyId: string) => void;
-}
-
-export function Board({ planId, onSelectStory }: BoardProps) {
-  const { data: stories = [], isLoading } = useStories(planId);
+export function Board() {
+  const navigate = useNavigate();
+  const { data: stories = [], isLoading } = useStories();
 
   const grouped = useMemo(() => {
     const map: Record<string, Story[]> = {
@@ -164,6 +114,10 @@ export function Board({ planId, onSelectStory }: BoardProps) {
     }
     return map;
   }, [stories]);
+
+  function handleSelectStory(storyId: string) {
+    navigate({ to: '/stories/$storyId', params: { storyId } });
+  }
 
   if (isLoading) {
     return (
@@ -193,9 +147,9 @@ export function Board({ planId, onSelectStory }: BoardProps) {
           <Column
             key={col.key}
             label={col.label}
-            color={col.color}
+            countColor={col.countColor}
             stories={grouped[col.key]}
-            onSelectStory={onSelectStory}
+            onSelectStory={handleSelectStory}
           />
         ))}
       </div>

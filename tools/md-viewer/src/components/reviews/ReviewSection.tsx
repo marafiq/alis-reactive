@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { VerdictBadge } from '@/components/ui/badges';
 import type { Review, Story, ParsedReview } from '@/lib/types';
 import {
   parseReview,
@@ -8,14 +9,6 @@ import {
   confidenceLevel,
   type AgentRole,
 } from '@/lib/types';
-
-// ── Verdict colors ──
-
-const VERDICT_STYLES: Record<string, string> = {
-  approve: 'bg-approve-light text-approve',
-  object: 'bg-blocker-light text-blocker',
-  'approve-with-notes': 'bg-changes-light text-changes',
-};
 
 // ── Confidence dots ──
 
@@ -99,7 +92,7 @@ export function ReviewSection({
 
       {/* Consensus bar */}
       <div className="space-y-2">
-        <div className="h-3 w-full rounded-full bg-muted overflow-hidden flex">
+        <div className="h-2 w-full rounded-full bg-muted overflow-hidden flex">
           <div
             className="h-full bg-approve transition-all duration-500"
             style={{ width: `${approvePct}%` }}
@@ -137,8 +130,8 @@ export function ReviewSection({
               key={review.id}
               onClick={() => onSelectReview(review)}
               className={cn(
-                'text-left border border-border rounded-lg p-3.5 space-y-2.5',
-                'bg-card hover:shadow-md hover:-translate-y-0.5 transition-all duration-150',
+                'text-left shadow-sm border border-border rounded-lg p-3.5 space-y-2.5',
+                'bg-card hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-150',
                 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring',
               )}
             >
@@ -147,14 +140,7 @@ export function ReviewSection({
                 <span className="text-sm font-semibold text-foreground leading-snug">
                   {roleName}
                 </span>
-                <span
-                  className={cn(
-                    'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider',
-                    VERDICT_STYLES[review.verdict] ?? 'bg-muted text-muted-foreground',
-                  )}
-                >
-                  {verdictLabel(review.verdict)}
-                </span>
+                <VerdictBadge verdict={review.verdict} label={verdictLabel(review.verdict)} />
               </div>
 
               {/* Counts */}

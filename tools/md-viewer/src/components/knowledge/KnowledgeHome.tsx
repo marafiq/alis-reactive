@@ -1,46 +1,14 @@
+import { Link } from '@tanstack/react-router';
 import { useConcepts } from '@/hooks/queries';
 import type { Concept } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { BookOpen, Loader2, AlertCircle } from 'lucide-react';
 
-interface KnowledgeHomeProps {
-  onSelectConcept: (name: string) => void;
-}
-
-const ENTITY_BADGE_STYLES: Record<string, string> = {
-  plan: 'bg-purple-100 text-purple-800',
-  story: 'bg-violet-100 text-violet-800',
-  review: 'bg-amber-100 text-amber-800',
-  file: 'bg-gray-100 text-gray-700',
-};
-
-function EntityBadge({ type }: { type: string }) {
+function ConceptCard({ concept }: { concept: Concept }) {
   return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide',
-        ENTITY_BADGE_STYLES[type] ?? 'bg-gray-100 text-gray-600',
-      )}
-    >
-      {type}
-    </span>
-  );
-}
-
-function ConceptCard({
-  concept,
-  onClick,
-}: {
-  concept: Concept;
-  onClick: () => void;
-}) {
-  // Derive entity types from the concept name context — the API returns link_count
-  // but not per-type counts. We show the badge set based on available links when
-  // the user drills in. For the card grid, we show the aggregate count.
-  return (
-    <button
-      type="button"
-      onClick={onClick}
+    <Link
+      to="/knowledge/$concept"
+      params={{ concept: concept.name }}
       className={cn(
         'group flex flex-col gap-3 rounded-lg border-l-4 border-[#7A2E3B] bg-white p-4',
         'text-left shadow-sm transition-all duration-200',
@@ -55,11 +23,11 @@ function ConceptCard({
       <span className="text-xs text-gray-500">
         {concept.link_count} {concept.link_count === 1 ? 'reference' : 'references'}
       </span>
-    </button>
+    </Link>
   );
 }
 
-export function KnowledgeHome({ onSelectConcept }: KnowledgeHomeProps) {
+export function KnowledgeHome() {
   const { data: concepts, isLoading, error } = useConcepts();
 
   return (
@@ -115,11 +83,7 @@ export function KnowledgeHome({ onSelectConcept }: KnowledgeHomeProps) {
           style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}
         >
           {concepts.map((concept) => (
-            <ConceptCard
-              key={concept.id}
-              concept={concept}
-              onClick={() => onSelectConcept(concept.name)}
-            />
+            <ConceptCard key={concept.id} concept={concept} />
           ))}
         </div>
       )}
