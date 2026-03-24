@@ -20,7 +20,7 @@ const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
 const plans: Plan[] = [];
 
 for (const el of planEls) {
-  const traceLevel = el.getAttribute("data-trace") as TraceLevel | null;
+  const traceLevel = el.dataset.trace as TraceLevel | undefined;
   if (traceLevel) trace.setLevel(traceLevel);
 
   try {

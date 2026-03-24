@@ -12,7 +12,7 @@ function init(): void {
 
     if (visible) {
       // Target: move loader inside target element
-      const targetId = loader.getAttribute("data-target");
+      const targetId = loader.dataset.target;
       if (targetId) {
         const target = document.getElementById(targetId);
         if (target) {
@@ -22,7 +22,7 @@ function init(): void {
       }
 
       // Timeout: auto-hide after N ms
-      const timeout = loader.getAttribute("data-timeout");
+      const timeout = loader.dataset.timeout;
       if (timeout) {
         const ms = parseInt(timeout, 10);
         if (ms > 0) {
@@ -37,8 +37,8 @@ function init(): void {
       if (loader.parentElement !== document.body) {
         document.body.appendChild(loader);
       }
-      loader.removeAttribute("data-target");
-      loader.removeAttribute("data-timeout");
+      delete loader.dataset.target;
+      delete loader.dataset.timeout;
       const msg = document.getElementById("alis-loader-message");
       if (msg) msg.textContent = "";
     }

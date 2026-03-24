@@ -47,7 +47,7 @@ function handleClick(event: MouseEvent): void {
 }
 
 function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
-  const raw = anchor.getAttribute("data-reactive-link");
+  const raw = anchor.dataset.reactiveLink;
   if (!raw) {
     throw new Error("NativeActionLink is missing data-reactive-link.");
   }
