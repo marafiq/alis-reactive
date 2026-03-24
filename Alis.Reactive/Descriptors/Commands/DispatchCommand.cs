@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Alis.Reactive.Descriptors.Guards;
 
 namespace Alis.Reactive.Descriptors.Commands
 {
@@ -12,10 +13,16 @@ namespace Alis.Reactive.Descriptors.Commands
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object? Payload { get; }
 
-        public DispatchCommand(string @event, object? payload = null)
+        public DispatchCommand(string @event, object? payload = null, Guard? when = null)
+            : base(when)
         {
             Event = @event;
             Payload = payload;
+        }
+
+        protected override Command CloneWithGuard(Guard guard)
+        {
+            return new DispatchCommand(Event, Payload, guard);
         }
     }
 }

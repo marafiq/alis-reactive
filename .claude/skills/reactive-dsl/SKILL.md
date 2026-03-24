@@ -25,7 +25,7 @@ PLAN_WIRING :=
 @using Alis.Reactive.Native.Extensions       -- Html.On, ReactivePlan, RenderPlan, InputField
 @using Alis.Reactive.Native.Components       -- NativeTextBox, NativeButton, NativeCheckBox, ...
 @using Alis.Reactive.Fusion.Components       -- FusionAutoComplete, FusionDropDownList, ...
-@using Alis.Reactive.Fusion.Extensions       -- Fusion gather Include<FusionXxx, TModel>(...)
+@using Alis.Reactive.Builders.Requests       -- Gather Include<TComponent, TModel>(...) (vendor-agnostic)
 @using Alis.Reactive.Native.AppLevel         -- NativeDrawer, NativeLoader, DrawerSize
 @using Alis.Reactive.Fusion.AppLevel         -- FusionToast, FusionConfirm
 @using Syncfusion.EJ2                        -- Html.EJS()

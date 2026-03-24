@@ -1,0 +1,123 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/step1,
+          onSuccess: [
+            {
+              reaction: {
+                kind: conditional,
+                branches: [
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.active
+                      },
+                      coerceAs: boolean,
+                      op: truthy
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: step1-status,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
+                          value: active user
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: step1-status,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
+                          value: inactive user
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          chained: {
+            verb: POST,
+            url: /api/step2,
+            onSuccess: [
+              {
+                reaction: {
+                  kind: conditional,
+                  branches: [
+                    {
+                      guard: {
+                        kind: value,
+                        source: {
+                          kind: event,
+                          path: evt.count
+                        },
+                        coerceAs: number,
+                        op: gt,
+                        operand: 0
+                      },
+                      reaction: {
+                        kind: sequential,
+                        commands: [
+                          {
+                            kind: mutate-element,
+                            target: step2-count,
+                            mutation: {
+                              kind: set-prop,
+                              prop: textContent
+                            },
+                            value: has items
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      reaction: {
+                        kind: sequential,
+                        commands: [
+                          {
+                            kind: mutate-element,
+                            target: step2-count,
+                            mutation: {
+                              kind: set-prop,
+                              prop: textContent
+                            },
+                            value: empty
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

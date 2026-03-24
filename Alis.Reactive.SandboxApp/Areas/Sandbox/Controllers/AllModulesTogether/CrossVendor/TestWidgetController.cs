@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.CrossVendor
 {
@@ -9,23 +8,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.
     {
         [HttpGet("")]
         [HttpGet("Index")]
-        public IActionResult Index() => View("~/Areas/Sandbox/Views/AllModulesTogether/TestWidget/Index.cshtml", new TestWidgetModel());
-
-        [HttpGet("DataSource")]
-        public IActionResult DataSource() => Ok(new
+        public IActionResult Index()
         {
-            name = "Widget Data",
-            count = 3,
-            selected = "beta",
-            items = new[] { "alpha", "beta", "gamma" },
-            detail = new
-            {
-                region = "US-East",
-                metadata = new { version = 2 }
-            }
-        });
+            return View("~/Areas/Sandbox/Views/AllModulesTogether/TestWidget/Index.cshtml");
+        }
 
         [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] Dictionary<string, object> data) => Ok(data);
+        public IActionResult Echo([FromBody] Dictionary<string, object> data)
+        {
+            return Ok(data);
+        }
+
+        [HttpGet("DataSource")]
+        public IActionResult DataSource()
+        {
+            return Ok(new { value = "beta", items = new[] { "alpha", "beta", "gamma" } });
+        }
     }
 }

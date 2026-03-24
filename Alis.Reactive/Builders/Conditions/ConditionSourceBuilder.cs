@@ -132,28 +132,7 @@ namespace Alis.Reactive.Builders.Conditions
             var bindSource = _typedSource.ToBindSource();
             var guard = new ValueGuard(bindSource, _coerceAs, GuardOp.ArrayContains,
                 item, _typedSource.ElementCoercionType);
-
-            if (_mode != CompositionMode.None && _existingGuard != null)
-            {
-                Guard combined;
-                if (_mode == CompositionMode.All)
-                {
-                    var guards = new System.Collections.Generic.List<Guard>();
-                    GuardBuilder<TModel>.FlattenAllStatic(_existingGuard, guards);
-                    guards.Add(guard);
-                    combined = new AllGuard(guards);
-                }
-                else
-                {
-                    var guards = new System.Collections.Generic.List<Guard>();
-                    GuardBuilder<TModel>.FlattenAnyStatic(_existingGuard, guards);
-                    guards.Add(guard);
-                    combined = new AnyGuard(guards);
-                }
-                return WrapGuard(combined);
-            }
-
-            return WrapGuard(guard);
+            return ComposeAndWrap(guard);
         }
 
         // --- Source-vs-source comparison (right side is a TypedSource, not a literal) ---
@@ -170,28 +149,7 @@ namespace Alis.Reactive.Builders.Conditions
             var leftSource = _typedSource.ToBindSource();
             var rightSource = right.ToBindSource();
             var guard = new ValueGuard(leftSource, _coerceAs, op, rightSource);
-
-            if (_mode != CompositionMode.None && _existingGuard != null)
-            {
-                Guard combined;
-                if (_mode == CompositionMode.All)
-                {
-                    var guards = new System.Collections.Generic.List<Guard>();
-                    GuardBuilder<TModel>.FlattenAllStatic(_existingGuard, guards);
-                    guards.Add(guard);
-                    combined = new AllGuard(guards);
-                }
-                else
-                {
-                    var guards = new System.Collections.Generic.List<Guard>();
-                    GuardBuilder<TModel>.FlattenAnyStatic(_existingGuard, guards);
-                    guards.Add(guard);
-                    combined = new AnyGuard(guards);
-                }
-                return WrapGuard(combined);
-            }
-
-            return WrapGuard(guard);
+            return ComposeAndWrap(guard);
         }
 
         // --- Internal ---
@@ -200,29 +158,31 @@ namespace Alis.Reactive.Builders.Conditions
         {
             var bindSource = _typedSource.ToBindSource();
             var guard = new ValueGuard(bindSource, _coerceAs, op, operand);
+            return ComposeAndWrap(guard);
+        }
 
-            // If in composition mode, combine with existing guard
-            if (_mode != CompositionMode.None && _existingGuard != null)
-            {
-                Guard combined;
-                if (_mode == CompositionMode.All)
-                {
-                    var guards = new System.Collections.Generic.List<Guard>();
-                    GuardBuilder<TModel>.FlattenAllStatic(_existingGuard, guards);
-                    guards.Add(guard);
-                    combined = new AllGuard(guards);
-                }
-                else // Any
-                {
-                    var guards = new System.Collections.Generic.List<Guard>();
-                    GuardBuilder<TModel>.FlattenAnyStatic(_existingGuard, guards);
-                    guards.Add(guard);
-                    combined = new AnyGuard(guards);
-                }
-                return WrapGuard(combined);
-            }
+        /// <summary>
+        /// Composes a new guard with the existing guard (if in And/Or mode),
+        /// then wraps it in a GuardBuilder. Single composition point — all
+        /// operator methods (Build, BuildVsSource, ArrayContains) delegate here.
+        /// </summary>
+        private GuardBuilder<TModel> ComposeAndWrap(Guard newGuard)
+        {
+            if (_mode == CompositionMode.None || _existingGuard == null)
+                return WrapGuard(newGuard);
 
-            return WrapGuard(guard);
+            var guards = new System.Collections.Generic.List<Guard>();
+            if (_mode == CompositionMode.All)
+                GuardBuilder<TModel>.FlattenAllStatic(_existingGuard, guards);
+            else
+                GuardBuilder<TModel>.FlattenAnyStatic(_existingGuard, guards);
+
+            guards.Add(newGuard);
+            Guard combined = _mode == CompositionMode.All
+                ? new AllGuard(guards)
+                : (Guard)new AnyGuard(guards);
+
+            return WrapGuard(combined);
         }
 
         private GuardBuilder<TModel> WrapGuard(Guard guard)

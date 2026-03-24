@@ -1,0 +1,54 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: parallel-http,
+        requests: [
+          {
+            verb: POST,
+            url: /api/save,
+            onSuccess: [
+              {
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: save-result,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: saved
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            verb: DELETE,
+            url: /api/cleanup,
+            onSuccess: [
+              {
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: cleanup-result,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: cleaned
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

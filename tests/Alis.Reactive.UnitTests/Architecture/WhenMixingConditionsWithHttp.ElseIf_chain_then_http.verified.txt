@@ -1,0 +1,112 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: eq,
+              operand: admin
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: role,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: Administrator
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: eq,
+              operand: user
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: role,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: Standard User
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: role,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: Guest
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/log,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: log-status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: logged
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

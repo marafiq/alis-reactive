@@ -68,9 +68,14 @@ namespace Alis.Reactive.Builders
 
         private void SetMode(PipelineMode mode)
         {
-            if (_mode != PipelineMode.Sequential && _mode != mode)
-                throw new InvalidOperationException(
-                    $"Cannot switch to {mode} — pipeline is already in {_mode} mode.");
+            if (_mode == mode || _mode == PipelineMode.Sequential)
+            {
+                _mode = mode;
+                return;
+            }
+
+            // Transitioning between non-Sequential modes — flush current segment first
+            FlushSegment();
             _mode = mode;
         }
     }

@@ -1,0 +1,100 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        preFetch: [
+          {
+            kind: dispatch,
+            event: step-1
+          },
+          {
+            kind: dispatch,
+            event: step-2
+          }
+        ],
+        request: {
+          verb: POST,
+          url: /api/action,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: action-result,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: acted
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: dispatch,
+            event: step-4
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.active
+              },
+              coerceAs: boolean,
+              op: truthy
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: dispatch,
+                  event: step-3-active
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: dispatch,
+                  event: step-3-inactive
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

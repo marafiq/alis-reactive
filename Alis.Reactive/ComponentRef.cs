@@ -21,12 +21,12 @@ namespace Alis.Reactive
         private static readonly TComponent _instance = new TComponent();
 
         internal string TargetId { get; }
-        internal PipelineBuilder<TModel> Pipeline { get; }
+        internal ICommandEmitter Emitter { get; }
 
         internal ComponentRef(string targetId, PipelineBuilder<TModel> pipeline)
         {
             TargetId = targetId;
-            Pipeline = pipeline;
+            Emitter = pipeline;
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Alis.Reactive
             object? value = null,
             BindSource? source = null)
         {
-            Pipeline.AddCommand(new MutateElementCommand(
+            Emitter.AddCommand(new MutateElementCommand(
                 TargetId, mutation, value, source, vendor: _instance.Vendor));
             return this;
         }

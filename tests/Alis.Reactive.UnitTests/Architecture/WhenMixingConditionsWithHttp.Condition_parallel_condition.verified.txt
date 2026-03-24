@@ -1,0 +1,133 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: eq,
+              operand: go
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: go-badge,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: parallel-http,
+        requests: [
+          {
+            verb: GET,
+            url: /api/first
+          },
+          {
+            verb: GET,
+            url: /api/second
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.count
+              },
+              coerceAs: number,
+              op: gt,
+              operand: 0
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: has-results,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: has-results,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

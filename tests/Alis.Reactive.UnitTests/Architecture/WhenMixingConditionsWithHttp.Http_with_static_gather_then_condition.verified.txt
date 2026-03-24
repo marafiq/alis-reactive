@@ -1,0 +1,113 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/submit,
+          gather: [
+            {
+              kind: static,
+              param: action,
+              value: save
+            },
+            {
+              kind: static,
+              param: version,
+              value: 2
+            }
+          ],
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: submit-result,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: submitted
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.category
+              },
+              coerceAs: string,
+              op: eq,
+              operand: urgent
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: urgency,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: URGENT
+                },
+                {
+                  kind: mutate-element,
+                  target: urgency,
+                  mutation: {
+                    kind: call,
+                    method: add,
+                    chain: classList,
+                    args: [
+                      {
+                        kind: literal,
+                        value: text-red
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: urgency,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: normal
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+using System;
 using Alis.Reactive.Descriptors.Triggers;
 using Alis.Reactive.Descriptors.Reactions;
 
@@ -14,8 +15,8 @@ namespace Alis.Reactive.Descriptors
 
         public Entry(Trigger trigger, Reaction reaction)
         {
-            Trigger = trigger;
-            Reaction = reaction;
+            Trigger = trigger ?? throw new ArgumentNullException(nameof(trigger));
+            Reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
         }
     }
 }

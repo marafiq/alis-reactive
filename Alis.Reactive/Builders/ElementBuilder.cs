@@ -146,7 +146,10 @@ namespace Alis.Reactive.Builders
             var csb = new ConditionSourceBuilder<TModel, TProp>(source);
             var gb = configure(csb);
             if (_pipeline.Commands.Count > 0)
-                _pipeline.Commands[_pipeline.Commands.Count - 1].GuardWith(gb.Guard);
+            {
+                var idx = _pipeline.Commands.Count - 1;
+                _pipeline.Commands[idx] = _pipeline.Commands[idx].WithGuard(gb.Guard);
+            }
             return this;
         }
     }
