@@ -760,6 +760,24 @@ describe("when evaluating guards", () => {
     });
   });
 
+  // -- Text operators on Date sources (propagation proof) -------------------
+
+  describe("text operators on Date sources", () => {
+    it("contains finds year-month in ISO date from event payload", () => {
+      const guard = vg("evt.admissionDate", "string", "contains", "2024-03");
+      expect(evaluateGuard(guard, ctx({
+        admissionDate: new Date("2024-03-15T00:00:00Z")
+      }))).toBe(true);
+    });
+
+    it("min-length uses ISO length (24 chars) not locale length (~58)", () => {
+      const guard = vg("evt.date", "string", "min-length", 50);
+      expect(evaluateGuard(guard, ctx({
+        date: new Date("2024-03-15T00:00:00Z")
+      }))).toBe(false);
+    });
+  });
+
   // -- Edge cases ---------------------------------------------------------
 
   describe("edge cases", () => {
