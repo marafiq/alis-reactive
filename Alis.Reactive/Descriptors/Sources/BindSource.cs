@@ -6,7 +6,7 @@ namespace Alis.Reactive.Descriptors.Sources
     [JsonConverter(typeof(WriteOnlyPolymorphicConverter<BindSource>))]
     public abstract class BindSource { }
 
-    public sealed class EventSource : BindSource
+    internal sealed class EventSource : BindSource
     {
         [JsonPropertyOrder(-1)]
         public string Kind => "event";
