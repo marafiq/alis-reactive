@@ -373,6 +373,62 @@ public class FullCoverageConditionalValidator : ReactiveValidator<FullCoverageMo
     }
 }
 
+// --- Bug proof validators ---
+
+public class EnumValidator : AbstractValidator<TestModel>
+{
+    public EnumValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x.CareLevel).IsInEnum();
+    }
+}
+
+public class TimeOnlyComparisonValidator : AbstractValidator<TestModel>
+{
+    public TimeOnlyComparisonValidator()
+    {
+        RuleFor(x => x.ShiftEnd).GreaterThan(x => x.ShiftStart);
+    }
+}
+
+public class BraceInCustomMessageValidator : AbstractValidator<TestModel>
+{
+    public BraceInCustomMessageValidator()
+    {
+        RuleFor(x => x.Name).MinimumLength(3)
+            .WithMessage("Name must be at least {MinLength} characters long.");
+    }
+}
+
+public class NestedCrossPropertyValidator : AbstractValidator<NestedCrossPropertyModel>
+{
+    public NestedCrossPropertyValidator()
+    {
+        RuleFor(x => x.HomeAddress!).SetValidator(new HomeAddressValidator());
+        RuleFor(x => x.WorkAddress!).SetValidator(new WorkAddressValidator());
+    }
+}
+
+public class HomeAddressValidator : AbstractValidator<TestAddress>
+{
+    public HomeAddressValidator()
+    {
+        RuleFor(x => x.ZipCode).NotEmpty();
+    }
+}
+
+public class WorkAddressValidator : AbstractValidator<TestAddress>
+{
+    public WorkAddressValidator()
+    {
+        // Cross-property: work zip must differ from home zip
+        // But MemberToCompare.Name is just "ZipCode" — ambiguous with HomeAddress.ZipCode
+        RuleFor(x => x.ZipCode).NotEqual(x => x.City)
+            .WithMessage("Zip must differ from city");
+    }
+}
+
 // --- EqualTo rules ---
 
 public class EqualToValidator : AbstractValidator<TestModel>

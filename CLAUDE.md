@@ -490,7 +490,67 @@ The runtime resolves root, walks paths, and executes via bracket notation. That'
 to exercise ALL interaction types end-to-end. Playwright tests verify every module path.
 If any module breaks vendor-agnostic architecture, these tests catch it immediately.
 
-### 9. Fixing Bugs — Root Cause, Not Patch
+### 9. Validation Extraction — Design Rationale
+
+The `FluentValidationAdapter` extracts a **subset** of FluentValidation rules for client-side
+validation. This is intentional — not all server rules CAN be extracted.
+
+**Why only simple rules:** FluentValidation supports arbitrary C# predicates (`.Must(x => ...)`),
+database lookups, async validators, and dependency-injected services. These are opaque lambdas —
+they cannot be serialized to JSON and sent to the browser. The adapter extracts ONLY rules that
+map to a deterministic, stateless predicate the JS runtime can evaluate with zero server calls.
+
+**Extracted rule types (18 client rules from FV interfaces):**
+
+| FV Validator Interface | Client Rule | Example |
+|------------------------|-------------|---------|
+| `INotEmptyValidator` / `INotNullValidator` | `required` | `.NotEmpty()` |
+| `ILengthValidator` | `minLength`, `maxLength` | `.MinimumLength(3).MaximumLength(100)` |
+| `IEmailValidator` | `email` | `.EmailAddress()` |
+| `IRegularExpressionValidator` | `regex` | `.Matches(@"^\d{5}$")` |
+| `ICreditCardValidator` | `creditCard` | `.CreditCard()` |
+| `IBetweenValidator` | `range` | `.InclusiveBetween(0, 120)` |
+| `IExclusiveBetweenValidator` | `exclusiveRange` | `.IsExclusiveBetween(0, 100)` |
+| `IComparisonValidator` | `min`, `max`, `gt`, `lt`, `equalTo`, `notEqualTo`, `notEqual` | `.GreaterThan(0)` |
+| `IEmptyValidator` (custom) | `empty` | `.IsEmpty()` |
+
+**Not extracted (server-only by design — cannot serialize to JSON):**
+
+| Pattern | Why |
+|---------|-----|
+| `.Must(x => ...)` | Arbitrary C# lambda — cannot run in browser |
+| `.MustAsync(...)` | Async + arbitrary logic |
+| `.When(x => ...)` on rule | Arbitrary C# predicate for conditions |
+| `.Unless(x => ...)` | Same as `.When()` — arbitrary predicate |
+| Custom `IValidator` implementations | Unknown logic, may use DI, DB, etc. |
+| `.IsInEnum()` | Requires enum values at extraction time (no reflection) |
+
+**Conditional rules — two systems by design:**
+
+| System | Where | How | Extractable? |
+|--------|-------|-----|-------------|
+| FV `.When(x => predicate)` | On rule or component | Arbitrary C# lambda | **No** — server-only |
+| `ReactiveValidator.WhenField()` | On rule group | Constrained to field comparison (truthy/falsy/eq/neq) | **Yes** — serializes to `ValidationCondition` |
+
+The framework provides `WhenField()` specifically because FV's `.When()` cannot be serialized.
+`WhenField()` constrains conditions to simple, serializable field comparisons that the JS
+runtime can evaluate. This is the ONLY way to get conditional validation on the client.
+
+**Known limitations:**
+- `IsInEnum()` silently dropped (no reflection = can't extract enum values)
+- `TimeOnly` / `TimeSpan` comparisons extract with `null` coerceAs (no coercion type defined)
+- Unsupported validator types produce zero client rules with no warning
+
+**CoerceAs inference (for comparison rules):**
+
+| C# Type | CoerceAs | Runtime comparison |
+|---------|----------|-------------------|
+| `int`, `long`, `decimal`, `double`, `float`, `byte`, `short` | `"number"` | Numeric |
+| `DateTime`, `DateTimeOffset`, `DateOnly` | `"date"` | Timestamp (milliseconds) |
+| `TimeOnly`, `TimeSpan` | `null` (not supported) | String (incorrect) |
+| Everything else | `null` | String |
+
+### 10. Fixing Bugs — Root Cause, Not Patch
 
 When a behavior is wrong:
 1. **STOP.** Do not apply the first fix that comes to mind.
