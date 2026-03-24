@@ -13,7 +13,7 @@ describe("when auto booting plans", () => {
         ${JSON.stringify({
           planId: "Test.Model",
           components: {
-            "Root.Name": { id: "root-name", vendor: "native", readExpr: "value" },
+            "Root.Name": { id: "root-name", vendor: "native", readExpr: "value", componentType: "textbox" },
           },
           entries: [{
             trigger: { kind: "dom-ready" },
@@ -33,7 +33,7 @@ describe("when auto booting plans", () => {
         ${JSON.stringify({
           planId: "Test.Model",
           components: {
-            "Nested.City": { id: "nested-city", vendor: "native", readExpr: "value" },
+            "Nested.City": { id: "nested-city", vendor: "native", readExpr: "value", componentType: "textbox" },
           },
           entries: [{
             trigger: { kind: "custom-event", event: "kick" },

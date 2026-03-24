@@ -14,6 +14,7 @@ export interface ComponentEntry {
   id: string;
   vendor: Vendor;
   readExpr: string;
+  componentType: string;
 }
 
 export interface Entry {

@@ -33,7 +33,7 @@ function unrelatedPlan(overrides?: Partial<Plan>): Plan {
 }
 
 function comp(id: string, vendor: "native" | "fusion" = "native", readExpr = "value"): ComponentEntry {
-  return { id, vendor, readExpr };
+  return { id, vendor, readExpr, componentType: "textbox" };
 }
 
 function dispatchEntry(event: string): Entry {

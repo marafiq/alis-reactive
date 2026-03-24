@@ -149,7 +149,7 @@ describe("reaction execution end-to-end", () => {
 
   it("component source reads native input value", () => {
     boot({ planId: "t",
-      components: { "Name": { id: "NameField", vendor: "native", readExpr: "value" } },
+      components: { "Name": { id: "NameField", vendor: "native", readExpr: "value", componentType: "textbox" } },
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [
@@ -163,7 +163,7 @@ describe("reaction execution end-to-end", () => {
   it("component source reads checkbox checked state", () => {
     (document.getElementById("ActiveField") as HTMLInputElement).checked = true;
     boot({ planId: "t",
-      components: { "Active": { id: "ActiveField", vendor: "native", readExpr: "checked" } },
+      components: { "Active": { id: "ActiveField", vendor: "native", readExpr: "checked", componentType: "switch" } },
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [

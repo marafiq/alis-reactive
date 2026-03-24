@@ -347,14 +347,14 @@ describe("IncludeAll with mixed component types", () => {
     fusionEl("DietaryRestrictions", { value: ["vegetarian", "halal"] });
 
     const components: Record<string, ComponentEntry> = {
-      "ResidentName":       { id: "ResidentName", vendor: "native", readExpr: "value" },
-      "HasAllergies":       { id: "HasAllergies", vendor: "native", readExpr: "checked" },
-      "MobilityLevel":      { id: "MobilityLevel", vendor: "native", readExpr: "value" },
-      "Allergies":          { id: "Allergies", vendor: "native", readExpr: "value" },
-      "MonthlyRate":        { id: "MonthlyRate", vendor: "fusion", readExpr: "value" },
-      "FacilityId":         { id: "FacilityId", vendor: "fusion", readExpr: "value" },
-      "AdmissionDate":      { id: "AdmissionDate", vendor: "fusion", readExpr: "value" },
-      "DietaryRestrictions": { id: "DietaryRestrictions", vendor: "fusion", readExpr: "value" },
+      "ResidentName":       { id: "ResidentName", vendor: "native", readExpr: "value", componentType: "textbox" },
+      "HasAllergies":       { id: "HasAllergies", vendor: "native", readExpr: "checked", componentType: "switch" },
+      "MobilityLevel":      { id: "MobilityLevel", vendor: "native", readExpr: "value", componentType: "textbox" },
+      "Allergies":          { id: "Allergies", vendor: "native", readExpr: "value", componentType: "textbox" },
+      "MonthlyRate":        { id: "MonthlyRate", vendor: "fusion", readExpr: "value", componentType: "numerictextbox" },
+      "FacilityId":         { id: "FacilityId", vendor: "fusion", readExpr: "value", componentType: "textbox" },
+      "AdmissionDate":      { id: "AdmissionDate", vendor: "fusion", readExpr: "value", componentType: "datepicker" },
+      "DietaryRestrictions": { id: "DietaryRestrictions", vendor: "fusion", readExpr: "value", componentType: "textbox" },
     };
 
     const items: GatherItem[] = [{ kind: "all" }];
@@ -390,10 +390,10 @@ describe("IncludeAll with mixed component types", () => {
     fusionEl("MonthlyRate", { value: 4250 });
 
     const components: Record<string, ComponentEntry> = {
-      "ResidentName": { id: "ResidentName", vendor: "native", readExpr: "value" },
-      "HasAllergies": { id: "HasAllergies", vendor: "native", readExpr: "checked" },
-      "Allergies":    { id: "Allergies", vendor: "native", readExpr: "value" },
-      "MonthlyRate":  { id: "MonthlyRate", vendor: "fusion", readExpr: "value" },
+      "ResidentName": { id: "ResidentName", vendor: "native", readExpr: "value", componentType: "textbox" },
+      "HasAllergies": { id: "HasAllergies", vendor: "native", readExpr: "checked", componentType: "switch" },
+      "Allergies":    { id: "Allergies", vendor: "native", readExpr: "value", componentType: "textbox" },
+      "MonthlyRate":  { id: "MonthlyRate", vendor: "fusion", readExpr: "value", componentType: "numerictextbox" },
     };
 
     const items: GatherItem[] = [{ kind: "all" }];

@@ -126,7 +126,7 @@ describe("path resolution end-to-end", () => {
 
   it("component source reads native input value", () => {
     boot({ planId: "t",
-      components: { "Name": { id: "Name", vendor: "native", readExpr: "value" } },
+      components: { "Name": { id: "Name", vendor: "native", readExpr: "value", componentType: "textbox" } },
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [
