@@ -415,4 +415,231 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         Assert.That(json, Does.Contain("special"));
         return VerifyJson(json);
     }
+
+    // ═══════════════════════════════════════════════════════════
+    // Conditions inside HTTP OnSuccess
+    // ═══════════════════════════════════════════════════════════
+
+    [Test]
+    public Task Condition_inside_http_on_success_with_surrounding_commands()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.Element("status").SetText("loading");
+            p.Post("/api/save")
+             .Response(r => r.OnSuccess(s =>
+             {
+                 s.Element("status").SetText("saved");
+                 s.When(args, x => x.Active).Truthy()
+                     .Then(t => t.Element("badge").Show())
+                     .Else(e => e.Element("badge").Hide());
+                 s.Element("timestamp").SetText("now");
+             }));
+            p.Element("footer").SetText("done");
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("loading"), "Pre-http command");
+        Assert.That(json, Does.Contain("saved"), "OnSuccess command");
+        Assert.That(json, Does.Contain("badge"), "Condition inside OnSuccess");
+        Assert.That(json, Does.Contain("timestamp"), "Post-condition command inside OnSuccess");
+        Assert.That(json, Does.Contain("footer"), "Post-http command");
+        return VerifyJson(json);
+    }
+
+    [Test]
+    public Task ElseIf_chain_inside_http_on_success()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.Post("/api/process")
+             .Response(r => r.OnSuccess(s =>
+             {
+                 s.When(args, x => x.Count).Gt(100)
+                     .Then(t => t.Element("tier").SetText("gold"))
+                     .ElseIf(args, x => x.Count).Gt(50)
+                     .Then(t => t.Element("tier").SetText("silver"))
+                     .ElseIf(args, x => x.Count).Gt(10)
+                     .Then(t => t.Element("tier").SetText("bronze"))
+                     .Else(e => e.Element("tier").SetText("none"));
+             }));
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("gold"));
+        Assert.That(json, Does.Contain("silver"));
+        Assert.That(json, Does.Contain("bronze"));
+        Assert.That(json, Does.Contain("none"));
+        return VerifyJson(json);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Conditions after HTTP
+    // ═══════════════════════════════════════════════════════════
+
+    [Test]
+    public Task Condition_after_http_response_block()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.Post("/api/save")
+             .Response(r => r.OnSuccess(s =>
+             {
+                 s.Element("status").SetText("saved");
+             }));
+            p.When(args, x => x.Active).Truthy()
+                .Then(t => t.Element("active-badge").Show())
+                .Else(e => e.Element("active-badge").Hide());
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("saved"), "OnSuccess handler present");
+        Assert.That(json, Does.Contain("active-badge"), "Condition after HTTP present");
+        return VerifyJson(json);
+    }
+
+    [Test]
+    public Task Multiple_conditions_after_http()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.Post("/api/save")
+             .Response(r => r.OnSuccess(s =>
+             {
+                 s.Element("status").SetText("saved");
+             }));
+            p.When(args, x => x.Active).Truthy()
+                .Then(t => t.Element("badge").Show());
+            p.When(args, x => x.Category).Eq("premium")
+                .Then(t => t.Element("premium-label").Show())
+                .Else(e => e.Element("premium-label").Hide());
+            p.Element("footer").SetText("complete");
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("saved"));
+        Assert.That(json, Does.Contain("badge"));
+        Assert.That(json, Does.Contain("premium-label"));
+        Assert.That(json, Does.Contain("complete"));
+        return VerifyJson(json);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Multiple ElseIf chains with commands between them
+    // ═══════════════════════════════════════════════════════════
+
+    [Test]
+    public Task Two_elseif_chains_with_commands_between()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.When(args, x => x.Count).Gt(100)
+                .Then(t => t.Element("tier").SetText("gold"))
+                .ElseIf(args, x => x.Count).Gt(50)
+                .Then(t => t.Element("tier").SetText("silver"))
+                .Else(e => e.Element("tier").SetText("bronze"));
+            p.Element("divider").Show();
+            p.Dispatch("tier-evaluated");
+            p.When(args, x => x.Category).Eq("vip")
+                .Then(t => t.Element("vip-badge").Show())
+                .ElseIf(args, x => x.Category).Eq("member")
+                .Then(t => t.Element("member-badge").Show())
+                .Else(e => e.Element("guest-badge").Show());
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("gold"));
+        Assert.That(json, Does.Contain("silver"));
+        Assert.That(json, Does.Contain("bronze"));
+        Assert.That(json, Does.Contain("divider"));
+        Assert.That(json, Does.Contain("tier-evaluated"));
+        Assert.That(json, Does.Contain("vip-badge"));
+        Assert.That(json, Does.Contain("member-badge"));
+        Assert.That(json, Does.Contain("guest-badge"));
+        return VerifyJson(json);
+    }
+
+    [Test]
+    public Task Three_elseif_chains_interleaved_with_commands()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.Element("header").SetText("evaluating");
+            p.When(args, x => x.Count).Gt(100)
+                .Then(t => t.Element("count-tier").SetText("high"))
+                .ElseIf(args, x => x.Count).Gt(10)
+                .Then(t => t.Element("count-tier").SetText("medium"))
+                .Else(e => e.Element("count-tier").SetText("low"));
+            p.Dispatch("count-done");
+            p.When(args, x => x.Active).Truthy()
+                .Then(t => t.Element("active-ind").Show())
+                .Else(e => e.Element("active-ind").Hide());
+            p.Element("mid").SetText("between");
+            p.When(args, x => x.Value).Eq("urgent")
+                .Then(t =>
+                {
+                    t.Element("priority").SetText("URGENT");
+                    t.Element("priority").AddClass("text-red");
+                })
+                .ElseIf(args, x => x.Value).Eq("normal")
+                .Then(t => t.Element("priority").SetText("normal"))
+                .Else(e => e.Element("priority").SetText("low"));
+            p.Element("footer").SetText("complete");
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("evaluating"));
+        Assert.That(json, Does.Contain("count-tier"));
+        Assert.That(json, Does.Contain("count-done"));
+        Assert.That(json, Does.Contain("active-ind"));
+        Assert.That(json, Does.Contain("between"));
+        Assert.That(json, Does.Contain("URGENT"));
+        Assert.That(json, Does.Contain("priority"));
+        Assert.That(json, Does.Contain("complete"));
+        return VerifyJson(json);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // HTTP between conditions
+    // ═══════════════════════════════════════════════════════════
+
+    [Test]
+    public Task Http_between_two_condition_blocks()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.When(args, x => x.Active).Truthy()
+                .Then(t => t.Element("status").SetText("active"))
+                .Else(e => e.Element("status").SetText("inactive"));
+            p.Post("/api/audit")
+             .Response(r => r.OnSuccess(s =>
+             {
+                 s.Element("audit-result").SetText("logged");
+             }));
+            p.When(args, x => x.Count).Gt(0)
+                .Then(t => t.Element("count-badge").Show())
+                .Else(e => e.Element("count-badge").Hide());
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("active"));
+        Assert.That(json, Does.Contain("inactive"));
+        Assert.That(json, Does.Contain("audit-result"));
+        Assert.That(json, Does.Contain("count-badge"));
+        return VerifyJson(json);
+    }
 }

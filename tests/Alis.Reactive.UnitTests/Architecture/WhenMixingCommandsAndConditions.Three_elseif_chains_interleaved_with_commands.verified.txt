@@ -1,0 +1,308 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: header,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: evaluating
+          },
+          {
+            kind: dispatch,
+            event: count-done
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.count
+              },
+              coerceAs: number,
+              op: gt,
+              operand: 100
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: count-tier,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: high
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.count
+              },
+              coerceAs: number,
+              op: gt,
+              operand: 10
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: count-tier,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: medium
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: count-tier,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: low
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: mid,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: between
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.active
+              },
+              coerceAs: boolean,
+              op: truthy
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: active-ind,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: active-ind,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: footer,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: complete
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: eq,
+              operand: urgent
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: priority,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: URGENT
+                },
+                {
+                  kind: mutate-element,
+                  target: priority,
+                  mutation: {
+                    kind: call,
+                    method: add,
+                    chain: classList,
+                    args: [
+                      {
+                        kind: literal,
+                        value: text-red
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: eq,
+              operand: normal
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: priority,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: normal
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: priority,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: low
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
