@@ -20,17 +20,17 @@ public class RealTimeBroadcastService(
     private static readonly string[] CareLevels =
         ["Assisted Living", "Memory Care", "Independent", "Skilled Nursing", "Assisted Living"];
 
-    protected override async Task ExecuteAsync(CancellationToken ct)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var counter = 0;
 
-        while (!ct.IsCancellationRequested)
+        while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                await Task.Delay(2000, ct);
+                await Task.Delay(2000, stoppingToken);
             }
-            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
                 break;
             }
@@ -46,7 +46,7 @@ public class RealTimeBroadcastService(
                     Count = counter,
                     Message = $"[{now}] #{counter} — {Residents[idx]} status update",
                     Priority = counter % 3 == 0 ? "high" : "normal"
-                }, ct);
+                }, stoppingToken);
 
                 await residentHub.Clients.All.SendAsync("StatusChanged", new ResidentStatusPayload
                 {
@@ -54,9 +54,9 @@ public class RealTimeBroadcastService(
                     Status = Statuses[idx],
                     CareLevel = CareLevels[idx],
                     UpdatedAt = DateTime.UtcNow
-                }, ct);
+                }, stoppingToken);
             }
-            catch (Exception ex) when (!ct.IsCancellationRequested)
+            catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
             {
                 logger.LogWarning(ex, "Broadcast failed — will retry next cycle");
             }
