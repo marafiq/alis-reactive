@@ -1,5 +1,3 @@
-using Alis.Reactive.Builders.Conditions;
-
 namespace Alis.Reactive.UnitTests;
 
 public class MixedPayload
@@ -11,20 +9,14 @@ public class MixedPayload
 }
 
 /// <summary>
-/// BDD tests for the pipeline's ability to mix sequential commands and conditional
-/// blocks in any order. Each When().Then().Else() is an independent block — they
-/// do not interfere with each other (no first-match-wins across blocks).
-///
-/// The pipeline builder segments content: commands → condition → commands → condition.
-/// Each segment becomes a separate entry on the same trigger. The runtime fires all
-/// entries for a trigger, so all blocks execute independently.
+/// Pipeline segmentation: commands → condition → commands → condition.
+/// Each When().Then().Else() is an independent block — they do not interfere
+/// with each other. Each segment becomes a separate entry on the same trigger.
 /// </summary>
 [TestFixture]
 public class WhenMixingCommandsAndConditions : PlanTestBase
 {
-    // ═══════════════════════════════════════════════════════════
-    // Two independent When blocks — the core fix
-    // ═══════════════════════════════════════════════════════════
+    // ── Two independent When blocks ──
 
     [Test]
     public Task Two_independent_when_blocks_both_produce_entries()
@@ -70,9 +62,7 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Commands before / between / after conditions
-    // ═══════════════════════════════════════════════════════════
+    // ── Commands before / between / after conditions ──
 
     [Test]
     public Task Commands_before_first_when()
@@ -179,9 +169,7 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // ElseIf chains — single block, not split
-    // ═══════════════════════════════════════════════════════════
+    // ── ElseIf chains ──
 
     [Test]
     public Task ElseIf_chain_is_one_block_not_multiple()
@@ -227,314 +215,6 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         Assert.That(json, Does.Contain("badge"));
         return VerifyJson(json);
     }
-
-    // ═══════════════════════════════════════════════════════════
-    // Then-only (no Else) conditions
-    // ═══════════════════════════════════════════════════════════
-
-    [Test]
-    public Task Then_only_without_else()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.When(args, x => x.Active).Truthy()
-                .Then(t => t.Element("badge").Show());
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("badge"));
-        Assert.That(json, Does.Not.Contain("\"guard\":null"), "No else branch");
-        return VerifyJson(json);
-    }
-
-    [Test]
-    public Task Two_then_only_blocks()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.When(args, x => x.Active).Truthy()
-                .Then(t => t.Element("badge").Show());
-            p.When(args, x => x.Count).Gt(0)
-                .Then(t => t.Element("counter").Show());
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("badge"));
-        Assert.That(json, Does.Contain("counter"));
-        return VerifyJson(json);
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // Multiple commands in Then/Else branches
-    // ═══════════════════════════════════════════════════════════
-
-    [Test]
-    public Task Multiple_commands_in_then_and_else()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.When(args, x => x.Active).Truthy()
-                .Then(t =>
-                {
-                    t.Element("panel").Show();
-                    t.Element("panel").AddClass("active");
-                    t.Element("status").SetText("enabled");
-                })
-                .Else(e =>
-                {
-                    e.Element("panel").Hide();
-                    e.Element("panel").RemoveClass("active");
-                    e.Element("status").SetText("disabled");
-                });
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("enabled"));
-        Assert.That(json, Does.Contain("disabled"));
-        return VerifyJson(json);
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // Regression — existing patterns must not break
-    // ═══════════════════════════════════════════════════════════
-
-    [Test]
-    public Task Single_when_still_works()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.Element("echo").SetText("before");
-            p.When(args, x => x.Value).Eq("hello")
-                .Then(t => t.Element("r1").SetText("yes"))
-                .Else(e => e.Element("r1").SetText("no"));
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("before"));
-        Assert.That(json, Does.Contain("r1"));
-        return VerifyJson(json);
-    }
-
-    [Test]
-    public Task Commands_only_still_produces_sequential()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.Element("a").SetText("one");
-            p.Element("b").SetText("two");
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("sequential"));
-        Assert.That(json, Does.Not.Contain("conditional"));
-        return VerifyJson(json);
-    }
-
-    [Test]
-    public Task DomReady_with_mixed_commands_and_condition()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).DomReady(p =>
-        {
-            p.Element("loader").Hide();
-            p.Dispatch("page-ready");
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("dom-ready"));
-        Assert.That(json, Does.Contain("loader"));
-        Assert.That(json, Does.Contain("page-ready"));
-        return VerifyJson(json);
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // Condition with Dispatch inside Then
-    // ═══════════════════════════════════════════════════════════
-
-    [Test]
-    public Task Condition_then_dispatches_event()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.When(args, x => x.Active).Truthy()
-                .Then(t =>
-                {
-                    t.Element("status").SetText("active");
-                    t.Dispatch("user-activated");
-                })
-                .Else(e =>
-                {
-                    e.Element("status").SetText("inactive");
-                    e.Dispatch("user-deactivated");
-                });
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("user-activated"));
-        Assert.That(json, Does.Contain("user-deactivated"));
-        return VerifyJson(json);
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // Mixed event-arg and component source conditions
-    // ═══════════════════════════════════════════════════════════
-
-    [Test]
-    public Task Event_arg_condition_followed_by_component_condition()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.Element("echo").SetText(args, x => x.Value);
-            p.When(args, x => x.Value).Eq("special")
-                .Then(t => t.Element("highlight").Show())
-                .Else(e => e.Element("highlight").Hide());
-            p.When(args, x => x.Count).Gte(10)
-                .Then(t => t.Element("badge").SetText("many"))
-                .Else(e => e.Element("badge").SetText("few"));
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("echo"));
-        Assert.That(json, Does.Contain("highlight"));
-        Assert.That(json, Does.Contain("badge"));
-        Assert.That(json, Does.Contain("special"));
-        return VerifyJson(json);
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // Conditions inside HTTP OnSuccess
-    // ═══════════════════════════════════════════════════════════
-
-    [Test]
-    public Task Condition_inside_http_on_success_with_surrounding_commands()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.Element("status").SetText("loading");
-            p.Post("/api/save")
-             .Response(r => r.OnSuccess(s =>
-             {
-                 s.Element("status").SetText("saved");
-                 s.When(args, x => x.Active).Truthy()
-                     .Then(t => t.Element("badge").Show())
-                     .Else(e => e.Element("badge").Hide());
-                 s.Element("timestamp").SetText("now");
-             }));
-            p.Element("footer").SetText("done");
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("loading"), "Pre-http command");
-        Assert.That(json, Does.Contain("saved"), "OnSuccess command");
-        Assert.That(json, Does.Contain("badge"), "Condition inside OnSuccess");
-        Assert.That(json, Does.Contain("timestamp"), "Post-condition command inside OnSuccess");
-        Assert.That(json, Does.Contain("footer"), "Post-http command");
-        return VerifyJson(json);
-    }
-
-    [Test]
-    public Task ElseIf_chain_inside_http_on_success()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.Post("/api/process")
-             .Response(r => r.OnSuccess(s =>
-             {
-                 s.When(args, x => x.Count).Gt(100)
-                     .Then(t => t.Element("tier").SetText("gold"))
-                     .ElseIf(args, x => x.Count).Gt(50)
-                     .Then(t => t.Element("tier").SetText("silver"))
-                     .ElseIf(args, x => x.Count).Gt(10)
-                     .Then(t => t.Element("tier").SetText("bronze"))
-                     .Else(e => e.Element("tier").SetText("none"));
-             }));
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("gold"));
-        Assert.That(json, Does.Contain("silver"));
-        Assert.That(json, Does.Contain("bronze"));
-        Assert.That(json, Does.Contain("none"));
-        return VerifyJson(json);
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // Conditions after HTTP
-    // ═══════════════════════════════════════════════════════════
-
-    [Test]
-    public Task Condition_after_http_response_block()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.Post("/api/save")
-             .Response(r => r.OnSuccess(s =>
-             {
-                 s.Element("status").SetText("saved");
-             }));
-            p.When(args, x => x.Active).Truthy()
-                .Then(t => t.Element("active-badge").Show())
-                .Else(e => e.Element("active-badge").Hide());
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("saved"), "OnSuccess handler present");
-        Assert.That(json, Does.Contain("active-badge"), "Condition after HTTP present");
-        return VerifyJson(json);
-    }
-
-    [Test]
-    public Task Multiple_conditions_after_http()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
-        {
-            p.Post("/api/save")
-             .Response(r => r.OnSuccess(s =>
-             {
-                 s.Element("status").SetText("saved");
-             }));
-            p.When(args, x => x.Active).Truthy()
-                .Then(t => t.Element("badge").Show());
-            p.When(args, x => x.Category).Eq("premium")
-                .Then(t => t.Element("premium-label").Show())
-                .Else(e => e.Element("premium-label").Hide());
-            p.Element("footer").SetText("complete");
-        });
-
-        var json = plan.Render();
-        AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("saved"));
-        Assert.That(json, Does.Contain("badge"));
-        Assert.That(json, Does.Contain("premium-label"));
-        Assert.That(json, Does.Contain("complete"));
-        return VerifyJson(json);
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // Multiple ElseIf chains with commands between them
-    // ═══════════════════════════════════════════════════════════
 
     [Test]
     public Task Two_elseif_chains_with_commands_between()
@@ -611,35 +291,181 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // HTTP between conditions
-    // ═══════════════════════════════════════════════════════════
+    // ── Then-only (no Else) conditions ──
 
     [Test]
-    public Task Http_between_two_condition_blocks()
+    public Task Then_only_without_else()
     {
         var plan = CreatePlan();
         Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
         {
             p.When(args, x => x.Active).Truthy()
-                .Then(t => t.Element("status").SetText("active"))
-                .Else(e => e.Element("status").SetText("inactive"));
-            p.Post("/api/audit")
-             .Response(r => r.OnSuccess(s =>
-             {
-                 s.Element("audit-result").SetText("logged");
-             }));
-            p.When(args, x => x.Count).Gt(0)
-                .Then(t => t.Element("count-badge").Show())
-                .Else(e => e.Element("count-badge").Hide());
+                .Then(t => t.Element("badge").Show());
         });
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("active"));
-        Assert.That(json, Does.Contain("inactive"));
-        Assert.That(json, Does.Contain("audit-result"));
-        Assert.That(json, Does.Contain("count-badge"));
+        Assert.That(json, Does.Contain("badge"));
+        Assert.That(json, Does.Not.Contain("\"guard\":null"), "No else branch");
+        return VerifyJson(json);
+    }
+
+    [Test]
+    public Task Two_then_only_blocks()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.When(args, x => x.Active).Truthy()
+                .Then(t => t.Element("badge").Show());
+            p.When(args, x => x.Count).Gt(0)
+                .Then(t => t.Element("counter").Show());
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("badge"));
+        Assert.That(json, Does.Contain("counter"));
+        return VerifyJson(json);
+    }
+
+    // ── Multiple commands in Then/Else branches ──
+
+    [Test]
+    public Task Multiple_commands_in_then_and_else()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.When(args, x => x.Active).Truthy()
+                .Then(t =>
+                {
+                    t.Element("panel").Show();
+                    t.Element("panel").AddClass("active");
+                    t.Element("status").SetText("enabled");
+                })
+                .Else(e =>
+                {
+                    e.Element("panel").Hide();
+                    e.Element("panel").RemoveClass("active");
+                    e.Element("status").SetText("disabled");
+                });
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("enabled"));
+        Assert.That(json, Does.Contain("disabled"));
+        return VerifyJson(json);
+    }
+
+    // ── Regression — existing patterns must not break ──
+
+    [Test]
+    public Task Single_when_still_works()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.Element("echo").SetText("before");
+            p.When(args, x => x.Value).Eq("hello")
+                .Then(t => t.Element("r1").SetText("yes"))
+                .Else(e => e.Element("r1").SetText("no"));
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("before"));
+        Assert.That(json, Does.Contain("r1"));
+        return VerifyJson(json);
+    }
+
+    [Test]
+    public Task Commands_only_still_produces_sequential()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.Element("a").SetText("one");
+            p.Element("b").SetText("two");
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("sequential"));
+        Assert.That(json, Does.Not.Contain("conditional"));
+        return VerifyJson(json);
+    }
+
+    [Test]
+    public Task DomReady_with_mixed_commands_and_condition()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).DomReady(p =>
+        {
+            p.Element("loader").Hide();
+            p.Dispatch("page-ready");
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("dom-ready"));
+        Assert.That(json, Does.Contain("loader"));
+        Assert.That(json, Does.Contain("page-ready"));
+        return VerifyJson(json);
+    }
+
+    // ── Condition with Dispatch inside Then ──
+
+    [Test]
+    public Task Condition_then_dispatches_event()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.When(args, x => x.Active).Truthy()
+                .Then(t =>
+                {
+                    t.Element("status").SetText("active");
+                    t.Dispatch("user-activated");
+                })
+                .Else(e =>
+                {
+                    e.Element("status").SetText("inactive");
+                    e.Dispatch("user-deactivated");
+                });
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("user-activated"));
+        Assert.That(json, Does.Contain("user-deactivated"));
+        return VerifyJson(json);
+    }
+
+    // ── Mixed event-arg conditions ──
+
+    [Test]
+    public Task Event_arg_condition_followed_by_component_condition()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.Element("echo").SetText(args, x => x.Value);
+            p.When(args, x => x.Value).Eq("special")
+                .Then(t => t.Element("highlight").Show())
+                .Else(e => e.Element("highlight").Hide());
+            p.When(args, x => x.Count).Gte(10)
+                .Then(t => t.Element("badge").SetText("many"))
+                .Else(e => e.Element("badge").SetText("few"));
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("echo"));
+        Assert.That(json, Does.Contain("highlight"));
+        Assert.That(json, Does.Contain("badge"));
+        Assert.That(json, Does.Contain("special"));
         return VerifyJson(json);
     }
 }

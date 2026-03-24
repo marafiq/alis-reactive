@@ -1,0 +1,138 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: GET,
+          url: /api/status,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: fetched
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.count
+              },
+              coerceAs: number,
+              op: gt,
+              operand: 100
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: tier,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: gold
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.count
+              },
+              coerceAs: number,
+              op: gt,
+              operand: 50
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: tier,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: silver
+                }
+              ]
+            }
+          },
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.count
+              },
+              coerceAs: number,
+              op: gt,
+              operand: 10
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: tier,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: bronze
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: tier,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: none
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,394 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: submit-form
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: submit-btn,
+            mutation: {
+              kind: call,
+              method: add,
+              chain: classList,
+              args: [
+                {
+                  kind: literal,
+                  value: disabled
+                }
+              ]
+            }
+          },
+          {
+            kind: mutate-element,
+            target: spinner,
+            mutation: {
+              kind: call,
+              method: removeAttribute,
+              args: [
+                {
+                  kind: literal,
+                  value: hidden
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: submit-form
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: is-empty
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: name-error,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: Name is required
+                },
+                {
+                  kind: mutate-element,
+                  target: name-error,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: name-error,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: submit-form
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/residents,
+          gather: [
+            {
+              kind: static,
+              param: source,
+              value: form
+            }
+          ],
+          onSuccess: [
+            {
+              reaction: {
+                kind: conditional,
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: status,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: saved successfully
+                  }
+                ],
+                branches: [
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.count
+                      },
+                      coerceAs: number,
+                      op: gt,
+                      operand: 100
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: capacity,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
+                          value: at capacity
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.count
+                      },
+                      coerceAs: number,
+                      op: gt,
+                      operand: 50
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: capacity,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
+                          value: filling up
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: capacity,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
+                          value: available
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          onError: [
+            {
+              statusCode: 400,
+              reaction: {
+                kind: conditional,
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: status,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: validation failed
+                  }
+                ],
+                branches: [
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.category
+                      },
+                      coerceAs: string,
+                      op: eq,
+                      operand: duplicate
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: dup-warning,
+                          mutation: {
+                            kind: call,
+                            method: removeAttribute,
+                            args: [
+                              {
+                                kind: literal,
+                                value: hidden
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              statusCode: 500,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: server error
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: submit-form
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: spinner,
+            mutation: {
+              kind: call,
+              method: setAttribute,
+              args: [
+                {
+                  kind: literal,
+                  value: hidden
+                },
+                {
+                  kind: literal,
+                  value: 
+                }
+              ]
+            }
+          },
+          {
+            kind: mutate-element,
+            target: submit-btn,
+            mutation: {
+              kind: call,
+              method: remove,
+              chain: classList,
+              args: [
+                {
+                  kind: literal,
+                  value: disabled
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: submit-form
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: all,
+              guards: [
+                {
+                  kind: value,
+                  source: {
+                    kind: event,
+                    path: evt.active
+                  },
+                  coerceAs: boolean,
+                  op: truthy
+                },
+                {
+                  kind: value,
+                  source: {
+                    kind: event,
+                    path: evt.value
+                  },
+                  coerceAs: string,
+                  op: not-empty
+                }
+              ]
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: dispatch,
+                  event: resident-created
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: dispatch,
+                  event: resident-draft-saved
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

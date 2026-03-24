@@ -1,0 +1,106 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.active
+              },
+              coerceAs: boolean,
+              op: truthy
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: active
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: status,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: inactive
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: parallel-http,
+        requests: [
+          {
+            verb: POST,
+            url: /api/audit,
+            onSuccess: [
+              {
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: audit,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: logged
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            verb: POST,
+            url: /api/notify,
+            onSuccess: [
+              {
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: notify,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: sent
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

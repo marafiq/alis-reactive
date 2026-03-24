@@ -1,0 +1,118 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: GET,
+          url: /api/permissions,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: perms,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: loaded
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: not,
+              inner: {
+                kind: any,
+                guards: [
+                  {
+                    kind: value,
+                    source: {
+                      kind: event,
+                      path: evt.value
+                    },
+                    coerceAs: string,
+                    op: eq,
+                    operand: admin
+                  },
+                  {
+                    kind: value,
+                    source: {
+                      kind: event,
+                      path: evt.value
+                    },
+                    coerceAs: string,
+                    op: eq,
+                    operand: superadmin
+                  }
+                ]
+              }
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: restricted,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: restricted,
+                  mutation: {
+                    kind: call,
+                    method: setAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      },
+                      {
+                        kind: literal,
+                        value: 
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
