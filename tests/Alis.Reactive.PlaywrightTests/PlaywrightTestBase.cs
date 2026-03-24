@@ -10,7 +10,7 @@ public abstract class PlaywrightTestBase : PageTest
     private readonly List<string> _consoleErrors = new();
 
     [SetUp]
-    public void SetUpConsoleCapture()
+    public async Task SetUpConsoleCapture()
     {
         _consoleMessages.Clear();
         _consoleErrors.Clear();
@@ -27,18 +27,51 @@ public abstract class PlaywrightTestBase : PageTest
             _consoleErrors.Add($"[PAGE ERROR] {error}");
             _consoleMessages.Add($"[PAGE ERROR] {error}");
         };
+
+        // Start tracing — captures screenshots, DOM snapshots, and network.
+        // On failure, saved as a .zip trace viewable at https://trace.playwright.dev
+        await Context.Tracing.StartAsync(new()
+        {
+            Title = $"{TestContext.CurrentContext.Test.ClassName}.{TestContext.CurrentContext.Test.Name}",
+            Screenshots = true,
+            Snapshots = true,
+            Sources = false
+        });
     }
 
     [TearDown]
-    public void DumpLogsOnFailure()
+    public async Task TearDown()
     {
-        if (TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed
-            && _consoleMessages.Count > 0)
+        var failed = TestContext.CurrentContext.Result.Outcome.Status
+            == NUnit.Framework.Interfaces.TestStatus.Failed;
+
+        // Save trace + screenshot on failure to a FIXED path under the test project.
+        // Traces: `npx playwright show-trace <path>` or https://trace.playwright.dev
+        // Screenshots: PNG files viewable directly
+        // Output next to the test .cs files — not buried in bin/Debug/net10.0/
+        var projectDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", ".."));
+        var traceDir = Path.Combine(projectDir, "TestResults", "playwright-traces");
+        Directory.CreateDirectory(traceDir);
+
+        var testName = TestContext.CurrentContext.Test.Name;
+        var tracePath = failed ? Path.Combine(traceDir, $"{testName}.zip") : null;
+        var screenshotPath = failed ? Path.Combine(traceDir, $"{testName}.png") : null;
+
+        await Context.Tracing.StopAsync(new() { Path = tracePath });
+
+        if (failed)
         {
-            TestContext.Out.WriteLine("=== Browser Console Output ===");
-            foreach (var msg in _consoleMessages)
-                TestContext.Out.WriteLine(msg);
-            TestContext.Out.WriteLine("=== End Console Output ===");
+            await Page.ScreenshotAsync(new() { Path = screenshotPath!, FullPage = true });
+            TestContext.AddTestAttachment(tracePath!, "Playwright trace");
+            TestContext.AddTestAttachment(screenshotPath!, "Screenshot on failure");
+
+            if (_consoleMessages.Count > 0)
+            {
+                TestContext.Out.WriteLine("=== Browser Console Output ===");
+                foreach (var msg in _consoleMessages)
+                    TestContext.Out.WriteLine(msg);
+                TestContext.Out.WriteLine("=== End Console Output ===");
+            }
         }
     }
 

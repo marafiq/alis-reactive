@@ -79,26 +79,7 @@
                             });
                     })); }
         </div>
-    </section>
-
-    <!-- Section 2: Property Read — Echo Value -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">2. Property Read (Value as Source)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the Facility component's <code>value</code> property and displays it in a text element.
-        </p>
-        <div class="font-mono text-sm">
-            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-        </div>
-    </section>
-
-    <!-- Section 3: Method Calls (ShowPopup / HidePopup) -->
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">3. Method Calls (ShowPopup / HidePopup)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Buttons invoke <code>el.showPopup()</code> and <code>el.hidePopup()</code> on the Syncfusion instance.
-        </p>
-        <div class="flex gap-2 mb-3">
+        <div class="flex gap-2 mt-4">
             @(Html.NativeButton("show-popup-btn", "Show Popup")
                 .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -112,9 +93,12 @@
                     p.Component<FusionMultiColumnComboBox>(m => m.Facility).HidePopup();
                 }))
         </div>
+        <div class="font-mono text-sm mt-4">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
     </section>
 
-    <!-- Section 4: Events — Changed -->
+    <!-- Section 2: Events — Changed -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">4. Events (Changed)</h2>
         <p class="text-sm text-text-secondary mb-4">

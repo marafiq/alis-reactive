@@ -303,8 +303,11 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
         var changeValue = Page.Locator("#change-value");
         var argsCondition = Page.Locator("#args-condition");
 
+        var showBtn = Page.Locator("#show-popup-btn");
+        var physician = Physician;
+
         // Cycle 1: select Dr. Johnson → change fires, args says "other physician"
-        await Page.Locator("#show-popup-btn").ClickAsync();
+        await showBtn.ClickAsync();
         await Expect(Page.Locator(".e-ddl.e-popup"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Johnson" }).ClickAsync();
@@ -314,7 +317,9 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
         await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
 
         // Cycle 2: select Dr. Williams → change fires again with new value
-        await Page.Locator("#show-popup-btn").ClickAsync();
+        // Wait for popup close animation to complete before re-opening
+        await Expect(Page.Locator(".e-ddl.e-popup")).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await showBtn.ClickAsync();
         await Expect(Page.Locator(".e-ddl.e-popup"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Williams" }).ClickAsync();
@@ -324,7 +329,8 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
         await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
 
         // Cycle 3: select Dr. Smith → change fires, args condition flips to "dr smith selected"
-        await Page.Locator("#show-popup-btn").ClickAsync();
+        await Expect(Page.Locator(".e-ddl.e-popup")).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await showBtn.ClickAsync();
         await Expect(Page.Locator(".e-ddl.e-popup"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Page.Locator(".e-ddl.e-popup .e-list-item").Filter(new() { HasText = "Dr. Smith" }).ClickAsync();

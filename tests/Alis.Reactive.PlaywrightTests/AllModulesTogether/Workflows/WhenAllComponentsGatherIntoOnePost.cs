@@ -14,7 +14,9 @@ namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.Workflows;
 /// All Fusion components are filled via real browser gestures (popup clicks,
 /// keyboard typing) through locator classes — no ej2_instances API calls.
 /// </summary>
-[TestFixture]
+// Heavy form-fill tests (14+ SF popup interactions) — cannot run in parallel reliably.
+// Under parallel load, SF popup animations overlap with other browser instances.
+[TestFixture, NonParallelizable]
 public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/AllModulesTogether/ComponentGather";
