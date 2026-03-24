@@ -5,6 +5,29 @@ const ELEMENT_ID = "alisConfirmDialog";
 
 let queue = Promise.resolve();
 
+function showConfirmDialog(
+  dialog: any,
+  message: string,
+  outerResolve: (value: boolean) => void
+): Promise<void> {
+  return new Promise<void>((resolve) => {
+    dialog.header = "Confirm";
+    dialog.content = message;
+    dialog.buttons = [
+      {
+        click: () => { dialog.close = null; dialog.hide(); resolve(); outerResolve(true); },
+        buttonModel: { content: "OK", isPrimary: true, cssClass: "e-primary" },
+      },
+      {
+        click: () => { dialog.close = null; dialog.hide(); resolve(); outerResolve(false); },
+        buttonModel: { content: "Cancel" },
+      },
+    ];
+    dialog.close = () => { resolve(); outerResolve(false); };
+    dialog.show();
+  });
+}
+
 /**
  * Initializes the SF Dialog on the confirm element and wires window.alis.confirm().
  * Called once from auto-boot before any plans are processed.
@@ -31,25 +54,7 @@ export function init(): void {
   (window as any).alis = (window as any).alis || {};
   (window as any).alis.confirm = function (message: string): Promise<boolean> {
     return new Promise<boolean>((outerResolve) => {
-      queue = queue.then(
-        () =>
-          new Promise<void>((resolve) => {
-            dialog.header = "Confirm";
-            dialog.content = message;
-            dialog.buttons = [
-              {
-                click: () => { dialog.close = null; dialog.hide(); resolve(); outerResolve(true); },
-                buttonModel: { content: "OK", isPrimary: true, cssClass: "e-primary" },
-              },
-              {
-                click: () => { dialog.close = null; dialog.hide(); resolve(); outerResolve(false); },
-                buttonModel: { content: "Cancel" },
-              },
-            ];
-            dialog.close = () => { resolve(); outerResolve(false); };
-            dialog.show();
-          })
-      );
+      queue = queue.then(() => showConfirmDialog(dialog, message, outerResolve));
     });
   };
 
