@@ -45,6 +45,9 @@ public sealed class DropDownListLocator
     /// </summary>
     public async Task Select(string text)
     {
+        // Clear stale focus from any prior DDL — prevents keyboard events going to wrong popup
+        await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
+
         await DropdownIcon.ClickAsync();
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
 
