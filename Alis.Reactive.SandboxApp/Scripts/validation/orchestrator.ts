@@ -94,6 +94,35 @@ function handleUnresolvableField(
   return false;
 }
 
+/**
+ * Checks a rule's When condition. Returns:
+ *   "skip"  — condition is false, skip this rule
+ *   "block" — condition is unresolvable (null), block with summary
+ *   "eval"  — condition passed or no condition, evaluate the rule
+ */
+function checkRuleCondition(
+  rule: ValidationRule, condReader: ConditionReader
+): "skip" | "block" | "eval" {
+  if (!rule.when) return "eval";
+  const result = evalCondition(rule.when, condReader);
+  if (result === false) return "skip";
+  if (result === null) return "block";
+  return "eval";
+}
+
+/** Reports a validation failure — routes to inline or summary based on visibility. */
+function reportFailure(
+  f: ValidationField, message: string, hidden: boolean,
+  formId: string, summaryEl: HTMLElement | null
+): void {
+  if (hidden) {
+    if (summaryEl) addToSummary(summaryEl, f.fieldName, message);
+  } else {
+    showInline(formId, f, message);
+    if (summaryEl) removeSummaryEntry(summaryEl, f.fieldName);
+  }
+}
+
 /** Evaluates all rules for a resolved field. Returns true if all pass. */
 function evaluateRules(
   f: ValidationField, value: unknown, hidden: boolean,
@@ -101,22 +130,15 @@ function evaluateRules(
   summaryEl: HTMLElement | null
 ): boolean {
   for (const rule of f.rules) {
-    if (rule.when) {
-      const condResult = evalCondition(rule.when, condReader);
-      if (condResult === false) continue;
-      if (condResult === null) {
-        if (summaryEl) addToSummary(summaryEl, f.fieldName, rule.message);
-        return false;
-      }
+    const condStatus = checkRuleCondition(rule, condReader);
+    if (condStatus === "skip") continue;
+    if (condStatus === "block") {
+      if (summaryEl) addToSummary(summaryEl, f.fieldName, rule.message);
+      return false;
     }
 
     if (ruleFails(rule, value, peerReader)) {
-      if (hidden) {
-        if (summaryEl) addToSummary(summaryEl, f.fieldName, rule.message);
-      } else {
-        showInline(formId, f, rule.message);
-        if (summaryEl) removeSummaryEntry(summaryEl, f.fieldName);
-      }
+      reportFailure(f, rule.message, hidden, formId, summaryEl);
       return false;
     }
   }
