@@ -84,7 +84,13 @@ export function executeCommand(cmd: Command, ctx?: ExecContext): void {
       const container = document.getElementById(cmd.target);
       if (!container) throw new Error(`[alis] Into("${cmd.target}") target not found. Is the element rendered?`);
       if (ctx?.responseBody != null) {
-        injectHtml(container, String(ctx.responseBody));
+        if (typeof ctx.responseBody !== "string") {
+          throw new Error(
+            `[alis] Into("${cmd.target}") received ${typeof ctx.responseBody} body. ` +
+            `Into expects text/html responses. Use a different handler for JSON.`
+          );
+        }
+        injectHtml(container, ctx.responseBody);
       }
       break;
     }
