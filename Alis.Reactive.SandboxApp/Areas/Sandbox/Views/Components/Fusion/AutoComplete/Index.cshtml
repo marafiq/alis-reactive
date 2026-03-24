@@ -1,0 +1,195 @@
+@model AutoCompleteModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@{
+    ViewData["Title"] = "AutoComplete";
+
+    var plan = Html.ReactivePlan<AutoCompleteModel>();
+    var physicians = (List<PhysicianItem>)ViewBag.Physicians;
+
+    // ── Section 1+2: Property Write (SetValue) + Property Read on DomReady ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<FusionAutoComplete>(m => m.Physician).SetValue("smith");
+        var comp = p.Component<FusionAutoComplete>(m => m.Physician);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
+
+    // ── Section 5: Gather — POST with Include ──
+
+    Html.On(plan, t => t.CustomEvent("do-gather", p =>
+    {
+        p.Post("/Sandbox/Components/AutoComplete/Echo", g =>
+            g.Include<FusionAutoComplete, AutoCompleteModel>(m => m.Physician))
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("gather-result").SetText("gathered");
+            }));
+    }));
+
+    // ── Section 7: Filtering event with HTTP — Server-filtered Medications ──
+    // (Section 7 plan wiring is inline below via .Reactive on the component)
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">FusionAutoComplete — Full API</h1>
+        <p class="mt-2 text-text-secondary">
+            Exercises all supported FusionAutoComplete API: property writes, method calls,
+            property reads, events, conditions, and gather.
+        </p>
+    </div>
+
+    <!-- Section 1: Property Write (SetValue) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Property Write (SetValue)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, sets value="Dr. Smith" via structured prop on the Syncfusion ej2 instance.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.Physician, o => o.Label("Physician (SF AutoComplete)"))
+                .AutoComplete(b => b
+                    .DataSource(physicians)
+                    .Fields<PhysicianItem>(t => t.Text, v => v.Value)
+                    .Placeholder("Select a physician")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("change-value").SetText(args, x => x.Value);
+                        p.When(args, x => x.Value).Eq("smith")
+                            .Then(t => t.Element("args-condition").SetText("dr smith selected"))
+                            .Else(e => e.Element("args-condition").SetText("other physician"));
+                        var comp = p.Component<FusionAutoComplete>(m => m.Physician);
+                        p.When(comp.Value()).NotNull()
+                            .Then(then =>
+                            {
+                                then.Element("selected-indicator").Show();
+                                then.Element("selected-indicator").SetText("selected");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("selected-indicator").Hide();
+                            });
+                    })); }
+        </div>
+    </section>
+
+    <!-- Section 2: Property Read — Echo Value -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Property Read (Value as Source)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the Physician component's <code>value</code> property and displays it in a text element.
+        </p>
+        <div class="font-mono text-sm">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 3: Method Calls (ShowPopup / HidePopup) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Method Calls (ShowPopup / HidePopup)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Buttons invoke <code>el.showPopup()</code> and <code>el.hidePopup()</code> on the Syncfusion instance.
+        </p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("show-popup-btn", "Show Popup")
+                .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionAutoComplete>(m => m.Physician).ShowPopup();
+                }))
+            @(Html.NativeButton("hide-popup-btn", "Hide Popup")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionAutoComplete>(m => m.Physician).HidePopup();
+                }))
+        </div>
+    </section>
+
+    <!-- Section 4: Events — Changed -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Events (Changed)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            The Physician field wires the Changed event. Change shows the new value.
+        </p>
+        <div class="font-mono text-sm space-y-1">
+            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
+            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
+            <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 5: Conditions — Typed Event-Args + Component-Read -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">5. Conditions (Both Types)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Two condition types are exercised:
+            <code>When(args, x =&gt; x.Value).Eq("smith")</code> (typed event-args condition)
+            and <code>When(comp.Value()).NotNull()</code> (component-read condition).
+        </p>
+    </section>
+
+    <!-- Section 6: Gather — Include in POST -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">6. Gather (Include in POST)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Click to POST the Physician value gathered from the Syncfusion component via
+            <code>Include&lt;FusionAutoComplete&gt;</code>.
+        </p>
+        @(Html.NativeButton("gather-btn", "Gather Physician")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-gather");
+            }))
+        <div class="font-mono text-sm">
+            <p>Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
+        </div>
+    </section>
+
+    <!-- Section 7: Filtering Event — Server-Filtered Medications -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">7. Filtering Event (Server-Filtered HTTP)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Type to search medications. The Filtering event fires on each keystroke (debounced 500ms),
+            sends the typed text to the server via HTTP GET, and updates the dropdown DataSource from the response.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.MedicationType, o => o.Label("Medication (Server-Filtered)"))
+                .AutoComplete(b => b
+                    .Fields<MedicationTypeItem>(t => t.Text, v => v.Value)
+                    .Placeholder("Type to search medications...")
+                    .DebounceDelay(500)
+                    .AllowObjectBinding(true)
+                    .AllowCustom(false).ShowPopupButton().Highlight(true)
+                    .Reactive(plan, evt => evt.Filtering, (args, p) =>
+                    {
+                        
+                        args.PreventDefault(p);
+                        p.Get("/Sandbox/Components/AutoComplete/Medications")
+                         .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))
+                         .Response(r => r
+                            .OnSuccess<MedicationSearchResponse>((json, s) =>
+                            {
+                                args.UpdateData(s, json, j => j.Medications);
+                                s.Element("filter-status").SetText("results loaded");
+                            }));
+                    })); }
+        </div>
+        <div class="font-mono text-sm mt-2 space-y-1">
+            <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)

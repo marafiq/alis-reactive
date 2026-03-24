@@ -1,0 +1,64 @@
+@model DrawerResidentModel
+@using Alis.Reactive.Native.AppLevel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.AppLevel
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    var plan = Html.ResolvePlan<DrawerResidentModel>();
+
+    var careLevels = new[]
+    {
+        new RadioButtonItem("Independent Living", "Independent Living"),
+        new RadioButtonItem("Assisted Living", "Assisted Living"),
+        new RadioButtonItem("Memory Care", "Memory Care"),
+        new RadioButtonItem("Skilled Nursing", "Skilled Nursing"),
+    };
+}
+
+<form id="drawer-resident-form">
+    <native-vstack gap="Base">
+        @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Resident Name"))
+            .NativeTextBox(b => b.Placeholder("Full name")); }
+
+        @{ Html.InputField(plan, m => m.Email, o => o.Required().Label("Email"))
+            .NativeTextBox(b => b.Placeholder("resident@facility.com")); }
+
+        @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
+            .NativeRadioGroup(b => b.Items(careLevels)); }
+
+        @{ Html.InputField(plan, m => m.Notes, o => o.Label("Notes"))
+            .NativeTextBox(b => b.Placeholder("Additional care notes...")); }
+
+        <native-hstack gap="Sm" align="Center">
+            @(Html.NativeButton("drawer-submit-btn", "Save Resident")
+                .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Element("alis-loader-message").SetText("Saving resident...");
+                    p.Post("/Sandbox/Components/Drawer/SubmitResident", g => g.IncludeAll())
+                     .Validate<DrawerResidentValidator>("drawer-resident-form")
+                     .WhileLoading(loader=> loader.Component<NativeLoader>().SetTarget("drawer-resident-form").SetTimeout(1000).Show())
+                     .Response(r => r
+                        .OnSuccess(s =>
+                        {
+                            s.Component<NativeLoader>().Hide();
+                            s.Component<FusionToast>()
+                                .SetTitle("Admission")
+                                .SetContent("Resident saved successfully")
+                                .Success()
+                                .Show();
+                            s.Component<NativeDrawer>().Close();
+                        })
+                        .OnError(400, e =>
+                        {
+                            e.Component<NativeLoader>().Hide();
+                            e.ValidationErrors("drawer-resident-form");
+                        }));
+                }))
+            <span id="drawer-result" class="text-sm text-text-muted"></span>
+        </native-hstack>
+    </native-vstack>
+</form>
+
+@Html.RenderPlan(plan)

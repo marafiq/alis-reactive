@@ -1,0 +1,204 @@
+@model PlaygroundSyntaxModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Reactive Conditions";
+
+    var statusItems = (IEnumerable<SelectListItem>)ViewBag.StatusItems;
+    var cityItems = (IEnumerable<SelectListItem>)ViewBag.CityItems;
+    var stateItems = (IEnumerable<SelectListItem>)ViewBag.StateItems;
+
+    var plan = new ReactivePlan<PlaygroundSyntaxModel>();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Reactive Conditions</native-heading>
+        <native-text color="Secondary">
+            Conditions inside <code class="bg-slate-100 px-1 rounded">.Reactive()</code>
+            — each control is rendered once, its <code class="bg-slate-100 px-1 rounded">.Reactive()</code>
+            pipeline uses conditions to mutate other controls cross-vendor.
+        </native-text>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         All form fields rendered once — each with its own .Reactive()
+         ═══════════════════════════════════════════════════════════ -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Form — Each control has its own .Reactive() pipeline</native-heading>
+
+        <!-- Row 1: Status (native) + Amount (fusion) -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+
+            <!-- ── Status: Native dropdown with ElseIf branches ──
+                 "active"   → Amount=100, City="seattle", show success
+                 "inactive" → Amount=0,   hide address,   show warning
+                 else       → reset message, show address -->
+            @{ Html.InputField(plan, m => m.Status, o => o.Required().Label("Status"))
+               .NativeDropDown(b => b
+                   .Items(statusItems)
+                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   {
+                       p.When(args, x => x.Value).Eq("active")
+                           .Then(then =>
+                           {
+                               then.Component<FusionNumericTextBox>(m => m.Amount).SetValue(100);
+                               then.Component<NativeDropDown>(m => m.Address!.City).SetValue("seattle");
+                               then.Element("status-result").SetText("Active: Amount=100, City=Seattle");
+                               then.Element("status-result").AddClass("text-emerald-700");
+                               then.Element("status-result").RemoveClass("text-amber-600");
+                               then.Element("status-result").RemoveClass("text-slate-500");
+                               then.Element("address-section").Show();
+                           })
+                           .ElseIf(args, x => x.Value).Eq("inactive")
+                           .Then(then =>
+                           {
+                               then.Component<FusionNumericTextBox>(m => m.Amount).SetValue(0);
+                               then.Element("status-result").SetText("Inactive: Amount=0, address hidden");
+                               then.Element("status-result").AddClass("text-amber-600");
+                               then.Element("status-result").RemoveClass("text-emerald-700");
+                               then.Element("status-result").RemoveClass("text-slate-500");
+                               then.Element("address-section").Hide();
+                           })
+                           .Else(else_ =>
+                           {
+                               else_.Element("status-result").SetText("Pending or empty");
+                               else_.Element("status-result").AddClass("text-slate-500");
+                               else_.Element("status-result").RemoveClass("text-emerald-700");
+                               else_.Element("status-result").RemoveClass("text-amber-600");
+                               else_.Element("address-section").Show();
+                           });
+                   })); }
+
+            <!-- ── Amount: Fusion NumericTextBox with ElseIf tier ladder ──
+                 >= 5000 → "High value order"
+                 >= 1000 → "Standard order"
+                 else    → "Small order" -->
+            @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount"))
+               .NumericTextBox(b => b
+                   .Min(0).Max(99999).Step(100)
+                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   {
+                       p.When(args, x => x.Value).Gte(5000m)
+                           .Then(then =>
+                           {
+                               then.Element("amount-tier").SetText("High value order");
+                               then.Element("amount-tier").AddClass("text-rose-600");
+                               then.Element("amount-tier").RemoveClass("text-sky-600");
+                               then.Element("amount-tier").RemoveClass("text-slate-500");
+                           })
+                           .ElseIf(args, x => x.Value).Gte(1000m)
+                           .Then(then =>
+                           {
+                               then.Element("amount-tier").SetText("Standard order");
+                               then.Element("amount-tier").AddClass("text-sky-600");
+                               then.Element("amount-tier").RemoveClass("text-rose-600");
+                               then.Element("amount-tier").RemoveClass("text-slate-500");
+                           })
+                           .Else(else_ =>
+                           {
+                               else_.Element("amount-tier").SetText("Small order");
+                               else_.Element("amount-tier").AddClass("text-slate-500");
+                               else_.Element("amount-tier").RemoveClass("text-rose-600");
+                               else_.Element("amount-tier").RemoveClass("text-sky-600");
+                           });
+                   })); }
+        </div>
+
+        <!-- Row 2: Address fields (nested) -->
+        <div id="address-section" class="grid grid-cols-3 gap-4 mb-4">
+
+            <!-- ── City: Nested native dropdown with condition → auto-fill siblings ──
+                 "seattle"  → State=WA, PostalCode=98101
+                 "portland" → State=OR, PostalCode=97201
+                 "denver"   → State=CO, PostalCode=80201
+                 else       → clear both -->
+            @{ Html.InputField(plan, m => m.Address!.City, o => o.Label("City"))
+               .NativeDropDown(b => b
+                   .Items(cityItems)
+                   .Reactive(plan, evt => evt.Changed, (args, p) =>
+                   {
+                       p.When(args, x => x.Value).Eq("seattle")
+                           .Then(then =>
+                           {
+                               then.Component<NativeDropDown>(m => m.Address!.State).SetValue("WA");
+                               then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).SetValue(98101);
+                               then.Element("city-auto").SetText("Auto-filled: WA, 98101");
+                           })
+                           .ElseIf(args, x => x.Value).Eq("portland")
+                           .Then(then =>
+                           {
+                               then.Component<NativeDropDown>(m => m.Address!.State).SetValue("OR");
+                               then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).SetValue(97201);
+                               then.Element("city-auto").SetText("Auto-filled: OR, 97201");
+                           })
+                           .ElseIf(args, x => x.Value).Eq("denver")
+                           .Then(then =>
+                           {
+                               then.Component<NativeDropDown>(m => m.Address!.State).SetValue("CO");
+                               then.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).SetValue(80201);
+                               then.Element("city-auto").SetText("Auto-filled: CO, 80201");
+                           })
+                           .Else(else_ =>
+                           {
+                               else_.Component<NativeDropDown>(m => m.Address!.State).SetValue("");
+                               else_.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).SetValue(0);
+                               else_.Element("city-auto").SetText("Select a city");
+                           });
+                   })); }
+
+            @{ Html.InputField(plan, m => m.Address!.State, o => o.Label("State"))
+               .NativeDropDown(b => b
+                   .Items(stateItems)); }
+
+            @{ Html.InputField(plan, m => m.Address!.PostalCode, o => o.Label("Postal Code"))
+               .NumericTextBox(b => b
+                   .Min(10000).Max(99999).Step(1)); }
+        </div>
+
+        <!-- Echo panel -->
+        <div class="border-t border-border pt-3 space-y-2 text-xs font-mono">
+            <div class="flex justify-between">
+                <span class="text-text-secondary">Status result</span>
+                <span id="status-result">&mdash;</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-text-secondary">Amount tier</span>
+                <span id="amount-tier">&mdash;</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-text-secondary">City auto-fill</span>
+                <span id="city-auto">Select a city</span>
+            </div>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- What this proves -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2" class="mb-2">What this proves</native-heading>
+        <ul class="text-xs text-text-secondary space-y-1 list-disc pl-4">
+            <li><strong>Conditions inside .Reactive()</strong> — ElseIf branching evaluates event payload at runtime</li>
+            <li><strong>Cross-vendor mutations</strong> — Native event → mutates Fusion component and vice versa</li>
+            <li><strong>Nested property targets</strong> — <code>m => m.Address!.City</code> resolves to correct element ID per vendor</li>
+            <li><strong>.Component&lt;T&gt;() targeting</strong> — Both <code>Component&lt;FusionNumericTextBox&gt;</code> and <code>Component&lt;NativeDropDown&gt;</code> resolve correctly</li>
+            <li><strong>DOM mutations</strong> — SetText, AddClass, RemoveClass, Show, Hide all execute in branches</li>
+            <li><strong>Plan JSON</strong> — Branches with guards serialize correctly to the runtime plan</li>
+        </ul>
+    </native-card-body>
+    </native-card>
+
+    <!-- Plan JSON -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2" class="mb-3">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

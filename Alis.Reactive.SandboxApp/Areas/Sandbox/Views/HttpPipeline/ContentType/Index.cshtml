@@ -1,0 +1,149 @@
+@model ContentTypeModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Content Type";
+
+    var plan = Html.ReactivePlan<ContentTypeModel>();
+
+    // ── Section 1: JSON Flat Response — OnSuccess<FlatResponse> ──
+
+    Html.On(plan, t => t.CustomEvent("fetch-flat", p =>
+    {
+        p.Get("/Sandbox/HttpPipeline/ContentType/FlatJson")
+         .WhileLoading(l => l.Element("flat-spinner").Show())
+         .Response(r => r
+            .OnSuccess<FlatResponse>((json, s) =>
+            {
+                s.Element("flat-spinner").Hide();
+                s.Element("flat-message").SetText(json, x => x.Message);
+                s.Element("flat-count").SetText(json, x => x.Count);
+            })
+         );
+    }));
+
+    // ── Section 2: JSON Nested Response — OnSuccess<NestedResponse> ──
+
+    Html.On(plan, t => t.CustomEvent("fetch-nested", p =>
+    {
+        p.Get("/Sandbox/HttpPipeline/ContentType/NestedJson")
+         .WhileLoading(l => l.Element("nested-spinner").Show())
+         .Response(r => r
+            .OnSuccess<NestedResponse>((json, s) =>
+            {
+                s.Element("nested-spinner").Hide();
+                s.Element("nested-name").SetText(json, x => x.Data!.User!.Name);
+                s.Element("nested-email").SetText(json, x => x.Data!.User!.Email);
+                s.Element("nested-total").SetText(json, x => x.Data!.Total);
+            })
+         );
+    }));
+
+    // ── Section 3: HTML Partial via Into ──
+
+    Html.On(plan, t => t.CustomEvent("fetch-partial", p =>
+    {
+        p.Get("/Sandbox/HttpPipeline/ContentType/Partial")
+         .WhileLoading(l => l.Element("partial-spinner").Show())
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("partial-spinner").Hide();
+                s.Into("partial-container");
+            })
+         );
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Content-Type Aware Success Handlers</native-heading>
+        <native-text color="Secondary">
+            JSON responses use <code>OnSuccess&lt;T&gt;</code> with typed path walking via <code>ResponseBody&lt;T&gt;</code>.
+            HTML partials use <code>Into</code> with <code>ej.base.append</code>.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Flat JSON Response -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">1. JSON Flat Response</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            <code>OnSuccess&lt;FlatResponse&gt;((json, s) =&gt; s.Element("x").SetText(json, r =&gt; r.Message))</code>
+            — walks <code>responseBody.message</code> at runtime.
+        </p>
+        @(Html.NativeButton("flat-btn", "Fetch Flat JSON")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("fetch-flat");
+            }))
+        <div class="font-mono text-sm space-y-1">
+            <p id="flat-spinner" hidden class="text-amber-600">Loading...</p>
+            <p>Message: <span id="flat-message" class="text-text-muted">&mdash;</span></p>
+            <p>Count: <span id="flat-count" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 2: Nested JSON Response -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">2. JSON Nested Response</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            <code>OnSuccess&lt;NestedResponse&gt;((json, s) =&gt; s.Element("x").SetText(json, r =&gt; r.Data.User.Name))</code>
+            — walks <code>responseBody.data.user.name</code> (3 levels deep).
+        </p>
+        @(Html.NativeButton("nested-btn", "Fetch Nested JSON")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("fetch-nested");
+            }))
+        <div class="font-mono text-sm space-y-1">
+            <p id="nested-spinner" hidden class="text-amber-600">Loading...</p>
+            <p>Name: <span id="nested-name" class="text-text-muted">&mdash;</span></p>
+            <p>Email: <span id="nested-email" class="text-text-muted">&mdash;</span></p>
+            <p>Total: <span id="nested-total" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 3: HTML Partial via Into -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">3. HTML Partial via Into</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            <code>Into("partial-container")</code> injects server-rendered HTML.
+            Partial includes native <code>&lt;input&gt;</code> via <code>Html.NativeTextBoxFor()</code> and Syncfusion <code>NumericTextBox</code> via <code>Html.NumericTextBoxFor()</code>.
+            SF components initialize via <code>ej.base.append</code> which executes the inline <code>ScriptManager</code> output.
+        </p>
+        @(Html.NativeButton("partial-btn", "Load Partial")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("fetch-partial");
+            }))
+        <div class="font-mono text-sm">
+            <p id="partial-spinner" hidden class="text-amber-600">Loading partial...</p>
+        </div>
+        <div id="partial-container" class="mt-3 rounded-md border border-dashed border-border p-4">
+            <p class="text-text-muted text-sm">Partial not loaded yet</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Plan JSON -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@section Scripts {
+    <script src="~/js/test-widget.js" asp-append-version="true"></script>
+}
+
+@Html.RenderPlan(plan)

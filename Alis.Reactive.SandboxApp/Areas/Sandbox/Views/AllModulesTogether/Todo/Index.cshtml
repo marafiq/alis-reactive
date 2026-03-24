@@ -1,0 +1,75 @@
+@model TodoModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.AppLevel
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    ViewData["Title"] = "Todo";
+    var plan = Html.ReactivePlan<TodoModel>();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Your First Plan — Todo</native-heading>
+        <native-text color="Secondary">
+            Getting started example: conditional visibility, client-side validation, HTTP post with toast.
+        </native-text>
+    </div>
+
+    <native-card>
+    <native-card-body>
+        <form id="todo-form" class="grid grid-cols-1 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.Title, o => o.Required().Label("Title"))
+                .NativeTextBox(b => b
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("What needs to be done?")); }
+
+            @{ Html.InputField(plan, m => m.IsUrgent, o => o.Label("Urgent"))
+                .NativeCheckBox(b => b
+                    .CssClass("h-4 w-4 rounded border-border text-accent")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.When(args, a => a.Checked).Truthy()
+                            .Then(t => t.Element("due-date-section").Show())
+                            .Else(e => e.Element("due-date-section").Hide());
+                    })); }
+
+            <div id="due-date-section" hidden>
+                @{ Html.InputField(plan, m => m.DueDate, o => o.Label("Due Date"))
+                    .DatePicker(b => b.Placeholder("Select due date")); }
+            </div>
+        </form>
+
+        @(Html.NativeButton("save-btn", "Save Todo")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/AllModulesTogether/Todo/Save", g => g.IncludeAll())
+                 .Validate<TodoValidator>("todo-form")
+                 .Response(r => r
+                    .OnSuccess(s =>
+                    {
+                        s.Component<FusionToast>()
+                            .SetTitle("Todo")
+                            .SetContent("Todo saved successfully")
+                            .Success()
+                            .Show();
+                    })
+                    .OnError(400, e => e.ValidationErrors("todo-form")));
+            }))
+
+        <p id="todo-result" class="mt-3 text-sm text-text-muted">Fill in the form and click Save</p>
+    </native-card-body>
+    </native-card>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="text-xs overflow-auto"><code>@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

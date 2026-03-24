@@ -1,0 +1,182 @@
+@model RealTimeModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Hubs
+@{
+    ViewData["Title"] = "Real-Time Triggers";
+
+    IReactivePlan<RealTimeModel> plan = new ReactivePlan<RealTimeModel>();
+
+    // SSE: facility alerts (native EventSource, zero library, auto-reconnect)
+    Html.On(plan, t => t.ServerPush<FacilityAlert>("/api/facility-alerts", "facility-alert",
+        (alert, p) =>
+    {
+        p.Element("alert-message").SetText(alert, x => x.Message);
+        p.Element("alert-level").SetText(alert, x => x.Level);
+        p.Element("alert-status").RemoveClass("text-text-muted");
+        p.Element("alert-status").AddClass("text-success");
+        p.Element("alert-status").SetText("Connected");
+    }));
+
+    // SignalR Hub 1: notifications
+    Html.On(plan, t => t.SignalR<NotificationPayload>("/hubs/notifications", "ReceiveNotification",
+        (payload, p) =>
+    {
+        p.Element("notif-count").SetText(payload, x => x.Count);
+        p.Element("notif-message").SetText(payload, x => x.Message);
+        p.Element("notif-priority").SetText(payload, x => x.Priority);
+    }));
+
+    // SignalR Hub 2: resident status
+    Html.On(plan, t => t.SignalR<ResidentStatusPayload>("/hubs/resident-status", "StatusChanged",
+        (payload, p) =>
+    {
+        p.Element("resident-name").SetText(payload, x => x.ResidentName);
+        p.Element("resident-status").SetText(payload, x => x.Status);
+        p.Element("resident-care-level").SetText(payload, x => x.CareLevel);
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Real-Time Triggers</native-heading>
+        <native-text color="Secondary">
+            Server-to-client push via SSE and SignalR — zero JavaScript in the view.
+            The background service pushes updates every 2 seconds via both hubs.
+        </native-text>
+    </div>
+
+    @* ── SSE: Facility Alerts ── *@
+    <native-card>
+        <native-card-body>
+            <native-hstack gap="Base" justify="Between">
+                <native-heading level="H2">SSE — Facility Alerts</native-heading>
+                <span id="alert-status" class="text-sm text-text-muted">Connecting...</span>
+            </native-hstack>
+            <native-text color="Secondary" size="Sm">
+                Native browser EventSource — zero library, auto-reconnect built into the spec.
+            </native-text>
+            <native-divider />
+            <native-grid cols="C2" gap="Sm">
+                <div>
+                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Message</dt>
+                    <dd id="alert-message" class="mt-1 text-sm text-text-primary">—</dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Level</dt>
+                    <dd id="alert-level" class="mt-1 text-sm text-text-primary">—</dd>
+                </div>
+            </native-grid>
+        </native-card-body>
+    </native-card>
+
+    @* ── SignalR Hub 1: Notifications ── *@
+    <native-card>
+        <native-card-body>
+            <native-hstack gap="Base" justify="Between">
+                <native-heading level="H2">SignalR — Notifications</native-heading>
+                <native-text color="Muted" size="Sm">Hub 1: /hubs/notifications</native-text>
+            </native-hstack>
+            <native-text color="Secondary" size="Sm">
+                Server broadcasts via IHubContext. Count, message, and priority update in real time.
+            </native-text>
+            <native-divider />
+            <native-grid cols="C3" gap="Sm">
+                <div>
+                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Count</dt>
+                    <dd id="notif-count" class="mt-1 text-2xl font-semibold text-text-primary">—</dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Message</dt>
+                    <dd id="notif-message" class="mt-1 text-sm text-text-primary">—</dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Priority</dt>
+                    <dd id="notif-priority" class="mt-1 text-sm text-text-primary">—</dd>
+                </div>
+            </native-grid>
+            <native-divider />
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("btn-push-notification", "Push Manual Notification")
+                    .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post("/Sandbox/HttpPipeline/RealTime/PushNotification")
+                         .Gather(g => g
+                             .Static("count", 99)
+                             .Static("message", "Manual push at " + DateTime.Now.ToString("HH:mm:ss"))
+                             .Static("priority", "high"))
+                         .Response(r => r.OnSuccess(s => { }));
+                    }))
+            </native-hstack>
+        </native-card-body>
+    </native-card>
+
+    @* ── SignalR Hub 2: Resident Status ── *@
+    <native-card>
+        <native-card-body>
+            <native-hstack gap="Base" justify="Between">
+                <native-heading level="H2">SignalR — Resident Status</native-heading>
+                <native-text color="Muted" size="Sm">Hub 2: /hubs/resident-status</native-text>
+            </native-hstack>
+            <native-text color="Secondary" size="Sm">
+                Second hub proving independent connections. Resident details cycle automatically.
+            </native-text>
+            <native-divider />
+            <native-grid cols="C3" gap="Sm">
+                <div>
+                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Resident</dt>
+                    <dd id="resident-name" class="mt-1 text-sm font-semibold text-text-primary">—</dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Status</dt>
+                    <dd id="resident-status" class="mt-1 text-sm text-text-primary">—</dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Care Level</dt>
+                    <dd id="resident-care-level" class="mt-1 text-sm text-text-primary">—</dd>
+                </div>
+            </native-grid>
+            <native-divider />
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("btn-push-status", "Push Manual Status")
+                    .CssClass("px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post("/Sandbox/HttpPipeline/RealTime/PushResidentStatus")
+                         .Gather(g => g
+                             .Static("residentName", "Helen Martinez (Manual)")
+                             .Static("status", "Under Review")
+                             .Static("careLevel", "Memory Care")
+                             .Static("updatedAt", DateTime.UtcNow.ToString("O")))
+                         .Response(r => r.OnSuccess(s => { }));
+                    }))
+            </native-hstack>
+        </native-card-body>
+    </native-card>
+
+    @* ── Partial View: Dynamic Hub Connection ── *@
+    <native-card>
+        <native-card-body>
+            <native-heading level="H2">Partial View — Dynamic Hub Connection</native-heading>
+            <native-text color="Secondary" size="Sm">
+                Loads a partial view with its own plan and SignalR trigger.
+                The runtime reuses the existing /hubs/resident-status connection — no duplicate WebSocket.
+            </native-text>
+            <native-divider />
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("load-panel", "Open Resident Panel")
+                    .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get("/Sandbox/HttpPipeline/RealTime/ResidentPanel")
+                         .Response(r => r.OnSuccess(s => s.Into("panel-container")));
+                    }))
+            </native-hstack>
+            <div id="panel-container" class="mt-4"></div>
+        </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

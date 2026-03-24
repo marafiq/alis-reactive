@@ -1,0 +1,147 @@
+@model TimePickerModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@{
+    ViewData["Title"] = "TimePicker";
+
+    var plan = Html.ReactivePlan<TimePickerModel>();
+
+    // Section 1+2: Property Write + Property Read on DomReady
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<FusionTimePicker>(m => m.MedicationTime).SetValue(new DateTime(2026, 1, 1, 8, 30, 0));
+        var comp = p.Component<FusionTimePicker>(m => m.MedicationTime);
+        p.Element("value-echo").SetText(comp.Value());
+    }));
+
+    // Section 5: Gather — POST with Include
+    Html.On(plan, t => t.CustomEvent("do-gather", p =>
+    {
+        p.Post("/Sandbox/Components/TimePicker/Echo", g =>
+            g.Include<FusionTimePicker, TimePickerModel>(m => m.MedicationTime))
+         .Response(r => r
+            .OnSuccess(s =>
+            {
+                s.Element("gather-result").SetText("gathered");
+            }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">FusionTimePicker — Full API</native-heading>
+        <native-text color="Secondary">
+            Exercises all supported FusionTimePicker API: property writes, property reads,
+            events, conditions, and gather.
+            Senior living domain: medication and wake-up times.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Property Write (SetValue) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Property Write (SetValue)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, sets medication time to 08:30 via structured prop on the Syncfusion ej2 instance.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.MedicationTime, o => o.Label("Medication Time (SF TimePicker)"))
+                .TimePicker(b => { }); }
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 2: Property Read — Echo Value -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, reads the MedicationTime component's <code>value</code> property and displays it in a text element.
+        </p>
+        <div class="font-mono text-sm">
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 3: Events — Changed -->
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Events (Changed) + Conditions</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            The WakeUpTime field wires the Changed event. Change shows the new value.
+            Conditions use <code>When(args, x =&gt; x.Value).NotNull()</code> (event-args)
+            and <code>When(comp.Value()).IsEmpty()</code> (component-read).
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.WakeUpTime, o => o.Label("Wake-Up Time (SF TimePicker)"))
+                .TimePicker(b => b
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("change-value").SetText(args, x => x.Value);
+                        // Event-args condition: When(args, x => x.Value).NotNull()
+                        p.When(args, x => x.Value).NotNull()
+                            .Then(then =>
+                            {
+                                then.Element("time-status").Show();
+                                then.Element("time-status").SetText("time selected");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("time-status").Hide();
+                            });
+                        // Component-read condition: When(comp.Value()).IsEmpty()
+                        var comp = p.Component<FusionTimePicker>(m => m.WakeUpTime);
+                        p.When(comp.Value()).IsEmpty()
+                            .Then(then =>
+                            {
+                                then.Element("empty-indicator").Show();
+                                then.Element("empty-indicator").SetText("no time set");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("empty-indicator").Hide();
+                            });
+                    })); }
+        </div>
+        <div class="font-mono text-sm space-y-1">
+            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
+            <p>Status: <span id="time-status" hidden class="text-emerald-600">&mdash;</span></p>
+            <p>Empty: <span id="empty-indicator" hidden class="text-rose-600">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 4: Conditions -->
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Conditions (Both Patterns)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Section 3 exercises both typed condition patterns:
+            <code>When(args, x =&gt; x.Value).NotNull()</code> (event-args) shows a time-selected status,
+            <code>When(comp.Value()).IsEmpty()</code> (component-read) shows an empty indicator.
+            Select a time to see the status; clear the field to see the empty indicator.
+        </p>
+    </native-card-body></native-card>
+
+    <!-- Section 5: Gather — Include in POST -->
+    <native-card><native-card-body>
+        <native-heading level="H2">5. Gather (Include in POST)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Click to POST the MedicationTime value gathered from the Syncfusion component via
+            <code>Include&lt;FusionTimePicker&gt;</code>.
+        </p>
+        @(Html.NativeButton("gather-btn", "Gather Medication Time")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-gather");
+            }))
+        <div class="font-mono text-sm">
+            <p>Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

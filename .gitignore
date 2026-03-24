@@ -18,3 +18,4 @@ docs-site/dist/
 docs-site/.astro/
 docs-site/public/d2/
 .DS_Store
+tests/Alis.Reactive.PlaywrightTests/TestResults/

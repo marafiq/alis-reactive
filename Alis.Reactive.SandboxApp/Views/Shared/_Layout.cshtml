@@ -29,55 +29,25 @@
                     </span>
                 </a>
                 <nav class="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-                    <a asp-controller="Home" asp-action="Index"
+                    <a href="@Url.Action("Index", "Home")"
                        class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Home</a>
-                    <a asp-area="Sandbox" asp-controller="Events" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Events</a>
-                    <a asp-area="Sandbox" asp-controller="Payload" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Payload</a>
-                    <a asp-area="Sandbox" asp-controller="Conditions" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Conditions</a>
-                    <a asp-area="Sandbox" asp-controller="Validation" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Validation</a>
-                    <a asp-area="Sandbox" asp-controller="Architecture" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Architecture</a>
-                    <a asp-area="Sandbox" asp-controller="Drawer" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Drawer</a>
+                    <a href="@Url.Action("Index", "SandboxHome", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-semibold text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Sandbox</a>
 
                     <span class="w-px h-5 bg-border mx-1"></span>
 
-                    <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Playground</a>
-                    <a asp-area="Sandbox" asp-controller="PlaygroundSyntax" asp-action="ReactiveConditions"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Reactive Cond.</a>
-                    <a asp-area="Sandbox" asp-controller="ContentType" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Content Type</a>
-                    <a asp-area="Sandbox" asp-controller="NumericTextBox" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">NumericTextBox</a>
-                    <a asp-area="Sandbox" asp-controller="DropDownList" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">DropDownList</a>
-                    <a asp-area="Sandbox" asp-controller="AutoComplete" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">AutoComplete</a>
-                    <a asp-area="Sandbox" asp-controller="MultiSelect" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">MultiSelect</a>
-                    <a asp-area="Sandbox" asp-controller="NativeTextArea" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">TextArea</a>
-                    <a asp-area="Sandbox" asp-controller="NativeHiddenField" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">HiddenField</a>
-                    <a asp-area="Sandbox" asp-controller="DateTimePicker" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">DateTimePicker</a>
-                    <a asp-area="Sandbox" asp-controller="DateRangePicker" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">DateRangePicker</a>
-                    <a asp-area="Sandbox" asp-controller="InputMask" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">InputMask</a>
-                    <a asp-area="Sandbox" asp-controller="RichTextEditor" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">RichTextEditor</a>
-                    <a asp-area="Sandbox" asp-controller="Switch" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Switch</a>
-                    <a asp-area="Sandbox" asp-controller="FileUpload" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">FileUpload</a>
-                    <a asp-area="Sandbox" asp-controller="ComponentGather" asp-action="Index"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">ComponentGather</a>
+                    <a href="@Url.Action("Index", "CoreBehaviors", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Core</a>
+                    <a href="@Url.Action("Index", "Conditions", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Conditions</a>
+                    <a href="@Url.Action("Index", "HttpPipeline", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">HTTP</a>
+                    <a href="@Url.Action("Index", "Validation", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Validation</a>
+                    <a href="@Url.Action("Index", "Components", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Components</a>
+                    <a href="@Url.Action("Index", "AllModulesTogether", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">All Modules</a>
                 </nav>
             </div>
         </native-container>
@@ -85,6 +55,7 @@
 
     <main class="flex-1">
         <native-container class="py-10">
+            @await Html.PartialAsync("_SandboxBreadcrumb")
             @RenderBody()
         </native-container>
     </main>

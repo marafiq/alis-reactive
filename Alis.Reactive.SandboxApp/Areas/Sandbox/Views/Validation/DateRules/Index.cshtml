@@ -1,0 +1,55 @@
+@model DateValidationModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Date Validation";
+    var plan = Html.ReactivePlan<DateValidationModel>();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Date Validation</native-heading>
+        <native-text color="Secondary">
+            Date-aware validation with cross-property comparison.
+            Admission date >= 2020-01-01, discharge date > admission date.
+        </native-text>
+    </div>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Resident Stay Dates</native-heading>
+        <form id="date-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
+                .DatePicker(b => b
+                    .Placeholder("Select admission date")); }
+            @{ Html.InputField(plan, m => m.DischargeDate, o => o.Required().Label("Discharge Date"))
+                .DatePicker(b => b
+                    .Placeholder("Select discharge date")); }
+        </form>
+        @(Html.NativeButton("validate-dates-btn", "Validate Dates")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Validation/DateRules/ValidateClient")
+                 .Validate<DateValidationValidator>("date-form")
+                 .Response(r => r.OnSuccess(s =>
+                 {
+                     s.Element("date-result").SetText("All dates valid!");
+                     s.Element("date-result").AddClass("text-green-600");
+                     s.Element("date-result").RemoveClass("text-text-muted");
+                 }));
+            }))
+        <p id="date-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
+        <div data-reactive-validation-summary hidden
+             class="mt-3 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700"></div>
+    </native-card-body>
+    </native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,293 @@
+@model ComponentGatherModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@using Syncfusion.EJ2.DropDowns
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "ComponentGather";
+
+    var plan = Html.ReactivePlan<ComponentGatherModel>();
+
+    var mobilityOptions = (SelectListItem[])ViewBag.MobilityOptions;
+    var allergyItems = (RadioButtonItem[])ViewBag.AllergyItems;
+    var facilities = (List<GatherFacilityItem>)ViewBag.Facilities;
+    var physicians = (List<GatherPhysicianItem>)ViewBag.Physicians;
+    var insuranceProviders = (List<GatherInsuranceItem>)ViewBag.InsuranceProviders;
+    var dietaryItems = (List<GatherDietaryItem>)ViewBag.DietaryItems;
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">ComponentGather — All 18 Input Components</native-heading>
+        <native-text color="Secondary">
+            Every onboarded input component in a single form. Two submit buttons: JSON POST and FormData POST.
+            Server echoes received fields back to prove gather works for all component types.
+        </native-text>
+    </div>
+
+    <form id="gather-form">
+
+    <!-- Hidden fields — invisible but gathered via IncludeAll -->
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+    @Html.HiddenFieldFor(plan, m => m.FormToken)
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Native Scalar Components</native-heading>
+        <div class="space-y-4">
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Name"))
+                    .NativeTextBox(b => b.Placeholder("Full resident name")); }
+
+                @{ Html.InputField(plan, m => m.MobilityLevel, o => o.Required().Label("Mobility Level"))
+                    .NativeDropDown(b => b
+                        .Items(mobilityOptions)
+                        .Placeholder("-- Select Mobility --")
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
+            </native-grid>
+
+            @{ Html.InputField(plan, m => m.CareNotes, o => o.Required().Label("Care Notes"))
+                .NativeTextArea(b => b
+                    .Rows(3)
+                    .Placeholder("Enter care notes")
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.HasAllergies, o => o.Label("Has Allergies"))
+                    .NativeCheckBox(b => { }); }
+
+                @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
+                    .NativeRadioGroup(b => b
+                        .Option("independent", "Independent")
+                        .Option("assisted", "Assisted")
+                        .Option("memory-care", "Memory Care")); }
+            </native-grid>
+        </div>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Native Array Components</native-heading>
+        @{ Html.InputField(plan, m => m.Allergies, o => o.Required().Label("Allergies"))
+            .NativeCheckList(b => b.Items(allergyItems)); }
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Fusion Scalar Components</native-heading>
+        <div class="space-y-4">
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate"))
+                    .NumericTextBox(b => b
+                        .Min(0).Max(99999).Step(50)
+                        .Format("c2")); }
+
+                @{ Html.InputField(plan, m => m.FacilityId, o => o.Required().Label("Facility"))
+                    .DropDownList(b => b
+                        .DataSource(facilities)
+                        .Fields<GatherFacilityItem>(t => t.Text, v => v.Value)
+                        .Placeholder("Select a facility")); }
+            </native-grid>
+
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.PhysicianName, o => o.Required().Label("Physician"))
+                    .AutoComplete(b => b
+                        .DataSource(physicians)
+                        .Fields<GatherPhysicianItem>(t => t.Text, v => v.Value)
+                        .Placeholder("Search physician")); }
+
+                @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
+                    .DatePicker(b => b.Placeholder("Select admission date")); }
+            </native-grid>
+
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.MedicationTime, o => o.Required().Label("Medication Time"))
+                    .TimePicker(b => b.Placeholder("Select medication time")); }
+
+                @{ Html.InputField(plan, m => m.AppointmentTime, o => o.Required().Label("Appointment Time"))
+                    .DateTimePicker(b => b.Placeholder("Select appointment time")); }
+            </native-grid>
+
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.StayStart, o => o.Required().Label("Stay Period"))
+                    .DateRangePicker(b => b.Placeholder("Select stay period")); }
+
+                @{ Html.InputField(plan, m => m.InsuranceProvider, o => o.Required().Label("Insurance Provider"))
+                    .MultiColumnComboBox(b => b
+                        .DataSource(insuranceProviders)
+                        .Fields<GatherInsuranceItem>(t => t.Text, v => v.Value)
+                        .Columns(col =>
+                        {
+                            col.Field("text").Header("Provider").Width("160").Add();
+                            col.Field("category").Header("Category").Width("120").Add();
+                        })
+                        .Placeholder("Select insurance provider")
+                        .PopupWidth("300")); }
+            </native-grid>
+
+            @{ Html.InputField(plan, m => m.PhoneNumber, o => o.Required().Label("Phone Number"))
+                .InputMask(b => b
+                    .Mask("(000) 000-0000")
+                    .Placeholder("Enter phone number")); }
+
+            @{ Html.InputField(plan, m => m.CarePlan, o => o.Required().Label("Care Plan"))
+                .RichTextEditor(b => b.Placeholder("Enter care plan notes...")); }
+
+            @{ Html.InputField(plan, m => m.ReceiveNotifications, o => o.Label("Receive Notifications"))
+                .Switch(b => { }); }
+        </div>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Fusion Array Components</native-heading>
+        @{ Html.InputField(plan, m => m.DietaryRestrictions, o => o.Required().Label("Dietary Restrictions"))
+            .MultiSelect(b => b
+                .DataSource(dietaryItems)
+                .Fields<GatherDietaryItem>(t => t.Text, v => v.Value)
+                .Placeholder("Select dietary restrictions")
+                .Mode(VisualMode.Box)); }
+    </native-card-body></native-card>
+
+    <!-- Submit Buttons -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Submit</native-heading>
+        <native-text color="Secondary">
+            Two submit modes: JSON POST sends <code>application/json</code>, FormData POST sends <code>multipart/form-data</code>.
+            Both gather all 18 fields via <code>IncludeAll()</code>.
+        </native-text>
+
+        <div class="flex items-center gap-4 mt-4">
+            @(Html.NativeButton("submit-json-btn", "Submit JSON")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/AllModulesTogether/ComponentGather/EchoJson", g => g.IncludeAll())
+                     .Validate<ComponentGatherValidator>("gather-form")
+                     .Response(r => r
+                        .OnSuccess<GatherEchoResponse>((json, s) =>
+                        {
+                            s.Element("submit-mode").SetText("JSON");
+                            s.Element("echo-resident-id").SetText(json, x => x.ResidentId);
+                            s.Element("echo-form-token").SetText(json, x => x.FormToken);
+                            s.Element("echo-resident-name").SetText(json, x => x.ResidentName);
+                            s.Element("echo-care-notes").SetText(json, x => x.CareNotes);
+                            s.Element("echo-has-allergies").SetText(json, x => x.HasAllergies);
+                            s.Element("echo-mobility-level").SetText(json, x => x.MobilityLevel);
+                            s.Element("echo-care-level").SetText(json, x => x.CareLevel);
+                            s.Element("echo-allergies").SetText(json, x => x.Allergies);
+                            s.Element("echo-monthly-rate").SetText(json, x => x.MonthlyRate);
+                            s.Element("echo-facility-id").SetText(json, x => x.FacilityId);
+                            s.Element("echo-physician-name").SetText(json, x => x.PhysicianName);
+                            s.Element("echo-admission-date").SetText(json, x => x.AdmissionDate);
+                            s.Element("echo-medication-time").SetText(json, x => x.MedicationTime);
+                            s.Element("echo-appointment-time").SetText(json, x => x.AppointmentTime);
+                            s.Element("echo-stay-start").SetText(json, x => x.StayStart);
+                            s.Element("echo-insurance-provider").SetText(json, x => x.InsuranceProvider);
+                            s.Element("echo-phone-number").SetText(json, x => x.PhoneNumber);
+                            s.Element("echo-care-plan").SetText(json, x => x.CarePlan);
+                            s.Element("echo-receive-notifications").SetText(json, x => x.ReceiveNotifications);
+                            s.Element("echo-dietary-restrictions").SetText(json, x => x.DietaryRestrictions);
+                            s.Element("echo-field-count").SetText(json, x => x.FieldCount);
+                            s.Element("echo-result").AddClass("text-green-600");
+                            s.Element("echo-result").RemoveClass("text-red-600");
+                        })
+                        .OnError(400, e => { e.ValidationErrors("gather-form"); })
+                     );
+                }))
+
+            @(Html.NativeButton("submit-form-btn", "Submit FormData")
+                .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/AllModulesTogether/ComponentGather/EchoFormData", g => g.IncludeAll())
+                     .AsFormData()
+                     .Validate<ComponentGatherValidator>("gather-form")
+                     .Response(r => r
+                        .OnSuccess<GatherEchoResponse>((json, s) =>
+                        {
+                            s.Element("submit-mode").SetText("FormData");
+                            s.Element("echo-resident-id").SetText(json, x => x.ResidentId);
+                            s.Element("echo-form-token").SetText(json, x => x.FormToken);
+                            s.Element("echo-resident-name").SetText(json, x => x.ResidentName);
+                            s.Element("echo-care-notes").SetText(json, x => x.CareNotes);
+                            s.Element("echo-has-allergies").SetText(json, x => x.HasAllergies);
+                            s.Element("echo-mobility-level").SetText(json, x => x.MobilityLevel);
+                            s.Element("echo-care-level").SetText(json, x => x.CareLevel);
+                            s.Element("echo-allergies").SetText(json, x => x.Allergies);
+                            s.Element("echo-monthly-rate").SetText(json, x => x.MonthlyRate);
+                            s.Element("echo-facility-id").SetText(json, x => x.FacilityId);
+                            s.Element("echo-physician-name").SetText(json, x => x.PhysicianName);
+                            s.Element("echo-admission-date").SetText(json, x => x.AdmissionDate);
+                            s.Element("echo-medication-time").SetText(json, x => x.MedicationTime);
+                            s.Element("echo-appointment-time").SetText(json, x => x.AppointmentTime);
+                            s.Element("echo-stay-start").SetText(json, x => x.StayStart);
+                            s.Element("echo-insurance-provider").SetText(json, x => x.InsuranceProvider);
+                            s.Element("echo-phone-number").SetText(json, x => x.PhoneNumber);
+                            s.Element("echo-care-plan").SetText(json, x => x.CarePlan);
+                            s.Element("echo-receive-notifications").SetText(json, x => x.ReceiveNotifications);
+                            s.Element("echo-dietary-restrictions").SetText(json, x => x.DietaryRestrictions);
+                            s.Element("echo-field-count").SetText(json, x => x.FieldCount);
+                            s.Element("echo-result").AddClass("text-green-600");
+                            s.Element("echo-result").RemoveClass("text-red-600");
+                        })
+                        .OnError(400, e => { e.ValidationErrors("gather-form"); })
+                     );
+                }))
+        </div>
+    </native-card-body></native-card>
+    </form>
+
+    <!-- Echo Results -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Server Echo</native-heading>
+        <native-text color="Secondary">
+            Displays the server response after submit. Each field shows what the server received.
+        </native-text>
+
+        <div id="echo-result" class="mt-4 space-y-1 font-mono text-sm text-text-muted">
+            <p>Mode: <span id="submit-mode">&mdash;</span></p>
+            <hr class="my-2 border-border"/>
+            <p class="font-semibold text-text-primary">Native Hidden</p>
+            <p>Resident ID: <span id="echo-resident-id">&mdash;</span></p>
+            <p>Form Token: <span id="echo-form-token">&mdash;</span></p>
+            <hr class="my-2 border-border"/>
+            <p class="font-semibold text-text-primary">Native Scalar</p>
+            <p>Resident Name: <span id="echo-resident-name">&mdash;</span></p>
+            <p>Care Notes: <span id="echo-care-notes">&mdash;</span></p>
+            <p>Has Allergies: <span id="echo-has-allergies">&mdash;</span></p>
+            <p>Mobility Level: <span id="echo-mobility-level">&mdash;</span></p>
+            <p>Care Level: <span id="echo-care-level">&mdash;</span></p>
+            <hr class="my-2 border-border"/>
+            <p class="font-semibold text-text-primary">Native Array</p>
+            <p>Allergies: <span id="echo-allergies">&mdash;</span></p>
+            <hr class="my-2 border-border"/>
+            <p class="font-semibold text-text-primary">Fusion Scalar</p>
+            <p>Monthly Rate: <span id="echo-monthly-rate">&mdash;</span></p>
+            <p>Facility ID: <span id="echo-facility-id">&mdash;</span></p>
+            <p>Physician Name: <span id="echo-physician-name">&mdash;</span></p>
+            <p>Admission Date: <span id="echo-admission-date">&mdash;</span></p>
+            <p>Medication Time: <span id="echo-medication-time">&mdash;</span></p>
+            <p>Appointment Time: <span id="echo-appointment-time">&mdash;</span></p>
+            <p>Stay Start: <span id="echo-stay-start">&mdash;</span></p>
+            <p>Insurance Provider: <span id="echo-insurance-provider">&mdash;</span></p>
+            <p>Phone Number: <span id="echo-phone-number">&mdash;</span></p>
+            <p>Care Plan: <span id="echo-care-plan">&mdash;</span></p>
+            <p>Receive Notifications: <span id="echo-receive-notifications">&mdash;</span></p>
+            <hr class="my-2 border-border"/>
+            <p class="font-semibold text-text-primary">Fusion Array</p>
+            <p>Dietary Restrictions: <span id="echo-dietary-restrictions">&mdash;</span></p>
+            <hr class="my-2 border-border"/>
+            <p class="font-semibold text-text-primary text-lg">
+                Fields Received: <span id="echo-field-count">&mdash;</span>/20
+            </p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

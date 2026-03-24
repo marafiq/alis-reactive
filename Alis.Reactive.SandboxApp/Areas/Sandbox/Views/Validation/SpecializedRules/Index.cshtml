@@ -1,0 +1,87 @@
+@model NewRuleTypesModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "New Rule Types";
+    var plan = Html.ReactivePlan<NewRuleTypesModel>();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">New Rule Types</native-heading>
+        <native-text color="Secondary">
+            Exercises all new validation rule types: creditCard, exclusiveRange, gt, lt,
+            notEqual, notEqualTo, url, and empty. Each field validates on submit and live on blur.
+        </native-text>
+    </div>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">All New Rules</native-heading>
+        <form id="new-rules-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.CardNumber, o => o.Label("Card Number"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("4111-1111-1111-1111")); }
+            @{ Html.InputField(plan, m => m.Score, o => o.Label("Score (0–100 exclusive)"))
+               .NativeTextBox(b => b
+                   .Type("number")
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("1-99")); }
+            @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Label("Monthly Rate (> 0)"))
+               .NativeTextBox(b => b
+                   .Type("number")
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Must be positive")); }
+            @{ Html.InputField(plan, m => m.MaxDeposit, o => o.Label("Max Deposit (< 1M)"))
+               .NativeTextBox(b => b
+                   .Type("number")
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Under 1000000")); }
+            @{ Html.InputField(plan, m => m.Status, o => o.Label("Status (not 'deleted')"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("active, archived...")); }
+            @{ Html.InputField(plan, m => m.Email, o => o.Label("Primary Email"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("john@@facility.com")); }
+            @{ Html.InputField(plan, m => m.AlternateEmail, o => o.Label("Alternate Email (≠ primary)"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Must differ from primary")); }
+            @{ Html.InputField(plan, m => m.Website, o => o.Label("Website (URL)"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("https://facility.com")); }
+            @{ Html.InputField(plan, m => m.Nickname, o => o.Label("Nickname (must be empty)"))
+               .NativeTextBox(b => b
+                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                   .Placeholder("Leave blank")); }
+        </form>
+        @(Html.NativeButton("validate-new-rules-btn", "Validate New Rules")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Validation/SpecializedRules/ValidateClient")
+                 .Validate<NewRuleTypesValidator>("new-rules-form")
+                 .Response(r => r.OnSuccess(s =>
+                 {
+                     s.Element("new-rules-result").SetText("All new rule types passed!");
+                     s.Element("new-rules-result").AddClass("text-green-600");
+                     s.Element("new-rules-result").RemoveClass("text-text-muted");
+                 }));
+            }))
+        <p id="new-rules-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
+        <div data-reactive-validation-summary hidden
+             class="mt-3 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700"></div>
+    </native-card-body>
+    </native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

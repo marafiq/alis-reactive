@@ -1,0 +1,85 @@
+@model DrawerModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@{
+    ViewData["Title"] = "Drawer";
+
+    var plan = Html.ReactivePlan<DrawerModel>();
+    var formattedJson = plan.RenderFormatted();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Drawer</native-heading>
+        <native-text color="Secondary">
+            Plan-driven slide-out drawer: set size, title, load content via partial, open — all via C# DSL.
+            Escape key and close button handled by drawer.ts.
+        </native-text>
+    </div>
+
+    <!-- Size Variants -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Drawer Sizes</native-heading>
+        <native-text color="Secondary">
+            Three width primitives: Small (28rem), Medium (36rem), Large (48rem).
+            On mobile (&lt;640px) all sizes become full width. Content loaded via server partials.
+        </native-text>
+        <div class="flex flex-wrap gap-3">
+            @(Html.NativeButton("btn-open-sm", "Small — Resident Details")
+                .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Element("alis-drawer-title").SetText("Resident Details");
+                    p.Component<NativeDrawer>().SetSize(DrawerSize.Sm);
+                    p.Get("/Sandbox/Components/Drawer/ResidentDetails")
+                     .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+                    p.Component<NativeDrawer>().Open();
+                }))
+
+            @(Html.NativeButton("btn-open-md", "Medium — Care Plan Notes")
+                .CssClass("px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent-dark transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Element("alis-drawer-title").SetText("Care Plan Notes");
+                    p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+                    p.Get("/Sandbox/Components/Drawer/CarePlanNotes")
+                     .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+                    p.Component<NativeDrawer>().Open();
+                }))
+
+            @(Html.NativeButton("btn-open-lg", "Large — Add Resident Form")
+                .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Element("alis-drawer-title").SetText("Add Resident");
+                    p.Component<NativeDrawer>().SetSize(DrawerSize.Lg);
+                    p.Get("/Sandbox/Components/Drawer/AddResidentForm")
+                     .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+                    p.Component<NativeDrawer>().Open();
+                }))
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Close Drawer -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Close Drawer via Plan</native-heading>
+        <native-text color="Secondary">
+            Close the drawer programmatically. Also closes via X button or Escape key.
+        </native-text>
+        @(Html.NativeButton("btn-close-drawer", "Close Drawer")
+            .CssClass("px-4 py-2 rounded-lg border border-border text-sm font-medium text-text-secondary hover:bg-surface-alt transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<NativeDrawer>().Close();
+            }))
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code>@Html.Raw(formattedJson)</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

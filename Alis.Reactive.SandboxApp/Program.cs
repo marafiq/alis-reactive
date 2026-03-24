@@ -14,6 +14,11 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Syncfusion license — stored in user secrets: dotnet user-secrets set "Syncfusion:LicenseKey" "YOUR_KEY"
+var sfLicense = builder.Configuration["Syncfusion:LicenseKey"];
+if (!string.IsNullOrEmpty(sfLicense))
+    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(sfLicense);
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 

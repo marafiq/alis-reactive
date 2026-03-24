@@ -103,6 +103,62 @@ public sealed class PagePlan<TModel> where TModel : class
         return new NativeTextBoxLocator(_page, entry.Id);
     }
 
+    /// <summary>DatePicker — resolved from plan via model expression.</summary>
+    public DatePickerLocator DatePicker(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "datepicker");
+        return new DatePickerLocator(_page, entry.Id);
+    }
+
+    /// <summary>TimePicker — resolved from plan via model expression.</summary>
+    public TimePickerLocator TimePicker(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "timepicker");
+        return new TimePickerLocator(_page, entry.Id);
+    }
+
+    /// <summary>DateTimePicker — resolved from plan via model expression.</summary>
+    public DateTimePickerLocator DateTimePicker(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "datetimepicker");
+        return new DateTimePickerLocator(_page, entry.Id);
+    }
+
+    /// <summary>DateRangePicker — resolved from plan via model expression.</summary>
+    public DateRangePickerLocator DateRangePicker(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "daterangepicker");
+        return new DateRangePickerLocator(_page, entry.Id);
+    }
+
+    /// <summary>MultiColumnComboBox — resolved from plan via model expression.</summary>
+    public MultiColumnComboBoxLocator MultiColumnComboBox(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "multicolumncombobox");
+        return new MultiColumnComboBoxLocator(_page, entry.Id);
+    }
+
+    /// <summary>InputMask — resolved from plan via model expression.</summary>
+    public InputMaskLocator InputMask(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "inputmask");
+        return new InputMaskLocator(_page, entry.Id);
+    }
+
+    /// <summary>RichTextEditor — resolved from plan via model expression.</summary>
+    public RichTextEditorLocator RichTextEditor(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "richtexteditor");
+        return new RichTextEditorLocator(_page, entry.Id);
+    }
+
+    /// <summary>MultiSelect — resolved from plan via model expression.</summary>
+    public MultiSelectLocator MultiSelect(Expression<Func<TModel, object?>> expr)
+    {
+        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "multiselect");
+        return new MultiSelectLocator(_page, entry.Id);
+    }
+
     // ─── String-based overloads (for non-model elements) ───
 
     /// <summary>AutoComplete — by binding path string (when expression isn't available).</summary>
