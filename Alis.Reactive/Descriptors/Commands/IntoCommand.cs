@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Alis.Reactive.Descriptors.Guards;
 
 namespace Alis.Reactive.Descriptors.Commands
 {
@@ -13,9 +14,15 @@ namespace Alis.Reactive.Descriptors.Commands
 
         public string Target { get; }
 
-        public IntoCommand(string target)
+        public IntoCommand(string target, Guard? when = null)
+            : base(when)
         {
             Target = target;
+        }
+
+        internal override Command WithGuard(Guard guard)
+        {
+            return new IntoCommand(Target, guard);
         }
     }
 }

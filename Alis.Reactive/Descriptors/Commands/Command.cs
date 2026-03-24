@@ -9,14 +9,17 @@ namespace Alis.Reactive.Descriptors.Commands
     public abstract class Command
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Guard? When { get; private set; }
+        public Guard? When { get; }
 
-        internal void GuardWith(Guard guard)
+        protected Command(Guard? when = null)
         {
-            if (!(When is null))
-                throw new InvalidOperationException(
-                    "Command already has a guard. Each command can only have one When guard.");
-            When = guard;
+            When = when;
         }
+
+        /// <summary>
+        /// Returns a new Command of the same kind with the guard attached.
+        /// Immutable — the original instance is unchanged.
+        /// </summary>
+        internal abstract Command WithGuard(Guard guard);
     }
 }
