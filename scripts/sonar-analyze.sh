@@ -106,7 +106,7 @@ run_analysis() {
         /k:"${PROJECT_KEY}" \
         /d:sonar.host.url="${SONAR_HOST}" \
         /d:sonar.token="${SONAR_TOKEN}" \
-        /d:sonar.exclusions="**/node_modules/**,**/.worktrees/**,**/docs-site/**,**/wwwroot/**,**/*.verified.txt,**/obj/**,**/bin/**,**/tools/**,**/examples/**" \
+        /d:sonar.exclusions="**/node_modules/**,**/.worktrees/**,**/docs-site/**,**/wwwroot/**,**/*.verified.txt,**/obj/**,**/bin/**,**/tools/**,**/examples/**,**/*.css,**/*.cshtml" \
         /d:sonar.test.inclusions="**/*.test.ts,**/Tests/**,**/UnitTests/**" \
         /d:sonar.cs.opencover.reportsPaths="TestResults/coverage/**/coverage.opencover.xml"
 
