@@ -62,18 +62,14 @@ export function isConfirmGuard(guard: Guard): boolean {
   return false;
 }
 
-function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
+/** Evaluates presence/emptiness operators using RAW resolution (no coercion). */
+function evaluatePresenceOp(guard: ValueGuard, ctx?: ExecContext): boolean | undefined {
   const op = guard.op;
-
-  // Presence operators (is-null, not-null) use RAW resolution — coercion
-  // would destroy null/undefined (e.g. coerce(null, "string") → "").
   if (op === "is-null" || op === "not-null") {
     const raw = resolveSource(guard.source, ctx);
     log.trace("eval-presence", { source: guard.source, op, raw });
     return op === "is-null" ? raw == null : raw != null;
   }
-
-  // is-empty / not-empty also use raw resolution
   if (op === "is-empty" || op === "not-empty") {
     const raw = resolveSource(guard.source, ctx);
     log.trace("eval-presence", { source: guard.source, op, raw });
@@ -81,7 +77,17 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
       || (Array.isArray(raw) && raw.length === 0);
     return op === "is-empty" ? isEmpty : !isEmpty;
   }
+  return undefined; // Not a presence op
+}
 
+interface ResolvedOperands {
+  resolved: unknown;
+  operand: unknown;
+  items: unknown[] | undefined;
+}
+
+/** Resolves source, operand, and items with conditional coercion for value comparison. */
+function resolveGuardOperands(guard: ValueGuard, ctx?: ExecContext): ResolvedOperands {
   // Truthy/falsy use typed coercion — correctly maps "false" → false for booleans.
   // Comparison operators use typed coercion on BOTH source and operand so that
   // comparisons are type-consistent (e.g. both sides are numbers).
@@ -107,9 +113,17 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
     ? (resolved as unknown[]).map(item => coerce(item, guard.elementCoerceAs!))
     : undefined;
 
-  log.trace("eval", { source: guard.source, op, resolved, operand });
+  return { resolved, operand, items };
+}
 
-  switch (op) {
+function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
+  const presenceResult = evaluatePresenceOp(guard, ctx);
+  if (presenceResult !== undefined) return presenceResult;
+
+  const { resolved, operand, items } = resolveGuardOperands(guard, ctx);
+  log.trace("eval", { source: guard.source, op: guard.op, resolved, operand });
+
+  switch (guard.op) {
     case "eq":       return resolved === operand;
     case "neq":      return resolved !== operand;
     case "gt":       return (resolved as number) > (operand as number);
@@ -152,6 +166,6 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
       return String(resolved ?? "").length >= Number(operand);
 
     default:
-      throw new Error(`Unknown guard operator: ${op}`);
+      throw new Error(`Unknown guard operator: ${guard.op}`);
   }
 }
