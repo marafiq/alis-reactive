@@ -13,8 +13,8 @@
  */
 
 export class TestWidget {
-  private _el: HTMLElement;
-  private _input: HTMLInputElement;
+  private readonly _el: HTMLElement;
+  private readonly _input: HTMLInputElement;
   private _value: string;
   private _items: unknown[];
   private _focused: boolean;
