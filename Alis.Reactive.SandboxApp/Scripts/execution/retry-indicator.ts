@@ -13,8 +13,9 @@ const RETRY_ATTR = "data-alis-retry";
  */
 export function firstMutationTarget(reaction: Reaction): string | undefined {
   let commands: Command[] | undefined;
-  if (reaction.kind === "sequential") commands = reaction.commands;
-  else if (reaction.kind === "conditional") commands = reaction.commands;
+  if (reaction.kind === "sequential" || reaction.kind === "conditional") {
+    commands = reaction.commands;
+  }
 
   const cmd = commands?.find(c => c.kind === "mutate-element");
   return cmd?.kind === "mutate-element" ? cmd.target : undefined;
