@@ -681,3 +681,11 @@ Never commit with failing tests. Never skip Playwright.
 **SonarQube:** If the quality gate fails (exit code 1), review violations at
 `http://localhost:9000/dashboard?id=alis-reactive` and fix before committing.
 SonarQube analyzes both C# and TypeScript for bugs, vulnerabilities, and code smells.
+
+**Refactored Code Coverage Rule (80% BDD):** Any code touched during a SonarQube-driven
+refactor MUST have at least 80% test coverage using BDD principles:
+- Tests are named after **behavior** (`When{Scenario}` classes, descriptive method names)
+- Tests verify **value delivered** — what the system does for the user, not implementation details
+- Each refactored method must be exercised through at least one BDD test that asserts
+  the observable outcome (e.g., extracted rules match expected JSON, conditions resolve correctly)
+- If coverage is below 80% for refactored code, add BDD tests before committing

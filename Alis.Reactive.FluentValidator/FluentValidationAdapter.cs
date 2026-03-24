@@ -91,76 +91,99 @@ namespace Alis.Reactive.FluentValidator
 
             foreach (var rule in rules)
             {
-                var propertyName = rule.PropertyName;
+                var (ruleCondition, skip) = TryResolveCondition(rule, prefix, fieldRules, clientConditions);
+                if (skip) continue;
 
-                // Check if this conditional rule was registered via WhenField()
-                ValidationCondition? ruleCondition = null;
-                if (rule.HasCondition || rule.HasAsyncCondition)
+                if (string.IsNullOrEmpty(rule.PropertyName))
                 {
-                    if (clientConditions != null && clientConditions.TryGetValue(rule, out var cc))
-                    {
-                        // Apply prefix to condition field for nested validators
-                        var condField = string.IsNullOrEmpty(prefix)
-                            ? cc.Field
-                            : prefix + "." + cc.Field;
-                        ruleCondition = new ValidationCondition(condField, cc.Op, cc.Value);
-
-                        // Ensure condition source field is in the descriptor (runtime needs it for value reading)
-                        var condSourcePath = condField;
-                        if (!fieldRules.ContainsKey(condSourcePath))
-                        {
-                            fieldRules[condSourcePath] = new List<ExtractedRule>();
-                        }
-                    }
-                    else
-                    {
-                        continue; // Server-only .When() — skip
-                    }
-                }
-
-                // Include() rules have empty PropertyName — recurse with same prefix
-                if (string.IsNullOrEmpty(propertyName))
-                {
-                    foreach (IRuleComponent component in rule.Components)
-                    {
-                        if (component.Validator is IChildValidatorAdaptor adaptor)
-                        {
-                            var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
-                            var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
-                            ExtractFromValidator(nested, prefix, fieldRules, factory, nestedConditions);
-                        }
-                    }
+                    ProcessIncludeRule(rule, prefix, fieldRules, factory);
                     continue;
                 }
 
                 var fullPath = string.IsNullOrEmpty(prefix)
-                    ? propertyName
-                    : prefix + "." + propertyName;
+                    ? rule.PropertyName
+                    : prefix + "." + rule.PropertyName;
 
-                foreach (IRuleComponent component in rule.Components)
+                ProcessComponents(rule, fullPath, rule.PropertyName, fieldRules, factory, ruleCondition, parentCondition);
+            }
+        }
+
+        /// <summary>
+        /// Checks if a rule has a client-side WhenField() condition. Returns the condition
+        /// and whether the rule should be skipped (server-only .When()).
+        /// </summary>
+        private static (ValidationCondition? condition, bool skip) TryResolveCondition(
+            IValidationRule rule,
+            string prefix,
+            Dictionary<string, List<ExtractedRule>> fieldRules,
+            IReadOnlyDictionary<IValidationRule, ValidationCondition>? clientConditions)
+        {
+            if (!rule.HasCondition && !rule.HasAsyncCondition)
+                return (null, false);
+
+            if (clientConditions == null || !clientConditions.TryGetValue(rule, out var cc))
+                return (null, true); // Server-only .When() — skip
+
+            var condField = string.IsNullOrEmpty(prefix) ? cc.Field : prefix + "." + cc.Field;
+            if (!fieldRules.ContainsKey(condField))
+                fieldRules[condField] = new List<ExtractedRule>();
+
+            return (new ValidationCondition(condField, cc.Op, cc.Value), false);
+        }
+
+        /// <summary>
+        /// Handles Include() rules (empty PropertyName) — recurses into the included validator.
+        /// </summary>
+        private static void ProcessIncludeRule(
+            IValidationRule rule,
+            string prefix,
+            Dictionary<string, List<ExtractedRule>> fieldRules,
+            Func<Type, IValidator?> factory)
+        {
+            foreach (IRuleComponent component in rule.Components)
+            {
+                if (component.Validator is IChildValidatorAdaptor adaptor)
                 {
-                    // Skip conditional components
-                    if (component.HasCondition || component.HasAsyncCondition) continue;
+                    var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
+                    var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
+                    ExtractFromValidator(nested, prefix, fieldRules, factory, nestedConditions);
+                }
+            }
+        }
 
-                    // Handle nested validators recursively — propagate parent condition
-                    if (component.Validator is IChildValidatorAdaptor adaptor)
-                    {
-                        var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
-                        var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
-                        ExtractFromValidator(nested, fullPath, fieldRules, factory, nestedConditions, ruleCondition);
-                        continue;
-                    }
+        /// <summary>
+        /// Iterates rule components, recursing into nested validators and mapping leaf validators.
+        /// </summary>
+        private static void ProcessComponents(
+            IValidationRule rule,
+            string fullPath,
+            string propertyName,
+            Dictionary<string, List<ExtractedRule>> fieldRules,
+            Func<Type, IValidator?> factory,
+            ValidationCondition? ruleCondition,
+            ValidationCondition? parentCondition)
+        {
+            foreach (IRuleComponent component in rule.Components)
+            {
+                if (component.HasCondition || component.HasAsyncCondition) continue;
 
-                    var extracted = MapComponent(component, propertyName, ruleCondition ?? parentCondition);
-                    if (extracted.Count > 0)
+                if (component.Validator is IChildValidatorAdaptor adaptor)
+                {
+                    var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
+                    var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
+                    ExtractFromValidator(nested, fullPath, fieldRules, factory, nestedConditions, ruleCondition);
+                    continue;
+                }
+
+                var extracted = MapComponent(component, propertyName, ruleCondition ?? parentCondition);
+                if (extracted.Count > 0)
+                {
+                    if (!fieldRules.TryGetValue(fullPath, out var list))
                     {
-                        if (!fieldRules.TryGetValue(fullPath, out var list))
-                        {
-                            list = new List<ExtractedRule>();
-                            fieldRules[fullPath] = list;
-                        }
-                        list.AddRange(extracted);
+                        list = new List<ExtractedRule>();
+                        fieldRules[fullPath] = list;
                     }
+                    list.AddRange(extracted);
                 }
             }
         }
@@ -199,7 +222,7 @@ namespace Alis.Reactive.FluentValidator
             // even when no .WithMessage() was set. Only treat it as a custom message if it does NOT
             // contain FV placeholder tokens like {PropertyName}.
             var rawMsg = component.GetUnformattedErrorMessage();
-            var customMsg = !string.IsNullOrEmpty(rawMsg) && !rawMsg.Contains("{")
+            var customMsg = !string.IsNullOrEmpty(rawMsg) && !rawMsg.Contains('{')
                 ? rawMsg
                 : null;
 
@@ -264,112 +287,92 @@ namespace Alis.Reactive.FluentValidator
                     break;
 
                 case IExclusiveBetweenValidator ebv:
-                {
-                    var coerceAs = InferCoerceAs(ebv.From?.GetType());
-                    var from = coerceAs == "date" ? SerializeDateConstraint(ebv.From!) : ebv.From;
-                    var to = coerceAs == "date" ? SerializeDateConstraint(ebv.To!) : ebv.To;
-                    result.Add(new ExtractedRule(
-                        "exclusiveRange",
+                    result.Add(MapRangeValidator("exclusiveRange", ebv.From, ebv.To,
                         customMsg ?? $"'{displayName}' must be between {ebv.From} and {ebv.To} (exclusive).",
-                        new object[] { from!, to! }, ruleCondition, field: null, coerceAs: coerceAs));
+                        ruleCondition));
                     break;
-                }
 
                 case IBetweenValidator bv:
-                {
-                    var coerceAs = InferCoerceAs(bv.From?.GetType());
-                    var from = coerceAs == "date" ? SerializeDateConstraint(bv.From!) : bv.From;
-                    var to = coerceAs == "date" ? SerializeDateConstraint(bv.To!) : bv.To;
-                    result.Add(new ExtractedRule(
-                        "range",
+                    result.Add(MapRangeValidator("range", bv.From, bv.To,
                         customMsg ?? $"'{displayName}' must be between {bv.From} and {bv.To}.",
-                        new object[] { from!, to! }, ruleCondition, field: null, coerceAs: coerceAs));
+                        ruleCondition));
                     break;
-                }
 
                 case IComparisonValidator cv:
                 {
-                    Type? propertyType = null;
-                    string? field = null;
-                    object? constraint = null;
-
-                    if (cv.MemberToCompare != null)
-                    {
-                        field = cv.MemberToCompare.Name;
-                        if (cv.MemberToCompare is System.Reflection.PropertyInfo pi)
-                            propertyType = pi.PropertyType;
-                        else if (cv.MemberToCompare is System.Reflection.FieldInfo fi)
-                            propertyType = fi.FieldType;
-                    }
-                    else
-                    {
-                        constraint = cv.ValueToCompare;
-                        propertyType = cv.ValueToCompare?.GetType();
-                    }
-
-                    var coerceAs = InferCoerceAs(propertyType);
-                    if (coerceAs == "date" && constraint != null)
-                        constraint = SerializeDateConstraint(constraint);
-
-                    string ruleType;
-                    string defaultMsg;
-
-                    switch (cv.Comparison)
-                    {
-                        case Comparison.Equal:
-                            ruleType = "equalTo";
-                            defaultMsg = field != null
-                                ? $"'{displayName}' must match '{Humanize(field)}'."
-                                : $"'{displayName}' must equal {constraint}.";
-                            break;
-                        case Comparison.NotEqual:
-                            if (field != null)
-                            {
-                                ruleType = "notEqualTo";
-                                defaultMsg = $"'{displayName}' must not match '{Humanize(field)}'.";
-                            }
-                            else
-                            {
-                                ruleType = "notEqual";
-                                defaultMsg = $"'{displayName}' must not equal '{constraint}'.";
-                            }
-                            break;
-                        case Comparison.GreaterThanOrEqual:
-                            ruleType = "min";
-                            defaultMsg = field != null
-                                ? $"'{displayName}' must be at least '{Humanize(field)}'."
-                                : $"'{displayName}' must be at least {constraint}.";
-                            break;
-                        case Comparison.LessThanOrEqual:
-                            ruleType = "max";
-                            defaultMsg = field != null
-                                ? $"'{displayName}' must be at most '{Humanize(field)}'."
-                                : $"'{displayName}' must be at most {constraint}.";
-                            break;
-                        case Comparison.GreaterThan:
-                            ruleType = "gt";
-                            defaultMsg = field != null
-                                ? $"'{displayName}' must be greater than '{Humanize(field)}'."
-                                : $"'{displayName}' must be greater than {constraint}.";
-                            break;
-                        case Comparison.LessThan:
-                            ruleType = "lt";
-                            defaultMsg = field != null
-                                ? $"'{displayName}' must be less than '{Humanize(field)}'."
-                                : $"'{displayName}' must be less than {constraint}.";
-                            break;
-                        default:
-                            throw new InvalidOperationException(
-                                $"Unknown Comparison type '{cv.Comparison}' on property '{propertyName}'. " +
-                                $"This FluentValidation comparison is not supported for client-side extraction.");
-                    }
-
-                    result.Add(new ExtractedRule(ruleType, customMsg ?? defaultMsg, constraint, ruleCondition, field, coerceAs));
+                    var comparisonRule = MapComparisonValidator(cv, propertyName, displayName, customMsg, ruleCondition);
+                    result.Add(comparisonRule);
                     break;
                 }
             }
 
             return result;
+        }
+
+        private static ExtractedRule MapRangeValidator(
+            string ruleType, object? from, object? to,
+            string message, ValidationCondition? ruleCondition)
+        {
+            var coerceAs = InferCoerceAs(from?.GetType());
+            var serializedFrom = coerceAs == "date" && from != null ? SerializeDateConstraint(from) : from;
+            var serializedTo = coerceAs == "date" && to != null ? SerializeDateConstraint(to) : to;
+            return new ExtractedRule(ruleType, message,
+                new object[] { serializedFrom!, serializedTo! }, ruleCondition, field: null, coerceAs: coerceAs);
+        }
+
+        private static ExtractedRule MapComparisonValidator(
+            IComparisonValidator cv, string propertyName, string displayName,
+            string? customMsg, ValidationCondition? ruleCondition)
+        {
+            var (field, constraint, propertyType) = ResolveComparisonOperands(cv);
+            var coerceAs = InferCoerceAs(propertyType);
+            if (coerceAs == "date" && constraint != null)
+                constraint = SerializeDateConstraint(constraint);
+
+            var (ruleType, defaultMsg) = cv.Comparison switch
+            {
+                Comparison.Equal => ("equalTo", field != null
+                    ? $"'{displayName}' must match '{Humanize(field)}'."
+                    : $"'{displayName}' must equal {constraint}."),
+                Comparison.NotEqual => field != null
+                    ? ("notEqualTo", $"'{displayName}' must not match '{Humanize(field)}'.")
+                    : ("notEqual", $"'{displayName}' must not equal '{constraint}'."),
+                Comparison.GreaterThanOrEqual => ("min", field != null
+                    ? $"'{displayName}' must be at least '{Humanize(field)}'."
+                    : $"'{displayName}' must be at least {constraint}."),
+                Comparison.LessThanOrEqual => ("max", field != null
+                    ? $"'{displayName}' must be at most '{Humanize(field)}'."
+                    : $"'{displayName}' must be at most {constraint}."),
+                Comparison.GreaterThan => ("gt", field != null
+                    ? $"'{displayName}' must be greater than '{Humanize(field)}'."
+                    : $"'{displayName}' must be greater than {constraint}."),
+                Comparison.LessThan => ("lt", field != null
+                    ? $"'{displayName}' must be less than '{Humanize(field)}'."
+                    : $"'{displayName}' must be less than {constraint}."),
+                _ => throw new InvalidOperationException(
+                    $"Unknown Comparison type '{cv.Comparison}' on property '{propertyName}'. " +
+                    $"This FluentValidation comparison is not supported for client-side extraction.")
+            };
+
+            return new ExtractedRule(ruleType, customMsg ?? defaultMsg, constraint, ruleCondition, field, coerceAs);
+        }
+
+        private static (string? field, object? constraint, Type? propertyType) ResolveComparisonOperands(
+            IComparisonValidator cv)
+        {
+            if (cv.MemberToCompare != null)
+            {
+                var field = cv.MemberToCompare.Name;
+                Type? propertyType = cv.MemberToCompare switch
+                {
+                    System.Reflection.PropertyInfo pi => pi.PropertyType,
+                    System.Reflection.FieldInfo fi => fi.FieldType,
+                    _ => null
+                };
+                return (field, null, propertyType);
+            }
+
+            return (null, cv.ValueToCompare, cv.ValueToCompare?.GetType());
         }
 
         private static string? InferCoerceAs(Type? propertyType)
