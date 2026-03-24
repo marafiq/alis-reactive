@@ -666,9 +666,18 @@ dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 
 # 6. Playwright browser tests (browser behavior) — 481 tests
 dotnet test tests/Alis.Reactive.PlaywrightTests
+
+# 7. SonarQube quality gate (requires Docker running with SonarQube)
+./scripts/sonar-analyze.sh
+# Exit code 1 = quality gate failed — fix reported issues before committing.
+# Skip if Docker/SonarQube is not running, but run at least once per feature branch.
 ```
 
 **Total: ~1,700 tests (894 TS + 326 C# unit + 481 Playwright)**
 
 If any test fails, fix the issue and re-run ALL tests before committing.
 Never commit with failing tests. Never skip Playwright.
+
+**SonarQube:** If the quality gate fails (exit code 1), review violations at
+`http://localhost:9000/dashboard?id=alis-reactive` and fix before committing.
+SonarQube analyzes both C# and TypeScript for bugs, vulnerabilities, and code smells.

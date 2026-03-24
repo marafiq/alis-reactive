@@ -20,3 +20,7 @@ docs-site/public/d2/
 .DS_Store
 tests/Alis.Reactive.PlaywrightTests/TestResults/
 TestResults/
+
+# SonarQube
+.sonarqube/
+.scannerwork/
