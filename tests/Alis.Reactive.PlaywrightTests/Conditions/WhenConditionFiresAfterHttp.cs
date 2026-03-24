@@ -30,7 +30,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Outer condition evaluates active=true → badge visible
         await Expect(Page.Locator("#s1-badge")).ToBeVisibleAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Outer condition evaluates active=false → badge hidden
         await Expect(Page.Locator("#s1-badge")).ToBeHiddenAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Page.Locator("#s1-btn-active").ClickAsync();
         await Expect(Page.Locator("#s1-badge")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -86,7 +86,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Second condition: count=5 > 0 → badge visible
         await Expect(Page.Locator("#s2-count-badge")).ToBeVisibleAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -103,7 +103,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Second condition: count=0 → badge hidden
         await Expect(Page.Locator("#s2-count-badge")).ToBeHiddenAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -121,7 +121,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Expect(Page.Locator("#s2-active-status")).ToHaveTextAsync("inactive", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s2-count-badge")).ToBeHiddenAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -148,7 +148,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Post-pipeline command
         await Expect(Page.Locator("#s3-footer")).ToHaveTextAsync("done");
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -170,7 +170,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Post-pipeline command still fires
         await Expect(Page.Locator("#s3-footer")).ToHaveTextAsync("done");
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -193,7 +193,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Post-HTTP command
         await Expect(Page.Locator("#s4-footer")).ToHaveTextAsync("done");
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -210,7 +210,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Expect(Page.Locator("#s4-timestamp")).ToHaveTextAsync("now");
         await Expect(Page.Locator("#s4-footer")).ToHaveTextAsync("done");
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -225,7 +225,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Expect(Page.Locator("#s4-timestamp")).ToHaveTextAsync("now");
         await Expect(Page.Locator("#s4-footer")).ToHaveTextAsync("done");
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -246,7 +246,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Outer condition: active=true → trial badge hidden
         await Expect(Page.Locator("#s5-trial-badge")).ToBeHiddenAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -262,7 +262,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // active=true → trial hidden
         await Expect(Page.Locator("#s5-trial-badge")).ToBeHiddenAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -278,7 +278,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Outer condition: active=false → trial badge shown
         await Expect(Page.Locator("#s5-trial-badge")).ToBeVisibleAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -294,7 +294,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // active=false → trial shown
         await Expect(Page.Locator("#s5-trial-badge")).ToBeVisibleAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -314,7 +314,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Page.Locator("#s5-btn-enterprise").ClickAsync();
         await Expect(Page.Locator("#s5-client-tier")).ToHaveTextAsync("gold", new() { Timeout = 5000 });
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -336,7 +336,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         // Post-conditions command
         await Expect(Page.Locator("#s6-footer")).ToHaveTextAsync("complete");
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -353,7 +353,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Expect(Page.Locator("#s6-premium-label")).ToBeHiddenAsync();
         await Expect(Page.Locator("#s6-footer")).ToHaveTextAsync("complete");
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -370,7 +370,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Expect(Page.Locator("#s6-premium-label")).ToBeVisibleAsync();
         await Expect(Page.Locator("#s6-footer")).ToHaveTextAsync("complete");
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -440,7 +440,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Expect(Page.Locator("#s8-saved")).ToHaveTextAsync("Eve", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s8-qualified")).ToBeVisibleAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -454,7 +454,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Expect(Page.Locator("#s8-saved")).ToHaveTextAsync("Eve", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s8-qualified")).ToBeHiddenAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -468,7 +468,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Expect(Page.Locator("#s8-saved")).ToHaveTextAsync("Eve", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s8-qualified")).ToBeHiddenAsync();
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -489,7 +489,7 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
         await Page.Locator("#s8-btn-qualified").ClickAsync();
         await Expect(Page.Locator("#s8-qualified")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -501,6 +501,6 @@ public class WhenConditionFiresAfterHttp : PlaywrightTestBase
     {
         await NavigateTo("/Sandbox/Conditions/HttpMixing");
         await Expect(Page).ToHaveTitleAsync("Conditions + HTTP Mixing — Alis.Reactive Sandbox");
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 }
