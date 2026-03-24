@@ -1,0 +1,46 @@
+@*
+    Auto-renders breadcrumb back links based on the current Sandbox route.
+    Uses Url.Action for MVC route resolution — no hardcoded paths.
+
+    /Sandbox                        → no breadcrumb (home)
+    /Sandbox/{Concern}              → ← Sandbox
+    /Sandbox/{Concern}/{Slice}      → ← Sandbox  /  ← {Concern}
+*@
+@{
+    var path = Context.Request.Path.Value ?? "";
+    var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+    // Only render for Sandbox area with depth > 1
+    if (segments.Length >= 2 && segments[0].Equals("Sandbox", StringComparison.OrdinalIgnoreCase))
+    {
+        // Concern folder → (controller name, display name)
+        var concerns = new Dictionary<string, (string Controller, string Display)>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["CoreBehaviors"]     = ("CoreBehaviors", "Core Behaviors"),
+            ["Conditions"]        = ("Conditions", "Conditions"),
+            ["HttpPipeline"]      = ("HttpPipeline", "HTTP Pipeline"),
+            ["Validation"]        = ("Validation", "Validation"),
+            ["Components"]        = ("Components", "Components"),
+            ["AllModulesTogether"] = ("AllModulesTogether", "All Modules Together"),
+        };
+
+        var sandboxUrl = Url.Action("Index", "SandboxHome", new { area = "Sandbox" });
+
+        <nav class="mb-6 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+            <a href="@sandboxUrl"
+               class="inline-flex items-center gap-1 text-text-secondary hover:text-[#7A2E3B] transition-colors">
+                <span>&larr;</span> Sandbox
+            </a>
+
+            @if (segments.Length >= 3 && concerns.TryGetValue(segments[1], out var concern))
+            {
+                var concernUrl = Url.Action("Index", concern.Controller, new { area = "Sandbox" });
+                <span class="text-text-muted">/</span>
+                <a href="@concernUrl"
+                   class="text-text-secondary hover:text-[#7A2E3B] transition-colors">
+                    @concern.Display
+                </a>
+            }
+        </nav>
+    }
+}

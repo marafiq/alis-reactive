@@ -29,55 +29,25 @@
                     </span>
                 </a>
                 <nav class="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-                    <a href="/"
+                    <a href="@Url.Action("Index", "Home")"
                        class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Home</a>
-                    <a href="/Sandbox/CoreBehaviors/Events"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Events</a>
-                    <a href="/Sandbox/CoreBehaviors/Payload"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Payload</a>
-                    <a href="/Sandbox/Conditions/Guards"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Conditions</a>
-                    <a href="/Sandbox/Validation/AllRules"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Validation</a>
-                    <a href="/Sandbox/AllModulesTogether/Architecture"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Architecture</a>
-                    <a href="/Sandbox/Components/Drawer"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Drawer</a>
+                    <a href="@Url.Action("Index", "SandboxHome", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-semibold text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Sandbox</a>
 
                     <span class="w-px h-5 bg-border mx-1"></span>
 
-                    <a href="/Sandbox/AllModulesTogether/PlaygroundSyntax"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Playground</a>
-                    <a href="/Sandbox/AllModulesTogether/PlaygroundSyntax/ReactiveConditions"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Reactive Cond.</a>
-                    <a href="/Sandbox/HttpPipeline/ContentType"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Content Type</a>
-                    <a href="/Sandbox/Components/NumericTextBox"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">NumericTextBox</a>
-                    <a href="/Sandbox/Components/DropDownList"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">DropDownList</a>
-                    <a href="/Sandbox/Components/AutoComplete"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">AutoComplete</a>
-                    <a href="/Sandbox/Components/MultiSelect"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">MultiSelect</a>
-                    <a href="/Sandbox/Components/NativeTextArea"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">TextArea</a>
-                    <a href="/Sandbox/Components/NativeHiddenField"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">HiddenField</a>
-                    <a href="/Sandbox/Components/DateTimePicker"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">DateTimePicker</a>
-                    <a href="/Sandbox/Components/DateRangePicker"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">DateRangePicker</a>
-                    <a href="/Sandbox/Components/InputMask"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">InputMask</a>
-                    <a href="/Sandbox/Components/RichTextEditor"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">RichTextEditor</a>
-                    <a href="/Sandbox/Components/Switch"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Switch</a>
-                    <a href="/Sandbox/Components/FileUpload"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">FileUpload</a>
-                    <a href="/Sandbox/AllModulesTogether/ComponentGather"
-                       class="px-3 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">ComponentGather</a>
+                    <a href="@Url.Action("Index", "CoreBehaviors", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Core</a>
+                    <a href="@Url.Action("Index", "Conditions", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Conditions</a>
+                    <a href="@Url.Action("Index", "HttpPipeline", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">HTTP</a>
+                    <a href="@Url.Action("Index", "Validation", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Validation</a>
+                    <a href="@Url.Action("Index", "Components", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Components</a>
+                    <a href="@Url.Action("Index", "AllModulesTogether", new { area = "Sandbox" })"
+                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">All Modules</a>
                 </nav>
             </div>
         </native-container>
@@ -85,6 +55,7 @@
 
     <main class="flex-1">
         <native-container class="py-10">
+            @await Html.PartialAsync("_SandboxBreadcrumb")
             @RenderBody()
         </native-container>
     </main>
