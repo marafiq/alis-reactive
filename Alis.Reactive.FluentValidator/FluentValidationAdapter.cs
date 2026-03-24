@@ -244,23 +244,8 @@ namespace Alis.Reactive.FluentValidator
                     break;
 
                 case ILengthValidator lv:
-                {
-                    if (lv.Min > 0)
-                    {
-                        result.Add(new ExtractedRule(
-                            "minLength",
-                            customMsg ?? $"'{displayName}' must be at least {lv.Min} characters.",
-                            lv.Min, ruleCondition));
-                    }
-                    if (lv.Max > 0)
-                    {
-                        result.Add(new ExtractedRule(
-                            "maxLength",
-                            customMsg ?? $"'{displayName}' must be at most {lv.Max} characters.",
-                            lv.Max, ruleCondition));
-                    }
+                    MapLengthValidator(lv, displayName, customMsg, ruleCondition, result);
                     break;
-                }
 
                 case IEmailValidator _:
                     result.Add(new ExtractedRule(
@@ -307,6 +292,26 @@ namespace Alis.Reactive.FluentValidator
             }
 
             return result;
+        }
+
+        private static void MapLengthValidator(
+            ILengthValidator lv, string displayName, string? customMsg,
+            ValidationCondition? ruleCondition, List<ExtractedRule> result)
+        {
+            if (lv.Min > 0)
+            {
+                result.Add(new ExtractedRule(
+                    "minLength",
+                    customMsg ?? $"'{displayName}' must be at least {lv.Min} characters.",
+                    lv.Min, ruleCondition));
+            }
+            if (lv.Max > 0)
+            {
+                result.Add(new ExtractedRule(
+                    "maxLength",
+                    customMsg ?? $"'{displayName}' must be at most {lv.Max} characters.",
+                    lv.Max, ruleCondition));
+            }
         }
 
         private static ExtractedRule MapRangeValidator(
