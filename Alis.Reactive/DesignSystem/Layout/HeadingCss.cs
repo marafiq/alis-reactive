@@ -5,7 +5,7 @@ namespace Alis.Reactive.DesignSystem.Layout
 {
     public static class HeadingCss
     {
-        public static string Classes(HeadingLevel level, string userClass = null)
+        public static string Classes(HeadingLevel level, string? userClass = null)
         {
             var sizeClass = level switch
             {
@@ -20,7 +20,7 @@ namespace Alis.Reactive.DesignSystem.Layout
             return CssUtils.MergeClasses($"font-display text-text-primary {sizeClass}", userClass);
         }
 
-        public static string OverlineClasses(string userClass = null)
+        public static string OverlineClasses(string? userClass = null)
         {
             return CssUtils.MergeClasses("text-xs font-semibold uppercase tracking-wider text-text-muted mb-1", userClass);
         }

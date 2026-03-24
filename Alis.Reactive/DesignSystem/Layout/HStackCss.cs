@@ -9,7 +9,7 @@ namespace Alis.Reactive.DesignSystem.Layout
             AlignItems align = AlignItems.Center,
             JustifyContent justify = JustifyContent.Start,
             bool wrap = false,
-            string userClass = null)
+            string? userClass = null)
         {
             var wrapClass = wrap ? "flex-wrap" : "";
             var baseClasses = $"flex {TokenMap.Gap(gap)} {TokenMap.Items(align)} {TokenMap.Justify(justify)} {wrapClass}".Trim();

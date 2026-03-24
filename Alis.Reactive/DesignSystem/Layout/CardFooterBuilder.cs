@@ -5,7 +5,7 @@ namespace Alis.Reactive.DesignSystem.Layout
     public class CardFooterBuilder
     {
         private CardDivider _divider = CardDivider.None;
-        private string _cssClass;
+        private string? _cssClass;
 
         public CardFooterBuilder Divider(CardDivider divider)
         {

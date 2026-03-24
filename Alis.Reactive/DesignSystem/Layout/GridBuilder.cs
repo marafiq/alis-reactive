@@ -9,8 +9,8 @@ namespace Alis.Reactive.DesignSystem.Layout
         private GridCols _cols;
         private SpacingScale _gap = SpacingScale.Md;
         private bool _responsive = true;
-        private string _cssClass;
-        private string _id;
+        private string? _cssClass;
+        private string? _id;
 
         public GridBuilder(GridCols cols)
         {

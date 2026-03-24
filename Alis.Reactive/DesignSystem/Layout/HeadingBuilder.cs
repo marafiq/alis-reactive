@@ -6,9 +6,9 @@ namespace Alis.Reactive.DesignSystem.Layout
     public class HeadingBuilder
     {
         private HeadingLevel _level = HeadingLevel.H2;
-        private string _overline;
-        private string _cssClass;
-        private string _id;
+        private string? _overline;
+        private string? _cssClass;
+        private string? _id;
 
         public HeadingBuilder Level(HeadingLevel level)
         {

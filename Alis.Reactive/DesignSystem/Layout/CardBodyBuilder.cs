@@ -5,7 +5,7 @@ namespace Alis.Reactive.DesignSystem.Layout
     public class CardBodyBuilder
     {
         private CardPadding _padding = CardPadding.Standard;
-        private string _cssClass;
+        private string? _cssClass;
 
         public CardBodyBuilder Padding(CardPadding padding)
         {

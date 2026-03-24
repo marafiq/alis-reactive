@@ -5,8 +5,8 @@ namespace Alis.Reactive.DesignSystem.Layout
 {
     public class ContainerBuilder
     {
-        private string _cssClass;
-        private string _id;
+        private string? _cssClass;
+        private string? _id;
 
         public ContainerBuilder CssClass(string cssClass)
         {

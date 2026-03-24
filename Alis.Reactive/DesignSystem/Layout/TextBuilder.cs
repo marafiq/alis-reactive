@@ -9,8 +9,8 @@ namespace Alis.Reactive.DesignSystem.Layout
         private TextColor _color = TextColor.Primary;
         private bool _bold;
         private bool _span;
-        private string _cssClass;
-        private string _id;
+        private string? _cssClass;
+        private string? _id;
 
         public TextBuilder Size(TextSize size)
         {

@@ -5,7 +5,7 @@ namespace Alis.Reactive.DesignSystem.Layout
     public class CardHeaderBuilder
     {
         private CardDivider _divider = CardDivider.None;
-        private string _cssClass;
+        private string? _cssClass;
 
         public CardHeaderBuilder Divider(CardDivider divider)
         {

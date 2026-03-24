@@ -7,8 +7,8 @@ namespace Alis.Reactive.DesignSystem.Layout
     {
         private CardElevation _elevation = CardElevation.Low;
         private AccentColor? _accent;
-        private string _id;
-        private string _cssClass;
+        private string? _id;
+        private string? _cssClass;
 
         public CardBuilder Elevation(CardElevation elevation)
         {

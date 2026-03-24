@@ -9,8 +9,8 @@ namespace Alis.Reactive.DesignSystem.Layout
         private AlignItems _align = AlignItems.Center;
         private JustifyContent _justify = JustifyContent.Start;
         private bool _wrap;
-        private string _cssClass;
-        private string _id;
+        private string? _cssClass;
+        private string? _id;
 
         public HStackBuilder(SpacingScale gap)
         {
