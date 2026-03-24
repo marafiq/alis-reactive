@@ -1,4 +1,4 @@
-import type { Command, MethodArg, ExecContext } from "../types";
+import type { Command, MutateEventCommand, MethodArg, ExecContext } from "../types";
 import { mutateElement } from "./element";
 import { evaluateGuard, isConfirmGuard } from "../conditions/conditions";
 import { showServerErrors } from "../validation";
@@ -17,6 +17,27 @@ function resolveMethodArg(arg: MethodArg, ctx?: ExecContext): unknown {
       return arg.coerce ? coerce(raw, arg.coerce) : raw;
     }
     default: assertNever(arg, "method arg kind");
+  }
+}
+
+function executeMutateEvent(cmd: MutateEventCommand, ctx: ExecContext): void {
+  if (!ctx?.evt) throw new Error("[alis] mutate-event requires event context — was this command used outside an event handler?");
+  const m = cmd.mutation;
+  switch (m.kind) {
+    case "set-prop": {
+      const val = cmd.source ? resolveSource(cmd.source, ctx) : cmd.value;
+      const coerced = m.coerce ? coerce(val, m.coerce) : val;
+      log.trace("mutate-event", { prop: m.prop, val: coerced });
+      (ctx.evt as any)[m.prop] = coerced;
+      break;
+    }
+    case "call": {
+      const resolved = (m.args ?? []).map(a => resolveMethodArg(a, ctx));
+      log.trace("mutate-event", { method: m.method, args: resolved });
+      (ctx.evt as any)[m.method](...resolved);
+      break;
+    }
+    default: assertNever(m, "event mutation kind");
   }
 }
 
@@ -55,27 +76,9 @@ export function executeCommand(cmd: Command, ctx?: ExecContext): void {
       break;
     }
 
-    case "mutate-event": {
-      if (!ctx?.evt) throw new Error("[alis] mutate-event requires event context — was this command used outside an event handler?");
-      const m = cmd.mutation;
-      switch (m.kind) {
-        case "set-prop": {
-          const val = cmd.source ? resolveSource(cmd.source, ctx) : cmd.value;
-          const coerced = m.coerce ? coerce(val, m.coerce) : val;
-          log.trace("mutate-event", { prop: m.prop, val: coerced });
-          (ctx.evt as any)[m.prop] = coerced;
-          break;
-        }
-        case "call": {
-          const resolved = (m.args ?? []).map(a => resolveMethodArg(a, ctx));
-          log.trace("mutate-event", { method: m.method, args: resolved });
-          (ctx.evt as any)[m.method](...resolved);
-          break;
-        }
-        default: assertNever(m, "event mutation kind");
-      }
+    case "mutate-event":
+      executeMutateEvent(cmd, ctx!);
       break;
-    }
 
     case "into": {
       const container = document.getElementById(cmd.target);
