@@ -130,16 +130,18 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Returns a single reaction for simple pipelines (one segment),
-        /// or the first reaction for backwards compatibility.
-        /// Prefer BuildReactions() for multi-segment pipelines.
+        /// Returns the single reaction for this pipeline.
+        /// Throws if the pipeline produced multiple segments — callers that
+        /// need multi-segment support must use <see cref="BuildReactions"/> instead.
         /// </summary>
         public Reaction BuildReaction()
         {
             var reactions = BuildReactions();
-            return reactions.Count == 1
-                ? reactions[0]
-                : reactions[0]; // caller should use BuildReactions() for multi-segment
+            if (reactions.Count > 1)
+                throw new InvalidOperationException(
+                    $"BuildReaction() requires exactly one reaction segment but found {reactions.Count}. " +
+                    "Use BuildReactions() for pipelines with multiple When() blocks.");
+            return reactions[0];
         }
 
         /// <summary>
