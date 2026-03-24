@@ -22,9 +22,17 @@ export function coerce(value: unknown, type: CoercionType): unknown {
   }
 }
 
-/** null/undefined → "". Everything else → String(). */
+/** Type-aware string conversion — THE single source of truth for value→string. */
 export function toString(value: unknown): string {
-  return String(value ?? "");
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (value instanceof Date) return value.toISOString();
+  if (Array.isArray(value)) return JSON.stringify(value);
+  throw new Error(
+    `[alis:coerce] toString() received a plain object — ` +
+    `missing coerceAs or wrong readExpr. Got: ${JSON.stringify(value)}`
+  );
 }
 
 /** NaN → 0. null/undefined → 0. Everything else → Number(). */

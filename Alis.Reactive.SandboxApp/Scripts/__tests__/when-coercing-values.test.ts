@@ -41,6 +41,19 @@ describe("when coercing values", () => {
     it("converts NaN to string", () => {
       expect(toString(NaN)).toBe("NaN");
     });
+
+    it("Date round-trips through toString and toDate (ISO is the canonical form)", () => {
+      const d = new Date("2024-03-15T08:30:00Z");
+      expect(toDate(toString(d))).toBe(d.getTime());
+    });
+
+    it("throws on plain object — exposes misconfigured plan immediately", () => {
+      expect(() => toString({ name: "John" })).toThrow(/plain object/);
+    });
+
+    it("converts array to JSON string preserving structure", () => {
+      expect(toString(["Peanuts", "Dairy"])).toBe('["Peanuts","Dairy"]');
+    });
   });
 
   // ── toNumber ──────────────────────────────────────────────
