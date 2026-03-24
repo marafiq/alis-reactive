@@ -75,6 +75,20 @@ function createJsonTransport(body: Record<string, unknown>): Transport {
   };
 }
 
+function emitValue(name: string, raw: unknown, transport: Transport): void {
+  if (typeof FileList !== "undefined" && raw instanceof FileList) {
+    transport.emitArray(name, Array.from(raw));
+    log.trace("file", { name, count: raw.length });
+    return;
+  }
+  if (Array.isArray(raw)) {
+    transport.emitArray(name, raw);
+  } else {
+    transport.emitScalar(name, raw);
+  }
+  log.trace("component", { name, value: raw });
+}
+
 export function resolveGather(
   items: GatherItem[],
   verb: string,
@@ -93,35 +107,20 @@ export function resolveGather(
       ? createTransport(urlParams, formData, body)
       : createJsonTransport(body);
 
-  function emit(name: string, raw: unknown): void {
-    // FileList — browser native, array-like but not Array.isArray
-    if (typeof FileList !== "undefined" && raw instanceof FileList) {
-      transport.emitArray(name, Array.from(raw));
-      log.trace("file", { name, count: raw.length });
-      return;
-    }
-    if (Array.isArray(raw)) {
-      transport.emitArray(name, raw);
-    } else {
-      transport.emitScalar(name, raw);
-    }
-    log.trace("component", { name, value: raw });
-  }
-
   for (const g of items) {
     switch (g.kind) {
       case "component":
-        emit(g.name, evalRead(g.componentId, g.vendor, g.readExpr));
+        emitValue(g.name, evalRead(g.componentId, g.vendor, g.readExpr), transport);
         break;
 
       case "static":
-        emit(g.param, g.value);
+        emitValue(g.param, g.value, transport);
         break;
 
       case "event": {
         const ctx = evt ? { evt } : {};
         const val = walk(ctx, g.path);
-        emit(g.param, val);
+        emitValue(g.param, val, transport);
         break;
       }
 
@@ -132,7 +131,7 @@ export function resolveGather(
             "No components registered — check that builders call plan.AddToComponentsMap().");
         }
         for (const [bindingPath, comp] of Object.entries(components)) {
-          emit(bindingPath, evalRead(comp.id, comp.vendor, comp.readExpr));
+          emitValue(bindingPath, evalRead(comp.id, comp.vendor, comp.readExpr), transport);
         }
         break;
 
