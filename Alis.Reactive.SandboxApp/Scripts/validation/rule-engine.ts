@@ -35,6 +35,61 @@ function resolveTarget(rule: ValidationRule, peerReader: PeerReader): unknown {
   return rule.constraint;
 }
 
+// --- Extracted evaluators (pure functions, no DOM, no side effects) ---
+
+function failsComparisonRule(
+  rule: ValidationRule, value: unknown, empty: boolean, peerReader: PeerReader
+): boolean {
+  const target = resolveTarget(rule, peerReader);
+  if (target === undefined) return true;
+  switch (rule.rule) {
+    case "min": return !empty && compareValues(value, target, rule.coerceAs) < 0;
+    case "max": return !empty && compareValues(value, target, rule.coerceAs) > 0;
+    case "gt":  return empty || compareValues(value, target, rule.coerceAs) <= 0;
+    case "lt":  return !empty && compareValues(value, target, rule.coerceAs) >= 0;
+    default:    return true;
+  }
+}
+
+function failsRangeRule(
+  rule: ValidationRule, value: unknown, empty: boolean
+): boolean {
+  const [lo, hi] = rule.constraint as [unknown, unknown];
+  if (empty) return false;
+  if (rule.rule === "range") {
+    return compareValues(value, lo, rule.coerceAs) < 0
+        || compareValues(value, hi, rule.coerceAs) > 0;
+  }
+  // exclusiveRange
+  return compareValues(value, lo, rule.coerceAs) <= 0
+      || compareValues(value, hi, rule.coerceAs) >= 0;
+}
+
+function failsEqualityRule(
+  rule: ValidationRule, value: unknown, empty: boolean, peerReader: PeerReader
+): boolean {
+  switch (rule.rule) {
+    case "equalTo": {
+      if (empty) return false;
+      const target = resolveTarget(rule, peerReader);
+      if (target === undefined) return true;
+      if (rule.coerceAs) return compareValues(value, target, rule.coerceAs) !== 0;
+      return String(value ?? "") !== String(target ?? "");
+    }
+    case "notEqual":
+      return !empty && String(value) === String(rule.constraint);
+    case "notEqualTo": {
+      const target = resolveTarget(rule, peerReader);
+      if (target === undefined) return true;
+      if (rule.coerceAs) return !empty && compareValues(value, target, rule.coerceAs) === 0;
+      return !empty && String(value ?? "") === String(target ?? "");
+    }
+    default: return true;
+  }
+}
+
+// --- Main dispatcher ---
+
 export function ruleFails(
   rule: ValidationRule,
   value: unknown,
@@ -44,84 +99,28 @@ export function ruleFails(
   const empty = value == null || str === "" || value === false;
 
   switch (rule.rule) {
-    case "required":
-      return empty;
-    case "empty":
-      return !empty;
-    case "minLength":
-      return !empty && str.length < Number(rule.constraint);
-    case "maxLength":
-      return !empty && str.length > Number(rule.constraint);
-    case "email":
-      return !empty && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
-    case "regex": {
+    case "required":    return empty;
+    case "empty":       return !empty;
+    case "minLength":   return !empty && str.length < Number(rule.constraint);
+    case "maxLength":   return !empty && str.length > Number(rule.constraint);
+    case "email":       return !empty && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+    case "regex":
       try { return !empty && !new RegExp(String(rule.constraint)).test(str); }
-      catch { return true; } // Broken regex → fail-closed (block, don't pass)
-    }
-    case "url":
-      return !empty && !/^https?:\/\/.+/.test(str);
-    case "creditCard":
-      return !empty && !luhn(str.replace(/\D/g, ""));
+      catch { return true; }
+    case "url":         return !empty && !/^https?:\/\/.+/.test(str);
+    case "creditCard":  return !empty && !luhn(str.replace(/\D/g, ""));
 
-    case "min": {
-      const target = resolveTarget(rule, peerReader);
-      if (target === undefined) return true;
-      return !empty && compareValues(value, target, rule.coerceAs) < 0;
-    }
-    case "max": {
-      const target = resolveTarget(rule, peerReader);
-      if (target === undefined) return true;
-      return !empty && compareValues(value, target, rule.coerceAs) > 0;
-    }
-    case "gt": {
-      const target = resolveTarget(rule, peerReader);
-      if (target === undefined) return true;
-      return empty || compareValues(value, target, rule.coerceAs) <= 0;
-    }
-    case "lt": {
-      const target = resolveTarget(rule, peerReader);
-      if (target === undefined) return true;
-      return !empty && compareValues(value, target, rule.coerceAs) >= 0;
-    }
+    case "min": case "max": case "gt": case "lt":
+      return failsComparisonRule(rule, value, empty, peerReader);
 
-    case "range": {
-      const [lo, hi] = rule.constraint as [unknown, unknown];
-      if (empty) return false;
-      return compareValues(value, lo, rule.coerceAs) < 0
-          || compareValues(value, hi, rule.coerceAs) > 0;
-    }
-    case "exclusiveRange": {
-      const [lo, hi] = rule.constraint as [unknown, unknown];
-      if (empty) return false;
-      return compareValues(value, lo, rule.coerceAs) <= 0
-          || compareValues(value, hi, rule.coerceAs) >= 0;
-    }
+    case "range": case "exclusiveRange":
+      return failsRangeRule(rule, value, empty);
 
-    case "equalTo": {
-      if (empty) return false;
-      const target = resolveTarget(rule, peerReader);
-      if (target === undefined) return true;
-      if (rule.coerceAs) {
-        return compareValues(value, target, rule.coerceAs) !== 0;
-      }
-      return String(value ?? "") !== String(target ?? "");
-    }
-    case "notEqual":
-      return !empty && String(value) === String(rule.constraint);
-    case "notEqualTo": {
-      const target = resolveTarget(rule, peerReader);
-      if (target === undefined) return true;
-      if (rule.coerceAs) {
-        return !empty && compareValues(value, target, rule.coerceAs) === 0;
-      }
-      return !empty && String(value ?? "") === String(target ?? "");
-    }
+    case "equalTo": case "notEqual": case "notEqualTo":
+      return failsEqualityRule(rule, value, empty, peerReader);
 
-    case "atLeastOne":
-      return Array.isArray(value) ? value.length === 0 : empty;
-
-    default:
-      return true; // Unknown rule type → fail-closed (block, don't pass)
+    case "atLeastOne":  return Array.isArray(value) ? value.length === 0 : empty;
+    default:            return true;
   }
 }
 
