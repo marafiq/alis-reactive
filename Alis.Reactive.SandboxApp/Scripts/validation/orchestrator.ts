@@ -83,29 +83,80 @@ export function revalidateField(desc: ValidationDescriptor, field: ValidationFie
 
 // ── Per-field evaluation (shared by validate + revalidateField) ──
 
+/** Handles fields that cannot be resolved (unenriched or missing element). */
+function handleUnresolvableField(
+  f: ValidationField, condReader: ConditionReader, summaryEl: HTMLElement | null
+): boolean {
+  if (allRulesConditionallySkipped(f, condReader)) return true;
+  if (f.rules.length > 0 && summaryEl) {
+    addToSummary(summaryEl, f.fieldName, f.rules[0].message);
+  }
+  return false;
+}
+
+/**
+ * Checks a rule's When condition. Returns:
+ *   "skip"  — condition is false, skip this rule
+ *   "block" — condition is unresolvable (null), block with summary
+ *   "eval"  — condition passed or no condition, evaluate the rule
+ */
+function checkRuleCondition(
+  rule: ValidationRule, condReader: ConditionReader
+): "skip" | "block" | "eval" {
+  if (!rule.when) return "eval";
+  const result = evalCondition(rule.when, condReader);
+  if (result === false) return "skip";
+  if (result === null) return "block";
+  return "eval";
+}
+
+/** Reports a validation failure — routes to inline or summary based on visibility. */
+function reportFailure(
+  f: ValidationField, message: string, hidden: boolean,
+  formId: string, summaryEl: HTMLElement | null
+): void {
+  if (hidden) {
+    if (summaryEl) addToSummary(summaryEl, f.fieldName, message);
+  } else {
+    showInline(formId, f, message);
+    if (summaryEl) removeSummaryEntry(summaryEl, f.fieldName);
+  }
+}
+
+/** Evaluates all rules for a resolved field. Returns true if all pass. */
+function evaluateRules(
+  f: ValidationField, value: unknown, hidden: boolean,
+  formId: string, condReader: ConditionReader, peerReader: PeerReader,
+  summaryEl: HTMLElement | null
+): boolean {
+  for (const rule of f.rules) {
+    const condStatus = checkRuleCondition(rule, condReader);
+    if (condStatus === "skip") continue;
+    if (condStatus === "block") {
+      if (summaryEl) addToSummary(summaryEl, f.fieldName, rule.message);
+      return false;
+    }
+
+    if (ruleFails(rule, value, peerReader)) {
+      reportFailure(f, rule.message, hidden, formId, summaryEl);
+      return false;
+    }
+  }
+  return true;
+}
+
 function evaluateField(
   f: ValidationField, formId: string, container: HTMLElement,
   condReader: ConditionReader, peerReader: PeerReader,
   summaryEl: HTMLElement | null
 ): boolean {
-  // Unenriched: field declared in validator but no component registered.
   if (!f.fieldId || !f.vendor || !f.readExpr) {
-    if (allRulesConditionallySkipped(f, condReader)) return true;
-    if (f.rules.length > 0 && summaryEl) {
-      addToSummary(summaryEl, f.fieldName, f.rules[0].message);
-    }
-    return false;
+    return handleUnresolvableField(f, condReader, summaryEl);
   }
 
   const el = document.getElementById(f.fieldId);
-
-  // Enriched but element missing from DOM.
   if (!el) {
-    if (allRulesConditionallySkipped(f, condReader)) return true;
-    if (f.rules.length > 0 && summaryEl) {
-      addToSummary(summaryEl, f.fieldName, f.rules[0].message);
-    }
-    return false;
+    return handleUnresolvableField(f, condReader, summaryEl);
   }
 
   if (!container.contains(el)) {
@@ -118,32 +169,7 @@ function evaluateField(
   const root = resolveRoot(el, f.vendor);
   const value = walk(root, f.readExpr);
 
-  for (const rule of f.rules) {
-    if (rule.when) {
-      const condResult = evalCondition(rule.when, condReader);
-      if (condResult === false) continue;
-      if (condResult === null) {
-        if (summaryEl) {
-          addToSummary(summaryEl, f.fieldName, rule.message);
-        }
-        return false;
-      }
-    }
-
-    if (ruleFails(rule, value, peerReader)) {
-      if (hidden) {
-        if (summaryEl) {
-          addToSummary(summaryEl, f.fieldName, rule.message);
-        }
-      } else {
-        showInline(formId, f, rule.message);
-        if (summaryEl) removeSummaryEntry(summaryEl, f.fieldName);
-      }
-      return false;
-    }
-  }
-
-  return true;
+  return evaluateRules(f, value, hidden, formId, condReader, peerReader, summaryEl);
 }
 
 function hasSummaryEntry(summaryEl: HTMLElement | null, fieldName: string): boolean {
