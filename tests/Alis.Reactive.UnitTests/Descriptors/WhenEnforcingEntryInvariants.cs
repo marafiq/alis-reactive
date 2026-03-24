@@ -10,7 +10,7 @@ namespace Alis.Reactive.UnitTests;
 /// F-T2 (grep: no new Entry(null, …) in production code) verified manually.
 /// </summary>
 [TestFixture]
-public class WhenEnforcingEntryInvariants
+public class WhenEnforcingEntryInvariants : PlanTestBase
 {
     [Test]
     public void Null_trigger_throws_ArgumentNullException()
@@ -29,12 +29,16 @@ public class WhenEnforcingEntryInvariants
     }
 
     [Test]
-    public void Valid_entry_assigns_both_properties()
+    public Task Valid_entry_renders_correct_plan_json()
     {
-        var trigger = new DomReadyTrigger();
-        var reaction = new SequentialReaction(new List<Descriptors.Commands.Command>());
-        var entry = new Entry(trigger, reaction);
-        Assert.That(entry.Trigger, Is.SameAs(trigger));
-        Assert.That(entry.Reaction, Is.SameAs(reaction));
+        var plan = CreatePlan();
+        Trigger(plan).DomReady(p =>
+        {
+            p.Element("status").SetText("loaded");
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        return VerifyJson(json);
     }
 }

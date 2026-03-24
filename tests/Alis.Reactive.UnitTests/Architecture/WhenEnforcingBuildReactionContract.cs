@@ -1,4 +1,5 @@
 using Alis.Reactive.Builders;
+using Alis.Reactive.Descriptors.Reactions;
 
 namespace Alis.Reactive.UnitTests;
 
@@ -21,7 +22,7 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
     // ═══════════════════════════════════════════════════════════
 
     [Test]
-    public void Two_when_blocks_produce_two_reactions()
+    public void Two_when_blocks_produce_two_conditional_reactions()
     {
         var pb = new PipelineBuilder<TestModel>();
         var payload = new SegmentPayload();
@@ -31,7 +32,9 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
             .Then(t => t.Element("r2").SetText("second"));
 
         var reactions = pb.BuildReactions();
-        Assert.That(reactions.Count, Is.EqualTo(2));
+        Assert.That(reactions, Has.Count.EqualTo(2));
+        Assert.That(reactions[0], Is.InstanceOf<ConditionalReaction>());
+        Assert.That(reactions[1], Is.InstanceOf<ConditionalReaction>());
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -39,7 +42,7 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
     // ═══════════════════════════════════════════════════════════
 
     [Test]
-    public void BuildReaction_throws_when_multiple_segments()
+    public void BuildReaction_throws_when_multiple_segments_exist()
     {
         var pb = new PipelineBuilder<TestModel>();
         var payload = new SegmentPayload();
@@ -50,10 +53,12 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
 
         var ex = Assert.Throws<InvalidOperationException>(() => pb.BuildReaction());
         Assert.That(ex!.Message, Does.Contain("BuildReactions()"));
+        Assert.That(ex.Message, Does.Contain("2"),
+            "Error message should include the actual segment count");
     }
 
     [Test]
-    public void BuildReaction_succeeds_for_single_segment()
+    public void Single_conditional_segment_returns_conditional_reaction()
     {
         var pb = new PipelineBuilder<TestModel>();
         var payload = new SegmentPayload();
@@ -61,26 +66,30 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
             .Then(t => t.Element("r1").SetText("matched"));
 
         var reaction = pb.BuildReaction();
-        Assert.That(reaction, Is.Not.Null);
+        Assert.That(reaction, Is.InstanceOf<ConditionalReaction>());
     }
 
     [Test]
-    public void BuildReaction_succeeds_for_sequential_commands()
+    public void Sequential_commands_return_sequential_reaction_with_correct_count()
     {
         var pb = new PipelineBuilder<TestModel>();
         pb.Element("a").SetText("one");
         pb.Element("b").SetText("two");
+        pb.Dispatch("done");
 
         var reaction = pb.BuildReaction();
-        Assert.That(reaction, Is.Not.Null);
+        Assert.That(reaction, Is.InstanceOf<SequentialReaction>());
+        var seq = (SequentialReaction)reaction;
+        Assert.That(seq.Commands, Has.Count.EqualTo(3));
     }
 
     // ═══════════════════════════════════════════════════════════
-    // F-T6 — TriggerBuilder with 2 When blocks → 2 entries
+    // F-T6 — TriggerBuilder with 2 When blocks → 2 entries,
+    //         plan renders valid JSON with both conditions
     // ═══════════════════════════════════════════════════════════
 
     [Test]
-    public void TriggerBuilder_two_when_blocks_produce_two_entries()
+    public Task TriggerBuilder_two_when_blocks_produce_two_plan_entries()
     {
         var plan = CreatePlan();
         Trigger(plan).CustomEvent<SegmentPayload>("test", (args, p) =>
@@ -93,9 +102,6 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
-
-        using var doc = System.Text.Json.JsonDocument.Parse(json);
-        var entries = doc.RootElement.GetProperty("entries");
-        Assert.That(entries.GetArrayLength(), Is.EqualTo(2));
+        return VerifyJson(json);
     }
 }
