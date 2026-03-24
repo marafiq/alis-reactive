@@ -527,6 +527,67 @@ No IIFE, no `window.alis`, no import maps, no inline `<script type="module">` bl
 appends `?v=SHA256hash` — browser always gets the latest build. This works because the
 layout uses `src=` (not inline `import from`), and ASP.NET's tag helpers compute the hash.
 
+### 12. Playwright Test Workflow — Report First, Fix Methodically
+
+**Always run Playwright with trx report so failures are captured in one pass:**
+
+```bash
+dotnet test tests/Alis.Reactive.PlaywrightTests \
+  --logger "html;LogFileName=playwright-report.html" \
+  --logger "trx;LogFileName=playwright-results.trx" \
+  --results-directory TestResults
+```
+
+The HTML report at `TestResults/playwright-report.html` shows pass/fail with error
+messages and stack traces. The trx file is machine-readable for CI pipelines.
+
+**When tests fail, immediately open the HTML report in the user's browser:**
+```bash
+open TestResults/playwright-report.html
+```
+Do NOT re-run the full suite to find which tests failed — the report already has everything.
+
+**After a run with failures, extract the failed test list from the report — never re-run
+the full suite just to find which tests failed.**
+
+**Fix one test at a time using this workflow:**
+
+1. **Read the failed test** — understand what it asserts
+2. **Check prerequisites** — was Sandbox rebuilt? (`npm run build:all && dotnet build`)
+3. **Re-run only the failed test** — `dotnet test --filter "test_name"`
+4. **If it still fails, open browser** — navigate to the page manually, verify behavior
+5. **Compare test selectors vs actual DOM** — use browser DevTools to find correct selectors
+6. **Fix the test** — update selectors or assertions to match current DOM
+7. **Re-run only that test** — confirm it passes
+8. **Move to next failed test** — repeat from step 1
+
+**Never shotgun-fix multiple tests at once.** Each test gets its own diagnosis cycle.
+After all individual tests pass, run the full suite once to confirm no regressions.
+
+**Re-running only failed tests (with screenshots and sequential execution):**
+
+```bash
+# Extract failed test names from trx report and re-run sequentially
+FAILED=$(grep 'outcome="Failed"' TestResults/playwright-results.trx \
+  | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
+  | grep -v "ResultSummary" | paste -sd '|' -)
+
+dotnet test tests/Alis.Reactive.PlaywrightTests \
+  --filter "$FAILED" \
+  --logger "html;LogFileName=rerun-report.html" \
+  --logger "trx;LogFileName=rerun-results.trx" \
+  --results-directory TestResults \
+  -- NUnit.NumberOfTestWorkers=1
+```
+
+Screenshots are captured automatically on failure (`TestResults/screenshots/{testName}.png`)
+via `PlaywrightTestBase.DumpLogsOnFailure()`.
+
+**When re-run completes with failures, open the report:**
+```bash
+open TestResults/rerun-report.html
+```
+
 ## Feedback Loop
 
 ```
