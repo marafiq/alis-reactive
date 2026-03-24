@@ -75,6 +75,41 @@ function createJsonTransport(body: Record<string, unknown>): Transport {
   };
 }
 
+function emitValue(name: string, raw: unknown, transport: Transport): void {
+  if (typeof FileList !== "undefined" && raw instanceof FileList) {
+    transport.emitArray(name, Array.from(raw));
+    log.trace("file", { name, count: raw.length });
+    return;
+  }
+  if (Array.isArray(raw)) {
+    transport.emitArray(name, raw);
+  } else {
+    transport.emitScalar(name, raw);
+  }
+  log.trace("component", { name, value: raw });
+}
+
+function selectTransport(
+  verb: string, urlParams: string[], formData: FormData | null, body: Record<string, unknown>
+): Transport {
+  if (verb === "GET") return createTransport(urlParams, null, body);
+  if (formData) return createTransport(urlParams, formData, body);
+  return createJsonTransport(body);
+}
+
+function emitAllComponents(
+  components: Record<string, ComponentEntry>, transport: Transport
+): void {
+  if (Object.keys(components).length === 0) {
+    throw new Error(
+      "[alis] IncludeAll() executed but plan.components is empty. " +
+      "No components registered — check that builders call plan.AddToComponentsMap().");
+  }
+  for (const [bindingPath, comp] of Object.entries(components)) {
+    emitValue(bindingPath, evalRead(comp.id, comp.vendor, comp.readExpr), transport);
+  }
+}
+
 export function resolveGather(
   items: GatherItem[],
   verb: string,
@@ -83,57 +118,28 @@ export function resolveGather(
   evt?: Record<string, unknown>
 ): GatherResult {
   const urlParams: string[] = [];
-  const useFormData = contentType === "form-data";
-  const formData = useFormData ? new FormData() : null;
+  const formData = contentType === "form-data" ? new FormData() : null;
   const body: Record<string, unknown> = {};
-
-  const transport = verb === "GET"
-    ? createTransport(urlParams, null, body)
-    : formData
-      ? createTransport(urlParams, formData, body)
-      : createJsonTransport(body);
-
-  function emit(name: string, raw: unknown): void {
-    // FileList — browser native, array-like but not Array.isArray
-    if (typeof FileList !== "undefined" && raw instanceof FileList) {
-      transport.emitArray(name, Array.from(raw));
-      log.trace("file", { name, count: raw.length });
-      return;
-    }
-    if (Array.isArray(raw)) {
-      transport.emitArray(name, raw);
-    } else {
-      transport.emitScalar(name, raw);
-    }
-    log.trace("component", { name, value: raw });
-  }
+  const transport = selectTransport(verb, urlParams, formData, body);
 
   for (const g of items) {
     switch (g.kind) {
       case "component":
-        emit(g.name, evalRead(g.componentId, g.vendor, g.readExpr));
+        emitValue(g.name, evalRead(g.componentId, g.vendor, g.readExpr), transport);
         break;
 
       case "static":
-        emit(g.param, g.value);
+        emitValue(g.param, g.value, transport);
         break;
 
       case "event": {
         const ctx = evt ? { evt } : {};
-        const val = walk(ctx, g.path);
-        emit(g.param, val);
+        emitValue(g.param, walk(ctx, g.path), transport);
         break;
       }
 
       case "all":
-        if (Object.keys(components).length === 0) {
-          throw new Error(
-            "[alis] IncludeAll() executed but plan.components is empty. " +
-            "No components registered — check that builders call plan.AddToComponentsMap().");
-        }
-        for (const [bindingPath, comp] of Object.entries(components)) {
-          emit(bindingPath, evalRead(comp.id, comp.vendor, comp.readExpr));
-        }
+        emitAllComponents(components, transport);
         break;
 
       default:
