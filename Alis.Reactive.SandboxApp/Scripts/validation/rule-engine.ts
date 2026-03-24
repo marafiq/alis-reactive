@@ -3,7 +3,7 @@
 // No DOM, no vendor, no side effects. Takes a value and rule → pass/fail.
 // Used by validation.ts orchestrator. Testable without jsdom.
 
-import { coerce } from "../core/coerce";
+import { coerce, toString } from "../core/coerce";
 import type { CoercionType } from "../core/coerce";
 import type { ValidationRule } from "../types";
 
@@ -74,15 +74,15 @@ function failsEqualityRule(
       const target = resolveTarget(rule, peerReader);
       if (target === undefined) return true;
       if (rule.coerceAs) return compareValues(value, target, rule.coerceAs) !== 0;
-      return String(value ?? "") !== String(target ?? "");
+      return toString(value) !== toString(target);
     }
     case "notEqual":
-      return !empty && String(value) === String(rule.constraint);
+      return !empty && toString(value) === toString(rule.constraint);
     case "notEqualTo": {
       const target = resolveTarget(rule, peerReader);
       if (target === undefined) return true;
       if (rule.coerceAs) return !empty && compareValues(value, target, rule.coerceAs) === 0;
-      return !empty && String(value ?? "") === String(target ?? "");
+      return !empty && toString(value) === toString(target);
     }
     default: return true;
   }
@@ -95,7 +95,7 @@ export function ruleFails(
   value: unknown,
   peerReader: PeerReader
 ): boolean {
-  const str = value == null ? "" : String(value);
+  const str = toString(value);
   const empty = value == null || str === "" || value === false;
 
   switch (rule.rule) {
