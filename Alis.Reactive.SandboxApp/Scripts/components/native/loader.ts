@@ -4,7 +4,7 @@
 export {}; // Module marker — prevents TS global-scope collisions
 
 function handleVisible(loader: HTMLElement): void {
-  const targetId = loader.getAttribute("data-target");
+  const targetId = loader.dataset.target;
   if (targetId) {
     const target = document.getElementById(targetId);
     if (target) {
@@ -13,7 +13,7 @@ function handleVisible(loader: HTMLElement): void {
     }
   }
 
-  const timeout = loader.getAttribute("data-timeout");
+  const timeout = loader.dataset.timeout;
   if (timeout) {
     const ms = parseInt(timeout, 10);
     if (ms > 0) {
@@ -29,8 +29,8 @@ function handleHidden(loader: HTMLElement): void {
   if (loader.parentElement !== document.body) {
     document.body.appendChild(loader);
   }
-  loader.removeAttribute("data-target");
-  loader.removeAttribute("data-timeout");
+  delete loader.dataset.target;
+  delete loader.dataset.timeout;
   const msg = document.getElementById("alis-loader-message");
   if (msg) msg.textContent = "";
 }

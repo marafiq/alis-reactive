@@ -49,7 +49,7 @@ export function clearAllInline(formId: string, fields: ValidationField[]): void 
 
 export function addToSummary(summaryEl: HTMLElement, fieldName: string, message: string): void {
   const item = document.createElement("div");
-  item.setAttribute("data-valmsg-summary-for", fieldName);
+  item.dataset.valmsgSummaryFor = fieldName;
   item.textContent = message;
   summaryEl.appendChild(item);
 }
