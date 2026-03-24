@@ -118,28 +118,30 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.
 
         private static int CountNonNull(ComponentGatherModel m)
         {
-            var count = 0;
-            if (m.ResidentId != null) count++;
-            if (m.FormToken != null) count++;
-            if (m.ResidentName != null) count++;
-            if (m.CareNotes != null) count++;
-            if (m.HasAllergies) count++;
-            if (m.MobilityLevel != null) count++;
-            if (m.CareLevel != null) count++;
-            if (m.Allergies?.Length > 0) count++;
-            if (m.MonthlyRate != 0) count++;
-            if (m.FacilityId != null) count++;
-            if (m.PhysicianName != null) count++;
-            if (m.AdmissionDate.HasValue) count++;
-            if (m.MedicationTime.HasValue) count++;
-            if (m.AppointmentTime.HasValue) count++;
-            if (m.StayStart.HasValue) count++;
-            if (m.InsuranceProvider != null) count++;
-            if (m.PhoneNumber != null) count++;
-            if (m.CarePlan != null) count++;
-            if (m.ReceiveNotifications) count++;
-            if (m.DietaryRestrictions?.Length > 0) count++;
-            return count;
+            Func<bool>[] checks =
+            [
+                () => m.ResidentId != null,
+                () => m.FormToken != null,
+                () => m.ResidentName != null,
+                () => m.CareNotes != null,
+                () => m.HasAllergies,
+                () => m.MobilityLevel != null,
+                () => m.CareLevel != null,
+                () => m.Allergies?.Length > 0,
+                () => m.MonthlyRate != 0,
+                () => m.FacilityId != null,
+                () => m.PhysicianName != null,
+                () => m.AdmissionDate.HasValue,
+                () => m.MedicationTime.HasValue,
+                () => m.AppointmentTime.HasValue,
+                () => m.StayStart.HasValue,
+                () => m.InsuranceProvider != null,
+                () => m.PhoneNumber != null,
+                () => m.CarePlan != null,
+                () => m.ReceiveNotifications,
+                () => m.DietaryRestrictions?.Length > 0,
+            ];
+            return checks.Count(c => c());
         }
     }
 }
