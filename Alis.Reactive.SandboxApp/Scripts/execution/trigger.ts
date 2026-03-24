@@ -41,9 +41,12 @@ export function wireTrigger(
       const expr = trigger.readExpr;
       log.debug("component-event", { componentId: trigger.componentId, jsEvent: trigger.jsEvent, vendor: trigger.vendor });
       (root as EventTarget).addEventListener(trigger.jsEvent, (e: any) => {
-        const detail = trigger.vendor === "native"
-          ? (expr ? { [expr]: walk(el, expr), event: e } : { event: e })
-          : (e ?? {});
+        let detail: Record<string, unknown>;
+        if (trigger.vendor === "native") {
+          detail = expr ? { [expr]: walk(el, expr), event: e } : { event: e };
+        } else {
+          detail = e ?? {};
+        }
         executeReaction(reaction, { evt: detail, components }).catch(err => log.error("reaction failed", { error: String(err) }));
       }, opts);
       break;

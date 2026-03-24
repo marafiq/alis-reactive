@@ -103,9 +103,10 @@ function resolveGuardOperands(guard: ValueGuard, ctx?: ExecContext): ResolvedOpe
   const rawOp = guard.rightSource
     ? resolveSourceAs(guard.rightSource, opCoerceAs, ctx)
     : guard.operand;
-  const operand = rawOp != null && !guard.rightSource
-    ? (Array.isArray(rawOp) ? rawOp.map(v => coerce(v, opCoerceAs)) : coerce(rawOp, opCoerceAs))
-    : rawOp;
+  let operand: unknown = rawOp;
+  if (rawOp != null && !guard.rightSource) {
+    operand = Array.isArray(rawOp) ? rawOp.map(v => coerce(v, opCoerceAs)) : coerce(rawOp, opCoerceAs);
+  }
 
   // For array sources with element coercion: pre-coerce elements so switch cases stay pure.
   // For non-array operators elementCoerceAs is null → items is undefined → unused.
