@@ -3,6 +3,8 @@
 **Scope:** Every descriptor class in `Alis.Reactive/Descriptors/`
 **Triggered by:** [command-guard-mutability-design-issues.md](command-guard-mutability-design-issues.md)
 
+> **Accuracy note (2025-03-24):** A stricter re-count of `Descriptors/**/*.cs` yields **~40** `class` declarations (exact number depends on inclusion of nested/helper types), not **34** — **qualitative conclusions below are unchanged**. “Controlled mutation” is best summarized as **`Command.GuardWith`** plus **`RequestDescriptor`** internal attach/enrich; **ValidationResolver** mutates nested **`ValidationField`** / **`ValidationDescriptor`** properties — count **descriptor API methods** separately from **resolver call sites**. **11** `List<>` properties across **6** classes and **zero** post-construction list mutations remain **verified**.
+
 ---
 
 ## The Question
@@ -38,7 +40,7 @@ request, one thread, one method chain.
 
 ## What the Audit Found
 
-### 34 descriptor classes audited. 26 already immutable.
+### ~34–40 descriptor classes audited (see accuracy note). 26 already immutable.
 
 The remaining 8 classes have controlled mutations that exist for legitimate architectural reasons.
 

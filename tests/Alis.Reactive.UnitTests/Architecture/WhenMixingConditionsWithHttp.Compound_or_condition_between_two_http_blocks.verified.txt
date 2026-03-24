@@ -1,0 +1,117 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: GET,
+          url: /api/data,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: data,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: fetched
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: any,
+              guards: [
+                {
+                  kind: value,
+                  source: {
+                    kind: event,
+                    path: evt.value
+                  },
+                  coerceAs: string,
+                  op: eq,
+                  operand: override
+                },
+                {
+                  kind: value,
+                  source: {
+                    kind: event,
+                    path: evt.active
+                  },
+                  coerceAs: boolean,
+                  op: truthy
+                }
+              ]
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: proceed,
+                  mutation: {
+                    kind: call,
+                    method: removeAttribute,
+                    args: [
+                      {
+                        kind: literal,
+                        value: hidden
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/process,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: processed,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: done
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

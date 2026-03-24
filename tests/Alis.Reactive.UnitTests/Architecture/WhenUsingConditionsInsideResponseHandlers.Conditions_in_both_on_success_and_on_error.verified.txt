@@ -1,0 +1,121 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/transfer,
+          onSuccess: [
+            {
+              reaction: {
+                kind: conditional,
+                branches: [
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.count
+                      },
+                      coerceAs: number,
+                      op: gt,
+                      operand: 0
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: transfer-detail,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
+                          value: items transferred
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: transfer-detail,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
+                          value: nothing to transfer
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          onError: [
+            {
+              statusCode: 409,
+              reaction: {
+                kind: conditional,
+                branches: [
+                  {
+                    guard: {
+                      kind: value,
+                      source: {
+                        kind: event,
+                        path: evt.category
+                      },
+                      coerceAs: string,
+                      op: eq,
+                      operand: locked
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: conflict-msg,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
+                          value: resource locked
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: conflict-msg,
+                          mutation: {
+                            kind: set-prop,
+                            prop: textContent
+                          },
+                          value: conflict detected
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

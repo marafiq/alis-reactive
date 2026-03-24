@@ -1,5 +1,3 @@
-using Alis.Reactive.Builders.Conditions;
-
 namespace Alis.Reactive.UnitTests;
 
 public class MixedPayload
@@ -11,20 +9,14 @@ public class MixedPayload
 }
 
 /// <summary>
-/// BDD tests for the pipeline's ability to mix sequential commands and conditional
-/// blocks in any order. Each When().Then().Else() is an independent block — they
-/// do not interfere with each other (no first-match-wins across blocks).
-///
-/// The pipeline builder segments content: commands → condition → commands → condition.
-/// Each segment becomes a separate entry on the same trigger. The runtime fires all
-/// entries for a trigger, so all blocks execute independently.
+/// Pipeline segmentation: commands → condition → commands → condition.
+/// Each When().Then().Else() is an independent block — they do not interfere
+/// with each other. Each segment becomes a separate entry on the same trigger.
 /// </summary>
 [TestFixture]
 public class WhenMixingCommandsAndConditions : PlanTestBase
 {
-    // ═══════════════════════════════════════════════════════════
-    // Two independent When blocks — the core fix
-    // ═══════════════════════════════════════════════════════════
+    // ── Two independent When blocks ──
 
     [Test]
     public Task Two_independent_when_blocks_both_produce_entries()
@@ -70,9 +62,7 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Commands before / between / after conditions
-    // ═══════════════════════════════════════════════════════════
+    // ── Commands before / between / after conditions ──
 
     [Test]
     public Task Commands_before_first_when()
@@ -179,9 +169,7 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // ElseIf chains — single block, not split
-    // ═══════════════════════════════════════════════════════════
+    // ── ElseIf chains ──
 
     [Test]
     public Task ElseIf_chain_is_one_block_not_multiple()
@@ -228,9 +216,82 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Then-only (no Else) conditions
-    // ═══════════════════════════════════════════════════════════
+    [Test]
+    public Task Two_elseif_chains_with_commands_between()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.When(args, x => x.Count).Gt(100)
+                .Then(t => t.Element("tier").SetText("gold"))
+                .ElseIf(args, x => x.Count).Gt(50)
+                .Then(t => t.Element("tier").SetText("silver"))
+                .Else(e => e.Element("tier").SetText("bronze"));
+            p.Element("divider").Show();
+            p.Dispatch("tier-evaluated");
+            p.When(args, x => x.Category).Eq("vip")
+                .Then(t => t.Element("vip-badge").Show())
+                .ElseIf(args, x => x.Category).Eq("member")
+                .Then(t => t.Element("member-badge").Show())
+                .Else(e => e.Element("guest-badge").Show());
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("gold"));
+        Assert.That(json, Does.Contain("silver"));
+        Assert.That(json, Does.Contain("bronze"));
+        Assert.That(json, Does.Contain("divider"));
+        Assert.That(json, Does.Contain("tier-evaluated"));
+        Assert.That(json, Does.Contain("vip-badge"));
+        Assert.That(json, Does.Contain("member-badge"));
+        Assert.That(json, Does.Contain("guest-badge"));
+        return VerifyJson(json);
+    }
+
+    [Test]
+    public Task Three_elseif_chains_interleaved_with_commands()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
+        {
+            p.Element("header").SetText("evaluating");
+            p.When(args, x => x.Count).Gt(100)
+                .Then(t => t.Element("count-tier").SetText("high"))
+                .ElseIf(args, x => x.Count).Gt(10)
+                .Then(t => t.Element("count-tier").SetText("medium"))
+                .Else(e => e.Element("count-tier").SetText("low"));
+            p.Dispatch("count-done");
+            p.When(args, x => x.Active).Truthy()
+                .Then(t => t.Element("active-ind").Show())
+                .Else(e => e.Element("active-ind").Hide());
+            p.Element("mid").SetText("between");
+            p.When(args, x => x.Value).Eq("urgent")
+                .Then(t =>
+                {
+                    t.Element("priority").SetText("URGENT");
+                    t.Element("priority").AddClass("text-red");
+                })
+                .ElseIf(args, x => x.Value).Eq("normal")
+                .Then(t => t.Element("priority").SetText("normal"))
+                .Else(e => e.Element("priority").SetText("low"));
+            p.Element("footer").SetText("complete");
+        });
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        Assert.That(json, Does.Contain("evaluating"));
+        Assert.That(json, Does.Contain("count-tier"));
+        Assert.That(json, Does.Contain("count-done"));
+        Assert.That(json, Does.Contain("active-ind"));
+        Assert.That(json, Does.Contain("between"));
+        Assert.That(json, Does.Contain("URGENT"));
+        Assert.That(json, Does.Contain("priority"));
+        Assert.That(json, Does.Contain("complete"));
+        return VerifyJson(json);
+    }
+
+    // ── Then-only (no Else) conditions ──
 
     [Test]
     public Task Then_only_without_else()
@@ -268,9 +329,7 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Multiple commands in Then/Else branches
-    // ═══════════════════════════════════════════════════════════
+    // ── Multiple commands in Then/Else branches ──
 
     [Test]
     public Task Multiple_commands_in_then_and_else()
@@ -300,9 +359,7 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Regression — existing patterns must not break
-    // ═══════════════════════════════════════════════════════════
+    // ── Regression — existing patterns must not break ──
 
     [Test]
     public Task Single_when_still_works()
@@ -358,9 +415,7 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Condition with Dispatch inside Then
-    // ═══════════════════════════════════════════════════════════
+    // ── Condition with Dispatch inside Then ──
 
     [Test]
     public Task Condition_then_dispatches_event()
@@ -388,9 +443,7 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Mixed event-arg and component source conditions
-    // ═══════════════════════════════════════════════════════════
+    // ── Mixed event-arg conditions ──
 
     [Test]
     public Task Event_arg_condition_followed_by_component_condition()

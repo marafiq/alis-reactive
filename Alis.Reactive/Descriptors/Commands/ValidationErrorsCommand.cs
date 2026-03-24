@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Alis.Reactive.Descriptors.Guards;
 
 namespace Alis.Reactive.Descriptors.Commands
 {
@@ -9,9 +10,15 @@ namespace Alis.Reactive.Descriptors.Commands
 
         public string FormId { get; }
 
-        public ValidationErrorsCommand(string formId)
+        public ValidationErrorsCommand(string formId, Guard? when = null)
+            : base(when)
         {
             FormId = formId;
+        }
+
+        protected override Command CloneWithGuard(Guard guard)
+        {
+            return new ValidationErrorsCommand(FormId, guard);
         }
     }
 }

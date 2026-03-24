@@ -1,15 +1,8 @@
 @model ArchitectureModel
 @using Alis.Reactive
-@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.Fusion.Extensions
-@using Alis.Reactive.Descriptors.Sources
-@using Alis.Reactive.Descriptors
-@using Alis.Reactive.Descriptors.Commands
-@using Alis.Reactive.Descriptors.Mutations
-@using Alis.Reactive.Descriptors.Triggers
 @using Alis.Reactive.Validation
 @{
     ViewData["Title"] = "Architecture";
@@ -61,32 +54,28 @@
             }));
     }));
 
-    // ── Section 4: Event Wiring — component-event triggers wired directly ──
+    // ── Section 4: Event Wiring — .Reactive() extensions on both vendors ──
 
-    // Native: "change" event on native input → walk evt.value → SetText
-    {
-        var pb = new PipelineBuilder<ArchitectureModel>();
-        pb.AddCommand(new MutateElementCommand("native-event-result", new SetPropMutation("textContent"), source: new EventSource("evt.value")));
-        plan.AddEntry(new Entry(
-            new ComponentEventTrigger("native-event", "change", "native", readExpr: "value"),
-            pb.BuildReaction()));
-    }
+    var nativeEventWidget = Html.TestWidgetNative<ArchitectureModel>("native-event")
+        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+        .Reactive(plan, evt => evt.Changed, (args, p) =>
+        {
+            p.Element("native-event-result").SetText(args, x => x.Value);
+        });
 
-    // Fusion: "change" event on TestWidget → walk evt.newValue → SetText
-    {
-        var pb = new PipelineBuilder<ArchitectureModel>();
-        pb.AddCommand(new MutateElementCommand("fusion-event-result", new SetPropMutation("textContent"), source: new EventSource("evt.newValue")));
-        plan.AddEntry(new Entry(
-            new ComponentEventTrigger("fusion-event", "change", "fusion"),
-            pb.BuildReaction()));
-    }
+    var fusionEventWidget = Html.TestWidget<ArchitectureModel>("fusion-event")
+        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+        .Reactive(plan, evt => evt.Changed, (args, p) =>
+        {
+            p.Element("fusion-event-result").SetText(args, x => x.NewValue);
+        });
 
     // ── Section 5: Deep Dot-Path Walk ──
 
-    Html.On(plan, t => t.CustomEvent("deep-walk-ready", p =>
+    Html.On(plan, t => t.CustomEvent<DeepWalkPayload>("deep-walk-ready", (args, p) =>
     {
-        p.AddCommand(new MutateElementCommand("deep-total", new SetPropMutation("textContent"), source: new EventSource("evt.result.detail.total")));
-        p.AddCommand(new MutateElementCommand("deep-city", new SetPropMutation("textContent"), source: new EventSource("evt.result.detail.address.city")));
+        p.Element("deep-total").SetText(args, x => x.Result.Detail.Total);
+        p.Element("deep-city").SetText(args, x => x.Result.Detail.Address.City);
     }));
 
     // ── Section 7: Both vendors gathered together ──
@@ -198,13 +187,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
                 <label class="block text-sm font-medium mb-1">Native Input</label>
-                <input id="native-event" type="text"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm w-full" />
+                @nativeEventWidget
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1">Fusion TestWidget</label>
-                <div id="fusion-event" data-test-widget
-                     class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
+                @fusionEventWidget
             </div>
         </div>
         <div class="font-mono text-sm space-y-1">

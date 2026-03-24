@@ -7,7 +7,7 @@ using Alis.Reactive.Descriptors.Reactions;
 
 namespace Alis.Reactive.Builders
 {
-    public partial class PipelineBuilder<TModel> where TModel : class
+    public partial class PipelineBuilder<TModel> : ICommandEmitter where TModel : class
     {
         private enum PipelineMode { Sequential, Http, Parallel, Conditional }
 
@@ -25,10 +25,10 @@ namespace Alis.Reactive.Builders
         private List<Reaction>? _segments;
 
         /// <summary>
-        /// Adds a command to the pipeline. Used by vendor-specific projects
-        /// (Fusion, Native) to emit their own command descriptors.
+        /// ICommandEmitter — the only path for adding commands from outside.
+        /// Vendor extensions accept ICommandEmitter, not PipelineBuilder.
         /// </summary>
-        public void AddCommand(Command command)
+        void ICommandEmitter.AddCommand(Command command)
         {
             Commands.Add(command);
         }
@@ -114,11 +114,30 @@ namespace Alis.Reactive.Builders
         {
             _segments ??= new List<Reaction>();
 
-            // Flush any accumulated commands as a sequential segment
-            if (Commands.Count > 0)
+            if (_mode == PipelineMode.Http && _httpBuilder != null)
             {
-                _segments.Add(new SequentialReaction(new List<Command>(Commands)));
+                // HTTP mode: pre-HTTP commands belong inside the HttpReaction
+                _segments.Add(new HttpReaction(
+                    Commands.Count > 0 ? new List<Command>(Commands) : null,
+                    _httpBuilder.BuildRequestDescriptor()));
                 Commands.Clear();
+                _httpBuilder = null;
+            }
+            else if (_mode == PipelineMode.Parallel && _parallelBuilder != null)
+            {
+                _segments.Add(_parallelBuilder.BuildReaction(
+                    Commands.Count > 0 ? new List<Command>(Commands) : null));
+                Commands.Clear();
+                _parallelBuilder = null;
+            }
+            else
+            {
+                // Sequential/Conditional: flush commands as a standalone reaction
+                if (Commands.Count > 0)
+                {
+                    _segments.Add(new SequentialReaction(new List<Command>(Commands)));
+                    Commands.Clear();
+                }
             }
 
             // Flush current conditional block
@@ -127,19 +146,23 @@ namespace Alis.Reactive.Builders
                 _segments.Add(new ConditionalReaction(null, ConditionalBranches.ToArray()));
                 ConditionalBranches = null;
             }
+
+            _mode = PipelineMode.Sequential;
         }
 
         /// <summary>
-        /// Returns a single reaction for simple pipelines (one segment),
-        /// or the first reaction for backwards compatibility.
-        /// Prefer BuildReactions() for multi-segment pipelines.
+        /// Returns the single reaction for this pipeline.
+        /// Throws if the pipeline produced multiple segments — callers that
+        /// need multi-segment support must use <see cref="BuildReactions"/> instead.
         /// </summary>
         public Reaction BuildReaction()
         {
             var reactions = BuildReactions();
-            return reactions.Count == 1
-                ? reactions[0]
-                : reactions[0]; // caller should use BuildReactions() for multi-segment
+            if (reactions.Count > 1)
+                throw new InvalidOperationException(
+                    $"BuildReaction() requires exactly one reaction segment but found {reactions.Count}. " +
+                    "Use BuildReactions() for pipelines with multiple When() blocks.");
+            return reactions[0];
         }
 
         /// <summary>
@@ -155,17 +178,8 @@ namespace Alis.Reactive.Builders
                 return new List<Reaction> { BuildSingleReaction() };
             }
 
-            // Flush any trailing commands/branches after the last When()
-            if (Commands.Count > 0)
-            {
-                _segments.Add(new SequentialReaction(new List<Command>(Commands)));
-                Commands.Clear();
-            }
-            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
-            {
-                _segments.Add(new ConditionalReaction(null, ConditionalBranches.ToArray()));
-                ConditionalBranches = null;
-            }
+            // Flush any trailing content (commands, branches, HTTP, parallel)
+            FlushSegment();
 
             return _segments;
         }

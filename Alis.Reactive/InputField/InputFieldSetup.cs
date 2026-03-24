@@ -40,9 +40,17 @@ namespace Alis.Reactive.InputField
 
         /// <summary>
         /// Renders the field wrapper (label + validation slot) around content written by the callback.
+        /// Throws if the component was not registered via AddToComponentsMap — unregistered components
+        /// are invisible to validation and gather, causing silent failures.
         /// </summary>
         internal void Render(Action writeContent)
         {
+            if (!Plan.ComponentsMap.ContainsKey(BindingPath))
+                throw new InvalidOperationException(
+                    $"Component for '{BindingPath}' was rendered without calling " +
+                    $"plan.AddToComponentsMap(). Validation and gather will not work. " +
+                    $"Add plan.AddToComponentsMap(\"{BindingPath}\", ...) in your HtmlExtensions factory.");
+
             var fb = new InputFieldBuilder(Writer, BindingPath).ForId(ElementId);
             if (Options.LabelText != null) fb.Label(Options.LabelText);
             if (Options.IsRequired) fb.Required();

@@ -94,23 +94,45 @@ run_analysis() {
 
     log "Starting SonarQube analysis..."
     log "  Project: ${PROJECT_KEY}"
-    log "  C#: all projects in Alis.Reactive.slnx"
+    log "  C#: all projects (excluding examples/)"
     log "  TS: Alis.Reactive.SandboxApp/Scripts/"
 
+    # Clean previous coverage results
+    rm -rf TestResults/coverage 2>/dev/null
+
     # Begin — the .NET scanner auto-discovers C# and TS sources from the solution.
-    # sonar.sources/sonar.tests are NOT supported by dotnet-sonarscanner (ignored with warning).
-    # Use sonar.exclusions to filter out non-project directories.
+    # sonar.cs.opencover.reportsPaths tells the scanner where to find coverage data.
     dotnet sonarscanner begin \
         /k:"${PROJECT_KEY}" \
         /d:sonar.host.url="${SONAR_HOST}" \
         /d:sonar.token="${SONAR_TOKEN}" \
-        /d:sonar.exclusions="**/node_modules/**,**/.worktrees/**,**/docs-site/**,**/wwwroot/**,**/*.verified.txt,**/obj/**,**/bin/**,**/tools/**" \
-        /d:sonar.test.inclusions="**/*.test.ts,**/Tests/**,**/UnitTests/**"
+        /d:sonar.exclusions="**/node_modules/**,**/.worktrees/**,**/docs-site/**,**/wwwroot/**,**/*.verified.txt,**/obj/**,**/bin/**,**/tools/**,**/examples/**" \
+        /d:sonar.test.inclusions="**/*.test.ts,**/Tests/**,**/UnitTests/**" \
+        /d:sonar.cs.opencover.reportsPaths="TestResults/coverage/**/coverage.opencover.xml"
 
     # Build — SonarQube hooks into MSBuild to collect C# analysis data
-    dotnet build Alis.Reactive.slnx
+    dotnet build Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj
 
-    # End — uploads all results (C# + TS) to SonarQube
+    # Test with coverage — generates OpenCover XML reports that SonarQube consumes.
+    # Each test project writes to its own subfolder under TestResults/coverage/.
+    log "Running tests with coverage collection..."
+    local test_projects=(
+        "tests/Alis.Reactive.UnitTests"
+        "tests/Alis.Reactive.Native.UnitTests"
+        "tests/Alis.Reactive.Fusion.UnitTests"
+        "tests/Alis.Reactive.FluentValidator.UnitTests"
+    )
+    for proj in "${test_projects[@]}"; do
+        local proj_name
+        proj_name=$(basename "$proj")
+        dotnet test "$proj" \
+            --no-build \
+            --collect:"XPlat Code Coverage" \
+            --results-directory "TestResults/coverage/${proj_name}" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+    done
+
+    # End — uploads all results (C# + TS + coverage) to SonarQube
     dotnet sonarscanner end \
         /d:sonar.token="${SONAR_TOKEN}"
 

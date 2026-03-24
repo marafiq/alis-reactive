@@ -1,26 +1,24 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Descriptors.Requests;
 
-namespace Alis.Reactive.Fusion.Extensions
+namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Adds Include&lt;TComponent&gt;() to GatherBuilder for Syncfusion components.
-    /// Vendor = "fusion", readExpr resolved from IInputComponent.ReadExpr on TComponent.
-    /// Vendor determines root (ej2_instances[0]), readExpr walks from that root.
+    /// Vendor-agnostic gather extensions for any IComponent + IInputComponent.
+    /// Works for both Native and Fusion components — vendor and readExpr
+    /// are resolved from the component instance at build time.
     /// </summary>
-    public static class FusionGatherExtensions
+    public static class GatherExtensions
     {
         /// <summary>
-        /// Gathers the value of a Fusion component bound to a model property.
+        /// Gathers the value of a component bound to a model property.
         /// The component is identified by the model expression (m => m.FacilityId).
-        /// ReadExpr is resolved from the component type's IInputComponent.ReadExpr property.
         /// </summary>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             Expression<Func<TModel, object?>> expr)
-            where TComponent : FusionComponent, IInputComponent, new()
+            where TComponent : IComponent, IInputComponent, new()
             where TModel : class
         {
             var component = new TComponent();
@@ -35,14 +33,14 @@ namespace Alis.Reactive.Fusion.Extensions
         }
 
         /// <summary>
-        /// Gathers the value of a Fusion component identified by string ref.
+        /// Gathers the value of a component identified by string ref.
         /// Used for non-model-bound components (grids, string-id controls).
         /// </summary>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             string refId,
             string name)
-            where TComponent : FusionComponent, IInputComponent, new()
+            where TComponent : IComponent, IInputComponent, new()
             where TModel : class
         {
             var component = new TComponent();

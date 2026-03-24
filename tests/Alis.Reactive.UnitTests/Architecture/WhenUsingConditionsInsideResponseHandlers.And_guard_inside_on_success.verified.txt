@@ -1,0 +1,97 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/evaluate,
+          onSuccess: [
+            {
+              reaction: {
+                kind: conditional,
+                branches: [
+                  {
+                    guard: {
+                      kind: all,
+                      guards: [
+                        {
+                          kind: value,
+                          source: {
+                            kind: event,
+                            path: evt.active
+                          },
+                          coerceAs: boolean,
+                          op: truthy
+                        },
+                        {
+                          kind: value,
+                          source: {
+                            kind: event,
+                            path: evt.count
+                          },
+                          coerceAs: number,
+                          op: gt,
+                          operand: 5
+                        }
+                      ]
+                    },
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: qualified,
+                          mutation: {
+                            kind: call,
+                            method: removeAttribute,
+                            args: [
+                              {
+                                kind: literal,
+                                value: hidden
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    reaction: {
+                      kind: sequential,
+                      commands: [
+                        {
+                          kind: mutate-element,
+                          target: qualified,
+                          mutation: {
+                            kind: call,
+                            method: setAttribute,
+                            args: [
+                              {
+                                kind: literal,
+                                value: hidden
+                              },
+                              {
+                                kind: literal,
+                                value: 
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,356 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing.HttpMixingModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
+@{
+    ViewData["Title"] = "Conditions + HTTP Mixing";
+
+    var plan = Html.ReactivePlan<HttpMixingModel>();
+
+    // ── Shared event listeners (Sections 1–8 use custom events dispatched from buttons) ──
+
+    // Section 1: Condition AFTER HTTP — the core fix
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s1-save-then-check", (args, p) =>
+    {
+        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Alice"))
+         .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
+         {
+             s.Element("s1-status").SetText(json, x => x.ReceivedName);
+         }));
+        p.When(args, x => x.Active).Truthy()
+            .Then(then => then.Element("s1-badge").Show())
+            .Else(else_ => else_.Element("s1-badge").Hide());
+    }));
+
+    // Section 2: HTTP BETWEEN two conditions
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s2-condition-http-condition", (args, p) =>
+    {
+        p.When(args, x => x.Active).Truthy()
+            .Then(then => then.Element("s2-active-status").SetText("active"))
+            .Else(else_ => else_.Element("s2-active-status").SetText("inactive"));
+        p.Post("/Sandbox/Conditions/HttpMixing/Audit", g => g.Static("action", "login"))
+         .Response(r => r.OnSuccess<HttpMixingAuditResponse>((json, s) =>
+         {
+             s.Element("s2-audit-result").SetText(json, x => x.Result);
+         }));
+        p.When(args, x => x.Count).Gt(0)
+            .Then(then => then.Element("s2-count-badge").Show())
+            .Else(else_ => else_.Element("s2-count-badge").Hide());
+    }));
+
+    // Section 3: Full interleaving — commands + condition + HTTP + condition + commands
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s3-full-interleave", (args, p) =>
+    {
+        p.Element("s3-header").SetText("start");
+        p.When(args, x => x.Active).Truthy()
+            .Then(then => then.Element("s3-pre-badge").Show());
+        p.Element("s3-loading").SetText("please wait");
+        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Bob"))
+         .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
+         {
+             s.Element("s3-http-result").SetText(json, x => x.ReceivedName);
+         }));
+        p.When(args, x => x.Count).Gt(0)
+            .Then(then => then.Element("s3-count").Show())
+            .Else(else_ => else_.Element("s3-count").Hide());
+        p.Element("s3-footer").SetText("done");
+    }));
+
+    // Section 4: Condition INSIDE OnSuccess
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s4-condition-inside-success", (args, p) =>
+    {
+        p.Element("s4-pre").SetText("loading");
+        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Carol"))
+         .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
+         {
+             s.Element("s4-status").SetText("saved");
+             s.When(args, x => x.Active).Truthy()
+                 .Then(then => then.Element("s4-inner-badge").Show())
+                 .Else(else_ => else_.Element("s4-inner-badge").Hide());
+             s.Element("s4-timestamp").SetText("now");
+         }));
+        p.Element("s4-footer").SetText("done");
+    }));
+
+    // Section 5: ElseIf chain inside OnSuccess + outer condition
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s5-elseif-inside-success", (args, p) =>
+    {
+        p.Post("/Sandbox/Conditions/HttpMixing/Classify", g => g
+            .FromEvent(args, x => x.Count, "count"))
+         .Response(r => r.OnSuccess<HttpMixingClassifyResponse>((json, s) =>
+         {
+             s.Element("s5-server-tier").SetText(json, x => x.Tier);
+             s.When(args, x => x.Count).Gt(100)
+                 .Then(then => then.Element("s5-client-tier").SetText("gold"))
+                 .ElseIf(args, x => x.Count).Gt(50)
+                 .Then(then => then.Element("s5-client-tier").SetText("silver"))
+                 .ElseIf(args, x => x.Count).Gt(10)
+                 .Then(then => then.Element("s5-client-tier").SetText("bronze"))
+                 .Else(else_ => else_.Element("s5-client-tier").SetText("none"));
+         }));
+        p.When(args, x => x.Active).Truthy()
+            .Then(then => then.Element("s5-trial-badge").Hide())
+            .Else(else_ => else_.Element("s5-trial-badge").Show());
+    }));
+
+    // Section 6: Multiple conditions after HTTP
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s6-multi-conditions-after-http", (args, p) =>
+    {
+        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Dave"))
+         .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
+         {
+             s.Element("s6-saved").SetText(json, x => x.ReceivedName);
+         }));
+        p.When(args, x => x.Active).Truthy()
+            .Then(then => then.Element("s6-active-badge").Show());
+        p.When(args, x => x.Category).Eq("premium")
+            .Then(then => then.Element("s6-premium-label").Show())
+            .Else(else_ => else_.Element("s6-premium-label").Hide());
+        p.Element("s6-footer").SetText("complete");
+    }));
+
+    // Section 7: Condition inside OnError handler
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s7-condition-in-error", (args, p) =>
+    {
+        p.Post("/Sandbox/Conditions/HttpMixing/FailValidation")
+         .Response(r => r
+             .OnSuccess(s => s.Element("s7-status").SetText("should not happen"))
+             .OnError(400, e =>
+             {
+                 e.When(args, x => x.Category).Eq("required")
+                     .Then(then => then.Element("s7-error-msg").SetText("missing required fields"))
+                     .Else(else_ => else_.Element("s7-error-msg").SetText("validation error"));
+             }));
+    }));
+
+    // Section 8: And guard inside OnSuccess
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s8-and-guard-inside-success", (args, p) =>
+    {
+        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Eve"))
+         .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
+         {
+             s.Element("s8-saved").SetText(json, x => x.ReceivedName);
+             s.When(args, x => x.Active).Truthy()
+                 .And(args, x => x.Count).Gt(5)
+                 .Then(then => then.Element("s8-qualified").Show())
+                 .Else(else_ => else_.Element("s8-qualified").Hide());
+         }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Conditions + HTTP Mixing</native-heading>
+        <native-text color="Secondary">
+            Exercises pipeline mode fix: conditions compose freely with HTTP blocks.
+            Each section mirrors a unit test scenario from WhenMixingConditionsWithHttp,
+            WhenMixingCommandsAndConditions, and WhenUsingConditionsInsideResponseHandlers.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Condition after HTTP -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">1. Condition after HTTP</native-heading>
+        <p class="text-sm text-text-secondary mb-3">POST saves, then outer condition checks active flag.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s1-btn-active", "Save (active=true)")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s1-save-then-check", new HttpMixingPayload { Active = true })))
+            @(Html.NativeButton("s1-btn-inactive", "Save (active=false)")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s1-save-then-check", new HttpMixingPayload { Active = false })))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Saved: <span id="s1-status">&mdash;</span></p>
+            <p id="s1-badge" hidden class="text-green-600 font-semibold">Active Badge</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 2: HTTP between conditions -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">2. HTTP between two conditions</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Condition &rarr; POST audit &rarr; Condition. All three segments execute independently.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s2-btn-active-with-count", "active=true, count=5")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s2-condition-http-condition", new HttpMixingPayload { Active = true, Count = 5 })))
+            @(Html.NativeButton("s2-btn-inactive-zero", "active=false, count=0")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s2-condition-http-condition", new HttpMixingPayload { Active = false, Count = 0 })))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Active status: <span id="s2-active-status">&mdash;</span></p>
+            <p>Audit: <span id="s2-audit-result">&mdash;</span></p>
+            <p id="s2-count-badge" hidden class="text-blue-600 font-semibold">Count Badge</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 3: Full interleaving -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">3. Full interleaving</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Commands &rarr; Condition &rarr; Commands &rarr; HTTP &rarr; Condition &rarr; Commands.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s3-btn-all-true", "active=true, count=3")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s3-full-interleave", new HttpMixingPayload { Active = true, Count = 3 })))
+            @(Html.NativeButton("s3-btn-all-false", "active=false, count=0")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s3-full-interleave", new HttpMixingPayload { Active = false, Count = 0 })))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Header: <span id="s3-header">&mdash;</span></p>
+            <p id="s3-pre-badge" hidden class="text-green-600 font-semibold">Pre-HTTP Badge</p>
+            <p>Loading: <span id="s3-loading">&mdash;</span></p>
+            <p>HTTP result: <span id="s3-http-result">&mdash;</span></p>
+            <p id="s3-count" hidden class="text-blue-600 font-semibold">Count Visible</p>
+            <p>Footer: <span id="s3-footer">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 4: Condition inside OnSuccess -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">4. Condition inside OnSuccess</native-heading>
+        <p class="text-sm text-text-secondary mb-3">POST &rarr; OnSuccess { SetText + When(active) + SetText }. Inner condition within response handler.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s4-btn-active", "active=true")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s4-condition-inside-success", new HttpMixingPayload { Active = true })))
+            @(Html.NativeButton("s4-btn-inactive", "active=false")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s4-condition-inside-success", new HttpMixingPayload { Active = false })))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Pre: <span id="s4-pre">&mdash;</span></p>
+            <p>Status: <span id="s4-status">&mdash;</span></p>
+            <p id="s4-inner-badge" hidden class="text-green-600 font-semibold">Inner Active Badge</p>
+            <p>Timestamp: <span id="s4-timestamp">&mdash;</span></p>
+            <p>Footer: <span id="s4-footer">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 5: ElseIf inside OnSuccess + outer condition -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">5. ElseIf inside OnSuccess + outer condition</native-heading>
+        <p class="text-sm text-text-secondary mb-3">POST classify &rarr; OnSuccess { ElseIf tier ladder } &rarr; outer When(active).</p>
+        <div class="flex flex-wrap gap-2 mb-3">
+            @(Html.NativeButton("s5-btn-enterprise", "count=200, active=true")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s5-elseif-inside-success", new HttpMixingPayload { Count = 200, Active = true })))
+            @(Html.NativeButton("s5-btn-business", "count=75, active=true")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s5-elseif-inside-success", new HttpMixingPayload { Count = 75, Active = true })))
+            @(Html.NativeButton("s5-btn-team", "count=25, active=false")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s5-elseif-inside-success", new HttpMixingPayload { Count = 25, Active = false })))
+            @(Html.NativeButton("s5-btn-individual", "count=3, active=false")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s5-elseif-inside-success", new HttpMixingPayload { Count = 3, Active = false })))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Server tier: <span id="s5-server-tier">&mdash;</span></p>
+            <p>Client tier: <span id="s5-client-tier">&mdash;</span></p>
+            <p id="s5-trial-badge" class="text-amber-600 font-semibold">Trial Badge</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 6: Multiple conditions after HTTP -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">6. Multiple conditions after HTTP</native-heading>
+        <p class="text-sm text-text-secondary mb-3">POST &rarr; When(active) &rarr; When(category=="premium") &rarr; SetText.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s6-btn-active-premium", "active, premium")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s6-multi-conditions-after-http", new HttpMixingPayload { Active = true, Category = "premium" })))
+            @(Html.NativeButton("s6-btn-active-standard", "active, standard")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s6-multi-conditions-after-http", new HttpMixingPayload { Active = true, Category = "standard" })))
+            @(Html.NativeButton("s6-btn-inactive-premium", "inactive, premium")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s6-multi-conditions-after-http", new HttpMixingPayload { Active = false, Category = "premium" })))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Saved: <span id="s6-saved">&mdash;</span></p>
+            <p id="s6-active-badge" hidden class="text-green-600 font-semibold">Active Badge</p>
+            <p id="s6-premium-label" hidden class="text-purple-600 font-semibold">Premium</p>
+            <p>Footer: <span id="s6-footer">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 7: Condition inside OnError -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">7. Condition inside OnError handler</native-heading>
+        <p class="text-sm text-text-secondary mb-3">POST fails &rarr; OnError(400) { When(category=="required") &rarr; specific error message }.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s7-btn-required", "category=required")
+                .CssClass("rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s7-condition-in-error", new HttpMixingPayload { Category = "required" })))
+            @(Html.NativeButton("s7-btn-other", "category=format")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s7-condition-in-error", new HttpMixingPayload { Category = "format" })))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Status: <span id="s7-status">&mdash;</span></p>
+            <p>Error: <span id="s7-error-msg">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 8: And guard inside OnSuccess -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">8. And guard inside OnSuccess</native-heading>
+        <p class="text-sm text-text-secondary mb-3">POST &rarr; OnSuccess { When(active).And(count &gt; 5) &rarr; Show/Hide }.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s8-btn-qualified", "active=true, count=10")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s8-and-guard-inside-success", new HttpMixingPayload { Active = true, Count = 10 })))
+            @(Html.NativeButton("s8-btn-not-qualified", "active=true, count=2")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s8-and-guard-inside-success", new HttpMixingPayload { Active = true, Count = 2 })))
+            @(Html.NativeButton("s8-btn-inactive", "active=false, count=10")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s8-and-guard-inside-success", new HttpMixingPayload { Active = false, Count = 10 })))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Saved: <span id="s8-saved">&mdash;</span></p>
+            <p id="s8-qualified" hidden class="text-green-600 font-semibold">Qualified!</p>
+        </div>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

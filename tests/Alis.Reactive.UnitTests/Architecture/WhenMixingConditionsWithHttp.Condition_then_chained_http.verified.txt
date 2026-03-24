@@ -1,0 +1,104 @@
+﻿{
+  planId: Alis.Reactive.UnitTests.TestModel,
+  entries: [
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: conditional,
+        branches: [
+          {
+            guard: {
+              kind: value,
+              source: {
+                kind: event,
+                path: evt.value
+              },
+              coerceAs: string,
+              op: not-empty
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: pre-check,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: has value
+                }
+              ]
+            }
+          },
+          {
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: pre-check,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: empty
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: GET,
+          url: /api/lookup,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: lookup-result,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: found
+                }
+              ]
+            }
+          ],
+          chained: {
+            verb: POST,
+            url: /api/enrich,
+            onSuccess: [
+              {
+                commands: [
+                  {
+                    kind: mutate-element,
+                    target: enrich-result,
+                    mutation: {
+                      kind: set-prop,
+                      prop: textContent
+                    },
+                    value: enriched
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

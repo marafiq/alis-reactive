@@ -50,10 +50,9 @@ namespace Alis.Reactive.Fusion.Components
         /// Without this, SF shows "No records found" flash while the async HTTP is in-flight.
         /// Usage: args.PreventDefault(p)
         /// </summary>
-        public static void PreventDefault<TModel>(
+        public static void PreventDefault(
             this FusionAutoCompleteFilteringArgs args,
-            PipelineBuilder<TModel> pipeline)
-            where TModel : class
+            ICommandEmitter pipeline)
         {
             pipeline.AddCommand(new MutateEventCommand(
                 new SetPropMutation("preventDefaultAction"), value: true));
@@ -67,12 +66,11 @@ namespace Alis.Reactive.Fusion.Components
         /// Only updateData() works because it re-enters SF's popup rendering lifecycle.
         /// Usage: args.UpdateData(s, json, j => j.Medications)
         /// </summary>
-        public static void UpdateData<TModel, TResponse>(
+        public static void UpdateData<TResponse>(
             this FusionAutoCompleteFilteringArgs args,
-            PipelineBuilder<TModel> pipeline,
+            ICommandEmitter pipeline,
             ResponseBody<TResponse> source,
             Expression<Func<TResponse, object?>> path)
-            where TModel : class
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
