@@ -244,9 +244,9 @@ describe("FusionDatePicker gather", () => {
     const d = new Date("2024-03-15T00:00:00");
     fusionEl("AdmissionDate", { value: d });
     const result = resolveGather([gather("AdmissionDate", "fusion", "AdmissionDate")], "GET", {});
-    // Date.toString() is used — just verify it's a non-empty param
+    // toString() produces ISO — verify ISO format, not locale garbage
     expect(result.urlParams.length).toBe(1);
-    expect(result.urlParams[0]).toMatch(/^AdmissionDate=.+/);
+    expect(result.urlParams[0]).toMatch(/^AdmissionDate=.*\d{4}-\d{2}-\d{2}T/);
   });
 });
 
@@ -260,8 +260,9 @@ describe("FusionTimePicker gather", () => {
   it("gathers time as GET param string", () => {
     fusionEl("MedicationTime", { value: new Date("1970-01-01T08:30:00") });
     const result = resolveGather([gather("MedicationTime", "fusion", "MedicationTime")], "GET", {});
+    // toString() produces ISO — verify ISO format, not locale garbage
     expect(result.urlParams.length).toBe(1);
-    expect(result.urlParams[0]).toMatch(/^MedicationTime=.+/);
+    expect(result.urlParams[0]).toMatch(/^MedicationTime=.*\d{4}-\d{2}-\d{2}T/);
   });
 });
 
@@ -449,8 +450,9 @@ describe("FusionDateTimePicker gather", () => {
   it("gathers DateTime as GET param", () => {
     fusionEl("MedicationTime", { value: new Date("2024-03-15T08:30:00") });
     const result = resolveGather([gather("MedicationTime", "fusion", "MedicationTime")], "GET", {});
+    // toString() produces ISO — verify ISO format, not locale garbage
     expect(result.urlParams.length).toBe(1);
-    expect(result.urlParams[0]).toMatch(/^MedicationTime=.+/);
+    expect(result.urlParams[0]).toMatch(/^MedicationTime=.*\d{4}-\d{2}-\d{2}T/);
   });
 });
 
@@ -653,5 +655,25 @@ describe("File object gather", () => {
     expect(fd.get("ResidentName")).toBe("Margaret");
     expect(fd.getAll("Documents").length).toBe(1);
     expect((fd.getAll("Documents")[0] as File).name).toBe("photo.jpg");
+  });
+});
+
+describe("Date components gather correctly across all transports", () => {
+  it("admission form with DatePicker gathers ISO in FormData, GET, and JSON", () => {
+    fusionEl("AdmissionDate", { value: new Date("2024-03-15T00:00:00Z") });
+    const item = gather("AdmissionDate", "fusion", "AdmissionDate");
+
+    // FormData POST — server receives ISO, not locale garbage
+    const fd = resolveGather([item], "POST", {}, "form-data").body as FormData;
+    expect(fd.get("AdmissionDate")).toBe("2024-03-15T00:00:00.000Z");
+
+    // GET param — URL contains ISO, not URL-encoded locale garbage
+    const get = resolveGather([item], "GET", {});
+    expect(get.urlParams[0]).toBe(
+      `AdmissionDate=${encodeURIComponent("2024-03-15T00:00:00.000Z")}`);
+
+    // JSON POST — Date object passes through (JSON.stringify calls toJSON → ISO)
+    const json = resolveGather([item], "POST", {});
+    expect((json.body as any).AdmissionDate).toBeInstanceOf(Date);
   });
 });

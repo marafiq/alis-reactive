@@ -96,7 +96,8 @@ export function ruleFails(
   peerReader: PeerReader
 ): boolean {
   const str = toString(value);
-  const empty = value == null || str === "" || value === false;
+  const empty = value == null || str === "" || value === false
+    || (Array.isArray(value) && value.length === 0);
 
   switch (rule.rule) {
     case "required":    return empty;

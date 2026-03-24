@@ -3,6 +3,7 @@ import { evalRead } from "../resolution/component";
 import { walk } from "../core/walk";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
+import { toString } from "../core/coerce";
 
 const log = scope("gather");
 
@@ -42,24 +43,24 @@ function createTransport(
 ): Transport {
   if (formData) {
     return {
-      emitScalar: (name, value) => formData.append(name, String(value ?? "")),
+      emitScalar: (name, value) => formData.append(name, toString(value)),
       emitArray: (name, items) => {
         for (const item of items) {
           const file = toFile(item);
           if (file) formData.append(name, file, file.name);
-          else formData.append(name, String(item ?? ""));
+          else formData.append(name, toString(item));
         }
       },
     };
   }
   return {
     emitScalar: (name, value) => urlParams.push(
-      `${encodeURIComponent(name)}=${encodeURIComponent(String(value))}`),
+      `${encodeURIComponent(name)}=${encodeURIComponent(toString(value))}`),
     emitArray: (name, items) => {
       if (hasFiles(items))
         throw new Error("[alis] File objects cannot be sent via GET");
       for (const item of items)
-        urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(String(item))}`);
+        urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(toString(item))}`);
     },
   };
 }
