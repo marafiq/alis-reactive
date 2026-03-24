@@ -131,7 +131,7 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
 
     // Array membership — elements and operand pre-coerced via elementCoerceAs above
     case "array-contains":
-      return items != null && items.includes(operand);
+      return items?.includes(operand) ?? false;
 
     // Text
     case "contains":
