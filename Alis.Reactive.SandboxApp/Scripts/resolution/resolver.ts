@@ -14,9 +14,6 @@ const log = scope("resolver");
  */
 export type BindExpr = string;
 
-// Re-export coerce and CoercionType — callers can import from resolver or core/coerce
-export { coerce, type CoercionType };
-
 /**
  * Unified entry point — dispatches by source kind.
  * Handles both "event" (walk execution context) and "component" (read from DOM component).
@@ -45,8 +42,14 @@ export function resolveEventPath(path: string, ctx?: ExecContext): unknown {
 
 /**
  * Resolves a BindSource and coerces the result to a specific type.
+ * Returns undefined on coercion failure and logs a warning.
  */
 export function resolveSourceAs(source: BindSource, coerceAs: CoercionType, ctx?: ExecContext): unknown {
   const raw = resolveSource(source, ctx);
-  return coerce(raw, coerceAs);
+  const result = coerce(raw, coerceAs);
+  if (!result.ok) {
+    log.warn("resolveSourceAs coerce failed", { source, coerceAs, error: result.error });
+    return undefined;
+  }
+  return result.value;
 }

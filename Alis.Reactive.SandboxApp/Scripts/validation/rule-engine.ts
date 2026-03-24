@@ -20,8 +20,11 @@ function compareValues(a: unknown, b: unknown, coerceAs: CoercionType | undefine
       "The adapter must set coerceAs from the property type."
     );
   }
-  const ca = coerce(a, coerceAs) as number;
-  const cb = coerce(b, coerceAs) as number;
+  const ra = coerce(a, coerceAs);
+  const rb = coerce(b, coerceAs);
+  if (!ra.ok || !rb.ok) return NaN; // coerce failed → comparison undefined
+  const ca = ra.value as number;
+  const cb = rb.value as number;
   if (Number.isNaN(ca) || Number.isNaN(cb)) return NaN;
   return ca - cb;
 }
@@ -74,15 +77,19 @@ function failsEqualityRule(
       const target = resolveTarget(rule, peerReader);
       if (target === undefined) return true;
       if (rule.coerceAs) return compareValues(value, target, rule.coerceAs) !== 0;
-      return toString(value) !== toString(target);
+      const sv = toString(value); const tv = toString(target);
+      return (sv.ok ? sv.value : "") !== (tv.ok ? tv.value : "");
     }
-    case "notEqual":
-      return !empty && toString(value) === toString(rule.constraint);
+    case "notEqual": {
+      const sv = toString(value); const tv = toString(rule.constraint);
+      return !empty && (sv.ok ? sv.value : "") === (tv.ok ? tv.value : "");
+    }
     case "notEqualTo": {
       const target = resolveTarget(rule, peerReader);
       if (target === undefined) return true;
       if (rule.coerceAs) return !empty && compareValues(value, target, rule.coerceAs) === 0;
-      return !empty && toString(value) === toString(target);
+      const sv = toString(value); const tv = toString(target);
+      return !empty && (sv.ok ? sv.value : "") === (tv.ok ? tv.value : "");
     }
     default: return true;
   }
@@ -95,7 +102,8 @@ export function ruleFails(
   value: unknown,
   peerReader: PeerReader
 ): boolean {
-  const str = toString(value);
+  const strResult = toString(value);
+  const str = strResult.ok ? strResult.value : "";
   const empty = value == null || str === "" || value === false
     || (Array.isArray(value) && value.length === 0);
 
@@ -105,9 +113,12 @@ export function ruleFails(
     case "minLength":   return !empty && str.length < Number(rule.constraint);
     case "maxLength":   return !empty && str.length > Number(rule.constraint);
     case "email":       return !empty && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
-    case "regex":
-      try { return !empty && !new RegExp(String(rule.constraint)).test(str); }
+    case "regex": {
+      const constraintResult = toString(rule.constraint);
+      const constraint = constraintResult.ok ? constraintResult.value : "";
+      try { return !empty && !new RegExp(constraint).test(str); }
       catch { return true; }
+    }
     case "url":         return !empty && !/^https?:\/\/.+/.test(str);
     case "creditCard":  return !empty && !luhn(str.replace(/\D/g, ""));
 

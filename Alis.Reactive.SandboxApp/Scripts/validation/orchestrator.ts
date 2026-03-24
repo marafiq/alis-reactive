@@ -246,7 +246,9 @@ function domConditionReader(byName: Map<string, ValidationField>): ConditionRead
       const root = resolveRoot(el, srcField.vendor);
       const val = walk(root, srcField.readExpr);
       // Normalize: null/undefined/false → "" (empty = no value expressed)
-      return (val == null || val === false) ? "" : toString(val);
+      if (val == null || val === false) return "";
+      const result = toString(val);
+      return result.ok ? result.value : "";
     },
   };
 }

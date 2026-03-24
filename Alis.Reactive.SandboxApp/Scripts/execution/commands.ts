@@ -3,7 +3,8 @@ import { mutateElement } from "./element";
 import { evaluateGuard, isConfirmGuard } from "../conditions/conditions";
 import { showServerErrors } from "../validation";
 import { injectHtml } from "./inject";
-import { resolveSource, coerce } from "../resolution/resolver";
+import { resolveSource } from "../resolution/resolver";
+import { coerceOrThrow } from "../core/coerce";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
 
@@ -14,7 +15,7 @@ function resolveMethodArg(arg: MethodArg, ctx?: ExecContext): unknown {
     case "literal": return arg.value;
     case "source": {
       const raw = resolveSource(arg.source, ctx);
-      return arg.coerce ? coerce(raw, arg.coerce) : raw;
+      return arg.coerce ? coerceOrThrow(raw, arg.coerce) : raw;
     }
     default: assertNever(arg, "method arg kind");
   }
@@ -26,7 +27,7 @@ function executeMutateEvent(cmd: MutateEventCommand, ctx: ExecContext): void {
   switch (m.kind) {
     case "set-prop": {
       const val = cmd.source ? resolveSource(cmd.source, ctx) : cmd.value;
-      const coerced = m.coerce ? coerce(val, m.coerce) : val;
+      const coerced = m.coerce ? coerceOrThrow(val, m.coerce) : val;
       log.trace("mutate-event", { prop: m.prop, val: coerced });
       (ctx.evt as any)[m.prop] = coerced;
       break;

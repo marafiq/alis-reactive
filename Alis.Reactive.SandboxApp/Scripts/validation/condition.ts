@@ -4,6 +4,7 @@
 // null means "cannot evaluate" (source not available).
 
 import type { ValidationCondition } from "../types";
+import { toString } from "../core/coerce";
 
 /** Reads a condition source field's string value. Returns undefined if unavailable. */
 export interface ConditionReader {
@@ -29,8 +30,14 @@ export function evalCondition(
   switch (cond.op) {
     case "truthy": return !empty;
     case "falsy": return empty;
-    case "eq": return empty ? false : str === String(cond.value ?? "");
-    case "neq": return empty ? false : str !== String(cond.value ?? "");
+    case "eq": {
+      const cv = toString(cond.value);
+      return empty ? false : str === (cv.ok ? cv.value : "");
+    }
+    case "neq": {
+      const cv = toString(cond.value);
+      return empty ? false : str !== (cv.ok ? cv.value : "");
+    }
     default: return true;
   }
 }

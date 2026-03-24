@@ -7,6 +7,16 @@ import { toString } from "../core/coerce";
 
 const log = scope("gather");
 
+/** Unwrap toString Result — returns empty string on Err and logs a warning. */
+function serializeValue(value: unknown, name: string): string {
+  const result = toString(value);
+  if (!result.ok) {
+    log.warn("gather serialize failed, using empty", { name, error: result.error });
+    return "";
+  }
+  return result.value;
+}
+
 /** Extracts a File from a value — handles raw File objects and wrapper objects with .rawFile. */
 function toFile(item: unknown): File | null {
   if (item instanceof File) return item;
@@ -43,24 +53,24 @@ function createTransport(
 ): Transport {
   if (formData) {
     return {
-      emitScalar: (name, value) => formData.append(name, toString(value)),
+      emitScalar: (name, value) => formData.append(name, serializeValue(value, name)),
       emitArray: (name, items) => {
         for (const item of items) {
           const file = toFile(item);
           if (file) formData.append(name, file, file.name);
-          else formData.append(name, toString(item));
+          else formData.append(name, serializeValue(item, name));
         }
       },
     };
   }
   return {
     emitScalar: (name, value) => urlParams.push(
-      `${encodeURIComponent(name)}=${encodeURIComponent(toString(value))}`),
+      `${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(value, name))}`),
     emitArray: (name, items) => {
       if (hasFiles(items))
         throw new Error("[alis] File objects cannot be sent via GET");
       for (const item of items)
-        urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(toString(item))}`);
+        urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(item, name))}`);
     },
   };
 }

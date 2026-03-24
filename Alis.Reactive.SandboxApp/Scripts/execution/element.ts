@@ -1,6 +1,7 @@
 import type { MutateElementCommand, MethodArg, ExecContext } from "../types";
 import { scope } from "../core/trace";
-import { resolveSource, coerce } from "../resolution/resolver";
+import { resolveSource } from "../resolution/resolver";
+import { coerceOrThrow } from "../core/coerce";
 import { resolveRoot } from "../resolution/component";
 import { assertNever } from "../core/assert-never";
 
@@ -11,7 +12,7 @@ function resolveArg(arg: MethodArg, ctx?: ExecContext): unknown {
     case "literal": return arg.value;
     case "source": {
       const raw = resolveSource(arg.source, ctx);
-      return arg.coerce ? coerce(raw, arg.coerce) : raw;
+      return arg.coerce ? coerceOrThrow(raw, arg.coerce) : raw;
     }
     default: assertNever(arg, "method arg kind");
   }
@@ -27,7 +28,7 @@ export function mutateElement(cmd: MutateElementCommand, ctx?: ExecContext): voi
   switch (m.kind) {
     case "set-prop": {
       const val = cmd.source ? resolveSource(cmd.source, ctx) : cmd.value;
-      const coerced = m.coerce ? coerce(val, m.coerce) : val;
+      const coerced = m.coerce ? coerceOrThrow(val, m.coerce) : val;
       log.trace("set-prop", { target: cmd.target, prop: m.prop, val: coerced });
       (root as any)[m.prop] = coerced;
       break;

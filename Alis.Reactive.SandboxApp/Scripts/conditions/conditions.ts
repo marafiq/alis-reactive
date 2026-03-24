@@ -1,5 +1,6 @@
 import type { Guard, ValueGuard, ExecContext } from "../types";
-import { resolveSource, resolveSourceAs, coerce } from "../resolution/resolver";
+import { resolveSource, resolveSourceAs } from "../resolution/resolver";
+import { coerce, toString } from "../core/coerce";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
 
@@ -105,13 +106,15 @@ function resolveGuardOperands(guard: ValueGuard, ctx?: ExecContext): ResolvedOpe
     : guard.operand;
   let operand: unknown = rawOp;
   if (rawOp != null && !guard.rightSource) {
-    operand = Array.isArray(rawOp) ? rawOp.map(v => coerce(v, opCoerceAs)) : coerce(rawOp, opCoerceAs);
+    operand = Array.isArray(rawOp)
+      ? rawOp.map(v => { const r = coerce(v, opCoerceAs); return r.ok ? r.value : undefined; })
+      : (() => { const r = coerce(rawOp, opCoerceAs); return r.ok ? r.value : undefined; })();
   }
 
   // For array sources with element coercion: pre-coerce elements so switch cases stay pure.
   // For non-array operators elementCoerceAs is null → items is undefined → unused.
   const items = guard.elementCoerceAs != null && Array.isArray(resolved)
-    ? (resolved as unknown[]).map(item => coerce(item, guard.elementCoerceAs!))
+    ? (resolved as unknown[]).map(item => { const r = coerce(item, guard.elementCoerceAs!); return r.ok ? r.value : undefined; })
     : undefined;
 
   return { resolved, operand, items };
@@ -148,23 +151,48 @@ function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
     case "array-contains":
       return items?.includes(operand) ?? false;
 
-    // Text
-    case "contains":
-      return String(resolved ?? "").includes(String(operand));
-    case "starts-with":
-      return String(resolved ?? "").startsWith(String(operand));
-    case "ends-with":
-      return String(resolved ?? "").endsWith(String(operand));
+    // Text — resolve source as STRING, not as guard.coerceAs.
+    // guard.coerceAs may be "date" (→ timestamp number) or "number" — text ops
+    // need the string form. resolveSourceAs with "string" calls toString() which
+    // handles Date→ISO, number→digits, boolean→"true"/"false".
+    case "contains": {
+      const str = resolveSourceAs(guard.source, "string", ctx);
+      if (str == null) return false;
+      const opResult = toString(operand);
+      if (!opResult.ok) return false;
+      return (str as string).includes(opResult.value);
+    }
+    case "starts-with": {
+      const str = resolveSourceAs(guard.source, "string", ctx);
+      if (str == null) return false;
+      const opResult = toString(operand);
+      if (!opResult.ok) return false;
+      return (str as string).startsWith(opResult.value);
+    }
+    case "ends-with": {
+      const str = resolveSourceAs(guard.source, "string", ctx);
+      if (str == null) return false;
+      const opResult = toString(operand);
+      if (!opResult.ok) return false;
+      return (str as string).endsWith(opResult.value);
+    }
     case "matches": {
+      const str = resolveSourceAs(guard.source, "string", ctx);
+      if (str == null) return false;
+      const opResult = toString(operand);
+      if (!opResult.ok) return false;
       try {
-        return new RegExp(String(operand)).test(String(resolved ?? ""));
+        return new RegExp(opResult.value).test(str as string);
       } catch {
         log.warn("invalid guard regex", { operand });
         return false;
       }
     }
-    case "min-length":
-      return String(resolved ?? "").length >= Number(operand);
+    case "min-length": {
+      const str = resolveSourceAs(guard.source, "string", ctx);
+      if (str == null) return false;
+      return (str as string).length >= Number(operand);
+    }
 
     default:
       throw new Error(`Unknown guard operator: ${guard.op}`);
