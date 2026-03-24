@@ -1,13 +1,12 @@
 @model ArchitectureModel
 @using Alis.Reactive
 @using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Requests
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.Descriptors.Sources
 @using Alis.Reactive.Descriptors
-@using Alis.Reactive.Descriptors.Commands
-@using Alis.Reactive.Descriptors.Mutations
+@using Alis.Reactive.Descriptors.Sources
 @using Alis.Reactive.Descriptors.Triggers
 @using Alis.Reactive.Validation
 @{
@@ -65,7 +64,7 @@
     // Native: "change" event on native input → walk evt.value → SetText
     {
         var pb = new PipelineBuilder<ArchitectureModel>();
-        pb.AddCommand(new MutateElementCommand("native-event-result", new SetPropMutation("textContent"), source: new EventSource("evt.value")));
+        pb.Element("native-event-result").SetText(new EventSource("evt.value"));
         plan.AddEntry(new Entry(
             new ComponentEventTrigger("native-event", "change", "native", readExpr: "value"),
             pb.BuildReaction()));
@@ -74,7 +73,7 @@
     // Fusion: "change" event on TestWidget → walk evt.newValue → SetText
     {
         var pb = new PipelineBuilder<ArchitectureModel>();
-        pb.AddCommand(new MutateElementCommand("fusion-event-result", new SetPropMutation("textContent"), source: new EventSource("evt.newValue")));
+        pb.Element("fusion-event-result").SetText(new EventSource("evt.newValue"));
         plan.AddEntry(new Entry(
             new ComponentEventTrigger("fusion-event", "change", "fusion"),
             pb.BuildReaction()));
@@ -84,8 +83,8 @@
 
     Html.On(plan, t => t.CustomEvent("deep-walk-ready", p =>
     {
-        p.AddCommand(new MutateElementCommand("deep-total", new SetPropMutation("textContent"), source: new EventSource("evt.result.detail.total")));
-        p.AddCommand(new MutateElementCommand("deep-city", new SetPropMutation("textContent"), source: new EventSource("evt.result.detail.address.city")));
+        p.Element("deep-total").SetText(new EventSource("evt.result.detail.total"));
+        p.Element("deep-city").SetText(new EventSource("evt.result.detail.address.city"));
     }));
 
     // ── Section 7: Both vendors gathered together ──

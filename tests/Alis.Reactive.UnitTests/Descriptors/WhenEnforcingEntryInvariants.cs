@@ -1,13 +1,15 @@
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Descriptors.Commands;
+using Alis.Reactive.Descriptors.Guards;
 using Alis.Reactive.Descriptors.Reactions;
+using Alis.Reactive.Descriptors.Sources;
 using Alis.Reactive.Descriptors.Triggers;
 
 namespace Alis.Reactive.UnitTests;
 
 /// <summary>
 /// F1 — Entry constructor must reject null trigger and null reaction.
-/// Test IDs: F-T1 (null trigger → ANE), F-T1b (null reaction → ANE).
-/// F-T2 (grep: no new Entry(null, …) in production code) verified manually.
+/// A-T1 — Double guard on same command must throw.
 /// </summary>
 [TestFixture]
 public class WhenEnforcingEntryInvariants : PlanTestBase
@@ -40,5 +42,21 @@ public class WhenEnforcingEntryInvariants : PlanTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
         return VerifyJson(json);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // A-T1 — Double guard on same command must throw
+    // ═══════════════════════════════════════════════════════════
+
+    [Test]
+    public void WithGuard_on_already_guarded_command_throws()
+    {
+        var guard = new ValueGuard(
+            new EventSource("evt.name"), "string", GuardOp.Eq, "test");
+        var cmd = new DispatchCommand("test");
+        var guarded = cmd.WithGuard(guard);
+
+        var ex = Assert.Throws<InvalidOperationException>(() => guarded.WithGuard(guard));
+        Assert.That(ex!.Message, Does.Contain("already has a guard"));
     }
 }

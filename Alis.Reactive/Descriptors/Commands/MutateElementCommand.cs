@@ -38,7 +38,7 @@ namespace Alis.Reactive.Descriptors.Commands
             Vendor = vendor;
         }
 
-        internal override Command WithGuard(Guard guard)
+        protected override Command CloneWithGuard(Guard guard)
         {
             return new MutateElementCommand(Target, Mutation, Value, Source, Vendor, guard);
         }

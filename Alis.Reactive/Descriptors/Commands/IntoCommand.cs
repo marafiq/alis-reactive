@@ -20,7 +20,7 @@ namespace Alis.Reactive.Descriptors.Commands
             Target = target;
         }
 
-        internal override Command WithGuard(Guard guard)
+        protected override Command CloneWithGuard(Guard guard)
         {
             return new IntoCommand(Target, guard);
         }

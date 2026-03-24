@@ -20,7 +20,7 @@ namespace Alis.Reactive.Descriptors.Commands
             Payload = payload;
         }
 
-        internal override Command WithGuard(Guard guard)
+        protected override Command CloneWithGuard(Guard guard)
         {
             return new DispatchCommand(Event, Payload, guard);
         }

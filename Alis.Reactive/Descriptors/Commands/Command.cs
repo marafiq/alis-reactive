@@ -19,7 +19,17 @@ namespace Alis.Reactive.Descriptors.Commands
         /// <summary>
         /// Returns a new Command of the same kind with the guard attached.
         /// Immutable — the original instance is unchanged.
+        /// Throws if this command already has a guard (A-T1).
         /// </summary>
-        internal abstract Command WithGuard(Guard guard);
+        internal Command WithGuard(Guard guard)
+        {
+            if (When != null)
+                throw new InvalidOperationException(
+                    "Command already has a guard. Each command can only have one When guard.");
+            return CloneWithGuard(guard);
+        }
+
+        /// <summary>Subclass hook — creates a new instance of the same kind with the guard set.</summary>
+        protected abstract Command CloneWithGuard(Guard guard);
     }
 }

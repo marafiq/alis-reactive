@@ -25,11 +25,10 @@ namespace Alis.Reactive.Builders
         private List<Reaction>? _segments;
 
         /// <summary>
-        /// Adds a command to the pipeline. Part of ICommandEmitter —
-        /// vendor extensions and ComponentRef accept the narrow interface,
-        /// but this remains public for advanced usage (architecture tests, etc.).
+        /// ICommandEmitter — the only path for adding commands from outside.
+        /// Vendor extensions accept ICommandEmitter, not PipelineBuilder.
         /// </summary>
-        public void AddCommand(Command command)
+        void ICommandEmitter.AddCommand(Command command)
         {
             Commands.Add(command);
         }

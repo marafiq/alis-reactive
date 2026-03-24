@@ -28,7 +28,7 @@ namespace Alis.Reactive.Descriptors.Sources
         public string Vendor { get; }
         public string ReadExpr { get; }
 
-        public ComponentSource(string componentId, string vendor, string readExpr)
+        internal ComponentSource(string componentId, string vendor, string readExpr)
         {
             ComponentId = componentId;
             Vendor = vendor;

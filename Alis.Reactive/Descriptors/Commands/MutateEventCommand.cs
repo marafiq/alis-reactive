@@ -35,7 +35,7 @@ namespace Alis.Reactive.Descriptors.Commands
             Source = source;
         }
 
-        internal override Command WithGuard(Guard guard)
+        protected override Command CloneWithGuard(Guard guard)
         {
             return new MutateEventCommand(Mutation, Value, Source, guard);
         }
