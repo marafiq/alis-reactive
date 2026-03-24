@@ -7,7 +7,7 @@ using Alis.Reactive.Descriptors.Reactions;
 
 namespace Alis.Reactive.Builders
 {
-    public partial class PipelineBuilder<TModel> where TModel : class
+    public partial class PipelineBuilder<TModel> : ICommandEmitter where TModel : class
     {
         private enum PipelineMode { Sequential, Http, Parallel, Conditional }
 
@@ -25,8 +25,9 @@ namespace Alis.Reactive.Builders
         private List<Reaction>? _segments;
 
         /// <summary>
-        /// Adds a command to the pipeline. Used by vendor-specific projects
-        /// (Fusion, Native) to emit their own command descriptors.
+        /// Adds a command to the pipeline. Part of ICommandEmitter —
+        /// vendor extensions and ComponentRef accept the narrow interface,
+        /// but this remains public for advanced usage (architecture tests, etc.).
         /// </summary>
         public void AddCommand(Command command)
         {
