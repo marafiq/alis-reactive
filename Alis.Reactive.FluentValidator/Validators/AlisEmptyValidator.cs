@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FluentValidation;
 using FluentValidation.Validators;
 
@@ -21,7 +22,7 @@ namespace Alis.Reactive.FluentValidator.Validators
         {
             if (value == null) return true;
             if (value is string s) return string.IsNullOrEmpty(s);
-            return value.Equals(default(TProperty));
+            return EqualityComparer<TProperty>.Default.Equals(value, default!);
         }
 
         protected override string GetDefaultMessageTemplate(string errorCode)

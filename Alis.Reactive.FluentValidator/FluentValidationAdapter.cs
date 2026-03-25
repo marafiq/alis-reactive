@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using FluentValidation;
 using FluentValidation.Internal;
@@ -49,15 +50,11 @@ namespace Alis.Reactive.FluentValidator
             ExtractFromValidator(validator, "", fieldRules, _factory, clientConditions);
 
             // Ensure cross-property peer fields are in the descriptor (runtime needs them for value reading)
-            var peerFields = new HashSet<string>();
-            foreach (var kvp in fieldRules)
-            {
-                foreach (var er in kvp.Value)
-                {
-                    if (!string.IsNullOrEmpty(er.Field) && !fieldRules.ContainsKey(er.Field))
-                        peerFields.Add(er.Field);
-                }
-            }
+            var peerFields = fieldRules
+                .SelectMany(kvp => kvp.Value)
+                .Where(er => !string.IsNullOrEmpty(er.Field) && !fieldRules.ContainsKey(er.Field!))
+                .Select(er => er.Field!)
+                .ToHashSet();
             foreach (var peerField in peerFields)
                 fieldRules[peerField] = new List<ExtractedRule>();
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FluentValidation;
 using FluentValidation.Validators;
 
@@ -38,7 +39,7 @@ namespace Alis.Reactive.FluentValidator.Validators
 
         public override bool IsValid(ValidationContext<T> context, TProperty value)
         {
-            if (value == null) return true;
+            if (EqualityComparer<TProperty>.Default.Equals(value, default!)) return true;
             return value.CompareTo(_from) > 0 && value.CompareTo(_to) < 0;
         }
 
