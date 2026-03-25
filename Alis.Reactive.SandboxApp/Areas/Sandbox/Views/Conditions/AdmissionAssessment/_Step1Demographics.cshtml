@@ -150,6 +150,14 @@
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
+                        // Propagate screeningId to Steps 2, 3, 4
+                        s.Component<NativeHiddenField, Step2ClinicalModel>(m => m.ScreeningId)
+                            .SetValue(json, x => x.ScreeningId);
+                        s.Component<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId)
+                            .SetValue(json, x => x.ScreeningId);
+                        s.Component<NativeHiddenField, Step4ReviewModel>(m => m.ScreeningId)
+                            .SetValue(json, x => x.ScreeningId);
+
                         s.Element("step-1").Hide();
                         s.Element("step-2").Show();
                         s.Element("step-ind-1").RemoveClass("font-bold");

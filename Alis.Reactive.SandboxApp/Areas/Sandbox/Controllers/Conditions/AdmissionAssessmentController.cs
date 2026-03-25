@@ -105,8 +105,9 @@ public class AdmissionAssessmentController : Controller
         if (model.PrimaryDiagnosis == "Diabetes" && !string.IsNullOrEmpty(model.DiabetesType))
             model.DiabetesAssessmentId = $"DIA-{ts}";
 
-        var id = EnsureScreeningId(null);
-        Step2Drafts[id] = model;
+        var id = model.ScreeningId;
+        if (!string.IsNullOrEmpty(id))
+            Step2Drafts[id] = model;
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 2 saved" });
     }
 
@@ -116,8 +117,9 @@ public class AdmissionAssessmentController : Controller
     public async Task<IActionResult> SaveStep3([FromBody] Step3FunctionalModel model)
     {
         await Task.Delay(200);
-        var id = EnsureScreeningId(null);
-        Step3Drafts[id] = model;
+        var id = model.ScreeningId;
+        if (!string.IsNullOrEmpty(id))
+            Step3Drafts[id] = model;
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 3 saved" });
     }
 
@@ -245,8 +247,12 @@ public class AdmissionAssessmentController : Controller
         var errors = new Dictionary<string, string[]>();
         var id = model.ScreeningId;
 
-        // Step 4: validate with proper validator
+        // Step 4: validate with proper validator (includes ScreeningId NotEmpty)
         CollectErrors(new Step4Validator().Validate(model), errors);
+
+        // If ScreeningId missing, can't look up drafts — return early
+        if (string.IsNullOrEmpty(id))
+            return BadRequest(new { errors });
 
         // Step 1: must be saved
         if (!Step1Drafts.TryGetValue(id, out var step1))

@@ -19,6 +19,7 @@
     </p>
 
     <!-- Hidden fields: cross-step data + auto-populated by conditions -->
+    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
     @Html.HiddenFieldFor(plan, m => m.PrimaryDiagnosis)
     @Html.HiddenFieldFor(plan, m => m.ResidentName)
     @Html.HiddenFieldFor(plan, m => m.CareUnit)

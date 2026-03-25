@@ -23,6 +23,7 @@
     </p>
 
     <!-- Hidden fields: cross-step data -->
+    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
     <!-- Age uses NumericTextBox (hidden) so compound condition gets decimal type for .Gte(80m) -->
     <div hidden>
         @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))

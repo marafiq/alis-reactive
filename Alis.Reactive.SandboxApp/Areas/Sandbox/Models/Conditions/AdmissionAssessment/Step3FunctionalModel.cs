@@ -3,6 +3,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 public class Step3FunctionalModel
 {
     // Cross-step: copied from Step 1 draft by controller
+    public string ScreeningId { get; set; } = "";
     public decimal Age { get; set; }
     public string ResidentName { get; set; } = "";
 

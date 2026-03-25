@@ -3,6 +3,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 public class Step2ClinicalModel
 {
     // Cross-step: copied from Step 1 draft by controller
+    public string ScreeningId { get; set; } = "";
     public string PrimaryDiagnosis { get; set; } = "";
     public string ResidentName { get; set; } = "";
 
