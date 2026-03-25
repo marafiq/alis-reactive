@@ -1,6 +1,10 @@
 using System.IO;
 using System.Text.Encodings.Web;
+#if NET48
+using System.Web;
+#else
 using Microsoft.AspNetCore.Html;
+#endif
 
 namespace Alis.Reactive.Native.Components
 {
@@ -13,8 +17,13 @@ namespace Alis.Reactive.Native.Components
     ///       .InitialValue("hello")
     ///       .CssClass("rounded-md border"))
     /// </summary>
+#if NET48
+    public class TestWidgetNativeBuilder<TModel> : IHtmlString where TModel : class
+    {
+#else
     public class TestWidgetNativeBuilder<TModel> : IHtmlContent where TModel : class
     {
+#endif
         private readonly string _elementId;
         private string? _cssClass;
         private string? _initialValue;
@@ -48,6 +57,17 @@ namespace Alis.Reactive.Native.Components
             _readOnly = true;
             return this;
         }
+
+#if NET48
+        public string ToHtmlString()
+        {
+            using (var sw = new StringWriter())
+            {
+                WriteTo(sw, HtmlEncoder.Default);
+                return sw.ToString();
+            }
+        }
+#endif
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {

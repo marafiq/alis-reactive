@@ -404,8 +404,10 @@ namespace Alis.Reactive.FluentValidator
                 return dto.TimeOfDay == TimeSpan.Zero
                     ? dto.ToString("yyyy-MM-dd")
                     : dto.ToString("s");
+#if NET6_0_OR_GREATER
             if (value is DateOnly d)
                 return d.ToString("yyyy-MM-dd");
+#endif
             return value;
         }
 
