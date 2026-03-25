@@ -90,13 +90,14 @@
     <Reference Include="System.IO.Pipelines">
       <HintPath>packages\System.IO.Pipelines.9.0.14\lib\net462\System.IO.Pipelines.dll</HintPath>
     </Reference>
-    <!-- Alis.Reactive framework DLLs (built from source, net48 target) -->
-    <Reference Include="Alis.Reactive">
-      <HintPath>..\..\Alis.Reactive\bin\Release\net48\Alis.Reactive.dll</HintPath>
-    </Reference>
-    <Reference Include="Alis.Reactive.Native">
-      <HintPath>..\..\Alis.Reactive.Native\bin\Release\net48\Alis.Reactive.Native.dll</HintPath>
-    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Alis.Reactive\Alis.Reactive.csproj">
+      <Name>Alis.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Alis.Reactive.Native\Alis.Reactive.Native.csproj">
+      <Name>Alis.Reactive.Native</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
@@ -106,8 +107,14 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\_DrawerContent.cshtml" />
-    <Content Include="css\design-system.css" />
-    <Content Include="js\alis-reactive.js" />
+    <Content Include="..\..\Alis.Reactive.Native\wwwroot\css\design-system.css">
+      <Link>css\design-system.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Alis.Reactive.Native\wwwroot\js\alis-reactive.js">
+      <Link>js\alis-reactive.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
