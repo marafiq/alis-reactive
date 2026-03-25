@@ -339,6 +339,19 @@ Adding a new command, trigger, or action requires:
 8. **Playwright test** — browser behavior verification
 9. **Sandbox view usage** — demonstrate in Events page (or new page)
 
+### 3a. Schema Changes Require a Failing Test First
+
+Any change to `reactive-plan.schema.json` MUST be preceded by a failing schema test
+in `AllPlansConformToSchema.cs` that proves the schema rejects the new plan shape.
+The test fails (RED), then the schema is updated, then the test passes (GREEN).
+
+This prevents undeclared properties from accumulating — `additionalProperties: false`
+on schema objects means any property not declared in the schema causes validation failure.
+If enrichment adds a field (e.g., `coerceAs` on `ValidationField`), the schema test
+must exercise a plan WITH that field populated to catch the gap.
+
+**The schema is the DSL's truth.** If the DSL produces it, the schema must declare it.
+
 ### 4. Two-Phase Boot Is Inviolable
 
 Custom-event listeners wire before dom-ready reactions execute. This ensures event chains
