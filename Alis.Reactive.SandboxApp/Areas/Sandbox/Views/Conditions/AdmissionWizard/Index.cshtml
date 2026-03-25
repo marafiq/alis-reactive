@@ -1,0 +1,21 @@
+@model Step1DemographicsModel
+@using Alis.Reactive.Native.Extensions
+@{
+    ViewData["Title"] = "Admission Wizard";
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Admission Wizard (Server-Side)</native-heading>
+        <native-text color="Secondary">
+            Single page. Each step loads from server via Into(). Edit scenario: server loads from draft.
+        </native-text>
+    </div>
+
+    @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionWizard/_StepIndicator.cshtml")
+
+    <!-- Step content container — replaced by Into() on each Next/Previous -->
+    <div id="step-container">
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionWizard/_Step1Content.cshtml", Model)
+    </div>
+</native-vstack>
