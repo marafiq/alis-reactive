@@ -153,7 +153,7 @@ Always visible:
 | Diagnosis = Diabetes + InsulinDependent | InsulinSchedule |
 | FallHistory != None + CausedInjury | InjuryType |
 | TakesPainMedication | PainLevel |
-| TakesPainMedication + PainLevel >= 7 | PainLocation |
+| TakesPainMedication + PainLevel > 7 | PainLocation |
 | IsVeteran | VaId |
 
 ### Client-side validation rules (same rules, enforced before POST)
@@ -275,13 +275,13 @@ no hidden counter — just direct Show/Hide per step.
 |-----------|-----------------|----------|---------------|
 | WanderFreq → elopement alert | comp.Value() DDL | Eq("Frequently") | POST /AlertElopement in Then |
 | InjuryType → neuro consult | comp.Value() DDL | Eq("Head Injury") | POST /AlertNeuro in Then |
-| PainLevel → pain alert | comp.Value() NumericTB | Gte(7m) | POST /AlertPain in Then |
+| PainLevel → pain alert | comp.Value() NumericTB | Gt(7m) | POST /AlertPain in Then |
 
 **Compound conditions:**
 
 | User sees | Sources | Operator | Branch action |
 |-----------|---------|----------|---------------|
-| FallRisk + Age → continuous | FallRiskScore + Age | Gte(7m).And(age.Value()).Gte(80m) | Component.SetValue MonitoringLevel = "Continuous" |
+| FallRisk + Age → continuous | FallRiskScore + Age | Gt(7m).And(age.Value()).Gte(80m) | Component.SetValue MonitoringLevel = "Continuous" |
 
 ### HTTP → Primitive Mapping
 
@@ -294,7 +294,7 @@ no hidden counter — just direct Show/Hide per step.
 | Uncontrolled diabetes | A1C > 9 | POST /AlertUncontrolled | spinner | SetText("Endocrinology referral") |
 | Neuro consult | InjuryType = Head Injury | POST /AlertNeuro | spinner | SetText("Neuro consult ordered") |
 | Room setup | MobilityAid = Wheelchair | POST /RequestRoomSetup | spinner | SetText("Accessible room") |
-| Pain alert | PainLevel >= 7 | POST /AlertPain | spinner | SetText("Pain plan required") |
+| Pain alert | PainLevel > 7 | POST /AlertPain | spinner | SetText("Pain plan required") |
 | Save Cognitive | Button click | POST /SaveCognitive | spinner + disable btn | HiddenField.SetValue(id) + SetText("Saved") |
 | Save Cardiac | Button click | POST /SaveCardiac | spinner + disable btn | HiddenField.SetValue(id) + SetText("Saved") |
 | Save Diabetes | Button click | POST /SaveDiabetes | spinner + disable btn | HiddenField.SetValue(id) + SetText("Saved") |
@@ -363,9 +363,36 @@ public class AdmissionAssessmentValidator : ReactiveValidator<HealthScreeningMod
 }
 ```
 
-Note: PainLocation required when PainLevel >= 7 needs a numeric WhenField condition.
-Research needed: does WhenField support numeric thresholds, or only truthy/eq?
-If not, server-side validation handles this case.
+### Validation Strategy — Three Layers, Zero New Primitives
+
+WhenField supports: `truthy`, `falsy`, `eq(value)`, `neq(value)` — 4 operators.
+It does NOT support `gt`, `gte`, `lt`, `lte`, `in`. The conditions DSL does.
+
+Three layers work together:
+
+| Layer | Fires when | Handles | Mechanism |
+|-------|-----------|---------|-----------|
+| Conditions DSL | Instantly on field change | UI indicators ("required" labels, section visibility) | `When(comp.Value()).Gt(7m).Then(Show("location-required"))` |
+| Client FluentValidation | Submit click, before HTTP | Empty required fields + truthy/eq conditions | `WhenField(x => x.IsVeteran, () => NotEmpty())` |
+| Server validation | POST /Submit | ALL rules including numeric thresholds | `if (PainLevel > 7 && empty PainLocation) → 400` |
+
+Field-by-field mapping:
+
+| Conditional rule | Conditions DSL (instant UI) | Client WhenField | Server |
+|-----------------|---------------------------|-----------------|--------|
+| VaId when veteran | Show veteran section | `WhenField(truthy)` | yes |
+| CogScore when Alzheimer's | Show cognitive section | `WhenField(eq)` | yes |
+| WanderFreq when wanders | Show frequency field | `WhenField(truthy)` | yes |
+| PacemakerModel when pacemaker | Show pacemaker details | `WhenField(truthy)` | yes |
+| InsulinSchedule when insulin | Show schedule field | `WhenField(truthy)` | yes |
+| InjuryType when injury | Show injury type | `WhenField(truthy)` | yes |
+| PainLevel when takes pain med | Show pain section | `WhenField(truthy)` | yes |
+| PainLocation when pain > 7 | Show "required" indicator | **not expressible** | yes |
+| SystolicBP for heart disease | Show cardiac section | `WhenField(eq)` | yes |
+| DiabetesType for diabetes | Show diabetes section | `WhenField(eq)` | yes |
+
+Only PainLocation has no client-side validation — the conditions DSL shows the
+"required" indicator instantly, server enforces on submit. No gap in UX.
 
 ### Partial Structure
 
