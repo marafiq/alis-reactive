@@ -403,6 +403,8 @@ namespace Alis.Reactive.FluentValidator
                 return dto.TimeOfDay == TimeSpan.Zero
                     ? dto.ToString("yyyy-MM-dd")
                     : dto.ToString("s");
+            if (value is DateOnly d)
+                return d.ToString("yyyy-MM-dd");
             return value;
         }
 

@@ -50,8 +50,8 @@ namespace Alis.Reactive
 
                 throw new InvalidOperationException(
                     $"Duplicate component registration for binding path '{bindingPath}': " +
-                    $"existing [{existing.ComponentId}, {existing.Vendor}] vs " +
-                    $"new [{entry.ComponentId}, {entry.Vendor}]. " +
+                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ReadExpr}, {existing.ComponentType}, {existing.CoerceAs}] vs " +
+                    $"new [{entry.ComponentId}, {entry.Vendor}, {entry.ReadExpr}, {entry.ComponentType}, {entry.CoerceAs}]. " +
                     "Each binding path must map to exactly one component.");
             }
 
