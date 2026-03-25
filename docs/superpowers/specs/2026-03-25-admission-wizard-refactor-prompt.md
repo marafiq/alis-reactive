@@ -43,10 +43,23 @@ SF components bind to it, user sees their previously entered values.
 4. **DRAFT PERSISTENCE = IN-MEMORY.** Use a static ConcurrentDictionary keyed by screeningId.
    Each step save stores the step model. Step load reads it back. No database.
 
-5. **EDIT SCENARIO = MODEL BINDING.** When the controller loads a step, it passes the saved
-   draft as the model. ASP.NET MVC renders the view with model values. SF components pick up
-   the values automatically via property expressions. DataSource items come from ViewBag.
-   The user sees their saved data. No custom JS hydration.
+5. **EDIT SCENARIO = MODEL + DATA SOURCE.** When the controller loads a step, it passes BOTH:
+   - The saved draft as the model (so component shows the selected value)
+   - The data source items in ViewBag (so component has the options list to render)
+   Without the data source, a DropDownList can't display "Alzheimer's" even if the model says so.
+   SF components bind to model property via expression, and render options from DataSource.
+   This is exactly how every sandbox component page works. No custom JS hydration.
+   ```csharp
+   // Controller — loading step from draft (edit scenario)
+   public IActionResult Step1(string? screeningId)
+   {
+       var model = LoadDraft<Step1Model>(screeningId) ?? new Step1Model();
+       // model.PrimaryDiagnosis = "Alzheimer's" (from draft)
+       ViewBag.Diagnoses = new[] { "Alzheimer's", "Parkinson's", "Heart Disease", ... };
+       // → DropDownList renders with options AND "Alzheimer's" pre-selected
+       return PartialView("_Step1", model);
+   }
+   ```
 
 6. **NAVIGATION = SAVE THEN LOAD.** Next button: POST save current step → OnSuccess → navigate
    to next step (which loads from server with saved state). Previous: just load previous step
@@ -268,7 +281,10 @@ Source: `Alis.Reactive.Native/Extensions/PlanExtensions.cs`
                 .Else(e => e.Element("risk-badge").SetText("Low Risk"));
         })); }
 
-// FusionDropDownList with .DataSource from ViewBag
+// FusionDropDownList — simple string list from ViewBag
+@{
+    var diagnoses = (List<string>)ViewBag.Diagnoses;  // cast ViewBag to typed list
+}
 @{ Html.InputField(plan, m => m.PrimaryDiagnosis, o => o.Required().Label("Diagnosis"))
     .DropDownList(b => b
         .DataSource(diagnoses)
@@ -280,6 +296,16 @@ Source: `Alis.Reactive.Native/Extensions/PlanExtensions.cs`
                 .Then(t => t.Element("cardiac-section").Show())
                 .Else(e => e.Element("cardiac-section").Hide());
         })); }
+
+// FusionDropDownList — typed items with Fields (for complex data sources)
+@{
+    var physicians = (List<PhysicianItem>)ViewBag.Physicians;  // typed items
+}
+@{ Html.InputField(plan, m => m.AttendingPhysician, o => o.Label("Physician"))
+    .AutoComplete(b => b
+        .DataSource(physicians)
+        .Fields<PhysicianItem>(t => t.Text, v => v.Value)  // map Text + Value
+        .Placeholder("Select physician")); }
 
 // FusionSwitch
 @{ Html.InputField(plan, m => m.IsVeteran, o => o.Label("Is Veteran"))
