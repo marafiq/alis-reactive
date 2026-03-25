@@ -12,7 +12,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Element("status").SetText("Framework loaded on net48!");
-        p.Element("status").AddClass("loaded");
+        p.Element("status").AddClass("bg-emerald-100");
     }));
 
     // ── 2. CustomEvent handler → Show hidden section ──
@@ -20,7 +20,7 @@
     {
         p.Element("hidden-section").Show();
         p.Element("section-status").SetText("Section visible — custom event handled.");
-        p.Element("section-status").AddClass("loaded");
+        p.Element("section-status").AddClass("bg-emerald-100");
     }));
 
     // ── 3. CustomEvent handler → Open drawer with Into() ──
@@ -44,13 +44,13 @@
     {
         p.Element("hidden-section").Hide();
         p.Element("section-status").SetText("Section hidden.");
-        p.Element("section-status").RemoveClass("loaded");
+        p.Element("section-status").RemoveClass("bg-emerald-100");
     }));
 }
 
 <h2>1. DomReady &rarr; SetText</h2>
 <p>On page load, the plan sets text and adds a CSS class:</p>
-<p id="status" class="status">Waiting for DomReady...</p>
+<p id="status" class="p-3 rounded-lg bg-surface-alt font-mono text-sm">Waiting for DomReady...</p>
 
 <h2>2. InputField &mdash; NativeTextBox with validation</h2>
 @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
@@ -63,35 +63,37 @@
 
 <h2>3. NativeButton &rarr; Show / Hide section</h2>
 @(Html.NativeButton("btn-show", "Show Section")
-    .CssClass("btn-primary")
+    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
     .Reactive(plan, evt => evt.Click, (args, p) =>
     {
         p.Dispatch("show-section");
     }))
 
 @(Html.NativeButton("btn-hide", "Hide Section")
+    .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface transition-colors")
     .Reactive(plan, evt => evt.Click, (args, p) =>
     {
         p.Dispatch("hide-section");
     }))
 
-<p id="section-status" class="status">Section hidden.</p>
+<p id="section-status" class="p-3 rounded-lg bg-surface-alt font-mono text-sm">Section hidden.</p>
 
 <div id="hidden-section" hidden>
-    <div style="padding: 16px; background: #e8f4fd; border-radius: 6px; border: 1px solid #b3d7f2; margin: 8px 0;">
+    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 my-2">
         <strong>Success!</strong> This section was shown by a button click &rarr; dispatch &rarr; custom event &rarr; Show().
     </div>
 </div>
 
 <h2>4. NativeDrawer &mdash; Open / Close + Into()</h2>
 @(Html.NativeButton("btn-open-drawer", "Open Drawer")
-    .CssClass("btn-primary")
+    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
     .Reactive(plan, evt => evt.Click, (args, p) =>
     {
         p.Dispatch("open-drawer");
     }))
 
 @(Html.NativeButton("btn-close-drawer", "Close Drawer")
+    .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface transition-colors")
     .Reactive(plan, evt => evt.Click, (args, p) =>
     {
         p.Dispatch("close-drawer");
