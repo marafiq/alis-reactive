@@ -32,10 +32,11 @@ function wireField(desc: ValidationDescriptor, field: ValidationField): void {
 
   // Already wired — skip (partial reload dedup)
   if (wiredFields.has(field.fieldId)) return;
-  wiredFields.add(field.fieldId);
 
   const el = document.getElementById(field.fieldId);
-  if (!el) return; // Element not in DOM yet (lazy partial)
+  if (!el) return; // Element not in DOM yet — do NOT mark as wired so retry can attach
+
+  wiredFields.add(field.fieldId);
 
   const clearHandler = () => clearInline(desc.formId, field);
   const revalidateHandler = () => revalidateField(desc, field);

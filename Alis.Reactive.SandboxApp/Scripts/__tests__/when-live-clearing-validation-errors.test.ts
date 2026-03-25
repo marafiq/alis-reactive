@@ -608,4 +608,45 @@ describe("when live-clearing validation errors", () => {
       expect(hasError("Name")).toBe(false);
     });
   });
+
+  // -- Bug F5: wiredFields.add before getElementById ──────────────────
+  // If element is missing on first wire attempt, wiredFields must NOT mark it as wired.
+  // Otherwise retry (e.g., after partial loads the element) is blocked by dedup.
+  describe("lazy element wiring", () => {
+    it("retries wiring when element appears after initial attempt", () => {
+      const form = document.createElement("form");
+      form.id = "f-lazy";
+      document.body.appendChild(form);
+      const span = document.createElement("span");
+      span.id = "LazyField_error";
+      span.setAttribute("data-valmsg-for", "LazyField");
+      span.setAttribute("hidden", "");
+      form.appendChild(span);
+
+      const lazyField = nativeField("LazyField", "LazyField", [
+        { rule: "required", message: "Required" },
+      ]);
+      const d = desc("f-lazy", [lazyField]);
+
+      // First attempt: element does NOT exist — wire should NOT mark as wired
+      wireLiveValidation(d);
+
+      // Now add the element to DOM (simulates partial loading)
+      const input = document.createElement("input");
+      input.id = "LazyField";
+      input.value = "";
+      form.appendChild(input);
+
+      // Second attempt: element now exists — wire should attach listeners
+      wireLiveValidation(d);
+
+      // Prove live-clear is wired: submit to get error, then type to clear
+      validate(d);
+      expect(hasError("LazyField")).toBe(true);
+
+      input.value = "filled";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      expect(hasError("LazyField")).toBe(false);
+    });
+  });
 });
