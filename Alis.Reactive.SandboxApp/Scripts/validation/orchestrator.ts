@@ -15,7 +15,7 @@ import { scope } from "../core/trace";
 import { walk } from "../core/walk";
 import { ruleFails, type PeerReader } from "./rule-engine";
 import { evalCondition, type ConditionReader } from "./condition";
-import { toString } from "../core/coerce";
+import { toString, toDate } from "../core/coerce";
 import {
   showInline, clearInline, clearAllInline,
   addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
@@ -249,13 +249,19 @@ function domConditionReader(byName: Map<string, ValidationField>): ConditionRead
       const val = walk(root, srcField.readExpr);
       // Normalize: null/undefined/false → "" (empty = no value expressed)
       if (val == null || val === false) return "";
+
+      // Date fields: convert to Unix ms string for comparison with C# Unix ms condition values.
+      // C# WhenField<DateTime> serializes via DateTimeOffset.ToUnixTimeMilliseconds().
+      // JS Date.getTime() produces the same Unix ms. String(ms) === String(ms) → exact match.
+      if (srcField.coerceAs === "date") {
+        const dateResult = toDate(val);
+        if (!dateResult.ok) return undefined; // fail-closed
+        return Number.isNaN(dateResult.value) ? "" : String(dateResult.value);
+      }
+
       const result = toString(val);
-      // toString Err means walk returned a plain object (plan misconfiguration —
-      // wrong readExpr or future component with object-typed value).
-      // Return undefined → condition evaluates to null (unresolvable) → rule blocks
-      // via fail-closed behavior in checkRuleCondition. Stricter than returning ""
-      // which would silently treat an unreadable value as empty.
-      // See: https://github.com/marafiq/alis-reactive/issues/49 (tracking)
+      // toString Err means walk returned a plain object (plan misconfiguration).
+      // Return undefined → fail-closed. See: https://github.com/marafiq/alis-reactive/issues/50
       return result.ok ? result.value : undefined;
     },
   };

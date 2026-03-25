@@ -46,7 +46,7 @@ namespace Alis.Reactive.FluentValidator
         {
             var fieldName = ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = new ValidationCondition(fieldName, "eq", value);
+            var condition = new ValidationCondition(fieldName, "eq", SerializeConditionValue(value));
 
             ApplyClientCondition(
                 x => Equals(fieldFunc(x), value),
@@ -78,7 +78,7 @@ namespace Alis.Reactive.FluentValidator
         {
             var fieldName = ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = new ValidationCondition(fieldName, "neq", value);
+            var condition = new ValidationCondition(fieldName, "neq", SerializeConditionValue(value));
 
             ApplyClientCondition(
                 x => !Equals(fieldFunc(x), value),
@@ -103,6 +103,21 @@ namespace Alis.Reactive.FluentValidator
                 _clientConditions[rulesAfter[i]] = clientCondition;
             }
         }
+
+        /// <summary>
+        /// Serializes a condition value for plan JSON.
+        /// DateTime/DateTimeOffset/DateOnly → Unix ms (long) via ToUnixTimeMilliseconds.
+        /// All other types pass through as-is.
+        /// Developer controls timezone by passing DateTime with the intended Kind.
+        /// TimeSpan.Zero forces UTC interpretation for DateTime without explicit Kind.
+        /// </summary>
+        private static object? SerializeConditionValue<TProp>(TProp value) => value switch
+        {
+            DateTime dt => new DateTimeOffset(dt, TimeSpan.Zero).ToUnixTimeMilliseconds(),
+            DateTimeOffset dto => dto.ToUnixTimeMilliseconds(),
+            DateOnly d => new DateTimeOffset(d.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero).ToUnixTimeMilliseconds(),
+            _ => value
+        };
 
         private static string ExtractPropertyName<TResult>(Expression<Func<T, TResult>> expression)
         {

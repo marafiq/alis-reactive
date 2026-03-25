@@ -255,4 +255,117 @@ describe("when validating component values", () => {
       expect(result).toBe(false);
     });
   });
+
+  // -- Condition reader with Date component and coerceAs "date" -------------------
+  // When coerceAs === "date", condition reader converts Date via toDate() → Unix ms string.
+  // C# WhenField<DateTime> serializes condition value as Unix ms (long).
+  // Both sides produce the same numeric string → eq/neq comparison matches.
+  describe("condition reader with date component (Unix ms comparison)", () => {
+    it("condition eq matches when component Date Unix ms equals plan Unix ms", () => {
+      const form = setupForm("f-date-cond");
+
+      // Fusion DatePicker with Date value
+      const el = document.createElement("div");
+      el.id = "AdmDate";
+      const widget = new TestWidget(el);
+      // Simulate DatePicker value: 2026-07-01T00:00:00Z
+      const dateValue = new Date("2026-07-01T00:00:00Z");
+      widget.value = dateValue as any;
+      (el as any).ej2_instances = [widget];
+      form.appendChild(el);
+      addErrorSpan(form, "AdmDate", "AdmDate");
+
+      // Target field
+      addNativeInput(form, "PatientName", "");
+
+      // Unix ms for 2026-07-01T00:00:00Z (same as C# DateTimeOffset.ToUnixTimeMilliseconds)
+      const unixMs = dateValue.getTime();
+
+      const result = validate({
+        formId: "f-date-cond",
+        fields: [
+          { fieldId: "AdmDate", fieldName: "AdmDate",
+            vendor: "fusion", readExpr: "value", coerceAs: "date", rules: [] },
+          { fieldId: "PatientName", fieldName: "PatientName",
+            vendor: "native", readExpr: "value",
+            rules: [{
+              rule: "required", message: "Name required for this date",
+              when: { field: "AdmDate", op: "eq", value: unixMs }
+            }]
+          },
+        ],
+      });
+
+      // Component Date → toDate() → getTime() → Unix ms string
+      // Plan value: unixMs (number) → toString() → same Unix ms string
+      // eq matches → required fires → PatientName empty → FAILS
+      expect(result).toBe(false);
+    });
+
+    it("condition truthy works for Date without Unix ms comparison", () => {
+      const form = setupForm("f-date-truthy");
+
+      const el = document.createElement("div");
+      el.id = "AdmDate2";
+      const widget = new TestWidget(el);
+      widget.value = new Date("2026-07-01T00:00:00Z") as any;
+      (el as any).ej2_instances = [widget];
+      form.appendChild(el);
+      addErrorSpan(form, "AdmDate2", "AdmDate2");
+
+      addNativeInput(form, "PatientName2", "");
+
+      const result = validate({
+        formId: "f-date-truthy",
+        fields: [
+          { fieldId: "AdmDate2", fieldName: "AdmDate2",
+            vendor: "fusion", readExpr: "value", coerceAs: "date", rules: [] },
+          { fieldId: "PatientName2", fieldName: "PatientName2",
+            vendor: "native", readExpr: "value",
+            rules: [{
+              rule: "required", message: "Name required when date set",
+              when: { field: "AdmDate2", op: "truthy" }
+            }]
+          },
+        ],
+      });
+
+      // Date → toDate() → Unix ms → String(ms) → non-empty → truthy = true
+      // → required fires → PatientName2 empty → FAILS
+      expect(result).toBe(false);
+    });
+
+    it("condition reader returns empty for null Date with coerceAs date", () => {
+      const form = setupForm("f-date-null");
+
+      const el = document.createElement("div");
+      el.id = "AdmDate3";
+      const widget = new TestWidget(el);
+      widget.value = null as any; // no date selected
+      (el as any).ej2_instances = [widget];
+      form.appendChild(el);
+      addErrorSpan(form, "AdmDate3", "AdmDate3");
+
+      addNativeInput(form, "PatientName3", "");
+
+      const result = validate({
+        formId: "f-date-null",
+        fields: [
+          { fieldId: "AdmDate3", fieldName: "AdmDate3",
+            vendor: "fusion", readExpr: "value", coerceAs: "date", rules: [] },
+          { fieldId: "PatientName3", fieldName: "PatientName3",
+            vendor: "native", readExpr: "value",
+            rules: [{
+              rule: "required", message: "Name required when date set",
+              when: { field: "AdmDate3", op: "truthy" }
+            }]
+          },
+        ],
+      });
+
+      // null Date → normalized to "" at line 251 → truthy = false
+      // → condition NOT met → required skipped → PASSES
+      expect(result).toBe(true);
+    });
+  });
 });
