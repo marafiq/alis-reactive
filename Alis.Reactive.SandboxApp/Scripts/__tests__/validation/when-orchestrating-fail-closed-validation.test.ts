@@ -178,6 +178,48 @@ describe("When a hidden field rule has a condition that evaluates false", () => 
 });
 
 // ══════════════════════════════════════════════════════════
+// MISSING DOM ELEMENT + WHEN CONDITION → SKIP (wizard partial)
+// ══════════════════════════════════════════════════════════
+
+describe("When an enriched field is missing from DOM but all rules have when conditions that evaluate false", () => {
+  it("skips the field (condition false → no need to find the element)", () => {
+    // Scenario: Step 2 wizard partial loaded for Alzheimer's diagnosis.
+    // SystolicBP field does NOT exist in DOM (cardiac section not rendered).
+    // Its rule has when: PrimaryDiagnosis == "Heart Disease" → false.
+    // PrimaryDiagnosis IS in the DOM as a hidden field with value "Alzheimer's".
+    const diagField = field({
+      fieldName: "PrimaryDiagnosis", fieldId: "Name", // reuse existing DOM element as stand-in
+      vendor: "native", readExpr: "value", rules: [],
+    });
+    // Set the stand-in element value to "Alzheimer's"
+    (document.getElementById("Name") as HTMLInputElement).value = "Alzheimer's";
+
+    const missingField = enrichedField("SystolicBP_MISSING", [
+      { rule: "gt", message: "BP required", constraint: 0, coerceAs: "number",
+        when: { field: "PrimaryDiagnosis", op: "eq", value: "Heart Disease" } },
+    ]);
+    // SystolicBP_MISSING does NOT exist in the DOM
+
+    expect(validate(desc("form", [diagField, missingField]))).toBe(true);
+  });
+
+  it("blocks when the when condition evaluates TRUE but element is missing", () => {
+    (document.getElementById("Name") as HTMLInputElement).value = "Heart Disease";
+
+    const diagField = field({
+      fieldName: "PrimaryDiagnosis", fieldId: "Name",
+      vendor: "native", readExpr: "value", rules: [],
+    });
+    const missingField = enrichedField("SystolicBP_MISSING", [
+      { rule: "gt", message: "BP required", constraint: 0, coerceAs: "number",
+        when: { field: "PrimaryDiagnosis", op: "eq", value: "Heart Disease" } },
+    ]);
+
+    expect(validate(desc("form", [diagField, missingField]))).toBe(false);
+  });
+});
+
+// ══════════════════════════════════════════════════════════
 // VISIBLE ENRICHED FIELDS → INLINE
 // ══════════════════════════════════════════════════════════
 

@@ -88,7 +88,11 @@ export function revalidateField(desc: ValidationDescriptor, field: ValidationFie
 function handleUnresolvableField(
   f: ValidationField, condReader: ConditionReader, summaryEl: HTMLElement | null
 ): boolean {
-  if (allRulesConditionallySkipped(f, condReader)) return true;
+  if (allRulesConditionallySkipped(f, condReader)) {
+    log.trace("unresolvable-skip", { fieldName: f.fieldName, reason: "all conditions false" });
+    return true;
+  }
+  log.trace("unresolvable-block", { fieldName: f.fieldName, fieldId: f.fieldId, rules: f.rules.length });
   if (f.rules.length > 0 && summaryEl) {
     addToSummary(summaryEl, f.fieldName, f.rules[0].message);
   }
@@ -134,11 +138,13 @@ function evaluateRules(
     const condStatus = checkRuleCondition(rule, condReader);
     if (condStatus === "skip") continue;
     if (condStatus === "block") {
+      log.trace("rule-block", { fieldName: f.fieldName, rule: rule.rule, reason: "condition unresolvable" });
       if (summaryEl) addToSummary(summaryEl, f.fieldName, rule.message);
       return false;
     }
 
     if (ruleFails(rule, value, peerReader)) {
+      log.trace("rule-fail", { fieldName: f.fieldName, rule: rule.rule, value, message: rule.message });
       reportFailure(f, rule.message, hidden, formId, summaryEl);
       return false;
     }
