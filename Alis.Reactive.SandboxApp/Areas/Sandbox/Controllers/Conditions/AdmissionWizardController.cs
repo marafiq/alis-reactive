@@ -7,8 +7,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
 /// <summary>
 /// Server-side wizard — each step is a full page load.
-/// Next = POST save → redirect to next step. Previous = GET with screeningId.
-/// Edit scenario: server loads model from draft, SF components render with saved values.
+/// Next = NativeButton + Reactive POST (JSON) → save draft → return SaveStepResponse.
+/// Previous = GET with screeningId. Edit scenario: server loads model from draft.
 /// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Conditions/AdmissionWizard")]
@@ -57,11 +57,15 @@ public class AdmissionWizardController : Controller
     }
 
     [HttpPost("SaveStep1")]
-    public IActionResult SaveStep1([FromForm] Step1DemographicsModel model, [FromForm] string? screeningId)
+    public IActionResult SaveStep1([FromBody] Step1DemographicsModel model)
     {
-        var id = string.IsNullOrEmpty(screeningId) ? NewScreeningId() : screeningId;
+        var errors = new Dictionary<string, string[]>();
+        CollectErrors(new Step1Validator().Validate(model), errors);
+        if (errors.Count > 0) return BadRequest(new { errors });
+
+        var id = NewScreeningId();
         Step1Drafts[id] = model;
-        return RedirectToAction(nameof(Step2), new { screeningId = id });
+        return Ok(new SaveStepResponse { ScreeningId = id, Message = $"Step 1 saved for {model.ResidentName}" });
     }
 
     // ── Step 2: Clinical ────────────────────────────────────────────────────
@@ -88,9 +92,13 @@ public class AdmissionWizardController : Controller
     }
 
     [HttpPost("SaveStep2")]
-    public IActionResult SaveStep2([FromForm] Step2ClinicalModel model, [FromForm] string screeningId)
+    public IActionResult SaveStep2([FromBody] Step2ClinicalModel model)
     {
-        model.ScreeningId = screeningId;
+        var errors = new Dictionary<string, string[]>();
+        CollectErrors(new Step2Validator().Validate(model), errors);
+        if (errors.Count > 0) return BadRequest(new { errors });
+
+        var screeningId = model.ScreeningId;
 
         // Generate assessment IDs
         var ts = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
@@ -102,7 +110,7 @@ public class AdmissionWizardController : Controller
             model.DiabetesAssessmentId = $"DIA-{ts}";
 
         Step2Drafts[screeningId] = model;
-        return RedirectToAction(nameof(Step3), new { screeningId });
+        return Ok(new SaveStepResponse { ScreeningId = screeningId, Message = $"Step 2 saved — {model.PrimaryDiagnosis} assessment recorded" });
     }
 
     // ── Step 3: Functional ──────────────────────────────────────────────────
@@ -128,11 +136,15 @@ public class AdmissionWizardController : Controller
     }
 
     [HttpPost("SaveStep3")]
-    public IActionResult SaveStep3([FromForm] Step3FunctionalModel model, [FromForm] string screeningId)
+    public IActionResult SaveStep3([FromBody] Step3FunctionalModel model)
     {
-        model.ScreeningId = screeningId;
+        var errors = new Dictionary<string, string[]>();
+        CollectErrors(new Step3Validator().Validate(model), errors);
+        if (errors.Count > 0) return BadRequest(new { errors });
+
+        var screeningId = model.ScreeningId;
         Step3Drafts[screeningId] = model;
-        return RedirectToAction(nameof(Step4), new { screeningId });
+        return Ok(new SaveStepResponse { ScreeningId = screeningId, Message = "Step 3 saved — functional assessment recorded" });
     }
 
     // ── Step 4: Review & Submit ─────────────────────────────────────────────
