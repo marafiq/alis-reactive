@@ -217,6 +217,21 @@ describe("When an enriched field is missing from DOM but all rules have when con
 
     expect(validate(desc("form", [diagField, missingField]))).toBe(false);
   });
+
+  it("skips when BOTH the field AND its condition field are missing (section not rendered)", () => {
+    // Wizard scenario: cardiac section not rendered for Alzheimer's.
+    // PacemakerModel missing from DOM. Its when condition references HasPacemaker.
+    // HasPacemaker ALSO missing from DOM (not in validation fields either).
+    // Both field and condition field absent = section not rendered = skip.
+    const missingField = enrichedField("PacemakerModel_MISSING", [
+      { rule: "required", message: "Model required",
+        when: { field: "HasPacemaker", op: "truthy" } },
+    ]);
+    // HasPacemaker is NOT in the DOM and NOT in the fields list
+    // → condReader returns null → unresolvable → should SKIP (not block)
+
+    expect(validate(desc("form", [missingField]))).toBe(true);
+  });
 });
 
 // ══════════════════════════════════════════════════════════

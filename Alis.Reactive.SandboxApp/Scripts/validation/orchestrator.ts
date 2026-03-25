@@ -229,16 +229,19 @@ export function clearAll(desc: ValidationDescriptor): void {
 
 /**
  * Returns true if every rule on this field has a condition AND that condition evaluates to false.
- * Used for unenriched fields: if all rules are conditionally suppressed (e.g., AddressType != "Custom Address"),
- * the field doesn't need a component yet and shouldn't block.
- * If ANY rule is unconditional or has a true/null condition, returns false (must block).
+ * Used for fields missing from DOM: if all rules are conditionally suppressed
+ * (condition false) or the condition field itself is missing (unresolvable),
+ * the field's entire section wasn't rendered — skip it.
+ *
+ * Unresolvable condition for a missing field = section not rendered = skip.
+ * This differs from enriched fields where unresolvable = block (fail-closed).
  */
 function allRulesConditionallySkipped(f: ValidationField, condReader: ConditionReader): boolean {
   if (f.rules.length === 0) return true;
   for (const rule of f.rules) {
     if (!rule.when) return false; // unconditional rule → must block
     const result = evalCondition(rule.when, condReader);
-    if (result !== false) return false; // condition met or unresolvable → must block
+    if (result === true) return false; // condition met → must block (field should exist but doesn't)
   }
   return true; // all conditions false → skip
 }
