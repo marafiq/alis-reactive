@@ -265,20 +265,84 @@ public class AdmissionAssessmentController : Controller
     {
         await Task.Delay(1000);
 
-        var errors = new Dictionary<string, string>();
-        if (string.IsNullOrEmpty(model.EmergencyContact))
-            errors["EmergencyContact"] = "Emergency contact is required";
+        var errors = new Dictionary<string, string[]>();
+        var id = model.ScreeningId;
+
+        // Step 4: validate with proper validator
+        CollectErrors(new Step4Validator().Validate(model), errors);
+
+        // Step 1: must be saved
+        if (!Step1Drafts.TryGetValue(id, out var step1))
+        {
+            errors["Step1"] = ["Step 1 (Demographics) must be saved before submission"];
+        }
+        else
+        {
+            CollectErrors(new Step1Validator().Validate(step1), errors);
+        }
+
+        // Step 2: validate draft + check section saves
+        Step2Drafts.TryGetValue(id, out var step2);
+        if (step2 != null)
+            CollectErrors(new Step2Validator().Validate(step2), errors);
+
+        if (step1 != null)
+        {
+            if (step1.PrimaryDiagnosis is "Alzheimer's" or "Parkinson's"
+                && string.IsNullOrEmpty(step2?.CognitiveAssessmentId))
+                errors["CognitiveAssessmentId"] = ["Cognitive assessment must be saved"];
+
+            if (step1.PrimaryDiagnosis == "Heart Disease"
+                && string.IsNullOrEmpty(step2?.CardiacAssessmentId))
+                errors["CardiacAssessmentId"] = ["Cardiac assessment must be saved"];
+
+            if (step1.PrimaryDiagnosis == "Diabetes"
+                && string.IsNullOrEmpty(step2?.DiabetesAssessmentId))
+                errors["DiabetesAssessmentId"] = ["Diabetes assessment must be saved"];
+        }
+
+        // Step 3: validate draft
+        Step3Drafts.TryGetValue(id, out var step3);
+        if (step3 != null)
+            CollectErrors(new Step3Validator().Validate(step3), errors);
 
         if (errors.Count > 0) return BadRequest(new { errors });
 
+        // Compute care plan from drafts
+        var careUnit = step1?.PrimaryDiagnosis switch
+        {
+            "Alzheimer's" or "Parkinson's" when (step2?.CognitiveScore ?? 0) < 15 => "Memory Care",
+            "Alzheimer's" or "Parkinson's" when (step2?.CognitiveScore ?? 0) < 25 => "Assisted Living with Memory Support",
+            _ => "Standard Assisted Living"
+        };
+
+        var monitoring = "Standard";
+        if (step3?.TakesBloodThinners == true) monitoring = "Enhanced";
+        if ((step3?.FallRiskScore ?? 0) >= 7 && (step1?.Age ?? 0) >= 80) monitoring = "Continuous";
+
         return Ok(new SubmitScreeningResponse
         {
-            ScreeningId = model.ScreeningId,
-            CareUnit = model.CareUnit,
-            MonitoringLevel = model.MonitoringLevel,
-            Message = $"Assessment complete — {model.ScreeningId}",
+            ScreeningId = id,
+            CareUnit = careUnit,
+            MonitoringLevel = monitoring,
+            Message = $"Assessment complete for {step1?.ResidentName}",
             Alerts = model.AlertsSent
         });
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private static void CollectErrors(FluentValidation.Results.ValidationResult result,
+        Dictionary<string, string[]> errors)
+    {
+        foreach (var failure in result.Errors)
+        {
+            var key = failure.PropertyName;
+            if (!errors.ContainsKey(key))
+                errors[key] = [failure.ErrorMessage];
+            else
+                errors[key] = [..errors[key], failure.ErrorMessage];
+        }
     }
 
     // ── Request DTOs ──────────────────────────────────────────────────────────
