@@ -67,7 +67,7 @@
             </div>
 
             @{ Html.InputField(plan, m => m.FacilityId, o => o.Required().Label("Facility"))
-                .NativeDropDown(b => b
+                .NativeDropDown(nativeDropDownBuilder => nativeDropDownBuilder
                     .CssClass("w-full rounded-md border border-border px-3 py-1.5 text-sm")
                     .Placeholder("-- Select facility --")
                     .Items(facilities.Select(f => new System.Web.Mvc.SelectListItem { Text = f.Name, Value = f.Id }))
