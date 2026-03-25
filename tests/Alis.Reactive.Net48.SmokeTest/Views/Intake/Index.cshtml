@@ -68,13 +68,13 @@
             </div>
 
             @{ Html.InputField(plan, m => m.FacilityId, o => o.Required().Label("Facility"))
-                .NativeDropDown(nativeDropDownBuilder => nativeDropDownBuilder
-                    .CssClass("w-full rounded-md border border-border px-3 py-1.5 text-sm")
-                    .Placeholder("-- Select facility --")
-                    .Items(facilities.Select(f => new System.Web.Mvc.SelectListItem { Text = f.Name, Value = f.Id }))
-                    .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+                .NativeDropDown(dd =>
+                {
+                    dd.CssClass("w-full rounded-md border border-border px-3 py-1.5 text-sm")
+                      .Placeholder("-- Select facility --")
+                      .Items(facilities.Select(f => new System.Web.Mvc.SelectListItem { Text = f.Name, Value = f.Id }));
+                    dd.Reactive(plan, evt => evt.Changed, (args, pipeline) =>
                     {
-                        // Cascade: load units + facility info + requirements
                         pipeline.Parallel(
                             a => a.Get("/Intake/Units")
                                 .Gather(g => g.FromEvent(args, x => x.Value, "facilityId"))
@@ -86,7 +86,8 @@
                                 .Gather(g => g.FromEvent(args, x => x.Value, "facilityId"))
                                 .Response(r => r.OnSuccess(s => s.Into("facility-requirements")))
                         );
-                    })); }
+                    });
+                }); }
 
             <div id="facility-info" class="col-span-full"></div>
             <div id="facility-requirements" class="col-span-full"></div>
@@ -101,17 +102,18 @@
             </div>
 
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
-                .NativeDropDown(b => b
-                    .CssClass("w-full rounded-md border border-border px-3 py-1.5 text-sm")
-                    .Placeholder("-- Select care level --")
-                    .Items(careLevels.Select(c => new System.Web.Mvc.SelectListItem { Text = c.Name, Value = c.Id }))
-                    .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+                .NativeDropDown(dd =>
+                {
+                    dd.CssClass("w-full rounded-md border border-border px-3 py-1.5 text-sm")
+                      .Placeholder("-- Select care level --")
+                      .Items(careLevels.Select(c => new System.Web.Mvc.SelectListItem { Text = c.Name, Value = c.Id }));
+                    dd.Reactive(plan, evt => evt.Changed, (args, pipeline) =>
                     {
-                        // Condition: "Memory Care" → show cognitive assessment
                         pipeline.When(args, a => a.Value).Eq("memory-care")
                             .Then(t => t.Element("cognitive-section").Show())
                             .Else(e => e.Element("cognitive-section").Hide());
-                    })); }
+                    });
+                }); }
 
             @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
                 .NativeTextBox(b => b
@@ -141,15 +143,16 @@
             <div class="col-span-full">
                 @{ Html.InputField(plan, m => m.RequiresMedicationManagement,
                     o => o.Label("Requires Medication Management"))
-                    .NativeCheckBox(b => b
-                        .CssClass("h-4 w-4 rounded border-border text-accent")
-                        .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+                    .NativeCheckBox(cb =>
+                    {
+                        cb.CssClass("h-4 w-4 rounded border-border text-accent");
+                        cb.Reactive(plan, evt => evt.Changed, (args, pipeline) =>
                         {
-                            // Condition: checkbox → show/hide physician field
                             pipeline.When(args, a => a.Checked).Truthy()
                                 .Then(t => t.Element("physician-section").Show())
                                 .Else(e => e.Element("physician-section").Hide());
-                        })); }
+                        });
+                    }); }
             </div>
 
             <div id="physician-section" class="col-span-full" hidden>
@@ -185,43 +188,43 @@
         @* FORM ACTIONS                                            *@
         @* ═══════════════════════════════════════════════════════ *@
         <div id="form-actions" class="mt-6 flex items-center gap-3">
-            @(Html.NativeButton("submit-intake", "Submit Intake")
-                .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, pipeline) =>
-                {
-                    // Confirm → POST → Success/Error → Chained confirmation #
-                    pipeline.Confirm("Submit this resident intake? Please verify all information is correct.")
-                        .Then(t =>
-                        {
-                            t.Post("/Intake/Save", g => g.IncludeAll())
-                             .Validate<IntakeValidator>("intake-form")
-                             .WhileLoading(l =>
-                             {
-                                 l.Component<NativeLoader>().Show();
-                             })
-                             .Response(r => r
-                                .OnSuccess(s =>
-                                {
-                                    s.Component<NativeLoader>().Hide();
-                                    s.Element("success-toast").Show();
-                                    s.Element("post-save-section").Show();
-                                    s.Element("submit-intake").Hide();
-                                })
-                                .OnError(400, e =>
-                                {
-                                    e.Component<NativeLoader>().Hide();
-                                    e.ValidationErrors("intake-form");
-                                })
-                                .Chained(c => c
-                                    .Get("/Intake/ConfirmationNumber")
-                                    .Response(r2 => r2
-                                        .OnSuccess<ConfirmationResponse>((json, s2) =>
-                                        {
-                                            s2.Element("confirmation-number")
-                                                .SetText(json, j => j.Number);
-                                        }))));
-                        });
-                }))
+            @{ var submitBtn = Html.NativeButton("submit-intake", "Submit Intake")
+                .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors");
+               submitBtn.Reactive(plan, evt => evt.Click, (args, pipeline) =>
+               {
+                   pipeline.Confirm("Submit this resident intake? Please verify all information is correct.")
+                       .Then(t =>
+                       {
+                           t.Post("/Intake/Save", g => g.IncludeAll())
+                            .Validate<IntakeValidator>("intake-form")
+                            .WhileLoading(l =>
+                            {
+                                l.Component<NativeLoader>().Show();
+                            })
+                            .Response(r => r
+                               .OnSuccess(s =>
+                               {
+                                   s.Component<NativeLoader>().Hide();
+                                   s.Element("success-toast").Show();
+                                   s.Element("post-save-section").Show();
+                                   s.Element("submit-intake").Hide();
+                               })
+                               .OnError(400, e =>
+                               {
+                                   e.Component<NativeLoader>().Hide();
+                                   e.ValidationErrors("intake-form");
+                               })
+                               .Chained(c => c
+                                   .Get("/Intake/ConfirmationNumber")
+                                   .Response(r2 => r2
+                                       .OnSuccess<ConfirmationResponse>((json, s2) =>
+                                       {
+                                           s2.Element("confirmation-number")
+                                               .SetText(json, j => j.Number);
+                                       }))));
+                       });
+               }); }
+            @submitBtn
         </div>
 
         @* ═══════════════════════════════════════════════════════ *@
@@ -243,12 +246,13 @@
                 Confirmation: <strong id="confirmation-number" class="text-text-primary"></strong>
             </p>
             <div class="mt-3">
-                @(Html.NativeButton("view-summary", "View Summary")
-                    .CssClass("rounded-md border border-border px-4 py-1.5 text-sm font-medium hover:bg-surface-alt transition-colors")
-                    .Reactive(plan, evt => evt.Click, (args, pipeline) =>
-                    {
-                        pipeline.Dispatch("intake-saved");
-                    }))
+                @{ var viewSummaryBtn = Html.NativeButton("view-summary", "View Summary")
+                    .CssClass("rounded-md border border-border px-4 py-1.5 text-sm font-medium hover:bg-surface-alt transition-colors");
+                   viewSummaryBtn.Reactive(plan, evt => evt.Click, (args, pipeline) =>
+                   {
+                       pipeline.Dispatch("intake-saved");
+                   }); }
+                @viewSummaryBtn
             </div>
         </div>
 
