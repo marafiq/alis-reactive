@@ -6,7 +6,7 @@ namespace Alis.Reactive.InputField
     /// <summary>
     /// Writes closing HTML tags when disposed. Pure BCL.
     /// </summary>
-    internal class InputFieldRenderScope : IDisposable
+    internal sealed class InputFieldRenderScope : IDisposable
     {
         private readonly TextWriter _writer;
         private readonly string _closeTags;
