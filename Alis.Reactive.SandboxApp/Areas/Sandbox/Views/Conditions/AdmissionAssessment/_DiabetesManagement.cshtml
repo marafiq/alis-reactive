@@ -1,0 +1,114 @@
+@model HealthScreeningModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ResolvePlan<HealthScreeningModel>();
+}
+
+<native-card><native-card-body>
+    <native-heading level="H3">Diabetes Management</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        A1C above 9% triggers an uncontrolled diabetes alert.
+        Insulin-dependent residents require schedule details.
+    </p>
+
+    <!-- Row 1: Diabetes Type + A1C Level -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.DiabetesType, o => o.Label("Diabetes Type"))
+            .DropDownList(b => b
+                .DataSource(new[] { "Type 1", "Type 2" })
+                .Placeholder("Select type")); }
+
+        @{ Html.InputField(plan, m => m.A1cLevel, o => o.Label("A1C Level (%)"))
+            .NumericTextBox(b => b
+                .Min(0).Max(20).Step(0.1)
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.A1cLevel);
+                    p.Element("a1c-echo").SetText(comp.Value());
+
+                    p.When(comp.Value()).Gt(9m)
+                        .Then(then =>
+                        {
+                            then.Element("uncontrolled-spinner").Show();
+                            then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertUncontrolled",
+                                g => g.Include<FusionNumericTextBox, HealthScreeningModel>(m => m.A1cLevel)
+                                      .Include<FusionDropDownList, HealthScreeningModel>(m => m.DiabetesType))
+                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                             {
+                                 s.Element("uncontrolled-result").SetText(json, x => x.Message);
+                                 s.Element("uncontrolled-result").Show();
+                                 s.Element("uncontrolled-spinner").Hide();
+                             }));
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("uncontrolled-result").SetText("Controlled");
+                            e.Element("uncontrolled-result").Show();
+                        });
+                })); }
+    </div>
+
+    <!-- Row 2: Insulin Dependent -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.InsulinDependent, o => o.Label("Insulin Dependent"))
+            .Switch(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var sw = p.Component<FusionSwitch>(m => m.InsulinDependent);
+                    p.When(sw.Value()).Truthy()
+                        .Then(t => t.Element("insulin-details").Show())
+                        .Else(e => e.Element("insulin-details").Hide());
+                })); }
+    </div>
+
+    <!-- Status echoes -->
+    <div class="font-mono text-sm space-y-1 mb-4">
+        <p>A1C: <span id="a1c-echo" class="text-text-muted">&mdash;</span></p>
+        <p><span id="uncontrolled-spinner" hidden class="text-accent">Sending alert...</span></p>
+        <div id="uncontrolled-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
+    </div>
+
+    <!-- Insulin details (conditionally visible) -->
+    <div id="insulin-details" hidden>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.InsulinSchedule, o => o.Label("Insulin Schedule"))
+                .DropDownList(b => b
+                    .DataSource(new[] { "Once daily", "Twice daily", "Before meals", "Sliding scale" })
+                    .Placeholder("Select schedule")); }
+        </div>
+    </div>
+
+    <!-- Save Diabetes Assessment -->
+    <div class="mt-4 flex items-center gap-3">
+        @(Html.NativeButton("save-diabetes-btn", "Save Diabetes Assessment")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Element("save-diabetes-spinner").Show();
+                p.Element("save-diabetes-text").Hide();
+                p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveDiabetes",
+                    g => g.Include<FusionDropDownList, HealthScreeningModel>(m => m.DiabetesType)
+                          .Include<FusionNumericTextBox, HealthScreeningModel>(m => m.A1cLevel)
+                          .Include<FusionSwitch, HealthScreeningModel>(m => m.InsulinDependent)
+                          .Include<FusionDropDownList, HealthScreeningModel>(m => m.InsulinSchedule))
+                 .Response(r => r.OnSuccess<SaveSectionResponse>((json, s) =>
+                 {
+                     s.Element("diabetes-id-echo").SetText(json, x => x.Id);
+                     s.Element("diabetes-save-status").SetText(json, x => x.Message);
+                     s.Element("diabetes-save-status").Show();
+                     s.Element("save-diabetes-spinner").Hide();
+                     s.Element("save-diabetes-text").Show();
+                 }));
+            }))
+        <span id="save-diabetes-spinner" hidden class="text-accent text-sm">Saving...</span>
+        <span id="save-diabetes-text"></span>
+    </div>
+    <div class="font-mono text-sm mt-2">
+        <span id="diabetes-id-echo" hidden></span>
+        <span id="diabetes-save-status" hidden class="text-emerald-600"></span>
+    </div>
+</native-card-body></native-card>
+
+@Html.RenderPlan(plan)

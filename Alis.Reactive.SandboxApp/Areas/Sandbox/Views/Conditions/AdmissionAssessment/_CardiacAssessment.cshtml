@@ -1,0 +1,107 @@
+@model HealthScreeningModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ResolvePlan<HealthScreeningModel>();
+}
+
+<native-card><native-card-body>
+    <native-heading level="H3">Cardiac Assessment</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        Blood pressure above 140 systolic triggers a hypertension alert.
+        Pacemaker details appear when the pacemaker switch is enabled.
+    </p>
+
+    <!-- Row 1: Systolic BP + Has Pacemaker -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.SystolicBP, o => o.Label("Systolic BP (mmHg)"))
+            .NumericTextBox(b => b
+                .Min(0).Max(300).Step(1)
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.SystolicBP);
+                    p.Element("bp-echo").SetText(comp.Value());
+
+                    p.When(comp.Value()).Gt(140m)
+                        .Then(then =>
+                        {
+                            then.Element("hypertension-spinner").Show();
+                            then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertHypertension",
+                                g => g.Include<FusionNumericTextBox, HealthScreeningModel>(m => m.SystolicBP)
+                                      .Include<NativeTextBox, HealthScreeningModel>(m => m.ResidentName))
+                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                             {
+                                 s.Element("hypertension-result").SetText(json, x => x.Message);
+                                 s.Element("hypertension-result").Show();
+                                 s.Element("hypertension-spinner").Hide();
+                             }));
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("hypertension-result").SetText("Normal");
+                            e.Element("hypertension-result").Show();
+                        });
+                })); }
+
+        @{ Html.InputField(plan, m => m.HasPacemaker, o => o.Label("Has Pacemaker"))
+            .Switch(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var pm = p.Component<FusionSwitch>(m => m.HasPacemaker);
+                    p.When(pm.Value()).Truthy()
+                        .Then(t => t.Element("pacemaker-details").Show())
+                        .Else(e => e.Element("pacemaker-details").Hide());
+                })); }
+    </div>
+
+    <!-- Status echoes -->
+    <div class="font-mono text-sm space-y-1 mb-4">
+        <p>BP: <span id="bp-echo" class="text-text-muted">&mdash;</span></p>
+        <p><span id="hypertension-spinner" hidden class="text-accent">Sending alert...</span></p>
+        <div id="hypertension-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
+    </div>
+
+    <!-- Pacemaker details (conditionally visible) -->
+    <div id="pacemaker-details" hidden>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.PacemakerModel, o => o.Label("Pacemaker Model"))
+                .NativeTextBox(b => b.Placeholder("e.g. Medtronic Azure")); }
+
+            @{ Html.InputField(plan, m => m.LastDeviceCheck, o => o.Label("Last Device Check"))
+                .DatePicker(b => b.Placeholder("Select date")); }
+        </div>
+    </div>
+
+    <!-- Save Cardiac Assessment -->
+    <div class="mt-4 flex items-center gap-3">
+        @(Html.NativeButton("save-cardiac-btn", "Save Cardiac Assessment")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Element("save-cardiac-spinner").Show();
+                p.Element("save-cardiac-text").Hide();
+                p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveCardiac",
+                    g => g.Include<FusionNumericTextBox, HealthScreeningModel>(m => m.SystolicBP)
+                          .Include<FusionSwitch, HealthScreeningModel>(m => m.HasPacemaker)
+                          .Include<NativeTextBox, HealthScreeningModel>(m => m.PacemakerModel)
+                          .Include<FusionDatePicker, HealthScreeningModel>(m => m.LastDeviceCheck))
+                 .Response(r => r.OnSuccess<SaveSectionResponse>((json, s) =>
+                 {
+                     s.Element("cardiac-id-echo").SetText(json, x => x.Id);
+                     s.Element("cardiac-save-status").SetText(json, x => x.Message);
+                     s.Element("cardiac-save-status").Show();
+                     s.Element("save-cardiac-spinner").Hide();
+                     s.Element("save-cardiac-text").Show();
+                 }));
+            }))
+        <span id="save-cardiac-spinner" hidden class="text-accent text-sm">Saving...</span>
+        <span id="save-cardiac-text"></span>
+    </div>
+    <div class="font-mono text-sm mt-2">
+        <span id="cardiac-id-echo" hidden></span>
+        <span id="cardiac-save-status" hidden class="text-emerald-600"></span>
+    </div>
+</native-card-body></native-card>
+
+@Html.RenderPlan(plan)

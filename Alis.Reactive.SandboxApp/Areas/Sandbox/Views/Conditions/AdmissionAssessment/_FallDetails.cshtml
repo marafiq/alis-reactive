@@ -1,0 +1,67 @@
+@model HealthScreeningModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ResolvePlan<HealthScreeningModel>();
+}
+
+<native-card><native-card-body>
+    <native-heading level="H3">Fall Details</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        If a fall caused injury, details appear. Head injuries trigger a neurology alert.
+    </p>
+
+    <!-- Row 1: Caused Injury -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.CausedInjury, o => o.Label("Caused Injury"))
+            .Switch(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var sw = p.Component<FusionSwitch>(m => m.CausedInjury);
+                    p.When(sw.Value()).Truthy()
+                        .Then(t => t.Element("injury-details").Show())
+                        .Else(e => e.Element("injury-details").Hide());
+                })); }
+    </div>
+
+    <!-- Injury details (conditionally visible) -->
+    <div id="injury-details" hidden>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.InjuryType, o => o.Label("Injury Type"))
+                .DropDownList(b => b
+                    .DataSource(new[] { "Bruise", "Fracture", "Laceration", "Head Injury", "Other" })
+                    .Placeholder("Select injury type")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        var inj = p.Component<FusionDropDownList>(m => m.InjuryType);
+                        p.When(inj.Value()).Eq("Head Injury")
+                            .Then(then =>
+                            {
+                                then.Element("neuro-spinner").Show();
+                                then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertNeuro",
+                                    g => g.Include<FusionDropDownList, HealthScreeningModel>(m => m.InjuryType)
+                                          .Include<NativeTextBox, HealthScreeningModel>(m => m.ResidentName))
+                                 .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                                 {
+                                     s.Element("neuro-result").SetText(json, x => x.Message);
+                                     s.Element("neuro-result").Show();
+                                     s.Element("neuro-spinner").Hide();
+                                 }));
+                            })
+                            .Else(e =>
+                            {
+                                e.Element("neuro-result").SetText("Noted");
+                                e.Element("neuro-result").Show();
+                            });
+                    })); }
+        </div>
+
+        <div class="font-mono text-sm space-y-1">
+            <p><span id="neuro-spinner" hidden class="text-accent">Sending alert...</span></p>
+            <div id="neuro-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
+        </div>
+    </div>
+</native-card-body></native-card>
+
+@Html.RenderPlan(plan)
