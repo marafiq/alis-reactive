@@ -9,7 +9,7 @@
 //
 // Vendor-agnostic: delegates value reading to component.ts via resolveRoot.
 
-import type { ValidationDescriptor, ValidationField } from "../types";
+import type { ValidationDescriptor, ValidationField, ValidationRule } from "../types";
 import { resolveRoot } from "../resolution/component";
 import { scope } from "../core/trace";
 import { walk } from "../core/walk";

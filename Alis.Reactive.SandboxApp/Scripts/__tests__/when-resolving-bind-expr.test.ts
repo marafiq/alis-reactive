@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { resolveEventPath, coerce } from "../resolution/resolver";
+import { resolveEventPath } from "../resolution/resolver";
+import { coerce } from "../core/coerce";
 import type { ExecContext } from "../types";
 
 describe("when resolving a BindExpr against execution context", () => {
@@ -167,48 +168,50 @@ describe("when resolving a BindExpr against execution context", () => {
   describe("resolution with typed coercion", () => {
     it("resolves string value and coerces to number", () => {
       const ctx: ExecContext = { evt: { amount: "42" } };
-      expect(coerce(resolveEventPath("evt.amount", ctx), "number")).toBe(42);
+      expect(coerce(resolveEventPath("evt.amount", ctx), "number")).toEqual({ ok: true, value: 42 });
     });
 
     it("resolves number value and coerces to string", () => {
       const ctx: ExecContext = { evt: { count: 99 } };
-      expect(coerce(resolveEventPath("evt.count", ctx), "string")).toBe("99");
+      expect(coerce(resolveEventPath("evt.count", ctx), "string")).toEqual({ ok: true, value: "99" });
     });
 
     it("resolves string 'true' and coerces to boolean", () => {
       const ctx: ExecContext = { evt: { flag: "true" } };
-      expect(coerce(resolveEventPath("evt.flag", ctx), "boolean")).toBe(true);
+      expect(coerce(resolveEventPath("evt.flag", ctx), "boolean")).toEqual({ ok: true, value: true });
     });
 
     it("resolves number 1 and coerces to boolean", () => {
       const ctx: ExecContext = { evt: { flag: 1 } };
-      expect(coerce(resolveEventPath("evt.flag", ctx), "boolean")).toBe(true);
+      expect(coerce(resolveEventPath("evt.flag", ctx), "boolean")).toEqual({ ok: true, value: true });
     });
 
     it("resolves missing path and coerces to string as empty", () => {
       const ctx: ExecContext = { evt: {} };
-      expect(coerce(resolveEventPath("evt.missing", ctx), "string")).toBe("");
+      expect(coerce(resolveEventPath("evt.missing", ctx), "string")).toEqual({ ok: true, value: "" });
     });
 
     it("resolves missing path and coerces to number as zero", () => {
       const ctx: ExecContext = { evt: {} };
-      expect(coerce(resolveEventPath("evt.missing", ctx), "number")).toBe(0);
+      expect(coerce(resolveEventPath("evt.missing", ctx), "number")).toEqual({ ok: true, value: 0 });
     });
 
     it("resolves missing path and coerces to boolean as false", () => {
       const ctx: ExecContext = { evt: {} };
-      expect(coerce(resolveEventPath("evt.missing", ctx), "boolean")).toBe(false);
+      expect(coerce(resolveEventPath("evt.missing", ctx), "boolean")).toEqual({ ok: true, value: false });
     });
 
     it("resolves nested path and coerces to number", () => {
       const ctx: ExecContext = { evt: { stats: { score: "95.5" } } };
-      expect(coerce(resolveEventPath("evt.stats.score", ctx), "number")).toBe(95.5);
+      expect(coerce(resolveEventPath("evt.stats.score", ctx), "number")).toEqual({ ok: true, value: 95.5 });
     });
 
     it("raw coercion returns the exact resolved value", () => {
       const obj = { nested: true };
       const ctx: ExecContext = { evt: { data: obj } };
-      expect(coerce(resolveEventPath("evt.data", ctx), "raw")).toBe(obj);
+      const r = coerce(resolveEventPath("evt.data", ctx), "raw");
+      expect(r.ok).toBe(true);
+      if (r.ok) expect(r.value).toBe(obj);
     });
   });
 
@@ -228,8 +231,8 @@ describe("when resolving a BindExpr against execution context", () => {
     };
 
     it("resolves value for numeric comparison (Gt/Lt/Gte/Lte)", () => {
-      expect(coerce(resolveEventPath("evt.value", ctx), "number")).toBe(42);
-      expect(coerce(resolveEventPath("evt.score", ctx), "number")).toBe(95.5);
+      expect(coerce(resolveEventPath("evt.value", ctx), "number")).toEqual({ ok: true, value: 42 });
+      expect(coerce(resolveEventPath("evt.score", ctx), "number")).toEqual({ ok: true, value: 95.5 });
     });
 
     it("resolves value for equality comparison (Eq/NotEq)", () => {
@@ -244,10 +247,10 @@ describe("when resolving a BindExpr against execution context", () => {
     });
 
     it("resolves value for truthiness check (Truthy/Falsy)", () => {
-      expect(coerce(resolveEventPath("evt.isActive", ctx), "boolean")).toBe(true);
-      expect(coerce(resolveEventPath("evt.zero", ctx), "boolean")).toBe(false);
-      expect(coerce(resolveEventPath("evt.empty", ctx), "boolean")).toBe(false);
-      expect(coerce(resolveEventPath("evt.status", ctx), "boolean")).toBe(false);
+      expect(coerce(resolveEventPath("evt.isActive", ctx), "boolean")).toEqual({ ok: true, value: true });
+      expect(coerce(resolveEventPath("evt.zero", ctx), "boolean")).toEqual({ ok: true, value: false });
+      expect(coerce(resolveEventPath("evt.empty", ctx), "boolean")).toEqual({ ok: true, value: false });
+      expect(coerce(resolveEventPath("evt.status", ctx), "boolean")).toEqual({ ok: true, value: false });
     });
 
     it("resolves value for emptiness check (IsEmpty/NotEmpty)", () => {
@@ -259,21 +262,25 @@ describe("when resolving a BindExpr against execution context", () => {
     });
 
     it("resolves value for text assertion (Contains/StartsWith)", () => {
-      const text = coerce(resolveEventPath("evt.text", ctx), "string") as string;
-      expect(text.includes("eat")).toBe(true);
-      expect(text.startsWith("Sea")).toBe(true);
+      const r = coerce(resolveEventPath("evt.text", ctx), "string");
+      expect(r.ok).toBe(true);
+      if (r.ok) {
+        expect((r.value as string).includes("eat")).toBe(true);
+        expect((r.value as string).startsWith("Sea")).toBe(true);
+      }
     });
 
     it("resolves value for range assertion (Between)", () => {
-      const val = coerce(resolveEventPath("evt.value", ctx), "number") as number;
-      expect(val >= 10 && val <= 100).toBe(true);
+      const r = coerce(resolveEventPath("evt.value", ctx), "number");
+      expect(r.ok).toBe(true);
+      if (r.ok) expect((r.value as number) >= 10 && (r.value as number) <= 100).toBe(true);
     });
 
     it("resolves nested value for cross-path comparison", () => {
       const nestedCount = coerce(resolveEventPath("evt.nested.count", ctx), "number");
       const topValue = coerce(resolveEventPath("evt.value", ctx), "number");
-      expect(nestedCount).toBe(7);
-      expect(topValue).toBe(42);
+      expect(nestedCount).toEqual({ ok: true, value: 7 });
+      expect(topValue).toEqual({ ok: true, value: 42 });
     });
   });
 });
