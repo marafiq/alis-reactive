@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { coerce, coerceOrThrow, toString, toNumber, toBoolean, toDate, toArray } from "../core/coerce";
-import type { CoerceResult } from "../core/coerce";
 
 describe("when coercing values", () => {
 

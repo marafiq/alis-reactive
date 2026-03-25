@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { resolveEventPath } from "../resolution/resolver";
-import { coerce } from "../core/coerce";
+import { coerce, toString } from "../core/coerce";
 import type { ExecContext } from "../types";
 
 describe("when resolving a BindExpr against execution context", () => {
@@ -117,51 +117,51 @@ describe("when resolving a BindExpr against execution context", () => {
   describe("resolution with string coercion", () => {
     it("coerces number to string", () => {
       const ctx: ExecContext = { evt: { count: 42 } };
-      expect(String(resolveEventPath("evt.count", ctx) ?? "")).toBe("42");
+      expect(toString(resolveEventPath("evt.count", ctx))).toEqual({ ok: true, value: "42" });
     });
 
     it("coerces boolean true to 'true'", () => {
       const ctx: ExecContext = { evt: { active: true } };
-      expect(String(resolveEventPath("evt.active", ctx) ?? "")).toBe("true");
+      expect(toString(resolveEventPath("evt.active", ctx))).toEqual({ ok: true, value: "true" });
     });
 
     it("coerces boolean false to 'false'", () => {
       const ctx: ExecContext = { evt: { active: false } };
-      expect(String(resolveEventPath("evt.active", ctx) ?? "")).toBe("false");
+      expect(toString(resolveEventPath("evt.active", ctx))).toEqual({ ok: true, value: "false" });
     });
 
     it("coerces null to empty string", () => {
       const ctx: ExecContext = { evt: { value: null } };
-      expect(String(resolveEventPath("evt.value", ctx) ?? "")).toBe("");
+      expect(toString(resolveEventPath("evt.value", ctx))).toEqual({ ok: true, value: "" });
     });
 
     it("returns empty string for missing path", () => {
       const ctx: ExecContext = { evt: {} };
-      expect(String(resolveEventPath("evt.nonexistent", ctx) ?? "")).toBe("");
+      expect(toString(resolveEventPath("evt.nonexistent", ctx))).toEqual({ ok: true, value: "" });
     });
 
     it("returns empty string for undefined context", () => {
-      expect(String(resolveEventPath("evt.name", undefined) ?? "")).toBe("");
+      expect(toString(resolveEventPath("evt.name", undefined))).toEqual({ ok: true, value: "" });
     });
 
     it("leaves string as-is", () => {
       const ctx: ExecContext = { evt: { name: "Alice" } };
-      expect(String(resolveEventPath("evt.name", ctx) ?? "")).toBe("Alice");
+      expect(toString(resolveEventPath("evt.name", ctx))).toEqual({ ok: true, value: "Alice" });
     });
 
     it("coerces zero to '0'", () => {
       const ctx: ExecContext = { evt: { count: 0 } };
-      expect(String(resolveEventPath("evt.count", ctx) ?? "")).toBe("0");
+      expect(toString(resolveEventPath("evt.count", ctx))).toEqual({ ok: true, value: "0" });
     });
 
     it("coerces large number precisely", () => {
       const ctx: ExecContext = { evt: { big: 9007199254740991 } };
-      expect(String(resolveEventPath("evt.big", ctx) ?? "")).toBe("9007199254740991");
+      expect(toString(resolveEventPath("evt.big", ctx))).toEqual({ ok: true, value: "9007199254740991" });
     });
 
     it("coerces float precisely", () => {
       const ctx: ExecContext = { evt: { pi: 3.14159 } };
-      expect(String(resolveEventPath("evt.pi", ctx) ?? "")).toBe("3.14159");
+      expect(toString(resolveEventPath("evt.pi", ctx))).toEqual({ ok: true, value: "3.14159" });
     });
   });
 

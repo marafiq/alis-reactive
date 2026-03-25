@@ -192,7 +192,9 @@ export function showServerErrors(desc: ValidationDescriptor, data: unknown): voi
   let summaryHasErrors = false;
 
   for (const [name, msgs] of Object.entries(errors)) {
-    const msg = Array.isArray(msgs) ? msgs.join(", ") : String(msgs);
+    // Server 400 Problem Details always sends string or string[] per field
+    const msgResult = toString(msgs);
+    const msg = Array.isArray(msgs) ? msgs.join(", ") : msgResult.ok ? msgResult.value : "";
 
     const spanExists = findErrorSpanExists(name, desc.fields);
     if (spanExists) {

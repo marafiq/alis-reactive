@@ -9,12 +9,6 @@ import type { CoercionType } from "../core/coerce";
 const log = scope("resolver");
 
 /**
- * A BindExpr is a dot-notation path into the execution context.
- * Examples: "evt.intValue", "evt.address.city", "evt.boolValue"
- */
-export type BindExpr = string;
-
-/**
  * Unified entry point — dispatches by source kind.
  * Handles both "event" (walk execution context) and "component" (read from DOM component).
  */
