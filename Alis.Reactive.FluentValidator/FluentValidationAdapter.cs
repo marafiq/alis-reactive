@@ -385,7 +385,11 @@ namespace Alis.Reactive.FluentValidator
                 t == typeof(double) || t == typeof(float) || t == typeof(byte) || t == typeof(short) ||
                 t == typeof(uint) || t == typeof(ushort) || t == typeof(ulong))
                 return "number";
-            if (t == typeof(DateTime) || t == typeof(DateTimeOffset) || t == typeof(DateOnly))
+            if (t == typeof(DateTime) || t == typeof(DateTimeOffset)
+#if NET6_0_OR_GREATER
+                || t == typeof(DateOnly)
+#endif
+                )
                 return "date";
             return null;
         }
@@ -400,8 +404,10 @@ namespace Alis.Reactive.FluentValidator
                 return dto.TimeOfDay == TimeSpan.Zero
                     ? dto.ToString("yyyy-MM-dd")
                     : dto.ToString("s");
+#if NET6_0_OR_GREATER
             if (value is DateOnly d)
                 return d.ToString("yyyy-MM-dd");
+#endif
             return value;
         }
 

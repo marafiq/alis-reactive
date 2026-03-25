@@ -517,7 +517,29 @@ error message telling the developer what they forgot to register. Fallbacks hide
 In UI code, a silent fallback means the wrong component gets read, the wrong vendor gets
 resolved, or the wrong field gets validated — all silently. Throw, don't guess.
 
-### 11. ESM Only + Cache Busting
+### 11. Multi-Targeting (net48 + net10.0) — Keep It Compiling
+
+All library projects target both `net48` and `net10.0`. Every new file must compile on both.
+
+**Exception:** `Alis.Reactive.NativeTagHelpers` is `net10.0`-only — ASP.NET Core Tag Helpers
+have no net48 equivalent.
+
+**When adding a new component builder or extension:**
+- `#if NET48` / `#else` for using statements: `System.Web.Mvc` vs `Microsoft.AspNetCore`
+- `IHtmlString` vs `IHtmlContent`, `HtmlHelper<T>` vs `IHtmlHelper<T>`
+- `ExpressionHelper.GetExpressionText()` vs `html.NameFor()`
+- `ToHtmlString()` method (net48 only — wraps `WriteTo`)
+- `MvcHtmlString` vs `HtmlString` for app-level components
+
+**API availability guards:**
+- `DateOnly` / `TimeOnly` → `#if NET6_0_OR_GREATER`
+- `ArgumentNullException.ThrowIfNull` → `#if NET6_0_OR_GREATER` (use manual throw on net48)
+- Collection expressions `[]` → use `new List<T> { }` if file targets net48
+
+**After any C# change:** run `dotnet build` and check BOTH targets compile.
+If you see `error CS` with `TargetFramework=net48`, you forgot a guard.
+
+### 12. ESM Only + Cache Busting
 
 The runtime is bundled as ESM (`--format=esm`). The layout loads it via
 `<script type="module" src="~/js/alis-reactive.js" asp-append-version="true">`.
@@ -527,7 +549,7 @@ No IIFE, no `window.alis`, no import maps, no inline `<script type="module">` bl
 appends `?v=SHA256hash` — browser always gets the latest build. This works because the
 layout uses `src=` (not inline `import from`), and ASP.NET's tag helpers compute the hash.
 
-### 12. Playwright Test Workflow — Report First, Fix Methodically
+### 13. Playwright Test Workflow — Report First, Fix Methodically
 
 **Always run Playwright with trx report so failures are captured in one pass:**
 

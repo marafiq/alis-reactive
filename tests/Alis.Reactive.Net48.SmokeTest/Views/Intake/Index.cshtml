@@ -1,0 +1,300 @@
+@model Alis.Reactive.Net48.SmokeTest.Models.ResidentIntakeModel
+@using Alis.Reactive
+@using Alis.Reactive.Fusion.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.AppLevel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@using Alis.Reactive.Net48.SmokeTest.Models
+@using Alis.Reactive.Net48.SmokeTest.Validators
+@{
+    ViewBag.Title = "New Resident Intake";
+    var plan = Html.ReactivePlan<ResidentIntakeModel>();
+
+    // ── DomReady: Load facility + care level lookups via parallel HTTP ──
+    Html.On(plan, t => t.DomReady(pipeline =>
+    {
+        pipeline.Parallel(
+            a => a.Get("/Intake/Facilities")
+                  .Response(r => r.OnSuccess<FacilitiesResponse>((json, s) =>
+                  {
+                      s.Component<FusionDropDownList>(m => m.FacilityId)
+                          .SetDataSource(json, j => j.Facilities)
+                          .DataBind();
+                  })),
+            b => b.Get("/Intake/CareLevels")
+                  .Response(r => r.OnSuccess<CareLevelsResponse>((json, s) =>
+                  {
+                      s.Component<FusionDropDownList>(m => m.CareLevel)
+                          .SetDataSource(json, j => j.Levels)
+                          .DataBind();
+                  }))
+        ).OnAllSettled(s =>
+        {
+            s.Element("loading-message").Hide();
+            s.Element("intake-form").Show();
+            s.Element("form-actions").Show();
+        });
+    }));
+
+    // ── CustomEvent: loads summary into drawer after save ──
+    Html.On(plan, t => t.CustomEvent("intake-saved", pipeline =>
+    {
+        pipeline.Get("/Intake/Summary")
+            .Gather(g => g.IncludeAll())
+            .Response(r => r.OnSuccess(s =>
+            {
+                s.Into("alis-drawer-content");
+            }));
+        pipeline.Element("alis-drawer-title").SetText("Intake Summary");
+        pipeline.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+        pipeline.Component<NativeDrawer>().Open();
+    }));
+}
+
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <div>
+        <h1 class="text-2xl font-bold text-text-primary border-b-2 border-accent pb-2">New Resident Intake</h1>
+        <p class="text-sm text-text-muted mt-1">Complete all sections below. Fields marked with * are required.</p>
+    </div>
+
+    <p id="loading-message" class="text-sm text-text-muted">Loading form data...</p>
+
+    <div class="bg-white border border-border rounded-lg shadow-sm">
+    <div class="p-6">
+        <form id="intake-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4" hidden>
+
+            @* ═══════════════════════════════════════════════════════ *@
+            @* PERSONAL INFORMATION                                    *@
+            @* ═══════════════════════════════════════════════════════ *@
+            <div class="col-span-full">
+                <h3 class="text-lg font-semibold text-text-primary">Personal Information</h3>
+            </div>
+
+            @{ Html.InputField(plan, m => m.FirstName, o => o.Required().Label("First Name"))
+                .NativeTextBox(b => b
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("Jane")); }
+
+            @{ Html.InputField(plan, m => m.LastName, o => o.Required().Label("Last Name"))
+                .NativeTextBox(b => b
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("Doe")); }
+
+            @{ Html.InputField(plan, m => m.DateOfBirth, o => o.Required().Label("Date of Birth"))
+                .DatePicker(b => b
+                    .Placeholder("Select date of birth")); }
+
+            @* ═══════════════════════════════════════════════════════ *@
+            @* PLACEMENT                                               *@
+            @* ═══════════════════════════════════════════════════════ *@
+            <div class="col-span-full mt-2">
+                <h3 class="text-lg font-semibold text-text-primary">Placement</h3>
+            </div>
+
+            @{ Html.InputField(plan, m => m.FacilityId, o => o.Required().Label("Facility"))
+                .DropDownList(b => b
+                    .Placeholder("Select facility")
+                    .Fields<LookupItem>(t => t.Name, v => v.Id)
+                    .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+                    {
+                        // ── Parallel: cascade units + facility info + facility requirements ──
+                        pipeline.Parallel(
+                            a => a.Get("/Intake/Units")
+                                .Gather(g => g
+                                    .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                                .Response(r => r
+                                    .OnSuccess<UnitsResponse>((json, s) =>
+                                    {
+                                        s.Component<FusionDropDownList>(m => m.UnitId)
+                                            .SetDataSource(json, j => j.Units)
+                                            .DataBind();
+                                    })),
+                            b2 => b2.Get("/Intake/FacilityInfo")
+                                .Gather(g => g
+                                    .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                                .Response(r => r
+                                    .OnSuccess(s => s.Into("facility-info"))),
+                            c => c.Get("/Intake/FacilityRequirements")
+                                .Gather(g => g
+                                    .Include<FusionDropDownList, ResidentIntakeModel>(m => m.FacilityId))
+                                .Response(r => r
+                                    .OnSuccess(s => s.Into("facility-requirements")))
+                        );
+                    })); }
+
+            <div id="facility-info" class="col-span-full"></div>
+            <div id="facility-requirements" class="col-span-full"></div>
+
+            @{ Html.InputField(plan, m => m.UnitId, o => o.Label("Unit"))
+                .DropDownList(b => b
+                    .Placeholder("Select unit \u2014 pick a facility first")
+                    .Fields<LookupItem>(t => t.Name, v => v.Id)); }
+
+            @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
+                .DropDownList(b => b
+                    .Placeholder("Select care level")
+                    .Fields<LookupItem>(t => t.Name, v => v.Id)
+                    .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+                    {
+                        // ── Condition: "Memory Care" → show cognitive assessment ──
+                        pipeline.When(args, a => a.Value).Eq("memory-care")
+                            .Then(t => t.Element("cognitive-section").Show())
+                            .Else(e => e.Element("cognitive-section").Hide());
+                    })); }
+
+            @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
+                .DatePicker(b => b
+                    .Placeholder("Select admission date")); }
+
+            @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
+                .NumericTextBox(b => b
+                    .Min(0).Step(100)); }
+
+            <div id="cognitive-section" class="col-span-full" hidden>
+                @{ Html.InputField(plan, m => m.CognitiveAssessmentDate,
+                    o => o.Label("Last Cognitive Assessment"))
+                    .DatePicker(b => b
+                        .Placeholder("Assessment date")); }
+            </div>
+
+            @* ═══════════════════════════════════════════════════════ *@
+            @* MEDICAL                                                 *@
+            @* ═══════════════════════════════════════════════════════ *@
+            <div class="col-span-full mt-2">
+                <h3 class="text-lg font-semibold text-text-primary">Medical</h3>
+            </div>
+
+            <div class="col-span-full">
+                @{ Html.InputField(plan, m => m.RequiresMedicationManagement,
+                    o => o.Label("Requires Medication Management"))
+                    .NativeCheckBox(b => b
+                        .CssClass("h-4 w-4 rounded border-border text-accent")
+                        .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+                        {
+                            // ── Condition: checkbox → show/hide physician field ──
+                            pipeline.When(args, a => a.Checked).Truthy()
+                                .Then(t => t.Element("physician-section").Show())
+                                .Else(e => e.Element("physician-section").Hide());
+                        })); }
+            </div>
+
+            <div id="physician-section" class="col-span-full" hidden>
+                @{ Html.InputField(plan, m => m.PrimaryPhysician,
+                    o => o.Label("Primary Physician"))
+                    .NativeTextBox(b => b
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("Dr. Smith")); }
+            </div>
+
+            @* ═══════════════════════════════════════════════════════ *@
+            @* EMERGENCY CONTACT                                       *@
+            @* ═══════════════════════════════════════════════════════ *@
+            <div class="col-span-full mt-2">
+                <h3 class="text-lg font-semibold text-text-primary">Emergency Contact</h3>
+            </div>
+
+            @{ Html.InputField(plan, m => m.EmergencyContactName,
+                o => o.Required().Label("Contact Name"))
+                .NativeTextBox(b => b
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                    .Placeholder("John Doe")); }
+
+            @{ Html.InputField(plan, m => m.EmergencyContactPhone,
+                o => o.Required().Label("Contact Phone"))
+                .InputMask(b => b
+                    .Mask("(000) 000-0000")
+                    .Placeholder("(555) 123-4567")); }
+
+        </form>
+
+        @* ═══════════════════════════════════════════════════════ *@
+        @* FORM ACTIONS                                            *@
+        @* ═══════════════════════════════════════════════════════ *@
+        <div id="form-actions" class="mt-6 flex items-center gap-3" hidden>
+            @(Html.NativeButton("submit-intake", "Submit Intake")
+                .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, pipeline) =>
+                {
+                    // ── Confirm → POST → Validate → Toast → Chained confirmation # ──
+                    pipeline.Confirm("Submit this resident intake? Please verify all information is correct.")
+                        .Then(t =>
+                        {
+                            t.Post("/Intake/Save", g => g.IncludeAll())
+                             .Validate<IntakeValidator>("intake-form")
+                             .WhileLoading(l =>
+                             {
+                                 l.Component<NativeLoader>().Show();
+                             })
+                             .Response(r => r
+                                .OnSuccess(s =>
+                                {
+                                    s.Component<NativeLoader>().Hide();
+                                    s.Component<FusionToast>()
+                                        .SetTitle("Resident Intake")
+                                        .SetContent("Intake submitted successfully")
+                                        .Success()
+                                        .Show();
+                                    s.Element("post-save-section").Show();
+                                    s.Element("submit-intake").Hide();
+                                })
+                                .OnError(400, e =>
+                                {
+                                    e.Component<NativeLoader>().Hide();
+                                    e.ValidationErrors("intake-form");
+                                })
+                                .Chained(c => c
+                                    .Get("/Intake/ConfirmationNumber")
+                                    .Response(r2 => r2
+                                        .OnSuccess<ConfirmationResponse>((json, s2) =>
+                                        {
+                                            s2.Element("confirmation-number")
+                                                .SetText(json, j => j.Number);
+                                        }))));
+                        });
+                }))
+        </div>
+
+        @* ═══════════════════════════════════════════════════════ *@
+        @* POST-SAVE SECTION (hidden until save succeeds)          *@
+        @* ═══════════════════════════════════════════════════════ *@
+        <div id="post-save-section" class="mt-6 p-4 rounded-md border border-border bg-surface-alt" hidden>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-sm font-medium text-text-primary">Intake Submitted</span>
+            </div>
+            <p class="text-sm text-text-secondary">
+                Confirmation: <strong id="confirmation-number" class="text-text-primary"></strong>
+            </p>
+            <div class="mt-3">
+                @(Html.NativeButton("view-summary", "View Summary")
+                    .CssClass("rounded-md border border-border px-4 py-1.5 text-sm font-medium hover:bg-surface-alt")
+                    .Reactive(plan, evt => evt.Click, (args, pipeline) =>
+                    {
+                        // ── Dispatch event → CustomEvent handler loads drawer ──
+                        pipeline.Dispatch("intake-saved");
+                    }))
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+    @* ═══════════════════════════════════════════════════════ *@
+    @* PLAN JSON (developer reference)                         *@
+    @* ═══════════════════════════════════════════════════════ *@
+    <div class="bg-white border border-border rounded-lg shadow-sm">
+    <div class="p-6">
+        <h3 class="text-lg font-semibold text-text-primary mb-1">Plan JSON</h3>
+        <p class="text-sm text-text-muted mb-3">
+            The rendered JSON plan &mdash; this is the only contract between C# and the browser.
+        </p>
+        <pre class="text-xs overflow-auto max-h-96 p-3 bg-surface-alt rounded-md"><code>@Html.Raw(plan.RenderFormatted())</code></pre>
+    </div>
+    </div>
+
+</div>
+
+@Html.RenderPlan(plan)

@@ -2,8 +2,13 @@ using System;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
 using Alis.Reactive.Descriptors;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Components
 {
@@ -22,13 +27,21 @@ namespace Alis.Reactive.Native.Components
         /// Returns IHtmlContent for direct rendering in views: @Html.HiddenFieldFor(plan, m => m.Id)
         /// </summary>
         public static NativeHiddenFieldBuilder<TModel, TProp> HiddenFieldFor<TModel, TProp>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             IReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression)
             where TModel : class
         {
             var elementId = IdGenerator.For<TModel, TProp>(expression);
+#if NET48
+            var bindingPath = ExpressionHelper.GetExpressionText(expression);
+#else
             var bindingPath = html.NameFor(expression);
+#endif
 
             plan.AddToComponentsMap(bindingPath, new ComponentRegistration(
                 elementId, _component.Vendor, bindingPath, _component.ReadExpr, "hiddenfield",

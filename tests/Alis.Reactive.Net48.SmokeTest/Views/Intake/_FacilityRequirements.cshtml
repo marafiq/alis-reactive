@@ -1,0 +1,25 @@
+@model Alis.Reactive.Net48.SmokeTest.Models.ResidentIntakeModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Extensions
+@{
+    var plan = Html.ResolvePlan<Alis.Reactive.Net48.SmokeTest.Models.ResidentIntakeModel>();
+}
+
+<div class="space-y-3">
+    <h4 class="text-base font-semibold text-text-primary">Facility Requirements</h4>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        @{ Html.InputField(plan, m => m.RoomPreference, o => o.Required().Label("Room Preference"))
+            .NativeTextBox(b => b
+                .CssClass("w-full rounded-md border border-border px-3 py-1.5 text-sm")
+                .Placeholder("e.g., Ground floor, near garden")); }
+
+        @{ Html.InputField(plan, m => m.DepositAmount, o => o.Required().Label("Move-in Deposit ($)"))
+            .NumericTextBox(b => b
+                .Min(0).Step(500)); }
+    </div>
+</div>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)

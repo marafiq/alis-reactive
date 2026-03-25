@@ -2,11 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Encodings.Web;
+#if NET48
+using System.Web;
+#else
 using Microsoft.AspNetCore.Html;
+#endif
 
 namespace Alis.Reactive.Native.Components
 {
+#if NET48
+    public sealed class NativeActionLinkBuilder<TModel> : IHtmlString
+#else
     public sealed class NativeActionLinkBuilder<TModel> : IHtmlContent
+#endif
         where TModel : class
     {
         private readonly string _elementId;
@@ -47,6 +55,17 @@ namespace Alis.Reactive.Native.Components
             _attributes[name] = value;
             return this;
         }
+
+#if NET48
+        public string ToHtmlString()
+        {
+            using (var sw = new StringWriter())
+            {
+                WriteTo(sw, HtmlEncoder.Default);
+                return sw.ToString();
+            }
+        }
+#endif
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {

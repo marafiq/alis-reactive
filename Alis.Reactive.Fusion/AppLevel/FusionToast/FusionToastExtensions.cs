@@ -1,7 +1,12 @@
 using Alis.Reactive;
 using Alis.Reactive.Descriptors.Mutations;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Notifications;
 
@@ -73,9 +78,15 @@ namespace Alis.Reactive.Fusion.AppLevel
 
         // ── Layout renderer ──
 
+#if NET48
+        public static IHtmlString FusionToast(this HtmlHelper html)
+        {
+            return html.EJS().Toast(AppLevel.FusionToast.ElementId)
+#else
         public static IHtmlContent FusionToast(this IHtmlHelper html)
         {
             return html.EJS().Toast(AppLevel.FusionToast.ElementId)
+#endif
                 .Target("body")
                 .Position(new ToastToastPosition { X = "Right", Y = "Bottom" })
                 .NewestOnTop(true)

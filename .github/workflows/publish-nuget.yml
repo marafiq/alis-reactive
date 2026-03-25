@@ -1,0 +1,39 @@
+name: Publish NuGet packages
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore library projects
+        run: |
+          dotnet restore Alis.Reactive/Alis.Reactive.csproj
+          dotnet restore Alis.Reactive.Native/Alis.Reactive.Native.csproj
+          dotnet restore Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj
+          dotnet restore Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj
+          dotnet restore Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj
+          dotnet restore Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj
+      - name: Build all targets
+        run: |
+          dotnet build Alis.Reactive/Alis.Reactive.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj -c Release --no-restore
+      - name: Pack NuGet packages
+        run: |
+          dotnet pack Alis.Reactive/Alis.Reactive.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj -c Release --no-build -o ./nupkgs
+      - run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

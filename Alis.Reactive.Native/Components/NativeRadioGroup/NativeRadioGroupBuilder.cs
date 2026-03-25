@@ -3,8 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Mvc.Html;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Components
 {
@@ -21,9 +27,15 @@ namespace Alis.Reactive.Native.Components
     ///           .OptionCssClass("flex items-start gap-3 p-3 rounded-lg border cursor-pointer")
     ///           .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
     /// </summary>
+#if NET48
+    public class NativeRadioGroupBuilder<TModel, TProp> : IHtmlString
+    {
+        private readonly HtmlHelper<TModel> _html;
+#else
     public class NativeRadioGroupBuilder<TModel, TProp> : IHtmlContent
     {
         private readonly IHtmlHelper<TModel> _html;
+#endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
         private readonly string _bindingPath;
@@ -31,12 +43,20 @@ namespace Alis.Reactive.Native.Components
         private string _cssClass = "flex flex-col gap-2";
         private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
 
+#if NET48
+        internal NativeRadioGroupBuilder(HtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+#else
         internal NativeRadioGroupBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+#endif
         {
             _html = html;
             _expression = expression;
             _elementId = IdGenerator.For<TModel, TProp>(expression);
+#if NET48
+            _bindingPath = ExpressionHelper.GetExpressionText(expression);
+#else
             _bindingPath = html.NameFor(expression);
+#endif
         }
 
         /// <summary>The resolved element ID — used by .Reactive() to wire events.</summary>
@@ -91,9 +111,24 @@ namespace Alis.Reactive.Native.Components
             return this;
         }
 
+#if NET48
+        public string ToHtmlString()
+        {
+            using (var sw = new StringWriter())
+            {
+                WriteTo(sw, HtmlEncoder.Default);
+                return sw.ToString();
+            }
+        }
+#endif
+
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
+#if NET48
+            var modelValue = _html.Value(ExpressionHelper.GetExpressionText(_expression))?.ToString() ?? "";
+#else
             var modelValue = _html.ValueFor(_expression, "{0}")?.ToString() ?? "";
+#endif
 
             var encodedId = encoder.Encode(_elementId);
 
@@ -115,8 +150,13 @@ namespace Alis.Reactive.Native.Components
 
                 // Radio input via Html.RadioButtonFor for MVC strong binding
                 var attrs = new Dictionary<string, object> { ["id"] = radioId };
+#if NET48
+                var radioHtml = System.Web.Mvc.Html.InputExtensions.RadioButtonFor(_html, _expression, option.Value, attrs);
+                writer.Write(radioHtml.ToHtmlString());
+#else
                 var radioHtml = _html.RadioButtonFor(_expression, option.Value, attrs);
                 radioHtml.WriteTo(writer, HtmlEncoder.Default);
+#endif
 
                 // Text block — flex-col stacks label above description
                 writer.Write("<div class=\"flex flex-col\">");
