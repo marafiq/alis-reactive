@@ -53,7 +53,7 @@ describe("when coercing values", () => {
       }
     });
 
-    it("throws on plain object — exposes misconfigured plan immediately", () => {
+    it("returns Err on plain object — exposes misconfigured plan immediately", () => {
       expect(toString({ name: "John" }).ok).toBe(false);
     });
 
@@ -167,7 +167,7 @@ describe("when coercing values", () => {
       expect(toBoolean(1)).toEqual({ ok: true, value: true });
     });
 
-    it("throws on plain object — fail-fast for misconfigured plan", () => {
+    it("returns Err on plain object — fail-fast for misconfigured plan", () => {
       expect(toBoolean({}).ok).toBe(false);
     });
 
@@ -281,7 +281,7 @@ describe("when coercing values", () => {
       expect(toArray(42)).toEqual({ ok: true, value: [42] });
     });
 
-    it("throws on plain object — walk should decompose via readExpr", () => {
+    it("returns Err on plain object — walk should decompose via readExpr", () => {
       expect(toArray({ a: 1 }).ok).toBe(false);
     });
 

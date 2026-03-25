@@ -1,5 +1,4 @@
 export * from "./context";
-export type { CoercionType } from "../core/coerce";
 export * from "./sources";
 export * from "./validation";
 export * from "./guards";

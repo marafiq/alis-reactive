@@ -1,8 +1,5 @@
 import type { Vendor } from "../types";
 import { walk } from "../core/walk";
-import { scope } from "../core/trace";
-
-const _log = scope("component");
 
 /**
  * Resolves the vendor-specific root object for a component.

@@ -103,8 +103,11 @@ export function ruleFails(
   peerReader: PeerReader
 ): boolean {
   const strResult = toString(value);
+  // toString Err (plain object) → treat as empty. Required rule will catch it.
+  // Validation domain: empty array = no value (toString returns "[]" not "").
   const str = strResult.ok ? strResult.value : "";
   const empty = value == null || str === "" || value === false
+    || !strResult.ok
     || (Array.isArray(value) && value.length === 0);
 
   switch (rule.rule) {

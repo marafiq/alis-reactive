@@ -1,5 +1,5 @@
-import type { Command, MutateEventCommand, MethodArg, ExecContext } from "../types";
-import { mutateElement } from "./element";
+import type { Command, MutateEventCommand, ExecContext } from "../types";
+import { mutateElement, resolveArg } from "./element";
 import { evaluateGuard, isConfirmGuard } from "../conditions/conditions";
 import { showServerErrors } from "../validation";
 import { injectHtml } from "./inject";
@@ -9,17 +9,6 @@ import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
 
 const log = scope("command");
-
-function resolveMethodArg(arg: MethodArg, ctx?: ExecContext): unknown {
-  switch (arg.kind) {
-    case "literal": return arg.value;
-    case "source": {
-      const raw = resolveSource(arg.source, ctx);
-      return arg.coerce ? coerceOrThrow(raw, arg.coerce) : raw;
-    }
-    default: assertNever(arg, "method arg kind");
-  }
-}
 
 function executeMutateEvent(cmd: MutateEventCommand, ctx: ExecContext): void {
   if (!ctx?.evt) throw new Error("[alis] mutate-event requires event context — was this command used outside an event handler?");
@@ -33,7 +22,7 @@ function executeMutateEvent(cmd: MutateEventCommand, ctx: ExecContext): void {
       break;
     }
     case "call": {
-      const resolved = (m.args ?? []).map(a => resolveMethodArg(a, ctx));
+      const resolved = (m.args ?? []).map(a => resolveArg(a, ctx));
       log.trace("mutate-event", { method: m.method, args: resolved });
       (ctx.evt as any)[m.method](...resolved);
       break;

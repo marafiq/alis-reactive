@@ -7,7 +7,8 @@ import { assertNever } from "../core/assert-never";
 
 const log = scope("element");
 
-function resolveArg(arg: MethodArg, ctx?: ExecContext): unknown {
+/** Resolves a method argument — literal pass-through, source with optional coercion. */
+export function resolveArg(arg: MethodArg, ctx?: ExecContext): unknown {
   switch (arg.kind) {
     case "literal": return arg.value;
     case "source": {

@@ -128,15 +128,15 @@ Zero runtime changes. `resolveRoot` is the vendor-neutral execution layer.
 
 **Source binding (BindExpr):** `value` provides a static val. `source` provides a BindExpr
 (dot-notation path into execution context) — resolved at runtime via `resolver.ts`.
-The runtime resolves: `source` present → `resolveToString(source, ctx)` → val. Otherwise → `value`.
+The runtime resolves: `source` present → `resolveSourceAs(source, coerceAs, ctx)` → val. Otherwise → `value`.
 
 C# DSL: `p.Element("x").SetText(payload, x => x.Address.City)` →
 `ExpressionPathHelper` converts the expression to `"evt.address.city"`.
 
-**Resolver (reusable module):** `resolver.ts` exports `resolve()`, `resolveAs()`, `resolveToString()`,
-and `coerce()`. Coercion types: `string` (null→""), `number` (NaN→0), `boolean` ("false"→false), `raw`.
-Schema defines `BindExpr` and `CoercionType` as reusable `$defs`. This module will be used by
-the Conditions module for guard evaluation, not just DOM mutations.
+**Resolver (reusable module):** `resolver.ts` exports `resolveSource()`, `resolveEventPath()`,
+and `resolveSourceAs()`. Coercion is in `core/coerce.ts` — returns `CoerceResult<T>` (never throws).
+Coercion types: `string`, `number`, `boolean`, `date`, `raw`, `array`.
+Schema defines `CoercionType` as reusable `$defs`.
 
 ### Layer 3: JS Runtime (Plan Executor)
 
@@ -151,7 +151,7 @@ ESM module bundled by esbuild. The runtime reads the plan JSON and executes it. 
 | `Scripts/trigger.ts` | `wireTrigger()` — wires dom-ready and custom-event listeners |
 | `Scripts/execute.ts` | `executeReaction()` → `executeCommand()` — dispatch to command handlers |
 | `Scripts/element.ts` | `mutateElement()` — resolves element by ID, executes mutation action |
-| `Scripts/resolver.ts` | `resolve()`, `resolveAs()`, `resolveToString()`, `coerce()` — BindExpr dot-path resolution with type coercion |
+| `Scripts/resolver.ts` | `resolveSource()`, `resolveEventPath()`, `resolveSourceAs()` — source resolution + coercion via `core/coerce.ts` |
 | `Scripts/trace.ts` | `scope()`, `setLevel()` — deterministic single-string trace output |
 | `Scripts/types.ts` | TypeScript interfaces mirroring the JSON plan schema |
 
@@ -248,7 +248,7 @@ resolver functions and test every edge case in isolation.
 | `when-dispatching-a-custom-event-with-payload.test.ts` | All primitive types survive serialization |
 | `when-mutating-an-element.test.ts` | All 7 mutate actions + mixed chains |
 | `when-resolving-payload-source.test.ts` | Source dot-path resolution via boot(): flat int/string/bool, nested, missing path fallback |
-| `when-resolving-bind-expr.test.ts` | Direct resolve()/resolveAs()/resolveToString() tests: flat/nested/edge cases, condition-ready patterns (numeric, presence, truthiness, emptiness, text, range) |
+| `when-resolving-bind-expr.test.ts` | Direct resolveEventPath() + toString() Result tests: flat/nested/edge cases, condition-ready patterns (numeric, presence, truthiness, emptiness, text, range) |
 | `when-coercing-resolved-values.test.ts` | Direct coerce() tests: all 4 types (string, number, boolean, raw) with every boundary value |
 | `when-using-unified-call-mutations.test.ts` | Unified call mutation: void, literal, source, multi-arg, mixed, component source, per-arg coerce |
 
