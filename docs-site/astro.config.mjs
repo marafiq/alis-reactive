@@ -111,6 +111,8 @@ export default defineConfig({
 								{ label: 'Plan Composition', slug: 'architecture/plan-composition' },
 							],
 						},
+						{ label: 'Onboarding a Component', slug: 'architecture/onboarding-component' },
+						{ label: 'Creating a Sandbox Demo', slug: 'architecture/sandbox-demo' },
 					],
 				},
 				{
