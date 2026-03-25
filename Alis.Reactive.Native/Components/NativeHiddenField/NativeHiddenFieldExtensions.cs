@@ -17,6 +17,15 @@ namespace Alis.Reactive.Native.Components
             return self.Emit(new SetPropMutation("value"), value: value);
         }
 
+        // ── Property Write (component source — cross-plan value binding) ──
+
+        public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel>(
+            this ComponentRef<NativeHiddenField, TModel> self, TypedComponentSource<string> source)
+            where TModel : class
+        {
+            return self.Emit(new SetPropMutation("value"), source: source.ToBindSource());
+        }
+
         // ── Property Write (response body) ──
 
         public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel, TResponse>(

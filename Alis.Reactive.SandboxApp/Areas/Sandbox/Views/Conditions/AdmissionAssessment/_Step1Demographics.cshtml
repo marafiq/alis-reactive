@@ -67,6 +67,10 @@
                 {
                     var diag = p.Component<FusionDropDownList>(m => m.PrimaryDiagnosis);
 
+                    // Cross-step: sync diagnosis to Step 2's hidden field
+                    p.Component<NativeHiddenField, Step2ClinicalModel>(m => m.PrimaryDiagnosis)
+                        .SetValue(diag.Value());
+
                     p.When(diag.Value()).In("Alzheimer's", "Parkinson's")
                         .Then(t => t.Element("cognitive-section").Show())
                         .Else(e => e.Element("cognitive-section").Hide());
