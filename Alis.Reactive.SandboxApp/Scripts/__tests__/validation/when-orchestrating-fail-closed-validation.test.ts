@@ -232,6 +232,34 @@ describe("When an enriched field is missing from DOM but all rules have when con
 
     expect(validate(desc("form", [missingField]))).toBe(true);
   });
+
+  it("blocks when condition field IS present and true but validated field is missing", () => {
+    // HasPacemaker IS in the DOM (checkbox, checked = true).
+    // PacemakerModel is NOT in the DOM.
+    // Condition evaluates to true → field SHOULD exist but doesn't → block.
+    (document.getElementById("IsVet") as HTMLInputElement).checked = true;
+
+    const condField = field({
+      fieldName: "HasPacemaker", fieldId: "IsVet", // reuse IsVet checkbox as stand-in
+      vendor: "native", readExpr: "checked", rules: [],
+    });
+    const missingField = enrichedField("PacemakerModel_MISSING", [
+      { rule: "required", message: "Model required",
+        when: { field: "HasPacemaker", op: "truthy" } },
+    ]);
+
+    // Condition is TRUE (checked), field missing → MUST block
+    expect(validate(desc("form", [condField, missingField]))).toBe(false);
+  });
+
+  it("blocks when field is missing with an unconditional rule", () => {
+    // Field missing + no when condition = must block (fail-closed)
+    const missingField = enrichedField("RequiredField_MISSING", [
+      { rule: "required", message: "Field required" },
+    ]);
+
+    expect(validate(desc("form", [missingField]))).toBe(false);
+  });
 });
 
 // ══════════════════════════════════════════════════════════
