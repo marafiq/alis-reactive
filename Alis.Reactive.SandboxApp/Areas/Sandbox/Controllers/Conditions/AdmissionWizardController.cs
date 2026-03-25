@@ -101,36 +101,41 @@ public class AdmissionWizardController : Controller
     public IActionResult LoadStep([FromBody] LoadStepRequest request)
     {
         SetDataSources();
-        ViewBag.ScreeningId = request.ScreeningId;
+        var id = request.ScreeningId ?? "";
+        ViewBag.ScreeningId = id;
         ViewBag.CurrentStep = request.Step;
 
         return request.Step switch
         {
             1 => PartialView(ViewBase + "_Step1Content.cshtml",
-                Step1Drafts.TryGetValue(request.ScreeningId, out var s1) ? s1 : new Step1DemographicsModel()),
-            2 => LoadStep2Partial(request.ScreeningId),
-            3 => LoadStep3Partial(request.ScreeningId),
+                !string.IsNullOrEmpty(id) && Step1Drafts.TryGetValue(id, out var s1) ? s1 : new Step1DemographicsModel()),
+            2 => LoadStep2Partial(id),
+            3 => LoadStep3Partial(id),
             _ => BadRequest("Invalid step")
         };
     }
 
-    private IActionResult LoadStep2Partial(string screeningId)
+    private IActionResult LoadStep2Partial(string id)
     {
-        Step1Drafts.TryGetValue(screeningId, out var step1);
-        var model = Step2Drafts.TryGetValue(screeningId, out var draft)
-            ? draft : new Step2ClinicalModel();
-        model.ScreeningId = screeningId;
+        Step1DemographicsModel? step1 = null;
+        if (!string.IsNullOrEmpty(id)) Step1Drafts.TryGetValue(id, out step1);
+        Step2ClinicalModel? draft = null;
+        if (!string.IsNullOrEmpty(id)) Step2Drafts.TryGetValue(id, out draft);
+        var model = draft ?? new Step2ClinicalModel();
+        model.ScreeningId = id;
         model.PrimaryDiagnosis = step1?.PrimaryDiagnosis ?? "";
         model.ResidentName = step1?.ResidentName ?? "";
         return PartialView(ViewBase + "_Step2Content.cshtml", model);
     }
 
-    private IActionResult LoadStep3Partial(string screeningId)
+    private IActionResult LoadStep3Partial(string id)
     {
-        Step1Drafts.TryGetValue(screeningId, out var step1);
-        var model = Step3Drafts.TryGetValue(screeningId, out var draft)
-            ? draft : new Step3FunctionalModel();
-        model.ScreeningId = screeningId;
+        Step1DemographicsModel? step1 = null;
+        if (!string.IsNullOrEmpty(id)) Step1Drafts.TryGetValue(id, out step1);
+        Step3FunctionalModel? draft = null;
+        if (!string.IsNullOrEmpty(id)) Step3Drafts.TryGetValue(id, out draft);
+        var model = draft ?? new Step3FunctionalModel();
+        model.ScreeningId = id;
         model.Age = step1?.Age ?? 0;
         model.ResidentName = step1?.ResidentName ?? "";
         return PartialView(ViewBase + "_Step3Content.cshtml", model);
