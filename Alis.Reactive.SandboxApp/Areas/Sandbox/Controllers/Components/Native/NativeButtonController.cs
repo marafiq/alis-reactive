@@ -8,7 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
     public class NativeButtonController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             return View("~/Areas/Sandbox/Views/Components/Native/NativeButton/Index.cshtml", new NativeButtonModel());

@@ -17,7 +17,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         private static HashSet<int> _deletedNativeActionLinkRows = new HashSet<int>();
 
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             ResetNativeActionLinkRows();

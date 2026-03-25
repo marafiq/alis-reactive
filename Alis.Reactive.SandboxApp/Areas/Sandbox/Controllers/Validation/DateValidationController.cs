@@ -8,7 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     public class DateValidationController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             return View("~/Areas/Sandbox/Views/Validation/DateRules/Index.cshtml", new DateValidationModel());

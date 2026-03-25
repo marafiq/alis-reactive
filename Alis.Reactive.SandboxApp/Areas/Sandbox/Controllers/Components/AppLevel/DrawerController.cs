@@ -8,7 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
     public class DrawerController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             return View("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/Index.cshtml", new DrawerModel());

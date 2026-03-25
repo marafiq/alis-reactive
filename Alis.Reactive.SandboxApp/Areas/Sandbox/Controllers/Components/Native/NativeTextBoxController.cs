@@ -8,7 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
     public class NativeTextBoxController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             return View("~/Areas/Sandbox/Views/Components/Native/NativeTextBox/Index.cshtml", new NativeTextBoxModel());

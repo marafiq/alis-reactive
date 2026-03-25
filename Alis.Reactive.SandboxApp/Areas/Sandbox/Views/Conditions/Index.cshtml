@@ -6,7 +6,7 @@
 <p class="text-text-secondary mb-8">Guard evaluation and branching</p>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <a href="/Sandbox/Conditions/Guards"
+    <a asp-area="Sandbox" asp-controller="Conditions" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -15,11 +15,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            All 20 operators, AND/OR composition, NOT inversion, per-action When guards
+            Interactive demo of all 20 condition operators, AND/OR/NOT composition, Confirm dialog, and per-action When guards — click buttons to see guards evaluate
         </p>
     </a>
 
-    <a href="/Sandbox/Conditions/HttpMixing"
+    <a asp-area="Sandbox" asp-controller="HttpMixing" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -28,11 +28,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Conditions compose freely with HTTP blocks: after, between, inside OnSuccess/OnError, ElseIf chains, And guards
+            Conditions interleaved with HTTP requests: guards after POST, guards between chained requests, branching on success/error responses
         </p>
     </a>
 
-    <a href="/Sandbox/Conditions/NumericCondition"
+    <a asp-area="Sandbox" asp-controller="NumericCondition" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -41,11 +41,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Conditions with FusionNumericTextBox: simple Gt, ElseIf ladder, AND compound, cross-component source-vs-source
+            Type a number and watch conditions react: simple Gt threshold, ElseIf severity ladder, AND compound guards, cross-component source-vs-source comparisons
         </p>
     </a>
 
-    <a href="/Sandbox/Conditions/VitalsAlert"
+    <a asp-area="Sandbox" asp-controller="VitalsAlert" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -54,11 +54,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Condition-gated HTTP: comp.Value() > threshold → POST alert, ElseIf severity tiers, command sandwich
+            Enter vitals and see condition-gated HTTP fire: systolic > 140 posts a hypertension alert, severity tiers escalate, DOM updates wrap the request lifecycle
         </p>
     </a>
 
-    <a href="/Sandbox/Conditions/CareLevelCascade"
+    <a asp-area="Sandbox" asp-controller="CareLevelCascade" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -67,11 +67,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Condition → component mutation: dropdown cascade (SetValue), cross-component (SetChecked on switch), In() operator
+            Select a care level and watch components react: dropdown cascades set values, cross-component switch toggles, In() operator matches multiple values
         </p>
     </a>
 
-    <a href="/Sandbox/Conditions/AdmissionAssessment"
+    <a asp-area="Sandbox" asp-controller="AdmissionAssessment" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -80,7 +80,20 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Flagship: 4-step wizard, 33 fields, 17 conditions, 12 HTTP endpoints, 6 partials, validation
+            Single-page flagship: 33 fields across 6 partials, 17 reactive conditions showing/hiding sections, 12 HTTP endpoints, full validation — fill out a resident admission form
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="AdmissionWizard" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+        <div class="flex items-start justify-between">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                Admission Wizard
+            </h3>
+            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+        </div>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            4-step server-side wizard: navigate forward/back with draft persistence, each step validates before advancing, final submit validates all steps together
         </p>
     </a>
 </div>

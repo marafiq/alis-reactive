@@ -7,7 +7,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.
     public class TestWidgetController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             return View("~/Areas/Sandbox/Views/AllModulesTogether/TestWidget/Index.cshtml");

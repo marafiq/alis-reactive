@@ -8,7 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.
     public class IdGeneratorController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             return View("~/Areas/Sandbox/Views/AllModulesTogether/IdGenerator/Index.cshtml", new IdGeneratorModel

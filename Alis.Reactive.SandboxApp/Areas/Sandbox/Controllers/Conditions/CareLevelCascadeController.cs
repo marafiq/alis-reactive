@@ -8,7 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 public class CareLevelCascadeController : Controller
 {
     [HttpGet("")]
-    [HttpGet("Index")]
     public IActionResult Index()
     {
         ViewBag.CareLevels = new List<string>
