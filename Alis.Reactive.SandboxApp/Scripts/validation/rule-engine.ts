@@ -45,11 +45,12 @@ function failsComparisonRule(
 ): boolean {
   const target = resolveTarget(rule, peerReader);
   if (target === undefined) return true;
+  const cmp = compareValues(value, target, rule.coerceAs);
   switch (rule.rule) {
-    case "min": return !empty && compareValues(value, target, rule.coerceAs) < 0;
-    case "max": return !empty && compareValues(value, target, rule.coerceAs) > 0;
-    case "gt":  return empty || compareValues(value, target, rule.coerceAs) <= 0;
-    case "lt":  return !empty && compareValues(value, target, rule.coerceAs) >= 0;
+    case "min": return !empty && (Number.isNaN(cmp) || cmp < 0);
+    case "max": return !empty && (Number.isNaN(cmp) || cmp > 0);
+    case "gt":  return empty || Number.isNaN(cmp) || cmp <= 0;
+    case "lt":  return !empty && (Number.isNaN(cmp) || cmp >= 0);
     default:    return true;
   }
 }
@@ -59,13 +60,14 @@ function failsRangeRule(
 ): boolean {
   const [lo, hi] = rule.constraint as [unknown, unknown];
   if (empty) return false;
+  const cmpLo = compareValues(value, lo, rule.coerceAs);
+  const cmpHi = compareValues(value, hi, rule.coerceAs);
+  if (Number.isNaN(cmpLo) || Number.isNaN(cmpHi)) return true; // NaN → fail closed
   if (rule.rule === "range") {
-    return compareValues(value, lo, rule.coerceAs) < 0
-        || compareValues(value, hi, rule.coerceAs) > 0;
+    return cmpLo < 0 || cmpHi > 0;
   }
   // exclusiveRange
-  return compareValues(value, lo, rule.coerceAs) <= 0
-      || compareValues(value, hi, rule.coerceAs) >= 0;
+  return cmpLo <= 0 || cmpHi >= 0;
 }
 
 function failsEqualityRule(

@@ -630,22 +630,19 @@ describe("When comparison rule is missing coerceAs", () => {
 // ── NaN handling (invalid values with coercion) ──────────
 
 describe("When invalid value is coerced for date comparison", () => {
-  it("min with invalid date string coerces to NaN, comparison is false (skips empty check already passed)", () => {
-    // "not-a-date" is not empty, toDate returns NaN, NaN < constraint is false → passes
-    // This is by design: non-date strings in a date field pass comparison rules.
-    // The "required" rule catches truly missing values.
+  it("min with invalid date string coerces to NaN — fails closed", () => {
+    // "not-a-date" is not empty, toDate returns NaN → NaN fail-closed → fails
     expect(ruleFails(
       rule({ rule: "min", constraint: "2020-01-01", coerceAs: "date" }),
       "not-a-date", noPeers
-    )).toBe(false);
+    )).toBe(true);
   });
-  it("gt with invalid date string fails (gt implies required, empty check catches NaN)", () => {
-    // "not-a-date" is not empty, so gt checks: compareValues returns NaN,
-    // NaN <= 0 is false → returns false → passes. Consistent with min behavior.
+  it("gt with invalid date string fails closed (NaN)", () => {
+    // "not-a-date" is not empty, compareValues returns NaN → fail closed
     expect(ruleFails(
       rule({ rule: "gt", constraint: "2020-01-01", coerceAs: "date" }),
       "not-a-date", noPeers
-    )).toBe(false);
+    )).toBe(true);
   });
 });
 
