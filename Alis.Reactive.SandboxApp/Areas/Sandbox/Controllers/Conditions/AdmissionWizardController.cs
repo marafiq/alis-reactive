@@ -55,7 +55,8 @@ public class AdmissionWizardController : Controller
         CollectErrors(new Step1Validator().Validate(model), errors);
         if (errors.Count > 0) return BadRequest(new { errors });
 
-        var id = NewScreeningId();
+        var id = string.IsNullOrEmpty(model.ScreeningId) ? NewScreeningId() : model.ScreeningId;
+        model.ScreeningId = id;
         Step1Drafts[id] = model;
         return Ok(new SaveStepResponse { ScreeningId = id, Message = $"Step 1 saved for {model.ResidentName}" });
     }
