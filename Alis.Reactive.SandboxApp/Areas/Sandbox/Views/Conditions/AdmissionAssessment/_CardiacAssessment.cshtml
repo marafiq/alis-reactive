@@ -73,35 +73,6 @@
         </div>
     </div>
 
-    <!-- Save Cardiac Assessment -->
-    <div class="mt-4 flex items-center gap-3">
-        @(Html.NativeButton("save-cardiac-btn", "Save Cardiac Assessment")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Element("save-cardiac-spinner").Show();
-                p.Element("save-cardiac-text").Hide();
-                p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveCardiac",
-                    g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.SystolicBP)
-                          .Include<FusionSwitch, Step2ClinicalModel>(m => m.HasPacemaker)
-                          .Include<NativeTextBox, Step2ClinicalModel>(m => m.PacemakerModel)
-                          .Include<FusionDatePicker, Step2ClinicalModel>(m => m.LastDeviceCheck))
-                 .Response(r => r.OnSuccess<SaveSectionResponse>((json, s) =>
-                 {
-                     s.Component<NativeHiddenField>(m => m.CardiacAssessmentId).SetValue(json, x => x.Id);
-                     s.Element("cardiac-save-status").SetText(json, x => x.Message);
-                     s.Element("cardiac-save-status").Show();
-                     s.Element("save-cardiac-spinner").Hide();
-                     s.Element("save-cardiac-text").Show();
-                 }));
-            }))
-        <span id="save-cardiac-spinner" hidden class="text-accent text-sm">Saving...</span>
-        <span id="save-cardiac-text"></span>
-    </div>
-    <div class="font-mono text-sm mt-2">
-        <span id="cardiac-id-echo" hidden></span>
-        <span id="cardiac-save-status" hidden class="text-emerald-600"></span>
-    </div>
 </native-card-body></native-card>
 
 @Html.RenderPlan(plan)

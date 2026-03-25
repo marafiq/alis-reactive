@@ -18,13 +18,10 @@
         Each section can be saved independently.
     </p>
 
-    <!-- Hidden fields: cross-step data from Step 1 -->
+    <!-- Hidden fields: cross-step data + auto-populated by conditions -->
     @Html.HiddenFieldFor(plan, m => m.PrimaryDiagnosis)
     @Html.HiddenFieldFor(plan, m => m.ResidentName)
     @Html.HiddenFieldFor(plan, m => m.CareUnit)
-    @Html.HiddenFieldFor(plan, m => m.CognitiveAssessmentId)
-    @Html.HiddenFieldFor(plan, m => m.CardiacAssessmentId)
-    @Html.HiddenFieldFor(plan, m => m.DiabetesAssessmentId)
 
     <!-- Conditional clinical sections (visibility set by Step 1 diagnosis dropdown targeting these element IDs cross-plan) -->
     <div id="cognitive-section" hidden>

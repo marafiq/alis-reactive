@@ -95,6 +95,16 @@ public class AdmissionAssessmentController : Controller
     public async Task<IActionResult> SaveStep2([FromBody] Step2ClinicalModel model)
     {
         await Task.Delay(200);
+
+        // Generate assessment IDs based on diagnosis
+        var ts = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        if (model.PrimaryDiagnosis is "Alzheimer's" or "Parkinson's" && model.CognitiveScore > 0)
+            model.CognitiveAssessmentId = $"COG-{ts}";
+        if (model.PrimaryDiagnosis == "Heart Disease" && model.SystolicBP > 0)
+            model.CardiacAssessmentId = $"CAR-{ts}";
+        if (model.PrimaryDiagnosis == "Diabetes" && !string.IsNullOrEmpty(model.DiabetesType))
+            model.DiabetesAssessmentId = $"DIA-{ts}";
+
         var id = EnsureScreeningId(null);
         Step2Drafts[id] = model;
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 2 saved" });
@@ -224,39 +234,6 @@ public class AdmissionAssessmentController : Controller
     }
 
     // ── POST Save section endpoints (3) — within Step 2 ─────────────────────
-
-    [HttpPost("SaveCognitive")]
-    public async Task<IActionResult> SaveCognitive([FromBody] Step2ClinicalModel model)
-    {
-        await Task.Delay(800);
-        return Ok(new SaveSectionResponse
-        {
-            Id = $"COG-{DateTime.UtcNow:yyyyMMddHHmmss}",
-            Message = "Cognitive assessment saved"
-        });
-    }
-
-    [HttpPost("SaveCardiac")]
-    public async Task<IActionResult> SaveCardiac([FromBody] Step2ClinicalModel model)
-    {
-        await Task.Delay(600);
-        return Ok(new SaveSectionResponse
-        {
-            Id = $"CAR-{DateTime.UtcNow:yyyyMMddHHmmss}",
-            Message = "Cardiac assessment saved"
-        });
-    }
-
-    [HttpPost("SaveDiabetes")]
-    public async Task<IActionResult> SaveDiabetes([FromBody] Step2ClinicalModel model)
-    {
-        await Task.Delay(700);
-        return Ok(new SaveSectionResponse
-        {
-            Id = $"DIA-{DateTime.UtcNow:yyyyMMddHHmmss}",
-            Message = "Diabetes assessment saved"
-        });
-    }
 
     // ── POST Submit ───────────────────────────────────────────────────────────
 
