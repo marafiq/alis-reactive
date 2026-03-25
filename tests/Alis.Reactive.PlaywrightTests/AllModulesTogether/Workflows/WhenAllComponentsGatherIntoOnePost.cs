@@ -302,8 +302,13 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-appointment-time"))
             .ToContainTextAsync(year, new() { Timeout = 5000 });
-        await Expect(Page.Locator("#echo-stay-start"))
-            .ToContainTextAsync(year, new() { Timeout = 5000 });
+        // DateRangePicker: StayPeriod is DateTime[] — echo shows JSON array of date strings
+        var stayEcho = Page.Locator("#echo-stay-start");
+        await Expect(stayEcho).ToContainTextAsync(year, new() { Timeout = 5000 });
+        // Verify both dates are present (array has 2 elements, both contain the year)
+        var stayText = await stayEcho.TextContentAsync();
+        Assert.That(stayText, Does.Contain(","),
+            "StayPeriod echo must contain two dates (comma-separated in JSON array)");
         AssertNoConsoleErrors();
     }
 
