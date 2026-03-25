@@ -44,7 +44,8 @@ namespace Alis.Reactive
                 if (existing.ComponentId == entry.ComponentId
                     && existing.Vendor == entry.Vendor
                     && existing.ReadExpr == entry.ReadExpr
-                    && existing.ComponentType == entry.ComponentType)
+                    && existing.ComponentType == entry.ComponentType
+                    && existing.CoerceAs == entry.CoerceAs)
                     return;
 
                 throw new InvalidOperationException(
