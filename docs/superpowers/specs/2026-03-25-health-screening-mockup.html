@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Screening — Form Mockup</title>
+<style>
+  :root { --bg: #f8f9fa; --card: #fff; --border: #e2e8f0; --accent: #7A2E3B; --muted: #94a3b8; --text: #1e293b; --green: #16a34a; --amber: #d97706; --rose: #e11d48; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 24px; max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--accent); }
+  h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); margin-bottom: 24px; font-size: 14px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .card.nested { border-left: 3px solid var(--accent); margin-left: 16px; background: #fefefe; }
+  .card.nested-2 { border-left: 3px solid var(--amber); margin-left: 16px; }
+  .card.hidden-section { opacity: 0.35; border-style: dashed; }
+  .card.http-partial { border-left: 3px solid var(--green); margin-left: 16px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 12px; font-weight: 500; color: var(--muted); }
+  .field input, .field select { border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-size: 14px; background: #fff; }
+  .field input:disabled, .field select:disabled { background: #f1f5f9; }
+  .toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .toggle { width: 40px; height: 22px; background: #cbd5e1; border-radius: 11px; position: relative; cursor: pointer; }
+  .toggle.on { background: var(--accent); }
+  .toggle::after { content: ''; width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: .2s; }
+  .toggle.on::after { left: 20px; }
+  .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-lg { padding: 12px 24px; font-size: 15px; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .tag-condition { background: #ede9fe; color: #7c3aed; }
+  .tag-http { background: #dcfce7; color: #16a34a; }
+  .tag-partial { background: #fef3c7; color: #d97706; }
+  .tag-hidden { background: #f1f5f9; color: #64748b; }
+  .tag-gather { background: #dbeafe; color: #2563eb; }
+  .tag-validate { background: #fce7f3; color: #db2777; }
+  .condition-arrow { color: var(--accent); font-weight: 600; font-size: 12px; margin: 8px 0; }
+  .progress-bar { display: flex; gap: 4px; margin-bottom: 16px; }
+  .progress-dot { width: 32px; height: 6px; border-radius: 3px; background: #e2e8f0; }
+  .progress-dot.done { background: var(--green); }
+  .progress-dot.active { background: var(--accent); }
+  .hidden-field { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 6px; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
+  .hidden-field .value { font-family: monospace; color: var(--text); }
+  .annotation { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 4px; }
+  .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8fafc; border-radius: 8px; margin-bottom: 16px; }
+  .save-status { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .save-status .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-saved { background: var(--green); }
+  .dot-pending { background: var(--amber); }
+  .dot-empty { background: #e2e8f0; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; }
+  .error-msg { color: var(--rose); font-size: 12px; margin-top: 2px; }
+  .server-response { padding: 10px 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; font-size: 13px; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<h1>Resident Admission — Health Screening</h1>
+<p class="subtitle">Nurse completes this assessment during move-in. Sections appear based on answers. Each section saves independently.</p>
+
+<!-- Progress -->
+<div class="status-bar">
+  <div style="display:flex;gap:12px;align-items:center;">
+    <strong style="font-size:13px;">Progress</strong>
+    <div class="progress-bar">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+  </div>
+  <div style="font-size:13px;">
+    <span id="sections-saved" style="font-weight:600;color:var(--green);">2</span> / <span id="sections-total">5</span> sections saved
+    <span class="tag tag-http" style="margin-left:8px;">GET /Progress — updates on each save</span>
+  </div>
+</div>
+
+<!-- Hidden Fields (populated by partial save responses) -->
+<div class="card" style="background:#f8fafc;">
+  <h3>Hidden Fields <span class="tag tag-hidden">auto-populated by save responses</span></h3>
+  <div class="hidden-field">CognitiveAssessmentId: <span class="value">COG-2026-001</span> <span class="tag tag-gather">included in final Submit</span></div>
+  <div class="hidden-field">CardiacAssessmentId: <span class="value">(empty)</span></div>
+  <div class="hidden-field">DiabetesAssessmentId: <span class="value">(empty)</span></div>
+  <div class="hidden-field">SectionsCompleted: <span class="value">2</span> <span class="tag tag-http">set by GET /Progress response</span></div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION A: Demographics (always visible)        -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="flex-between">
+    <h2>A. Demographics</h2>
+    <div class="save-status"><div class="dot dot-saved"></div> Saved</div>
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <label>Resident Name <span style="color:var(--rose)">*</span></label>
+      <input type="text" value="Margaret Johnson" />
+    </div>
+    <div class="field">
+      <label>Age <span class="tag tag-condition">→ Risk Tier ElseIf</span></label>
+      <input type="number" value="82" />
+      <div class="annotation">Gte(85) → High | Between(65,84) → Standard | Lt(65) → Low</div>
+    </div>
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <label>Primary Diagnosis <span class="tag tag-condition">→ drives form shape</span></label>
+      <select>
+        <option>Select...</option>
+        <option selected>Alzheimer's</option>
+        <option>Parkinson's</option>
+        <option>Heart Disease</option>
+        <option>Diabetes</option>
+        <option>Stroke</option>
+        <option>Other</option>
+      </select>
+      <div class="annotation">Eq/In → shows/hides entire nested sections below</div>
+    </div>
+    <div class="field">
+      <label>Risk Tier <span class="tag tag-hidden">auto-set by Age condition</span></label>
+      <select disabled><option>Standard</option></select>
+    </div>
+  </div>
+  <div class="toggle-row">
+    <div class="toggle on"></div>
+    <span>Is Veteran <span class="tag tag-condition">Truthy → show Veteran partial</span></span>
+  </div>
+
+  <!-- Veteran sub-section (same-model partial, shown when IsVeteran) -->
+  <div class="card nested">
+    <div class="flex-between">
+      <h3>Veteran Details <span class="tag tag-partial">@Html.Partial("_VeteranDetails", Model)</span></h3>
+    </div>
+    <div class="condition-arrow">When(IsVeteran).Truthy() → Show</div>
+    <div class="field-row">
+      <div class="field">
+        <label>VA ID <span style="color:var(--rose)">*</span> <span class="tag tag-validate">required when veteran</span></label>
+        <input type="text" value="VA-12345" />
+      </div>
+      <div class="field">
+        <label>Service Branch</label>
+        <select><option selected>Army</option></select>
+      </div>
+    </div>
+    <button class="btn btn-outline" style="margin-top:8px;">Verify VA Benefits <span class="tag tag-http">POST /VerifyVeteran</span></button>
+    <div class="server-response">VA benefits verified — eligible for enhanced coverage</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION B: Cognitive (partial — shown for Alz/Park) -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="flex-between">
+    <h2>B. Cognitive Assessment <span class="tag tag-partial">@Html.Partial("_CognitiveAssessment", Model)</span></h2>
+    <div class="save-status"><div class="dot dot-saved"></div> Saved</div>
+  </div>
+  <div class="condition-arrow">When(Diagnosis).In("Alzheimer's", "Parkinson's") → Show entire section</div>
+  <div class="field-row">
+    <div class="field">
+      <label>MMSE Cognitive Score (0-30) <span style="color:var(--rose)">*</span> <span class="tag tag-condition">→ Care Unit ElseIf</span></label>
+      <input type="number" value="12" />
+      <div class="annotation">Lt(15) → Memory Care | Between(15,24) → Assisted + Memory Support | Gte(25) → Standard</div>
+    </div>
+    <div class="field">
+      <label>Care Unit <span class="tag tag-hidden">auto-set by score</span></label>
+      <select disabled><option>Memory Care</option></select>
+    </div>
+  </div>
+  <div class="toggle-row">
+    <div class="toggle on"></div>
+    <span>Wanders <span class="tag tag-condition">Truthy → show frequency</span></span>
+  </div>
+
+  <!-- Level 3 nesting: Wander frequency -->
+  <div class="card nested-2">
+    <h3>Wander Details</h3>
+    <div class="condition-arrow">When(Wanders).Truthy() → Show</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Wander Frequency <span style="color:var(--rose)">*</span> <span class="tag tag-validate">required when wanders</span></label>
+        <select><option selected>Frequently</option></select>
+        <div class="annotation">Eq("Frequently") → POST /AlertElopementRisk</div>
+      </div>
+    </div>
+    <div class="condition-arrow">When(WanderFrequency).Eq("Frequently") → POST alert</div>
+    <div class="server-response">Elopement risk flagged — GPS tracker required <span class="tag tag-http">POST /AlertElopementRisk</span></div>
+  </div>
+
+  <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-success">Save Cognitive Assessment</button>
+    <span class="tag tag-http">POST /SaveCognitive</span>
+    <span class="tag tag-gather">Include: CognitiveScore, Wanders, WanderFrequency</span>
+  </div>
+  <div class="annotation">OnSuccess → HiddenField(CognitiveAssessmentId).SetValue(response.id)</div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION C: Cardiac (HIDDEN — diagnosis is Alzheimer's, not Heart Disease) -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="card hidden-section">
+  <div class="flex-between">
+    <h2>C. Cardiac Assessment <span class="tag tag-partial">@Html.Partial("_CardiacAssessment", Model)</span></h2>
+    <div class="save-status"><div class="dot dot-empty"></div> Hidden</div>
+  </div>
+  <div class="condition-arrow" style="color:var(--muted);">When(Diagnosis).Eq("Heart Disease") → Show — currently hidden</div>
+  <div class="field-row" style="opacity:0.5;">
+    <div class="field">
+      <label>Has Pacemaker <span class="tag tag-condition">→ show pacemaker details</span></label>
+      <div class="toggle"></div>
+    </div>
+    <div class="field">
+      <label>Systolic BP <span class="tag tag-condition">Gt(140) → POST hypertension flag</span></label>
+      <input type="number" disabled placeholder="mmHg" />
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION D: Diabetes (HIDDEN) -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="card hidden-section">
+  <div class="flex-between">
+    <h2>D. Diabetes Management <span class="tag tag-partial">@Html.Partial("_DiabetesManagement", Model)</span></h2>
+    <div class="save-status"><div class="dot dot-empty"></div> Hidden</div>
+  </div>
+  <div class="condition-arrow" style="color:var(--muted);">When(Diagnosis).Eq("Diabetes") → Show — currently hidden</div>
+  <div class="field-row" style="opacity:0.5;">
+    <div class="field"><label>Type</label><select disabled><option>Type 1 / Type 2</option></select></div>
+    <div class="field"><label>A1C Level <span class="tag tag-condition">Gt(9) → uncontrolled flag</span></label><input disabled /></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION E: Mobility & Falls (always visible)    -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="flex-between">
+    <h2>E. Mobility & Falls</h2>
+    <div class="save-status"><div class="dot dot-pending"></div> Unsaved</div>
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <label>Fall History <span class="tag tag-condition">In("1-2","3+") → show details</span></label>
+      <select><option selected>3+ falls</option></select>
+    </div>
+    <div class="field">
+      <label>Mobility Aid <span class="tag tag-condition">In("Walker","Wheelchair") → escort</span></label>
+      <select><option selected>Wheelchair</option></select>
+      <div class="annotation">Eq("Wheelchair") → POST /RequestRoomSetup</div>
+    </div>
+  </div>
+
+  <!-- Fall details (shown when falls > None) -->
+  <div class="card nested">
+    <h3>Fall Details <span class="tag tag-partial">@Html.Partial("_FallDetails", Model)</span></h3>
+    <div class="condition-arrow">When(FallHistory).In("1-2 falls", "3+ falls") → Show</div>
+    <div class="toggle-row">
+      <div class="toggle on"></div>
+      <span>Caused Injury <span class="tag tag-condition">Truthy → show injury type</span></span>
+    </div>
+    <div class="card nested-2">
+      <div class="condition-arrow">When(CausedInjury).Truthy() → Show</div>
+      <div class="field">
+        <label>Injury Type <span style="color:var(--rose)">*</span> <span class="tag tag-validate">required when injury</span></label>
+        <select><option selected>Head Injury</option></select>
+        <div class="annotation">Eq("Head Injury") → POST /AlertNeuro</div>
+      </div>
+      <div class="server-response">Neuro consult ordered <span class="tag tag-http">POST /AlertNeuro</span></div>
+    </div>
+  </div>
+
+  <!-- Compound condition: FallRisk + Age -->
+  <div class="field-row">
+    <div class="field">
+      <label>Fall Risk Score (0-10) <span class="tag tag-condition">AND compound with Age</span></label>
+      <input type="number" value="8" />
+      <div class="annotation">When(FallRisk).Gte(7).And(Age).Gte(80) → MonitoringLevel = "Continuous"</div>
+    </div>
+    <div class="field">
+      <label>Monitoring Level <span class="tag tag-hidden">auto-set by compound</span></label>
+      <select disabled><option>Continuous</option></select>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION F: Medications (always visible)         -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="flex-between">
+    <h2>F. Medications</h2>
+    <div class="save-status"><div class="dot dot-pending"></div> Unsaved</div>
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <label>Medication Count <span class="tag tag-condition">Gt(10) → polypharmacy warning</span></label>
+      <input type="number" value="14" />
+    </div>
+  </div>
+  <div style="padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;font-size:13px;color:var(--rose);margin-bottom:12px;">
+    Polypharmacy alert: 14 medications — pharmacy review required
+    <span class="tag tag-condition" style="margin-left:4px;">When(MedCount).Gt(10)</span>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle on"></div>
+    <span>Takes Blood Thinners <span class="tag tag-condition">Truthy → MonitoringLevel at least "Enhanced"</span></span>
+  </div>
+  <div class="toggle-row">
+    <div class="toggle on"></div>
+    <span>Takes Pain Medication <span class="tag tag-condition">Truthy → show Pain section</span></span>
+  </div>
+
+  <!-- Pain section (shown when TakesPainMedication) -->
+  <div class="card nested">
+    <h3>Pain Assessment <span class="tag tag-partial">@Html.Partial("_PainAssessment", Model)</span></h3>
+    <div class="condition-arrow">When(TakesPainMedication).Truthy() → Show</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Pain Level (0-10) <span style="color:var(--rose)">*</span> <span class="tag tag-condition">Gte(7) → alert + location required</span></label>
+        <input type="number" value="8" />
+      </div>
+      <div class="field">
+        <label>Pain Location <span style="color:var(--rose)">*</span> <span class="tag tag-validate">required when pain >= 7</span></label>
+        <input type="text" value="Lower back" />
+      </div>
+    </div>
+    <div class="server-response">Pain management plan required — immediate <span class="tag tag-http">POST /AlertPainManagement</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION G: Emergency & Contacts (HTTP partial)  -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="flex-between">
+    <h2>G. Emergency Contacts</h2>
+    <span class="tag tag-http" style="font-size:12px;">GET /LoadContactForm — loaded via HTTP at page load</span>
+  </div>
+  <div class="condition-arrow" style="color:var(--green);">DomReady → GET /LoadContactForm → SetHtml("contacts-container")</div>
+  <div class="field-row">
+    <div class="field">
+      <label>Emergency Contact <span style="color:var(--rose)">*</span> <span class="tag tag-condition">IsEmpty → warning</span></label>
+      <input type="text" value="" placeholder="Required" />
+      <div class="error-msg">Emergency contact is required</div>
+    </div>
+    <div class="field">
+      <label>Physician <span class="tag tag-condition">Contains("Dr.") → verified badge</span></label>
+      <input type="text" value="Dr. Sarah Chen" />
+      <div style="color:var(--green);font-size:12px;margin-top:2px;">Verified physician</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SUBMIT -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="card" style="background:linear-gradient(135deg, #fdf2f8, #faf5ff);">
+  <div class="flex-between" style="margin-bottom:16px;">
+    <h2 style="margin-bottom:0;">Submit Assessment</h2>
+    <span class="tag tag-gather">IncludeAll() + hidden fields</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+    <div class="save-status"><div class="dot dot-saved"></div> Demographics ✓</div>
+    <div class="save-status"><div class="dot dot-saved"></div> Cognitive ✓</div>
+    <div class="save-status"><div class="dot dot-empty"></div> Cardiac (hidden)</div>
+    <div class="save-status"><div class="dot dot-empty"></div> Diabetes (hidden)</div>
+    <div class="save-status"><div class="dot dot-pending"></div> Mobility — unsaved</div>
+    <div class="save-status"><div class="dot dot-pending"></div> Medications — unsaved</div>
+  </div>
+
+  <div style="padding:10px 14px;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;font-size:13px;color:var(--amber);margin-bottom:12px;">
+    2 sections unsaved. <span class="tag tag-validate">Server validates: visible sections must be saved</span>
+  </div>
+
+  <button class="btn btn-primary btn-lg" style="width:100%;">
+    Submit Complete Assessment
+    <span class="tag tag-http" style="margin-left:8px;background:rgba(255,255,255,0.2);color:#fff;">POST /Submit</span>
+  </button>
+  <div class="annotation" style="margin-top:8px;text-align:center;">
+    Server validates: conditionally required fields present, all visible sections saved, returns care plan or 400 errors
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="card" style="margin-top:24px;background:#f8fafc;">
+  <h3>Legend — Framework Primitives</h3>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
+    <span class="tag tag-condition">Condition (When/Then/Else)</span>
+    <span class="tag tag-http">HTTP (POST/GET)</span>
+    <span class="tag tag-partial">Partial (@Html.Partial)</span>
+    <span class="tag tag-hidden">Hidden Field (auto-set)</span>
+    <span class="tag tag-gather">Gather (Include/IncludeAll)</span>
+    <span class="tag tag-validate">Validation (conditional required)</span>
+  </div>
+  <div style="margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6;">
+    <strong>Conditions used:</strong> Eq, In, Gte, Gt, Lt, Between, Truthy, Falsy, IsEmpty, NotEmpty, Contains, And (compound), source-vs-source<br>
+    <strong>Actions in branches:</strong> Component.SetValue, Component.SetChecked, Element.Show/Hide/SetText, HTTP POST, Dispatch<br>
+    <strong>Partials:</strong> 5 same-model (shared plan), 1 HTTP-loaded (GET at runtime)<br>
+    <strong>Nesting depth:</strong> 3 levels (Diagnosis → Wanders → WanderFrequency)<br>
+    <strong>HTTP endpoints:</strong> 5 alerts + 3 section saves + 1 progress GET + 1 final submit
+  </div>
+</div>
+
+</body>
+</html>
