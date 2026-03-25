@@ -14,6 +14,8 @@ export interface ValidationField {
   fieldId?: string;
   vendor?: Vendor;
   readExpr?: string;
+  /** Coercion type from component registration. Enriched from plan.components. */
+  coerceAs?: CoercionType;
 }
 
 export type ValidationRuleType =

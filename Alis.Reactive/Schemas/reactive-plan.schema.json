@@ -24,12 +24,13 @@
   "$defs": {
     "ComponentEntry": {
       "type": "object",
-      "required": ["id", "vendor", "readExpr", "componentType"],
+      "required": ["id", "vendor", "readExpr", "componentType", "coerceAs"],
       "properties": {
         "id": { "type": "string", "description": "DOM element ID" },
         "vendor": { "$ref": "#/$defs/Vendor" },
         "readExpr": { "type": "string", "description": "Property path from vendor root" },
-        "componentType": { "type": "string", "description": "Component kind — autocomplete, dropdownlist, switch, textbox, etc." }
+        "componentType": { "type": "string", "description": "Component kind — autocomplete, dropdownlist, switch, textbox, etc." },
+        "coerceAs": { "$ref": "#/$defs/CoercionType", "description": "Coercion type inferred from C# typeof(TProp)" }
       },
       "additionalProperties": false
     },

@@ -347,14 +347,14 @@ describe("IncludeAll with mixed component types", () => {
     fusionEl("DietaryRestrictions", { value: ["vegetarian", "halal"] });
 
     const components: Record<string, ComponentEntry> = {
-      "ResidentName":       { id: "ResidentName", vendor: "native", readExpr: "value", componentType: "textbox" },
-      "HasAllergies":       { id: "HasAllergies", vendor: "native", readExpr: "checked", componentType: "switch" },
-      "MobilityLevel":      { id: "MobilityLevel", vendor: "native", readExpr: "value", componentType: "textbox" },
-      "Allergies":          { id: "Allergies", vendor: "native", readExpr: "value", componentType: "textbox" },
-      "MonthlyRate":        { id: "MonthlyRate", vendor: "fusion", readExpr: "value", componentType: "numerictextbox" },
-      "FacilityId":         { id: "FacilityId", vendor: "fusion", readExpr: "value", componentType: "textbox" },
-      "AdmissionDate":      { id: "AdmissionDate", vendor: "fusion", readExpr: "value", componentType: "datepicker" },
-      "DietaryRestrictions": { id: "DietaryRestrictions", vendor: "fusion", readExpr: "value", componentType: "textbox" },
+      "ResidentName":       { id: "ResidentName", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "HasAllergies":       { id: "HasAllergies", vendor: "native", readExpr: "checked", componentType: "switch", coerceAs: "boolean" },
+      "MobilityLevel":      { id: "MobilityLevel", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "Allergies":          { id: "Allergies", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "MonthlyRate":        { id: "MonthlyRate", vendor: "fusion", readExpr: "value", componentType: "numerictextbox", coerceAs: "number" },
+      "FacilityId":         { id: "FacilityId", vendor: "fusion", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "AdmissionDate":      { id: "AdmissionDate", vendor: "fusion", readExpr: "value", componentType: "datepicker", coerceAs: "date" },
+      "DietaryRestrictions": { id: "DietaryRestrictions", vendor: "fusion", readExpr: "value", componentType: "textbox", coerceAs: "string" },
     };
 
     const items: GatherItem[] = [{ kind: "all" }];
@@ -390,10 +390,10 @@ describe("IncludeAll with mixed component types", () => {
     fusionEl("MonthlyRate", { value: 4250 });
 
     const components: Record<string, ComponentEntry> = {
-      "ResidentName": { id: "ResidentName", vendor: "native", readExpr: "value", componentType: "textbox" },
-      "HasAllergies": { id: "HasAllergies", vendor: "native", readExpr: "checked", componentType: "switch" },
-      "Allergies":    { id: "Allergies", vendor: "native", readExpr: "value", componentType: "textbox" },
-      "MonthlyRate":  { id: "MonthlyRate", vendor: "fusion", readExpr: "value", componentType: "numerictextbox" },
+      "ResidentName": { id: "ResidentName", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "HasAllergies": { id: "HasAllergies", vendor: "native", readExpr: "checked", componentType: "switch", coerceAs: "boolean" },
+      "Allergies":    { id: "Allergies", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "MonthlyRate":  { id: "MonthlyRate", vendor: "fusion", readExpr: "value", componentType: "numerictextbox", coerceAs: "number" },
     };
 
     const items: GatherItem[] = [{ kind: "all" }];

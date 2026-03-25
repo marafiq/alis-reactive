@@ -99,7 +99,7 @@ describe("when http reactions reject", () => {
 
     boot({
       planId: "T",
-      components: { "Name": { id: "Name", vendor: "native", readExpr: "value", componentType: "textbox" } },
+      components: { "Name": { id: "Name", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
       entries: [{
         trigger: { kind: "component-event", componentId: "btn", jsEvent: "click", vendor: "native" },
         reaction: {

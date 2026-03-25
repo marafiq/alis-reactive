@@ -1,4 +1,5 @@
 import type { Vendor } from "./context";
+import type { CoercionType } from "../core/coerce";
 import type { Trigger } from "./triggers";
 import type { Reaction } from "./reactions";
 
@@ -15,6 +16,8 @@ export interface ComponentEntry {
   vendor: Vendor;
   readExpr: string;
   componentType: string;
+  /** Coercion type from C# typeof(TProp) — "string", "number", "boolean", "date", "array", "raw". */
+  coerceAs: CoercionType;
 }
 
 export interface Entry {

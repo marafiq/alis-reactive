@@ -344,7 +344,7 @@ describe("full boot-to-http integration", () => {
 
     boot({
       planId: "test",
-      components: { "Name": { id: "NameField", vendor: "native", readExpr: "value", componentType: "textbox" } },
+      components: { "Name": { id: "NameField", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
       entries: [{
         trigger: { kind: "custom-event", event: "do-save" },
         reaction: {

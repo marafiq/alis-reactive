@@ -11,7 +11,7 @@ describe("When injectHtml receives HTML with a plan script", () => {
   it("extracts plan JSON and merges it into the booted plan", () => {
     boot({
       planId: "Test.Model",
-      components: { "Name": { id: "name", vendor: "native", readExpr: "value", componentType: "textbox" } },
+      components: { "Name": { id: "name", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
       entries: [],
     });
 
@@ -23,7 +23,7 @@ describe("When injectHtml receives HTML with a plan script", () => {
       <input id="street" name="Address.Street" value="" />
       <script type="application/json" data-reactive-plan>${JSON.stringify({
         planId: "Test.Model",
-        components: { "Address.Street": { id: "street", vendor: "native", readExpr: "value", componentType: "textbox" } },
+        components: { "Address.Street": { id: "street", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
         entries: [],
       })}</script>
     `;
@@ -45,7 +45,7 @@ describe("When injectHtml receives HTML with a plan script", () => {
 
     const html = `<script type="application/json" data-reactive-plan>${JSON.stringify({
       planId: "Test.Model",
-      components: { "Field": { id: "f", vendor: "native", readExpr: "value", componentType: "textbox" } },
+      components: { "Field": { id: "f", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
       entries: [],
     })}</script>`;
 
@@ -57,7 +57,7 @@ describe("When injectHtml receives HTML with a plan script", () => {
     // Reload with different component — old should be removed
     const html2 = `<script type="application/json" data-reactive-plan>${JSON.stringify({
       planId: "Test.Model",
-      components: { "Field2": { id: "f2", vendor: "native", readExpr: "value", componentType: "textbox" } },
+      components: { "Field2": { id: "f2", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
       entries: [],
     })}</script>`;
 
@@ -126,12 +126,12 @@ describe("When injectHtml receives multiple plan scripts with same planId", () =
     const html = `
       <script type="application/json" data-reactive-plan>${JSON.stringify({
         planId: "Test.Model",
-        components: { "FA": { id: "fa", vendor: "native", readExpr: "value", componentType: "textbox" } },
+        components: { "FA": { id: "fa", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
         entries: [],
       })}</script>
       <script type="application/json" data-reactive-plan>${JSON.stringify({
         planId: "Test.Model",
-        components: { "FB": { id: "fb", vendor: "native", readExpr: "value", componentType: "textbox" } },
+        components: { "FB": { id: "fb", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
         entries: [],
       })}</script>
     `;

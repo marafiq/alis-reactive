@@ -21,6 +21,7 @@ function enrichValidationFields(
       f.fieldId = comp.id;
       f.vendor = comp.vendor;
       f.readExpr = comp.readExpr;
+      f.coerceAs = comp.coerceAs;
     } else {
       if (f.fieldId) {
         log.warn("clearing enrichment — component removed", { fieldName: f.fieldName });
@@ -28,6 +29,7 @@ function enrichValidationFields(
       f.fieldId = undefined;
       f.vendor = undefined;
       f.readExpr = undefined;
+      f.coerceAs = undefined;
     }
   }
 }

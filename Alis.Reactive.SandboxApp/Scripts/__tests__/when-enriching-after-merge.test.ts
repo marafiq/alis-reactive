@@ -11,7 +11,7 @@ import type { Entry, ValidationField, ComponentEntry } from "../types";
  */
 
 function comp(id: string, vendor: "native" | "fusion" = "native", readExpr = "value"): ComponentEntry {
-  return { id, vendor, readExpr, componentType: "textbox" };
+  return { id, vendor, readExpr, componentType: "textbox", coerceAs: "string" };
 }
 
 function validationHttpEntry(formId: string, fields: ValidationField[]): Entry {
