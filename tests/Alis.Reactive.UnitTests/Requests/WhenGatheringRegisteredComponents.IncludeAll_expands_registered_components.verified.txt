@@ -5,13 +5,15 @@
       id: comp1,
       vendor: native,
       readExpr: value,
-      componentType: textbox
+      componentType: textbox,
+      coerceAs: string
     },
     Amount: {
       id: comp2,
       vendor: fusion,
       readExpr: value,
-      componentType: numerictextbox
+      componentType: numerictextbox,
+      coerceAs: number
     }
   },
   entries: [

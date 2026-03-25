@@ -5,7 +5,8 @@
       id: comp1,
       vendor: native,
       readExpr: value,
-      componentType: textbox
+      componentType: textbox,
+      coerceAs: string
     }
   },
   entries: [
