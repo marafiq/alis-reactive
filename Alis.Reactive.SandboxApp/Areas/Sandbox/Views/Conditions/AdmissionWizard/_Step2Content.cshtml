@@ -120,7 +120,8 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/Conditions/AdmissionWizard/LoadStep",
-                    g => g.Static("screeningId", screeningId).Static("step", "1"))
+                    g => g.Include<NativeHiddenField, Step2ClinicalModel>(m => m.ScreeningId)
+                          .Static("step", 1))
                  .Response(r => r.OnSuccess(s => s.Into("step-container")));
             }))
         @(Html.NativeButton("next-2", "Next: Functional \u2192")

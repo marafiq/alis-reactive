@@ -1,0 +1,88 @@
+@model Step4ReviewModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ReactivePlan<Step4ReviewModel>();
+}
+
+<native-card><native-card-body id="screening-form">
+    <native-heading level="H2">Step 4: Review &amp; Submit</native-heading>
+
+    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
+    @Html.HiddenFieldFor(plan, m => m.RiskTier)
+    @Html.HiddenFieldFor(plan, m => m.CareUnit)
+    @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.EmergencyContact, o => o.Required().Label("Emergency Contact"))
+            .NativeTextBox(b => b.Placeholder("Full name and phone number")); }
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.RiskTier) || !string.IsNullOrEmpty(Model.CareUnit) || !string.IsNullOrEmpty(Model.MonitoringLevel))
+    {
+        <native-card><native-card-body>
+            <native-heading level="H3">Assessment Summary</native-heading>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
+                @if (!string.IsNullOrEmpty(Model.RiskTier))
+                {
+                    <div>
+                        <p class="text-xs text-text-muted uppercase tracking-wider">Risk Tier</p>
+                        <p class="text-sm font-semibold">@Model.RiskTier</p>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.CareUnit))
+                {
+                    <div>
+                        <p class="text-xs text-text-muted uppercase tracking-wider">Care Unit</p>
+                        <p class="text-sm font-semibold">@Model.CareUnit</p>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.MonitoringLevel))
+                {
+                    <div>
+                        <p class="text-xs text-text-muted uppercase tracking-wider">Monitoring Level</p>
+                        <p class="text-sm font-semibold">@Model.MonitoringLevel</p>
+                    </div>
+                }
+            </div>
+        </native-card-body></native-card>
+    }
+
+    <div class="mt-3 text-sm">
+        <p>Step 1: <strong class="@(Model.Step1Saved ? "text-emerald-600" : "text-red-600")">@(Model.Step1Saved ? "Saved" : "Not saved")</strong></p>
+        <p>Step 2: <strong class="@(Model.Step2Saved ? "text-emerald-600" : "text-red-600")">@(Model.Step2Saved ? "Saved" : "Not saved")</strong></p>
+        <p>Step 3: <strong class="@(Model.Step3Saved ? "text-emerald-600" : "text-red-600")">@(Model.Step3Saved ? "Saved" : "Not saved")</strong></p>
+    </div>
+
+    <div id="submit-result" hidden class="rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-700 mt-4"></div>
+
+    <div class="flex justify-between mt-6">
+        @(Html.NativeButton("prev-4", "\u2190 Back: Functional")
+            .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Conditions/AdmissionWizard/LoadStep",
+                    g => g.Include<NativeHiddenField, Step4ReviewModel>(m => m.ScreeningId)
+                          .Static("step", 3))
+                 .Response(r => r.OnSuccess(s => s.Into("step-container")));
+            }))
+        @(Html.NativeButton("submit-btn", "Submit Assessment")
+            .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Conditions/AdmissionWizard/Submit",
+                    g => g.IncludeAll())
+                 .Validate<Step4Validator>("screening-form")
+                 .Response(r => r
+                    .OnSuccess<SubmitScreeningResponse>((json, s) =>
+                    {
+                        s.Element("submit-result").SetText(json, x => x.Message);
+                        s.Element("submit-result").Show();
+                    })
+                    .OnError(400, e => e.ValidationErrors("screening-form")));
+            }))
+    </div>
+</native-card-body></native-card>
+
+@Html.RenderPlan(plan)
