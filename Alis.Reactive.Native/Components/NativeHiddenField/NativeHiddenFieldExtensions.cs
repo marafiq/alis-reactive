@@ -1,5 +1,8 @@
+using System;
+using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -12,6 +15,18 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             return self.Emit(new SetPropMutation("value"), value: value);
+        }
+
+        // ── Property Write (response body) ──
+
+        public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel, TResponse>(
+            this ComponentRef<NativeHiddenField, TModel> self,
+            ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
+            where TModel : class
+            where TResponse : class
+        {
+            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
+            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
         }
 
         public static TypedComponentSource<string> Value<TModel>(

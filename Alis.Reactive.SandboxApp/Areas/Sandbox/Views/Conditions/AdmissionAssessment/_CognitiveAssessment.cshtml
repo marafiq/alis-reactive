@@ -113,7 +113,7 @@
                           .Include<FusionDropDownList, HealthScreeningModel>(m => m.WanderFrequency))
                  .Response(r => r.OnSuccess<SaveSectionResponse>((json, s) =>
                  {
-                     s.Element("cognitive-id-echo").SetText(json, x => x.Id);
+                     s.Component<NativeHiddenField>(m => m.CognitiveAssessmentId).SetValue(json, x => x.Id);
                      s.Element("cognitive-save-status").SetText(json, x => x.Message);
                      s.Element("cognitive-save-status").Show();
                      s.Element("save-cognitive-spinner").Hide();

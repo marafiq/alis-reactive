@@ -95,7 +95,7 @@
                           .Include<FusionDropDownList, HealthScreeningModel>(m => m.InsulinSchedule))
                  .Response(r => r.OnSuccess<SaveSectionResponse>((json, s) =>
                  {
-                     s.Element("diabetes-id-echo").SetText(json, x => x.Id);
+                     s.Component<NativeHiddenField>(m => m.DiabetesAssessmentId).SetValue(json, x => x.Id);
                      s.Element("diabetes-save-status").SetText(json, x => x.Message);
                      s.Element("diabetes-save-status").Show();
                      s.Element("save-diabetes-spinner").Hide();

@@ -88,7 +88,7 @@
                           .Include<FusionDatePicker, HealthScreeningModel>(m => m.LastDeviceCheck))
                  .Response(r => r.OnSuccess<SaveSectionResponse>((json, s) =>
                  {
-                     s.Element("cardiac-id-echo").SetText(json, x => x.Id);
+                     s.Component<NativeHiddenField>(m => m.CardiacAssessmentId).SetValue(json, x => x.Id);
                      s.Element("cardiac-save-status").SetText(json, x => x.Message);
                      s.Element("cardiac-save-status").Show();
                      s.Element("save-cardiac-spinner").Hide();
