@@ -2,14 +2,14 @@
 
 > Last updated: 2026-03-25
 > Branch: feature/coerce-first-class
-> Status: P1 complete, P2-P5 pending
+> Status: P1+P2 complete, P3-P5 pending
 
 ## Vertical Slices — Sorted by Priority
 
 | # | Slice | Route | What it proves | Real user story | Status |
 |---|---|---|---|---|---|
 | **P1** | Vitals Alert | `/Sandbox/Conditions/VitalsAlert` | Condition → HTTP inside Then/Else, ElseIf → different POST per tier, command sandwich | Nurse enters HR > 140 → system POSTs alert, shows confirmation with server timestamp | **PASS (17 tests)** |
-| **P2** | Care Level Cascade | `/Sandbox/Conditions/CareLevelCascade` | Condition → Component mutation inside Then | Select Memory Care → protocol dropdown auto-populates, select Independent → dropdown clears | TODO |
+| **P2** | Care Level Cascade | `/Sandbox/Conditions/CareLevelCascade` | Condition → Component.SetValue (cascade) + Component.SetChecked (cross-type), In() operator | Select Memory Care → protocol dropdown auto-populates + escort switch enables | **PASS (9 tests)** |
 | **P3** | Veteran Toggle | `/Sandbox/Conditions/VeteranToggle` | Condition → Show section with real inputs + commands before/after condition | Toggle Is Veteran → veteran fields appear, toggle off → fields hide | TODO |
 | **P4** | Priority Escalation | `/Sandbox/Conditions/PriorityEscalation` | ElseIf → different Dispatch per branch → chained listeners do different HTTP | Urgent → dispatch alert → POST nurse. Routine → dispatch log → POST audit | TODO |
 | **P5** | Compound Gate | `/Sandbox/Conditions/CompoundGate` | AND compound with comp sources → HTTP only if both pass | HR AND BP both in range → POST vitals normal. Either out → show warning, no POST | TODO |
@@ -23,8 +23,8 @@
 | **Element.Show()** | Guards, NC, 18 comp pages | — | — | — |
 | **Element.Hide()** | Guards, NC, 18 comp pages | — | — | — |
 | **Element.SetText(source)** | **VA** (comp.Value before condition) | — | — | — |
-| **Component.SetValue()** | — | — | — | — |
-| **Component.Enable/Disable** | — | — | — | — |
+| **Component.SetValue()** | **CLC** (SetValue on DDL) | **CLC** (ElseIf per care level) | — | — |
+| **Component.SetChecked()** | **CLC** (SetChecked on Switch) | — | — | — |
 | **Component.Method()** | — | — | — | — |
 | **Dispatch()** | — | — | — | — |
 | **Post/Get (HTTP)** | **VA** (POST /Alert in Then) | **VA** (POST /Critical, /Warning per tier) | — | — |
@@ -54,8 +54,8 @@
 |---|---|---|---|---|
 | Enter heart rate > 140 → POST alert to nurse station | NumericTB comp.Value().Gt(140) | HTTP Post inside Then | **PASS** | P1 |
 | Heart rate <= 140 → show "normal" confirmation | NumericTB comp.Value().Gt(140) | Element.SetText in Else | **PASS** | P1 |
-| Select "Memory Care" → set protocol dropdown value | DropDown comp.Value().Eq("Memory Care") | Component.SetValue() | — | P2 |
-| Select "Independent" → clear protocol dropdown | DropDown comp.Value().Eq("Independent") | Component.SetValue("") | — | P2 |
+| Select "Memory Care" → set protocol dropdown value | DropDown comp.Value().Eq("Memory Care") | Component.SetValue() | **PASS** | P2 |
+| Select "Independent" → clear protocol dropdown | DropDown comp.Value().Eq("Independent") | Component.SetValue("") | **PASS** | P2 |
 | Toggle "Is Veteran" → show veteran ID section | Switch comp.Value().Truthy() | Show section + components | — | P3 |
 | Toggle off → hide veteran section, commands still run around condition | Switch comp.Value().Truthy() | Hide + before/after cmds | — | P3 |
 | Select "Urgent" → dispatch alert → chained POST | DropDown comp.Value().Eq("Urgent") | Dispatch in Then | — | P4 |
