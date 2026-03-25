@@ -156,7 +156,7 @@
 
             <!-- Veteran section (conditionally visible) -->
             <div id="veteran-section" hidden>
-                @await Html.PartialAsync("_VeteranDetails", Model)
+                @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_VeteranDetails.cshtml", Model)
             </div>
 
             <!-- Step 1 Navigation -->
@@ -187,15 +187,15 @@
             </p>
 
             <div id="cognitive-section" hidden>
-                @await Html.PartialAsync("_CognitiveAssessment", Model)
+                @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_CognitiveAssessment.cshtml", Model)
             </div>
 
             <div id="cardiac-section" hidden>
-                @await Html.PartialAsync("_CardiacAssessment", Model)
+                @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_CardiacAssessment.cshtml", Model)
             </div>
 
             <div id="diabetes-section" hidden>
-                @await Html.PartialAsync("_DiabetesManagement", Model)
+                @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_DiabetesManagement.cshtml", Model)
             </div>
 
             <div id="no-assessment-text" hidden>
@@ -350,11 +350,11 @@
 
             <!-- Conditional sections -->
             <div id="fall-details" hidden>
-                @await Html.PartialAsync("_FallDetails", Model)
+                @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_FallDetails.cshtml", Model)
             </div>
 
             <div id="pain-section" hidden>
-                @await Html.PartialAsync("_PainAssessment", Model)
+                @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_PainAssessment.cshtml", Model)
             </div>
 
             <div id="escort-indicator" hidden>
