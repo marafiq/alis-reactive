@@ -1,9 +1,9 @@
-@model HealthScreeningModel
+@model Step3FunctionalModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    var plan = Html.ResolvePlan<HealthScreeningModel>();
+    var plan = Html.ResolvePlan<Step3FunctionalModel>();
 }
 
 <native-card><native-card-body>
@@ -28,8 +28,8 @@
                             then.Element("pain-spinner").Show();
                             then.Element("location-required").Show();
                             then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertPain",
-                                g => g.Include<FusionNumericTextBox, HealthScreeningModel>(m => m.PainLevel)
-                                      .Include<NativeTextBox, HealthScreeningModel>(m => m.PainLocation))
+                                g => g.Include<FusionNumericTextBox, Step3FunctionalModel>(m => m.PainLevel)
+                                      .Include<NativeTextBox, Step3FunctionalModel>(m => m.PainLocation))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                              {
                                  s.Element("pain-result").SetText(json, x => x.Message);

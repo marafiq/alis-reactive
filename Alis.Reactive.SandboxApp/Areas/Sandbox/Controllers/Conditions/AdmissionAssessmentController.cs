@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
@@ -7,12 +8,54 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 [Route("Sandbox/Conditions/AdmissionAssessment")]
 public class AdmissionAssessmentController : Controller
 {
+    // ── Draft persistence (in-memory, keyed by screeningId) ──────────────────
+
+    private static readonly ConcurrentDictionary<string, Step1DemographicsModel> Step1Drafts = new();
+    private static readonly ConcurrentDictionary<string, Step2ClinicalModel> Step2Drafts = new();
+    private static readonly ConcurrentDictionary<string, Step3FunctionalModel> Step3Drafts = new();
+    private static readonly ConcurrentDictionary<string, Step4ReviewModel> Step4Drafts = new();
+
+    private static string EnsureScreeningId(string? id) =>
+        string.IsNullOrEmpty(id) ? $"SCR-{DateTime.UtcNow:yyyyMMddHHmmssffff}" : id;
+
     // ── GET Index ──────────────────────────────────────────────────────────────
 
     [HttpGet("")]
     [HttpGet("Index")]
-    public IActionResult Index()
+    public IActionResult Index([FromQuery] string? screeningId)
     {
+        var id = screeningId ?? "";
+
+        // Load each step from draft (or fresh)
+        Step1Drafts.TryGetValue(id, out var step1);
+        Step2Drafts.TryGetValue(id, out var step2);
+        Step3Drafts.TryGetValue(id, out var step3);
+
+        step1 ??= new Step1DemographicsModel();
+        step2 ??= new Step2ClinicalModel();
+        step3 ??= new Step3FunctionalModel();
+
+        // Cross-step data: copy from Step 1 draft into Step 2 and Step 3
+        step2.PrimaryDiagnosis = step1.PrimaryDiagnosis;
+        step2.ResidentName = step1.ResidentName;
+        step3.Age = step1.Age;
+        step3.ResidentName = step1.ResidentName;
+
+        // Step 4 summary from all drafts
+        var step4 = new Step4ReviewModel
+        {
+            ScreeningId = id,
+            RiskTier = step1.RiskTier,
+            CareUnit = step2.CareUnit,
+            MonitoringLevel = step3.MonitoringLevel,
+            Step1Saved = Step1Drafts.ContainsKey(id),
+            Step2Saved = Step2Drafts.ContainsKey(id),
+            Step3Saved = Step3Drafts.ContainsKey(id),
+        };
+        if (Step4Drafts.TryGetValue(id, out var step4Draft))
+            step4.EmergencyContact = step4Draft.EmergencyContact;
+
+        // Data sources for dropdowns
         ViewBag.Diagnoses = new[] { "Alzheimer's", "Parkinson's", "Heart Disease", "Diabetes", "Stroke", "Other" };
         ViewBag.FallOptions = new[] { "None", "1-2 falls", "3+ falls" };
         ViewBag.MobilityAids = new[] { "None", "Cane", "Walker", "Wheelchair" };
@@ -21,8 +64,51 @@ public class AdmissionAssessmentController : Controller
         ViewBag.InjuryTypes = new[] { "Bruise", "Fracture", "Head Injury", "Other" };
         ViewBag.DiabetesTypes = new[] { "Type 1", "Type 2" };
         ViewBag.ServiceBranches = new[] { "Army", "Navy", "Air Force", "Marines", "Coast Guard" };
+        ViewBag.ScreeningId = id;
 
-        return View("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/Index.cshtml", new HealthScreeningModel());
+        var model = new WizardShellModel
+        {
+            ScreeningId = id,
+            Step1 = step1,
+            Step2 = step2,
+            Step3 = step3,
+            Step4 = step4,
+        };
+
+        return View("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/Index.cshtml", model);
+    }
+
+    // ── POST SaveStep1 ──────────────────────────────────────────────────────
+
+    [HttpPost("SaveStep1")]
+    public async Task<IActionResult> SaveStep1([FromBody] Step1DemographicsModel model)
+    {
+        await Task.Delay(200);
+        var id = EnsureScreeningId(null);
+        Step1Drafts[id] = model;
+        return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 1 saved" });
+    }
+
+    // ── POST SaveStep2 ──────────────────────────────────────────────────────
+
+    [HttpPost("SaveStep2")]
+    public async Task<IActionResult> SaveStep2([FromBody] Step2ClinicalModel model)
+    {
+        await Task.Delay(200);
+        var id = EnsureScreeningId(null);
+        Step2Drafts[id] = model;
+        return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 2 saved" });
+    }
+
+    // ── POST SaveStep3 ──────────────────────────────────────────────────────
+
+    [HttpPost("SaveStep3")]
+    public async Task<IActionResult> SaveStep3([FromBody] Step3FunctionalModel model)
+    {
+        await Task.Delay(200);
+        var id = EnsureScreeningId(null);
+        Step3Drafts[id] = model;
+        return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 3 saved" });
     }
 
     // ── GET SearchPhysicians ───────────────────────────────────────────────────
@@ -73,7 +159,6 @@ public class AdmissionAssessmentController : Controller
     public async Task<IActionResult> AlertElopement([FromBody] AlertElopementRequest? request)
     {
         await Task.Delay(400);
-
         return Ok(new ScreeningAlertResponse
         {
             Message = $"Elopement risk flagged for {request?.ResidentName}",
@@ -85,7 +170,6 @@ public class AdmissionAssessmentController : Controller
     public async Task<IActionResult> AlertHypertension([FromBody] AlertHypertensionRequest? request)
     {
         await Task.Delay(400);
-
         return Ok(new ScreeningAlertResponse
         {
             Message = $"Hypertension flagged: {request?.SystolicBP}mmHg — cardiology referral",
@@ -97,7 +181,6 @@ public class AdmissionAssessmentController : Controller
     public async Task<IActionResult> AlertUncontrolled([FromBody] AlertUncontrolledRequest? request)
     {
         await Task.Delay(400);
-
         return Ok(new ScreeningAlertResponse
         {
             Message = $"Uncontrolled {request?.DiabetesType} diabetes: A1C {request?.A1cLevel} — endocrinology referral",
@@ -109,7 +192,6 @@ public class AdmissionAssessmentController : Controller
     public async Task<IActionResult> AlertNeuro([FromBody] AlertNeuroRequest? request)
     {
         await Task.Delay(400);
-
         return Ok(new ScreeningAlertResponse
         {
             Message = $"Neuro consult ordered for {request?.ResidentName} — {request?.InjuryType}",
@@ -121,7 +203,6 @@ public class AdmissionAssessmentController : Controller
     public async Task<IActionResult> AlertPain([FromBody] AlertPainRequest? request)
     {
         await Task.Delay(400);
-
         return Ok(new ScreeningAlertResponse
         {
             Message = $"Pain management required: level {request?.PainLevel} at {request?.PainLocation}",
@@ -135,7 +216,6 @@ public class AdmissionAssessmentController : Controller
     public async Task<IActionResult> RequestRoomSetup([FromBody] RequestRoomSetupRequest? request)
     {
         await Task.Delay(500);
-
         return Ok(new ScreeningAlertResponse
         {
             Message = $"Accessible room scheduled for {request?.ResidentName}",
@@ -143,13 +223,12 @@ public class AdmissionAssessmentController : Controller
         });
     }
 
-    // ── POST Save section endpoints (3) ───────────────────────────────────────
+    // ── POST Save section endpoints (3) — within Step 2 ─────────────────────
 
     [HttpPost("SaveCognitive")]
-    public async Task<IActionResult> SaveCognitive([FromBody] HealthScreeningModel model)
+    public async Task<IActionResult> SaveCognitive([FromBody] Step2ClinicalModel model)
     {
         await Task.Delay(800);
-
         return Ok(new SaveSectionResponse
         {
             Id = $"COG-{DateTime.UtcNow:yyyyMMddHHmmss}",
@@ -158,10 +237,9 @@ public class AdmissionAssessmentController : Controller
     }
 
     [HttpPost("SaveCardiac")]
-    public async Task<IActionResult> SaveCardiac([FromBody] HealthScreeningModel model)
+    public async Task<IActionResult> SaveCardiac([FromBody] Step2ClinicalModel model)
     {
         await Task.Delay(600);
-
         return Ok(new SaveSectionResponse
         {
             Id = $"CAR-{DateTime.UtcNow:yyyyMMddHHmmss}",
@@ -170,10 +248,9 @@ public class AdmissionAssessmentController : Controller
     }
 
     [HttpPost("SaveDiabetes")]
-    public async Task<IActionResult> SaveDiabetes([FromBody] HealthScreeningModel model)
+    public async Task<IActionResult> SaveDiabetes([FromBody] Step2ClinicalModel model)
     {
         await Task.Delay(700);
-
         return Ok(new SaveSectionResponse
         {
             Id = $"DIA-{DateTime.UtcNow:yyyyMMddHHmmss}",
@@ -184,92 +261,23 @@ public class AdmissionAssessmentController : Controller
     // ── POST Submit ───────────────────────────────────────────────────────────
 
     [HttpPost("Submit")]
-    public async Task<IActionResult> Submit([FromBody] HealthScreeningModel model)
+    public async Task<IActionResult> Submit([FromBody] Step4ReviewModel model)
     {
         await Task.Delay(1000);
 
         var errors = new Dictionary<string, string>();
-
-        // Always required
-        if (string.IsNullOrEmpty(model.ResidentName)) errors["ResidentName"] = "Resident name is required";
-        if (model.Age <= 0) errors["Age"] = "Age is required";
-        if (string.IsNullOrEmpty(model.PrimaryDiagnosis)) errors["PrimaryDiagnosis"] = "Primary diagnosis is required";
-        if (string.IsNullOrEmpty(model.EmergencyContact)) errors["EmergencyContact"] = "Emergency contact is required";
-
-        // Veteran conditional
-        if (model.IsVeteran && string.IsNullOrEmpty(model.VaId))
-            errors["VaId"] = "VA ID required for veterans";
-
-        // Cognitive conditional
-        if (model.PrimaryDiagnosis is "Alzheimer's" or "Parkinson's")
-        {
-            if (model.CognitiveScore <= 0) errors["CognitiveScore"] = "Cognitive score required for neurological diagnosis";
-            if (string.IsNullOrEmpty(model.CognitiveAssessmentId)) errors["CognitiveAssessmentId"] = "Cognitive assessment must be saved before submission";
-            if (model.Wanders && string.IsNullOrEmpty(model.WanderFrequency))
-                errors["WanderFrequency"] = "Wander frequency required when wandering reported";
-        }
-
-        // Cardiac conditional
-        if (model.PrimaryDiagnosis == "Heart Disease")
-        {
-            if (model.SystolicBP <= 0) errors["SystolicBP"] = "Blood pressure required for cardiac diagnosis";
-            if (string.IsNullOrEmpty(model.CardiacAssessmentId)) errors["CardiacAssessmentId"] = "Cardiac assessment must be saved before submission";
-            if (model.HasPacemaker && string.IsNullOrEmpty(model.PacemakerModel))
-                errors["PacemakerModel"] = "Pacemaker model required when pacemaker reported";
-        }
-
-        // Diabetes conditional
-        if (model.PrimaryDiagnosis == "Diabetes")
-        {
-            if (string.IsNullOrEmpty(model.DiabetesType)) errors["DiabetesType"] = "Diabetes type required";
-            if (model.A1cLevel <= 0) errors["A1cLevel"] = "A1C level required for diabetes diagnosis";
-            if (string.IsNullOrEmpty(model.DiabetesAssessmentId)) errors["DiabetesAssessmentId"] = "Diabetes assessment must be saved before submission";
-            if (model.InsulinDependent && string.IsNullOrEmpty(model.InsulinSchedule))
-                errors["InsulinSchedule"] = "Insulin schedule required when insulin dependent";
-        }
-
-        // Falls conditional
-        if (model.FallHistory is "1-2 falls" or "3+ falls")
-        {
-            if (model.CausedInjury && string.IsNullOrEmpty(model.InjuryType))
-                errors["InjuryType"] = "Injury type required when injury reported";
-        }
-
-        // Pain conditional
-        if (model.TakesPainMedication)
-        {
-            if (model.PainLevel <= 0) errors["PainLevel"] = "Pain level required when pain medication reported";
-            if (model.PainLevel > 7 && string.IsNullOrEmpty(model.PainLocation))
-                errors["PainLocation"] = "Pain location required for severe pain (level > 7)";
-        }
+        if (string.IsNullOrEmpty(model.EmergencyContact))
+            errors["EmergencyContact"] = "Emergency contact is required";
 
         if (errors.Count > 0) return BadRequest(new { errors });
 
-        // Compute care plan
-        var careUnit = model.PrimaryDiagnosis switch
-        {
-            "Alzheimer's" or "Parkinson's" when model.CognitiveScore < 15 => "Memory Care",
-            "Alzheimer's" or "Parkinson's" when model.CognitiveScore < 25 => "Assisted Living with Memory Support",
-            _ => "Standard Assisted Living"
-        };
-
-        var monitoring = "Standard";
-        if (model.TakesBloodThinners) monitoring = "Enhanced";
-        if (model.FallRiskScore >= 7 && model.Age >= 80) monitoring = "Continuous";
-
-        var alerts = new List<string>();
-        if (model.Wanders && model.WanderFrequency == "Frequently") alerts.Add("elopementRisk");
-        if (model.SystolicBP > 140) alerts.Add("hypertension");
-        if (model.A1cLevel > 9) alerts.Add("uncontrolledDiabetes");
-        if (model.PainLevel > 7) alerts.Add("painManagement");
-
         return Ok(new SubmitScreeningResponse
         {
-            ScreeningId = $"SCR-{DateTime.UtcNow:yyyyMMddHHmmss}",
-            CareUnit = careUnit,
-            MonitoringLevel = monitoring,
-            Message = $"Assessment complete for {model.ResidentName}",
-            Alerts = alerts
+            ScreeningId = model.ScreeningId,
+            CareUnit = model.CareUnit,
+            MonitoringLevel = model.MonitoringLevel,
+            Message = $"Assessment complete — {model.ScreeningId}",
+            Alerts = model.AlertsSent
         });
     }
 

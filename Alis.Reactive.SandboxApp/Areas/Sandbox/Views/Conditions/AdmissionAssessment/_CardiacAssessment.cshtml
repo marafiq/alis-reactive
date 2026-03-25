@@ -1,9 +1,9 @@
-@model HealthScreeningModel
+@model Step2ClinicalModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    var plan = Html.ResolvePlan<HealthScreeningModel>();
+    var plan = Html.ResolvePlan<Step2ClinicalModel>();
 }
 
 <native-card><native-card-body>
@@ -28,8 +28,8 @@
                         {
                             then.Element("hypertension-spinner").Show();
                             then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertHypertension",
-                                g => g.Include<FusionNumericTextBox, HealthScreeningModel>(m => m.SystolicBP)
-                                      .Include<NativeTextBox, HealthScreeningModel>(m => m.ResidentName))
+                                g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.SystolicBP)
+                                      .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                              {
                                  s.Element("hypertension-result").SetText(json, x => x.Message);
@@ -82,10 +82,10 @@
                 p.Element("save-cardiac-spinner").Show();
                 p.Element("save-cardiac-text").Hide();
                 p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveCardiac",
-                    g => g.Include<FusionNumericTextBox, HealthScreeningModel>(m => m.SystolicBP)
-                          .Include<FusionSwitch, HealthScreeningModel>(m => m.HasPacemaker)
-                          .Include<NativeTextBox, HealthScreeningModel>(m => m.PacemakerModel)
-                          .Include<FusionDatePicker, HealthScreeningModel>(m => m.LastDeviceCheck))
+                    g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.SystolicBP)
+                          .Include<FusionSwitch, Step2ClinicalModel>(m => m.HasPacemaker)
+                          .Include<NativeTextBox, Step2ClinicalModel>(m => m.PacemakerModel)
+                          .Include<FusionDatePicker, Step2ClinicalModel>(m => m.LastDeviceCheck))
                  .Response(r => r.OnSuccess<SaveSectionResponse>((json, s) =>
                  {
                      s.Component<NativeHiddenField>(m => m.CardiacAssessmentId).SetValue(json, x => x.Id);

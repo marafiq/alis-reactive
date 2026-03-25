@@ -1,9 +1,9 @@
-@model HealthScreeningModel
+@model Step2ClinicalModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    var plan = Html.ResolvePlan<HealthScreeningModel>();
+    var plan = Html.ResolvePlan<Step2ClinicalModel>();
 }
 
 <native-card><native-card-body>
@@ -77,8 +77,8 @@
                             {
                                 then.Element("elopement-spinner").Show();
                                 then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertElopement",
-                                    g => g.Include<FusionDropDownList, HealthScreeningModel>(m => m.WanderFrequency)
-                                          .Include<NativeTextBox, HealthScreeningModel>(m => m.ResidentName))
+                                    g => g.Include<FusionDropDownList, Step2ClinicalModel>(m => m.WanderFrequency)
+                                          .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
                                  .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                                  {
                                      s.Element("elopement-result").SetText(json, x => x.Message);
@@ -108,9 +108,9 @@
                 p.Element("save-cognitive-spinner").Show();
                 p.Element("save-cognitive-text").Hide();
                 p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveCognitive",
-                    g => g.Include<FusionNumericTextBox, HealthScreeningModel>(m => m.CognitiveScore)
-                          .Include<FusionSwitch, HealthScreeningModel>(m => m.Wanders)
-                          .Include<FusionDropDownList, HealthScreeningModel>(m => m.WanderFrequency))
+                    g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.CognitiveScore)
+                          .Include<FusionSwitch, Step2ClinicalModel>(m => m.Wanders)
+                          .Include<FusionDropDownList, Step2ClinicalModel>(m => m.WanderFrequency))
                  .Response(r => r.OnSuccess<SaveSectionResponse>((json, s) =>
                  {
                      s.Component<NativeHiddenField>(m => m.CognitiveAssessmentId).SetValue(json, x => x.Id);
@@ -130,3 +130,4 @@
 </native-card-body></native-card>
 
 @Html.RenderPlan(plan)
+

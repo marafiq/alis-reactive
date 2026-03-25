@@ -33,3 +33,9 @@ public class PhysicianSearchResponse
 }
 
 // PhysicianItem reused from AutoCompleteModel (same namespace) — has Text, Value, Specialty
+
+public class SaveStepResponse
+{
+    public string ScreeningId { get; set; } = "";
+    public string Message { get; set; } = "";
+}

@@ -1,9 +1,9 @@
-@model HealthScreeningModel
+@model Step2ClinicalModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    var plan = Html.ResolvePlan<HealthScreeningModel>();
+    var plan = Html.ResolvePlan<Step2ClinicalModel>();
 }
 
 <native-card><native-card-body>
@@ -33,8 +33,8 @@
                         {
                             then.Element("uncontrolled-spinner").Show();
                             then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertUncontrolled",
-                                g => g.Include<FusionNumericTextBox, HealthScreeningModel>(m => m.A1cLevel)
-                                      .Include<FusionDropDownList, HealthScreeningModel>(m => m.DiabetesType))
+                                g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.A1cLevel)
+                                      .Include<FusionDropDownList, Step2ClinicalModel>(m => m.DiabetesType))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
                              {
                                  s.Element("uncontrolled-result").SetText(json, x => x.Message);
@@ -89,10 +89,10 @@
                 p.Element("save-diabetes-spinner").Show();
                 p.Element("save-diabetes-text").Hide();
                 p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveDiabetes",
-                    g => g.Include<FusionDropDownList, HealthScreeningModel>(m => m.DiabetesType)
-                          .Include<FusionNumericTextBox, HealthScreeningModel>(m => m.A1cLevel)
-                          .Include<FusionSwitch, HealthScreeningModel>(m => m.InsulinDependent)
-                          .Include<FusionDropDownList, HealthScreeningModel>(m => m.InsulinSchedule))
+                    g => g.Include<FusionDropDownList, Step2ClinicalModel>(m => m.DiabetesType)
+                          .Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.A1cLevel)
+                          .Include<FusionSwitch, Step2ClinicalModel>(m => m.InsulinDependent)
+                          .Include<FusionDropDownList, Step2ClinicalModel>(m => m.InsulinSchedule))
                  .Response(r => r.OnSuccess<SaveSectionResponse>((json, s) =>
                  {
                      s.Component<NativeHiddenField>(m => m.DiabetesAssessmentId).SetValue(json, x => x.Id);
