@@ -49,6 +49,11 @@ SF components bind to it, user sees their previously entered values.
    Without the data source, a DropDownList can't display "Alzheimer's" even if the model says so.
    SF components bind to model property via expression, and render options from DataSource.
    This is exactly how every sandbox component page works. No custom JS hydration.
+   NOTE: If a component's DataSource is populated via cascading (HTTP request via .Reactive),
+   the initial DataSource from ViewBag is for the EDIT load only. Once the user interacts
+   and triggers a cascade (e.g., select parent → GET child items → SetDataSource + DataBind),
+   the runtime replaces the DataSource dynamically. Both patterns coexist — ViewBag for initial
+   render, .Reactive HTTP for runtime cascading. One does not impact the other.
    ```csharp
    // Controller — loading step from draft (edit scenario)
    public IActionResult Step1(string? screeningId)
