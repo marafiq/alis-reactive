@@ -196,121 +196,41 @@ POST /RequestRoomSetup
 POST /SaveCognitive, SaveCardiac, SaveDiabetes  (section saves within Step 2)
 ```
 
-## Assert Criteria — What Each Test Must Verify
+## Assert Criteria — Written as Comments, Tests Come Later
 
-### Existing 26 tests (must still pass):
+Do NOT write Playwright tests during the refactor. Instead:
+1. Build the app with per-step models
+2. Verify manually in the browser
+3. Write assert criteria as CODE COMMENTS in the views (what to verify later)
+4. Tests are written in a SEPARATE session after the app works correctly
 
-Group 1 — Step Navigation:
-  ASSERT: step-1 visible on load, step-2/3/4 hidden
-  ASSERT: click Next → current step hides, next step shows
-  ASSERT: click Previous → current step hides, previous step shows
+### Assert comments format (place in views where behavior occurs):
 
-Group 2 — Age → Risk Tier:
-  ASSERT: enter 85 → risk badge contains "High"
-  ASSERT: enter 70 → risk badge contains "Standard"
-  ASSERT: enter 50 → risk badge contains "Low"
+```csharp
+// ASSERT: enter age 85 → risk badge shows "High Risk"
+// ASSERT: select "Alzheimer's" → cognitive-section visible, cardiac/diabetes hidden
+// ASSERT: save Step 1 → reload → ResidentName shows saved value
+// ASSERT: save Step 2 with CognitiveScore 12 → reload → score pre-populated
+// ASSERT: Step 1 validation error stays on Step 1 — no cross-step leaks
+// ASSERT: Submit with missing Step 2 draft → 400 "Step 2 not saved"
+```
 
-Group 3 — Diagnosis → Section Visibility:
-  ASSERT: select "Alzheimer's" → cognitive-section visible, cardiac/diabetes hidden
-  ASSERT: select "Heart Disease" → cardiac-section visible, cognitive/diabetes hidden
-  ASSERT: select "Diabetes" → diabetes-section visible, cognitive/cardiac hidden
+### Key behaviors to verify manually in browser:
 
-Group 4 — Veteran Toggle:
-  ASSERT: toggle on → veteran-section visible
-  ASSERT: toggle off → veteran-section hidden
+**Draft persistence (the new thing):**
+- Fill Step 1 → Save → navigate away → come back → values still there
+- Fill Step 2 Alzheimer's cognitive → Save → Previous → Next → score pre-populated
+- SF components (dropdown, switch, numeric, datepicker) all show saved values on reload
+- Conditions fire correctly on top of pre-populated state (change score → care unit updates)
 
-Group 5 — Cognitive Assessment:
-  ASSERT: score 12 → cognitive-status contains "Memory Care"
-  ASSERT: score 20 → cognitive-status contains "Assisted"
-  ASSERT: wanders on → wander-details visible
-  ASSERT: frequency "Frequently" → elopement-result shows alert message
+**Per-step validation (the fix):**
+- Step 1 Save with empty name → error on Step 1 only
+- Step 2 Save with empty CognitiveScore (Alzheimer's) → error on Step 2 only
+- No phantom errors from other steps
 
-Group 6 — Cardiac Assessment:
-  ASSERT: BP 160 → hypertension-result shows alert message
-  ASSERT: BP 120 → hypertension-result shows "Normal"
-  ASSERT: pacemaker on → pacemaker-details visible
-
-Group 7 — Diabetes Assessment:
-  ASSERT: A1C 10.5 → uncontrolled-result shows alert message
-  ASSERT: A1C 7 → uncontrolled-result shows "Controlled"
-  ASSERT: insulin on → insulin-details visible
-
-Group 8 — Falls & Mobility:
-  ASSERT: "3+ falls" → fall-details visible
-  ASSERT: "Wheelchair" → escort-indicator visible + room-result shows message
-  ASSERT: fallRisk 8 + age 82 → fallrisk-result contains "Continuous"
-
-Group 9 — Medications:
-  ASSERT: medCount 14 → polypharmacy-warning visible
-  ASSERT: painMed on + pain 9 → pain-result shows alert + location-required visible
-
-### NEW tests to add (10 tests):
-
-Test: save_step1_and_reload_preserves_resident_name
-  ACTION: fill name "Margaret Johnson", age 82, diagnosis "Alzheimer's"
-  ACTION: click Save Step 1
-  ASSERT: server returns 200 with screeningId
-  ACTION: navigate away and back to Step 1
-  ASSERT: ResidentName field shows "Margaret Johnson"
-  ASSERT: Age field shows 82
-  ASSERT: Diagnosis dropdown shows "Alzheimer's"
-
-Test: save_step2_cognitive_and_reload_preserves_score
-  ACTION: complete Step 1 with Alzheimer's, save, go to Step 2
-  ACTION: fill CognitiveScore 12, toggle Wanders on, select "Frequently"
-  ACTION: click Save Step 2
-  ASSERT: server returns 200
-  ACTION: navigate away and back to Step 2
-  ASSERT: CognitiveScore shows 12
-  ASSERT: Wanders switch is on
-  ASSERT: WanderFrequency shows "Frequently"
-  ASSERT: cognitive-section is visible (because diagnosis = Alzheimer's)
-
-Test: step1_validation_error_shows_on_step1_only
-  ACTION: leave ResidentName empty, click Save Step 1
-  ASSERT: validation error appears next to ResidentName
-  ASSERT: NO errors appear on Step 2/3/4 fields
-
-Test: step2_validation_error_for_missing_cognitive_score
-  ACTION: save Step 1 with Alzheimer's
-  ACTION: go to Step 2, leave CognitiveScore empty, click Save Step 2
-  ASSERT: validation error for CognitiveScore
-  ASSERT: NO error for ResidentName or EmergencyContact
-
-Test: submit_with_all_drafts_saved_returns_care_plan
-  ACTION: complete and save all 4 steps
-  ACTION: click Submit
-  ASSERT: server returns 200 with screeningId, careUnit, monitoringLevel
-
-Test: submit_with_missing_step2_draft_returns_error
-  ACTION: save Step 1 only, skip Step 2, go to Step 4
-  ACTION: click Submit
-  ASSERT: server returns 400 with error about missing Step 2
-
-Test: per_step_validation_does_not_leak_across_steps
-  ACTION: save Step 1 (valid)
-  ACTION: go to Step 3, leave fields empty, click Save Step 3
-  ASSERT: Step 3 validates only Step 3 fields (CausedInjury, TakesPainMedication, etc.)
-  ASSERT: Step 1 fields (ResidentName, Age) are NOT referenced in errors
-
-Test: veteran_section_visible_on_reload_when_saved_as_veteran
-  ACTION: toggle IsVeteran on, fill VaId, save Step 1
-  ACTION: reload Step 1
-  ASSERT: IsVeteran switch is on
-  ASSERT: veteran-section is visible
-  ASSERT: VaId field shows saved value
-
-Test: conditions_fire_on_reloaded_step2_when_user_changes_value
-  ACTION: save Step 1 with Alzheimer's, save Step 2 with CognitiveScore 12
-  ACTION: reload Step 2
-  ASSERT: CognitiveScore shows 12, cognitive-status shows "Memory Care"
-  ACTION: change CognitiveScore to 20
-  ASSERT: cognitive-status updates to "Assisted" (condition fires on change)
-
-Test: previous_button_loads_step_from_server_with_saved_state
-  ACTION: fill and save Step 1, go to Step 2
-  ACTION: click Previous
-  ASSERT: Step 1 loads with all saved values visible
+**Final submit:**
+- All steps saved → Submit → 200 with care plan
+- Missing step draft → Submit → 400 with specific error
 
 ## Framework Primitives Reference — Exact Syntax From Sandbox
 
