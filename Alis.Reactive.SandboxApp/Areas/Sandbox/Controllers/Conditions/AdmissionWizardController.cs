@@ -70,7 +70,8 @@ public class AdmissionWizardController : Controller
         CollectErrors(new Step2Validator().Validate(model), errors);
         if (errors.Count > 0) return BadRequest(new { errors });
 
-        var screeningId = model.ScreeningId;
+        var id = string.IsNullOrEmpty(model.ScreeningId) ? NewScreeningId() : model.ScreeningId;
+        model.ScreeningId = id;
         var ts = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
         if (model.PrimaryDiagnosis is "Alzheimer's" or "Parkinson's" && model.CognitiveScore > 0)
             model.CognitiveAssessmentId = $"COG-{ts}";
@@ -78,8 +79,8 @@ public class AdmissionWizardController : Controller
             model.CardiacAssessmentId = $"CAR-{ts}";
         if (model.PrimaryDiagnosis == "Diabetes" && !string.IsNullOrEmpty(model.DiabetesType))
             model.DiabetesAssessmentId = $"DIA-{ts}";
-        Step2Drafts[screeningId] = model;
-        return Ok(new SaveStepResponse { ScreeningId = screeningId, Message = $"Step 2 saved — {model.PrimaryDiagnosis}" });
+        Step2Drafts[id] = model;
+        return Ok(new SaveStepResponse { ScreeningId = id, Message = $"Step 2 saved — {model.PrimaryDiagnosis}" });
     }
 
     // ── POST SaveStep3 → saves draft, returns JSON ──────────────────────────
@@ -91,9 +92,10 @@ public class AdmissionWizardController : Controller
         CollectErrors(new Step3Validator().Validate(model), errors);
         if (errors.Count > 0) return BadRequest(new { errors });
 
-        var screeningId = model.ScreeningId;
-        Step3Drafts[screeningId] = model;
-        return Ok(new SaveStepResponse { ScreeningId = screeningId, Message = "Step 3 saved" });
+        var id = string.IsNullOrEmpty(model.ScreeningId) ? NewScreeningId() : model.ScreeningId;
+        model.ScreeningId = id;
+        Step3Drafts[id] = model;
+        return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 3 saved" });
     }
 
     // ── POST LoadStep (Previous navigation) ─────────────────────────────────
