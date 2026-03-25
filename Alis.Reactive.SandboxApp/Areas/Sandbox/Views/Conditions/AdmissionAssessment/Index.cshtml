@@ -231,13 +231,13 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- Step 3: Functional Assessment (wired in Task 10)                       -->
+    <!-- Step 3: Functional Assessment                                          -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div id="step-3" hidden>
         <native-card><native-card-body>
             <native-heading level="H2">Step 3: Functional Assessment</native-heading>
             <p class="text-sm text-text-secondary mb-4">
-                Mobility, fall risk, and medication assessment. Conditions will be wired in Task 10.
+                Mobility, fall risk, and medication assessment. Conditions trigger clinical alerts and room setup.
             </p>
 
             <!-- Row 1: Fall History + Fall Risk Score -->
@@ -245,10 +245,42 @@
                 @{ Html.InputField(plan, m => m.FallHistory, o => o.Label("Fall History"))
                     .DropDownList(b => b
                         .DataSource(fallOptions)
-                        .Placeholder("Select fall history")); }
+                        .Placeholder("Select fall history")
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            var comp = p.Component<FusionDropDownList>(m => m.FallHistory);
+                            p.When(comp.Value()).In("1-2 falls", "3+ falls")
+                                .Then(t => t.Element("fall-details").Show())
+                                .Else(e => e.Element("fall-details").Hide());
+                        })); }
 
                 @{ Html.InputField(plan, m => m.FallRiskScore, o => o.Label("Fall Risk Score"))
                     .NumericTextBox(b => b.Min(0).Max(10).Step(1)); }
+            </div>
+
+            <!-- Fall Risk Check Button -->
+            <div class="mb-4">
+                @(Html.NativeButton("check-fallrisk-btn", "Check Fall Risk")
+                    .CssClass("rounded-md border border-border px-4 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var fallRisk = p.Component<FusionNumericTextBox>(m => m.FallRiskScore);
+                        var age = p.Component<FusionNumericTextBox>(m => m.Age);
+                        p.When(fallRisk.Value()).Gte(7m)
+                            .And(age.Value()).Gte(80m)
+                            .Then(t =>
+                            {
+                                t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Continuous");
+                                t.Element("fallrisk-result").SetText("High fall risk + elderly — Continuous monitoring");
+                                t.Element("fallrisk-result").Show();
+                            })
+                            .Else(e =>
+                            {
+                                e.Element("fallrisk-result").SetText("Standard monitoring");
+                                e.Element("fallrisk-result").Show();
+                            });
+                    }))
+                <span id="fallrisk-result" hidden class="ml-3 text-sm font-semibold text-accent"></span>
             </div>
 
             <!-- Row 2: Mobility Aid + Medication Count -->
@@ -256,22 +288,67 @@
                 @{ Html.InputField(plan, m => m.MobilityAid, o => o.Label("Mobility Aid"))
                     .DropDownList(b => b
                         .DataSource(mobilityAids)
-                        .Placeholder("Select mobility aid")); }
+                        .Placeholder("Select mobility aid")
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            var comp = p.Component<FusionDropDownList>(m => m.MobilityAid);
+                            // Escort indicator for Walker or Wheelchair
+                            p.When(comp.Value()).In("Walker", "Wheelchair")
+                                .Then(t => t.Element("escort-indicator").Show())
+                                .Else(e => e.Element("escort-indicator").Hide());
+                            // Room setup POST for Wheelchair only
+                            p.When(comp.Value()).Eq("Wheelchair")
+                                .Then(then =>
+                                {
+                                    then.Element("room-spinner").Show();
+                                    then.Post("/Sandbox/Conditions/AdmissionAssessment/RequestRoomSetup",
+                                        g => g.Include<FusionDropDownList, HealthScreeningModel>(m => m.MobilityAid)
+                                              .Include<NativeTextBox, HealthScreeningModel>(m => m.ResidentName))
+                                     .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                                     {
+                                         s.Element("room-result").SetText(json, x => x.Message);
+                                         s.Element("room-result").Show();
+                                         s.Element("room-spinner").Hide();
+                                     }));
+                                });
+                        })); }
 
                 @{ Html.InputField(plan, m => m.MedicationCount, o => o.Label("Medication Count"))
-                    .NumericTextBox(b => b.Min(0).Max(50).Step(1)); }
+                    .NumericTextBox(b => b
+                        .Min(0).Max(50).Step(1)
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            var comp = p.Component<FusionNumericTextBox>(m => m.MedicationCount);
+                            p.When(comp.Value()).Gt(10m)
+                                .Then(t => t.Element("polypharmacy-warning").Show())
+                                .Else(e => e.Element("polypharmacy-warning").Hide());
+                        })); }
             </div>
 
             <!-- Row 3: Blood Thinners + Pain Medication -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 @{ Html.InputField(plan, m => m.TakesBloodThinners, o => o.Label("Takes Blood Thinners"))
-                    .Switch(b => { }); }
+                    .Switch(b => b
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            var comp = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
+                            p.When(comp.Value()).Truthy()
+                                .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Enhanced"))
+                                .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Standard"));
+                        })); }
 
                 @{ Html.InputField(plan, m => m.TakesPainMedication, o => o.Label("Takes Pain Medication"))
-                    .Switch(b => { }); }
+                    .Switch(b => b
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            var comp = p.Component<FusionSwitch>(m => m.TakesPainMedication);
+                            p.When(comp.Value()).Truthy()
+                                .Then(t => t.Element("pain-section").Show())
+                                .Else(e => e.Element("pain-section").Hide());
+                        })); }
             </div>
 
-            <!-- Conditional sections (hidden, wired in Task 10) -->
+            <!-- Conditional sections -->
             <div id="fall-details" hidden>
                 @await Html.PartialAsync("_FallDetails", Model)
             </div>
@@ -284,8 +361,13 @@
                 <p class="text-sm font-semibold text-accent">Escort required for this resident.</p>
             </div>
 
+            <div id="room-spinner" hidden>
+                <p class="text-sm text-text-muted">Requesting accessible room setup...</p>
+            </div>
+            <div id="room-result" hidden class="text-sm font-semibold text-accent"></div>
+
             <div id="polypharmacy-warning" hidden>
-                <p class="text-sm font-semibold text-orange-600">Polypharmacy alert: 5+ medications.</p>
+                <p class="text-sm font-semibold text-orange-600">Polypharmacy alert: 10+ medications.</p>
             </div>
 
             <!-- Step 3 Navigation -->
@@ -317,19 +399,27 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- Step 4: Review & Submit (wired in Task 10)                             -->
+    <!-- Step 4: Review & Submit                                                -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div id="step-4" hidden>
-        <native-card><native-card-body>
+        <native-card><native-card-body id="screening-form">
             <native-heading level="H2">Step 4: Review &amp; Submit</native-heading>
             <p class="text-sm text-text-secondary mb-4">
-                Review summary and submit. Emergency contact is required. Submit wiring in Task 10.
+                Review summary and submit. Emergency contact is required.
             </p>
 
             <!-- Emergency Contact -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 @{ Html.InputField(plan, m => m.EmergencyContact, o => o.Required().Label("Emergency Contact"))
-                    .NativeTextBox(b => b.Placeholder("Contact name and phone")); }
+                    .NativeTextBox(b => b
+                        .Placeholder("Contact name and phone")
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            var comp = p.Component<NativeTextBox>(m => m.EmergencyContact);
+                            p.When(comp.Value()).IsEmpty()
+                                .Then(t => t.Element("contact-warning").Show())
+                                .Else(e => e.Element("contact-warning").Hide());
+                        })); }
             </div>
 
             <div id="contact-warning" hidden>
@@ -346,10 +436,8 @@
                 </div>
             </native-card-body></native-card>
 
-            <!-- Validation Summary -->
-            <div id="validation-summary" hidden>
-                <p class="text-sm font-semibold text-red-600">Please fix the errors above before submitting.</p>
-            </div>
+            <!-- Submit Result -->
+            <div id="submit-result" hidden class="text-sm font-semibold text-accent mt-4"></div>
 
             <!-- Step 4 Navigation -->
             <div class="flex justify-between mt-6">
@@ -365,7 +453,33 @@
                         p.Element("step-ind-3").AddClass("text-accent");
                     }))
                 @(Html.NativeButton("submit-btn", "Submit Assessment")
-                    .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+                    .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Element("submit-spinner").Show();
+                        p.Element("submit-text").Hide();
+                        p.Post("/Sandbox/Conditions/AdmissionAssessment/Submit",
+                            g => g.IncludeAll())
+                         .Validate<AdmissionAssessmentValidator>("screening-form")
+                         .Response(r => r
+                            .OnSuccess<SubmitScreeningResponse>((json, s) =>
+                            {
+                                s.Element("submit-result").SetText(json, x => x.Message);
+                                s.Element("submit-result").Show();
+                                s.Element("submit-spinner").Hide();
+                                s.Element("submit-text").Show();
+                            })
+                            .OnError(400, e =>
+                            {
+                                e.ValidationErrors("screening-form");
+                                e.Element("submit-spinner").Hide();
+                                e.Element("submit-text").Show();
+                            }));
+                    }))
+            </div>
+            <div class="mt-2">
+                <span id="submit-spinner" hidden class="text-sm text-text-muted">Submitting assessment...</span>
+                <span id="submit-text"></span>
             </div>
         </native-card-body></native-card>
     </div>
