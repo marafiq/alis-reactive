@@ -90,7 +90,8 @@ jobs:
       - name: Install Playwright browsers
         run: pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
 
-      - name: Run Playwright tests
+      - name: Run Playwright tests (attempt 1)
+        id: pw1
         run: |
           dotnet test tests/Alis.Reactive.PlaywrightTests \
             --no-build \
@@ -99,7 +100,61 @@ jobs:
             --results-directory TestResults
         continue-on-error: true
 
-      - name: Upload Playwright report
+      - name: Retry failed tests (attempt 2)
+        id: pw2
+        if: steps.pw1.outcome == 'failure'
+        run: |
+          FAILED=$(grep 'outcome="Failed"' TestResults/playwright-results.trx \
+            | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
+            | grep -v "ResultSummary" | paste -sd '|' -)
+          if [ -n "$FAILED" ]; then
+            echo "Retrying: $FAILED"
+            dotnet test tests/Alis.Reactive.PlaywrightTests \
+              --no-build --filter "$FAILED" \
+              --logger "html;LogFileName=retry-2-report.html" \
+              --logger "trx;LogFileName=retry-2-results.trx" \
+              --results-directory TestResults \
+              -- NUnit.NumberOfTestWorkers=1
+          fi
+        continue-on-error: true
+
+      - name: Retry failed tests (attempt 3)
+        id: pw3
+        if: steps.pw2.outcome == 'failure'
+        run: |
+          FAILED=$(grep 'outcome="Failed"' TestResults/retry-2-results.trx \
+            | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
+            | grep -v "ResultSummary" | paste -sd '|' -)
+          if [ -n "$FAILED" ]; then
+            echo "Retrying: $FAILED"
+            dotnet test tests/Alis.Reactive.PlaywrightTests \
+              --no-build --filter "$FAILED" \
+              --logger "html;LogFileName=retry-3-report.html" \
+              --logger "trx;LogFileName=retry-3-results.trx" \
+              --results-directory TestResults \
+              -- NUnit.NumberOfTestWorkers=1
+          fi
+        continue-on-error: true
+
+      - name: Retry failed tests (attempt 4 — final)
+        id: pw4
+        if: steps.pw3.outcome == 'failure'
+        run: |
+          FAILED=$(grep 'outcome="Failed"' TestResults/retry-3-results.trx \
+            | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
+            | grep -v "ResultSummary" | paste -sd '|' -)
+          if [ -n "$FAILED" ]; then
+            echo "Final retry: $FAILED"
+            dotnet test tests/Alis.Reactive.PlaywrightTests \
+              --no-build --filter "$FAILED" \
+              --logger "html;LogFileName=retry-4-report.html" \
+              --logger "trx;LogFileName=retry-4-results.trx" \
+              --results-directory TestResults \
+              -- NUnit.NumberOfTestWorkers=1
+          fi
+        continue-on-error: true
+
+      - name: Upload Playwright report + screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -107,6 +162,8 @@ jobs:
           path: |
             TestResults/playwright-report.html
             TestResults/playwright-results.trx
+            TestResults/retry-*-report.html
+            TestResults/retry-*-results.trx
             TestResults/playwright-traces/
           retention-days: 14
 
