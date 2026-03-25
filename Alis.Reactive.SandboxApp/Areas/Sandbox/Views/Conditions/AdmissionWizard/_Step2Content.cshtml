@@ -21,6 +21,11 @@
     @Html.HiddenFieldFor(plan, m => m.ResidentName)
     @Html.HiddenFieldFor(plan, m => m.CareUnit)
 
+    <!-- Condition fields: always in DOM so WhenField conditions can resolve (default false → skip) -->
+    @if (!showCognitive) { @Html.HiddenFieldFor(plan, m => m.Wanders) }
+    @if (!showCardiac) { @Html.HiddenFieldFor(plan, m => m.HasPacemaker) }
+    @if (!showDiabetes) { @Html.HiddenFieldFor(plan, m => m.InsulinDependent) }
+
     @if (showCognitive)
     {
         <native-card><native-card-body>
