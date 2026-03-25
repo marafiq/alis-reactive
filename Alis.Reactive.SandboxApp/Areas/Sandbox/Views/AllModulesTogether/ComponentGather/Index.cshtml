@@ -108,7 +108,7 @@
             </native-grid>
 
             <native-grid cols="C2" gap="Base">
-                @{ Html.InputField(plan, m => m.StayStart, o => o.Required().Label("Stay Period"))
+                @{ Html.InputField(plan, m => m.StayPeriod, o => o.Required().Label("Stay Period"))
                     .DateRangePicker(b => b.Placeholder("Select stay period")); }
 
                 @{ Html.InputField(plan, m => m.InsuranceProvider, o => o.Required().Label("Insurance Provider"))
@@ -180,7 +180,7 @@
                             s.Element("echo-admission-date").SetText(json, x => x.AdmissionDate);
                             s.Element("echo-medication-time").SetText(json, x => x.MedicationTime);
                             s.Element("echo-appointment-time").SetText(json, x => x.AppointmentTime);
-                            s.Element("echo-stay-start").SetText(json, x => x.StayStart);
+                            s.Element("echo-stay-start").SetText(json, x => x.StayPeriod);
                             s.Element("echo-insurance-provider").SetText(json, x => x.InsuranceProvider);
                             s.Element("echo-phone-number").SetText(json, x => x.PhoneNumber);
                             s.Element("echo-care-plan").SetText(json, x => x.CarePlan);
@@ -219,7 +219,7 @@
                             s.Element("echo-admission-date").SetText(json, x => x.AdmissionDate);
                             s.Element("echo-medication-time").SetText(json, x => x.MedicationTime);
                             s.Element("echo-appointment-time").SetText(json, x => x.AppointmentTime);
-                            s.Element("echo-stay-start").SetText(json, x => x.StayStart);
+                            s.Element("echo-stay-start").SetText(json, x => x.StayPeriod);
                             s.Element("echo-insurance-provider").SetText(json, x => x.InsuranceProvider);
                             s.Element("echo-phone-number").SetText(json, x => x.PhoneNumber);
                             s.Element("echo-care-plan").SetText(json, x => x.CarePlan);
@@ -267,7 +267,7 @@
             <p>Admission Date: <span id="echo-admission-date">&mdash;</span></p>
             <p>Medication Time: <span id="echo-medication-time">&mdash;</span></p>
             <p>Appointment Time: <span id="echo-appointment-time">&mdash;</span></p>
-            <p>Stay Start: <span id="echo-stay-start">&mdash;</span></p>
+            <p>Stay Period: <span id="echo-stay-start">&mdash;</span></p>
             <p>Insurance Provider: <span id="echo-insurance-provider">&mdash;</span></p>
             <p>Phone Number: <span id="echo-phone-number">&mdash;</span></p>
             <p>Care Plan: <span id="echo-care-plan">&mdash;</span></p>

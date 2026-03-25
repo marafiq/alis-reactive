@@ -13,14 +13,14 @@ public class WhenMutatingAFusionDateRangePicker : FusionTestBase
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            var source = p.Component<FusionDateRangePicker>(m => m.StayStart).StartDate();
+            var source = p.Component<FusionDateRangePicker>(m => m.StayPeriod).StartDate();
             Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime>>());
 
             var bindSource = source.ToBindSource();
             Assert.That(bindSource, Is.TypeOf<ComponentSource>());
 
             var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayStart"));
+            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
             Assert.That(cs.Vendor, Is.EqualTo("fusion"));
             Assert.That(cs.ReadExpr, Is.EqualTo("startDate"));
         });
@@ -32,35 +32,35 @@ public class WhenMutatingAFusionDateRangePicker : FusionTestBase
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            var source = p.Component<FusionDateRangePicker>(m => m.StayStart).EndDate();
+            var source = p.Component<FusionDateRangePicker>(m => m.StayPeriod).EndDate();
             Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime>>());
 
             var bindSource = source.ToBindSource();
             Assert.That(bindSource, Is.TypeOf<ComponentSource>());
 
             var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayStart"));
+            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
             Assert.That(cs.Vendor, Is.EqualTo("fusion"));
             Assert.That(cs.ReadExpr, Is.EqualTo("endDate"));
         });
     }
 
     [Test]
-    public void Value_returns_same_as_StartDate()
+    public void Value_returns_typed_component_source_with_value_readExpr_and_DateTime_array()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            var source = p.Component<FusionDateRangePicker>(m => m.StayStart).Value();
-            Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime>>());
+            var source = p.Component<FusionDateRangePicker>(m => m.StayPeriod).Value();
+            Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime[]>>());
 
             var bindSource = source.ToBindSource();
             Assert.That(bindSource, Is.TypeOf<ComponentSource>());
 
             var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayStart"));
+            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
             Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("startDate"));
+            Assert.That(cs.ReadExpr, Is.EqualTo("value"));
         });
     }
 
@@ -70,7 +70,7 @@ public class WhenMutatingAFusionDateRangePicker : FusionTestBase
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            var comp = p.Component<FusionDateRangePicker>(m => m.StayStart);
+            var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
             p.Element("start-echo").SetText(comp.StartDate());
         });
         var json = plan.Render();
@@ -84,7 +84,7 @@ public class WhenMutatingAFusionDateRangePicker : FusionTestBase
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            var comp = p.Component<FusionDateRangePicker>(m => m.StayStart);
+            var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
             p.Element("end-echo").SetText(comp.EndDate());
         });
         var json = plan.Render();

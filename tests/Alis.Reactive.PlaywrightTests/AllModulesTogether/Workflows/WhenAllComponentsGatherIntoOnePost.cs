@@ -65,8 +65,8 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         var aptTime = scope.DateTimePicker("AppointmentTime");
         await aptTime.Select(now.Year, now.Month, 10, "2:00 PM");
 
-        // StayStart (DateRangePicker) — current month to next month
-        var stay = scope.DateRangePicker("StayStart");
+        // StayPeriod (DateRangePicker) — current month to next month
+        var stay = scope.DateRangePicker("StayPeriod");
         await stay.SelectRange(now.Year, now.Month, 5, now.Year, now.Month, 20);
 
         // InsuranceProvider (MultiColumnComboBox) — type "Blue Cross" + Enter

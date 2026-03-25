@@ -25,7 +25,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public DateTime? AdmissionDate { get; set; }          // FusionDatePicker
         public DateTime? MedicationTime { get; set; }         // FusionTimePicker
         public DateTime? AppointmentTime { get; set; }        // FusionDateTimePicker
-        public DateTime? StayStart { get; set; }              // FusionDateRangePicker
+        public DateTime[]? StayPeriod { get; set; }            // FusionDateRangePicker
         public string? InsuranceProvider { get; set; }        // FusionMultiColumnComboBox
         public string? PhoneNumber { get; set; }              // FusionInputMask
         public string? CarePlan { get; set; }                 // FusionRichTextEditor
@@ -53,7 +53,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? AdmissionDate { get; set; }
         public string? MedicationTime { get; set; }
         public string? AppointmentTime { get; set; }
-        public string? StayStart { get; set; }
+        public string[]? StayPeriod { get; set; }
         public string? InsuranceProvider { get; set; }
         public string? PhoneNumber { get; set; }
         public string? CarePlan { get; set; }

@@ -457,20 +457,31 @@ describe("FusionDateTimePicker gather", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// FusionDateRangePicker — JSON POST (startDate + endDate)
+// FusionDateRangePicker — JSON POST + FormData (readExpr: "value" → [Date, Date])
 // ═══════════════════════════════════════════════════════════════
 
 describe("FusionDateRangePicker gather", () => {
-  it("gathers startDate in JSON POST", () => {
-    fusionEl("StayStart", { startDate: new Date("2024-01-15") });
-    const result = resolveGather([gather("StayStart", "fusion", "StayStart", "startDate")], "POST", {});
-    expect((result.body as any).StayStart).toBeInstanceOf(Date);
+  it("gathers [Date, Date] array via readExpr value in JSON POST", () => {
+    const start = new Date("2024-01-15T00:00:00Z");
+    const end = new Date("2024-06-15T00:00:00Z");
+    fusionEl("StayPeriod", { value: [start, end] });
+    const result = resolveGather([gather("StayPeriod", "fusion", "StayPeriod")], "POST", {});
+    const body = result.body as Record<string, unknown>;
+    expect(Array.isArray(body.StayPeriod)).toBe(true);
+    expect((body.StayPeriod as Date[])[0]).toBeInstanceOf(Date);
+    expect((body.StayPeriod as Date[])[1]).toBeInstanceOf(Date);
   });
 
-  it("gathers endDate in JSON POST", () => {
-    fusionEl("StayStart", { endDate: new Date("2024-06-15") });
-    const result = resolveGather([gather("StayStart", "fusion", "StayEnd", "endDate")], "POST", {});
-    expect((result.body as any).StayEnd).toBeInstanceOf(Date);
+  it("gathers [Date, Date] as repeated ISO strings in FormData", () => {
+    const start = new Date("2024-01-15T00:00:00Z");
+    const end = new Date("2024-06-15T00:00:00Z");
+    fusionEl("StayPeriod", { value: [start, end] });
+    const result = resolveGather([gather("StayPeriod", "fusion", "StayPeriod")], "POST", {}, "form-data");
+    const fd = result.body as FormData;
+    const entries = fd.getAll("StayPeriod");
+    expect(entries.length).toBe(2);
+    expect(entries[0]).toBe("2024-01-15T00:00:00.000Z");
+    expect(entries[1]).toBe("2024-06-15T00:00:00.000Z");
   });
 });
 

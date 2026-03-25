@@ -104,7 +104,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.
                 admissionDate = m.AdmissionDate?.ToString("yyyy-MM-dd"),
                 medicationTime = m.MedicationTime?.ToString("HH:mm"),
                 appointmentTime = m.AppointmentTime?.ToString("yyyy-MM-dd HH:mm"),
-                stayStart = m.StayStart?.ToString("yyyy-MM-dd"),
+                stayPeriod = m.StayPeriod?.Select(d => d.ToString("yyyy-MM-dd")).ToArray(),
                 insuranceProvider = m.InsuranceProvider,
                 phoneNumber = m.PhoneNumber,
                 carePlan = m.CarePlan != null
@@ -134,7 +134,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.
                 () => m.AdmissionDate.HasValue,
                 () => m.MedicationTime.HasValue,
                 () => m.AppointmentTime.HasValue,
-                () => m.StayStart.HasValue,
+                () => m.StayPeriod?.Length > 0,
                 () => m.InsuranceProvider != null,
                 () => m.PhoneNumber != null,
                 () => m.CarePlan != null,
