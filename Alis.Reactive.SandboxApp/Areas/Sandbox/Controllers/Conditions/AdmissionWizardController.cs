@@ -111,6 +111,7 @@ public class AdmissionWizardController : Controller
                 !string.IsNullOrEmpty(id) && Step1Drafts.TryGetValue(id, out var s1) ? s1 : new Step1DemographicsModel()),
             2 => LoadStep2Partial(id),
             3 => LoadStep3Partial(id),
+            4 => LoadStep4Partial(id),
             _ => BadRequest("Invalid step")
         };
     }
@@ -139,6 +140,28 @@ public class AdmissionWizardController : Controller
         model.Age = step1?.Age ?? 0;
         model.ResidentName = step1?.ResidentName ?? "";
         return PartialView(ViewBase + "_Step3Content.cshtml", model);
+    }
+
+    private IActionResult LoadStep4Partial(string id)
+    {
+        Step1DemographicsModel? step1 = null;
+        if (!string.IsNullOrEmpty(id)) Step1Drafts.TryGetValue(id, out step1);
+        Step2ClinicalModel? step2 = null;
+        if (!string.IsNullOrEmpty(id)) Step2Drafts.TryGetValue(id, out step2);
+        Step3FunctionalModel? step3 = null;
+        if (!string.IsNullOrEmpty(id)) Step3Drafts.TryGetValue(id, out step3);
+
+        Step4ReviewModel? draft = null;
+        if (!string.IsNullOrEmpty(id)) Step4Drafts.TryGetValue(id, out draft);
+        var model = draft ?? new Step4ReviewModel();
+        model.ScreeningId = id;
+        model.RiskTier = step1?.RiskTier ?? "";
+        model.CareUnit = step2?.CareUnit ?? "";
+        model.MonitoringLevel = step3?.MonitoringLevel ?? "";
+        model.Step1Saved = !string.IsNullOrEmpty(id) && Step1Drafts.ContainsKey(id);
+        model.Step2Saved = !string.IsNullOrEmpty(id) && Step2Drafts.ContainsKey(id);
+        model.Step3Saved = !string.IsNullOrEmpty(id) && Step3Drafts.ContainsKey(id);
+        return PartialView(ViewBase + "_Step4Content.cshtml", model);
     }
 
     // ── POST Submit ─────────────────────────────────────────────────────────
