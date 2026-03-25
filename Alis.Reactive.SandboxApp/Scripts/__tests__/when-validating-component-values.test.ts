@@ -40,7 +40,7 @@ describe("when validating component values", () => {
     return widget;
   }
 
-  function errorSpan(formId: string, fieldName: string): HTMLElement | null {
+  function errorSpan(_formId: string, fieldName: string): HTMLElement | null {
     return document.getElementById(fieldName + "_error");
   }
 
@@ -209,6 +209,50 @@ describe("when validating component values", () => {
         ],
       })).toBe(false);
       expect(errorSpan("f8", "confirm")?.textContent).toBe("Must match");
+    });
+  });
+
+  // -- Condition reader with uncoercible value (toString Err) -------------------
+  // When a component's readExpr walks to a plain object (plan misconfiguration),
+  // toString returns Err. The condition reader returns undefined → condition
+  // evaluates to null (unresolvable) → rule blocks via fail-closed behavior.
+  // See: https://github.com/marafiq/alis-reactive/issues/49
+  describe("condition reader with uncoercible component value", () => {
+    it("conditional rule blocks when condition source value is a plain object", () => {
+      const form = setupForm("f-obj");
+
+      // Condition source: Fusion widget whose value is a plain object
+      // (simulates wrong readExpr walking to an object instead of a scalar)
+      const el = document.createElement("div");
+      el.id = "ObjField";
+      const widget = new TestWidget(el);
+      widget.value = { nested: "data" } as any; // plain object — toString returns Err
+      (el as any).ej2_instances = [widget];
+      form.appendChild(el);
+      addErrorSpan(form, "ObjField", "ObjField");
+
+      // Target field: native input with conditional required
+      addNativeInput(form, "TargetField", "some value");
+
+      const result = validate({
+        formId: "f-obj",
+        fields: [
+          { fieldId: "ObjField", fieldName: "ObjField",
+            vendor: "fusion", readExpr: "value", rules: [] },
+          { fieldId: "TargetField", fieldName: "TargetField",
+            vendor: "native", readExpr: "value",
+            rules: [{
+              rule: "required", message: "Required when object field set",
+              when: { field: "ObjField", op: "truthy" }
+            }]
+          },
+        ],
+      });
+
+      // toString(plainObject) → Err → condition reader returns undefined
+      // → evalCondition returns null (unresolvable) → checkRuleCondition returns "block"
+      // → rule blocks → validation FAILS (fail-closed)
+      expect(result).toBe(false);
     });
   });
 });

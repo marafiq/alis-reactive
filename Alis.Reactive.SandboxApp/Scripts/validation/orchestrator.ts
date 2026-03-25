@@ -250,7 +250,13 @@ function domConditionReader(byName: Map<string, ValidationField>): ConditionRead
       // Normalize: null/undefined/false → "" (empty = no value expressed)
       if (val == null || val === false) return "";
       const result = toString(val);
-      return result.ok ? result.value : "";
+      // toString Err means walk returned a plain object (plan misconfiguration —
+      // wrong readExpr or future component with object-typed value).
+      // Return undefined → condition evaluates to null (unresolvable) → rule blocks
+      // via fail-closed behavior in checkRuleCondition. Stricter than returning ""
+      // which would silently treat an unreadable value as empty.
+      // See: https://github.com/marafiq/alis-reactive/issues/49 (tracking)
+      return result.ok ? result.value : undefined;
     },
   };
 }
