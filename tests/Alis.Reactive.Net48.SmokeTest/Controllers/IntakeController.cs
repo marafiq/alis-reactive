@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Alis.Reactive.Net48.SmokeTest.Models;
 using Alis.Reactive.Net48.SmokeTest.Validators;
 
@@ -11,30 +13,45 @@ namespace Alis.Reactive.Net48.SmokeTest.Controllers
     {
         public ActionResult Index()
         {
-            var model = new ResidentIntakeModel();
+            return View(new ResidentIntakeModel());
+        }
 
-            // Server-side lookup data for native <select> elements
-            ViewBag.Facilities = new List<LookupItem>
+        [HttpGet]
+        public ActionResult Facilities()
+        {
+            var response = new FacilitiesResponse
             {
-                new LookupItem("sunrise", "Sunrise Senior Living"),
-                new LookupItem("oakwood", "Oakwood Care Center"),
-                new LookupItem("maple", "Maple Grove Residence")
+                Facilities = new List<LookupItem>
+                {
+                    new LookupItem("sunrise", "Sunrise Senior Living"),
+                    new LookupItem("oakwood", "Oakwood Care Center"),
+                    new LookupItem("maple", "Maple Grove Residence")
+                }
             };
-            ViewBag.CareLevels = new List<LookupItem>
-            {
-                new LookupItem("independent", "Independent Living"),
-                new LookupItem("assisted", "Assisted Living"),
-                new LookupItem("memory-care", "Memory Care")
-            };
+            return JsonCamel(response);
+        }
 
-            return View(model);
+        [HttpGet]
+        public ActionResult CareLevels()
+        {
+            var response = new CareLevelsResponse
+            {
+                Levels = new List<LookupItem>
+                {
+                    new LookupItem("independent", "Independent Living"),
+                    new LookupItem("assisted", "Assisted Living"),
+                    new LookupItem("memory-care", "Memory Care")
+                }
+            };
+            return JsonCamel(response);
         }
 
         [HttpGet]
         public ActionResult Units(string facilityId)
         {
             var units = GetUnitsForFacility(facilityId ?? "");
-            return PartialView("_UnitOptions", units);
+            var response = new UnitsResponse { Units = units };
+            return JsonCamel(response);
         }
 
         [HttpGet]
@@ -89,8 +106,7 @@ namespace Alis.Reactive.Net48.SmokeTest.Controllers
             if (model == null)
             {
                 Response.StatusCode = 400;
-                return Json(new { errors = new Dictionary<string, string[]> { { "FirstName", new[] { "Request body is required." } } } },
-                    JsonRequestBehavior.AllowGet);
+                return JsonCamel(new { errors = new Dictionary<string, string[]> { { "FirstName", new[] { "Request body is required." } } } });
             }
 
             var validator = new IntakeValidator();
@@ -104,10 +120,10 @@ namespace Alis.Reactive.Net48.SmokeTest.Controllers
                         g => g.Key,
                         g => g.Select(e => e.ErrorMessage).ToArray());
                 Response.StatusCode = 400;
-                return Json(new { errors }, JsonRequestBehavior.AllowGet);
+                return JsonCamel(new { errors });
             }
 
-            return Json(new { message = "Intake saved successfully" }, JsonRequestBehavior.AllowGet);
+            return JsonCamel(new { message = "Intake saved successfully" });
         }
 
         [HttpGet]
@@ -115,7 +131,7 @@ namespace Alis.Reactive.Net48.SmokeTest.Controllers
         {
             var rng = new Random();
             var number = string.Format("RES-{0:yyyyMMdd}-{1}", DateTime.Now, rng.Next(1000, 9999));
-            return Json(new { number }, JsonRequestBehavior.AllowGet);
+            return JsonCamel(new { number });
         }
 
         [HttpGet]
@@ -129,6 +145,16 @@ namespace Alis.Reactive.Net48.SmokeTest.Controllers
             ViewBag.AdmissionDate = admissionDate ?? "\u2014";
             ViewBag.MonthlyRate = monthlyRate ?? "\u2014";
             return PartialView("_Summary");
+        }
+
+        private static readonly JsonSerializerSettings CamelCase = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
+
+        private ContentResult JsonCamel(object data)
+        {
+            return Content(JsonConvert.SerializeObject(data, CamelCase), "application/json");
         }
 
         private static List<LookupItem> GetUnitsForFacility(string facilityId)

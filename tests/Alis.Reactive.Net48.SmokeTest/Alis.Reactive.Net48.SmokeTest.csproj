@@ -94,6 +94,10 @@
     <Reference Include="FluentValidation">
       <HintPath>..\..\Alis.Reactive.FluentValidator\bin\Debug\net48\FluentValidation.dll</HintPath>
     </Reference>
+    <!-- Roslyn compiler for Razor views — fixes extension method resolution -->
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
+      <HintPath>packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\lib\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Alis.Reactive\Alis.Reactive.csproj">
@@ -101,6 +105,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Alis.Reactive.Native\Alis.Reactive.Native.csproj">
       <Name>Alis.Reactive.Native</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj">
+      <Name>Alis.Reactive.Fusion</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Alis.Reactive.FluentValidator\Alis.Reactive.FluentValidator.csproj">
       <Name>Alis.Reactive.FluentValidator</Name>
@@ -135,6 +142,14 @@
     <Compile Include="Validators\IntakeValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <!-- Copy Roslyn compiler to bin/roslyn — required by Microsoft.CodeDom.Providers.DotNetCompilerPlatform -->
+  <Target Name="CopyRoslynCompiler" AfterTargets="Build">
+    <ItemGroup>
+      <RoslynFiles Include="packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\tools\Roslyn-4.1.0\*.*" />
+    </ItemGroup>
+    <MakeDir Directories="$(OutputPath)roslyn" />
+    <Copy SourceFiles="@(RoslynFiles)" DestinationFolder="$(OutputPath)roslyn" SkipUnchangedFiles="true" />
+  </Target>
   <!-- Copy static assets from SandboxApp build output — single source of truth -->
   <Target Name="CopyStaticAssets" BeforeTargets="Build">
     <MakeDir Directories="css;js" />

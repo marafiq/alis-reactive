@@ -1,3 +1,10 @@
 # Copied from SandboxApp wwwroot at build time
 css/
 js/
+
+# NuGet packages (restored via packages.config)
+packages/
+
+# Build output
+bin/
+obj/

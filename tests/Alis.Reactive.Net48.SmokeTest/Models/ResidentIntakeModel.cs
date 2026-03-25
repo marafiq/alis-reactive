@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Alis.Reactive.Net48.SmokeTest.Models
 {
     public class ResidentIntakeModel
@@ -35,6 +37,21 @@ namespace Alis.Reactive.Net48.SmokeTest.Models
 
         public LookupItem() { }
         public LookupItem(string id, string name) { Id = id; Name = name; }
+    }
+
+    public class FacilitiesResponse
+    {
+        public List<LookupItem> Facilities { get; set; }
+    }
+
+    public class CareLevelsResponse
+    {
+        public List<LookupItem> Levels { get; set; }
+    }
+
+    public class UnitsResponse
+    {
+        public List<LookupItem> Units { get; set; }
     }
 
     public class ConfirmationResponse
