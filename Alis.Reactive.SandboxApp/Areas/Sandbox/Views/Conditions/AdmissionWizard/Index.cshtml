@@ -2,6 +2,18 @@
 @using Alis.Reactive.Native.Extensions
 @{
     ViewData["Title"] = "Admission Wizard";
+    var screeningId = (string?)ViewBag.ScreeningId ?? "";
+
+    // Shell plan — only used for DomReady to load Step 1
+    var plan = Html.ReactivePlan<Step1DemographicsModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Post("/Sandbox/Conditions/AdmissionWizard/LoadStep",
+            g => g.Static("screeningId", screeningId)
+                  .Static("step", 1))
+         .Response(r => r.OnSuccess(s => s.Into("step-container")));
+    }));
 }
 
 <native-vstack gap="Lg">
@@ -14,8 +26,9 @@
 
     @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionWizard/_StepIndicator.cshtml")
 
-    <!-- Step content container — replaced by Into() on each Next/Previous -->
     <div id="step-container">
-        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionWizard/_Step1Content.cshtml", Model)
+        <p class="text-sm text-text-muted p-4">Loading step 1...</p>
     </div>
 </native-vstack>
+
+@Html.RenderPlan(plan)

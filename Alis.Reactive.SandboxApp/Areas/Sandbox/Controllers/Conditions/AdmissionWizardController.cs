@@ -35,22 +35,15 @@ public class AdmissionWizardController : Controller
 
     private const string ViewBase = "~/Areas/Sandbox/Views/Conditions/AdmissionWizard/";
 
-    // ── GET /Index → full page with Step 1 loaded ───────────────────────────
+    // ── GET /Index → shell page, Step 1 loads on DomReady via Into() ────────
 
     [HttpGet("")]
     [HttpGet("Index")]
     public IActionResult Index([FromQuery] string? screeningId)
     {
-        SetDataSources();
-        var id = screeningId ?? "";
-        ViewBag.ScreeningId = id;
+        ViewBag.ScreeningId = screeningId ?? "";
         ViewBag.CurrentStep = 1;
-
-        var model = !string.IsNullOrEmpty(id) && Step1Drafts.TryGetValue(id, out var draft)
-            ? draft
-            : new Step1DemographicsModel();
-
-        return View(ViewBase + "Index.cshtml", model);
+        return View(ViewBase + "Index.cshtml", new Step1DemographicsModel());
     }
 
     // ── POST SaveStep1 → saves draft, returns Step 2 partial HTML ───────────
