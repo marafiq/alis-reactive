@@ -28,7 +28,8 @@ C# unit tests validate rendered plans against this schema using `AssertSchemaVal
       "id": "physician-field",
       "vendor": "fusion",
       "readExpr": "value",
-      "componentType": "autocomplete"
+      "componentType": "autocomplete",
+      "coerceAs": "string"
     }
   },
   "entries": [
@@ -45,6 +46,16 @@ C# unit tests validate rendered plans against this schema using `AssertSchemaVal
 | `planId` | Yes | `typeof(TModel).FullName` -- used as the runtime merge key |
 | `components` | Yes | Map of binding path to component registration. Used by gather and validation. |
 | `entries` | Yes | Array of trigger + reaction pairs |
+
+Each component entry carries:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | Yes | DOM element ID |
+| `vendor` | Yes | `"native"` or `"fusion"` — determines `resolveRoot()` strategy |
+| `readExpr` | Yes | Dot-path from vendor root to readable value (e.g., `"value"`, `"checked"`) |
+| `componentType` | Yes | Semantic label (e.g., `"datepicker"`, `"numerictextbox"`) |
+| `coerceAs` | Yes | Coercion type inferred from `typeof(TProp)` — `"string"`, `"number"`, `"boolean"`, `"date"`, `"array"`, `"raw"`. Used by gather (daterange decomposition) and validation (field enrichment). |
 
 ---
 
