@@ -56,6 +56,30 @@ Fires when `pipeline.Dispatch("resident-loaded")` is called from any pipeline.
 
 Fires when the component's DOM event fires. The trigger carries the vendor and readExpr so the runtime knows how to construct the execution context — for native components it reads the element property, for fusion it passes the event object directly.
 
+### server-push
+
+```json
+{
+  "kind": "server-push",
+  "url": "/api/notifications/stream",
+  "eventType": "notification"
+}
+```
+
+Fires when the server pushes data via Server-Sent Events (SSE). The `url` points to the SSE endpoint. The optional `eventType` filters to a specific SSE event type — omit it to receive all messages.
+
+### signalr
+
+```json
+{
+  "kind": "signalr",
+  "hubUrl": "/hubs/notifications",
+  "methodName": "ReceiveNotification"
+}
+```
+
+Fires when a SignalR hub method is invoked. The `hubUrl` identifies the hub connection (shared across triggers with the same URL). The `methodName` maps to the handler registered on the connection.
+
 ## Reactions — what happens
 
 ### sequential
@@ -251,7 +275,7 @@ Every plan is checked against a JSON Schema in unit tests. If a builder produces
 
 | Concept | Valid kinds |
 |---------|-----------|
-| Triggers | `dom-ready`, `custom-event`, `component-event` |
+| Triggers | `dom-ready`, `custom-event`, `component-event`, `server-push`, `signalr` |
 | Reactions | `sequential`, `conditional`, `http`, `parallel-http` |
 | Commands | `mutate-element`, `dispatch`, `mutate-event`, `validation-errors`, `into` |
 | Mutations | `set-prop`, `call` |

@@ -37,7 +37,7 @@ the `ReactivePlan`. Nothing executes at this point.
         p.Dispatch("ready");
     }));
 }
-<script type="application/json" data-reactive-plan data-trace="trace">@Html.Raw(plan.Render())</script>
+@Html.RenderPlan(plan)
 ```
 
 **Key files:**
@@ -45,7 +45,7 @@ the `ReactivePlan`. Nothing executes at this point.
 | File | Purpose |
 |------|---------|
 | `Alis.Reactive/IReactivePlan.cs` | Plan interface + `ReactivePlan<T>` (collects entries, renders JSON) |
-| `Alis.Reactive/Builders/TriggerBuilder.cs` | `DomReady()`, `CustomEvent()`, `CustomEvent<T>()` |
+| `Alis.Reactive/Builders/TriggerBuilder.cs` | `DomReady()`, `CustomEvent()`, `CustomEvent<T>()`, `ServerPush()`, `SignalR()` |
 | `Alis.Reactive/Builders/PipelineBuilder.cs` | `Dispatch()`, `Element()` — the reaction command builder |
 | `Alis.Reactive/Builders/ElementBuilder.cs` | `AddClass()`, `RemoveClass()`, `ToggleClass()`, `SetText()`, `SetHtml()`, `Show()`, `Hide()` |
 | `Alis.Reactive/Descriptors/Commands/Command.cs` | `DispatchCommand`, `MutateElementCommand` (polymorphic JSON) |
@@ -134,7 +134,7 @@ C# DSL: `p.Element("x").SetText(payload, x => x.Address.City)` →
 `ExpressionPathHelper` converts the expression to `"evt.address.city"`.
 
 **Resolver (reusable module):** `resolver.ts` exports `resolveSource()`, `resolveEventPath()`,
-and `resolveSourceAs()`. Coercion is in `core/coerce.ts` — returns `CoerceResult<T>` (never throws).
+and `resolveSourceAs()`. Coercion is in `core/coerce.ts` — coerces values in-place (never throws).
 Coercion types: `string`, `number`, `boolean`, `date`, `raw`, `array`.
 Schema defines `CoercionType` as reusable `$defs`.
 
@@ -147,13 +147,13 @@ ESM module bundled by esbuild. The runtime reads the plan JSON and executes it. 
 | File | Purpose |
 |------|---------|
 | `Scripts/root.ts` | esbuild entry point — auto-discovers `[data-reactive-plan]`, reads `data-trace`, calls `boot()` |
-| `Scripts/boot.ts` | Two-phase boot: wire custom-event listeners first, then execute dom-ready (testable export) |
-| `Scripts/trigger.ts` | `wireTrigger()` — wires dom-ready and custom-event listeners |
-| `Scripts/execute.ts` | `executeReaction()` → `executeCommand()` — dispatch to command handlers |
-| `Scripts/element.ts` | `mutateElement()` — resolves element by ID, executes mutation action |
-| `Scripts/resolver.ts` | `resolveSource()`, `resolveEventPath()`, `resolveSourceAs()` — source resolution + coercion via `core/coerce.ts` |
-| `Scripts/trace.ts` | `scope()`, `setLevel()` — deterministic single-string trace output |
-| `Scripts/types.ts` | TypeScript interfaces mirroring the JSON plan schema |
+| `Scripts/lifecycle/boot.ts` | Two-phase boot: wire custom-event listeners first, then execute dom-ready (testable export) |
+| `Scripts/execution/trigger.ts` | `wireTrigger()` — wires dom-ready and custom-event listeners |
+| `Scripts/execution/execute.ts` | `executeReaction()` → `executeCommand()` — dispatch to command handlers |
+| `Scripts/execution/element.ts` | `mutateElement()` — resolves element by ID, executes mutation action |
+| `Scripts/resolution/resolver.ts` | `resolveSource()`, `resolveEventPath()`, `resolveSourceAs()` — BindExpr dot-path resolution with type coercion |
+| `Scripts/core/trace.ts` | `scope()`, `setLevel()` — deterministic single-string trace output |
+| `Scripts/types/index.ts` | TypeScript interfaces mirroring the JSON plan schema (barrel export) |
 
 **Two-phase boot (critical invariant):**
 Custom-event listeners MUST be wired before dom-ready reactions execute. Otherwise
@@ -174,8 +174,8 @@ Views emit only the plan JSON element — no inline scripts at all.
 <link rel="stylesheet" href="~/css/design-system.css" asp-append-version="true"/>
 <script type="module" src="~/js/alis-reactive.js" asp-append-version="true"></script>
 
-<!-- View — plan element only, auto-boot discovers it -->
-<script type="application/json" data-reactive-plan data-trace="trace">@Html.Raw(planJson)</script>
+<!-- View — plan element only, root.ts discovers it -->
+@Html.RenderPlan(plan)
 ```
 
 **Auto-boot architecture:**
@@ -183,7 +183,7 @@ Views emit only the plan JSON element — no inline scripts at all.
 | File | Role |
 |------|------|
 | `Scripts/root.ts` | esbuild entry point — auto-discovers `[data-reactive-plan]`, reads `data-trace`, calls `boot()` |
-| `Scripts/boot.ts` | Testable export — `boot()` and `trace` used by vitest, NOT the browser entry point |
+| `Scripts/lifecycle/boot.ts` | Testable export — `boot()` and `trace` used by vitest, NOT the browser entry point |
 
 `root.ts` runs on every page load. If `[data-reactive-plan]` exists, it boots. If `data-trace`
 is set, it enables tracing. This eliminates per-view inline scripts entirely.
@@ -248,8 +248,8 @@ resolver functions and test every edge case in isolation.
 | `when-dispatching-a-custom-event-with-payload.test.ts` | All primitive types survive serialization |
 | `when-mutating-an-element.test.ts` | All 7 mutate actions + mixed chains |
 | `when-resolving-payload-source.test.ts` | Source dot-path resolution via boot(): flat int/string/bool, nested, missing path fallback |
-| `when-resolving-bind-expr.test.ts` | Direct resolveEventPath() + toString() Result tests: flat/nested/edge cases, condition-ready patterns (numeric, presence, truthiness, emptiness, text, range) |
-| `when-coercing-resolved-values.test.ts` | Direct coerce() tests: all 4 types (string, number, boolean, raw) with every boundary value |
+| `when-resolving-bind-expr.test.ts` | Direct resolveEventPath() + coerce() tests: flat/nested/edge cases, condition-ready patterns (numeric, presence, truthiness, emptiness, text, range) |
+| `when-coercing-resolved-values.test.ts` | Direct coerce() tests: string, number, boolean, raw with every boundary value (date and array tested separately) |
 | `when-using-unified-call-mutations.test.ts` | Unified call mutation: void, literal, source, multi-arg, mixed, component source, per-arg coerce |
 
 **Run:** `npm test`
@@ -338,19 +338,6 @@ Adding a new command, trigger, or action requires:
 7. **TS unit test** — runtime behavior in jsdom
 8. **Playwright test** — browser behavior verification
 9. **Sandbox view usage** — demonstrate in Events page (or new page)
-
-### 3a. Schema Changes Require a Failing Test First
-
-Any change to `reactive-plan.schema.json` MUST be preceded by a failing schema test
-in `AllPlansConformToSchema.cs` that proves the schema rejects the new plan shape.
-The test fails (RED), then the schema is updated, then the test passes (GREEN).
-
-This prevents undeclared properties from accumulating — `additionalProperties: false`
-on schema objects means any property not declared in the schema causes validation failure.
-If enrichment adds a field (e.g., `coerceAs` on `ValidationField`), the schema test
-must exercise a plan WITH that field populated to catch the gap.
-
-**The schema is the DSL's truth.** If the DSL produces it, the schema must declare it.
 
 ### 4. Two-Phase Boot Is Inviolable
 
@@ -662,22 +649,22 @@ restart before running Playwright.
 # Full test suite — run all from the repo root:
 cd /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive
 
-# 1. TS unit tests (vitest + jsdom) — 894 tests
+# 1. TS unit tests (vitest + jsdom) — 944 tests
 npm test
 
-# 2. C# unit + schema tests — 155 tests
+# 2. C# unit + schema tests — 282 tests
 dotnet test tests/Alis.Reactive.UnitTests
 
-# 3. Native component unit tests — 46 tests
+# 3. Native component unit tests — 73 tests
 dotnet test tests/Alis.Reactive.Native.UnitTests
 
-# 4. Fusion component unit tests — 58 tests
+# 4. Fusion component unit tests — 103 tests
 dotnet test tests/Alis.Reactive.Fusion.UnitTests
 
-# 5. FluentValidator unit tests — 50 tests
+# 5. FluentValidator unit tests — 52 tests
 dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 
-# 6. Playwright browser tests (browser behavior) — 481 tests
+# 6. Playwright browser tests (browser behavior) — 483 tests
 dotnet test tests/Alis.Reactive.PlaywrightTests
 
 # 7. SonarQube quality gate (requires Docker running with SonarQube)
@@ -686,7 +673,7 @@ dotnet test tests/Alis.Reactive.PlaywrightTests
 # Skip if Docker/SonarQube is not running, but run at least once per feature branch.
 ```
 
-**Total: ~1,700 tests (894 TS + 326 C# unit + 481 Playwright)**
+**Total: ~1,900+ tests (944 TS + 510 C# unit + 483 Playwright)**
 
 If any test fails, fix the issue and re-run ALL tests before committing.
 Never commit with failing tests. Never skip Playwright.
