@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Components
 {
@@ -20,9 +25,15 @@ namespace Alis.Reactive.Native.Components
     ///           .Items(allergyItems)
     ///           .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
     /// </summary>
+#if NET48
+    public class NativeCheckListBuilder<TModel, TProp> : IHtmlString
+    {
+        private readonly HtmlHelper<TModel> _html;
+#else
     public class NativeCheckListBuilder<TModel, TProp> : IHtmlContent
     {
         private readonly IHtmlHelper<TModel> _html;
+#endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
         private readonly string _bindingPath;
@@ -30,12 +41,20 @@ namespace Alis.Reactive.Native.Components
         private string _cssClass = "flex flex-col gap-2";
         private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
 
+#if NET48
+        internal NativeCheckListBuilder(HtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+#else
         internal NativeCheckListBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+#endif
         {
             _html = html;
             _expression = expression;
             _elementId = IdGenerator.For<TModel, TProp>(expression);
+#if NET48
+            _bindingPath = ExpressionHelper.GetExpressionText(expression);
+#else
             _bindingPath = html.NameFor(expression);
+#endif
         }
 
         /// <summary>The resolved element ID — used by .Reactive() to wire events.</summary>
@@ -90,10 +109,25 @@ namespace Alis.Reactive.Native.Components
             return this;
         }
 
+#if NET48
+        public string ToHtmlString()
+        {
+            using (var sw = new StringWriter())
+            {
+                WriteTo(sw, HtmlEncoder.Default);
+                return sw.ToString();
+            }
+        }
+#endif
+
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             // Resolve model value — may be string[] or CSV string depending on model binding
+#if NET48
+            var rawValue = _html.ViewData.Eval(ExpressionHelper.GetExpressionText(_expression));
+#else
             var rawValue = _html.ViewData.Eval(_html.NameFor(_expression));
+#endif
             string modelValue;
             HashSet<string> checkedValues;
             if (rawValue is string[] arr)
@@ -105,7 +139,7 @@ namespace Alis.Reactive.Native.Components
             {
                 modelValue = rawValue?.ToString() ?? "";
                 checkedValues = new HashSet<string>(
-                    modelValue.Split(',', StringSplitOptions.RemoveEmptyEntries));
+                    modelValue.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
             }
 
             var encodedId = encoder.Encode(_elementId);

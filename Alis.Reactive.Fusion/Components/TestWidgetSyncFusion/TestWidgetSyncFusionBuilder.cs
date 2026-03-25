@@ -1,6 +1,10 @@
 using System.IO;
 using System.Text.Encodings.Web;
+#if NET48
+using System.Web;
+#else
 using Microsoft.AspNetCore.Html;
+#endif
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -13,7 +17,11 @@ namespace Alis.Reactive.Fusion.Components
     ///       .InitialValue("hello")
     ///       .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
     /// </summary>
+#if NET48
+    public class TestWidgetSyncFusionBuilder<TModel> : IHtmlString where TModel : class
+#else
     public class TestWidgetSyncFusionBuilder<TModel> : IHtmlContent where TModel : class
+#endif
     {
         private readonly string _elementId;
         private string? _cssClass;
@@ -40,6 +48,17 @@ namespace Alis.Reactive.Fusion.Components
             _initialValue = value;
             return this;
         }
+
+#if NET48
+        public string ToHtmlString()
+        {
+            using (var sw = new StringWriter())
+            {
+                WriteTo(sw, HtmlEncoder.Default);
+                return sw.ToString();
+            }
+        }
+#endif
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {

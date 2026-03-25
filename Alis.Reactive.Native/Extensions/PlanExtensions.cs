@@ -1,5 +1,10 @@
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Extensions
 {
@@ -15,7 +20,11 @@ namespace Alis.Reactive.Native.Extensions
         /// Creates a ReactivePlan for the parent view.
         /// Validation extractor configured once via ReactivePlan.UseValidationExtractor() at startup.
         /// </summary>
+#if NET48
+        public static IReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
+#else
         public static IReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
+#endif
             where TModel : class
         {
             return new ReactivePlan<TModel>();
@@ -25,7 +34,11 @@ namespace Alis.Reactive.Native.Extensions
         /// Creates a ReactivePlan for a partial that belongs to the parent's plan.
         /// Same planId — runtime merges by planId. Same code as ReactivePlan.
         /// </summary>
+#if NET48
+        public static IReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)
+#else
         public static IReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
+#endif
             where TModel : class
         {
             return new ReactivePlan<TModel>(isPartial: true);
@@ -35,6 +48,21 @@ namespace Alis.Reactive.Native.Extensions
         /// Renders the plan as a JSON script tag for runtime discovery.
         /// Same call for parent views and partials — runtime merges by planId.
         /// </summary>
+#if NET48
+        public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html,
+            IReactivePlan<TModel> plan) where TModel : class
+        {
+            var json = plan.Render();
+            var script = $"<script type=\"application/json\" data-reactive-plan data-trace=\"trace\">{json}</script>";
+
+            if (plan.IsPartial)
+                return new MvcHtmlString(script);
+
+            var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
+            return new MvcHtmlString(script +
+                $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
+        }
+#else
         public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html,
             IReactivePlan<TModel> plan) where TModel : class
         {
@@ -50,5 +78,6 @@ namespace Alis.Reactive.Native.Extensions
             return new HtmlString(script +
                 $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
         }
+#endif
     }
 }

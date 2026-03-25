@@ -3,8 +3,13 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
 using Alis.Reactive.InputField;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Extensions
 {
@@ -14,11 +19,19 @@ namespace Alis.Reactive.Native.Extensions
     /// This is the ONLY file that binds the framework to the InputField infrastructure.
     /// </summary>
     public class InputFieldSetup<TModel, TProp>
+#if NET48
+        : InputFieldSetup<HtmlHelper<TModel>, TModel, TProp>
+#else
         : InputFieldSetup<IHtmlHelper<TModel>, TModel, TProp>
+#endif
         where TModel : class
     {
         internal InputFieldSetup(
+#if NET48
+            HtmlHelper<TModel> html,
+#else
             IHtmlHelper<TModel> html,
+#endif
             IReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             InputFieldOptions options,
@@ -33,16 +46,27 @@ namespace Alis.Reactive.Native.Extensions
         /// Renders IHtmlContent inside the field wrapper.
         /// All framework rendering noise (WriteTo, HtmlEncoder) is here — extensions just pass content.
         /// </summary>
+#if NET48
+        public void Render(IHtmlString content)
+        {
+            Render(() => Writer.Write(content.ToHtmlString()));
+        }
+#else
         public void Render(IHtmlContent content)
         {
             Render(() => content.WriteTo(Writer, HtmlEncoder.Default));
         }
+#endif
     }
 
     public static class InputFieldExtensions
     {
         public static InputFieldSetup<TModel, TProp> InputField<TModel, TProp>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             IReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             Action<InputFieldOptions>? options = null)
@@ -56,8 +80,13 @@ namespace Alis.Reactive.Native.Extensions
                 expression,
                 opts,
                 IdGenerator.For<TModel, TProp>(expression),
+#if NET48
+                ExpressionHelper.GetExpressionText(expression),
+                html.ViewContext.Writer);
+#else
                 html.NameFor(expression),
                 html.ViewContext.Writer);
+#endif
         }
     }
 }

@@ -32,8 +32,11 @@ namespace Alis.Reactive.Descriptors
                 underlying == typeof(double) || underlying == typeof(float) ||
                 underlying == typeof(decimal) || underlying == typeof(short) ||
                 underlying == typeof(byte)) return Number;
-            if (underlying == typeof(DateTime) || underlying == typeof(DateTimeOffset) ||
-                underlying == typeof(DateOnly)) return Date;
+            if (underlying == typeof(DateTime) || underlying == typeof(DateTimeOffset)
+#if NET6_0_OR_GREATER
+                || underlying == typeof(DateOnly)
+#endif
+                ) return Date;
             if (underlying.IsEnum) return String;
             return Raw;
         }

@@ -1,7 +1,12 @@
 using Alis.Reactive;
 using Alis.Reactive.Descriptors.Mutations;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.AppLevel
 {
@@ -47,9 +52,15 @@ namespace Alis.Reactive.Native.AppLevel
                        new[] { new LiteralArg("alis-drawer--visible") }));
         }
 
+#if NET48
+        public static IHtmlString NativeDrawer(this HtmlHelper html)
+        {
+            return new MvcHtmlString(
+#else
         public static IHtmlContent NativeDrawer(this IHtmlHelper html)
         {
             return new HtmlString(
+#endif
                 "<aside id=\"" + AppLevel.NativeDrawer.ElementId + "\" class=\"alis-drawer\" aria-hidden=\"true\">\n" +
                 "  <div class=\"alis-drawer__panel\">\n" +
                 "    <div class=\"alis-drawer__header\">\n" +
