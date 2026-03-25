@@ -131,8 +131,18 @@
                     g => g.IncludeAll())
                  .Validate<Step2Validator>("step2-form")
                  .Response(r => r
-                    .OnSuccess(s => s.Into("step-container"))
-                    .OnError(400, e => e.ValidationErrors("step2-form")));
+                    .OnSuccess<SaveStepResponse>((json, s) =>
+                    {
+                        s.Component<NativeHiddenField>(m => m.ScreeningId)
+                            .SetValue(json, x => x.ScreeningId);
+                    })
+                    .OnError(400, e => e.ValidationErrors("step2-form"))
+                    .Chained(c => c
+                        .Post("/Sandbox/Conditions/AdmissionWizard/LoadStep")
+                        .Gather(g => g
+                            .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ScreeningId)
+                            .Static("step", 3))
+                        .Response(r2 => r2.OnSuccess(s2 => s2.Into("step-container")))));
             }))
     </div>
 </native-card-body></native-card>

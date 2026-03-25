@@ -85,24 +85,10 @@ public class AdmissionWizardController : Controller
         if (model.PrimaryDiagnosis == "Diabetes" && !string.IsNullOrEmpty(model.DiabetesType))
             model.DiabetesAssessmentId = $"DIA-{ts}";
         Step2Drafts[screeningId] = model;
-
-        // Return Step 3 partial
-        SetDataSources();
-        ViewBag.ScreeningId = screeningId;
-        ViewBag.CurrentStep = 3;
-
-        Step1Drafts.TryGetValue(screeningId, out var step1);
-        var step3 = Step3Drafts.TryGetValue(screeningId, out var s3Draft)
-            ? s3Draft
-            : new Step3FunctionalModel();
-        step3.ScreeningId = screeningId;
-        step3.Age = step1?.Age ?? 0;
-        step3.ResidentName = step1?.ResidentName ?? "";
-
-        return PartialView(ViewBase + "_Step3Content.cshtml", step3);
+        return Ok(new SaveStepResponse { ScreeningId = screeningId, Message = $"Step 2 saved — {model.PrimaryDiagnosis}" });
     }
 
-    // ── POST SaveStep3 → saves draft, returns Step 4 partial HTML ───────────
+    // ── POST SaveStep3 → saves draft, returns JSON ──────────────────────────
 
     [HttpPost("SaveStep3")]
     public IActionResult SaveStep3([FromBody] Step3FunctionalModel model)
@@ -113,26 +99,7 @@ public class AdmissionWizardController : Controller
 
         var screeningId = model.ScreeningId;
         Step3Drafts[screeningId] = model;
-
-        // Return Step 4 partial
-        ViewBag.ScreeningId = screeningId;
-        ViewBag.CurrentStep = 4;
-
-        Step1Drafts.TryGetValue(screeningId, out var step1);
-        Step2Drafts.TryGetValue(screeningId, out var step2);
-
-        var step4 = Step4Drafts.TryGetValue(screeningId, out var s4Draft)
-            ? s4Draft
-            : new Step4ReviewModel();
-        step4.ScreeningId = screeningId;
-        step4.RiskTier = step1?.RiskTier ?? "";
-        step4.CareUnit = step2?.CareUnit ?? "";
-        step4.MonitoringLevel = model.MonitoringLevel;
-        step4.Step1Saved = Step1Drafts.ContainsKey(screeningId);
-        step4.Step2Saved = Step2Drafts.ContainsKey(screeningId);
-        step4.Step3Saved = true;
-
-        return PartialView(ViewBase + "_Step4Content.cshtml", step4);
+        return Ok(new SaveStepResponse { ScreeningId = screeningId, Message = "Step 3 saved" });
     }
 
     // ── POST LoadStep (Previous navigation) ─────────────────────────────────
