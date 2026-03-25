@@ -256,7 +256,9 @@ function domConditionReader(byName: Map<string, ValidationField>): ConditionRead
       if (srcField.coerceAs === "date") {
         const dateResult = toDate(val);
         if (!dateResult.ok) return undefined; // fail-closed
-        return Number.isNaN(dateResult.value) ? "" : String(dateResult.value);
+        if (Number.isNaN(dateResult.value)) return "";
+        const msResult = toString(dateResult.value);
+        return msResult.ok ? msResult.value : "";
       }
 
       const result = toString(val);
