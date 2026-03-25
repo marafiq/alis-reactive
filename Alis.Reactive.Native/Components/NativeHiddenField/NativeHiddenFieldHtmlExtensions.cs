@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+using Alis.Reactive.Descriptors;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -30,7 +31,8 @@ namespace Alis.Reactive.Native.Components
             var bindingPath = html.NameFor(expression);
 
             plan.AddToComponentsMap(bindingPath, new ComponentRegistration(
-                elementId, _component.Vendor, bindingPath, _component.ReadExpr, "hiddenfield"));
+                elementId, _component.Vendor, bindingPath, _component.ReadExpr, "hiddenfield",
+                CoercionTypes.InferFromType(typeof(TProp))));
 
             return new NativeHiddenFieldBuilder<TModel, TProp>(html, expression);
         }

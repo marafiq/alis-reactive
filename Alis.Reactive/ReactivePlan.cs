@@ -89,7 +89,8 @@ namespace Alis.Reactive
                     id = kvp.Value.ComponentId,
                     vendor = kvp.Value.Vendor,
                     readExpr = kvp.Value.ReadExpr,
-                    componentType = kvp.Value.ComponentType
+                    componentType = kvp.Value.ComponentType,
+                    coerceAs = kvp.Value.CoerceAs
                 };
             }
             return result;

@@ -152,6 +152,7 @@ namespace Alis.Reactive.Resolvers
                     field.FieldId = registration.ComponentId;
                     field.Vendor = registration.Vendor;
                     field.ReadExpr = registration.ReadExpr;
+                    field.CoerceAs = registration.CoerceAs;
                 }
             }
         }

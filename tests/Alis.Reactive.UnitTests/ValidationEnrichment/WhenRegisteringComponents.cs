@@ -8,10 +8,10 @@ public class WhenRegisteringComponents
     {
         var plan = new ReactivePlan<EnrichmentTestModel>();
 
-        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "native", "Name", "value", "textbox"));
+        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "native", "Name", "value", "textbox", "string"));
 
         Assert.Throws<InvalidOperationException>(() =>
-            plan.AddToComponentsMap("Name", new ComponentRegistration("other-input", "fusion", "Name", "value", "autocomplete")));
+            plan.AddToComponentsMap("Name", new ComponentRegistration("other-input", "fusion", "Name", "value", "autocomplete", "string")));
     }
 
     [Test]
@@ -19,8 +19,8 @@ public class WhenRegisteringComponents
     {
         var plan = new ReactivePlan<EnrichmentTestModel>();
 
-        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "native", "Name", "value", "textbox"));
-        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "native", "Name", "value", "textbox"));
+        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "native", "Name", "value", "textbox", "string"));
+        plan.AddToComponentsMap("Name", new ComponentRegistration("name-input", "native", "Name", "value", "textbox", "string"));
 
         Assert.That(plan.ComponentsMap.Count, Is.EqualTo(1));
     }

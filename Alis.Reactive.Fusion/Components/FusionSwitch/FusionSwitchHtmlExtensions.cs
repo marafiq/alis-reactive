@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Alis.Reactive.Descriptors;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Buttons;
@@ -19,7 +20,8 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "switch"));
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "switch",
+                CoercionTypes.InferFromType(typeof(bool))));
 
             var builder = setup.Helper.EJS().SwitchFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });

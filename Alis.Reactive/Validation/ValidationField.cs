@@ -26,6 +26,10 @@ namespace Alis.Reactive.Validation
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? ReadExpr { get; internal set; }
 
+        /// <summary>Coercion type from component registration (e.g. "date", "number"). Null when unenriched.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? CoerceAs { get; internal set; }
+
         public ValidationField(string fieldName, List<ValidationRule> rules)
         {
             FieldName = fieldName;
