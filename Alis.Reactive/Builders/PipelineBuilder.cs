@@ -65,6 +65,20 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
+        /// <summary>
+        /// Resolve component from a different model (cross-plan component reference).
+        /// Uses IdGenerator.For&lt;TOtherModel&gt; to produce the correct element ID.
+        /// Example: p.Component&lt;NativeHiddenField, Step2Model&gt;(m =&gt; m.Diagnosis).SetValue(...)
+        /// </summary>
+        public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
+            Expression<Func<TOtherModel, object?>> expr)
+            where TComponent : IComponent, new()
+            where TOtherModel : class
+        {
+            var elementId = IdGenerator.For<TOtherModel>(expr);
+            return new ComponentRef<TComponent, TModel>(elementId, this);
+        }
+
         /// <summary>Resolve component by string ref (non-input components by ID).</summary>
         public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
             where TComponent : IComponent, new()

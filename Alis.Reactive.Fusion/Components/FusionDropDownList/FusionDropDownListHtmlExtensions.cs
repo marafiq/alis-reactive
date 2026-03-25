@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Alis.Reactive.Descriptors;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
@@ -55,7 +56,8 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "dropdownlist"));
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "dropdownlist",
+                CoercionTypes.InferFromType(typeof(TProp))));
 
             var builder = setup.Helper.EJS().DropDownListFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });

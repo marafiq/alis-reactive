@@ -1,0 +1,176 @@
+@model Step1DemographicsModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ReactivePlan<Step1DemographicsModel>();
+    var diagnoses = (string[])ViewBag.Diagnoses;
+    var serviceBranches = (string[])ViewBag.ServiceBranches;
+}
+
+<!-- ASSERT: enter age 85 → risk badge shows "High Risk"
+     ASSERT: select "Alzheimer's" → cognitive-section visible (in Step 2)
+     ASSERT: toggle IsVeteran ON → veteran-section visible
+     ASSERT: save Step 1 with empty name → validation error on step1-form only
+     ASSERT: save Step 1 with valid data → "Step 1 saved" message -->
+<native-card><native-card-body id="step1-form">
+    <native-heading level="H2">Step 1: Demographics</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        Basic resident information. Age auto-calculates risk tier. Diagnosis determines which clinical sections appear in Step 2.
+    </p>
+
+    <!-- Row 1: Resident Name + Age -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Name"))
+            .NativeTextBox(b => b.Placeholder("Full name")); }
+
+        @{ Html.InputField(plan, m => m.Age, o => o.Required().Label("Age"))
+            .NumericTextBox(b => b
+                .Min(0).Max(120).Step(1)
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var ageComp = p.Component<FusionNumericTextBox>(m => m.Age);
+                    p.Element("age-echo").SetText(ageComp.Value());
+
+                    p.When(ageComp.Value()).Gte(85m)
+                        .Then(t =>
+                        {
+                            t.Component<FusionDropDownList>(m => m.RiskTier).SetValue("High");
+                            t.Element("risk-badge").SetText("High Risk");
+                            t.Element("risk-badge").Show();
+                        })
+                        .ElseIf(ageComp.Value()).Gte(65m)
+                        .Then(t =>
+                        {
+                            t.Component<FusionDropDownList>(m => m.RiskTier).SetValue("Standard");
+                            t.Element("risk-badge").SetText("Standard Risk");
+                            t.Element("risk-badge").Show();
+                        })
+                        .Else(e =>
+                        {
+                            e.Component<FusionDropDownList>(m => m.RiskTier).SetValue("Low");
+                            e.Element("risk-badge").SetText("Low Risk");
+                            e.Element("risk-badge").Show();
+                        });
+
+                    p.Element("age-status").SetText("assessed");
+                })); }
+    </div>
+
+    <!-- Row 2: Primary Diagnosis + Attending Physician -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.PrimaryDiagnosis, o => o.Required().Label("Primary Diagnosis"))
+            .DropDownList(b => b
+                .DataSource(diagnoses)
+                .Placeholder("Select diagnosis")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var diag = p.Component<FusionDropDownList>(m => m.PrimaryDiagnosis);
+
+                    // Cross-step: sync diagnosis to Step 2's hidden field
+                    p.Component<NativeHiddenField, Step2ClinicalModel>(m => m.PrimaryDiagnosis)
+                        .SetValue(diag.Value());
+
+                    p.When(diag.Value()).In("Alzheimer's", "Parkinson's")
+                        .Then(t => t.Element("cognitive-section").Show())
+                        .Else(e => e.Element("cognitive-section").Hide());
+
+                    p.When(diag.Value()).Eq("Heart Disease")
+                        .Then(t => t.Element("cardiac-section").Show())
+                        .Else(e => e.Element("cardiac-section").Hide());
+
+                    p.When(diag.Value()).Eq("Diabetes")
+                        .Then(t => t.Element("diabetes-section").Show())
+                        .Else(e => e.Element("diabetes-section").Hide());
+                })); }
+
+        @{ Html.InputField(plan, m => m.AttendingPhysician, o => o.Label("Attending Physician"))
+            .AutoComplete(b => b
+                .Placeholder("Type to search physicians...")
+                .DebounceDelay(300)
+                .Reactive(plan, evt => evt.Filtering, (args, p) =>
+                {
+                    args.PreventDefault(p);
+                    p.Get("/Sandbox/Conditions/AdmissionAssessment/SearchPhysicians")
+                     .Gather(g => g.FromEvent(args, x => x.Text, "q"))
+                     .Response(r => r.OnSuccess<PhysicianSearchResponse>((json, s) =>
+                     {
+                         args.UpdateData(s, json, j => j.Physicians);
+                     }));
+                })); }
+    </div>
+
+    <!-- Row 3: Risk Tier (auto) + Is Veteran -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.RiskTier, o => o.Label("Risk Tier (auto)"))
+            .DropDownList(b => b
+                .DataSource(new[] { "", "Low", "Standard", "High" })
+                .Placeholder("Set by age")); }
+
+        @{ Html.InputField(plan, m => m.IsVeteran, o => o.Label("Is Veteran"))
+            .Switch(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var sw = p.Component<FusionSwitch>(m => m.IsVeteran);
+                    p.When(sw.Value()).Truthy()
+                        .Then(t => t.Element("veteran-section").Show())
+                        .Else(e => e.Element("veteran-section").Hide());
+                })); }
+    </div>
+
+    <!-- Status echoes -->
+    <div class="font-mono text-sm space-y-1 mb-4">
+        <p>Age echo: <span id="age-echo" class="text-text-muted">&mdash;</span></p>
+        <p>Risk: <span id="risk-badge" hidden class="font-semibold text-accent">&mdash;</span></p>
+        <p>Age status: <span id="age-status" class="text-text-muted">&mdash;</span></p>
+    </div>
+
+    <!-- Veteran section (conditionally visible — inline, validated on Next) -->
+    <div id="veteran-section" hidden>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.VaId, o => o.Label("VA ID"))
+                .NativeTextBox(b => b.Placeholder("e.g. VA-12345")); }
+
+            @{ Html.InputField(plan, m => m.ServiceBranch, o => o.Label("Service Branch"))
+                .DropDownList(b => b
+                    .DataSource(serviceBranches)
+                    .Placeholder("Select branch")); }
+        </div>
+    </div>
+
+    <!-- Step 1 Navigation: validate + save on Next -->
+    <div class="flex justify-end mt-6">
+        @(Html.NativeButton("next-1", "Next: Clinical \u2192")
+            .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveStep1",
+                    g => g.IncludeAll())
+                 .Validate<Step1Validator>("step1-form")
+                 .Response(r => r
+                    .OnSuccess<SaveStepResponse>((json, s) =>
+                    {
+                        // Propagate screeningId to Steps 2, 3, 4
+                        s.Component<NativeHiddenField, Step2ClinicalModel>(m => m.ScreeningId)
+                            .SetValue(json, x => x.ScreeningId);
+                        s.Component<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId)
+                            .SetValue(json, x => x.ScreeningId);
+                        s.Component<NativeHiddenField, Step4ReviewModel>(m => m.ScreeningId)
+                            .SetValue(json, x => x.ScreeningId);
+
+                        s.Element("step-1").Hide();
+                        s.Element("step-2").Show();
+                        s.Element("step-ind-1").RemoveClass("font-bold");
+                        s.Element("step-ind-1").RemoveClass("text-accent");
+                        s.Element("step-ind-2").AddClass("font-bold");
+                        s.Element("step-ind-2").AddClass("text-accent");
+                    })
+                    .OnError(400, e =>
+                    {
+                        e.ValidationErrors("step1-form");
+                    }));
+            }))
+    </div>
+</native-card-body></native-card>
+
+@Html.RenderPlan(plan)

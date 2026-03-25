@@ -401,6 +401,32 @@ public class BrokenNestedValidator : AbstractValidator<TestModel>
     }
 }
 
+// --- DateTime condition validators (WhenField<DateTime> → Unix ms) ---
+
+public class DateTimeConditionValidator : ReactiveValidator<FullCoverageModel>
+{
+    public DateTimeConditionValidator()
+    {
+        // eq: Name required when AdmissionDate equals a specific date
+        WhenField(x => x.AdmissionDate, new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc), () =>
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name required for July 1 admissions");
+        });
+    }
+}
+
+public class DateTimeNeqConditionValidator : ReactiveValidator<FullCoverageModel>
+{
+    public DateTimeNeqConditionValidator()
+    {
+        // neq: Score required when AdmissionDate is NOT a specific date
+        WhenFieldNot(x => x.AdmissionDate, new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), () =>
+        {
+            RuleFor(x => x.Score).GreaterThan(0m).WithMessage("Score required for non-Jan-1 dates");
+        });
+    }
+}
+
 // --- All rule types in one validator ---
 
 public class AllRulesValidator : AbstractValidator<TestModel>

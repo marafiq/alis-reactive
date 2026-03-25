@@ -17,7 +17,7 @@
             },
             source: {
               kind: component,
-              componentId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayStart,
+              componentId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod,
               vendor: fusion,
               readExpr: startDate
             }

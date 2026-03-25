@@ -1,0 +1,105 @@
+@model Step2ClinicalModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ResolvePlan<Step2ClinicalModel>();
+}
+
+<native-card><native-card-body>
+    <native-heading level="H3">Cognitive Assessment</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        Score 0-30 (MMSE). Severe (&lt;15) routes to Memory Care. Moderate (15-24) adds memory support.
+        Wandering behavior triggers elopement alerts when frequent.
+    </p>
+
+    <!-- Row 1: Cognitive Score + Wanders -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.CognitiveScore, o => o.Label("Cognitive Score (MMSE)"))
+            .NumericTextBox(b => b
+                .Min(0).Max(30).Step(1)
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
+                    p.Element("score-echo").SetText(comp.Value());
+
+                    p.When(comp.Value()).Lt(15m)
+                        .Then(t =>
+                        {
+                            t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Memory Care");
+                            t.Element("cognitive-status").SetText("Severe Impairment — Memory Care");
+                        })
+                        .ElseIf(comp.Value()).Lt(25m)
+                        .Then(t =>
+                        {
+                            t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Assisted Living with Memory Support");
+                            t.Element("cognitive-status").SetText("Moderate Impairment — Assisted Living + Memory");
+                        })
+                        .Else(e =>
+                        {
+                            e.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Standard Assisted Living");
+                            e.Element("cognitive-status").SetText("Mild/Normal — Standard");
+                        });
+
+                    p.Element("cognitive-scored").SetText("scored");
+                })); }
+
+        @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
+            .Switch(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var sw = p.Component<FusionSwitch>(m => m.Wanders);
+                    p.When(sw.Value()).Truthy()
+                        .Then(t => t.Element("wander-details").Show())
+                        .Else(e => e.Element("wander-details").Hide());
+                })); }
+    </div>
+
+    <!-- Status echoes -->
+    <div class="font-mono text-sm space-y-1 mb-4">
+        <p>Score: <span id="score-echo" class="text-text-muted">&mdash;</span></p>
+        <p>Status: <span id="cognitive-status" class="text-text-muted">&mdash;</span></p>
+        <p>Scored: <span id="cognitive-scored" class="text-text-muted">&mdash;</span></p>
+    </div>
+
+    <!-- Wander details (conditionally visible) -->
+    <div id="wander-details" hidden>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.WanderFrequency, o => o.Label("Wander Frequency"))
+                .DropDownList(b => b
+                    .DataSource(new[] { "Rarely", "Occasionally", "Frequently" })
+                    .Placeholder("Select frequency")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        var freq = p.Component<FusionDropDownList>(m => m.WanderFrequency);
+                        p.When(freq.Value()).Eq("Frequently")
+                            .Then(then =>
+                            {
+                                then.Element("elopement-spinner").Show();
+                                then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertElopement",
+                                    g => g.Include<FusionDropDownList, Step2ClinicalModel>(m => m.WanderFrequency)
+                                          .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
+                                 .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                                 {
+                                     s.Element("elopement-result").SetText(json, x => x.Message);
+                                     s.Element("elopement-result").Show();
+                                     s.Element("elopement-spinner").Hide();
+                                 }));
+                            })
+                            .Else(e =>
+                            {
+                                e.Element("elopement-result").Hide();
+                            });
+                    })); }
+        </div>
+
+        <div class="font-mono text-sm space-y-1">
+            <p><span id="elopement-spinner" hidden class="text-accent">Sending alert...</span></p>
+            <div id="elopement-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
+        </div>
+    </div>
+
+</native-card-body></native-card>
+
+@Html.RenderPlan(plan)
+

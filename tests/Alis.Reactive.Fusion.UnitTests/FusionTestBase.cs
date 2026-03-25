@@ -16,8 +16,7 @@ public class FusionTestModel
     public string? Status { get; set; }
     public FusionTestAddress? Address { get; set; }
     public DateTime? AppointmentTime { get; set; }
-    public DateTime? StayStart { get; set; }
-    public DateTime? StayEnd { get; set; }
+    public DateTime[]? StayPeriod { get; set; }
     public string? PhoneNumber { get; set; }
     public string? CarePlan { get; set; }
     public bool ReceiveNotifications { get; set; }

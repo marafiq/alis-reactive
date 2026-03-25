@@ -264,43 +264,59 @@ p.Component<FusionTimePicker>(m => m.MedicationTime)
 
 ## FusionDateRangePicker
 
-A picker for selecting a start and end date. Unique among components because it exposes **two** readable properties from the ej2 instance: `startDate` and `endDate`.
+A picker for selecting a start and end date. Unique among components because the Syncfusion ej2 instance's `.value` returns `[Date, Date]` — an array of two Date objects (start + end).
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"startDate"` (primary) |
+| ReadExpr | `"value"` — returns `[Date, Date]` from ej2 instance |
+| Model type | `DateTime[]?` — array matches the Syncfusion value shape |
+| CoerceAs | `"array"` (inferred from `DateTime[]`) with element type `"date"` |
 | Events | `Changed` |
-| Typed Sources | `StartDate()` and `EndDate()`, both `TypedComponentSource<DateTime>` |
+| Typed Sources | `StartDate()` / `EndDate()` → `TypedComponentSource<DateTime>` (individual dates), `Value()` → `TypedComponentSource<DateTime[]>` (full array) |
 
 ### How do I render a date range picker?
 
 ```csharp
-Html.InputField(plan, m => m.StayStart, o => o.Label("Stay Period"))
+// Model property is DateTime[] — matches Syncfusion [Date, Date] value
+public DateTime[]? StayPeriod { get; set; }
+
+// View
+Html.InputField(plan, m => m.StayPeriod, o => o.Required().Label("Stay Period"))
     .DateRangePicker(b => b
         .Placeholder("Select date range"));
 ```
 
-### How do I read both dates?
+### How do I read individual dates in conditions?
+
+`StartDate()` and `EndDate()` use hardcoded readExpr `"startDate"` / `"endDate"` — independent of the component's ReadExpr. They return individual `DateTime` values for typed condition comparison.
 
 ```csharp
-var dateRange = p.Component<FusionDateRangePicker>(m => m.StayStart);
+var stay = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
 
-p.When(dateRange.StartDate()).NotNull()
-    .Then(t => t.Element("start-echo").SetText(dateRange.StartDate()));
+p.When(stay.StartDate()).NotNull()
+    .Then(t => t.Element("start-echo").SetText(stay.StartDate()));
 
-p.When(dateRange.EndDate()).NotNull()
-    .Then(t => t.Element("end-echo").SetText(dateRange.EndDate()));
+p.When(stay.EndDate()).NotNull()
+    .Then(t => t.Element("end-echo").SetText(stay.EndDate()));
 ```
+
+### How does gather work?
+
+`IncludeAll()` reads `ej2.value` → `[Date, Date]`. Gather's `emitArray` iterates each Date and serializes via `toString()` → ISO 8601.
+
+- **JSON POST:** `{ "StayPeriod": ["2026-07-01T...", "2026-07-15T..."] }` — ASP.NET binds `DateTime[]` natively
+- **FormData:** repeated key `StayPeriod=ISO&StayPeriod=ISO` — ASP.NET binds arrays from repeated keys
+- **GET:** repeated params — same pattern
 
 ### Source extensions
 
-| Extension | Description |
-|-----------|-------------|
-| `StartDate()` | Typed source reading `"startDate"` from the ej2 instance |
-| `EndDate()` | Typed source reading `"endDate"` from the ej2 instance |
-| `Value()` | Alias for `StartDate()` |
+| Extension | Returns | ReadExpr | Use case |
+|-----------|---------|----------|----------|
+| `StartDate()` | `TypedComponentSource<DateTime>` | `"startDate"` | Individual date for conditions/mutations |
+| `EndDate()` | `TypedComponentSource<DateTime>` | `"endDate"` | Individual date for conditions/mutations |
+| `Value()` | `TypedComponentSource<DateTime[]>` | `"value"` | Full array for gather/validation |
 
-No `SetValue()` is provided -- the DateRangePicker is set by user interaction only.
+No `SetValue()` is provided — the DateRangePicker is set by user interaction only.
 
 ---
 

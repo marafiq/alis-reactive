@@ -26,7 +26,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.AdmissionDate).NotEmpty().WithMessage("'Admission Date' is required.");
             RuleFor(x => x.MedicationTime).NotEmpty().WithMessage("'Medication Time' is required.");
             RuleFor(x => x.AppointmentTime).NotEmpty().WithMessage("'Appointment Time' is required.");
-            RuleFor(x => x.StayStart).NotEmpty().WithMessage("'Stay Start' is required.");
+            RuleFor(x => x.StayPeriod).NotEmpty().WithMessage("'Stay Period' is required.");
             RuleFor(x => x.InsuranceProvider).NotEmpty().WithMessage("'Insurance Provider' is required.");
             RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("'Phone Number' is required.");
             RuleFor(x => x.CarePlan).NotEmpty().WithMessage("'Care Plan' is required.");

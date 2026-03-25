@@ -1,0 +1,127 @@
+@model CareLevelModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Care Level Cascade";
+
+    var plan = Html.ReactivePlan<CareLevelModel>();
+    var careLevels = (List<string>)ViewBag.CareLevels;
+    var protocols = (List<string>)ViewBag.Protocols;
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Care Level Cascade — Condition-Gated Component Mutations</native-heading>
+        <native-text color="Secondary">
+            Realistic nurse workflow: selecting a care level auto-populates related fields.
+            Conditions mutate OTHER components — not just element text.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Condition → Component.SetValue() on another dropdown -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Condition → SetValue (Dropdown Cascade)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Select a care level. The protocol dropdown auto-populates based on the selection:
+            Memory Care → "Enhanced Monitoring", Skilled Nursing → "Full Clinical",
+            anything else → cleared. Commands before/after always run.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
+                .DropDownList(b => b
+                    .DataSource(careLevels)
+                    .Placeholder("Select care level")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
+
+                        // BEFORE condition — always: show current selection
+                        p.Element("s1-current-level").SetText(careLevel.Value());
+
+                        // Condition → mutate another component
+                        p.When(careLevel.Value()).Eq("Memory Care")
+                            .Then(then =>
+                            {
+                                then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Enhanced Monitoring");
+                            })
+                            .ElseIf(careLevel.Value()).Eq("Skilled Nursing")
+                            .Then(then =>
+                            {
+                                then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Full Clinical");
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Component<FusionDropDownList>(m => m.Protocol).SetValue("");
+                            });
+
+                        // AFTER condition — always: confirm update ran
+                        p.Element("s1-action-status").SetText("cascade-complete");
+                    })); }
+
+            @{ Html.InputField(plan, m => m.Protocol, o => o.Label("Protocol (auto-set by care level)"))
+                .DropDownList(b => b
+                    .DataSource(protocols)
+                    .Placeholder("Auto-assigned")); }
+        </div>
+        <div class="font-mono text-sm space-y-1">
+            <p>Current level: <span id="s1-current-level" class="text-text-muted">&mdash;</span></p>
+            <p>Action status: <span id="s1-action-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 2: Condition → SetChecked on Switch (cross-component type) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Condition → SetChecked (Cross-Component Type)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Button reads the care level dropdown and toggles the "Requires Escort" switch:
+            Memory Care or Skilled Nursing → escort required (checked),
+            anything else → not required (unchecked).
+            Proves conditions can mutate across component types (dropdown reads → switch writes).
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.RequiresEscort, o => o.Label("Requires Escort"))
+                .Switch(b => { }); }
+        </div>
+        <div class="mt-3">
+            @(Html.NativeButton("s2-apply-btn", "Apply Escort Policy")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
+
+                    // BEFORE: show what we're checking
+                    p.Element("s2-checking").SetText(careLevel.Value());
+
+                    // Condition → mutate switch
+                    p.When(careLevel.Value()).In("Memory Care", "Skilled Nursing")
+                        .Then(then =>
+                        {
+                            then.Component<FusionSwitch>(m => m.RequiresEscort).SetChecked(true);
+                            then.Element("s2-result").SetText("escort required");
+                        })
+                        .Else(else_ =>
+                        {
+                            else_.Component<FusionSwitch>(m => m.RequiresEscort).SetChecked(false);
+                            else_.Element("s2-result").SetText("no escort needed");
+                        });
+
+                    // AFTER: confirm policy applied
+                    p.Element("s2-policy-status").SetText("policy-applied");
+                }))
+        </div>
+        <div class="font-mono text-sm mt-3 space-y-1">
+            <p>Checking: <span id="s2-checking" class="text-text-muted">&mdash;</span></p>
+            <p>Result: <span id="s2-result" class="text-text-muted">&mdash;</span></p>
+            <p>Policy status: <span id="s2-policy-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

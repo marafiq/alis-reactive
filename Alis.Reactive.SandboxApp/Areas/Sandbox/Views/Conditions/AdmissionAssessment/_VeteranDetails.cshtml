@@ -1,0 +1,54 @@
+@model Step1DemographicsModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ResolvePlan<Step1DemographicsModel>();
+}
+
+<native-card><native-card-body>
+    <native-heading level="H3">Veteran Details</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        Enter VA ID and service branch. Verify benefits via server-side VA lookup.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.VaId, o => o.Label("VA ID"))
+            .NativeTextBox(b => b.Placeholder("e.g. VA-12345")); }
+
+        @{ Html.InputField(plan, m => m.ServiceBranch, o => o.Label("Service Branch"))
+            .DropDownList(b => b
+                .DataSource(new[] { "Army", "Navy", "Air Force", "Marines", "Coast Guard" })
+                .Placeholder("Select branch")); }
+    </div>
+
+    <div class="mt-3">
+        @(Html.NativeButton("verify-va-btn", "Verify VA Benefits")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Element("va-spinner").Show();
+                p.Element("verify-va-btn-text").Hide();
+                p.Post("/Sandbox/Conditions/AdmissionAssessment/VerifyVeteran",
+                    g => g.Include<NativeTextBox, Step1DemographicsModel>(m => m.VaId)
+                          .Include<FusionDropDownList, Step1DemographicsModel>(m => m.ServiceBranch))
+                 .Response(r => r.OnSuccess<VerifyVaResponse>((json, s) =>
+                 {
+                     s.Element("va-result").SetText(json, x => x.Message);
+                     s.Element("va-result").Show();
+                     s.Element("va-spinner").Hide();
+                     s.Element("verify-va-btn-text").Show();
+                 }));
+            }))
+    </div>
+
+    <div class="font-mono text-sm mt-3 space-y-1">
+        <p>
+            <span id="va-spinner" hidden class="text-accent">Verifying...</span>
+            <span id="verify-va-btn-text"></span>
+        </p>
+        <div id="va-result" hidden class="mt-2 rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-700"></div>
+    </div>
+</native-card-body></native-card>
+
+

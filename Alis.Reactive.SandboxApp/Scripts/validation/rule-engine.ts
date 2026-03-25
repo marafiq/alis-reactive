@@ -3,7 +3,7 @@
 // No DOM, no vendor, no side effects. Takes a value and rule → pass/fail.
 // Used by validation.ts orchestrator. Testable without jsdom.
 
-import { coerce } from "../core/coerce";
+import { coerce, toString } from "../core/coerce";
 import type { CoercionType } from "../core/coerce";
 import type { ValidationRule } from "../types";
 
@@ -20,8 +20,11 @@ function compareValues(a: unknown, b: unknown, coerceAs: CoercionType | undefine
       "The adapter must set coerceAs from the property type."
     );
   }
-  const ca = coerce(a, coerceAs) as number;
-  const cb = coerce(b, coerceAs) as number;
+  const ra = coerce(a, coerceAs);
+  const rb = coerce(b, coerceAs);
+  if (!ra.ok || !rb.ok) return NaN; // coerce failed → comparison undefined
+  const ca = ra.value as number;
+  const cb = rb.value as number;
   if (Number.isNaN(ca) || Number.isNaN(cb)) return NaN;
   return ca - cb;
 }
@@ -42,11 +45,12 @@ function failsComparisonRule(
 ): boolean {
   const target = resolveTarget(rule, peerReader);
   if (target === undefined) return true;
+  const cmp = compareValues(value, target, rule.coerceAs);
   switch (rule.rule) {
-    case "min": return !empty && compareValues(value, target, rule.coerceAs) < 0;
-    case "max": return !empty && compareValues(value, target, rule.coerceAs) > 0;
-    case "gt":  return empty || compareValues(value, target, rule.coerceAs) <= 0;
-    case "lt":  return !empty && compareValues(value, target, rule.coerceAs) >= 0;
+    case "min": return !empty && (Number.isNaN(cmp) || cmp < 0);
+    case "max": return !empty && (Number.isNaN(cmp) || cmp > 0);
+    case "gt":  return empty || Number.isNaN(cmp) || cmp <= 0;
+    case "lt":  return !empty && (Number.isNaN(cmp) || cmp >= 0);
     default:    return true;
   }
 }
@@ -56,13 +60,14 @@ function failsRangeRule(
 ): boolean {
   const [lo, hi] = rule.constraint as [unknown, unknown];
   if (empty) return false;
+  const cmpLo = compareValues(value, lo, rule.coerceAs);
+  const cmpHi = compareValues(value, hi, rule.coerceAs);
+  if (Number.isNaN(cmpLo) || Number.isNaN(cmpHi)) return true; // NaN → fail closed
   if (rule.rule === "range") {
-    return compareValues(value, lo, rule.coerceAs) < 0
-        || compareValues(value, hi, rule.coerceAs) > 0;
+    return cmpLo < 0 || cmpHi > 0;
   }
   // exclusiveRange
-  return compareValues(value, lo, rule.coerceAs) <= 0
-      || compareValues(value, hi, rule.coerceAs) >= 0;
+  return cmpLo <= 0 || cmpHi >= 0;
 }
 
 function failsEqualityRule(
@@ -74,15 +79,19 @@ function failsEqualityRule(
       const target = resolveTarget(rule, peerReader);
       if (target === undefined) return true;
       if (rule.coerceAs) return compareValues(value, target, rule.coerceAs) !== 0;
-      return String(value ?? "") !== String(target ?? "");
+      const sv = toString(value); const tv = toString(target);
+      return (sv.ok ? sv.value : "") !== (tv.ok ? tv.value : "");
     }
-    case "notEqual":
-      return !empty && String(value) === String(rule.constraint);
+    case "notEqual": {
+      const sv = toString(value); const tv = toString(rule.constraint);
+      return !empty && (sv.ok ? sv.value : "") === (tv.ok ? tv.value : "");
+    }
     case "notEqualTo": {
       const target = resolveTarget(rule, peerReader);
       if (target === undefined) return true;
       if (rule.coerceAs) return !empty && compareValues(value, target, rule.coerceAs) === 0;
-      return !empty && String(value ?? "") === String(target ?? "");
+      const sv = toString(value); const tv = toString(target);
+      return !empty && (sv.ok ? sv.value : "") === (tv.ok ? tv.value : "");
     }
     default: return true;
   }
@@ -95,8 +104,13 @@ export function ruleFails(
   value: unknown,
   peerReader: PeerReader
 ): boolean {
-  const str = value == null ? "" : String(value);
-  const empty = value == null || str === "" || value === false;
+  const strResult = toString(value);
+  // toString Err (plain object) → treat as empty. Required rule will catch it.
+  // Validation domain: empty array = no value (toString returns "[]" not "").
+  const str = strResult.ok ? strResult.value : "";
+  const empty = value == null || str === "" || value === false
+    || !strResult.ok
+    || (Array.isArray(value) && value.length === 0);
 
   switch (rule.rule) {
     case "required":    return empty;
@@ -104,9 +118,12 @@ export function ruleFails(
     case "minLength":   return !empty && str.length < Number(rule.constraint);
     case "maxLength":   return !empty && str.length > Number(rule.constraint);
     case "email":       return !empty && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
-    case "regex":
-      try { return !empty && !new RegExp(String(rule.constraint)).test(str); }
+    case "regex": {
+      const constraintResult = toString(rule.constraint);
+      const constraint = constraintResult.ok ? constraintResult.value : "";
+      try { return !empty && !new RegExp(constraint).test(str); }
       catch { return true; }
+    }
     case "url":         return !empty && !/^https?:\/\/.+/.test(str);
     case "creditCard":  return !empty && !luhn(str.replace(/\D/g, ""));
 

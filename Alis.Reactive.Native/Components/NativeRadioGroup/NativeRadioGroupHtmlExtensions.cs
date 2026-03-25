@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.Descriptors;
 using Alis.Reactive.Native.Extensions;
 
 namespace Alis.Reactive.Native.Components
@@ -21,7 +22,8 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr, "radiogroup"));
+                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr, "radiogroup",
+                CoercionTypes.InferFromType(typeof(TProp))));
 
             var builder = new NativeRadioGroupBuilder<TModel, TProp>(setup.Helper, setup.Expression);
             configure(builder);

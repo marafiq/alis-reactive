@@ -88,7 +88,7 @@ describe("trigger wiring end-to-end", () => {
 
   it("component-event fires on native input change", () => {
     boot({ planId: "t",
-      components: { "Name": { id: "Name", vendor: "native", readExpr: "value" } },
+      components: { "Name": { id: "Name", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
       entries: [{
         trigger: { kind: "component-event", componentId: "Name", jsEvent: "change", vendor: "native", readExpr: "value" },
         reaction: { kind: "sequential", commands: [
@@ -103,7 +103,7 @@ describe("trigger wiring end-to-end", () => {
 
   it("component-event fires on native select change", () => {
     boot({ planId: "t",
-      components: { "Country": { id: "Country", vendor: "native", readExpr: "value" } },
+      components: { "Country": { id: "Country", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
       entries: [{
         trigger: { kind: "component-event", componentId: "Country", jsEvent: "change", vendor: "native", readExpr: "value" },
         reaction: { kind: "sequential", commands: [
@@ -135,7 +135,7 @@ describe("trigger wiring end-to-end", () => {
 
   it("dom-ready + component-event + custom-event all work together", () => {
     boot({ planId: "t",
-      components: { "Name": { id: "Name", vendor: "native", readExpr: "value" } },
+      components: { "Name": { id: "Name", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
       entries: [
         { trigger: { kind: "dom-ready" }, reaction: { kind: "sequential", commands: [
           { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "booted" },

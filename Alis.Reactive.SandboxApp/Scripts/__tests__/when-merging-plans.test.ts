@@ -62,8 +62,8 @@ describe("when merging plans", () => {
       planId: "Test.Model",
       sourceId: "address-container",
       components: {
-        "Address.City": { id: "city-input", vendor: "native", readExpr: "value" },
-        "Address.Zip": { id: "zip-input", vendor: "native", readExpr: "value" },
+        "Address.City": { id: "city-input", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+        "Address.Zip": { id: "zip-input", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
       },
       entries: [],
     });
@@ -77,7 +77,7 @@ describe("when merging plans", () => {
       planId: "Test.Model",
       sourceId: "address-container",
       components: {
-        "Address.City": { id: "city-input", vendor: "native", readExpr: "value" },
+        "Address.City": { id: "city-input", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
       },
       entries: [],
     });
@@ -95,7 +95,7 @@ describe("when merging plans", () => {
       planId: "Test.Model",
       sourceId: "address-container",
       components: {
-        "Address.City": { id: "city-input", vendor: "native", readExpr: "value" },
+        "Address.City": { id: "city-input", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
       },
       entries: [],
     });
@@ -117,7 +117,7 @@ describe("when merging plans", () => {
     boot({
       planId: "Test.Model",
       components: {
-        "Name": { id: "name-input", vendor: "native", readExpr: "value" },
+        "Name": { id: "name-input", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
       },
       entries: [],
     });
@@ -127,7 +127,7 @@ describe("when merging plans", () => {
       planId: "Test.Model",
       sourceId: "address-container",
       components: {
-        "Address.City": { id: "city-input", vendor: "native", readExpr: "value" },
+        "Address.City": { id: "city-input", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
       },
       entries: [],
     });
@@ -169,7 +169,7 @@ describe("when merging plans", () => {
       planId: "Plan.A",
       sourceId: "shared-slot",
       components: {
-        "Root.Name": { id: "name-a", vendor: "native", readExpr: "value" },
+        "Root.Name": { id: "name-a", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
       },
       entries: [{
         trigger: { kind: "custom-event", event: "fire-a" },
@@ -194,7 +194,7 @@ describe("when merging plans", () => {
       planId: "Plan.B",
       sourceId: "shared-slot",
       components: {
-        "Root.Email": { id: "email-b", vendor: "native", readExpr: "value" },
+        "Root.Email": { id: "email-b", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
       },
       entries: [{
         trigger: { kind: "custom-event", event: "fire-b" },
@@ -257,7 +257,7 @@ describe("when merging plans", () => {
       planId: "Test.Model",
       sourceId: "address-slot",
       components: {
-        "Address.City": { id: "city-input", vendor: "native", readExpr: "value" },
+        "Address.City": { id: "city-input", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
       },
       entries: [],
     });

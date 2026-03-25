@@ -3,8 +3,19 @@ import { evalRead } from "../resolution/component";
 import { walk } from "../core/walk";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
+import { toString } from "../core/coerce";
 
 const log = scope("gather");
+
+/** Unwrap toString Result — returns empty string on Err and logs a warning. */
+function serializeValue(value: unknown, name: string): string {
+  const result = toString(value);
+  if (!result.ok) {
+    log.warn("gather serialize failed, using empty", { name, error: result.error });
+    return "";
+  }
+  return result.value;
+}
 
 /** Extracts a File from a value — handles raw File objects and wrapper objects with .rawFile. */
 function toFile(item: unknown): File | null {
@@ -38,28 +49,28 @@ interface Transport {
 function createTransport(
   urlParams: string[],
   formData: FormData | null,
-  body: Record<string, unknown>
+  _body: Record<string, unknown>
 ): Transport {
   if (formData) {
     return {
-      emitScalar: (name, value) => formData.append(name, String(value ?? "")),
+      emitScalar: (name, value) => formData.append(name, serializeValue(value, name)),
       emitArray: (name, items) => {
         for (const item of items) {
           const file = toFile(item);
           if (file) formData.append(name, file, file.name);
-          else formData.append(name, String(item ?? ""));
+          else formData.append(name, serializeValue(item, name));
         }
       },
     };
   }
   return {
     emitScalar: (name, value) => urlParams.push(
-      `${encodeURIComponent(name)}=${encodeURIComponent(String(value))}`),
+      `${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(value, name))}`),
     emitArray: (name, items) => {
       if (hasFiles(items))
         throw new Error("[alis] File objects cannot be sent via GET");
       for (const item of items)
-        urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(String(item))}`);
+        urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(item, name))}`);
     },
   };
 }

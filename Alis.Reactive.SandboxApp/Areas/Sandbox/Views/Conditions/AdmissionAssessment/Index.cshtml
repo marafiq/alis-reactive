@@ -1,0 +1,56 @@
+@model WizardShellModel
+@using Alis.Reactive.Native.Extensions
+@{
+    ViewData["Title"] = "Admission Assessment";
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Admission Assessment</native-heading>
+        <native-text color="Secondary">
+            Multi-step health screening workflow with per-step models, draft persistence,
+            and per-step validation.
+        </native-text>
+    </div>
+
+    <!-- Step Indicator -->
+    <native-card><native-card-body>
+        <div class="flex items-center justify-between text-sm">
+            <span id="step-ind-1" class="font-bold text-accent">1. Demographics</span>
+            <span class="text-text-muted">&rarr;</span>
+            <span id="step-ind-2" class="text-text-muted">2. Clinical</span>
+            <span class="text-text-muted">&rarr;</span>
+            <span id="step-ind-3" class="text-text-muted">3. Functional</span>
+            <span class="text-text-muted">&rarr;</span>
+            <span id="step-ind-4" class="text-text-muted">4. Review</span>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- Step 1: Demographics (own model, own plan)                             -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="step-1">
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_Step1Demographics.cshtml", Model.Step1)
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- Step 2: Clinical Assessment (own model, own plan)                      -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="step-2" hidden>
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_Step2Clinical.cshtml", Model.Step2)
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- Step 3: Functional Assessment (own model, own plan)                    -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="step-3" hidden>
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_Step3Functional.cshtml", Model.Step3)
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- Step 4: Review & Submit (own model, own plan)                          -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="step-4" hidden>
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_Step4Review.cshtml", Model.Step4)
+    </div>
+</native-vstack>

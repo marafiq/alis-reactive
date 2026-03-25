@@ -244,9 +244,9 @@ describe("FusionDatePicker gather", () => {
     const d = new Date("2024-03-15T00:00:00");
     fusionEl("AdmissionDate", { value: d });
     const result = resolveGather([gather("AdmissionDate", "fusion", "AdmissionDate")], "GET", {});
-    // Date.toString() is used — just verify it's a non-empty param
+    // toString() produces ISO — verify ISO format, not locale garbage
     expect(result.urlParams.length).toBe(1);
-    expect(result.urlParams[0]).toMatch(/^AdmissionDate=.+/);
+    expect(result.urlParams[0]).toMatch(/^AdmissionDate=.*\d{4}-\d{2}-\d{2}T/);
   });
 });
 
@@ -260,8 +260,9 @@ describe("FusionTimePicker gather", () => {
   it("gathers time as GET param string", () => {
     fusionEl("MedicationTime", { value: new Date("1970-01-01T08:30:00") });
     const result = resolveGather([gather("MedicationTime", "fusion", "MedicationTime")], "GET", {});
+    // toString() produces ISO — verify ISO format, not locale garbage
     expect(result.urlParams.length).toBe(1);
-    expect(result.urlParams[0]).toMatch(/^MedicationTime=.+/);
+    expect(result.urlParams[0]).toMatch(/^MedicationTime=.*\d{4}-\d{2}-\d{2}T/);
   });
 });
 
@@ -346,14 +347,14 @@ describe("IncludeAll with mixed component types", () => {
     fusionEl("DietaryRestrictions", { value: ["vegetarian", "halal"] });
 
     const components: Record<string, ComponentEntry> = {
-      "ResidentName":       { id: "ResidentName", vendor: "native", readExpr: "value" },
-      "HasAllergies":       { id: "HasAllergies", vendor: "native", readExpr: "checked" },
-      "MobilityLevel":      { id: "MobilityLevel", vendor: "native", readExpr: "value" },
-      "Allergies":          { id: "Allergies", vendor: "native", readExpr: "value" },
-      "MonthlyRate":        { id: "MonthlyRate", vendor: "fusion", readExpr: "value" },
-      "FacilityId":         { id: "FacilityId", vendor: "fusion", readExpr: "value" },
-      "AdmissionDate":      { id: "AdmissionDate", vendor: "fusion", readExpr: "value" },
-      "DietaryRestrictions": { id: "DietaryRestrictions", vendor: "fusion", readExpr: "value" },
+      "ResidentName":       { id: "ResidentName", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "HasAllergies":       { id: "HasAllergies", vendor: "native", readExpr: "checked", componentType: "switch", coerceAs: "boolean" },
+      "MobilityLevel":      { id: "MobilityLevel", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "Allergies":          { id: "Allergies", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "MonthlyRate":        { id: "MonthlyRate", vendor: "fusion", readExpr: "value", componentType: "numerictextbox", coerceAs: "number" },
+      "FacilityId":         { id: "FacilityId", vendor: "fusion", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "AdmissionDate":      { id: "AdmissionDate", vendor: "fusion", readExpr: "value", componentType: "datepicker", coerceAs: "date" },
+      "DietaryRestrictions": { id: "DietaryRestrictions", vendor: "fusion", readExpr: "value", componentType: "textbox", coerceAs: "string" },
     };
 
     const items: GatherItem[] = [{ kind: "all" }];
@@ -389,10 +390,10 @@ describe("IncludeAll with mixed component types", () => {
     fusionEl("MonthlyRate", { value: 4250 });
 
     const components: Record<string, ComponentEntry> = {
-      "ResidentName": { id: "ResidentName", vendor: "native", readExpr: "value" },
-      "HasAllergies": { id: "HasAllergies", vendor: "native", readExpr: "checked" },
-      "Allergies":    { id: "Allergies", vendor: "native", readExpr: "value" },
-      "MonthlyRate":  { id: "MonthlyRate", vendor: "fusion", readExpr: "value" },
+      "ResidentName": { id: "ResidentName", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "HasAllergies": { id: "HasAllergies", vendor: "native", readExpr: "checked", componentType: "switch", coerceAs: "boolean" },
+      "Allergies":    { id: "Allergies", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
+      "MonthlyRate":  { id: "MonthlyRate", vendor: "fusion", readExpr: "value", componentType: "numerictextbox", coerceAs: "number" },
     };
 
     const items: GatherItem[] = [{ kind: "all" }];
@@ -449,26 +450,38 @@ describe("FusionDateTimePicker gather", () => {
   it("gathers DateTime as GET param", () => {
     fusionEl("MedicationTime", { value: new Date("2024-03-15T08:30:00") });
     const result = resolveGather([gather("MedicationTime", "fusion", "MedicationTime")], "GET", {});
+    // toString() produces ISO — verify ISO format, not locale garbage
     expect(result.urlParams.length).toBe(1);
-    expect(result.urlParams[0]).toMatch(/^MedicationTime=.+/);
+    expect(result.urlParams[0]).toMatch(/^MedicationTime=.*\d{4}-\d{2}-\d{2}T/);
   });
 });
 
 // ═══════════════════════════════════════════════════════════════
-// FusionDateRangePicker — JSON POST (startDate + endDate)
+// FusionDateRangePicker — JSON POST + FormData (readExpr: "value" → [Date, Date])
 // ═══════════════════════════════════════════════════════════════
 
 describe("FusionDateRangePicker gather", () => {
-  it("gathers startDate in JSON POST", () => {
-    fusionEl("StayStart", { startDate: new Date("2024-01-15") });
-    const result = resolveGather([gather("StayStart", "fusion", "StayStart", "startDate")], "POST", {});
-    expect((result.body as any).StayStart).toBeInstanceOf(Date);
+  it("gathers [Date, Date] array via readExpr value in JSON POST", () => {
+    const start = new Date("2024-01-15T00:00:00Z");
+    const end = new Date("2024-06-15T00:00:00Z");
+    fusionEl("StayPeriod", { value: [start, end] });
+    const result = resolveGather([gather("StayPeriod", "fusion", "StayPeriod")], "POST", {});
+    const body = result.body as Record<string, unknown>;
+    expect(Array.isArray(body.StayPeriod)).toBe(true);
+    expect((body.StayPeriod as Date[])[0]).toBeInstanceOf(Date);
+    expect((body.StayPeriod as Date[])[1]).toBeInstanceOf(Date);
   });
 
-  it("gathers endDate in JSON POST", () => {
-    fusionEl("StayStart", { endDate: new Date("2024-06-15") });
-    const result = resolveGather([gather("StayStart", "fusion", "StayEnd", "endDate")], "POST", {});
-    expect((result.body as any).StayEnd).toBeInstanceOf(Date);
+  it("gathers [Date, Date] as repeated ISO strings in FormData", () => {
+    const start = new Date("2024-01-15T00:00:00Z");
+    const end = new Date("2024-06-15T00:00:00Z");
+    fusionEl("StayPeriod", { value: [start, end] });
+    const result = resolveGather([gather("StayPeriod", "fusion", "StayPeriod")], "POST", {}, "form-data");
+    const fd = result.body as FormData;
+    const entries = fd.getAll("StayPeriod");
+    expect(entries.length).toBe(2);
+    expect(entries[0]).toBe("2024-01-15T00:00:00.000Z");
+    expect(entries[1]).toBe("2024-06-15T00:00:00.000Z");
   });
 });
 
@@ -653,5 +666,25 @@ describe("File object gather", () => {
     expect(fd.get("ResidentName")).toBe("Margaret");
     expect(fd.getAll("Documents").length).toBe(1);
     expect((fd.getAll("Documents")[0] as File).name).toBe("photo.jpg");
+  });
+});
+
+describe("Date components gather correctly across all transports", () => {
+  it("admission form with DatePicker gathers ISO in FormData, GET, and JSON", () => {
+    fusionEl("AdmissionDate", { value: new Date("2024-03-15T00:00:00Z") });
+    const item = gather("AdmissionDate", "fusion", "AdmissionDate");
+
+    // FormData POST — server receives ISO, not locale garbage
+    const fd = resolveGather([item], "POST", {}, "form-data").body as FormData;
+    expect(fd.get("AdmissionDate")).toBe("2024-03-15T00:00:00.000Z");
+
+    // GET param — URL contains ISO, not URL-encoded locale garbage
+    const get = resolveGather([item], "GET", {});
+    expect(get.urlParams[0]).toBe(
+      `AdmissionDate=${encodeURIComponent("2024-03-15T00:00:00.000Z")}`);
+
+    // JSON POST — Date object passes through (JSON.stringify calls toJSON → ISO)
+    const json = resolveGather([item], "POST", {});
+    expect((json.body as any).AdmissionDate).toBeInstanceOf(Date);
   });
 });

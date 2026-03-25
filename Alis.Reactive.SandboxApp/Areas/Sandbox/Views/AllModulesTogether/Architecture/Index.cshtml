@@ -10,10 +10,10 @@
     var plan = Html.ReactivePlan<ArchitectureModel>();
 
     // Register raw validation fields (architecture test page uses manual inline descriptors, not model-bound builders)
-    plan.AddToComponentsMap("native-val-field", new ComponentRegistration("native-val-field", "native", "native-val-field", "value", "textbox"));
-    plan.AddToComponentsMap("fusion-val-field", new ComponentRegistration("fusion-val-field", "fusion", "fusion-val-field", "value", "textbox"));
-    plan.AddToComponentsMap("native-password", new ComponentRegistration("native-password", "native", "native-password", "value", "textbox"));
-    plan.AddToComponentsMap("fusion-confirm", new ComponentRegistration("fusion-confirm", "fusion", "fusion-confirm", "value", "textbox"));
+    plan.AddToComponentsMap("native-val-field", new ComponentRegistration("native-val-field", "native", "native-val-field", "value", "textbox", "string"));
+    plan.AddToComponentsMap("fusion-val-field", new ComponentRegistration("fusion-val-field", "fusion", "fusion-val-field", "value", "textbox", "string"));
+    plan.AddToComponentsMap("native-password", new ComponentRegistration("native-password", "native", "native-password", "value", "textbox", "string"));
+    plan.AddToComponentsMap("fusion-confirm", new ComponentRegistration("fusion-confirm", "fusion", "fusion-confirm", "value", "textbox", "string"));
 
     // ── Section 1: Property Write (structured prop) — dom-ready writes to both vendors ──
 

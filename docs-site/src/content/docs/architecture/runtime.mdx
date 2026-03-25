@@ -67,7 +67,7 @@ wire: "wireEntries()\nTwo-phase trigger wiring" {
 enrich -> validation -> wire
 ```
 
-**Enrichment** walks validation descriptors and fills in `fieldId`, `vendor`, and `readExpr` on each field from the ComponentsMap. This is the only runtime enrichment — gather placeholders and component trigger refs are already resolved at C# render time.
+**Enrichment** walks validation descriptors and fills in `fieldId`, `vendor`, `readExpr`, and `coerceAs` on each field from the ComponentsMap. The `coerceAs` field carries the type inferred from `typeof(TProp)` at C# registration time — used by the condition reader for typed comparison (e.g., Unix ms for dates). This is the only runtime enrichment — gather placeholders and component trigger refs are already resolved at C# render time.
 
 **Two-phase boot** guarantees event chains work regardless of declaration order. Phase 1 wires all CustomEvent and component-event listeners. Phase 2 runs DomReady reactions — which may dispatch events that Phase 1 listeners catch. Without this, a DomReady dispatch would fire before the listener exists and vanish silently.
 
@@ -214,6 +214,37 @@ path -> split -> step1 -> step2 -> step3
 
 Split on dots, walk each segment with bracket notation. If any segment is null, return `undefined`. This is how the C# expression `x => x.Address.City` reaches the browser value — `ExpressionPathHelper` converts it to `"evt.address.city"` at build time, `walk()` traverses it at runtime.
 
+## Coercion — `coerce.ts`
+
+The coerce module serves two distinct operations that share the type system but never mix:
+
+| Operation | Function | Purpose | Used by |
+|-----------|----------|---------|---------|
+| **Comparison** | `coerce(raw, type)` | Convert to typed value for operators | Conditions, Mutations, Validation comparison rules |
+| **Serialization** | `toString(raw)` | Convert to string for HTTP transport | Gather (FormData, GET). JSON uses `JSON.stringify` on raw values. |
+
+Every coerce function returns `CoerceResult<T>` — a discriminated union `{ ok: true, value: T } | { ok: false, error: string }`. Functions never throw. Callers decide how to handle `Err`:
+
+| Consumer | On Err | Why |
+|----------|--------|-----|
+| Conditions | Guard → false, else branch runs | User interaction must not crash |
+| Validation | Rule fails, shows error message | User sees field error, not app crash |
+| Mutations | `coerceOrThrow()` — throws with stack trace | Developer error in plan needs debugging |
+| Gather | Log warning, skip field | Don't crash entire HTTP request |
+
+Supported coercion types (inferred from C# `typeof(TProp)` via `CoercionTypes.InferFromType`):
+
+| CoercionType | C# types | Comparison result | Serialization result |
+|-------------|----------|-------------------|---------------------|
+| `"string"` | `string`, `Enum` | identity | identity |
+| `"number"` | `int`, `decimal`, `double`, ... | number | `"4250"` |
+| `"boolean"` | `bool` | `true`/`false` | `"true"`/`"false"` |
+| `"date"` | `DateTime`, `DateTimeOffset`, `DateOnly` | Unix ms (getTime) | ISO 8601 (toISOString) |
+| `"array"` | `T[]`, `List<T>`, ... | identity | JSON.stringify |
+| `"raw"` | everything else | pass-through | Err (plain objects) |
+
+The plan carries `coerceAs` on `ComponentEntry` (from `typeof(TProp)`), `ValueGuard` (from conditions), `SetPropMutation` (from mutations), and `ValidationRule` (from FluentValidation). The runtime never infers or guesses a coercion type — it reads the plan.
+
 ## Condition evaluation — `conditions.ts`
 
 ```d2
@@ -287,11 +318,13 @@ trigger: "trigger.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "
 execute: "execute.ts" { shape: rectangle; style.fill: "#fef7e0"; style.stroke: "#f9ab00"; style.font-size: 14 }
 commands: "commands.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
 element: "element.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
+gather: "gather.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
 component: "component.ts" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
 resolver: "resolver.ts" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
 coerce: "coerce.ts" { shape: rectangle; style.fill: "#f0f0f0"; style.stroke: "#666"; style.font-size: 14 }
 walk: "walk.ts" { shape: rectangle; style.fill: "#f0f0f0"; style.stroke: "#666"; style.font-size: 14 }
 conditions: "conditions.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
+validation: "validation/" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
 
 root -> boot
 boot -> trigger
@@ -305,12 +338,17 @@ commands -> coerce
 element -> component
 element -> resolver
 element -> coerce
+gather -> component
+gather -> coerce
+gather -> walk
 resolver -> component
 resolver -> walk
 resolver -> coerce
 component -> walk
 conditions -> resolver
 conditions -> coerce
+validation -> coerce
+validation -> component
 ```
 
 Every arrow is a function call. No circular dependencies. Any user action follows this graph — only the reaction kind and command kind change.

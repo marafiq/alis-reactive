@@ -1,0 +1,186 @@
+@model VitalsAlertModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Vitals Alert";
+
+    var plan = Html.ReactivePlan<VitalsAlertModel>();
+
+    // ── Section 1: Simple condition → HTTP in Then, Element in Else ──
+    // Commands BEFORE and AFTER the condition always execute.
+    // This proves: condition branches can contain full HTTP pipelines,
+    // and non-condition commands around them are not blocked.
+
+    // ── Section 2: ElseIf → different HTTP per severity tier ──
+    // Gte(180) → POST /Critical, Gte(140) → POST /Warning, Else → text only.
+    // This proves: each ElseIf branch can independently POST to different endpoints.
+
+    // ── Section 3: Commands before + condition + commands after ──
+    // Element.SetText BEFORE condition → When → Then/Else → Element.SetText AFTER.
+    // Button-triggered so we can test the "sandwich" pattern with component reads.
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Vitals Alert — Condition-Gated HTTP</native-heading>
+        <native-text color="Secondary">
+            Realistic nurse workflow: vital signs trigger HTTP alerts when thresholds are exceeded.
+            Conditions gate POST requests — not just element text flips.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Simple condition → HTTP in Then -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Condition → HTTP in Then</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Enter heart rate. Values above 140 POST an alert to the nurse station and show server confirmation.
+            Values at or below 140 show "Vitals normal" — no HTTP call.
+            Commands before (<code>last-reading</code>) and after (<code>check-status</code>) always execute.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.HeartRate, o => o.Label("Heart Rate (bpm)"))
+                .NumericTextBox(b => b
+                    .Min(0).Max(300).Step(1)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+
+                        // BEFORE condition — always executes
+                        p.Element("s1-last-reading").SetText(comp.Value());
+
+                        // Condition: Gt(140) → POST alert, Else → text only
+                        p.When(comp.Value()).Gt(140m)
+                            .Then(then =>
+                            {
+                                then.Post("/Sandbox/Conditions/VitalsAlert/Alert",
+                                        g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
+                                    .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
+                                    {
+                                        s.Element("s1-alert-status").SetText(json, x => x.Message);
+                                        s.Element("s1-alert-time").SetText(json, x => x.Timestamp);
+                                    }));
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("s1-alert-status").SetText("Vitals normal");
+                                else_.Element("s1-alert-time").SetText("");
+                            });
+
+                        // AFTER condition — always executes
+                        p.Element("s1-check-status").SetText("checked");
+                    })); }
+        </div>
+        <div class="font-mono text-sm space-y-1">
+            <p>Last reading: <span id="s1-last-reading" class="text-text-muted">&mdash;</span></p>
+            <p>Alert status: <span id="s1-alert-status" class="text-text-muted">&mdash;</span></p>
+            <p>Alert time: <span id="s1-alert-time" class="text-text-muted">&mdash;</span></p>
+            <p>Check status: <span id="s1-check-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 2: ElseIf → different HTTP per severity tier -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. ElseIf → Different HTTP per Tier</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Same heart rate field drives a severity ladder. Each tier POSTs to a different endpoint:
+            <code>Gte(180) → /Critical</code>, <code>Gte(140) → /Warning</code>, <code>Else → no HTTP</code>.
+            Button-triggered to allow controlled testing of each tier independently.
+        </p>
+        <div class="mt-3">
+            @(Html.NativeButton("s2-check-btn", "Evaluate Severity")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+
+                    p.When(comp.Value()).Gte(180m)
+                        .Then(then =>
+                        {
+                            then.Post("/Sandbox/Conditions/VitalsAlert/Critical",
+                                    g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
+                                .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
+                                {
+                                    s.Element("s2-tier-status").SetText(json, x => x.Message);
+                                    s.Element("s2-tier-level").SetText(json, x => x.Level);
+                                }));
+                        })
+                        .ElseIf(comp.Value()).Gte(140m)
+                        .Then(then =>
+                        {
+                            then.Post("/Sandbox/Conditions/VitalsAlert/Warning",
+                                    g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
+                                .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
+                                {
+                                    s.Element("s2-tier-status").SetText(json, x => x.Message);
+                                    s.Element("s2-tier-level").SetText(json, x => x.Level);
+                                }));
+                        })
+                        .Else(else_ =>
+                        {
+                            else_.Element("s2-tier-status").SetText("Normal — no alert needed");
+                            else_.Element("s2-tier-level").SetText("normal");
+                        });
+                }))
+        </div>
+        <div class="font-mono text-sm mt-3 space-y-1">
+            <p>Tier status: <span id="s2-tier-status" class="text-text-muted">&mdash;</span></p>
+            <p>Tier level: <span id="s2-tier-level" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 3: Commands before + condition + commands after (sandwich) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Command Sandwich — Before + Condition + After</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Proves non-condition commands before and after a condition block always execute,
+            regardless of which branch the condition takes. Button reads component, runs commands
+            around the condition, and the condition gates an HTTP POST.
+        </p>
+        <div class="mt-3">
+            @(Html.NativeButton("s3-sandwich-btn", "Run Sandwich Pipeline")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+
+                    // BEFORE condition — always
+                    p.Element("s3-before").SetText("before-ran");
+                    p.Element("s3-reading").SetText(comp.Value());
+
+                    // Condition: Gt(140) → POST, Else → text
+                    p.When(comp.Value()).Gt(140m)
+                        .Then(then =>
+                        {
+                            then.Post("/Sandbox/Conditions/VitalsAlert/Alert",
+                                    g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
+                                .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
+                                {
+                                    s.Element("s3-branch").SetText(json, x => x.Message);
+                                }));
+                        })
+                        .Else(else_ =>
+                        {
+                            else_.Element("s3-branch").SetText("no alert");
+                        });
+
+                    // AFTER condition — always
+                    p.Element("s3-after").SetText("after-ran");
+                }))
+        </div>
+        <div class="font-mono text-sm mt-3 space-y-1">
+            <p>Before: <span id="s3-before" class="text-text-muted">&mdash;</span></p>
+            <p>Reading: <span id="s3-reading" class="text-text-muted">&mdash;</span></p>
+            <p>Branch: <span id="s3-branch" class="text-text-muted">&mdash;</span></p>
+            <p>After: <span id="s3-after" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -50,7 +50,7 @@ public class WhenEnforcingComponentRegistration
         var writer = new StringWriter();
 
         plan.AddToComponentsMap("Email", new ComponentRegistration(
-            "Email", "native", "Email", "value", "textbox"));
+            "Email", "native", "Email", "value", "textbox", "string"));
 
         var setup = CreateSetup(plan, writer, x => x.Email, "Email");
         setup.Options.Label("Email Address");
@@ -75,7 +75,7 @@ public class WhenEnforcingComponentRegistration
 
         // Register Name but not Email
         plan.AddToComponentsMap("Name", new ComponentRegistration(
-            "Name", "native", "Name", "value", "textbox"));
+            "Name", "native", "Name", "value", "textbox", "string"));
 
         var nameSetup = CreateSetup(plan, writer, x => x.Name, "Name");
         Assert.DoesNotThrow(() =>

@@ -11,7 +11,7 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        var comp = p.Component<FusionDateRangePicker>(m => m.StayStart);
+        var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
         p.Element("start-echo").SetText(comp.StartDate());
         p.Element("end-echo").SetText(comp.EndDate());
     }));
@@ -35,7 +35,7 @@
             properties and displays them in text elements.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @{ Html.InputField(plan, m => m.StayStart, o => o.Label("Stay Period"))
+            @{ Html.InputField(plan, m => m.StayPeriod, o => o.Label("Stay Period"))
                 .DateRangePicker(b => b
                     .Placeholder("Select stay period")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -45,7 +45,7 @@
                         p.When(args, x => x.StartDate).NotNull()
                             .Then(t => t.Element("args-condition").SetText("stay period selected"))
                             .Else(e => e.Element("args-condition").SetText("no period"));
-                        var comp = p.Component<FusionDateRangePicker>(m => m.StayStart);
+                        var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
                         p.When(comp.StartDate()).NotNull()
                             .Then(then =>
                             {
@@ -100,7 +100,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    var comp = p.Component<FusionDateRangePicker>(m => m.StayStart);
+                    var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
                     p.When(comp.StartDate()).IsEmpty()
                         .Then(t => t.Element("stay-warning").SetText("stay period is required"))
                         .Else(e => e.Element("stay-warning").SetText("stay period set"));

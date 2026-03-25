@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Alis.Reactive.Descriptors;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Calendars;
@@ -19,7 +20,8 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "datepicker"));
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "datepicker",
+                CoercionTypes.InferFromType(typeof(TProp))));
 
             var builder = setup.Helper.EJS().DatePickerFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });

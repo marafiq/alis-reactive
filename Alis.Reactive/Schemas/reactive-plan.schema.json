@@ -24,12 +24,13 @@
   "$defs": {
     "ComponentEntry": {
       "type": "object",
-      "required": ["id", "vendor", "readExpr", "componentType"],
+      "required": ["id", "vendor", "readExpr", "componentType", "coerceAs"],
       "properties": {
         "id": { "type": "string", "description": "DOM element ID" },
         "vendor": { "$ref": "#/$defs/Vendor" },
         "readExpr": { "type": "string", "description": "Property path from vendor root" },
-        "componentType": { "type": "string", "description": "Component kind — autocomplete, dropdownlist, switch, textbox, etc." }
+        "componentType": { "type": "string", "description": "Component kind — autocomplete, dropdownlist, switch, textbox, etc." },
+        "coerceAs": { "$ref": "#/$defs/CoercionType", "description": "Coercion type inferred from C# typeof(TProp)" }
       },
       "additionalProperties": false
     },
@@ -565,7 +566,7 @@
         "message": { "type": "string", "minLength": 1 },
         "constraint": { "description": "Rule-specific constraint value" },
         "field": { "type": "string", "minLength": 1, "description": "Cross-property: binding path of field to compare against" },
-        "coerceAs": { "type": "string", "enum": ["string", "number", "boolean", "date"], "description": "Coercion type for comparison — derived from TProperty" },
+        "coerceAs": { "$ref": "#/$defs/CoercionType", "description": "Coercion type for comparison — derived from TProperty" },
         "when": { "$ref": "#/$defs/ValidationCondition" }
       }
     },
@@ -574,11 +575,15 @@
       "required": ["fieldName", "rules"],
       "additionalProperties": false,
       "properties": {
-        "fieldName": { "type": "string", "minLength": 1, "description": "Model property name (dot notation). Runtime enriches fieldId/vendor/readExpr from plan.components." },
+        "fieldName": { "type": "string", "minLength": 1, "description": "Model property name (dot notation)" },
         "rules": {
           "type": "array",
           "items": { "$ref": "#/$defs/ValidationRule" }
-        }
+        },
+        "fieldId": { "type": "string", "description": "DOM element ID — enriched from ComponentsMap at render time" },
+        "vendor": { "$ref": "#/$defs/Vendor", "description": "Component vendor — enriched from ComponentsMap" },
+        "readExpr": { "type": "string", "description": "Property path from vendor root — enriched from ComponentsMap" },
+        "coerceAs": { "$ref": "#/$defs/CoercionType", "description": "Coercion type — enriched from ComponentsMap" }
       }
     },
     "ValidationDescriptor": {

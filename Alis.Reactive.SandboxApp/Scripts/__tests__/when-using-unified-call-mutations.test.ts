@@ -177,7 +177,7 @@ describe("when using unified call mutations", () => {
     boot({
       planId: "Test.Model",
       components: {
-        srcA: { id: "a", vendor: "fusion", readExpr: "value" },
+        srcA: { id: "a", vendor: "fusion", readExpr: "value", componentType: "textbox", coerceAs: "string" },
       },
       entries: [{
         trigger: { kind: "dom-ready" },

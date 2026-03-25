@@ -37,7 +37,7 @@ the `ReactivePlan`. Nothing executes at this point.
         p.Dispatch("ready");
     }));
 }
-<script type="application/json" data-alis-plan data-trace="trace">@Html.Raw(plan.Render())</script>
+<script type="application/json" data-reactive-plan data-trace="trace">@Html.Raw(plan.Render())</script>
 ```
 
 **Key files:**
@@ -128,15 +128,15 @@ Zero runtime changes. `resolveRoot` is the vendor-neutral execution layer.
 
 **Source binding (BindExpr):** `value` provides a static val. `source` provides a BindExpr
 (dot-notation path into execution context) — resolved at runtime via `resolver.ts`.
-The runtime resolves: `source` present → `resolveToString(source, ctx)` → val. Otherwise → `value`.
+The runtime resolves: `source` present → `resolveSourceAs(source, coerceAs, ctx)` → val. Otherwise → `value`.
 
 C# DSL: `p.Element("x").SetText(payload, x => x.Address.City)` →
 `ExpressionPathHelper` converts the expression to `"evt.address.city"`.
 
-**Resolver (reusable module):** `resolver.ts` exports `resolve()`, `resolveAs()`, `resolveToString()`,
-and `coerce()`. Coercion types: `string` (null→""), `number` (NaN→0), `boolean` ("false"→false), `raw`.
-Schema defines `BindExpr` and `CoercionType` as reusable `$defs`. This module will be used by
-the Conditions module for guard evaluation, not just DOM mutations.
+**Resolver (reusable module):** `resolver.ts` exports `resolveSource()`, `resolveEventPath()`,
+and `resolveSourceAs()`. Coercion is in `core/coerce.ts` — returns `CoerceResult<T>` (never throws).
+Coercion types: `string`, `number`, `boolean`, `date`, `raw`, `array`.
+Schema defines `CoercionType` as reusable `$defs`.
 
 ### Layer 3: JS Runtime (Plan Executor)
 
@@ -146,12 +146,12 @@ ESM module bundled by esbuild. The runtime reads the plan JSON and executes it. 
 
 | File | Purpose |
 |------|---------|
-| `Scripts/auto-boot.ts` | esbuild entry point — auto-discovers `[data-alis-plan]`, reads `data-trace`, calls `boot()` |
+| `Scripts/root.ts` | esbuild entry point — auto-discovers `[data-reactive-plan]`, reads `data-trace`, calls `boot()` |
 | `Scripts/boot.ts` | Two-phase boot: wire custom-event listeners first, then execute dom-ready (testable export) |
 | `Scripts/trigger.ts` | `wireTrigger()` — wires dom-ready and custom-event listeners |
 | `Scripts/execute.ts` | `executeReaction()` → `executeCommand()` — dispatch to command handlers |
 | `Scripts/element.ts` | `mutateElement()` — resolves element by ID, executes mutation action |
-| `Scripts/resolver.ts` | `resolve()`, `resolveAs()`, `resolveToString()`, `coerce()` — BindExpr dot-path resolution with type coercion |
+| `Scripts/resolver.ts` | `resolveSource()`, `resolveEventPath()`, `resolveSourceAs()` — source resolution + coercion via `core/coerce.ts` |
 | `Scripts/trace.ts` | `scope()`, `setLevel()` — deterministic single-string trace output |
 | `Scripts/types.ts` | TypeScript interfaces mirroring the JSON plan schema |
 
@@ -171,21 +171,21 @@ Views emit only the plan JSON element — no inline scripts at all.
 
 ```html
 <!-- _Layout.cshtml — loads once, cache-busted via SHA256 hash -->
-<link rel="stylesheet" href="~/css/alis-modern-tailwind.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/design-system.css" asp-append-version="true"/>
 <script type="module" src="~/js/alis-reactive.js" asp-append-version="true"></script>
 
 <!-- View — plan element only, auto-boot discovers it -->
-<script type="application/json" data-alis-plan data-trace="trace">@Html.Raw(planJson)</script>
+<script type="application/json" data-reactive-plan data-trace="trace">@Html.Raw(planJson)</script>
 ```
 
 **Auto-boot architecture:**
 
 | File | Role |
 |------|------|
-| `Scripts/auto-boot.ts` | esbuild entry point — auto-discovers `[data-alis-plan]`, reads `data-trace`, calls `boot()` |
+| `Scripts/root.ts` | esbuild entry point — auto-discovers `[data-reactive-plan]`, reads `data-trace`, calls `boot()` |
 | `Scripts/boot.ts` | Testable export — `boot()` and `trace` used by vitest, NOT the browser entry point |
 
-`auto-boot.ts` runs on every page load. If `[data-alis-plan]` exists, it boots. If `data-trace`
+`root.ts` runs on every page load. If `[data-reactive-plan]` exists, it boots. If `data-trace`
 is set, it enables tracing. This eliminates per-view inline scripts entirely.
 
 ## Projects
@@ -248,7 +248,7 @@ resolver functions and test every edge case in isolation.
 | `when-dispatching-a-custom-event-with-payload.test.ts` | All primitive types survive serialization |
 | `when-mutating-an-element.test.ts` | All 7 mutate actions + mixed chains |
 | `when-resolving-payload-source.test.ts` | Source dot-path resolution via boot(): flat int/string/bool, nested, missing path fallback |
-| `when-resolving-bind-expr.test.ts` | Direct resolve()/resolveAs()/resolveToString() tests: flat/nested/edge cases, condition-ready patterns (numeric, presence, truthiness, emptiness, text, range) |
+| `when-resolving-bind-expr.test.ts` | Direct resolveEventPath() + toString() Result tests: flat/nested/edge cases, condition-ready patterns (numeric, presence, truthiness, emptiness, text, range) |
 | `when-coercing-resolved-values.test.ts` | Direct coerce() tests: all 4 types (string, number, boolean, raw) with every boundary value |
 | `when-using-unified-call-mutations.test.ts` | Unified call mutation: void, literal, source, multi-arg, mixed, component source, per-arg coerce |
 
@@ -278,11 +278,11 @@ on test failure.
 ## Build Commands
 
 ```bash
-# JS runtime (ESM bundle — entry: auto-boot.ts)
+# JS runtime (ESM bundle — entry: root.ts)
 npm run build                    # → wwwroot/js/alis-reactive.js (2kb)
 
 # Tailwind CSS (v4)
-npm run build:css                # → wwwroot/css/alis-modern-tailwind.css
+npm run build:css                # → wwwroot/css/design-system.css
 
 # Both JS + CSS
 npm run build:all
@@ -324,7 +324,7 @@ with its own branch. Run all builds and tests from within the worktree directory
 
 The C# DSL builds descriptors → `plan.Render()` serializes to JSON → JS runtime executes.
 No shortcuts. No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
-No inline `<script>` blocks in views — `auto-boot.ts` handles discovery and boot automatically.
+No inline `<script>` blocks in views — `root.ts` handles discovery and boot automatically.
 
 ### 3. Every New Primitive Needs All Three Layers
 
@@ -338,6 +338,19 @@ Adding a new command, trigger, or action requires:
 7. **TS unit test** — runtime behavior in jsdom
 8. **Playwright test** — browser behavior verification
 9. **Sandbox view usage** — demonstrate in Events page (or new page)
+
+### 3a. Schema Changes Require a Failing Test First
+
+Any change to `reactive-plan.schema.json` MUST be preceded by a failing schema test
+in `AllPlansConformToSchema.cs` that proves the schema rejects the new plan shape.
+The test fails (RED), then the schema is updated, then the test passes (GREEN).
+
+This prevents undeclared properties from accumulating — `additionalProperties: false`
+on schema objects means any property not declared in the schema causes validation failure.
+If enrichment adds a field (e.g., `coerceAs` on `ValidationField`), the schema test
+must exercise a plan WITH that field populated to catch the gap.
+
+**The schema is the DSL's truth.** If the DSL produces it, the schema must declare it.
 
 ### 4. Two-Phase Boot Is Inviolable
 

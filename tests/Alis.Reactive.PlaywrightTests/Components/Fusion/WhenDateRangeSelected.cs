@@ -26,7 +26,7 @@ public class WhenDateRangeSelected : PlaywrightTestBase
 
     // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateRangePickerModel";
-    private const string StayStartId = Scope + "__StayStart";
+    private const string StayStartId = Scope + "__StayPeriod";
 
     private DateRangePickerLocator StayStart => new(Page, StayStartId);
 
@@ -55,8 +55,8 @@ public class WhenDateRangeSelected : PlaywrightTestBase
             "Plan must contain mutate-element commands");
         Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
             "Plan must contain fusion vendor");
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"startDate\""),
-            "Plan must contain startDate readExpr");
+        Assert.That(planJson, Does.Contain("\"readExpr\": \"value\""),
+            "Plan must contain value readExpr");
         AssertNoConsoleErrors();
     }
 

@@ -1,0 +1,78 @@
+@model Step2ClinicalModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ReactivePlan<Step2ClinicalModel>();
+}
+
+<!-- ASSERT: Step 2 validation scopes to step2-form only — never leaks to Step 1 or Step 3
+     ASSERT: cognitive-section visible when PrimaryDiagnosis is "Alzheimer's" or "Parkinson's" (set by Step 1)
+     ASSERT: cardiac-section visible when PrimaryDiagnosis is "Heart Disease" (set by Step 1)
+     ASSERT: diabetes-section visible when PrimaryDiagnosis is "Diabetes" (set by Step 1)
+     ASSERT: save Step 2 with valid data → "Step 2 saved" message -->
+<native-card><native-card-body id="step2-form">
+    <native-heading level="H2">Step 2: Clinical Assessment</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        Clinical sections appear based on the primary diagnosis selected in Step 1.
+        Each section can be saved independently.
+    </p>
+
+    <!-- Hidden fields: cross-step data + auto-populated by conditions -->
+    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
+    @Html.HiddenFieldFor(plan, m => m.PrimaryDiagnosis)
+    @Html.HiddenFieldFor(plan, m => m.ResidentName)
+    @Html.HiddenFieldFor(plan, m => m.CareUnit)
+
+    <!-- Conditional clinical sections (visibility set by Step 1 diagnosis dropdown targeting these element IDs cross-plan) -->
+    <div id="cognitive-section" hidden>
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_CognitiveAssessment.cshtml", Model)
+    </div>
+
+    <div id="cardiac-section" hidden>
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_CardiacAssessment.cshtml", Model)
+    </div>
+
+    <div id="diabetes-section" hidden>
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_DiabetesManagement.cshtml", Model)
+    </div>
+
+    <!-- Step 2 Navigation: validate + save on Next, Previous is free -->
+    <div class="flex justify-between mt-6">
+        @(Html.NativeButton("prev-2", "\u2190 Back: Demographics")
+            .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Element("step-2").Hide();
+                p.Element("step-1").Show();
+                p.Element("step-ind-2").RemoveClass("font-bold");
+                p.Element("step-ind-2").RemoveClass("text-accent");
+                p.Element("step-ind-1").AddClass("font-bold");
+                p.Element("step-ind-1").AddClass("text-accent");
+            }))
+        @(Html.NativeButton("next-2", "Next: Functional \u2192")
+            .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveStep2",
+                    g => g.IncludeAll())
+                 .Validate<Step2Validator>("step2-form")
+                 .Response(r => r
+                    .OnSuccess<SaveStepResponse>((json, s) =>
+                    {
+                        s.Element("step-2").Hide();
+                        s.Element("step-3").Show();
+                        s.Element("step-ind-2").RemoveClass("font-bold");
+                        s.Element("step-ind-2").RemoveClass("text-accent");
+                        s.Element("step-ind-3").AddClass("font-bold");
+                        s.Element("step-ind-3").AddClass("text-accent");
+                    })
+                    .OnError(400, e =>
+                    {
+                        e.ValidationErrors("step2-form");
+                    }));
+            }))
+    </div>
+</native-card-body></native-card>
+
+@Html.RenderPlan(plan)

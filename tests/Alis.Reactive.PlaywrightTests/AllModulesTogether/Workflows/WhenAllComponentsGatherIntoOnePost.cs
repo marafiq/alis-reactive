@@ -65,8 +65,8 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         var aptTime = scope.DateTimePicker("AppointmentTime");
         await aptTime.Select(now.Year, now.Month, 10, "2:00 PM");
 
-        // StayStart (DateRangePicker) — current month to next month
-        var stay = scope.DateRangePicker("StayStart");
+        // StayPeriod (DateRangePicker) — current month to next month
+        var stay = scope.DateRangePicker("StayPeriod");
         await stay.SelectRange(now.Year, now.Month, 5, now.Year, now.Month, 20);
 
         // InsuranceProvider (MultiColumnComboBox) — type "Blue Cross" + Enter
@@ -302,8 +302,13 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-appointment-time"))
             .ToContainTextAsync(year, new() { Timeout = 5000 });
-        await Expect(Page.Locator("#echo-stay-start"))
-            .ToContainTextAsync(year, new() { Timeout = 5000 });
+        // DateRangePicker: StayPeriod is DateTime[] — echo shows JSON array of date strings
+        var stayEcho = Page.Locator("#echo-stay-start");
+        await Expect(stayEcho).ToContainTextAsync(year, new() { Timeout = 5000 });
+        // Verify both dates are present (array has 2 elements, both contain the year)
+        var stayText = await stayEcho.TextContentAsync();
+        Assert.That(stayText, Does.Contain(","),
+            "StayPeriod echo must contain two dates (comma-separated in JSON array)");
         AssertNoConsoleErrors();
     }
 

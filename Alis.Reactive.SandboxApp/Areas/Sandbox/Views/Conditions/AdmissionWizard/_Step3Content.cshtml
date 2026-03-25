@@ -1,0 +1,136 @@
+@model Step3FunctionalModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ReactivePlan<Step3FunctionalModel>();
+    var fallOptions = (string[])ViewBag.FallOptions;
+    var mobilityAids = (string[])ViewBag.MobilityAids;
+}
+
+<native-card><native-card-body id="step3-form">
+    <native-heading level="H2">Step 3: Functional Assessment</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        Functional assessment for @Model.ResidentName (age @Model.Age).
+    </p>
+
+    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
+    @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
+    <div hidden>
+        @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))
+            .NumericTextBox(b => b.Min(0).Max(120).Step(1)); }
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.FallHistory, o => o.Label("Fall History"))
+            .DropDownList(b => b
+                .DataSource(fallOptions)
+                .Placeholder("Select fall history")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var comp = p.Component<FusionDropDownList>(m => m.FallHistory);
+                    p.When(comp.Value()).In("1-2 falls", "3+ falls")
+                        .Then(t => t.Element("fall-details").Show())
+                        .Else(e => e.Element("fall-details").Hide());
+                })); }
+        @{ Html.InputField(plan, m => m.FallRiskScore, o => o.Label("Fall Risk Score"))
+            .NumericTextBox(b => b.Min(0).Max(10).Step(1)); }
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.MobilityAid, o => o.Label("Mobility Aid"))
+            .DropDownList(b => b
+                .DataSource(mobilityAids)
+                .Placeholder("Select mobility aid")); }
+        @{ Html.InputField(plan, m => m.MedicationCount, o => o.Label("Medication Count"))
+            .NumericTextBox(b => b.Min(0).Max(50).Step(1)); }
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.TakesBloodThinners, o => o.Label("Takes Blood Thinners"))
+            .Switch(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var comp = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
+                    p.When(comp.Value()).Truthy()
+                        .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Enhanced"))
+                        .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Standard"));
+                })); }
+        @{ Html.InputField(plan, m => m.TakesPainMedication, o => o.Label("Takes Pain Medication"))
+            .Switch(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var comp = p.Component<FusionSwitch>(m => m.TakesPainMedication);
+                    p.When(comp.Value()).Truthy()
+                        .Then(t => t.Element("pain-section").Show())
+                        .Else(e => e.Element("pain-section").Hide());
+                })); }
+    </div>
+
+    <div id="fall-details" @(Model.FallHistory is "1-2 falls" or "3+ falls" ? "" : "hidden")>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.CausedInjury, o => o.Label("Caused Injury"))
+                .Switch(b => b
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        var sw = p.Component<FusionSwitch>(m => m.CausedInjury);
+                        p.When(sw.Value()).Truthy()
+                            .Then(t => t.Element("injury-details").Show())
+                            .Else(e => e.Element("injury-details").Hide());
+                    })); }
+        </div>
+        <div id="injury-details" @(Model.CausedInjury ? "" : "hidden")>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                @{ Html.InputField(plan, m => m.InjuryType, o => o.Label("Injury Type"))
+                    .DropDownList(b => b
+                        .DataSource((string[])ViewBag.InjuryTypes)
+                        .Placeholder("Select type")); }
+            </div>
+        </div>
+    </div>
+
+    <div id="pain-section" @(Model.TakesPainMedication ? "" : "hidden")>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @{ Html.InputField(plan, m => m.PainLevel, o => o.Label("Pain Level (0-10)"))
+                .NumericTextBox(b => b.Min(0).Max(10).Step(1)); }
+            @{ Html.InputField(plan, m => m.PainLocation, o => o.Label("Pain Location"))
+                .NativeTextBox(b => b.Placeholder("e.g. Lower back")); }
+        </div>
+    </div>
+
+    <div class="flex justify-between mt-6">
+        @(Html.NativeButton("prev-3", "\u2190 Back: Clinical")
+            .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Conditions/AdmissionWizard/LoadStep",
+                    g => g.Include<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId)
+                          .Static("step", 2))
+                 .Response(r => r.OnSuccess(s => s.Into("step-container")));
+            }))
+        @(Html.NativeButton("next-3", "Next: Review \u2192")
+            .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Conditions/AdmissionWizard/SaveStep3",
+                    g => g.IncludeAll())
+                 .Validate<Step3Validator>("step3-form")
+                 .Response(r => r
+                    .OnSuccess<SaveStepResponse>((json, s) =>
+                    {
+                        s.Component<NativeHiddenField>(m => m.ScreeningId)
+                            .SetValue(json, x => x.ScreeningId);
+                    })
+                    .OnError(400, e => e.ValidationErrors("step3-form"))
+                    .Chained(c => c
+                        .Post("/Sandbox/Conditions/AdmissionWizard/LoadStep")
+                        .Gather(g => g
+                            .Include<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId)
+                            .Static("step", 4))
+                        .Response(r2 => r2.OnSuccess(s2 => s2.Into("step-container")))));
+            }))
+    </div>
+</native-card-body></native-card>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)

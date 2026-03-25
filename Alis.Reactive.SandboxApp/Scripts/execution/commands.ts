@@ -1,24 +1,14 @@
-import type { Command, MutateEventCommand, MethodArg, ExecContext } from "../types";
-import { mutateElement } from "./element";
+import type { Command, MutateEventCommand, ExecContext } from "../types";
+import { mutateElement, resolveArg } from "./element";
 import { evaluateGuard, isConfirmGuard } from "../conditions/conditions";
 import { showServerErrors } from "../validation";
 import { injectHtml } from "./inject";
-import { resolveSource, coerce } from "../resolution/resolver";
+import { resolveSource } from "../resolution/resolver";
+import { coerceOrThrow } from "../core/coerce";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
 
 const log = scope("command");
-
-function resolveMethodArg(arg: MethodArg, ctx?: ExecContext): unknown {
-  switch (arg.kind) {
-    case "literal": return arg.value;
-    case "source": {
-      const raw = resolveSource(arg.source, ctx);
-      return arg.coerce ? coerce(raw, arg.coerce) : raw;
-    }
-    default: assertNever(arg, "method arg kind");
-  }
-}
 
 function executeMutateEvent(cmd: MutateEventCommand, ctx: ExecContext): void {
   if (!ctx?.evt) throw new Error("[alis] mutate-event requires event context — was this command used outside an event handler?");
@@ -26,13 +16,13 @@ function executeMutateEvent(cmd: MutateEventCommand, ctx: ExecContext): void {
   switch (m.kind) {
     case "set-prop": {
       const val = cmd.source ? resolveSource(cmd.source, ctx) : cmd.value;
-      const coerced = m.coerce ? coerce(val, m.coerce) : val;
+      const coerced = m.coerce ? coerceOrThrow(val, m.coerce) : val;
       log.trace("mutate-event", { prop: m.prop, val: coerced });
       (ctx.evt as any)[m.prop] = coerced;
       break;
     }
     case "call": {
-      const resolved = (m.args ?? []).map(a => resolveMethodArg(a, ctx));
+      const resolved = (m.args ?? []).map(a => resolveArg(a, ctx));
       log.trace("mutate-event", { method: m.method, args: resolved });
       (ctx.evt as any)[m.method](...resolved);
       break;
@@ -84,7 +74,13 @@ export function executeCommand(cmd: Command, ctx?: ExecContext): void {
       const container = document.getElementById(cmd.target);
       if (!container) throw new Error(`[alis] Into("${cmd.target}") target not found. Is the element rendered?`);
       if (ctx?.responseBody != null) {
-        injectHtml(container, String(ctx.responseBody));
+        if (typeof ctx.responseBody !== "string") {
+          throw new Error(
+            `[alis] Into("${cmd.target}") received ${typeof ctx.responseBody} body. ` +
+            `Into expects text/html responses. Use a different handler for JSON.`
+          );
+        }
+        injectHtml(container, ctx.responseBody);
       }
       break;
     }

@@ -178,6 +178,91 @@ describe("When a hidden field rule has a condition that evaluates false", () => 
 });
 
 // ══════════════════════════════════════════════════════════
+// MISSING DOM ELEMENT + WHEN CONDITION → SKIP (wizard partial)
+// ══════════════════════════════════════════════════════════
+
+describe("When an enriched field is missing from DOM but all rules have when conditions that evaluate false", () => {
+  it("skips the field (condition false → no need to find the element)", () => {
+    // Scenario: Step 2 wizard partial loaded for Alzheimer's diagnosis.
+    // SystolicBP field does NOT exist in DOM (cardiac section not rendered).
+    // Its rule has when: PrimaryDiagnosis == "Heart Disease" → false.
+    // PrimaryDiagnosis IS in the DOM as a hidden field with value "Alzheimer's".
+    const diagField = field({
+      fieldName: "PrimaryDiagnosis", fieldId: "Name", // reuse existing DOM element as stand-in
+      vendor: "native", readExpr: "value", rules: [],
+    });
+    // Set the stand-in element value to "Alzheimer's"
+    (document.getElementById("Name") as HTMLInputElement).value = "Alzheimer's";
+
+    const missingField = enrichedField("SystolicBP_MISSING", [
+      { rule: "gt", message: "BP required", constraint: 0, coerceAs: "number",
+        when: { field: "PrimaryDiagnosis", op: "eq", value: "Heart Disease" } },
+    ]);
+    // SystolicBP_MISSING does NOT exist in the DOM
+
+    expect(validate(desc("form", [diagField, missingField]))).toBe(true);
+  });
+
+  it("blocks when the when condition evaluates TRUE but element is missing", () => {
+    (document.getElementById("Name") as HTMLInputElement).value = "Heart Disease";
+
+    const diagField = field({
+      fieldName: "PrimaryDiagnosis", fieldId: "Name",
+      vendor: "native", readExpr: "value", rules: [],
+    });
+    const missingField = enrichedField("SystolicBP_MISSING", [
+      { rule: "gt", message: "BP required", constraint: 0, coerceAs: "number",
+        when: { field: "PrimaryDiagnosis", op: "eq", value: "Heart Disease" } },
+    ]);
+
+    expect(validate(desc("form", [diagField, missingField]))).toBe(false);
+  });
+
+  it("skips when BOTH the field AND its condition field are missing (section not rendered)", () => {
+    // Wizard scenario: cardiac section not rendered for Alzheimer's.
+    // PacemakerModel missing from DOM. Its when condition references HasPacemaker.
+    // HasPacemaker ALSO missing from DOM (not in validation fields either).
+    // Both field and condition field absent = section not rendered = skip.
+    const missingField = enrichedField("PacemakerModel_MISSING", [
+      { rule: "required", message: "Model required",
+        when: { field: "HasPacemaker", op: "truthy" } },
+    ]);
+    // HasPacemaker is NOT in the DOM and NOT in the fields list
+    // → condReader returns null → unresolvable → should SKIP (not block)
+
+    expect(validate(desc("form", [missingField]))).toBe(true);
+  });
+
+  it("blocks when condition field IS present and true but validated field is missing", () => {
+    // HasPacemaker IS in the DOM (checkbox, checked = true).
+    // PacemakerModel is NOT in the DOM.
+    // Condition evaluates to true → field SHOULD exist but doesn't → block.
+    (document.getElementById("IsVet") as HTMLInputElement).checked = true;
+
+    const condField = field({
+      fieldName: "HasPacemaker", fieldId: "IsVet", // reuse IsVet checkbox as stand-in
+      vendor: "native", readExpr: "checked", rules: [],
+    });
+    const missingField = enrichedField("PacemakerModel_MISSING", [
+      { rule: "required", message: "Model required",
+        when: { field: "HasPacemaker", op: "truthy" } },
+    ]);
+
+    // Condition is TRUE (checked), field missing → MUST block
+    expect(validate(desc("form", [condField, missingField]))).toBe(false);
+  });
+
+  it("blocks when field is missing with an unconditional rule", () => {
+    // Field missing + no when condition = must block (fail-closed)
+    const missingField = enrichedField("RequiredField_MISSING", [
+      { rule: "required", message: "Field required" },
+    ]);
+
+    expect(validate(desc("form", [missingField]))).toBe(false);
+  });
+});
+
+// ══════════════════════════════════════════════════════════
 // VISIBLE ENRICHED FIELDS → INLINE
 // ══════════════════════════════════════════════════════════
 

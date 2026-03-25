@@ -9,12 +9,13 @@
 //
 // Vendor-agnostic: delegates value reading to component.ts via resolveRoot.
 
-import type { ValidationDescriptor, ValidationField } from "../types";
+import type { ValidationDescriptor, ValidationField, ValidationRule } from "../types";
 import { resolveRoot } from "../resolution/component";
 import { scope } from "../core/trace";
 import { walk } from "../core/walk";
 import { ruleFails, type PeerReader } from "./rule-engine";
 import { evalCondition, type ConditionReader } from "./condition";
+import { toString, toDate } from "../core/coerce";
 import {
   showInline, clearInline, clearAllInline,
   addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
@@ -87,7 +88,11 @@ export function revalidateField(desc: ValidationDescriptor, field: ValidationFie
 function handleUnresolvableField(
   f: ValidationField, condReader: ConditionReader, summaryEl: HTMLElement | null
 ): boolean {
-  if (allRulesConditionallySkipped(f, condReader)) return true;
+  if (allRulesConditionallySkipped(f, condReader)) {
+    log.trace("unresolvable-skip", { fieldName: f.fieldName, reason: "all conditions false" });
+    return true;
+  }
+  log.trace("unresolvable-block", { fieldName: f.fieldName, fieldId: f.fieldId, rules: f.rules.length });
   if (f.rules.length > 0 && summaryEl) {
     addToSummary(summaryEl, f.fieldName, f.rules[0].message);
   }
@@ -133,11 +138,13 @@ function evaluateRules(
     const condStatus = checkRuleCondition(rule, condReader);
     if (condStatus === "skip") continue;
     if (condStatus === "block") {
+      log.trace("rule-block", { fieldName: f.fieldName, rule: rule.rule, reason: "condition unresolvable" });
       if (summaryEl) addToSummary(summaryEl, f.fieldName, rule.message);
       return false;
     }
 
     if (ruleFails(rule, value, peerReader)) {
+      log.trace("rule-fail", { fieldName: f.fieldName, rule: rule.rule, value, message: rule.message });
       reportFailure(f, rule.message, hidden, formId, summaryEl);
       return false;
     }
@@ -191,7 +198,9 @@ export function showServerErrors(desc: ValidationDescriptor, data: unknown): voi
   let summaryHasErrors = false;
 
   for (const [name, msgs] of Object.entries(errors)) {
-    const msg = Array.isArray(msgs) ? msgs.join(", ") : String(msgs);
+    // Server 400 Problem Details always sends string or string[] per field
+    const msgResult = toString(msgs);
+    const msg = Array.isArray(msgs) ? msgs.join(", ") : msgResult.ok ? msgResult.value : "";
 
     const spanExists = findErrorSpanExists(name, desc.fields);
     if (spanExists) {
@@ -220,16 +229,19 @@ export function clearAll(desc: ValidationDescriptor): void {
 
 /**
  * Returns true if every rule on this field has a condition AND that condition evaluates to false.
- * Used for unenriched fields: if all rules are conditionally suppressed (e.g., AddressType != "Custom Address"),
- * the field doesn't need a component yet and shouldn't block.
- * If ANY rule is unconditional or has a true/null condition, returns false (must block).
+ * Used for fields missing from DOM: if all rules are conditionally suppressed
+ * (condition false) or the condition field itself is missing (unresolvable),
+ * the field's entire section wasn't rendered — skip it.
+ *
+ * Unresolvable condition for a missing field = section not rendered = skip.
+ * This differs from enriched fields where unresolvable = block (fail-closed).
  */
 function allRulesConditionallySkipped(f: ValidationField, condReader: ConditionReader): boolean {
   if (f.rules.length === 0) return true;
   for (const rule of f.rules) {
     if (!rule.when) return false; // unconditional rule → must block
     const result = evalCondition(rule.when, condReader);
-    if (result !== false) return false; // condition met or unresolvable → must block
+    if (result === true) return false; // condition met → must block (field should exist but doesn't)
   }
   return true; // all conditions false → skip
 }
@@ -245,7 +257,23 @@ function domConditionReader(byName: Map<string, ValidationField>): ConditionRead
       const root = resolveRoot(el, srcField.vendor);
       const val = walk(root, srcField.readExpr);
       // Normalize: null/undefined/false → "" (empty = no value expressed)
-      return (val == null || val === false) ? "" : String(val);
+      if (val == null || val === false) return "";
+
+      // Date fields: convert to Unix ms string for comparison with C# Unix ms condition values.
+      // C# WhenField<DateTime> serializes via DateTimeOffset.ToUnixTimeMilliseconds().
+      // JS Date.getTime() produces the same Unix ms. String(ms) === String(ms) → exact match.
+      if (srcField.coerceAs === "date") {
+        const dateResult = toDate(val);
+        if (!dateResult.ok) return undefined; // fail-closed
+        if (Number.isNaN(dateResult.value)) return "";
+        const msResult = toString(dateResult.value);
+        return msResult.ok ? msResult.value : "";
+      }
+
+      const result = toString(val);
+      // toString Err means walk returned a plain object (plan misconfiguration).
+      // Return undefined → fail-closed. See: https://github.com/marafiq/alis-reactive/issues/50
+      return result.ok ? result.value : undefined;
     },
   };
 }

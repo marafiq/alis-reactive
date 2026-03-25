@@ -274,7 +274,7 @@ describe("when walking source into each mutation kind", () => {
       boot({
         planId: "Test.Model",
         components: {
-          srcField: { id: "src-input", vendor: "native", readExpr: "value" },
+          srcField: { id: "src-input", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" },
         },
         entries: [{
           trigger: { kind: "dom-ready" },
@@ -300,7 +300,7 @@ describe("when walking source into each mutation kind", () => {
       boot({
         planId: "Test.Model",
         components: {
-          srcWidget: { id: "src-widget", vendor: "fusion", readExpr: "value" },
+          srcWidget: { id: "src-widget", vendor: "fusion", readExpr: "value", componentType: "textbox", coerceAs: "string" },
         },
         entries: [{
           trigger: { kind: "dom-ready" },
@@ -324,7 +324,7 @@ describe("when walking source into each mutation kind", () => {
       boot({
         planId: "Test.Model",
         components: {
-          src: { id: "cross-src", vendor: "fusion", readExpr: "value" },
+          src: { id: "cross-src", vendor: "fusion", readExpr: "value", componentType: "textbox", coerceAs: "string" },
         },
         entries: [{
           trigger: { kind: "dom-ready" },

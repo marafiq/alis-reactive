@@ -1,0 +1,202 @@
+@model Step3FunctionalModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ReactivePlan<Step3FunctionalModel>();
+    var fallOptions = (string[])ViewBag.FallOptions;
+    var mobilityAids = (string[])ViewBag.MobilityAids;
+}
+
+<!-- ASSERT: select "1-2 falls" or "3+ falls" → fall-details visible
+     ASSERT: FallRiskScore >= 7 AND Age >= 80 → MonitoringLevel = "Continuous", result shows
+     ASSERT: MobilityAid = "Walker" or "Wheelchair" → escort-indicator visible
+     ASSERT: MobilityAid = "Wheelchair" → room-spinner shows, POST fires, room-result shows
+     ASSERT: MedicationCount > 10 → polypharmacy-warning visible
+     ASSERT: TakesBloodThinners ON → MonitoringLevel = "Enhanced"
+     ASSERT: TakesPainMedication ON → pain-section visible
+     ASSERT: save Step 3 with valid data → "Step 3 saved" message -->
+<native-card><native-card-body id="step3-form">
+    <native-heading level="H2">Step 3: Functional Assessment</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        Fall risk, mobility, and medication assessment. High-risk combinations trigger automatic monitoring level changes.
+    </p>
+
+    <!-- Hidden fields: cross-step data -->
+    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
+    <!-- Age uses NumericTextBox (hidden) so compound condition gets decimal type for .Gte(80m) -->
+    <div hidden>
+        @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))
+            .NumericTextBox(b => b.Min(0).Max(120).Step(1)); }
+    </div>
+    @Html.HiddenFieldFor(plan, m => m.ResidentName)
+    @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
+
+    <!-- Row 1: Fall History + Fall Risk Score -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.FallHistory, o => o.Label("Fall History"))
+            .DropDownList(b => b
+                .DataSource(fallOptions)
+                .Placeholder("Select fall history")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var hist = p.Component<FusionDropDownList>(m => m.FallHistory);
+                    p.When(hist.Value()).In("1-2 falls", "3+ falls")
+                        .Then(t => t.Element("fall-details").Show())
+                        .Else(e => e.Element("fall-details").Hide());
+                })); }
+
+        @{ Html.InputField(plan, m => m.FallRiskScore, o => o.Label("Fall Risk Score"))
+            .NumericTextBox(b => b.Min(0).Max(10).Step(1)); }
+    </div>
+
+    <!-- Fall Risk Check button -->
+    <div class="mb-4 flex items-center">
+        @(Html.NativeButton("check-fallrisk-btn", "Check Fall Risk")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var fallRisk = p.Component<FusionNumericTextBox>(m => m.FallRiskScore);
+                var age = p.Component<FusionNumericTextBox>(m => m.Age);
+
+                p.When(fallRisk.Value()).Gte(7m).And(age.Value()).Gte(80m)
+                    .Then(t =>
+                    {
+                        t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Continuous");
+                        t.Element("fallrisk-result").SetText("Continuous monitoring required");
+                        t.Element("fallrisk-result").Show();
+                    })
+                    .Else(e =>
+                    {
+                        e.Element("fallrisk-result").SetText("Standard monitoring");
+                        e.Element("fallrisk-result").Show();
+                    });
+            }))
+        <span id="fallrisk-result" hidden class="ml-3 text-sm font-semibold text-accent"></span>
+    </div>
+
+    <!-- Row 2: Mobility Aid + Medication Count -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.MobilityAid, o => o.Label("Mobility Aid"))
+            .DropDownList(b => b
+                .DataSource(mobilityAids)
+                .Placeholder("Select mobility aid")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var aid = p.Component<FusionDropDownList>(m => m.MobilityAid);
+
+                    p.When(aid.Value()).In("Walker", "Wheelchair")
+                        .Then(t => t.Element("escort-indicator").Show())
+                        .Else(e => e.Element("escort-indicator").Hide());
+
+                    p.When(aid.Value()).Eq("Wheelchair")
+                        .Then(then =>
+                        {
+                            then.Element("room-spinner").Show();
+                            then.Post("/Sandbox/Conditions/AdmissionAssessment/RequestRoomSetup",
+                                g => g.Include<FusionDropDownList, Step3FunctionalModel>(m => m.MobilityAid)
+                                      .Include<NativeHiddenField, Step3FunctionalModel>(m => m.ResidentName))
+                             .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
+                             {
+                                 s.Element("room-result").SetText(json, x => x.Message);
+                                 s.Element("room-result").Show();
+                                 s.Element("room-spinner").Hide();
+                             }));
+                        });
+                })); }
+
+        @{ Html.InputField(plan, m => m.MedicationCount, o => o.Label("Medication Count"))
+            .NumericTextBox(b => b
+                .Min(0).Max(50).Step(1)
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var meds = p.Component<FusionNumericTextBox>(m => m.MedicationCount);
+                    p.When(meds.Value()).Gt(10m)
+                        .Then(t => t.Element("polypharmacy-warning").Show())
+                        .Else(e => e.Element("polypharmacy-warning").Hide());
+                })); }
+    </div>
+
+    <!-- Status indicators for mobility -->
+    <div class="font-mono text-sm space-y-1 mb-4">
+        <div id="escort-indicator" hidden class="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-700">
+            Escort required for mobility aid user.
+        </div>
+        <p><span id="room-spinner" hidden class="text-accent">Requesting room setup...</span></p>
+        <div id="room-result" hidden class="rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-700"></div>
+        <div id="polypharmacy-warning" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700">
+            Polypharmacy alert: more than 10 medications. Pharmacy review required.
+        </div>
+    </div>
+
+    <!-- Row 3: Blood Thinners + Pain Medication -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        @{ Html.InputField(plan, m => m.TakesBloodThinners, o => o.Label("Takes Blood Thinners"))
+            .Switch(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var bt = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
+                    p.When(bt.Value()).Truthy()
+                        .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Enhanced"))
+                        .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Standard"));
+                })); }
+
+        @{ Html.InputField(plan, m => m.TakesPainMedication, o => o.Label("Takes Pain Medication"))
+            .Switch(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var pm = p.Component<FusionSwitch>(m => m.TakesPainMedication);
+                    p.When(pm.Value()).Truthy()
+                        .Then(t => t.Element("pain-section").Show())
+                        .Else(e => e.Element("pain-section").Hide());
+                })); }
+    </div>
+
+    <!-- Conditional sections -->
+    <div id="fall-details" hidden>
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_FallDetails.cshtml", Model)
+    </div>
+
+    <div id="pain-section" hidden>
+        @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_PainAssessment.cshtml", Model)
+    </div>
+
+    <!-- Step 3 Navigation: validate + save on Next, Previous is free -->
+    <div class="flex justify-between mt-6">
+        @(Html.NativeButton("prev-3", "\u2190 Back: Clinical")
+            .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Element("step-3").Hide();
+                p.Element("step-2").Show();
+                p.Element("step-ind-3").RemoveClass("font-bold");
+                p.Element("step-ind-3").RemoveClass("text-accent");
+                p.Element("step-ind-2").AddClass("font-bold");
+                p.Element("step-ind-2").AddClass("text-accent");
+            }))
+        @(Html.NativeButton("next-3", "Next: Review \u2192")
+            .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveStep3",
+                    g => g.IncludeAll())
+                 .Validate<Step3Validator>("step3-form")
+                 .Response(r => r
+                    .OnSuccess<SaveStepResponse>((json, s) =>
+                    {
+                        s.Element("step-3").Hide();
+                        s.Element("step-4").Show();
+                        s.Element("step-ind-3").RemoveClass("font-bold");
+                        s.Element("step-ind-3").RemoveClass("text-accent");
+                        s.Element("step-ind-4").AddClass("font-bold");
+                        s.Element("step-ind-4").AddClass("text-accent");
+                    })
+                    .OnError(400, e =>
+                    {
+                        e.ValidationErrors("step3-form");
+                    }));
+            }))
+    </div>
+</native-card-body></native-card>
+
+@Html.RenderPlan(plan)

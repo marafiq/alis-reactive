@@ -44,13 +44,14 @@ namespace Alis.Reactive
                 if (existing.ComponentId == entry.ComponentId
                     && existing.Vendor == entry.Vendor
                     && existing.ReadExpr == entry.ReadExpr
-                    && existing.ComponentType == entry.ComponentType)
+                    && existing.ComponentType == entry.ComponentType
+                    && existing.CoerceAs == entry.CoerceAs)
                     return;
 
                 throw new InvalidOperationException(
                     $"Duplicate component registration for binding path '{bindingPath}': " +
-                    $"existing [{existing.ComponentId}, {existing.Vendor}] vs " +
-                    $"new [{entry.ComponentId}, {entry.Vendor}]. " +
+                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ReadExpr}, {existing.ComponentType}, {existing.CoerceAs}] vs " +
+                    $"new [{entry.ComponentId}, {entry.Vendor}, {entry.ReadExpr}, {entry.ComponentType}, {entry.CoerceAs}]. " +
                     "Each binding path must map to exactly one component.");
             }
 
@@ -89,7 +90,8 @@ namespace Alis.Reactive
                     id = kvp.Value.ComponentId,
                     vendor = kvp.Value.Vendor,
                     readExpr = kvp.Value.ReadExpr,
-                    componentType = kvp.Value.ComponentType
+                    componentType = kvp.Value.ComponentType,
+                    coerceAs = kvp.Value.CoerceAs
                 };
             }
             return result;
