@@ -5,7 +5,7 @@ namespace Alis.Reactive.DesignSystem.Layout
 {
     public class HStackBuilder
     {
-        private SpacingScale _gap;
+        private readonly SpacingScale _gap;
         private AlignItems _align = AlignItems.Center;
         private JustifyContent _justify = JustifyContent.Start;
         private bool _wrap;

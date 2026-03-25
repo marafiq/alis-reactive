@@ -5,7 +5,7 @@ namespace Alis.Reactive.DesignSystem.Layout
 {
     public class VStackBuilder
     {
-        private SpacingScale _gap;
+        private readonly SpacingScale _gap;
         private bool _divideY;
         private string? _cssClass;
         private string? _id;

@@ -6,7 +6,7 @@ namespace Alis.Reactive.DesignSystem.Layout
 {
     public class GridBuilder
     {
-        private GridCols _cols;
+        private readonly GridCols _cols;
         private SpacingScale _gap = SpacingScale.Md;
         private bool _responsive = true;
         private string? _cssClass;
