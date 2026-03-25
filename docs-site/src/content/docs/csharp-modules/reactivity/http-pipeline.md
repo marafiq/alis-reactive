@@ -486,3 +486,5 @@ And the save button's pipeline:
 This single pipeline handles confirmation, validation, loading state, success notification, and error display. Every step is described in the plan. The runtime executes it exactly as written.
 
 **Previous:** [Conditions](../conditions/) -- runtime branching with When/Then/ElseIf/Else and guard composition.
+
+**Next:** [Validation](../validation/) -- client-side validation with FluentValidation extraction, 16 rule types, and fail-closed orchestration.

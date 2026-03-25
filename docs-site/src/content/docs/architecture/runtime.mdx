@@ -123,8 +123,12 @@ Attaches listeners based on `trigger.kind`. Each creates an execution context an
 | `dom-ready` | Immediate execution (or `DOMContentLoaded`) | `{ components }` |
 | `custom-event` | `document.addEventListener(eventName)` | `{ evt: detail, components }` |
 | `component-event` | `resolveRoot(el, vendor).addEventListener(jsEvent)` | `{ evt: payload, components }` |
+| `server-push` | `new EventSource(url)` — SSE stream listener | `{ evt: parsed data, components }` |
+| `signalr` | `HubConnection.on(methodName)` — SignalR hub listener | `{ evt: method args, components }` |
 
 For component events, `trigger.ts` contains vendor-specific logic: native components read `readExpr` from the element and package it into the detail, fusion components pass the event object directly. All listeners use `AbortSignal` for clean teardown.
+
+For server-push and signalr, the runtime manages persistent connections shared by triggers with the same endpoint/hub URL. SSE uses the browser's native `EventSource` with automatic reconnection. SignalR uses `@microsoft/signalr` with `withAutomaticReconnect()`. Both show a retry indicator when all retries are exhausted.
 
 ### Decision 1 — Reaction kind (`execute.ts`)
 

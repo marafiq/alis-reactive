@@ -419,6 +419,59 @@ Html.On(plan, t => t.DomReady(p =>
 
 ---
 
+## NativeActionLink
+
+Renders an `<a>` element that triggers an HTTP pipeline on click. **Not an input component** -- action links have no form value, no `ReadExpr`, no `.Value()` source. They exist to make links that execute server requests declaratively.
+
+| Property | Value |
+|----------|-------|
+| Implements | Standalone (not `IComponent` or `IInputComponent`) |
+| Rendered | `<a>` with `data-reactive-link` attribute |
+
+### How do I render an action link?
+
+Action links are created via `Html.NativeActionLink`, not `Html.InputField`. The pipeline must contain exactly one HTTP request:
+
+```csharp
+@Html.NativeActionLink("Delete Resident", "/api/residents/delete/42", pipeline =>
+{
+    pipeline.Post("/api/residents/delete/42", g => g.Static("id", 42))
+        .WhileLoading(l => l.Element("status").SetText("Deleting..."))
+        .Response(r => r
+            .OnSuccess(p => p.Element("status").SetText("Deleted"))
+            .OnError(400, e => e.Element("status").SetText("Delete failed")));
+})
+    .CssClass("text-red-600 hover:text-red-700")
+```
+
+The `url` parameter must match the request URL in the pipeline.
+
+### How do I add a confirmation dialog?
+
+Wrap the HTTP request in a `Confirm` guard:
+
+```csharp
+@Html.NativeActionLink("Discharge", "/api/residents/discharge/42", pipeline =>
+{
+    pipeline.Confirm("Are you sure you want to discharge this resident?")
+        .Then(then =>
+        {
+            then.Post("/api/residents/discharge/42", g => g.Static("id", 42))
+                .Response(r => r.OnSuccess(p => p.Dispatch("resident-discharged")));
+        });
+})
+    .CssClass("text-amber-600 hover:text-amber-700")
+```
+
+### Builder methods
+
+| Method | Description |
+|--------|-------------|
+| `.CssClass(string)` | Sets CSS classes on the anchor element |
+| `.Attr(string name, string value)` | Adds a custom HTML attribute (cannot override `id`, `href`, or `data-reactive-link`; `class` is redirected to `.CssClass()`) |
+
+---
+
 ## NativeHiddenField
 
 Renders an `<input type="hidden">` element. No label, no validation slot, no visible presence. Participates in `ComponentsMap` so `IncludeAll()` gathers its value.
@@ -502,6 +555,6 @@ p.Post("/api/residents/save", g => g.IncludeAll())
     .Response(r =>
     {
         r.OnSuccess(s => s.Component<NativeLoader>().Hide());
-        r.OnFailure(f => f.Component<NativeLoader>().Hide());
+        r.OnError(500, e => e.Component<NativeLoader>().Hide());
     });
 ```

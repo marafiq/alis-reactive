@@ -12,7 +12,7 @@ Builders are the developer's API. Each one represents a stage of the composition
 ```d2
 direction: right
 
-trigger: "TriggerBuilder\nDomReady, CustomEvent" {
+trigger: "TriggerBuilder\nDomReady, CustomEvent,\nServerPush, SignalR" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
@@ -56,13 +56,18 @@ compref -> pipeline: returns pipeline {
 
 ## TriggerBuilder — what fires the pipeline
 
-`Html.On(plan, t => ...)` gives you a `TriggerBuilder`. It has three methods — each one takes a pipeline lambda and adds an `Entry` (trigger + reaction) to the plan.
+`Html.On(plan, t => ...)` gives you a `TriggerBuilder`. Each method takes a pipeline lambda and adds an `Entry` (trigger + reaction) to the plan.
 
 | Method | Trigger created | Lambda receives |
 |--------|----------------|-----------------|
 | `t.DomReady(pipeline => {...})` | `DomReadyTrigger` | `PipelineBuilder` |
 | `t.CustomEvent("name", pipeline => {...})` | `CustomEventTrigger` | `PipelineBuilder` |
 | `t.CustomEvent<T>("name", (payload, pipeline) => {...})` | `CustomEventTrigger` | Phantom `T` + `PipelineBuilder` |
+| `t.ServerPush(url, pipeline => {...})` | `ServerPushTrigger` | `PipelineBuilder` |
+| `t.ServerPush(url, eventType, pipeline => {...})` | `ServerPushTrigger` | `PipelineBuilder` |
+| `t.ServerPush<T>(url, eventType, (payload, pipeline) => {...})` | `ServerPushTrigger` | Phantom `T` + `PipelineBuilder` |
+| `t.SignalR(hubUrl, method, pipeline => {...})` | `SignalRTrigger` | `PipelineBuilder` |
+| `t.SignalR<T>(hubUrl, method, (payload, pipeline) => {...})` | `SignalRTrigger` | Phantom `T` + `PipelineBuilder` |
 
 TriggerBuilder returns itself — you can chain multiple triggers in one `Html.On` call.
 

@@ -29,6 +29,16 @@ void Html.On<TModel>(IReactivePlan<TModel> plan, Action<TriggerBuilder<TModel>> 
 TriggerBuilder<TModel> t.DomReady(Action<PipelineBuilder<TModel>> configure)
 TriggerBuilder<TModel> t.CustomEvent(string eventName, Action<PipelineBuilder<TModel>> configure)
 TriggerBuilder<TModel> t.CustomEvent<TPayload>(string eventName, Action<TPayload, PipelineBuilder<TModel>> configure)
+    where TPayload : new()
+TriggerBuilder<TModel> t.ServerPush(string url, Action<PipelineBuilder<TModel>> configure)
+TriggerBuilder<TModel> t.ServerPush(string url, string eventType, Action<PipelineBuilder<TModel>> configure)
+TriggerBuilder<TModel> t.ServerPush<TPayload>(string url, string eventType,
+    Action<TPayload, PipelineBuilder<TModel>> configure)
+    where TPayload : new()
+TriggerBuilder<TModel> t.SignalR(string hubUrl, string methodName, Action<PipelineBuilder<TModel>> configure)
+TriggerBuilder<TModel> t.SignalR<TPayload>(string hubUrl, string methodName,
+    Action<TPayload, PipelineBuilder<TModel>> configure)
+    where TPayload : new()
 ```
 
 ### InputField

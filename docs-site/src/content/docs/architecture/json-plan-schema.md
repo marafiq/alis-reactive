@@ -66,8 +66,11 @@ Each component entry carries:
 | `dom-ready` | -- | Fires once when the page loads |
 | `custom-event` | `event` | Fires when a named `CustomEvent` is dispatched on `document` |
 | `component-event` | `componentId`, `jsEvent`, `vendor` | Fires when a component emits a vendor-specific event |
+| `server-push` | `url` | Fires when the server pushes data via Server-Sent Events (SSE) |
+| `signalr` | `hubUrl`, `methodName` | Fires when a SignalR hub method is invoked |
 
 Optional fields on `component-event`: `bindingPath`, `readExpr`.
+Optional fields on `server-push`: `eventType`.
 
 ---
 
