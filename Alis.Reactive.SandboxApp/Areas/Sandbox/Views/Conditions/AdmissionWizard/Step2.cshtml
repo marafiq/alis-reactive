@@ -1,0 +1,156 @@
+@model Step2ClinicalModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Admission Wizard — Step 2";
+    var plan = Html.ReactivePlan<Step2ClinicalModel>();
+    var screeningId = (string)ViewBag.ScreeningId;
+    var showCognitive = Model.PrimaryDiagnosis is "Alzheimer's" or "Parkinson's";
+    var showCardiac = Model.PrimaryDiagnosis == "Heart Disease";
+    var showDiabetes = Model.PrimaryDiagnosis == "Diabetes";
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Admission Wizard (Server-Side)</native-heading>
+        <native-text color="Secondary">
+            Step 2: Clinical sections shown based on diagnosis from Step 1 (@Model.PrimaryDiagnosis).
+        </native-text>
+    </div>
+
+    @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionWizard/_StepIndicator.cshtml")
+
+    <form method="post" action="/Sandbox/Conditions/AdmissionWizard/SaveStep2">
+        <input type="hidden" name="screeningId" value="@screeningId" />
+        <input type="hidden" name="PrimaryDiagnosis" value="@Model.PrimaryDiagnosis" />
+        <input type="hidden" name="ResidentName" value="@Model.ResidentName" />
+
+        <native-card><native-card-body>
+            <native-heading level="H2">Step 2: Clinical Assessment</native-heading>
+            <p class="text-sm text-text-secondary mb-4">
+                Diagnosis: <strong>@Model.PrimaryDiagnosis</strong> — for resident @Model.ResidentName
+            </p>
+
+            @Html.HiddenFieldFor(plan, m => m.CareUnit)
+
+            @if (showCognitive)
+            {
+                <native-card><native-card-body>
+                    <native-heading level="H3">Cognitive Assessment</native-heading>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        @{ Html.InputField(plan, m => m.CognitiveScore, o => o.Label("Cognitive Score (MMSE)"))
+                            .NumericTextBox(b => b
+                                .Min(0).Max(30).Step(1)
+                                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                                {
+                                    var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
+                                    p.When(comp.Value()).Lt(15m)
+                                        .Then(t => { t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Memory Care"); t.Element("cog-status").SetText("Severe — Memory Care"); })
+                                        .ElseIf(comp.Value()).Lt(25m)
+                                        .Then(t => { t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Assisted Living + Memory"); t.Element("cog-status").SetText("Moderate — Assisted Living"); })
+                                        .Else(e => { e.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Standard"); e.Element("cog-status").SetText("Mild/Normal"); });
+                                })); }
+                        @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
+                            .Switch(b => b
+                                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                                {
+                                    var sw = p.Component<FusionSwitch>(m => m.Wanders);
+                                    p.When(sw.Value()).Truthy()
+                                        .Then(t => t.Element("wander-details").Show())
+                                        .Else(e => e.Element("wander-details").Hide());
+                                })); }
+                    </div>
+                    <p class="font-mono text-sm">Status: <span id="cog-status" class="text-text-muted">&mdash;</span></p>
+                    <div id="wander-details" @(Model.Wanders ? "" : "hidden")>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            @{ Html.InputField(plan, m => m.WanderFrequency, o => o.Label("Wander Frequency"))
+                                .DropDownList(b => b
+                                    .DataSource(new[] { "Rarely", "Occasionally", "Frequently" })
+                                    .Placeholder("Select frequency")); }
+                        </div>
+                    </div>
+                </native-card-body></native-card>
+            }
+
+            @if (showCardiac)
+            {
+                <native-card><native-card-body>
+                    <native-heading level="H3">Cardiac Assessment</native-heading>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        @{ Html.InputField(plan, m => m.SystolicBP, o => o.Label("Systolic BP (mmHg)"))
+                            .NumericTextBox(b => b.Min(0).Max(300).Step(1)); }
+                        @{ Html.InputField(plan, m => m.HasPacemaker, o => o.Label("Has Pacemaker"))
+                            .Switch(b => b
+                                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                                {
+                                    var sw = p.Component<FusionSwitch>(m => m.HasPacemaker);
+                                    p.When(sw.Value()).Truthy()
+                                        .Then(t => t.Element("pacemaker-details").Show())
+                                        .Else(e => e.Element("pacemaker-details").Hide());
+                                })); }
+                    </div>
+                    <div id="pacemaker-details" @(Model.HasPacemaker ? "" : "hidden")>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            @{ Html.InputField(plan, m => m.PacemakerModel, o => o.Label("Pacemaker Model"))
+                                .NativeTextBox(b => b.Placeholder("e.g. Medtronic Azure")); }
+                            @{ Html.InputField(plan, m => m.LastDeviceCheck, o => o.Label("Last Device Check"))
+                                .DatePicker(b => b.Placeholder("Select date")); }
+                        </div>
+                    </div>
+                </native-card-body></native-card>
+            }
+
+            @if (showDiabetes)
+            {
+                <native-card><native-card-body>
+                    <native-heading level="H3">Diabetes Management</native-heading>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        @{ Html.InputField(plan, m => m.DiabetesType, o => o.Label("Diabetes Type"))
+                            .DropDownList(b => b
+                                .DataSource(new[] { "Type 1", "Type 2" })
+                                .Placeholder("Select type")); }
+                        @{ Html.InputField(plan, m => m.A1cLevel, o => o.Label("A1C Level (%)"))
+                            .NumericTextBox(b => b.Min(0).Max(20).Step(0.1)); }
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        @{ Html.InputField(plan, m => m.InsulinDependent, o => o.Label("Insulin Dependent"))
+                            .Switch(b => b
+                                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                                {
+                                    var sw = p.Component<FusionSwitch>(m => m.InsulinDependent);
+                                    p.When(sw.Value()).Truthy()
+                                        .Then(t => t.Element("insulin-details").Show())
+                                        .Else(e => e.Element("insulin-details").Hide());
+                                })); }
+                    </div>
+                    <div id="insulin-details" @(Model.InsulinDependent ? "" : "hidden")>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            @{ Html.InputField(plan, m => m.InsulinSchedule, o => o.Label("Insulin Schedule"))
+                                .DropDownList(b => b
+                                    .DataSource(new[] { "Once daily", "Twice daily", "Before meals", "Sliding scale" })
+                                    .Placeholder("Select schedule")); }
+                        </div>
+                    </div>
+                </native-card-body></native-card>
+            }
+
+            @if (!showCognitive && !showCardiac && !showDiabetes)
+            {
+                <p class="text-sm text-text-secondary">No specialized clinical assessment required for @Model.PrimaryDiagnosis.</p>
+            }
+
+            <div class="flex justify-between mt-6">
+                <a href="/Sandbox/Conditions/AdmissionWizard/Step1?screeningId=@screeningId"
+                   class="rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors">
+                    &larr; Back: Demographics
+                </a>
+                <button type="submit" class="rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors">
+                    Next: Functional &rarr;
+                </button>
+            </div>
+        </native-card-body></native-card>
+    </form>
+</native-vstack>
+
+@Html.RenderPlan(plan)
