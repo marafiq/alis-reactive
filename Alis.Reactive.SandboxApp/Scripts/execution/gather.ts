@@ -49,7 +49,7 @@ interface Transport {
 function createTransport(
   urlParams: string[],
   formData: FormData | null,
-  body: Record<string, unknown>
+  _body: Record<string, unknown>
 ): Transport {
   if (formData) {
     return {

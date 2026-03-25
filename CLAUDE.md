@@ -37,7 +37,7 @@ the `ReactivePlan`. Nothing executes at this point.
         p.Dispatch("ready");
     }));
 }
-<script type="application/json" data-alis-plan data-trace="trace">@Html.Raw(plan.Render())</script>
+<script type="application/json" data-reactive-plan data-trace="trace">@Html.Raw(plan.Render())</script>
 ```
 
 **Key files:**
@@ -146,7 +146,7 @@ ESM module bundled by esbuild. The runtime reads the plan JSON and executes it. 
 
 | File | Purpose |
 |------|---------|
-| `Scripts/auto-boot.ts` | esbuild entry point — auto-discovers `[data-alis-plan]`, reads `data-trace`, calls `boot()` |
+| `Scripts/root.ts` | esbuild entry point — auto-discovers `[data-reactive-plan]`, reads `data-trace`, calls `boot()` |
 | `Scripts/boot.ts` | Two-phase boot: wire custom-event listeners first, then execute dom-ready (testable export) |
 | `Scripts/trigger.ts` | `wireTrigger()` — wires dom-ready and custom-event listeners |
 | `Scripts/execute.ts` | `executeReaction()` → `executeCommand()` — dispatch to command handlers |
@@ -171,21 +171,21 @@ Views emit only the plan JSON element — no inline scripts at all.
 
 ```html
 <!-- _Layout.cshtml — loads once, cache-busted via SHA256 hash -->
-<link rel="stylesheet" href="~/css/alis-modern-tailwind.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/design-system.css" asp-append-version="true"/>
 <script type="module" src="~/js/alis-reactive.js" asp-append-version="true"></script>
 
 <!-- View — plan element only, auto-boot discovers it -->
-<script type="application/json" data-alis-plan data-trace="trace">@Html.Raw(planJson)</script>
+<script type="application/json" data-reactive-plan data-trace="trace">@Html.Raw(planJson)</script>
 ```
 
 **Auto-boot architecture:**
 
 | File | Role |
 |------|------|
-| `Scripts/auto-boot.ts` | esbuild entry point — auto-discovers `[data-alis-plan]`, reads `data-trace`, calls `boot()` |
+| `Scripts/root.ts` | esbuild entry point — auto-discovers `[data-reactive-plan]`, reads `data-trace`, calls `boot()` |
 | `Scripts/boot.ts` | Testable export — `boot()` and `trace` used by vitest, NOT the browser entry point |
 
-`auto-boot.ts` runs on every page load. If `[data-alis-plan]` exists, it boots. If `data-trace`
+`root.ts` runs on every page load. If `[data-reactive-plan]` exists, it boots. If `data-trace`
 is set, it enables tracing. This eliminates per-view inline scripts entirely.
 
 ## Projects
@@ -278,11 +278,11 @@ on test failure.
 ## Build Commands
 
 ```bash
-# JS runtime (ESM bundle — entry: auto-boot.ts)
+# JS runtime (ESM bundle — entry: root.ts)
 npm run build                    # → wwwroot/js/alis-reactive.js (2kb)
 
 # Tailwind CSS (v4)
-npm run build:css                # → wwwroot/css/alis-modern-tailwind.css
+npm run build:css                # → wwwroot/css/design-system.css
 
 # Both JS + CSS
 npm run build:all
@@ -324,7 +324,7 @@ with its own branch. Run all builds and tests from within the worktree directory
 
 The C# DSL builds descriptors → `plan.Render()` serializes to JSON → JS runtime executes.
 No shortcuts. No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
-No inline `<script>` blocks in views — `auto-boot.ts` handles discovery and boot automatically.
+No inline `<script>` blocks in views — `root.ts` handles discovery and boot automatically.
 
 ### 3. Every New Primitive Needs All Three Layers
 

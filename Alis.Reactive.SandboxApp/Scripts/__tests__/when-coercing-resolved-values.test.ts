@@ -173,7 +173,7 @@ describe("when coercing resolved values", () => {
         expect(coerce(-1, "boolean")).toEqual({ ok: true, value: true });
       });
 
-      it("throws on plain object", () => {
+      it("returns Err on plain object", () => {
         expect(coerce({}, "boolean").ok).toBe(false);
       });
 
