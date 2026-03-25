@@ -2,6 +2,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 public class Step1DemographicsModel
 {
+    public string ScreeningId { get; set; } = "";
     public string ResidentName { get; set; } = "";
     public decimal Age { get; set; }
     public string PrimaryDiagnosis { get; set; } = "";

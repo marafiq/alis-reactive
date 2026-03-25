@@ -65,18 +65,16 @@ public class AdmissionWizardController : Controller
         var id = NewScreeningId();
         Step1Drafts[id] = model;
 
-        // Return Step 2 partial
+        // Return Step 2 partial HTML — Into("step-container") injects it
         SetDataSources();
         ViewBag.ScreeningId = id;
         ViewBag.CurrentStep = 2;
-
         var step2 = new Step2ClinicalModel
         {
             ScreeningId = id,
             PrimaryDiagnosis = model.PrimaryDiagnosis,
             ResidentName = model.ResidentName,
         };
-
         return PartialView(ViewBase + "_Step2Content.cshtml", step2);
     }
 

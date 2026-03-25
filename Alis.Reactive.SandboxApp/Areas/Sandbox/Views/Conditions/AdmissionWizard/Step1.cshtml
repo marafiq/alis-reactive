@@ -124,18 +124,13 @@
                         {
                             s.Element("step1-success").SetText(json, x => x.Message);
                             s.Element("step1-success").Show();
-                            s.Element("step1-continue").Show();
                         })
                         .OnError(400, e =>
                         {
                             e.ValidationErrors("step1-form");
                         }));
                 }))
-            <a id="step1-continue" hidden
-               href="/Sandbox/Conditions/AdmissionWizard/Step2?screeningId=@screeningId"
-               class="rounded-md bg-emerald-600 px-6 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors inline-flex items-center">
-                Continue to Step 2 &rarr;
-            </a>
+            
         </div>
     </native-card-body></native-card>
 </native-vstack>
