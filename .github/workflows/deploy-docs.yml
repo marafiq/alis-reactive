@@ -74,14 +74,12 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: Alis.Reactive.SandboxApp/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install npm dependencies
-        working-directory: Alis.Reactive.SandboxApp
         run: npm ci
 
       - name: Build JS + CSS bundles
-        working-directory: Alis.Reactive.SandboxApp
         run: npm run build:all
 
       - name: Build all C# projects
