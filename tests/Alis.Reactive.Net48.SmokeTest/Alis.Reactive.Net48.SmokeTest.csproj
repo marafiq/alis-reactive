@@ -107,6 +107,11 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\_DrawerContent.cshtml" />
+    <Content Include="Views\Intake\Index.cshtml" />
+    <Content Include="Views\Intake\_UnitOptions.cshtml" />
+    <Content Include="Views\Intake\_FacilityInfo.cshtml" />
+    <Content Include="Views\Intake\_FacilityRequirements.cshtml" />
+    <Content Include="Views\Intake\_Summary.cshtml" />
     <Content Include="css\design-system.css" />
     <Content Include="js\alis-reactive.js" />
     <Content Include="packages.config" />
@@ -117,7 +122,9 @@
     </Compile>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IntakeController.cs" />
     <Compile Include="Models\SmokeTestModel.cs" />
+    <Compile Include="Models\ResidentIntakeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <!-- Copy static assets from SandboxApp build output — single source of truth -->
