@@ -92,7 +92,7 @@
     </Reference>
     <!-- FluentValidation resolves transitively via Alis.Reactive.FluentValidator ProjectReference -->
     <Reference Include="FluentValidation">
-      <HintPath>..\..\Alis.Reactive.FluentValidator\bin\Debug\net48\FluentValidation.dll</HintPath>
+      <HintPath>..\..\Alis.Reactive.FluentValidator\bin\$(Configuration)\net48\FluentValidation.dll</HintPath>
     </Reference>
     <!-- Roslyn compiler for Razor views — fixes extension method resolution -->
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
@@ -122,7 +122,6 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\_DrawerContent.cshtml" />
     <Content Include="Views\Intake\Index.cshtml" />
-    <Content Include="Views\Intake\_UnitOptions.cshtml" />
     <Content Include="Views\Intake\_FacilityInfo.cshtml" />
     <Content Include="Views\Intake\_FacilityRequirements.cshtml" />
     <Content Include="Views\Intake\_Summary.cshtml" />

@@ -42,8 +42,15 @@ jobs:
       - name: Verify dual targets in packages
         run: |
           for pkg in nupkgs/*.nupkg; do
-            echo "=== $(basename $pkg) ==="
-            unzip -l "$pkg" | grep -E "lib/net(48|10)" | head -10
+            name=$(basename "$pkg")
+            echo "=== $name ==="
+            contents=$(unzip -l "$pkg")
+            echo "$contents" | grep -E "lib/net(48|10)" | head -10
+            # NativeTagHelpers is net10.0-only (no tag helpers on net48)
+            if echo "$name" | grep -qv "NativeTagHelpers"; then
+              echo "$contents" | grep -q "lib/net48" || { echo "FAIL: $name missing lib/net48"; exit 1; }
+              echo "$contents" | grep -q "lib/net10" || { echo "FAIL: $name missing lib/net10"; exit 1; }
+            fi
             echo ""
           done
 

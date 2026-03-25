@@ -521,6 +521,9 @@ resolved, or the wrong field gets validated — all silently. Throw, don't guess
 
 All library projects target both `net48` and `net10.0`. Every new file must compile on both.
 
+**Exception:** `Alis.Reactive.NativeTagHelpers` is `net10.0`-only — ASP.NET Core Tag Helpers
+have no net48 equivalent.
+
 **When adding a new component builder or extension:**
 - `#if NET48` / `#else` for using statements: `System.Web.Mvc` vs `Microsoft.AspNetCore`
 - `IHtmlString` vs `IHtmlContent`, `HtmlHelper<T>` vs `IHtmlHelper<T>`
@@ -546,7 +549,7 @@ No IIFE, no `window.alis`, no import maps, no inline `<script type="module">` bl
 appends `?v=SHA256hash` — browser always gets the latest build. This works because the
 layout uses `src=` (not inline `import from`), and ASP.NET's tag helpers compute the hash.
 
-### 12. Playwright Test Workflow — Report First, Fix Methodically
+### 13. Playwright Test Workflow — Report First, Fix Methodically
 
 **Always run Playwright with trx report so failures are captured in one pass:**
 

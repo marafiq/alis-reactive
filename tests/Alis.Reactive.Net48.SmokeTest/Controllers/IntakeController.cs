@@ -143,7 +143,8 @@ namespace Alis.Reactive.Net48.SmokeTest.Controllers
             ViewBag.FacilityId = facilityId ?? "\u2014";
             ViewBag.CareLevel = careLevel ?? "\u2014";
             ViewBag.AdmissionDate = admissionDate ?? "\u2014";
-            ViewBag.MonthlyRate = monthlyRate ?? "\u2014";
+            decimal rate;
+            ViewBag.MonthlyRate = decimal.TryParse(monthlyRate, out rate) ? rate.ToString("C") : "\u2014";
             return PartialView("_Summary");
         }
 
