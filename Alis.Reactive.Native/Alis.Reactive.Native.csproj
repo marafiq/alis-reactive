@@ -1,13 +1,40 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
+        <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageId>Alis.Reactive.Native</PackageId>
+        <Version>1.0.0-preview.1</Version>
+        <Authors>Adnan Rafiq</Authors>
+        <Company>Alis Technologies</Company>
+        <Description>Native HTML input components (TextBox, CheckBox, Button, Drawer, Loader) for Alis.Reactive — plan-driven reactivity for ASP.NET MVC.</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://marafiq.github.io/alis-reactive/</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/marafiq/alis-reactive</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>reactive;aspnet;mvc;json-plan;zero-javascript</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+        <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+        <Reference Include="System.Web" />
     </ItemGroup>
 
     <ItemGroup>
