@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using Alis.Reactive.Net48.SmokeTest.Models;
+using Alis.Reactive.Net48.SmokeTest.Validators;
 
 namespace Alis.Reactive.Net48.SmokeTest.Controllers
 {
@@ -87,28 +88,21 @@ namespace Alis.Reactive.Net48.SmokeTest.Controllers
         {
             if (model == null)
             {
-                return new HttpStatusCodeResult(400, "Request body is required.");
+                Response.StatusCode = 400;
+                return Json(new { errors = new Dictionary<string, string[]> { { "FirstName", new[] { "Request body is required." } } } },
+                    JsonRequestBehavior.AllowGet);
             }
 
-            var errors = new Dictionary<string, string[]>();
+            var validator = new IntakeValidator();
+            var result = validator.Validate(model);
 
-            if (string.IsNullOrWhiteSpace(model.FirstName))
-                errors["FirstName"] = new[] { "First name is required." };
-            if (string.IsNullOrWhiteSpace(model.LastName))
-                errors["LastName"] = new[] { "Last name is required." };
-            if (string.IsNullOrWhiteSpace(model.FacilityId))
-                errors["FacilityId"] = new[] { "Please select a facility." };
-            if (string.IsNullOrWhiteSpace(model.CareLevel))
-                errors["CareLevel"] = new[] { "Please select a care level." };
-            if (string.IsNullOrWhiteSpace(model.AdmissionDate))
-                errors["AdmissionDate"] = new[] { "Admission date is required." };
-            if (string.IsNullOrWhiteSpace(model.EmergencyContactName))
-                errors["EmergencyContactName"] = new[] { "Emergency contact name is required." };
-            if (string.IsNullOrWhiteSpace(model.EmergencyContactPhone))
-                errors["EmergencyContactPhone"] = new[] { "Emergency contact phone is required." };
-
-            if (errors.Any())
+            if (!result.IsValid)
             {
+                var errors = result.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray());
                 Response.StatusCode = 400;
                 return Json(new { errors }, JsonRequestBehavior.AllowGet);
             }

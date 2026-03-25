@@ -90,6 +90,10 @@
     <Reference Include="System.IO.Pipelines">
       <HintPath>packages\System.IO.Pipelines.9.0.14\lib\net462\System.IO.Pipelines.dll</HintPath>
     </Reference>
+    <!-- FluentValidation resolves transitively via Alis.Reactive.FluentValidator ProjectReference -->
+    <Reference Include="FluentValidation">
+      <HintPath>..\..\Alis.Reactive.FluentValidator\bin\Debug\net48\FluentValidation.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Alis.Reactive\Alis.Reactive.csproj">
@@ -97,6 +101,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Alis.Reactive.Native\Alis.Reactive.Native.csproj">
       <Name>Alis.Reactive.Native</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Alis.Reactive.FluentValidator\Alis.Reactive.FluentValidator.csproj">
+      <Name>Alis.Reactive.FluentValidator</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +132,7 @@
     <Compile Include="Controllers\IntakeController.cs" />
     <Compile Include="Models\SmokeTestModel.cs" />
     <Compile Include="Models\ResidentIntakeModel.cs" />
+    <Compile Include="Validators\IntakeValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <!-- Copy static assets from SandboxApp build output — single source of truth -->

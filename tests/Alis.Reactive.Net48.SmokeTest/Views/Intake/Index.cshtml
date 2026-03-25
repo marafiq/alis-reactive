@@ -4,6 +4,7 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Net48.SmokeTest.Models
+@using Alis.Reactive.Net48.SmokeTest.Validators
 @{
     ViewBag.Title = "New Resident Intake";
 
@@ -193,6 +194,7 @@
                         .Then(t =>
                         {
                             t.Post("/Intake/Save", g => g.IncludeAll())
+                             .Validate<IntakeValidator>("intake-form")
                              .WhileLoading(l =>
                              {
                                  l.Component<NativeLoader>().Show();
@@ -208,7 +210,7 @@
                                 .OnError(400, e =>
                                 {
                                     e.Component<NativeLoader>().Hide();
-                                    e.Element("error-toast").Show();
+                                    e.ValidationErrors("intake-form");
                                 })
                                 .Chained(c => c
                                     .Get("/Intake/ConfirmationNumber")
@@ -227,9 +229,6 @@
         @* ═══════════════════════════════════════════════════════ *@
         <div id="success-toast" class="mt-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-800" hidden>
             <strong>Resident Intake</strong> &mdash; Intake submitted successfully.
-        </div>
-        <div id="error-toast" class="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-800" hidden>
-            <strong>Validation Error</strong> &mdash; Please correct the highlighted fields.
         </div>
 
         @* ═══════════════════════════════════════════════════════ *@
