@@ -44,5 +44,25 @@ namespace Alis.Reactive.Descriptors.Triggers
             BindingPath = bindingPath;
             ReadExpr = readExpr;
         }
+
+        /// <summary>
+        /// Factory that resolves Vendor and ReadExpr from TComponent's interface declarations.
+        /// Centralizes trigger construction — all .Reactive() extensions call this instead of
+        /// manually assembling 5 constructor args. Uses a static cache per TComponent to match
+        /// the ComponentRef caching pattern — one allocation per component type for the app lifetime.
+        /// </summary>
+        public static ComponentEventTrigger For<TComponent>(
+            string componentId, string jsEvent, string? bindingPath = null)
+            where TComponent : IComponent, new()
+        {
+            var component = ComponentCache<TComponent>.Instance;
+            var readExpr = (component is IInputComponent input) ? input.ReadExpr : null;
+            return new ComponentEventTrigger(componentId, jsEvent, component.Vendor, bindingPath, readExpr);
+        }
+
+        private static class ComponentCache<T> where T : IComponent, new()
+        {
+            internal static readonly T Instance = new T();
+        }
     }
 }
