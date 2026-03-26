@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SF RTE — HTML Whitelist Proof of Concept</title>
+    <link href="https://cdn.syncfusion.com/ej2/32.2.8/material.css" rel="stylesheet">
+    <script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.4/purify.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { font-size: 1.4rem; }
+        h2 { font-size: 1.1rem; margin-top: 2rem; }
+        .log { background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 6px;
+               font-family: monospace; font-size: 0.85rem; max-height: 300px; overflow-y: auto; white-space: pre-wrap; }
+        .log .info { color: #4ec9b0; }
+        .log .warn { color: #dcdcaa; }
+        .log .strip { color: #ce9178; }
+        .section { margin: 1.5rem 0; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 6px; }
+        .drag-source { padding: 1rem; background: #fff3cd; border: 2px dashed #ffc107; border-radius: 6px;
+                       cursor: grab; margin: 0.5rem 0; }
+        .tag { display: inline-block; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 3px;
+               padding: 0.1rem 0.4rem; font-size: 0.8rem; margin: 0.1rem; }
+        .tag.denied { background: #ffebee; border-color: #ef9a9a; }
+        #raw-output { background: #f5f5f5; padding: 0.75rem; border-radius: 4px; font-family: monospace;
+                      font-size: 0.8rem; word-break: break-all; min-height: 2rem; margin-top: 0.5rem; }
+        .sample-box { padding: 0.75rem; background: #f9f9f9; border: 1px solid #ccc; border-radius: 4px;
+                      margin: 0.25rem 0 0.75rem 0; min-height: 2rem; }
+    </style>
+</head>
+<body>
+
+<h1>Syncfusion RTE — Whitelist HTML Tag Proof of Concept</h1>
+<p>Proves 3 client-side layers: <strong>paste override</strong> (deny&rarr;allow flip),
+   <strong>change event</strong> (catch-all), and <strong>toolbar button</strong> (manual clean).</p>
+
+<div class="section">
+    <h2>Allowed Tags</h2>
+    <span class="tag">p</span><span class="tag">br</span><span class="tag">strong</span>
+    <span class="tag">em</span><span class="tag">b</span><span class="tag">i</span>
+    <span class="tag">u</span><span class="tag">ul</span><span class="tag">ol</span>
+    <span class="tag">li</span><span class="tag">a</span><span class="tag">span</span>
+    <span class="tag">h1</span><span class="tag">h2</span><span class="tag">h3</span>
+    <span class="tag">sub</span><span class="tag">sup</span>
+</div>
+
+<div class="section">
+    <h2>Bad HTML Samples — Copy any box, paste into editor</h2>
+    <p>Each box contains rich HTML with disallowed tags. Select all text in a box, Cmd+C, then Cmd+V into the editor.</p>
+
+    <h3 style="margin-top:1rem; font-size:0.95rem;">1. Table + Div (layout tags)</h3>
+    <div id="sample-1" contenteditable="true" class="sample-box"></div>
+
+    <h3 style="margin-top:1rem; font-size:0.95rem;">2. Semantic tags (section, article, nav, header, footer)</h3>
+    <div id="sample-2" contenteditable="true" class="sample-box"></div>
+
+    <h3 style="margin-top:1rem; font-size:0.95rem;">3. Form elements (input, button, select, textarea)</h3>
+    <div id="sample-3" contenteditable="true" class="sample-box"></div>
+
+    <h3 style="margin-top:1rem; font-size:0.95rem;">4. Media + embed (img, video, iframe, object)</h3>
+    <div id="sample-4" contenteditable="true" class="sample-box"></div>
+
+    <h3 style="margin-top:1rem; font-size:0.95rem;">5. Nested deep (div > section > article > aside > span > text)</h3>
+    <div id="sample-5" contenteditable="true" class="sample-box"></div>
+
+    <h3 style="margin-top:1rem; font-size:0.95rem;">6. Allowed-only (should pass through unchanged)</h3>
+    <div id="sample-6" contenteditable="true" class="sample-box"></div>
+
+    <script>
+    // Inject samples safely — no event handlers execute
+    document.getElementById('sample-1').innerHTML =
+        '<table border="1" style="border-collapse:collapse;"><tr><td style="padding:4px;"><strong>Bold in table</strong></td><td style="padding:4px;"><em>Italic in table</em></td></tr><tr><td style="padding:4px;">Row 2 col 1</td><td style="padding:4px;">Row 2 col 2</td></tr></table>' +
+        '<div style="color:red; background:#ffe0e0; padding:8px;">Div with inline styles (should be stripped)</div>' +
+        '<p>This <strong>paragraph</strong> should survive intact.</p>';
+
+    document.getElementById('sample-2').innerHTML =
+        '<section style="border:1px solid #ccc; padding:8px; margin:4px 0;"><h2>Section heading</h2><p>Paragraph inside section</p></section>' +
+        '<article style="border:1px solid #ccc; padding:8px; margin:4px 0;"><h3>Article title</h3><p>Article <strong>body</strong> with <em>formatting</em></p></article>' +
+        '<nav style="background:#e0e0e0; padding:8px;"><a href="#">Link 1</a> | <a href="#">Link 2</a> | <a href="#">Link 3</a></nav>' +
+        '<header style="background:#f0f0f0; padding:8px;">Header content</header>' +
+        '<footer style="background:#f0f0f0; padding:8px;">Footer content</footer>';
+
+    document.getElementById('sample-3').innerHTML =
+        '<p>Name: <input type="text" value="John Doe" style="border:1px solid #ccc; padding:2px;"></p>' +
+        '<p>Message: <textarea style="border:1px solid #ccc; padding:2px;">Hello world</textarea></p>' +
+        '<p><button style="padding:4px 12px; background:#4285f4; color:white; border:none; border-radius:3px;">Click Me</button></p>' +
+        '<p>Choice: <select><option>Option A</option><option>Option B</option></select></p>' +
+        '<form action="/steal-data"><p>Hidden form — <strong>must be stripped</strong></p></form>';
+
+    document.getElementById('sample-4').innerHTML =
+        '<p>Image tag below (stripped, alt text stays):</p>' +
+        '<p>Video below (stripped):</p>' +
+        '<p>Iframe below (stripped):</p>' +
+        '<p>Object below (stripped):</p>' +
+        '<p><strong>Bold text</strong> after media tags should survive.</p>';
+
+    document.getElementById('sample-5').innerHTML =
+        '<div style="border:2px solid red; padding:8px;">' +
+            '<section style="border:2px solid orange; padding:8px;">' +
+                '<article style="border:2px solid yellow; padding:8px;">' +
+                    '<aside style="border:2px solid green; padding:8px;">' +
+                        '<span style="color:blue;">Deeply nested text — only span + text should survive</span>' +
+                    '</aside>' +
+                '</article>' +
+            '</section>' +
+        '</div>';
+
+    document.getElementById('sample-6').innerHTML =
+        '<h1>Heading 1</h1>' +
+        '<h2>Heading 2</h2>' +
+        '<h3>Heading 3</h3>' +
+        '<p><strong>Bold</strong>, <em>italic</em>, <u>underline</u>, <b>bold b</b>, <i>italic i</i></p>' +
+        '<ul><li>Bullet 1</li><li>Bullet 2</li><li>Bullet 3</li></ul>' +
+        '<ol><li>Number 1</li><li>Number 2</li><li>Number 3</li></ol>' +
+        '<p>Text with <sub>subscript</sub> and <sup>superscript</sup></p>' +
+        '<p>A <a href="https://example.com">link</a> that should survive.</p>';
+    </script>
+</div>
+
+<div class="section">
+    <h2>Drag & Drop</h2>
+    <p style="color:#666;">SF RTE blocks external drag-drop of HTML content. Only internal drag (reordering)
+    and file drops (images) are accepted. This is not an attack vector.</p>
+</div>
+
+<div class="section">
+    <h2>Editor</h2>
+    <div id="editor"></div>
+    <h2>Raw HTML Output</h2>
+    <div id="raw-output">(empty)</div>
+    <button onclick="showRaw()" style="margin-top:0.5rem; padding:0.4rem 1rem;">Refresh Raw HTML</button>
+</div>
+
+<div class="section">
+    <h2>Event Log</h2>
+    <div id="log" class="log"></div>
+    <button onclick="document.getElementById('log').textContent=''" style="margin-top:0.5rem; padding:0.4rem 1rem;">Clear Log</button>
+</div>
+
+<script>
+// ─── Allowed tags (uppercase for tagName comparison) ───
+const ALLOWED_TAGS = new Set([
+    'P','BR','STRONG','EM','B','I','U','UL','OL','LI','A','SPAN',
+    'H1','H2','H3','SUB','SUP'
+]);
+
+// Lowercase version for SF pasteCleanupSettings
+const ALLOWED_TAGS_LOWER = [...ALLOWED_TAGS].map(t => t.toLowerCase());
+
+// ─── DOMPurify config ───
+const PURIFY_CONFIG = {
+    ALLOWED_TAGS: ['p','br','strong','em','b','i','u','ul','ol','li','a','span',
+                    'h1','h2','h3','sub','sup','img'],
+    ALLOWED_ATTR: ['href','alt','src'],
+    ALLOW_ARIA_ATTR: false,
+    ALLOW_DATA_ATTR: false,
+};
+
+// Hook: strip images whose src doesn't start with /
+DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+    if (node.tagName === 'IMG' && data.attrName === 'src') {
+        const src = (data.attrValue || '').trim();
+        if (!src.startsWith('/') || src.startsWith('//')) {
+            node.remove();  // remove entire img, not just the attribute
+            data.keepAttr = false;
+        }
+    }
+});
+
+// ─── Shared sanitize function (DOMPurify) ───
+function sanitizeHtml(html) {
+    const clean = DOMPurify.sanitize(html, PURIFY_CONFIG);
+    const changed = clean !== html;
+    return { html: clean, changed };
+}
+
+// ─── Logging ───
+function log(level, msg) {
+    const el = document.getElementById('log');
+    const ts = new Date().toLocaleTimeString();
+    el.innerHTML += `<span class="${level}">[${ts}] [${level}] ${msg}</span>\n`;
+    el.scrollTop = el.scrollHeight;
+}
+
+// ─── LAYER 1: Prototype patch — flip deny-list to allow-list ───
+const proto = ej.richtexteditor.PasteCleanupAction.prototype;
+const originalDeniedTags = proto.deniedTags;
+
+proto.deniedTags = function(clipBoardElem) {
+    const before = clipBoardElem.innerHTML;
+    const cleaned = DOMPurify.sanitize(before, PURIFY_CONFIG);
+
+    if (cleaned !== before) {
+        clipBoardElem.innerHTML = cleaned;
+        log('strip', 'PASTE OVERRIDE (DOMPurify): stripped disallowed content');
+    } else {
+        log('info', 'PASTE OVERRIDE (DOMPurify): content clean');
+    }
+
+    return clipBoardElem;
+};
+
+log('info', 'Layer 1: PasteCleanupAction.prototype.deniedTags PATCHED (deny → allow)');
+
+// ─── Create RTE ───
+var rte = new ej.richtexteditor.RichTextEditor({
+    height: 300,
+    pasteCleanupSettings: {
+        // With our patch, this is now an ALLOW list
+        deniedTags: ALLOWED_TAGS_LOWER,
+        deniedAttrs: ['class', 'id', 'style', 'onclick', 'onload', 'onerror'],
+        allowedStyleProps: []
+    },
+    toolbarSettings: {
+        items: [
+            'Bold', 'Italic', 'Underline', 'StrikeThrough', '|',
+            'OrderedList', 'UnorderedList', '|',
+            'CreateLink', '|',
+            'Undo', 'Redo', '|',
+            'SourceCode', '|',
+            // ─── LAYER 3: Custom toolbar button ───
+            {
+                tooltipText: 'Clean HTML — strip disallowed tags',
+                template: '<button class="e-tbar-btn e-btn" style="font-weight:bold; color:#d32f2f;">Clean</button>',
+            }
+        ]
+    },
+    toolbarClick: function(args) {
+        if (args.item && args.item.tooltipText === 'Clean HTML — strip disallowed tags') {
+            const html = rte.getHtml();
+            if (!html) { log('info', 'BUTTON: editor empty'); return; }
+            const result = sanitizeHtml(html);
+            if (result.changed) {
+                rte.value = result.html;
+                rte.dataBind();
+                log('strip', 'BUTTON (DOMPurify): stripped disallowed content');
+                showRaw();
+            } else {
+                log('info', 'BUTTON (DOMPurify): content clean');
+            }
+        }
+    },
+    // App layer can use the change event freely — sanitizer is wired separately below
+    value: '<p>Type here, paste, or drag content in. <strong>Bold</strong> and <em>italic</em> are allowed.</p>'
+});
+rte.appendTo('#editor');
+
+// ─── LAYER 2: Additive change listener — doesn't block app layer's change handler ───
+rte.addEventListener('change', () => {
+    const html = rte.getHtml();
+    if (!html) return;
+    const result = sanitizeHtml(html);
+    if (result.changed) {
+        rte.value = result.html;
+        rte.dataBind();
+        log('strip', 'CHANGE EVENT (DOMPurify): stripped disallowed content');
+    } else {
+        log('info', 'CHANGE EVENT (DOMPurify): content clean');
+    }
+    showRaw();
+});
+
+log('info', 'Layer 2: change listener added (additive — app layer change event unaffected)');
+log('info', 'Layer 3: "Clean" toolbar button added');
+log('info', '--- Ready for testing ---');
+
+function showRaw() {
+    document.getElementById('raw-output').textContent = rte.getHtml() || '(empty)';
+}
+showRaw();
+</script>
+
+</body>
+</html>
