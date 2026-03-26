@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionGrid : FusionComponent
     {
         // NO IInputComponent — Grid has no form value to read.
-        // Events: actionComplete (sorting, paging)
+        // Events: dataStateChange (sorting, paging — custom binding mode)
         // Properties: dataSource (write), allowSorting, allowPaging
         // Methods: refresh()
     }

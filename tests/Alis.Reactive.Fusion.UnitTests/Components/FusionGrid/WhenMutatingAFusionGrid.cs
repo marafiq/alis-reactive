@@ -1,3 +1,4 @@
+using Alis.Reactive.Builders;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.Fusion.UnitTests;
@@ -29,6 +30,23 @@ public class WhenMutatingAFusionGrid : FusionTestBase
     }
 
     [Test]
+    public Task SetDataSource_whole_response_body_for_custom_binding()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).DomReady(p =>
+        {
+            p.Post("/api/data")
+             .Response(r => r.OnSuccess<GridResponsePayload>((json, s) =>
+             {
+                 s.Component<FusionGrid>("residents-grid").SetDataSource(json);
+             }));
+        });
+        var json2 = plan.Render();
+        AssertSchemaValid(json2);
+        return VerifyJson(json2);
+    }
+
+    [Test]
     public Task Refresh_followed_by_element_mutation()
     {
         var plan = CreatePlan();
@@ -46,4 +64,10 @@ public class WhenMutatingAFusionGrid : FusionTestBase
 public class GridDataPayload
 {
     public object? Items { get; set; }
+}
+
+public class GridResponsePayload
+{
+    public object? Result { get; set; }
+    public int Count { get; set; }
 }
