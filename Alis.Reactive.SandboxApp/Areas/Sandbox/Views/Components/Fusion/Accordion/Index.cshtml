@@ -1,0 +1,175 @@
+@model AccordionModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Navigations
+@{
+    ViewData["Title"] = "FusionAccordion";
+
+    var plan = Html.ReactivePlan<AccordionModel>();
+
+    // ── Section 1: Method Call — ExpandItem on DomReady ──
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<FusionAccordion>("demo-accordion").ExpandItem(true, 1);
+        p.Element("expand-result").SetText("Panel 1 expanded via ExpandItem");
+    }));
+
+    // ── Section 4: EnableItem — triggered by custom event from button ──
+
+    Html.On(plan, t => t.CustomEvent("disable-panel", p =>
+    {
+        p.Component<FusionAccordion>("demo-accordion").EnableItem(2, false);
+        p.Element("enable-result").SetText("Panel 2 disabled via EnableItem");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">FusionAccordion — Full API</native-heading>
+        <native-text color="Secondary">
+            Non-input container component. Exercises events (expanded), methods (expandItem, enableItem),
+            and typed conditions on event args. Senior living domain: facility information sections.
+        </native-text>
+    </div>
+
+    <!-- Section 1: Method Call (ExpandItem on DomReady) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Method Call (ExpandItem on DomReady)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, <code>ExpandItem(true, 1)</code> expands the second panel programmatically.
+        </p>
+        <div class="font-mono text-sm mt-2">
+            <p>ExpandItem result: <span id="expand-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 2: The Accordion Component -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Accordion Component</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Three panels with facility information. The expanded event fires after any panel
+            expand/collapse, reporting <code>index</code> and <code>isExpanded</code>.
+        </p>
+
+        @(Html.FusionAccordion(plan, "demo-accordion", b => b
+            .Items(new List<AccordionItem>
+            {
+                new AccordionItem { Header = "Facility Overview", Content = "<p>Sunrise Senior Living provides assisted living, memory care, and independent living communities across 30 states.</p>" },
+                new AccordionItem { Header = "Care Levels", Content = "<p>Level 1: Independent Living. Level 2: Assisted Living. Level 3: Memory Care. Level 4: Skilled Nursing.</p>" },
+                new AccordionItem { Header = "Contact Information", Content = "<p>Main Office: (555) 123-4567. Emergency: (555) 987-6543. Admissions: admissions@sunrise.example.com</p>" }
+            }))
+            .Reactive(evt => evt.Expanded, (args, p) =>
+            {
+                p.Element("expanded-index").SetText(args, x => x.Index);
+                p.Element("expanded-state").SetText(args, x => x.IsExpanded);
+
+                p.When(args, x => x.IsExpanded).Truthy()
+                    .Then(t => t.Element("condition-result").SetText("Panel expanded"))
+                    .Else(e => e.Element("condition-result").SetText("Panel collapsed"));
+            }))
+
+        <div class="font-mono text-sm mt-4 space-y-1">
+            <p>Last expanded index: <span id="expanded-index" class="text-text-muted">&mdash;</span></p>
+            <p>Is expanded: <span id="expanded-state" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 3: Condition (When/Then/Else on event args) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Condition (When/Then/Else)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            <code>When(args, x =&gt; x.IsExpanded).Truthy()</code> shows "Panel expanded" or "Panel collapsed"
+            based on the expanded event args.
+        </p>
+        <div class="font-mono text-sm mt-2">
+            <p>Condition result: <span id="condition-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 4: Method Call (EnableItem via button) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Method Call (EnableItem via Button)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Clicking the button dispatches <code>"disable-panel"</code>, which calls
+            <code>EnableItem(2, false)</code> to disable the third panel.
+        </p>
+
+        @(Html.NativeButton("btn-disable", "Disable Contact Panel")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("disable-panel");
+            }))
+
+        <div class="font-mono text-sm mt-2">
+            <p>EnableItem result: <span id="enable-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Section 5: Lazy-Load Content on Expand (HTTP + Into) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">5. Lazy-Load Content on Expand (HTTP + Into)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Each panel expand fires the <code>expanded</code> event. When <code>isExpanded</code> is true,
+            an HTTP GET fetches a partial view and injects it via <code>Into()</code> into a content container.
+        </p>
+
+        @{
+            var lazyAccordionItems = new List<AccordionItem>
+            {
+                new AccordionItem { Header = "Facility Overview", Content = "<div id='lazy-panel-0' class='text-sm text-text-muted p-2'>Click to load...</div>" },
+                new AccordionItem { Header = "Care Levels & Pricing", Content = "<div id='lazy-panel-1' class='text-sm text-text-muted p-2'>Click to load...</div>" },
+                new AccordionItem { Header = "Contact Information", Content = "<div id='lazy-panel-2' class='text-sm text-text-muted p-2'>Click to load...</div>" },
+            };
+        }
+
+        @(Html.FusionAccordion(plan, "lazy-accordion", b => b
+            .Items(lazyAccordionItems))
+            .Reactive(evt => evt.Expanded, (args, p) =>
+            {
+                p.When(args, x => x.IsExpanded).Truthy()
+                    .And(args, x => x.Index).Eq(0)
+                    .Then(t => t
+                        .Get("/Sandbox/Components/Accordion/OverviewPartial")
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into("lazy-panel-0");
+                            s.Element("lazy-load-status").SetText("Overview loaded");
+                        })));
+
+                p.When(args, x => x.IsExpanded).Truthy()
+                    .And(args, x => x.Index).Eq(1)
+                    .Then(t => t
+                        .Get("/Sandbox/Components/Accordion/CareLevelsPartial")
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into("lazy-panel-1");
+                            s.Element("lazy-load-status").SetText("Care Levels loaded");
+                        })));
+
+                p.When(args, x => x.IsExpanded).Truthy()
+                    .And(args, x => x.Index).Eq(2)
+                    .Then(t => t
+                        .Get("/Sandbox/Components/Accordion/ContactPartial")
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into("lazy-panel-2");
+                            s.Element("lazy-load-status").SetText("Contact loaded");
+                        })));
+            }))
+
+        <div class="font-mono text-sm mt-4">
+            <p>Load status: <span id="lazy-load-status" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON — always last -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
