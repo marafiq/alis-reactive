@@ -1,7 +1,12 @@
 using Alis.Reactive;
 using Alis.Reactive.Descriptors.Mutations;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.AppLevel
 {
@@ -51,9 +56,15 @@ namespace Alis.Reactive.Native.AppLevel
         }
 
         /// <summary>Renders the loader overlay element in the layout.</summary>
+#if NET48
+        public static IHtmlString NativeLoader(this HtmlHelper html)
+        {
+            return new MvcHtmlString(
+#else
         public static IHtmlContent NativeLoader(this IHtmlHelper html)
         {
             return new HtmlString(
+#endif
                 "<div id=\"" + AppLevel.NativeLoader.ElementId + "\" class=\"alis-loader\" aria-hidden=\"true\">\n" +
                 "  <div class=\"alis-loader__spinner\"></div>\n" +
                 "  <p id=\"alis-loader-message\" class=\"alis-loader__message\"></p>\n" +

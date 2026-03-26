@@ -1,0 +1,233 @@
+name: CI Build
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore library projects
+        run: |
+          dotnet restore Alis.Reactive/Alis.Reactive.csproj
+          dotnet restore Alis.Reactive.Native/Alis.Reactive.Native.csproj
+          dotnet restore Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj
+          dotnet restore Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj
+          dotnet restore Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj
+
+      - name: Build all targets (net48 + net10.0)
+        run: |
+          dotnet build Alis.Reactive/Alis.Reactive.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj -c Release --no-restore
+          dotnet build Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj -c Release --no-restore
+
+      - name: Pack NuGet packages
+        run: |
+          dotnet pack Alis.Reactive/Alis.Reactive.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj -c Release --no-build -o ./nupkgs
+
+      - name: Verify dual targets in packages
+        run: |
+          for pkg in nupkgs/*.nupkg; do
+            echo "=== $(basename $pkg) ==="
+            unzip -l "$pkg" | grep -E "lib/net(48|10)" | head -10
+            echo ""
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkgs
+          path: nupkgs/*.nupkg
+
+  smoke-test-net48:
+    needs: build-and-pack
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build framework net48 DLLs
+        run: |
+          dotnet build Alis.Reactive/Alis.Reactive.csproj -c Release
+          dotnet build Alis.Reactive.Native/Alis.Reactive.Native.csproj -c Release
+
+      - name: Restore MVC 5 NuGet packages
+        working-directory: tests/Alis.Reactive.Net48.SmokeTest
+        run: nuget restore packages.config -PackagesDirectory packages
+
+      - name: Install VS Web Application targets
+        run: |
+          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe" modify `
+            --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" `
+            --add Microsoft.VisualStudio.Component.WebDeploy `
+            --add Microsoft.VisualStudio.ComponentGroup.Web `
+            --quiet --norestart 2>&1 | Out-Null
+          # Fallback: install MSBuild web targets via NuGet if VS installer doesn't have them
+          if (-not (Test-Path "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets")) {
+            nuget install MSBuild.Microsoft.VisualStudio.Web.targets -Version 14.0.0.3 -OutputDirectory packages
+            $env:VSToolsPath = "$PWD\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\tools\VSToolsPath"
+          }
+
+      - name: Build smoke test with MSBuild
+        working-directory: tests/Alis.Reactive.Net48.SmokeTest
+        run: |
+          & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" `
+            Alis.Reactive.Net48.SmokeTest.csproj `
+            /p:Configuration=Release `
+            /p:Platform=AnyCPU `
+            /verbosity:minimal
+
+      - name: Verify DLLs in build output
+        working-directory: tests/Alis.Reactive.Net48.SmokeTest
+        run: |
+          Write-Host "=== Build output ==="
+          Get-ChildItem bin/*.dll | ForEach-Object { Write-Host "$($_.Name)  $($_.Length) bytes" }
+          if (-not (Test-Path "bin\Alis.Reactive.dll") -or -not (Test-Path "bin\Alis.Reactive.Native.dll")) {
+            Write-Error "Framework DLLs missing!"
+            exit 1
+          }
+
+      - name: Start IIS Express and test the page
+        working-directory: tests/Alis.Reactive.Net48.SmokeTest
+        run: |
+          $appPath = (Resolve-Path .).Path
+          $port = 5599
+          $iis = "${env:ProgramFiles}\IIS Express\iisexpress.exe"
+          if (-not (Test-Path $iis)) { $iis = "${env:ProgramFiles(x86)}\IIS Express\iisexpress.exe" }
+
+          Write-Host "Starting IIS Express at $appPath on port $port"
+          $proc = Start-Process -FilePath $iis -ArgumentList "/path:$appPath /port:$port" -PassThru -WindowStyle Hidden
+          Start-Sleep -Seconds 5
+
+          try {
+            Write-Host ""
+            Write-Host "=== Requesting http://localhost:$port/ ==="
+            & curl.exe -s -o rendered-page.html -w "%{http_code}" "http://localhost:$port/" | Out-Null
+            $status = (& curl.exe -s -o nul -w "%{http_code}" "http://localhost:$port/")
+            $html = Get-Content -Path "rendered-page.html" -Raw -ErrorAction SilentlyContinue
+            if (-not $html) { $html = "" }
+            Write-Host "Status: $status"
+            Write-Host "HTML length: $($html.Length) chars"
+
+            if ($status -ne "200") {
+              Write-Host "=== ERROR PAGE CONTENT (first 2000 chars) ==="
+              Write-Host $html.Substring(0, [Math]::Min(2000, $html.Length))
+            }
+            Write-Host ""
+
+            # === ASSERTION 1: Page rendered successfully ===
+            if ($status -ne 200) {
+              Write-Error "FAIL: Expected 200, got $status"
+              exit 1
+            }
+            Write-Host "PASS: Page returned 200"
+
+            # === ASSERTION 2: Plan JSON is present ===
+            if ($html -notmatch 'data-reactive-plan') {
+              Write-Error "FAIL: No data-reactive-plan element found in HTML"
+              Write-Host $html
+              exit 1
+            }
+            Write-Host "PASS: data-reactive-plan element found"
+
+            # === ASSERTION 3: DomReady trigger exists in plan ===
+            if ($html -notmatch '"kind"\s*:\s*"dom-ready"') {
+              Write-Error "FAIL: No dom-ready trigger in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: dom-ready trigger found in plan"
+
+            # === ASSERTION 4: CustomEvent trigger exists ===
+            if ($html -notmatch '"kind"\s*:\s*"custom-event"') {
+              Write-Error "FAIL: No custom-event trigger in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: custom-event trigger found in plan"
+
+            # === ASSERTION 5: Dispatch command exists ===
+            if ($html -notmatch '"kind"\s*:\s*"dispatch"') {
+              Write-Error "FAIL: No dispatch command in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: dispatch command found in plan"
+
+            # === ASSERTION 6: Mutate-element command exists ===
+            if ($html -notmatch '"kind"\s*:\s*"mutate-element"') {
+              Write-Error "FAIL: No mutate-element command in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: mutate-element command found in plan"
+
+            # === ASSERTION 7: Into command exists ===
+            if ($html -notmatch '"kind"\s*:\s*"into"') {
+              Write-Error "FAIL: No into command in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: into command found in plan"
+
+            # === ASSERTION 8: Components registered ===
+            if ($html -notmatch '"components"\s*:\s*\{') {
+              Write-Error "FAIL: No components map in plan JSON"
+              exit 1
+            }
+            Write-Host "PASS: components map found in plan"
+
+            # === ASSERTION 9: NativeTextBox input field rendered ===
+            if ($html -notmatch 'placeholder="Enter your name"') {
+              Write-Error "FAIL: NativeTextBox input not rendered"
+              exit 1
+            }
+            Write-Host "PASS: NativeTextBox rendered with placeholder"
+
+            # === ASSERTION 10: NativeButton rendered ===
+            if ($html -notmatch 'btn-open-drawer') {
+              Write-Error "FAIL: NativeButton for drawer not rendered"
+              exit 1
+            }
+            Write-Host "PASS: NativeButton (drawer) rendered"
+
+            # === ASSERTION 11: NativeDrawer element rendered ===
+            if ($html -notmatch 'alis-drawer') {
+              Write-Error "FAIL: NativeDrawer element not rendered"
+              exit 1
+            }
+            Write-Host "PASS: NativeDrawer element rendered"
+
+            Write-Host ""
+            Write-Host "=== Extract plan JSON snippet ==="
+            if ($html -match '<script[^>]*data-reactive-plan[^>]*>(.*?)</script>') {
+              $planJson = $Matches[1]
+              Write-Host "Plan JSON (first 500 chars):"
+              Write-Host $planJson.Substring(0, [Math]::Min(500, $planJson.Length))
+            }
+
+            Write-Host ""
+            Write-Host "=== ALL 11 ASSERTIONS PASSED — net48 MVC 5 app renders Alis.Reactive plan ==="
+
+          } finally {
+            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+            Write-Host "IIS Express stopped"
+          }
+
+      - name: Upload rendered HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: net48-rendered-html
+          path: tests/Alis.Reactive.Net48.SmokeTest/rendered-page.html

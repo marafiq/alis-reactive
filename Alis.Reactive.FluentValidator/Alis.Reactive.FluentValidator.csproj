@@ -1,14 +1,39 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <PackageId>Alis.Reactive.FluentValidator</PackageId>
+        <Version>1.0.0-preview.1</Version>
+        <Authors>Adnan Rafiq</Authors>
+        <Company>Alis Technologies</Company>
+        <Description>FluentValidation integration for Alis.Reactive — client-side rule extraction with WhenField conditional validation.</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://marafiq.github.io/alis-reactive/</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/marafiq/alis-reactive</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>reactive;aspnet;mvc;json-plan;fluentvalidation</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
     <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <PackageReference Include="FluentValidation" Version="12.*" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+        <PackageReference Include="FluentValidation" Version="11.*" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>

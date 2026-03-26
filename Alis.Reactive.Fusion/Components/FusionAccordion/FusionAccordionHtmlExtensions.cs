@@ -1,5 +1,9 @@
 using System;
+#if NET48
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
@@ -16,7 +20,11 @@ namespace Alis.Reactive.Fusion.Components
         /// Non-input component: renders directly, no label/validation wrapper.
         /// </summary>
         public static FusionAccordionBuilder<TModel> FusionAccordion<TModel>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             IReactivePlan<TModel> plan,
             string elementId,
             Action<AccordionBuilder> configure)
