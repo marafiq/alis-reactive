@@ -155,9 +155,18 @@ Copy the Roslyn compiler to `bin/roslyn` after build (add to `.csproj`):
 </Target>
 ```
 
-### Step 6: Configure Views/Web.config
+### Step 6: Configure Views/Web.config and Per-View @using (Critical)
 
-Register namespaces for Razor IntelliSense and implicit `@using`:
+MVC 5 has no `_ViewImports.cshtml`. Razor extension methods are resolved at runtime via two
+mechanisms that **both** matter:
+
+1. **`Views/Web.config` namespaces** -- global, applies to all views
+2. **Per-view `@using` directives** -- per-file, for namespaces not in Web.config
+
+**The working pattern:** Put the base framework namespaces in `Views/Web.config`, then add
+component-specific namespaces via `@using` in each view that needs them.
+
+#### Views/Web.config (global namespaces)
 
 ```xml
 <system.web.webPages.razor>
@@ -167,17 +176,62 @@ Register namespaces for Razor IntelliSense and implicit `@using`:
       <add namespace="System.Web.Mvc.Ajax" />
       <add namespace="System.Web.Mvc.Html" />
       <add namespace="System.Web.Routing" />
-      <!-- Alis.Reactive framework -->
+      <!-- Alis.Reactive core -->
       <add namespace="Alis.Reactive" />
       <add namespace="Alis.Reactive.Native.Extensions" />
       <add namespace="Alis.Reactive.Native.Components" />
       <add namespace="Alis.Reactive.Native.AppLevel" />
-      <!-- Only if using Syncfusion components -->
+      <!-- Syncfusion EJ2 MVC5 -->
       <add namespace="Syncfusion.EJ2" />
     </namespaces>
   </pages>
 </system.web.webPages.razor>
 ```
+
+#### Per-view @using directives
+
+Views that use Fusion components **must** add the Fusion namespaces via `@using`. This is
+the verified working pattern from the smoke test:
+
+**Views using Fusion components (DropDownList, NumericTextBox, DatePicker, etc.):**
+```csharp
+@using Alis.Reactive.Fusion.Components    // NumericTextBox(), DropDownList(), DatePicker(), etc.
+@using Alis.Reactive.Fusion.AppLevel      // Html.FusionToast(), Html.FusionConfirmDialog()
+@using Alis.Reactive.Fusion.Extensions    // .Fields<T>(), gather extensions
+```
+
+**Views using only Native components (TextBox, Button, CheckBox, etc.):**
+```csharp
+@using Alis.Reactive.Native.Extensions    // Html.On(), Html.ReactivePlan<T>(), Html.RenderPlan()
+@using Alis.Reactive.Native.Components    // NativeTextBox(), NativeButton(), etc.
+@using Alis.Reactive.Native.AppLevel      // Html.NativeLoader(), Html.NativeDrawer()
+```
+
+**Layout (_Layout.cshtml):**
+```csharp
+@using Alis.Reactive.Fusion.AppLevel      // Html.FusionToast(), Html.FusionConfirmDialog()
+@using Alis.Reactive.Native.AppLevel      // Html.NativeLoader(), Html.NativeDrawer()
+```
+
+**Views using validators:**
+```csharp
+@using Alis.Reactive.Net48.SmokeTest.Validators   // your project's validator namespace
+@using Alis.Reactive.Net48.SmokeTest.Models        // your project's model namespace
+```
+
+#### Complete namespace reference
+
+| Namespace | What it provides | Where to register |
+|-----------|-----------------|-------------------|
+| `Alis.Reactive` | `IReactivePlan<T>`, core descriptors | Views/Web.config |
+| `Alis.Reactive.Native.Extensions` | `Html.On()`, `Html.ReactivePlan<T>()`, `Html.RenderPlan()`, `Html.ResolvePlan<T>()` | Views/Web.config |
+| `Alis.Reactive.Native.Components` | `NativeTextBox()`, `NativeButton()`, `NativeCheckBox()`, etc. | Views/Web.config |
+| `Alis.Reactive.Native.AppLevel` | `Html.NativeLoader()`, `Html.NativeDrawer()` | Views/Web.config |
+| `Alis.Reactive.Fusion.Components` | `NumericTextBox()`, `DropDownList()`, `DatePicker()`, `FusionTab()`, etc. | Per-view `@using` |
+| `Alis.Reactive.Fusion.AppLevel` | `Html.FusionToast()`, `Html.FusionConfirmDialog()` | Per-view `@using` |
+| `Alis.Reactive.Fusion.Extensions` | `.Fields<T>()`, gather extensions | Per-view `@using` |
+| `Alis.Reactive.FluentValidator` | `ReactiveValidator<T>` | Per-view `@using` or Web.config |
+| `Syncfusion.EJ2` | `Html.EJS()`, `ScriptManager()` | Views/Web.config |
 
 ### Step 7: Copy JS and CSS Assets
 
