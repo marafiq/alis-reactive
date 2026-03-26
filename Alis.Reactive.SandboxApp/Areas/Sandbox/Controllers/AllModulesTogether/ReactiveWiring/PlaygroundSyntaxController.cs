@@ -9,7 +9,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.
     public class PlaygroundSyntaxController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             ViewBag.StatusItems = new List<SelectListItem>

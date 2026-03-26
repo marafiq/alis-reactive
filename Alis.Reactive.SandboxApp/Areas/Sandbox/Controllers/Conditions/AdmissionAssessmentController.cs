@@ -21,7 +21,6 @@ public class AdmissionAssessmentController : Controller
     // ── GET Index ──────────────────────────────────────────────────────────────
 
     [HttpGet("")]
-    [HttpGet("Index")]
     public IActionResult Index([FromQuery] string? screeningId)
     {
         var id = screeningId ?? "";

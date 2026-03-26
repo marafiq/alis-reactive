@@ -7,7 +7,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
     public class ConditionsController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             return View("~/Areas/Sandbox/Views/Conditions/Guards/Index.cshtml");

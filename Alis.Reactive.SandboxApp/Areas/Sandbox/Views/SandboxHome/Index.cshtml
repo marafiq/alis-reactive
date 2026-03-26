@@ -24,7 +24,7 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <a href="/Sandbox/CoreBehaviors"
+    <a asp-area="Sandbox" asp-controller="CoreBehaviors" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -33,11 +33,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Plan execution: triggers, events, payload resolution
+            Watch a 3-hop event chain fire in sequence, and see typed payload values (int, string, nested objects) resolve into the page
         </p>
     </a>
 
-    <a href="/Sandbox/Conditions"
+    <a asp-area="Sandbox" asp-controller="ConditionsHome" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -46,11 +46,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Guard evaluation: operators, composition, branching
+            Interactive condition demos: toggle guards, threshold alerts, cascading dropdowns, and full admission forms with branching logic
         </p>
     </a>
 
-    <a href="/Sandbox/HttpPipeline"
+    <a asp-area="Sandbox" asp-controller="HttpPipeline" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -59,11 +59,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Server communication: verbs, chaining, responses
+            GET/POST with gather and chaining, JSON vs HTML response handling, and SSE real-time streaming
         </p>
     </a>
 
-    <a href="/Sandbox/Validation"
+    <a asp-area="Sandbox" asp-controller="ValidationHome" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -72,11 +72,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Form correctness: rules, contracts, live-clear
+            Every rule type live: required, range, regex, comparison, date, email, phone — with server-side contract integration and conditional fields
         </p>
     </a>
 
-    <a href="/Sandbox/Components"
+    <a asp-area="Sandbox" asp-controller="Components" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -85,11 +85,11 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Input vertical slices: Native, Fusion, AppLevel
+            Every input component: native (button, textbox, checkbox, dropdown) and Fusion (numeric, date, autocomplete, RTE, file upload) — each with its own interactive demo
         </p>
     </a>
 
-    <a href="/Sandbox/AllModulesTogether"
+    <a asp-area="Sandbox" asp-controller="AllModulesTogether" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
         <div class="flex items-start justify-between">
             <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -98,7 +98,7 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Integration tests: cross-vendor, workflows
+            Full integration scenarios: cascading dropdowns, multi-component forms, a complete Todo app, and cross-vendor architecture verification
         </p>
     </a>
 </div>

@@ -7,7 +7,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.CoreBehaviors
     public class EventsController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index()
         {
             return View("~/Areas/Sandbox/Views/CoreBehaviors/Events/Index.cshtml");

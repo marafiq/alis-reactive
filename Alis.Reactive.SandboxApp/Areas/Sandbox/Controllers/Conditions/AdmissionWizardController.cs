@@ -54,7 +54,6 @@ public class AdmissionWizardController : Controller
     // ── GET Index — shell page, Step 1 loads on DomReady via Into() ──────────
 
     [HttpGet("")]
-    [HttpGet("Index")]
     public IActionResult Index([FromQuery] string? screeningId)
     {
         ViewBag.ScreeningId = screeningId ?? "";

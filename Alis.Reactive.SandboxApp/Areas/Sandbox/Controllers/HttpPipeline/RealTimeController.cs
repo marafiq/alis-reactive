@@ -21,7 +21,6 @@ public class RealTimeController : Controller
     }
 
     [HttpGet("")]
-    [HttpGet("Index")]
     public IActionResult Index() => View("~/Areas/Sandbox/Views/HttpPipeline/RealTime/Index.cshtml");
 
     [HttpGet("ResidentPanel")]

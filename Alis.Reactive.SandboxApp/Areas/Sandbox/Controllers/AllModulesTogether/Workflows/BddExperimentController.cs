@@ -8,7 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.AllModulesTogether.
     public class BddExperimentController : Controller
     {
         [HttpGet("")]
-        [HttpGet("Index")]
         public IActionResult Index() => View("~/Areas/Sandbox/Views/AllModulesTogether/BddExperiment/Index.cshtml");
 
         [HttpPost("Submit")]

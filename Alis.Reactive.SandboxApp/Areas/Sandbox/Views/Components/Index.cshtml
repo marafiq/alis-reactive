@@ -12,7 +12,7 @@
         <h2 class="text-lg font-semibold text-text-primary">Native</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <a href="/Sandbox/Components/NativeButton"
+        <a asp-area="Sandbox" asp-controller="NativeButton" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -21,11 +21,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Click triggers, dispatch on click
+                Click a button, see it dispatch a custom event and trigger DOM mutations
             </p>
         </a>
 
-        <a href="/Sandbox/Components/NativeTextBox"
+        <a asp-area="Sandbox" asp-controller="NativeTextBox" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -34,11 +34,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Text input, reactive value binding
+                Type text and see value binding update other elements reactively via input events
             </p>
         </a>
 
-        <a href="/Sandbox/Components/CheckBox"
+        <a asp-area="Sandbox" asp-controller="CheckBox" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -47,11 +47,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Boolean checked binding, toggle behavior
+                Toggle a checkbox and see checked state read as boolean, driving show/hide and other reactions
             </p>
         </a>
 
-        <a href="/Sandbox/Components/NativeCheckList"
+        <a asp-area="Sandbox" asp-controller="NativeCheckList" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -60,11 +60,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Multi-select checkbox group
+                Check multiple items from a group, see selected values gathered as an array for HTTP POST
             </p>
         </a>
 
-        <a href="/Sandbox/Components/NativeDropDown"
+        <a asp-area="Sandbox" asp-controller="NativeDropDown" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -73,11 +73,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Native select element, option binding
+                Pick from a native select element, see the selected value drive conditions and downstream mutations
             </p>
         </a>
 
-        <a href="/Sandbox/Components/NativeRadioGroup"
+        <a asp-area="Sandbox" asp-controller="NativeRadioGroup" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -86,11 +86,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Radio button group, single selection
+                Select one option from a radio group, see the chosen value reactively update the page
             </p>
         </a>
 
-        <a href="/Sandbox/Components/NativeTextArea"
+        <a asp-area="Sandbox" asp-controller="NativeTextArea" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -99,11 +99,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Multi-line text input
+                Type in a textarea and see value binding, useful for care notes and long-form input
             </p>
         </a>
 
-        <a href="/Sandbox/Components/NativeHiddenField"
+        <a asp-area="Sandbox" asp-controller="NativeHiddenField" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -112,7 +112,7 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Hidden form value, gather source
+                Invisible input that carries IDs and tokens — see it gathered into HTTP POST payloads alongside visible fields
             </p>
         </a>
     </div>
@@ -125,7 +125,7 @@
         <h2 class="text-lg font-semibold text-text-primary">Fusion</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <a href="/Sandbox/Components/DropDownList"
+        <a asp-area="Sandbox" asp-controller="DropDownList" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -134,11 +134,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Syncfusion dropdown, value binding
+                Syncfusion dropdown — select a value and see it update other components and get included in form submissions
             </p>
         </a>
 
-        <a href="/Sandbox/Components/NumericTextBox"
+        <a asp-area="Sandbox" asp-controller="NumericTextBox" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -147,11 +147,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Numeric input with coercion
+                Enter a number and see it treated as a true numeric value — used in conditions and form submissions without type issues
             </p>
         </a>
 
-        <a href="/Sandbox/Components/AutoComplete"
+        <a asp-area="Sandbox" asp-controller="AutoComplete" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -160,11 +160,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Type-ahead suggestions, async filtering
+                Start typing to see async-filtered suggestions from the server, select one to fire change events
             </p>
         </a>
 
-        <a href="/Sandbox/Components/MultiSelect"
+        <a asp-area="Sandbox" asp-controller="MultiSelect" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -173,11 +173,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Multi-value selection dropdown
+                Pick multiple items from a dropdown, see selected array gathered for POST payloads
             </p>
         </a>
 
-        <a href="/Sandbox/Components/FusionDatePicker"
+        <a asp-area="Sandbox" asp-controller="FusionDatePicker" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -186,11 +186,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Date selection with calendar popup
+                Pick a date from the calendar popup, see it formatted as ISO for use in conditions and form submissions
             </p>
         </a>
 
-        <a href="/Sandbox/Components/DateTimePicker"
+        <a asp-area="Sandbox" asp-controller="DateTimePicker" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -199,11 +199,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Combined date and time selection
+                Pick date and time together — useful for medication schedules and appointment booking
             </p>
         </a>
 
-        <a href="/Sandbox/Components/TimePicker"
+        <a asp-area="Sandbox" asp-controller="TimePicker" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -212,11 +212,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Time-only selection
+                Pick a time value, see it bound reactively — useful for shift schedules and routine timing
             </p>
         </a>
 
-        <a href="/Sandbox/Components/DateRangePicker"
+        <a asp-area="Sandbox" asp-controller="DateRangePicker" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -225,11 +225,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Start/end date range selection
+                Select a start and end date range for billing periods or stay durations
             </p>
         </a>
 
-        <a href="/Sandbox/Components/MultiColumnComboBox"
+        <a asp-area="Sandbox" asp-controller="MultiColumnComboBox" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -238,11 +238,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Multi-column dropdown with grid display
+                Search and select from a multi-column grid dropdown showing structured data (name, code, description)
             </p>
         </a>
 
-        <a href="/Sandbox/Components/InputMask"
+        <a asp-area="Sandbox" asp-controller="InputMask" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -251,11 +251,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Masked input with format enforcement
+                Type into a masked field (phone, SSN format) — input is constrained to the mask pattern automatically
             </p>
         </a>
 
-        <a href="/Sandbox/Components/RichTextEditor"
+        <a asp-area="Sandbox" asp-controller="RichTextEditor" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -264,11 +264,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                WYSIWYG HTML editor
+                Rich text editor with toolbar — type formatted content, see HTML value gathered for POST
             </p>
         </a>
 
-        <a href="/Sandbox/Components/Switch"
+        <a asp-area="Sandbox" asp-controller="Switch" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -277,11 +277,11 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Toggle switch, boolean binding
+                Flip the toggle switch and see its boolean state drive conditions and update other components
             </p>
         </a>
 
-        <a href="/Sandbox/Components/FileUpload"
+        <a asp-area="Sandbox" asp-controller="FileUpload" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -290,7 +290,7 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                File upload with validation
+                Select files and see them uploaded via FormData POST, with reactive feedback on upload progress
             </p>
         </a>
     </div>
@@ -303,7 +303,7 @@
         <h2 class="text-lg font-semibold text-text-primary">App Level</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <a href="/Sandbox/Components/Drawer"
+        <a asp-area="Sandbox" asp-controller="Drawer" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
                 <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
@@ -312,7 +312,7 @@
                 <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                Slide-out panel, partial content loading
+                Click to open a slide-out drawer panel, see partial HTML loaded into it via Into()
             </p>
         </a>
     </div>
