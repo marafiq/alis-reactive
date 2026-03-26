@@ -15,5 +15,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "~/Areas/Sandbox/Views/Components/Fusion/Accordion/Index.cshtml",
                 new AccordionModel());
         }
+
+        [HttpGet("OverviewPartial")]
+        public IActionResult OverviewPartial()
+        {
+            return PartialView("~/Areas/Sandbox/Views/Components/Fusion/Accordion/_OverviewPartial.cshtml");
+        }
+
+        [HttpGet("CareLevelsPartial")]
+        public IActionResult CareLevelsPartial()
+        {
+            return PartialView("~/Areas/Sandbox/Views/Components/Fusion/Accordion/_CareLevelsPartial.cshtml");
+        }
+
+        [HttpGet("ContactPartial")]
+        public IActionResult ContactPartial()
+        {
+            return PartialView("~/Areas/Sandbox/Views/Components/Fusion/Accordion/_ContactPartial.cshtml");
+        }
     }
 }
