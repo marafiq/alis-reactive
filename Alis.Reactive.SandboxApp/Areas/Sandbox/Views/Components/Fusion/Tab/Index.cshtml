@@ -1,0 +1,151 @@
+@model TabModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Navigations
+@{
+    ViewData["Title"] = "FusionTab";
+
+    var plan = Html.ReactivePlan<TabModel>();
+
+    // -- Section 1: Property Write (SetSelectedItem) on DomReady --
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<FusionTab>("demo-tab").SetSelectedItem(1);
+        p.Element("set-selected-result").SetText("SetSelectedItem applied (tab 2)");
+    }));
+
+    // -- Section 3: Method Call (Select via button) --
+    Html.On(plan, t => t.CustomEvent("do-select-tab", p =>
+    {
+        p.Component<FusionTab>("demo-tab").Select(2);
+        p.Element("method-result").SetText("select(2) called");
+    }));
+
+    // -- Section 4: Method Call (HideTab via button) --
+    Html.On(plan, t => t.CustomEvent("do-hide-tab", p =>
+    {
+        p.Component<FusionTab>("demo-tab").HideTab(3, true);
+        p.Element("hide-result").SetText("hideTab(3, true) called");
+    }));
+
+    // -- Section 5: Unhide Tab via button --
+    Html.On(plan, t => t.CustomEvent("do-show-tab", p =>
+    {
+        p.Component<FusionTab>("demo-tab").HideTab(3, false);
+        p.Element("hide-result").SetText("hideTab(3, false) called");
+    }));
+
+    // Tab items for the demo
+    var tabItems = new List<TabItem>
+    {
+        new TabItem { Header = new TabHeader { Text = "Residents" },
+            Content = "<div class='p-4'><p class='text-sm'>Resident management content. Lists all residents in the facility with care level assignments.</p></div>" },
+        new TabItem { Header = new TabHeader { Text = "Staff" },
+            Content = "<div class='p-4'><p class='text-sm'>Staff scheduling and assignments. View shift rotations and caregiver-to-resident ratios.</p></div>" },
+        new TabItem { Header = new TabHeader { Text = "Facilities" },
+            Content = "<div class='p-4'><p class='text-sm'>Facility details and room availability. Manage wings, rooms, and occupancy tracking.</p></div>" },
+        new TabItem { Header = new TabHeader { Text = "Reports" },
+            Content = "<div class='p-4'><p class='text-sm'>Monthly compliance and care reports. Track medication schedules, incident reports, and audit logs.</p></div>" }
+    };
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">FusionTab — Full API</h1>
+        <p class="text-sm text-text-secondary">
+            Exercises FusionTab API: property writes (SetSelectedItem), method calls (Select, HideTab),
+            and events (Selected) with typed conditions. Senior living domain: facility management tabs.
+        </p>
+    </div>
+
+    <!-- Section 1: Property Write (SetSelectedItem) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Property Write (SetSelectedItem)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            On DomReady, <code>SetSelectedItem(1)</code> switches to the "Staff" tab (index 1).
+        </p>
+        <div class="font-mono text-sm mt-4">
+            <p>SetSelectedItem result: <span id="set-selected-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 2: Tab Component -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">2. Tab Component + Selected Event</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Click tabs to fire the <code>selected</code> event. Echo spans show event arg values.
+        </p>
+
+        @(Html.FusionTab(plan, "demo-tab", b => b
+            .Items(tabItems))
+            .Reactive(evt => evt.Selected, (args, p) =>
+            {
+                p.Element("selected-index").SetText(args, x => x.SelectedIndex);
+                p.Element("previous-index").SetText(args, x => x.PreviousIndex);
+                p.Element("is-swiped").SetText(args, x => x.IsSwiped);
+                p.When(args, x => x.SelectedIndex).Eq(0)
+                    .Then(t => t.Element("condition-result").SetText("Residents tab active"))
+                    .ElseIf(args, x => x.SelectedIndex).Eq(1)
+                    .Then(t => t.Element("condition-result").SetText("Staff tab active"))
+                    .ElseIf(args, x => x.SelectedIndex).Eq(2)
+                    .Then(t => t.Element("condition-result").SetText("Facilities tab active"))
+                    .Else(e => e.Element("condition-result").SetText("Reports tab active"));
+            }))
+
+        <div class="font-mono text-sm mt-4 space-y-1">
+            <p>selectedIndex: <span id="selected-index" class="text-text-muted">&mdash;</span></p>
+            <p>previousIndex: <span id="previous-index" class="text-text-muted">&mdash;</span></p>
+            <p>isSwiped: <span id="is-swiped" class="text-text-muted">&mdash;</span></p>
+            <p>Condition: <span id="condition-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 3: Method Call (Select) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">3. Method Call (Select)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Button dispatches <code>do-select-tab</code> which calls <code>select(2)</code> — navigates to Facilities tab.
+        </p>
+        @(Html.NativeButton<TabModel>("select-tab-btn", "Select Facilities Tab")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-select-tab");
+            }))
+        <div class="font-mono text-sm mt-4">
+            <p>Method result: <span id="method-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 4: Method Call (HideTab / ShowTab) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">4. Method Call (HideTab / ShowTab)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Toggle visibility of the Reports tab (index 3).
+        </p>
+        @(Html.NativeButton<TabModel>("hide-tab-btn", "Hide Reports Tab")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white mr-2")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-hide-tab");
+            }))
+        @(Html.NativeButton<TabModel>("show-tab-btn", "Show Reports Tab")
+            .CssClass("rounded-md bg-accent-secondary px-4 py-2 text-sm font-medium text-white")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Dispatch("do-show-tab");
+            }))
+        <div class="font-mono text-sm mt-4">
+            <p>Hide/Show result: <span id="hide-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)
