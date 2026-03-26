@@ -96,6 +96,13 @@
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
       <HintPath>packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\lib\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
+    <!-- Syncfusion EJ2 MVC5 -->
+    <Reference Include="Syncfusion.EJ2">
+      <HintPath>packages\Syncfusion.EJ2.MVC5.32.2.8\lib\net462\Syncfusion.EJ2.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Licensing">
+      <HintPath>packages\Syncfusion.Licensing.32.2.8\lib\net462\Syncfusion.Licensing.dll</HintPath>
+    </Reference>
     <!-- Alis.Reactive framework (via local NuGet packages) -->
     <Reference Include="Alis.Reactive">
       <HintPath>packages\Alis.Reactive.1.0.0-preview.1\lib\net48\Alis.Reactive.dll</HintPath>
