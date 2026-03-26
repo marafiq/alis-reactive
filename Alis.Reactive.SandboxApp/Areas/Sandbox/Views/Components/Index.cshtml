@@ -281,6 +281,19 @@
             </p>
         </a>
 
+        <a asp-area="Sandbox" asp-controller="ColorPicker" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-start justify-between">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                    ColorPicker
+                </h3>
+                <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            </div>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Pick a color from the palette, see hex value bound reactively with conditions and toggle popup
+            </p>
+        </a>
+
         <a asp-area="Sandbox" asp-controller="FileUpload" asp-action="Index"
            class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-start justify-between">
@@ -291,6 +304,41 @@
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                 Select files and see them uploaded via FormData POST, with reactive feedback on upload progress
+            </p>
+        </a>
+    </div>
+</section>
+
+<!-- Navigation / Container -->
+<section class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="w-1 h-6 rounded-full bg-[#8B5CF6]"></span>
+        <h2 class="text-lg font-semibold text-text-primary">Navigation</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <a asp-area="Sandbox" asp-controller="Tab" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-start justify-between">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                    Tab
+                </h3>
+                <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            </div>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Click tabs to switch panels, see lazy-loaded partial content via HTTP + Into on each selection
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Accordion" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-start justify-between">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                    Accordion
+                </h3>
+                <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            </div>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Expand panels to lazy-load content from the server, see expand/collapse events drive conditions
             </p>
         </a>
     </div>
