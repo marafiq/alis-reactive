@@ -130,33 +130,34 @@
             .Reactive(evt => evt.Expanded, (args, p) =>
             {
                 p.When(args, x => x.IsExpanded).Truthy()
-                    .Then(t =>
-                    {
-                        t.When(args, x => x.Index).Eq(0)
-                            .Then(t0 => t0
-                                .Get("/Sandbox/Components/Accordion/OverviewPartial")
-                                .Response(r => r.OnSuccess(s =>
-                                {
-                                    s.Into("lazy-panel-0");
-                                    s.Element("lazy-load-status").SetText("Overview loaded");
-                                })));
-                        t.When(args, x => x.Index).Eq(1)
-                            .Then(t1 => t1
-                                .Get("/Sandbox/Components/Accordion/CareLevelsPartial")
-                                .Response(r => r.OnSuccess(s =>
-                                {
-                                    s.Into("lazy-panel-1");
-                                    s.Element("lazy-load-status").SetText("Care Levels loaded");
-                                })));
-                        t.When(args, x => x.Index).Eq(2)
-                            .Then(t2 => t2
-                                .Get("/Sandbox/Components/Accordion/ContactPartial")
-                                .Response(r => r.OnSuccess(s =>
-                                {
-                                    s.Into("lazy-panel-2");
-                                    s.Element("lazy-load-status").SetText("Contact loaded");
-                                })));
-                    });
+                    .And(args, x => x.Index).Eq(0)
+                    .Then(t => t
+                        .Get("/Sandbox/Components/Accordion/OverviewPartial")
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into("lazy-panel-0");
+                            s.Element("lazy-load-status").SetText("Overview loaded");
+                        })));
+
+                p.When(args, x => x.IsExpanded).Truthy()
+                    .And(args, x => x.Index).Eq(1)
+                    .Then(t => t
+                        .Get("/Sandbox/Components/Accordion/CareLevelsPartial")
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into("lazy-panel-1");
+                            s.Element("lazy-load-status").SetText("Care Levels loaded");
+                        })));
+
+                p.When(args, x => x.IsExpanded).Truthy()
+                    .And(args, x => x.Index).Eq(2)
+                    .Then(t => t
+                        .Get("/Sandbox/Components/Accordion/ContactPartial")
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into("lazy-panel-2");
+                            s.Element("lazy-load-status").SetText("Contact loaded");
+                        })));
             }))
 
         <div class="font-mono text-sm mt-4">
