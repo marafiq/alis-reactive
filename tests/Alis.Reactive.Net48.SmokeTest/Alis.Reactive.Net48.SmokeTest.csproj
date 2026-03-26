@@ -90,12 +90,21 @@
     <Reference Include="System.IO.Pipelines">
       <HintPath>packages\System.IO.Pipelines.9.0.14\lib\net462\System.IO.Pipelines.dll</HintPath>
     </Reference>
+    <Reference Include="FluentValidation">
+      <HintPath>packages\FluentValidation.11.11.0\lib\net48\FluentValidation.dll</HintPath>
+    </Reference>
     <!-- Alis.Reactive framework (via local NuGet packages) -->
     <Reference Include="Alis.Reactive">
       <HintPath>packages\Alis.Reactive.1.0.0-preview.1\lib\net48\Alis.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="Alis.Reactive.Native">
       <HintPath>packages\Alis.Reactive.Native.1.0.0-preview.1\lib\net48\Alis.Reactive.Native.dll</HintPath>
+    </Reference>
+    <Reference Include="Alis.Reactive.Fusion">
+      <HintPath>packages\Alis.Reactive.Fusion.1.0.0-preview.1\lib\net48\Alis.Reactive.Fusion.dll</HintPath>
+    </Reference>
+    <Reference Include="Alis.Reactive.FluentValidator">
+      <HintPath>packages\Alis.Reactive.FluentValidator.1.0.0-preview.1\lib\net48\Alis.Reactive.FluentValidator.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -106,7 +115,12 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\_DrawerContent.cshtml" />
+    <Content Include="Views\Intake\Index.cshtml" />
+    <Content Include="Views\Intake\_FacilityInfo.cshtml" />
+    <Content Include="Views\Intake\_FacilityRequirements.cshtml" />
+    <Content Include="Views\Intake\_Summary.cshtml" />
     <Content Include="js\alis-reactive.js" />
+    <Content Include="css\design-system.css" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -115,11 +129,20 @@
     </Compile>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IntakeController.cs" />
     <Compile Include="Models\SmokeTestModel.cs" />
+    <Compile Include="Models\ResidentIntakeModel.cs" />
+    <Compile Include="Validators\IntakeValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != '' AND Exists('$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets')" />
+
+  <!-- Copy JS + CSS from SandboxApp wwwroot into smoke test folders -->
+  <Target Name="CopyAssets" BeforeTargets="BeforeBuild">
+    <Copy SourceFiles="..\..\Alis.Reactive.SandboxApp\wwwroot\css\design-system.css" DestinationFolder="css" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\..\Alis.Reactive.SandboxApp\wwwroot\js\alis-reactive.js" DestinationFolder="js" SkipUnchangedFiles="true" />
+  </Target>
 
   <!-- Pack Alis.Reactive library projects into local nupkgs/ feed before build.
        Skips if packages already exist (incremental). Force re-pack: delete nupkgs/ folder. -->

@@ -1,37 +1,72 @@
+@using Alis.Reactive.Fusion.AppLevel
 @using Alis.Reactive.Native.AppLevel
 <!DOCTYPE html>
-<html>
+<html lang="en" class="h-full">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewBag.Title - Net48 Smoke Test</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; color: #1a1a2e; }
-        .container { max-width: 960px; margin: 0 auto; padding: 20px; }
-        h1 { color: #7A2E3B; border-bottom: 2px solid #D4A053; padding-bottom: 8px; }
-        h2 { color: #333; margin-top: 24px; }
-        h3 { color: #555; }
-        .status { padding: 12px; border-radius: 6px; background: #f0f0f0; font-family: monospace; margin: 8px 0; }
-        .loaded { background: #d4edda !important; color: #155724 !important; font-weight: bold; }
-        button { padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; margin: 4px; font-size: 14px; }
-        button:hover { background: #e8e8e8; }
-        .btn-primary { background: #7A2E3B; color: white; border-color: #7A2E3B; }
-        .btn-primary:hover { background: #5E1F2C; }
-        .field-wrapper { margin: 12px 0; }
-        .field-wrapper label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 14px; }
-        .field-wrapper input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 400px; box-sizing: border-box; }
-        pre { background: #1a1a2e; color: #4ade80; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
-        [hidden] { display: none !important; }
-    </style>
+    <title>@ViewBag.Title — Net48 Smoke Test</title>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/tailwind3.css"/>
+    <link rel="stylesheet" href="/css/design-system.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 </head>
-<body>
-    <div class="container">
-        <h1>Alis.Reactive &mdash; .NET Framework 4.8 Smoke Test</h1>
-        @RenderBody()
-    </div>
+<body class="alis-root h-full">
 
-    @Html.NativeLoader()
-    @Html.NativeDrawer()
-    <script src="/js/alis-reactive.js"></script>
+<div class="min-h-full flex flex-col">
+    <!-- Brand bar -->
+    <div class="h-1 bg-gradient-to-r from-[#7A2E3B] via-[#9B4A57] to-[#D4A053]"></div>
+
+    <header class="border-b border-border bg-white">
+        <native-container>
+            <div class="flex items-center h-16 gap-8">
+                <a href="/" class="flex items-center gap-2.5 shrink-0 group">
+                    <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7A2E3B] to-[#9B4A57] flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">A</span>
+                    </span>
+                    <span class="text-lg font-bold tracking-tight text-[#7A2E3B] group-hover:text-[#5E1F2C] transition-colors">
+                        Alis.Reactive
+                    </span>
+                </a>
+                <nav class="flex items-center gap-1">
+                    <a href="/" class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-colors">
+                        Smoke Test
+                    </a>
+                    <a href="/Intake" class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-colors">
+                        Resident Intake
+                    </a>
+                </nav>
+            </div>
+        </native-container>
+    </header>
+
+    <main class="flex-1">
+        <native-container class="py-10">
+            @RenderBody()
+        </native-container>
+    </main>
+
+    <footer class="border-t border-border bg-white mt-auto">
+        <native-container class="py-6">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-text-muted">&copy; 2026 Alis.Reactive — Net48 Smoke Test</p>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-[#7A2E3B]"></span>
+                    <span class="w-2 h-2 rounded-full bg-[#D4A053]"></span>
+                    <span class="w-2 h-2 rounded-full bg-border"></span>
+                </div>
+            </div>
+        </native-container>
+    </footer>
+</div>
+<script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+
+@Html.FusionToast()
+@Html.EJS().ScriptManager()
+@Html.FusionConfirmDialog()
+@Html.NativeLoader()
+@Html.NativeDrawer()
+<script type="module" src="/js/alis-reactive.js"></script>
 </body>
 </html>

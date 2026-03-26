@@ -1,0 +1,25 @@
+<div class="space-y-4 p-2">
+    <div class="border-b border-border pb-3">
+        <h4 class="text-sm font-semibold text-text-primary mb-2">Resident</h4>
+        <p class="text-sm">@ViewBag.FirstName @ViewBag.LastName</p>
+    </div>
+    <div class="border-b border-border pb-3">
+        <h4 class="text-sm font-semibold text-text-primary mb-2">Placement</h4>
+        <dl class="grid grid-cols-2 gap-2 text-sm">
+            <dt class="text-text-muted">Facility</dt>
+            <dd>@ViewBag.FacilityId</dd>
+            <dt class="text-text-muted">Care Level</dt>
+            <dd>@ViewBag.CareLevel</dd>
+            <dt class="text-text-muted">Admission</dt>
+            <dd>@ViewBag.AdmissionDate</dd>
+            <dt class="text-text-muted">Monthly Rate</dt>
+            <dd>@ViewBag.MonthlyRate</dd>
+        </dl>
+    </div>
+    <div>
+        <p class="text-xs text-text-muted">
+            This summary was loaded into the drawer via <code>Into()</code> &mdash;
+            an HTTP GET fetched this partial and injected it as HTML.
+        </p>
+    </div>
+</div>
