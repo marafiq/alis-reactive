@@ -1,0 +1,126 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "FusionGrid";
+
+    var plan = Html.ReactivePlan<GridModel>();
+
+    // -- DomReady: Load page 1 from server --
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Post("/Sandbox/Components/Grid/Data")
+         .Gather(g => g
+             .Static("skip", 0)
+             .Static("take", 10))
+         .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
+         {
+             s.Component<FusionGrid>("residents-grid")
+                 .SetDataSource(json);
+             s.Element("load-status").SetText("initial data loaded");
+         }));
+    }));
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">FusionGrid — Server-Side Sort, Paging &amp; Filter</h1>
+        <p class="text-sm text-text-secondary">
+            200 residents in server memory. Grid shows 10 per page with server-side sort + paging.
+            External Min Age filter sends the full state (skip, take, sorted, minAge) on every action.
+        </p>
+    </div>
+
+    <!-- Section 1: Grid + Sort + Paging -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">1. Grid with Server-Side Sort &amp; Paging</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Every sort or page action fires <code>dataStateChange</code> which POSTs the full grid state
+            + current filter value to the server. Response is <code>{result, count}</code>.
+        </p>
+
+        <!-- External Filter Panel -->
+        <div class="mb-4 p-4 rounded-md bg-slate-50 border border-border/50">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                @{ Html.InputField(plan, m => m.MinAge, o => o.Label("Min Age Filter"))
+                    .NumericTextBox(b => b
+                        .Format("n0")
+                        .Min(0).Max(100)
+                        .Placeholder("e.g. 80")
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            p.Element("filter-status").SetText("filtering...");
+                            p.Post("/Sandbox/Components/Grid/Data")
+                             .Gather(g => g
+                                 .Static("skip", 0)
+                                 .Static("take", 10)
+                                 .Include(m => m.MinAge))
+                             .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
+                             {
+                                 s.Component<FusionGrid>("residents-grid")
+                                     .SetDataSource(json);
+                                 s.Element("filter-status").SetText("filtered");
+                             }));
+                        })); }
+            </div>
+        </div>
+
+        @(Html.FusionGrid(plan, "residents-grid", b => b
+            .AllowSorting(true)
+            .AllowPaging(true)
+            .PageSettings(new GridPageSettings { PageSize = 10 })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "name", HeaderText = "Name", Width = "180" },
+                new GridColumn { Field = "age", HeaderText = "Age", Width = "80" },
+                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
+                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "100" },
+            }))
+            .Reactive(evt => evt.DataStateChange, (args, p) =>
+            {
+                p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
+                    .Then(t =>
+                    {
+                        t.Element("evt-skip").SetText(args, x => x.Skip);
+                        t.Element("evt-take").SetText(args, x => x.Take);
+                        t.Element("evt-action-type").SetText(args, x => x.Action.RequestType);
+                        t.Element("evt-action-column").SetText(args, x => x.Action.ColumnName);
+                        t.Element("evt-action-direction").SetText(args, x => x.Action.Direction);
+                        t.Element("evt-action-page").SetText(args, x => x.Action.CurrentPage);
+                        t.Post("/Sandbox/Components/Grid/Data")
+                         .Gather(g => g
+                             .FromEvent(args, x => x.Skip, "skip")
+                             .FromEvent(args, x => x.Take, "take")
+                             .FromEvent(args, x => x.Sorted, "sorted")
+                             .Include(m => m.MinAge))
+                         .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
+                         {
+                             s.Component<FusionGrid>("residents-grid")
+                                 .SetDataSource(json);
+                             s.Element("action-status").SetText("data refreshed");
+                         }));
+                    });
+            }))
+
+        <div class="font-mono text-sm mt-4 space-y-1">
+            <p>Load status: <span id="load-status" class="text-text-muted">&mdash;</span></p>
+            <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
+            <p>Action status: <span id="action-status" class="text-text-muted">&mdash;</span></p>
+            <p>Event skip: <span id="evt-skip" class="text-text-muted">&mdash;</span></p>
+            <p>Event take: <span id="evt-take" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.requestType: <span id="evt-action-type" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.columnName: <span id="evt-action-column" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.direction: <span id="evt-action-direction" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.currentPage: <span id="evt-action-page" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Plan JSON -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</div>
+
+@Html.RenderPlan(plan)
