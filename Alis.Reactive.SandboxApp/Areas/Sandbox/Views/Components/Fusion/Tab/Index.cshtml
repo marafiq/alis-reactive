@@ -15,6 +15,17 @@
         p.Element("set-selected-result").SetText("SetSelectedItem applied (tab 2)");
     }));
 
+    // -- Section 5: Load first tab content on DomReady --
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Get("/Sandbox/Components/Tab/ResidentsPartial")
+         .Response(r => r.OnSuccess(s =>
+         {
+             s.Into("lazy-tab-content");
+             s.Element("lazy-load-status").SetText("Residents loaded on boot");
+         }));
+    }));
+
     // -- Section 3: Method Call (Select via button) --
     Html.On(plan, t => t.CustomEvent("do-select-tab", p =>
     {
@@ -138,6 +149,65 @@
             }))
         <div class="font-mono text-sm mt-4">
             <p>Hide/Show result: <span id="hide-result" class="text-text-muted">&mdash;</span></p>
+        </div>
+    </section>
+
+    <!-- Section 5: Lazy-Load Tab Content via HTTP + Into -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">5. Lazy-Load Content (HTTP + Into)</h2>
+        <p class="text-sm text-text-secondary mb-4">
+            Each tab click fires the <code>selected</code> event, which does an HTTP GET to fetch a partial view
+            and injects it via <code>Into("lazy-tab-content")</code>. Content loads on demand — not all at once.
+        </p>
+
+        @{
+            var lazyTabItems = new List<TabItem>
+            {
+                new TabItem { Header = new TabHeader { Text = "Residents" }, Content = "<div class='p-4 text-sm text-text-muted'>Loading...</div>" },
+                new TabItem { Header = new TabHeader { Text = "Staff" }, Content = "<div class='p-4 text-sm text-text-muted'>Select to load</div>" },
+                new TabItem { Header = new TabHeader { Text = "Facilities" }, Content = "<div class='p-4 text-sm text-text-muted'>Select to load</div>" },
+            };
+        }
+
+        @(Html.FusionTab(plan, "lazy-tab", b => b
+            .Items(lazyTabItems))
+            .Reactive(evt => evt.Selected, (args, p) =>
+            {
+                p.When(args, x => x.SelectedIndex).Eq(0)
+                    .Then(t => t
+                        .Get("/Sandbox/Components/Tab/ResidentsPartial")
+                        .WhileLoading(l => l.Element("lazy-tab-content").SetText("Loading..."))
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into("lazy-tab-content");
+                            s.Element("lazy-load-status").SetText("Residents loaded via HTTP");
+                        })))
+                    .ElseIf(args, x => x.SelectedIndex).Eq(1)
+                    .Then(t => t
+                        .Get("/Sandbox/Components/Tab/StaffPartial")
+                        .WhileLoading(l => l.Element("lazy-tab-content").SetText("Loading..."))
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into("lazy-tab-content");
+                            s.Element("lazy-load-status").SetText("Staff loaded via HTTP");
+                        })))
+                    .ElseIf(args, x => x.SelectedIndex).Eq(2)
+                    .Then(t => t
+                        .Get("/Sandbox/Components/Tab/FacilitiesPartial")
+                        .WhileLoading(l => l.Element("lazy-tab-content").SetText("Loading..."))
+                        .Response(r => r.OnSuccess(s =>
+                        {
+                            s.Into("lazy-tab-content");
+                            s.Element("lazy-load-status").SetText("Facilities loaded via HTTP");
+                        })));
+            }))
+
+        <div id="lazy-tab-content" class="mt-2 rounded border border-border/50 min-h-[120px]">
+            <div class="p-4 text-sm text-text-muted">Click a tab to load content via HTTP</div>
+        </div>
+
+        <div class="font-mono text-sm mt-4">
+            <p>Load status: <span id="lazy-load-status" class="text-text-muted">&mdash;</span></p>
         </div>
     </section>
 
