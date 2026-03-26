@@ -91,7 +91,7 @@
       <HintPath>packages\System.IO.Pipelines.9.0.14\lib\net462\System.IO.Pipelines.dll</HintPath>
     </Reference>
     <Reference Include="FluentValidation">
-      <HintPath>packages\FluentValidation.11.11.0\lib\net48\FluentValidation.dll</HintPath>
+      <HintPath>packages\FluentValidation.11.11.0\lib\netstandard2.0\FluentValidation.dll</HintPath>
     </Reference>
     <!-- Alis.Reactive framework (via local NuGet packages) -->
     <Reference Include="Alis.Reactive">
