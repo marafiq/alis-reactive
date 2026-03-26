@@ -21,8 +21,8 @@ namespace Alis.Reactive.Native.Components
             Action<PipelineBuilder<TModel>> configure)
             where TModel : class
         {
-            ArgumentNullException.ThrowIfNull(html);
-            ArgumentNullException.ThrowIfNull(configure);
+            if (html == null) throw new ArgumentNullException(nameof(html));
+            if (configure == null) throw new ArgumentNullException(nameof(configure));
 
             var contract = NativeActionLinkSerializer.CreateContract(url, configure);
             var elementId = NativeActionLinkIdGenerator.Next<TModel>(html.ViewContext);
