@@ -90,12 +90,12 @@
     <Reference Include="System.IO.Pipelines">
       <HintPath>packages\System.IO.Pipelines.9.0.14\lib\net462\System.IO.Pipelines.dll</HintPath>
     </Reference>
-    <!-- Alis.Reactive framework DLLs (built from source, net48 target) -->
+    <!-- Alis.Reactive framework (via local NuGet packages) -->
     <Reference Include="Alis.Reactive">
-      <HintPath>..\..\Alis.Reactive\bin\Release\net48\Alis.Reactive.dll</HintPath>
+      <HintPath>packages\Alis.Reactive.1.0.0-preview.1\lib\net48\Alis.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="Alis.Reactive.Native">
-      <HintPath>..\..\Alis.Reactive.Native\bin\Release\net48\Alis.Reactive.Native.dll</HintPath>
+      <HintPath>packages\Alis.Reactive.Native.1.0.0-preview.1\lib\net48\Alis.Reactive.Native.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
