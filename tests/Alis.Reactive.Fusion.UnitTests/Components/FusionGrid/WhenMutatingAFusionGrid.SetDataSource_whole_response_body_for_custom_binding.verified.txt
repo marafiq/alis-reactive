@@ -1,0 +1,36 @@
+﻿{
+  planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: http,
+        request: {
+          verb: POST,
+          url: /api/data,
+          onSuccess: [
+            {
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: residents-grid,
+                  mutation: {
+                    kind: set-prop,
+                    prop: dataSource
+                  },
+                  source: {
+                    kind: event,
+                    path: responseBody
+                  },
+                  vendor: fusion
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

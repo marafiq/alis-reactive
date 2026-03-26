@@ -1,0 +1,33 @@
+﻿{
+  planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
+  entries: [
+    {
+      trigger: {
+        kind: dom-ready
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: residents-grid,
+            mutation: {
+              kind: call,
+              method: refresh
+            },
+            vendor: fusion
+          },
+          {
+            kind: mutate-element,
+            target: status,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: refreshed
+          }
+        ]
+      }
+    }
+  ]
+}
