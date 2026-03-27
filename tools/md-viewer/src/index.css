@@ -1,0 +1,111 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* ── Brand palette ── */
+  --color-primary: #7A2E3B;
+  --color-primary-foreground: #ffffff;
+
+  --color-background: #faf8f5;
+  --color-foreground: #1a1614;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #1a1614;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1a1614;
+
+  --color-secondary: #f2ede7;
+  --color-secondary-foreground: #2c2520;
+
+  --color-muted: #f5f1ec;
+  --color-muted-foreground: #78716c;
+
+  --color-accent: #f2ede7;
+  --color-accent-foreground: #2c2520;
+
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #e4ddd4;
+  --color-input: #e4ddd4;
+  --color-ring: #7A2E3B;
+
+  /* ── Sidebar ── */
+  --color-sidebar: #1a1614;
+  --color-sidebar-foreground: #c9bfb2;
+  --color-sidebar-muted: #6b5f54;
+  --color-sidebar-active: rgba(122, 46, 59, 0.2);
+
+  /* ── Semantic status ── */
+  --color-approve: #2d6a4f;
+  --color-approve-light: #d1fae5;
+  --color-changes: #b45309;
+  --color-changes-light: #fef3c7;
+  --color-blocker: #dc2626;
+  --color-blocker-light: #fecaca;
+  --color-conflict: #6d28d9;
+  --color-conflict-light: #ddd6fe;
+
+  /* ── Radii ── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* ── Typography ── */
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+  --font-heading: 'Geist Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+/* ── Subtle transitions on interactive elements ── */
+button, a, input, textarea, select, [role="button"] {
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+/* ── Markdown rendering ── */
+.prose h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--color-border); }
+.prose h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+.prose p { margin-bottom: 0.75rem; }
+.prose ol, .prose ul { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+.prose li { margin-bottom: 0.25rem; }
+.prose pre { background: #1a1614; color: #e8e2da; border-radius: var(--radius-md); padding: 1rem 1.25rem; margin: 1rem 0; overflow-x: auto; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; }
+.prose code { font-family: var(--font-mono); font-size: 0.85em; }
+.prose :not(pre) > code { background: var(--color-muted); padding: 2px 6px; border-radius: 4px; color: var(--color-primary); }
+.prose blockquote { border-left: 3px solid var(--color-primary); padding: 0.5rem 1rem; margin: 0.75rem 0; background: rgba(122,46,59,0.05); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-style: italic; }
+.prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+.prose th, .prose td { padding: 0.5rem 0.75rem; border: 1px solid var(--color-border); text-align: left; }
+.prose th { background: var(--color-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.04em; }
+
+/* ── Section heading utility ── */
+.section-heading {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted-foreground);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

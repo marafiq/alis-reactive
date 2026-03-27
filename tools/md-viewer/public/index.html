@@ -19,15 +19,32 @@
         <div class="sidebar-logo">R</div>
         <div>
           <div class="sidebar-title">Reactive Reader</div>
-          <div class="sidebar-subtitle">Plans, reviews, and skills</div>
+          <div class="sidebar-subtitle">Collaboration Hub</div>
         </div>
       </div>
     </div>
-    <div class="sidebar-tabs" id="sidebar-tabs"></div>
-    <div class="sidebar-search">
-      <input type="text" id="search" placeholder="Search files..." autocomplete="off">
+
+    <!-- Primary nav tabs -->
+    <div class="sidebar-nav" id="sidebar-nav">
+      <button class="nav-tab active" data-view="plans" onclick="switchView('plans')">
+        <span class="nav-icon">◆</span> Plans
+      </button>
+      <button class="nav-tab" data-view="board" onclick="switchView('board')">
+        <span class="nav-icon">▦</span> Board
+      </button>
+      <button class="nav-tab" data-view="knowledge" onclick="switchView('knowledge')">
+        <span class="nav-icon">◎</span> Knowledge
+      </button>
+      <button class="nav-tab" data-view="files" onclick="switchView('files')">
+        <span class="nav-icon">▤</span> Files
+      </button>
     </div>
-    <div id="sidebar-tree"></div>
+
+    <div class="sidebar-search">
+      <input type="text" id="search" placeholder="Search..." autocomplete="off">
+    </div>
+
+    <div class="sidebar-content" id="sidebar-content"></div>
   </nav>
 
   <div class="sidebar-overlay" id="overlay"></div>
@@ -39,29 +56,34 @@
       <div class="breadcrumb" id="breadcrumb"></div>
     </div>
 
-    <div id="doc-header" class="doc-header" style="display:none">
-      <div class="theme-ribbon" id="theme-ribbon"></div>
-      <h1 class="doc-title" id="doc-title"></h1>
-      <div class="doc-meta" id="doc-meta"></div>
-      <nav class="doc-nav" id="doc-nav"></nav>
-    </div>
-
-    <div class="content" id="content">
-      <div class="empty-state" id="empty-state">
-        <h2>Reactive Reader</h2>
-        <p>Select a theme and a file to begin reading.</p>
-        <div id="theme-overview"></div>
-      </div>
-    </div>
+    <!-- Dynamic content area -->
+    <div class="view-container" id="view-container"></div>
   </main>
+
+  <!-- REVIEW SLIDE-IN PANEL -->
+  <aside class="review-panel" id="review-panel">
+    <div class="review-panel-header">
+      <h3 id="review-panel-title"></h3>
+      <button class="review-panel-close" onclick="closeReviewPanel()">&times;</button>
+    </div>
+    <div class="review-panel-body" id="review-panel-body"></div>
+  </aside>
 </div>
 
-<!-- STATUS BAR -->
-<div class="status-bar" id="status-bar">
-  <span class="status-dot"></span>
-  <span id="status-file">Ready</span>
-  <span>|</span>
-  <span id="status-modified"></span>
+<!-- VERDICT BAR -->
+<div class="verdict-bar" id="verdict-bar" style="display:none">
+  <div class="verdict-glance" id="verdict-glance"></div>
+  <div class="verdict-actions">
+    <button class="verdict-btn verdict-approve" onclick="humanVerdict('approve')">
+      <span class="verdict-icon">✓</span> Approve
+    </button>
+    <button class="verdict-btn verdict-changes" onclick="humanVerdict('request-changes')">
+      <span class="verdict-icon">✕</span> Request Changes
+    </button>
+    <button class="verdict-btn verdict-defer" onclick="humanVerdict('defer')">
+      <span class="verdict-icon">⏸</span> Defer
+    </button>
+  </div>
 </div>
 
 <!-- TOAST -->
