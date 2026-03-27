@@ -4,25 +4,28 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.Extensions
 {
+    /// <summary>
+    /// Razor view extensions for adding reactive behavior to a plan.
+    /// </summary>
     public static class HtmlExtensions
     {
         /// <summary>
-        /// Entry point for wiring reactive triggers to a plan.
-        /// <para>
-        /// Supports: <c>DomReady</c>, <c>CustomEvent</c>, <c>ServerPush</c> (SSE),
-        /// and <c>SignalR</c> (hub method invocation). Each trigger pairs with a pipeline
-        /// that defines what happens when the trigger fires.
-        /// </para>
-        /// <para>
-        /// Can be called anywhere in the <c>.cshtml</c> view — order and placement do not matter.
-        /// Calls build descriptors only; no connections are opened until the browser boots the plan.
-        /// </para>
+        /// Adds reactive behavior to <paramref name="plan"/> by configuring triggers and
+        /// what happens when the producer dispatches an event in the browser.
         /// </summary>
-        /// <param name="html">The Razor HTML helper (implicit via extension method).</param>
-        /// <param name="plan">The reactive plan that collects trigger–reaction entries.</param>
+        /// <remarks>
+        /// Triggers execute the intent expressed in the body of <c>DomReady</c>,
+        /// <c>CustomEvent</c>, <c>ServerPush</c> (SSE), and <c>SignalR</c> in the browser, in declaration order,
+        /// when the producer dispatches the particular event via the <see cref="TriggerBuilder{TModel}"/> API.
+        /// Avoid defining the same event twice in the same view — duplicate listeners are an antipattern
+        /// unless there is a legitimate reason to split the reaction across multiple blocks.
+        /// </remarks>
+        /// <typeparam name="TModel">The view model type</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The plan to add reactive behavior to.</param>
         /// <param name="triggerBuilder">
-        /// Lambda that configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.
-        /// Triggers can be chained: <c>t.DomReady(...).CustomEvent(...).SignalR(...)</c>.
+        /// Configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.
+        /// Triggers can be chained: <c>t.DomReady(...).CustomEvent(...).SignalR(...).ServerPush(...)</c>.
         /// </param>
         public static void On<TModel>(this IHtmlHelper<TModel> html, IReactivePlan<TModel> plan,
             Action<TriggerBuilder<TModel>> triggerBuilder) where TModel : class
