@@ -121,18 +121,42 @@ work without `if (vendor === "newVendor")` hacks in existing modules.
 Runtime depends on plan JSON shape, not C# types. The schema is the shared contract —
 neither side references the other's implementation.
 
-**Recurring violations to watch for:**
+**Recurring violations — these cost hours every session:**
+
+Code quality:
+- Repeated `switch`/`if` chains instead of polymorphism or lookup tables
+- Nested `if` blocks instead of early returns (guard clauses)
+- Long methods doing 3+ things — extract, name the sub-operation
+- High cognitive complexity — flatten, simplify, break apart
+- Poor naming — types and methods must describe domain role, not implementation
+- Calling something "v1" or "good enough for now" — this is a production system, ship it right
+
+Visibility discipline:
 - Making `internal` → `public` to "fix" a compilation error (breaks encapsulation)
+- No sense of `private`/`internal`/`public` — everything defaults to public out of laziness
+- Tests treat internal API as if it were public — use the DSL entry points only
+
+Architecture:
 - Adding `if (type === "checkbox")` heuristics in runtime (plan should carry the info)
 - Creating duplicate abstractions to "get by" instead of fixing the existing one
 - String-matching on type names instead of using proper interfaces
 - Silent fallbacks that hide misconfiguration for hours
-- Poor naming — types, methods, variables must describe their domain role, not their implementation
-- Tests using internal constructors instead of the public DSL
-- Forgetting sandbox index cards when adding new pages
-- Vertical slices arranged inconsistently — follow the skill exactly
 - Vertical slice isolation not enforced in tests and sandbox views
+- Shallow module design — trace module in TS is too basic, lacks deep thought
+- Forgetting sandbox index cards when adding new pages
+
+Testing & debugging:
 - Root cause analysis skipped — patch-fix cycles that create 10+ commits fixing symptoms
+- When Playwright tests fail: forgetting to open traces, inspector, or real browser to debug
+- Guessing for 2 days instead of 5 minutes of research (SF DropDownList ArrowDown incident)
+- Claiming "all tests pass" without verifying in actual browser — tests pass ≠ working software
+- Writing surface BDD tests that assert true/false, not full user journeys
+
+Process:
+- Rubber-stamping audits — saying PASS without tracing runtime paths
+- Agreeing blindly instead of pushing back with evidence
+- Dispatching agents without roles, context, or evidence demands
+- Patching after user said "stop patching" — 5+ times in one session
 
 ## Rules
 
