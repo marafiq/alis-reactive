@@ -228,8 +228,8 @@ namespace Alis.Reactive.Builders.Conditions
         ///  .Else(e =&gt; e.Element("label").SetText("Unknown"));
         /// </code>
         /// </remarks>
-        /// <param name="configure">
-        /// Configures the pipeline commands for this branch. The callback receives a fresh
+        /// <param name="pipeline">
+        /// Builds the pipeline commands for this branch. The callback receives a fresh
         /// <see cref="PipelineBuilder{TModel}"/> scoped to this branch.
         /// </param>
         /// <returns>
@@ -239,10 +239,10 @@ namespace Alis.Reactive.Builders.Conditions
         /// Thrown when <c>Then</c> is called without a pipeline context (e.g. inside a
         /// standalone lambda not connected to a <c>When</c> call).
         /// </exception>
-        public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> configure)
+        public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(pb);
+            pipeline(pb);
             var reaction = pb.BuildReaction();
             var branch = new Branch(Guard, reaction);
 

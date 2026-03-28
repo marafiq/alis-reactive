@@ -25,10 +25,11 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Commands to execute after all parallel requests complete, regardless of individual success or failure.
         /// </summary>
-        public ParallelBuilder<TModel> OnAllSettled(Action<PipelineBuilder<TModel>> configure)
+        /// <param name="pipeline">Builds the commands that run after all branches complete.</param>
+        public ParallelBuilder<TModel> OnAllSettled(Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(pb);
+            pipeline(pb);
             var reaction = pb.BuildReaction();
             if (!(reaction is SequentialReaction))
                 throw new InvalidOperationException(

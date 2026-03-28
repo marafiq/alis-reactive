@@ -14,10 +14,11 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Registers a success handler (status 2xx, no specific code filter).
         /// </summary>
-        public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> configure)
+        /// <param name="pipeline">Builds the reaction commands that run on success.</param>
+        public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> pipeline)
         {
             var builder = new PipelineBuilder<TModel>();
-            configure(builder);
+            pipeline(builder);
             SuccessHandlers.Add(BuildHandler(null, builder));
             return this;
         }
@@ -31,11 +32,11 @@ namespace Alis.Reactive.Builders.Requests
         /// Generates: source = "responseBody.data.name" — resolved at runtime via walk(ctx, path).
         /// </summary>
         public ResponseBuilder<TModel> OnSuccess<TResponse>(
-            Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> configure)
+            Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> pipeline)
             where TResponse : class, new()
         {
             var builder = new PipelineBuilder<TModel>();
-            configure(new ResponseBody<TResponse>(new TResponse()), builder);
+            pipeline(new ResponseBody<TResponse>(new TResponse()), builder);
             SuccessHandlers.Add(BuildHandler(null, builder));
             return this;
         }
@@ -43,10 +44,12 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Registers an error handler for a specific HTTP status code.
         /// </summary>
-        public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> configure)
+        /// <param name="statusCode">The HTTP status code to handle.</param>
+        /// <param name="pipeline">Builds the reaction commands that run on this error status.</param>
+        public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> pipeline)
         {
             var builder = new PipelineBuilder<TModel>();
-            configure(builder);
+            pipeline(builder);
             ErrorHandlers.Add(BuildHandler(statusCode, builder));
             return this;
         }

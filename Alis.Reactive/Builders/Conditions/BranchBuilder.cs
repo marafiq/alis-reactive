@@ -87,21 +87,21 @@ namespace Alis.Reactive.Builders.Conditions
         /// Adds the fallback branch that executes when no previous guard passes. Must be the
         /// last branch. Only one <c>Else</c> is allowed per condition block.
         /// </summary>
-        /// <param name="configure">
-        /// Configures the pipeline commands for the fallback branch. The callback receives
+        /// <param name="pipeline">
+        /// Builds the pipeline commands for the fallback branch. The callback receives
         /// a fresh <see cref="PipelineBuilder{TModel}"/> scoped to this branch.
         /// </param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when <c>Else</c> has already been called on this condition block.
         /// </exception>
-        public void Else(Action<PipelineBuilder<TModel>> configure)
+        public void Else(Action<PipelineBuilder<TModel>> pipeline)
         {
             if (_elseCalled)
                 throw new InvalidOperationException(
                     "Else has already been called. Only one Else branch is allowed and it must be last.");
 
             var pb = new PipelineBuilder<TModel>();
-            configure(pb);
+            pipeline(pb);
             var reaction = pb.BuildReaction();
             _branches.Add(new Branch(null, reaction));
             _elseCalled = true;

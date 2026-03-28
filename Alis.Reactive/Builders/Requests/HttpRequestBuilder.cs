@@ -62,10 +62,11 @@ namespace Alis.Reactive.Builders.Requests
         /// Configures commands to execute while the request is in-flight.
         /// These commands are reverted after the response arrives.
         /// </summary>
-        public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> configure)
+        /// <param name="pipeline">Builds the loading-state commands (reverted after the response arrives).</param>
+        public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
             var builder = new PipelineBuilder<TModel>();
-            configure(builder);
+            pipeline(builder);
             var reaction = builder.BuildReaction();
             if (!(reaction is SequentialReaction sr))
                 throw new InvalidOperationException(

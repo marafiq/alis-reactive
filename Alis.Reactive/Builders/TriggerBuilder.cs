@@ -40,12 +40,12 @@ namespace Alis.Reactive.Builders
         /// <c>Dispatch("x")</c> inside a DomReady safely reaches any <c>CustomEvent("x", ...)</c>
         /// defined in the same plan.
         /// </remarks>
-        /// <param name="configure">Builds the reaction commands (element mutations, dispatches, HTTP calls, etc.).</param>
+        /// <param name="pipeline">Builds the reaction commands (element mutations, dispatches, HTTP calls, etc.).</param>
         /// <returns>This builder for chaining additional triggers.</returns>
-        public TriggerBuilder<TModel> DomReady(Action<PipelineBuilder<TModel>> configure)
+        public TriggerBuilder<TModel> DomReady(Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(pb);
+            pipeline(pb);
             AddEntryWithContexts(new DomReadyTrigger(), pb);
             return this;
         }
@@ -54,12 +54,12 @@ namespace Alis.Reactive.Builders
         /// Wires a reaction that executes when the named custom event fires in the browser.
         /// </summary>
         /// <param name="eventName">The event name to listen for (e.g. <c>"order-submitted"</c>).</param>
-        /// <param name="configure">Builds the reaction commands.</param>
+        /// <param name="pipeline">Builds the reaction commands.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
-        public TriggerBuilder<TModel> CustomEvent(string eventName, Action<PipelineBuilder<TModel>> configure)
+        public TriggerBuilder<TModel> CustomEvent(string eventName, Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(pb);
+            pipeline(pb);
             AddEntryWithContexts(new CustomEventTrigger(eventName), pb);
             return this;
         }
@@ -73,14 +73,14 @@ namespace Alis.Reactive.Builders
         /// </remarks>
         /// <typeparam name="TPayload">The event payload type, providing typed access to payload properties.</typeparam>
         /// <param name="eventName">The event name to listen for.</param>
-        /// <param name="configure">Receives the typed payload instance and the pipeline builder.</param>
+        /// <param name="pipeline">Receives the typed payload instance and the pipeline builder.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> CustomEvent<TPayload>(string eventName,
-            Action<TPayload, PipelineBuilder<TModel>> configure)
+            Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(new TPayload(), pb);
+            pipeline(new TPayload(), pb);
             AddEntryWithContexts(new CustomEventTrigger(eventName), pb);
             return this;
         }
@@ -89,12 +89,12 @@ namespace Alis.Reactive.Builders
         /// Wires a reaction that fires when a Server-Sent Events stream sends any message.
         /// </summary>
         /// <param name="url">The SSE endpoint URL.</param>
-        /// <param name="configure">Builds the reaction commands.</param>
+        /// <param name="pipeline">Builds the reaction commands.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
-        public TriggerBuilder<TModel> ServerPush(string url, Action<PipelineBuilder<TModel>> configure)
+        public TriggerBuilder<TModel> ServerPush(string url, Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(pb);
+            pipeline(pb);
             AddEntryWithContexts(new ServerPushTrigger(url), pb);
             return this;
         }
@@ -104,12 +104,12 @@ namespace Alis.Reactive.Builders
         /// </summary>
         /// <param name="url">The SSE endpoint URL.</param>
         /// <param name="eventType">The SSE event type to filter for.</param>
-        /// <param name="configure">Builds the reaction commands.</param>
+        /// <param name="pipeline">Builds the reaction commands.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
-        public TriggerBuilder<TModel> ServerPush(string url, string eventType, Action<PipelineBuilder<TModel>> configure)
+        public TriggerBuilder<TModel> ServerPush(string url, string eventType, Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(pb);
+            pipeline(pb);
             AddEntryWithContexts(new ServerPushTrigger(url, eventType), pb);
             return this;
         }
@@ -120,14 +120,14 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">The event payload type, providing typed access to payload properties.</typeparam>
         /// <param name="url">The SSE endpoint URL.</param>
         /// <param name="eventType">The SSE event type to filter for.</param>
-        /// <param name="configure">Receives the typed payload instance and the pipeline builder.</param>
+        /// <param name="pipeline">Receives the typed payload instance and the pipeline builder.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> ServerPush<TPayload>(string url, string eventType,
-            Action<TPayload, PipelineBuilder<TModel>> configure)
+            Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(new TPayload(), pb);
+            pipeline(new TPayload(), pb);
             AddEntryWithContexts(new ServerPushTrigger(url, eventType), pb);
             return this;
         }
@@ -137,13 +137,13 @@ namespace Alis.Reactive.Builders
         /// </summary>
         /// <param name="hubUrl">The SignalR hub endpoint URL.</param>
         /// <param name="methodName">The hub method name to listen for.</param>
-        /// <param name="configure">Builds the reaction commands.</param>
+        /// <param name="pipeline">Builds the reaction commands.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> SignalR(string hubUrl, string methodName,
-            Action<PipelineBuilder<TModel>> configure)
+            Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(pb);
+            pipeline(pb);
             AddEntryWithContexts(new SignalRTrigger(hubUrl, methodName), pb);
             return this;
         }
@@ -154,14 +154,14 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">The event payload type, providing typed access to payload properties.</typeparam>
         /// <param name="hubUrl">The SignalR hub endpoint URL.</param>
         /// <param name="methodName">The hub method name to listen for.</param>
-        /// <param name="configure">Receives the typed payload instance and the pipeline builder.</param>
+        /// <param name="pipeline">Receives the typed payload instance and the pipeline builder.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> SignalR<TPayload>(string hubUrl, string methodName,
-            Action<TPayload, PipelineBuilder<TModel>> configure)
+            Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
             var pb = new PipelineBuilder<TModel>();
-            configure(new TPayload(), pb);
+            pipeline(new TPayload(), pb);
             AddEntryWithContexts(new SignalRTrigger(hubUrl, methodName), pb);
             return this;
         }
