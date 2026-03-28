@@ -98,78 +98,70 @@ ALL tests must pass before every commit. Hooks enforce this.
 | Validation | FluentValidation 12.x |
 | Tests | NUnit 4.5 + Verify, Vitest 3.x + jsdom, Playwright 1.52 |
 
-## SOLID Design Principles
+## Process — Follow This Every Session
 
-Sources: Robert C. Martin (Clean Architecture, Functional Design 2023), Martin Fowler (Refactoring 2nd Ed),
-TanStack patterns, Kent Beck (Tidy First?). Full research in `.claude/memory/solid-ts-research.md`.
+```
+Prompt → Clear? ──no──→ Ask questions / push back
+           │yes
+           ▼
+     Plan mode → Load skills → Research code → Brainstorm
+           │
+           ▼
+     Decompose (INVEST) → Master index → Task context for agents
+           │
+           ▼
+     Pre-flight checklist → SOLID? Visibility? Skills loaded?
+           │
+           ▼
+     Execute → One task at a time → Verify in browser
+           │
+           ▼
+     Post-flight checklist → Tests pass? Root cause? No smells?
+           │
+           ▼
+     Commit (hooks enforce)
+```
 
-**S — Single Responsibility: "One actor, not one thing" (Uncle Bob)**
-A module is responsible to one actor — the person who would request changes to it.
-Ask "WHO requests changes?" not "does it do one thing?"
-- `component.ts` changes when vendor integration changes (one actor: vendor team)
-- `resolver.ts` changes when source binding changes (one actor: plan schema)
-- Each C# vertical slice changes when its component API changes (one actor: that component)
-- Violation: a module that changes for both "new component" AND "new command kind" reasons
+### Step 1: Understand the Prompt
+- Is it clear and specific? If not — ask questions. Do not start working on vague requests.
+- Push back if the request is lazy or underspecified. Propose a checklist.
+- Load relevant skills before responding (even for clarifying questions).
 
-**O — Open/Closed: extend without modifying**
-New components and command kinds extend the framework without touching existing modules.
-- New Fusion component = new C# vertical slice, zero TS changes
-- New command kind = new case in `commands.ts` switch + `assertNever` catches missing cases
-- Anti-pattern: `if (newType)` branches grafted into existing handlers
-- TanStack Table uses `TableFeature[]` registration — our vertical slices are the same pattern
+### Step 2: Plan (enter plan mode)
+- Brainstorm: what skills apply? What research is needed? What mockups?
+- Survey existing code before proposing changes — read it, don't guess.
+- Create a master task index with dependencies.
 
-**L — Liskov Substitution: "All duck-types are subtypes" (Uncle Bob)**
-Every `IComponent` implementation (Native, Fusion) is substitutable through `resolveRoot()`.
-Adding a third vendor must work without `if (vendor === "newVendor")` in existing modules.
-- Violation symptom: `if (trigger.vendor === "native")` in `trigger.ts:45` — this is a known leak
+### Step 3: Decompose Tasks (INVEST)
+Each task must be:
+- **I**ndependent — can be worked on in isolation
+- **N**egotiable — scope discussed with user
+- **V**aluable — delivers a user-visible outcome
+- **E**stimable — clear enough to know when it's done
+- **S**mall — completable in one focused pass
+- **T**estable — has pass/fail criteria
 
-**I — Interface Segregation: no client depends on methods it doesn't use**
-- `IComponent` (vendor only) → `IInputComponent` (+ readExpr) → `IAppLevelComponent` (+ defaultId)
-- `ICommandEmitter` is the narrow interface for adding commands — not the full `PipelineBuilder`
-- Violation: exporting 10 functions from a module when callers use 1 (fat barrel exports)
+### Step 4: Task Context (for agents working in isolation)
+Each task carries: files to read, skills to load, expected outcome, pre-checklist, post-checklist.
+Agents get a role, input context, and demand for explicit evidence with reasoning.
 
-**D — Dependency Inversion: depend toward stability**
-Pure utilities (`walk.ts`, `coerce.ts`) are the most stable — everything depends inward on them.
-Vendor-aware code (`component.ts`) is volatile detail — depended ON, never depends outward.
-The JSON schema is the shared contract — C# and TS never reference each other's implementation.
-- Kent Beck: `cost(software) ≈ coupling` — concentrate vendor coupling in ONE module
+### Step 5: Pre-flight (before writing code)
+- [ ] Loaded the right skills?
+- [ ] Read the relevant source code — not guessed?
+- [ ] Understood WHY the current code is the way it is?
+- [ ] Checked SOLID: SRP (one actor), OCP (extend not modify), LSP (substitutable), ISP (narrow interfaces), DIP (depend toward stability)?
+- [ ] No `internal` → `public` shortcuts, no duplicate abstractions, no fallbacks?
+- [ ] Visibility discipline: `private`/`internal`/`public` chosen deliberately?
 
-**Recurring violations — these cost hours every session:**
+### Step 6: Post-flight (before committing)
+- [ ] All tests pass (`npm test` + all `dotnet test` commands)?
+- [ ] Verified in actual browser — not just Playwright?
+- [ ] On Playwright failure: opened traces/inspector/real browser?
+- [ ] No code smells: repeated switches, nested ifs, long methods, poor naming?
+- [ ] Sandbox index card updated if new page added?
+- [ ] Root cause fixed — not a patch?
 
-Code quality:
-- Repeated `switch`/`if` chains instead of polymorphism or lookup tables
-- Nested `if` blocks instead of early returns (guard clauses)
-- Long methods doing 3+ things — extract, name the sub-operation
-- High cognitive complexity — flatten, simplify, break apart
-- Poor naming — types and methods must describe domain role, not implementation
-- Calling something "v1" or "good enough for now" — this is a production system, ship it right
-
-Visibility discipline:
-- Making `internal` → `public` to "fix" a compilation error (breaks encapsulation)
-- No sense of `private`/`internal`/`public` — everything defaults to public out of laziness
-- Tests treat internal API as if it were public — use the DSL entry points only
-
-Architecture:
-- Adding `if (type === "checkbox")` heuristics in runtime (plan should carry the info)
-- Creating duplicate abstractions to "get by" instead of fixing the existing one
-- String-matching on type names instead of using proper interfaces
-- Silent fallbacks that hide misconfiguration for hours
-- Vertical slice isolation not enforced in tests and sandbox views
-- Shallow module design — trace module in TS is too basic, lacks deep thought
-- Forgetting sandbox index cards when adding new pages
-
-Testing & debugging:
-- Root cause analysis skipped — patch-fix cycles that create 10+ commits fixing symptoms
-- When Playwright tests fail: forgetting to open traces, inspector, or real browser to debug
-- Guessing for 2 days instead of 5 minutes of research (SF DropDownList ArrowDown incident)
-- Claiming "all tests pass" without verifying in actual browser — tests pass ≠ working software
-- Writing surface BDD tests that assert true/false, not full user journeys
-
-Process:
-- Rubber-stamping audits — saying PASS without tracing runtime paths
-- Agreeing blindly instead of pushing back with evidence
-- Dispatching agents without roles, context, or evidence demands
-- Patching after user said "stop patching" — 5+ times in one session
+SOLID research: `.claude/memory/solid-ts-research.md` (Uncle Bob, Fowler, TanStack, Kent Beck)
 
 ## Rules
 
