@@ -78,6 +78,10 @@ namespace Alis.Reactive.Fusion.Components
             => self.Emit(new CallMutation("hidePopup"));
 
         /// <summary>Reads the current selected values for use in conditions or gather.</summary>
+        /// <remarks>
+        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
+        /// <c>p.When(p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Skills).Value()).NotNull().Then(p =&gt; { ... })</c>.
+        /// </remarks>
         /// <returns>A typed source representing the multi-select's current values.</returns>
         public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)

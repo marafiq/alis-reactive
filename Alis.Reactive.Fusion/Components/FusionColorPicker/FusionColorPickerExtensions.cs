@@ -39,6 +39,10 @@ namespace Alis.Reactive.Fusion.Components
                 value: disabled ? "true" : "false");
 
         /// <summary>Reads the current color value for use in conditions or gather.</summary>
+        /// <remarks>
+        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
+        /// <c>p.When(p.Component&lt;FusionColorPicker&gt;(m =&gt; m.ThemeColor).Value()).NotNull().Then(p =&gt; { ... })</c>.
+        /// </remarks>
         /// <returns>A typed source representing the color picker's current hex value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)

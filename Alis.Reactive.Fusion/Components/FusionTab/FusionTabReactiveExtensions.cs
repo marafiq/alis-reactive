@@ -6,9 +6,17 @@ using Alis.Reactive.Descriptors.Triggers;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto the FusionTabBuilder.
-    /// Non-input component: no readExpr in the trigger.
+    /// Wires browser events from a <see cref="FusionTab"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is called on the builder returned by
+    /// <see cref="FusionTabHtmlExtensions.FusionTab{TModel}"/>:
+    /// <code>
+    /// Html.FusionTab(plan, "my-tabs", b =&gt; { /* items */ })
+    ///     .Reactive(evt =&gt; evt.Selected, (args, p) =&gt; { /* commands */ })
+    ///     .Render();
+    /// </code>
+    /// </remarks>
     public static class FusionTabReactiveExtensions
     {
         private static readonly FusionTab Component = new FusionTab();

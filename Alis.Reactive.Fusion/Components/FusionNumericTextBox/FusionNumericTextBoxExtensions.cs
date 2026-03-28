@@ -66,6 +66,10 @@ namespace Alis.Reactive.Fusion.Components
             => self.Emit(new CallMutation("decrement"));
 
         /// <summary>Reads the current numeric value for use in conditions or gather.</summary>
+        /// <remarks>
+        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
+        /// <c>p.When(p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Quantity).Value()).Gt(0m).Then(p =&gt; { ... })</c>.
+        /// </remarks>
         /// <returns>A typed source representing the numeric input's current value.</returns>
         public static TypedComponentSource<decimal> Value<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)

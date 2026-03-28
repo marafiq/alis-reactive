@@ -32,6 +32,10 @@ namespace Alis.Reactive.Fusion.Components
             => self.Emit(new CallMutation("focusIn"));
 
         /// <summary>Reads the current HTML content for use in conditions or gather.</summary>
+        /// <remarks>
+        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
+        /// <c>p.When(p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.Notes).Value()).NotNull().Then(p =&gt; { ... })</c>.
+        /// </remarks>
         /// <returns>A typed source representing the editor's current HTML content.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)

@@ -10,6 +10,16 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionColorPicker"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionColorPickerHtmlExtensions.ColorPicker{TModel, TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.ThemeColor).ColorPicker(b =&gt;
+    /// {
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionColorPickerReactiveExtensions
     {
         private static readonly FusionColorPicker Component = new FusionColorPicker();

@@ -42,6 +42,10 @@ namespace Alis.Reactive.Fusion.Components
             => self.Emit(new CallMutation("focusOut"));
 
         /// <summary>Reads the current date value for use in conditions or gather.</summary>
+        /// <remarks>
+        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
+        /// <c>p.When(p.Component&lt;FusionDatePicker&gt;(m =&gt; m.BirthDate).Value()).NotNull().Then(p =&gt; { ... })</c>.
+        /// </remarks>
         /// <returns>A typed source representing the date picker's current value.</returns>
         public static TypedComponentSource<DateTime> Value<TModel>(
             this ComponentRef<FusionDatePicker, TModel> self)

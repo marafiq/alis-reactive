@@ -10,6 +10,17 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionMultiColumnComboBox"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionMultiColumnComboBoxHtmlExtensions.MultiColumnComboBox{TModel, TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.Facility).MultiColumnComboBox(b =&gt;
+    /// {
+    ///     b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value);
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionMultiColumnComboBoxReactiveExtensions
     {
         private static readonly FusionMultiColumnComboBox Component = new FusionMultiColumnComboBox();

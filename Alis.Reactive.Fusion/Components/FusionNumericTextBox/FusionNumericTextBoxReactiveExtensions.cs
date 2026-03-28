@@ -10,6 +10,17 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionNumericTextBox"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionNumericTextBoxHtmlExtensions.NumericTextBox{TModel, TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.Quantity).NumericTextBox(b =&gt;
+    /// {
+    ///     b.Min(0).Max(100);
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionNumericTextBoxReactiveExtensions
     {
         private static readonly FusionNumericTextBox Component = new FusionNumericTextBox();

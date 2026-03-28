@@ -19,6 +19,10 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly FusionFileUpload Component = new FusionFileUpload();
 
         /// <summary>Reads the current file data for use in conditions or gather.</summary>
+        /// <remarks>
+        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
+        /// <c>p.When(p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Document).Value()).NotNull().Then(p =&gt; { ... })</c>.
+        /// </remarks>
         /// <returns>A typed source representing the uploader's current file data.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionFileUpload, TModel> self)

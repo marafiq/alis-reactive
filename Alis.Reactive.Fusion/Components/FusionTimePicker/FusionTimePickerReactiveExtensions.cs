@@ -10,6 +10,17 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionTimePicker"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionTimePickerHtmlExtensions.TimePicker{TModel, TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.CheckInTime).TimePicker(b =&gt;
+    /// {
+    ///     b.Step(15);
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionTimePickerReactiveExtensions
     {
         private static readonly FusionTimePicker Component = new FusionTimePicker();

@@ -10,6 +10,17 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionRichTextEditor"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionRichTextEditorHtmlExtensions.RichTextEditor{TModel, TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.Notes).RichTextEditor(b =&gt;
+    /// {
+    ///     b.Height(200);
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionRichTextEditorReactiveExtensions
     {
         private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();

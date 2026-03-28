@@ -6,9 +6,17 @@ using Alis.Reactive.Descriptors.Triggers;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto FusionAccordionBuilder.
-    /// Non-input component — bindingPath = elementId, readExpr = null.
+    /// Wires browser events from a <see cref="FusionAccordion"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is called on the builder returned by
+    /// <see cref="FusionAccordionHtmlExtensions.FusionAccordion{TModel}"/>:
+    /// <code>
+    /// Html.FusionAccordion(plan, "my-accordion", b =&gt; { /* items */ })
+    ///     .Reactive(evt =&gt; evt.Expanded, (args, p) =&gt; { /* commands */ })
+    ///     .Render();
+    /// </code>
+    /// </remarks>
     public static class FusionAccordionReactiveExtensions
     {
         private static readonly FusionAccordion Component = new FusionAccordion();

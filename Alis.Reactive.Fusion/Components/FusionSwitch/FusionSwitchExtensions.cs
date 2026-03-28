@@ -25,6 +25,10 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Reads the current checked state for use in conditions or gather.</summary>
+        /// <remarks>
+        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
+        /// <c>p.When(p.Component&lt;FusionSwitch&gt;(m =&gt; m.IsActive).Value()).Eq(true).Then(p =&gt; { ... })</c>.
+        /// </remarks>
         /// <returns>A typed source representing the switch's current checked state.</returns>
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<FusionSwitch, TModel> self)

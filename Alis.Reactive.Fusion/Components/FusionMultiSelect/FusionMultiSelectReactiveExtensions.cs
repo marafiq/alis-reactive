@@ -10,6 +10,17 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionMultiSelect"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionMultiSelectHtmlExtensions.MultiSelect{TModel, TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.Skills).MultiSelect(b =&gt;
+    /// {
+    ///     b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value);
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionMultiSelectReactiveExtensions
     {
         private static readonly FusionMultiSelect Component = new FusionMultiSelect();

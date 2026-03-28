@@ -10,6 +10,16 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionSwitch"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionSwitchHtmlExtensions.Switch{TModel}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.IsActive).Switch(b =&gt;
+    /// {
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionSwitchReactiveExtensions
     {
         private static readonly FusionSwitch Component = new FusionSwitch();
