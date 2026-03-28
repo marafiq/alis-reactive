@@ -30,7 +30,10 @@ BEFORE starting any work. Focus is **process and harness** — no code changes t
 ### Docs Cleanup (still process, not code)
 
 6. **docs/ folder** — 14 delete, 28 archive, 16+ stale refs
-7. **docs-site drift** — 5 pages reference deleted IReactivePlan
+
+### Docs-Site Accuracy (may need its own session + plan)
+
+7. **docs-site drift** — 5 pages reference deleted IReactivePlan, 3 pages wrong API name, test counts 30-54% stale. Plan the scope before starting — this touches content accuracy, code examples, and potentially sandbox verification. Carry the todo list forward.
 
 ## Process Reminder
 
