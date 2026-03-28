@@ -22,7 +22,7 @@ namespace Alis.Reactive.Builders.Conditions
     public sealed class GuardBuilder<TModel> where TModel : class
     {
         public GuardBuilder<TModel> And() => this;
-        public BranchBuilder<TModel> Then(Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> configure) => new BranchBuilder<TModel>();
+        public BranchBuilder<TModel> Then(Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> pipeline) => new BranchBuilder<TModel>();
     }
 
     public sealed class ConditionSourceBuilder<TModel, TProp> where TModel : class
@@ -33,7 +33,7 @@ namespace Alis.Reactive.Builders.Conditions
 
     public sealed class BranchBuilder<TModel> where TModel : class
     {
-        public void Else(Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> configure) { }
+        public void Else(Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> pipeline) { }
     }
 }
 
