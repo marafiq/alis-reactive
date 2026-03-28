@@ -30,6 +30,10 @@ namespace Alis.Reactive.Validation
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? CoerceAs { get; internal set; }
 
+        /// <summary>
+        /// Framework-internal. Constructed by FluentValidation extractors — not intended for direct use in views.
+        /// TODO: Make constructor internal once Architecture page uses FluentValidator.
+        /// </summary>
         public ValidationField(string fieldName, List<ValidationRule> rules)
         {
             FieldName = fieldName;

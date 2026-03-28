@@ -17,6 +17,10 @@ namespace Alis.Reactive.Validation
 
         public List<ValidationField> Fields { get; }
 
+        /// <summary>
+        /// Framework-internal. Constructed by FluentValidation extractors — not intended for direct use in views.
+        /// TODO: Make constructor internal once Architecture page uses FluentValidator.
+        /// </summary>
         public ValidationDescriptor(string formId, List<ValidationField> fields)
         {
             FormId = formId;

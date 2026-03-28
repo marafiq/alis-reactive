@@ -46,6 +46,10 @@ namespace Alis.Reactive.Validation
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ValidationCondition? When { get; }
 
+        /// <summary>
+        /// Framework-internal. Constructed by FluentValidation extractors — not intended for direct use in views.
+        /// TODO: Make constructor internal once Architecture page uses FluentValidator.
+        /// </summary>
         public ValidationRule(string rule, string message, object? constraint = null,
             ValidationCondition? when = null, string? field = null, string? coerceAs = null)
         {
