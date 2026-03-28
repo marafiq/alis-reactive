@@ -5,7 +5,7 @@ using Alis.Reactive.Descriptors.Triggers;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Wires browser triggers — page load, custom events, server-sent events, and SignalR —
+    /// Wires browser triggers (page load, custom events, server-sent events, and SignalR)
     /// to reactions that execute in the browser.
     /// </summary>
     /// <remarks>
@@ -14,7 +14,7 @@ namespace Alis.Reactive.Builders
     /// Triggers can be chained: each call adds an independent trigger-reaction pair to the plan.
     /// </para>
     /// <para>
-    /// Avoid defining the same event name twice in the same view — duplicate listeners
+    /// Avoid defining the same event name twice in the same view. Duplicate listeners
     /// are an antipattern unless there is a legitimate reason to split the reaction.
     /// </para>
     /// </remarks>
@@ -24,7 +24,7 @@ namespace Alis.Reactive.Builders
         private readonly ReactivePlan<TModel> _plan;
 
         /// <summary>
-        /// NEVER make public. Constructed exclusively by <see cref="Alis.Reactive.Native.Extensions.HtmlExtensions.On{TModel}"/>.
+        /// NEVER make public. Constructed exclusively by <c>Html.On(plan, ...)</c>.
         /// Public constructors would let devs create orphaned builders not connected to a plan.
         /// </summary>
         public TriggerBuilder(ReactivePlan<TModel> plan)
@@ -69,7 +69,7 @@ namespace Alis.Reactive.Builders
         /// </summary>
         /// <remarks>
         /// The <typeparamref name="TPayload"/> instance is a phantom used for compile-time
-        /// expression paths — its property values are not read at build time.
+        /// expression paths. Its property values are not read at build time.
         /// </remarks>
         /// <typeparam name="TPayload">The event payload type, providing typed access to payload properties.</typeparam>
         /// <param name="eventName">The event name to listen for.</param>

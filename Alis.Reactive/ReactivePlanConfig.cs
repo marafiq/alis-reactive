@@ -21,9 +21,8 @@ namespace Alis.Reactive
         /// client-side validation descriptors.
         /// </summary>
         /// <remarks>
-        /// Must be called exactly once at app startup. Calling it a second time throws —
-        /// this prevents accidental double-registration that would silently replace
-        /// the extractor.
+        /// Must be called exactly once at app startup. Calling it a second time throws
+        /// to prevent accidental double-registration that would silently replace the extractor.
         /// </remarks>
         /// <param name="extractor">The extractor implementation (typically from <c>Alis.Reactive.FluentValidator</c>).</param>
         /// <exception cref="InvalidOperationException">Thrown if an extractor is already registered.</exception>

@@ -1,19 +1,22 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionFileUpload.Selected (SF "selected" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.FilesCount).GreaterThan(0)
-    /// ExpressionPathHelper resolves x => x.FilesCount to "evt.filesCount".
+    /// Event payload delivered when files are selected in a <see cref="FusionFileUpload"/>.
     /// </summary>
+    /// <remarks>
+    /// Access properties in conditions: <c>p.When(args, x =&gt; x.FilesCount).Gt(0)</c>.
+    /// </remarks>
     public class FusionFileUploadSelectedArgs
     {
-        /// <summary>The number of files selected.</summary>
+        /// <summary>Gets or sets the number of files selected.</summary>
         public int FilesCount { get; set; }
 
-        /// <summary>True if the selection was triggered by user interaction.</summary>
+        /// <summary>Gets or sets whether the selection was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
 
+        /// <summary>
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// </summary>
         public FusionFileUploadSelectedArgs() { }
     }
 }

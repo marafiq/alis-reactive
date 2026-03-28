@@ -9,12 +9,19 @@ using Syncfusion.EJ2.Inputs;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating MaskedTextBoxBuilder bound to a model property.
+    /// Creates a Syncfusion MaskedTextBox inside a field wrapper, bound to a model property.
     /// </summary>
     public static class FusionInputMaskHtmlExtensions
     {
         private static readonly FusionInputMask Component = new FusionInputMask();
 
+        /// <summary>
+        /// Renders a Syncfusion MaskedTextBox bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="configure">Callback to configure the MaskedTextBox (mask format, placeholder, etc.).</param>
         public static void InputMask<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<MaskedTextBoxBuilder> configure)

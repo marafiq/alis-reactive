@@ -3,13 +3,17 @@ using Alis.Reactive.Builders.Conditions;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Mutation extensions for FusionFileUpload (Value only — no SetValue).
-    /// Files are set by user interaction only, not programmatically.
+    /// Typed value reading for <see cref="FusionFileUpload"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// No <c>SetValue()</c> is provided. Files are set by user interaction only.
+    /// </remarks>
     public static class FusionFileUploadExtensions
     {
         private static readonly FusionFileUpload Component = new FusionFileUpload();
 
+        /// <summary>Reads the current file data for use in conditions or gather.</summary>
+        /// <returns>A typed source representing the uploader's current file data.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionFileUpload, TModel> self)
             where TModel : class

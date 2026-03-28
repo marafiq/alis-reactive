@@ -102,7 +102,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.Emit(new CallMutation("hidePopup"));
 
         // NOTE: showSpinner/hideSpinner have no visible effect on SF AutoComplete.
-        // refresh() causes focus loss mid-typing — not usable during filtering.
+        // refresh() causes focus loss mid-typing, not usable during filtering.
         // Both verified manually. Omitted intentionally.
 
         /// <summary>Enables the autocomplete input for user interaction.</summary>

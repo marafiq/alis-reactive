@@ -8,7 +8,7 @@ using Alis.Reactive.Descriptors.Sources;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Builds mutations on a DOM element — CSS classes, text content, HTML content, and visibility.
+    /// Builds mutations on a DOM element: CSS classes, text content, HTML content, and visibility.
     /// </summary>
     /// <remarks>
     /// Created by <see cref="PipelineBuilder{TModel}.Element(string)"/>. Each mutation method
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Toggles a CSS class on the element — adds it if absent, removes it if present.
+        /// Toggles a CSS class on the element. Adds it if absent, removes it if present.
         /// </summary>
         /// <param name="className">The CSS class name to toggle.</param>
         /// <returns>The pipeline builder for chaining additional commands.</returns>
@@ -76,9 +76,15 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Sets the element text from an event payload property resolved at runtime.
-        /// The source instance is used only for generic type inference — its value is ignored.
+        /// Sets the element text from an event payload property resolved in the browser.
         /// </summary>
+        /// <remarks>
+        /// The <paramref name="source"/> instance is used only for generic type inference. Its value is ignored.
+        /// </remarks>
+        /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <param name="source">The phantom payload instance for type inference.</param>
+        /// <param name="path">The property-access expression into the payload.</param>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object?>> path)
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
@@ -88,8 +94,11 @@ namespace Alis.Reactive.Builders
 
         /// <summary>
         /// Sets the element text from an HTTP response body property.
-        /// Same phantom pattern as event payload overload — compiler resolves via ResponseBody&lt;T&gt;.
         /// </summary>
+        /// <typeparam name="TResponse">The response body type.</typeparam>
+        /// <param name="source">The phantom response body instance for type inference.</param>
+        /// <param name="path">The property-access expression into the response body.</param>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
             where TResponse : class
         {
@@ -99,8 +108,10 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Sets the element text from a BindSource (event or component).
+        /// Sets the element text from a <see cref="BindSource"/> (event or component).
         /// </summary>
+        /// <param name="source">The source binding to resolve in the browser.</param>
+        /// <returns>This element builder for chaining additional mutations.</returns>
         public ElementBuilder<TModel> SetText(BindSource source)
         {
             _pipeline.Commands.Add(new MutateElementCommand(
@@ -111,6 +122,9 @@ namespace Alis.Reactive.Builders
         /// <summary>
         /// Sets the element text from a typed source (type-safe for conditions).
         /// </summary>
+        /// <typeparam name="TProp">The source property type.</typeparam>
+        /// <param name="source">The typed source to resolve.</param>
+        /// <returns>This element builder for chaining additional mutations.</returns>
         public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
         {
             _pipeline.Commands.Add(new MutateElementCommand(
@@ -130,8 +144,12 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Sets the element HTML from an event payload property resolved at runtime.
+        /// Sets the element HTML from an event payload property resolved in the browser.
         /// </summary>
+        /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <param name="source">The phantom payload instance for type inference.</param>
+        /// <param name="path">The property-access expression into the payload.</param>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object?>> path)
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
@@ -140,8 +158,10 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Sets the element HTML from a BindSource (event or component).
+        /// Sets the element HTML from a <see cref="BindSource"/> (event or component).
         /// </summary>
+        /// <param name="source">The source binding to resolve in the browser.</param>
+        /// <returns>This element builder for chaining additional mutations.</returns>
         public ElementBuilder<TModel> SetHtml(BindSource source)
         {
             _pipeline.Commands.Add(new MutateElementCommand(
@@ -152,6 +172,9 @@ namespace Alis.Reactive.Builders
         /// <summary>
         /// Sets the element HTML from a typed source (type-safe for conditions).
         /// </summary>
+        /// <typeparam name="TProp">The source property type.</typeparam>
+        /// <param name="source">The typed source to resolve.</param>
+        /// <returns>This element builder for chaining additional mutations.</returns>
         public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
         {
             _pipeline.Commands.Add(new MutateElementCommand(
@@ -180,9 +203,15 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Attaches a per-action guard to the LAST command added to the pipeline.
-        /// The guard is evaluated at runtime — if false, the command is skipped.
+        /// Attaches a per-action guard to the last command added to the pipeline.
+        /// The guard is evaluated in the browser: if false, the command is skipped.
         /// </summary>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
+        /// <typeparam name="TProp">The property type used by the condition.</typeparam>
+        /// <param name="payload">The phantom payload instance for type inference.</param>
+        /// <param name="path">The property-access expression into the payload.</param>
+        /// <param name="configure">Configures the condition operator and produces a guard.</param>
+        /// <returns>This element builder for chaining additional mutations.</returns>
         public ElementBuilder<TModel> When<TPayload, TProp>(
             TPayload payload,
             Expression<Func<TPayload, TProp>> path,

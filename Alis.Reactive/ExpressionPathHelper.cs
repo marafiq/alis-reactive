@@ -58,9 +58,12 @@ namespace Alis.Reactive
             => ToPath("evt", expression);
 
         /// <summary>
-        /// Typed overload — no boxing Convert node needed because TProp matches the property type.
-        /// Used by the typed condition builders.
+        /// Converts a typed expression to an event payload dot-path, preserving type safety for value types.
         /// </summary>
+        /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <typeparam name="TProp">The property type.</typeparam>
+        /// <param name="expression">The property-access expression to convert.</param>
+        /// <returns>A dot-path like <c>evt.facilityId</c>.</returns>
         public static string ToEventPath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
             => ToPath<TSource, TProp>("evt", expression);
 
@@ -102,9 +105,15 @@ namespace Alis.Reactive
 
         /// <summary>
         /// Extracts the model binding path from a model expression.
-        /// m => m.FacilityId → "FacilityId", m => m.Address.City → "Address.City".
-        /// Dot-notation preserves the model structure for HTTP gather (JSON/FormData).
         /// </summary>
+        /// <remarks>
+        /// <c>m =&gt; m.FacilityId</c> becomes <c>"FacilityId"</c>,
+        /// <c>m =&gt; m.Address.City</c> becomes <c>"Address.City"</c>.
+        /// Dot-notation preserves the model structure for HTTP gather.
+        /// </remarks>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="expression">The model property expression.</param>
+        /// <returns>A dot-separated binding path like <c>"Address.City"</c>.</returns>
         public static string ToPropertyName<TModel>(Expression<Func<TModel, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
@@ -112,10 +121,16 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Converts a model expression to the DOM element ID that ASP.NET / SF generates.
-        /// m => m.FacilityId → "FacilityId", m => m.Address.City → "Address_City".
-        /// Underscores match Html.IdFor() convention. Used by Component&lt;T&gt;(expr) for target resolution.
+        /// Converts a model expression to the DOM element ID that ASP.NET generates.
         /// </summary>
+        /// <remarks>
+        /// <c>m =&gt; m.FacilityId</c> becomes <c>"FacilityId"</c>,
+        /// <c>m =&gt; m.Address.City</c> becomes <c>"Address_City"</c>.
+        /// Underscores match the <c>Html.IdFor()</c> convention.
+        /// </remarks>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="expression">The model property expression.</param>
+        /// <returns>An underscore-separated element ID like <c>"Address_City"</c>.</returns>
         public static string ToElementId<TModel>(Expression<Func<TModel, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
@@ -123,8 +138,12 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Typed overload — converts a model expression to a DOM element ID without boxing.
+        /// Converts a typed model expression to a DOM element ID, preserving type safety for value types.
         /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The property type.</typeparam>
+        /// <param name="expression">The model property expression.</param>
+        /// <returns>An underscore-separated element ID like <c>"Address_City"</c>.</returns>
         public static string ToElementId<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);

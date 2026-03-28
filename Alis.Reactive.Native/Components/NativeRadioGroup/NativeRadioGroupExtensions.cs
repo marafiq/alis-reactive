@@ -7,7 +7,7 @@ using Alis.Reactive.Descriptors.Sources;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Pipeline extensions for <see cref="NativeRadioGroup"/> — set selected value, focus, and read.
+    /// Pipeline extensions for <see cref="NativeRadioGroup"/>: set selected value, focus, and read.
     /// </summary>
     public static class NativeRadioGroupExtensions
     {

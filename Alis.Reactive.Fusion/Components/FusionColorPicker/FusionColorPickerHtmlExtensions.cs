@@ -9,12 +9,19 @@ using Syncfusion.EJ2.Inputs;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating ColorPickerBuilder bound to a model property.
+    /// Creates a Syncfusion ColorPicker inside a field wrapper, bound to a model property.
     /// </summary>
     public static class FusionColorPickerHtmlExtensions
     {
         private static readonly FusionColorPicker Component = new FusionColorPicker();
 
+        /// <summary>
+        /// Renders a Syncfusion ColorPicker bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="configure">Callback to configure the ColorPicker (mode, columns, palette, etc.).</param>
         public static void ColorPicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<ColorPickerBuilder> configure)

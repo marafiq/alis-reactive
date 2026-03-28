@@ -12,7 +12,7 @@ namespace Alis.Reactive.Fusion.Components
     /// dates for use in conditions. <see cref="Value{TModel}"/> reads both dates as an array.
     /// </para>
     /// <para>
-    /// No <c>SetValue()</c> is provided — the date range is set by user interaction only.
+    /// No <c>SetValue()</c> is provided. The date range is set by user interaction only.
     /// </para>
     /// </remarks>
     public static class FusionDateRangePickerExtensions

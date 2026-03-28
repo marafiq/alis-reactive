@@ -1,11 +1,12 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Syncfusion MaskedTextBox component.
-    /// Phantom type — zero state. Used as type parameter in
-    /// p.Component&lt;FusionInputMask&gt;(m => m.PhoneNumber) to unlock
-    /// the InputMask-specific extension methods.
+    /// A Syncfusion MaskedTextBox for entering text with a format mask (e.g. phone numbers).
     /// </summary>
+    /// <remarks>
+    /// Use as a type parameter in <c>p.Component&lt;FusionInputMask&gt;(m =&gt; m.PhoneNumber)</c>
+    /// to access InputMask-specific mutations and value reading.
+    /// </remarks>
     public sealed class FusionInputMask : FusionComponent, IInputComponent
     {
         /// <inheritdoc />

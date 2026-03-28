@@ -8,20 +8,22 @@ using Syncfusion.EJ2.MultiColumnComboBox;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto the Syncfusion MultiColumnComboBoxBuilder.
-    ///
-    /// Usage (in .cshtml):
-    ///   Html.MultiColumnComboBoxFor(plan, expr)
-    ///       .Reactive(plan, evt => evt.Changed, (args, p) =>
-    ///       {
-    ///           p.Component&lt;FusionMultiColumnComboBox&gt;(m => m.Facility).SetValue("1");
-    ///       })
-    ///       .Render()
+    /// Wires browser events from a <see cref="FusionMultiColumnComboBox"/> into the reactive plan.
     /// </summary>
     public static class FusionMultiColumnComboBoxReactiveExtensions
     {
         private static readonly FusionMultiColumnComboBox Component = new FusionMultiColumnComboBox();
 
+        /// <summary>
+        /// Wires a MultiColumnComboBox event to a reactive pipeline that executes in the browser.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
+        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="plan">The plan to add the reactive behavior to.</param>
+        /// <param name="eventSelector">Selects which event to react to (e.g. <c>evt =&gt; evt.Changed</c>).</param>
+        /// <param name="pipeline">Configures the commands to run when the event fires.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static MultiColumnComboBoxBuilder Reactive<TModel, TArgs>(
             this MultiColumnComboBoxBuilder builder,
             ReactivePlan<TModel> plan,

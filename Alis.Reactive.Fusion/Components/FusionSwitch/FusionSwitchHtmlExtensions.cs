@@ -9,12 +9,18 @@ using Syncfusion.EJ2.Buttons;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating SwitchBuilder bound to a model property.
+    /// Creates a Syncfusion Switch inside a field wrapper, bound to a boolean model property.
     /// </summary>
     public static class FusionSwitchHtmlExtensions
     {
         private static readonly FusionSwitch Component = new FusionSwitch();
 
+        /// <summary>
+        /// Renders a Syncfusion Switch bound to the field's boolean model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="configure">Callback to configure the Switch (label, CSS class, etc.).</param>
         public static void Switch<TModel>(
             this InputBoundField<TModel, bool> setup,
             Action<SwitchBuilder> configure)

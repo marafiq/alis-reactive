@@ -9,6 +9,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionAutoCompleteEvents
     {
+        /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionAutoCompleteEvents Instance = new FusionAutoCompleteEvents();
         private FusionAutoCompleteEvents() { }
 

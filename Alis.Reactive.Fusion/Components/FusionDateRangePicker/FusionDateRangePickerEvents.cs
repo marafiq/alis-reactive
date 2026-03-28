@@ -9,6 +9,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionDateRangePickerEvents
     {
+        /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionDateRangePickerEvents Instance = new FusionDateRangePickerEvents();
         private FusionDateRangePickerEvents() { }
 

@@ -9,15 +9,19 @@ using Syncfusion.EJ2.Inputs;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating UploaderBuilder bound to a model property.
-    ///
-    /// SF Uploader has no UploaderFor — we use Uploader(id) with manual name binding,
-    /// similar to RichTextEditor. AutoUpload(false) ensures form-mode only (no saveUrl).
+    /// Creates a Syncfusion Uploader inside a field wrapper, bound to a model property.
     /// </summary>
     public static class FusionFileUploadHtmlExtensions
     {
         private static readonly FusionFileUpload Component = new FusionFileUpload();
 
+        /// <summary>
+        /// Renders a Syncfusion Uploader bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="configure">Callback to configure the Uploader (allowed extensions, max size, etc.).</param>
         public static void FileUpload<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<UploaderBuilder> configure)

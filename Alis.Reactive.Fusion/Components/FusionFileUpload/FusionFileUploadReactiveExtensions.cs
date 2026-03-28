@@ -8,20 +8,22 @@ using Syncfusion.EJ2.Inputs;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto the Syncfusion UploaderBuilder.
-    ///
-    /// Usage (in .cshtml):
-    ///   Html.InputField(plan, m => m.Documents, o => o.Label("Documents"))
-    ///       .FileUpload(b => b
-    ///           .Reactive(plan, evt => evt.Selected, (args, p) =>
-    ///           {
-    ///               p.Element("status").SetText("Files selected");
-    ///           }))
+    /// Wires browser events from a <see cref="FusionFileUpload"/> into the reactive plan.
     /// </summary>
     public static class FusionFileUploadReactiveExtensions
     {
         private static readonly FusionFileUpload Component = new FusionFileUpload();
 
+        /// <summary>
+        /// Wires a FileUpload event to a reactive pipeline that executes in the browser.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
+        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="plan">The plan to add the reactive behavior to.</param>
+        /// <param name="eventSelector">Selects which event to react to (e.g. <c>evt =&gt; evt.Selected</c>).</param>
+        /// <param name="pipeline">Configures the commands to run when the event fires.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static UploaderBuilder Reactive<TModel, TArgs>(
             this UploaderBuilder builder,
             ReactivePlan<TModel> plan,

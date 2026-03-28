@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <remarks>
         /// Derives field names from the data source item type and converts them to camelCase
-        /// to match JSON serialization: <c>.Fields&lt;CountryItem&gt;(t =&gt; t.Text, v =&gt; v.Value)</c>.
+        /// to match the data source property names: <c>.Fields&lt;CountryItem&gt;(t =&gt; t.Text, v =&gt; v.Value)</c>.
         /// </remarks>
         /// <typeparam name="TItem">The data source item type.</typeparam>
         /// <param name="builder">The Syncfusion builder.</param>

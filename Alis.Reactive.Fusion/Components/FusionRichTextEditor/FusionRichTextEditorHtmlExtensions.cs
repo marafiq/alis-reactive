@@ -9,18 +9,19 @@ using Syncfusion.EJ2.RichTextEditor;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating RichTextEditorBuilder bound to a model property.
-    ///
-    /// SF RichTextEditorBuilder.Render() differs from simpler input builders:
-    /// 1. It writes directly to Output (TextWriter) — throws NullRef if null.
-    /// 2. It emits id={model.Id} from the expression, then appends HtmlAttributes,
-    ///    causing duplicate id attributes. We fix this by overriding model.Id
-    ///    to match our IdGenerator-based element ID.
+    /// Creates a Syncfusion RichTextEditor inside a field wrapper, bound to a model property.
     /// </summary>
     public static class FusionRichTextEditorHtmlExtensions
     {
         private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();
 
+        /// <summary>
+        /// Renders a Syncfusion RichTextEditor bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="configure">Callback to configure the RichTextEditor (toolbar, iframe mode, etc.).</param>
         public static void RichTextEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<RichTextEditorBuilder> configure)

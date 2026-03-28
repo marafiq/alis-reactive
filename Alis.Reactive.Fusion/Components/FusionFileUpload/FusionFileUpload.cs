@@ -1,11 +1,12 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Syncfusion Uploader component in form mode (no auto-upload).
-    /// Phantom type — zero state. Used as type parameter in
-    /// p.Component&lt;FusionFileUpload&gt;(m => m.Documents) to unlock
-    /// the FileUpload-specific extension methods.
+    /// A Syncfusion Uploader for selecting files in form mode (no auto-upload).
     /// </summary>
+    /// <remarks>
+    /// Use as a type parameter in <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Documents)</c>
+    /// to access FileUpload-specific mutations and value reading.
+    /// </remarks>
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {
         /// <inheritdoc />

@@ -4,7 +4,7 @@ using Alis.Reactive.Descriptors.Mutations;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Pipeline extensions for <see cref="NativeDropDown"/> — set selected value, focus, and read.
+    /// Pipeline extensions for <see cref="NativeDropDown"/>: set selected value, focus, and read.
     /// </summary>
     public static class NativeDropDownExtensions
     {

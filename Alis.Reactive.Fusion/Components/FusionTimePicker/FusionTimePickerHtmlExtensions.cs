@@ -9,12 +9,19 @@ using Syncfusion.EJ2.Calendars;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating TimePickerBuilder bound to a model property.
+    /// Creates a Syncfusion TimePicker inside a field wrapper, bound to a model property.
     /// </summary>
     public static class FusionTimePickerHtmlExtensions
     {
         private static readonly FusionTimePicker Component = new FusionTimePicker();
 
+        /// <summary>
+        /// Renders a Syncfusion TimePicker bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="configure">Callback to configure the TimePicker (step, min/max, format, etc.).</param>
         public static void TimePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<TimePickerBuilder> configure)

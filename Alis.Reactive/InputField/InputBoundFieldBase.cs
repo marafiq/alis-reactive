@@ -63,9 +63,9 @@ namespace Alis.Reactive.InputField
         }
 
         /// <summary>
-        /// Renders the field wrapper (label + validation error HTML elements) around content
+        /// Renders the field wrapper (label + validation error elements) around content
         /// written by the callback. Throws if the component was not registered via
-        /// <c>AddToComponentsMap</c> — unregistered components are invisible to validation
+        /// <c>AddToComponentsMap</c>: unregistered components are invisible to validation
         /// and gather, causing silent failures.
         /// </summary>
         internal void Render(Action writeContent)

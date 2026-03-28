@@ -4,7 +4,7 @@ using Alis.Reactive.Descriptors.Mutations;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Pipeline extensions for <see cref="NativeTextArea"/> — set value, focus, and read.
+    /// Pipeline extensions for <see cref="NativeTextArea"/>: set value, focus, and read.
     /// </summary>
     public static class NativeTextAreaExtensions
     {

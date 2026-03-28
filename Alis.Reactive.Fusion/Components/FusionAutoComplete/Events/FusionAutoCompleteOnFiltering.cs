@@ -27,7 +27,7 @@ namespace Alis.Reactive.Fusion.Components
         public string Text { get; set; } = "";
 
         /// <summary>
-        /// Creates a new instance. Framework-internal — instances are created by the event descriptor.
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
         /// </summary>
         public FusionAutoCompleteFilteringArgs() { }
     }
@@ -38,7 +38,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <remarks>
     /// These extensions modify the filtering event object in the browser (e.g. suppressing
     /// client-side filtering or feeding server results). The pipeline parameter is required
-    /// because args does not carry pipeline context — pass the current <c>p</c> or <c>s</c>.
+    /// because args does not carry pipeline context. Pass the current <c>p</c> or <c>s</c>.
     /// </remarks>
     public static class FusionAutoCompleteFilteringArgsExtensions
     {

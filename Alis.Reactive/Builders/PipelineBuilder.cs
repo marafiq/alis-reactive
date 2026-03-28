@@ -8,7 +8,7 @@ using Alis.Reactive.Descriptors.Reactions;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Builds the sequence of commands that execute when a trigger fires — element mutations,
+    /// Builds the sequence of commands that execute when a trigger fires: element mutations,
     /// event dispatches, HTTP calls, component interactions, and conditional logic.
     /// </summary>
     /// <remarks>
@@ -41,8 +41,8 @@ namespace Alis.Reactive.Builders
         private List<Reaction>? _segments;
 
         /// <summary>
-        /// ICommandEmitter — the only path for adding commands from outside.
-        /// Vendor extensions accept ICommandEmitter, not PipelineBuilder.
+        /// Adds a command to the pipeline. Vendor extensions accept
+        /// <see cref="ICommandEmitter"/>, not <see cref="PipelineBuilder{TModel}"/> directly.
         /// </summary>
         void ICommandEmitter.AddCommand(Command command)
         {
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Builders
         /// <summary>
         /// Fires a custom event with a payload object in the browser.
         /// </summary>
-        /// <typeparam name="TPayload">The payload type — serialized as the event's detail data.</typeparam>
+        /// <typeparam name="TPayload">The payload type, serialized as the event's detail data.</typeparam>
         /// <param name="eventName">The event name.</param>
         /// <param name="payload">The data to attach to the event.</param>
         /// <returns>This builder for chaining additional commands.</returns>
@@ -90,10 +90,11 @@ namespace Alis.Reactive.Builders
         // ── Component<T>() — 3 overloads ──
 
         /// <summary>
-        /// Resolve component by model expression (input components bound to model).
-        /// Target ID uses underscore separator matching Html.IdFor() convention:
-        /// m => m.Address.City → target "Address_City".
+        /// Targets a component by model expression (input components bound to a model property).
         /// </summary>
+        /// <typeparam name="TComponent">The component type.</typeparam>
+        /// <param name="expr">The model property expression (e.g. <c>m =&gt; m.Address.City</c>).</param>
+        /// <returns>A component reference for chaining mutations like <c>SetValue</c> or <c>Focus</c>.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(
             Expression<Func<TModel, object?>> expr)
             where TComponent : IComponent, new()
@@ -103,10 +104,17 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Resolve component from a different model (cross-plan component reference).
-        /// Uses IdGenerator.For&lt;TOtherModel&gt; to produce the correct element ID.
-        /// Example: p.Component&lt;NativeHiddenField, Step2Model&gt;(m =&gt; m.Diagnosis).SetValue(...)
+        /// Targets a component from a different model (cross-plan component reference).
         /// </summary>
+        /// <remarks>
+        /// Uses <see cref="IdGenerator.For{TModel}(Expression{Func{TModel, object}})"/> with
+        /// <typeparamref name="TOtherModel"/> to produce the correct element ID.
+        /// Example: <c>p.Component&lt;NativeHiddenField, Step2Model&gt;(m =&gt; m.Diagnosis).SetValue(...)</c>.
+        /// </remarks>
+        /// <typeparam name="TComponent">The component type.</typeparam>
+        /// <typeparam name="TOtherModel">The other view's model type.</typeparam>
+        /// <param name="expr">The model property expression on the other model.</param>
+        /// <returns>A component reference for chaining mutations.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
             Expression<Func<TOtherModel, object?>> expr)
             where TComponent : IComponent, new()
@@ -116,14 +124,19 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
-        /// <summary>Resolve component by string ref (non-input components by ID).</summary>
+        /// <summary>Targets a component by its string ID (non-input components).</summary>
+        /// <typeparam name="TComponent">The component type.</typeparam>
+        /// <param name="refId">The HTML element ID of the component.</param>
+        /// <returns>A component reference for chaining mutations.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
             where TComponent : IComponent, new()
         {
             return new ComponentRef<TComponent, TModel>(refId, this);
         }
 
-        /// <summary>Resolve app-level component by its default ID (e.g., FusionConfirm).</summary>
+        /// <summary>Targets an app-level component by its default ID (e.g. <c>FusionConfirm</c>).</summary>
+        /// <typeparam name="TComponent">The app-level component type.</typeparam>
+        /// <returns>A component reference for chaining mutations.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>()
             where TComponent : IAppLevelComponent, new()
         {
@@ -132,9 +145,11 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Adds a validation-errors command — displays server-side validation errors
-        /// returned in the 400 response body at the correct form fields.
+        /// Displays server-side validation errors returned in the 400 response body
+        /// at the correct form fields.
         /// </summary>
+        /// <param name="formId">The form element ID to scope error display to.</param>
+        /// <returns>This builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
             Commands.Add(new ValidationErrorsCommand(formId));
@@ -142,9 +157,14 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Injects the HTTP response body as innerHTML of the target element.
-        /// Used for loading partial views: p.Get("/url").Response(r => r.OnSuccess(s => s.Into("container")))
+        /// Injects the HTTP response body as inner HTML of the target element.
         /// </summary>
+        /// <remarks>
+        /// Used for loading partial views:
+        /// <c>p.Get("/url").Response(r =&gt; r.OnSuccess(s =&gt; s.Into("container")))</c>.
+        /// </remarks>
+        /// <param name="elementId">The HTML element ID to inject content into.</param>
+        /// <returns>This builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Commands.Add(new IntoCommand(elementId));
@@ -203,9 +223,13 @@ namespace Alis.Reactive.Builders
 
         /// <summary>
         /// Returns the single reaction for this pipeline.
-        /// Throws if the pipeline produced multiple segments — callers that
-        /// need multi-segment support must use <see cref="BuildReactions"/> instead.
         /// </summary>
+        /// <remarks>
+        /// Throws if the pipeline produced multiple segments. Callers that
+        /// need multi-segment support must use <see cref="BuildReactions"/> instead.
+        /// </remarks>
+        /// <returns>The single reaction built from the pipeline commands.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the pipeline contains multiple reaction segments.</exception>
         public Reaction BuildReaction()
         {
             var reactions = BuildReactions();
@@ -221,6 +245,7 @@ namespace Alis.Reactive.Builders
         /// one reaction. Multiple When() blocks produce multiple reactions.
         /// Commands between/around conditions produce sequential reactions.
         /// </summary>
+        /// <returns>All reaction segments built from the pipeline commands.</returns>
         public List<Reaction> BuildReactions()
         {
             // If no segments were flushed, build a single reaction (common case)

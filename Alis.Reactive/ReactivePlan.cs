@@ -8,8 +8,8 @@ using Alis.Reactive.Resolvers;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Collects reactive behavior for a view — triggers, reactions, and component registrations —
-    /// then renders them as a JSON plan that executes in the browser.
+    /// Collects reactive behavior for a view: triggers, reactions, and component registrations.
+    /// Renders the collected behavior so it executes in the browser.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -19,7 +19,7 @@ namespace Alis.Reactive
     /// </para>
     /// <para>
     /// Partial views that share the same <typeparamref name="TModel"/> use
-    /// <c>Html.ResolvePlan()</c> instead — both plans merge and execute as a single unit.
+    /// <c>Html.ResolvePlan()</c> instead. Both plans merge and execute as a single unit.
     /// </para>
     /// </remarks>
     /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
@@ -51,8 +51,8 @@ namespace Alis.Reactive
         /// Gets the unique plan identifier, derived from the model's full type name.
         /// </summary>
         /// <remarks>
-        /// Used to scope validation summary elements — each view's summary div is
-        /// tagged with this ID so errors route to the correct view.
+        /// Used to scope validation summary elements. Each view's summary is tagged
+        /// with this ID so errors route to the correct view.
         /// </remarks>
         public string PlanId { get; } = typeof(TModel).FullName!;
 
@@ -60,8 +60,8 @@ namespace Alis.Reactive
         /// Gets whether this plan belongs to a partial view.
         /// </summary>
         /// <remarks>
-        /// Partial plans merge into the parent view's plan in the browser.
-        /// The parent view emits the validation summary div — partials do not.
+        /// Partial plans merge into the owning view's plan in the browser.
+        /// The view emits the validation summary. Partial views do not.
         /// </remarks>
         public bool IsPartial { get; }
 
@@ -77,7 +77,7 @@ namespace Alis.Reactive
 
         /// <summary>
         /// Registers a trigger-reaction pair in the plan. Called by
-        /// <see cref="Builders.TriggerBuilder{TModel}"/> — not intended for direct use in views.
+        /// <see cref="Builders.TriggerBuilder{TModel}"/>, not intended for direct use in views.
         /// </summary>
         internal void AddEntry(Entry entry)
         {
@@ -86,7 +86,7 @@ namespace Alis.Reactive
 
         /// <summary>
         /// Registers a component for a model property so validation and gather can find it.
-        /// Called by component builders — not intended for direct use in views.
+        /// Called by component builders, not intended for direct use in views.
         /// </summary>
         /// <param name="bindingPath">The model property path (e.g. <c>"FacilityId"</c>, <c>"Address.City"</c>).</param>
         /// <param name="entry">The component registration describing ID, vendor, and read expression.</param>
@@ -116,13 +116,13 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Serializes the plan to compact JSON for embedding in the page.
+        /// Renders the plan for embedding in the page.
         /// </summary>
         /// <remarks>
-        /// Called by <c>Html.RenderPlan(plan)</c> — not called directly in views.
-        /// Resolves validation rules and component enrichment before serializing.
+        /// Called by <c>Html.RenderPlan(plan)</c>, not called directly in views.
+        /// Resolves validation rules and component enrichment before rendering.
         /// </remarks>
-        /// <returns>The JSON plan string consumed by the browser.</returns>
+        /// <returns>The rendered plan string consumed by the browser.</returns>
         public string Render()
         {
             ResolveAll();
@@ -135,9 +135,9 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Serializes the plan to indented JSON for debugging and test snapshots.
+        /// Renders the plan with indentation for debugging and test snapshots.
         /// </summary>
-        /// <returns>The JSON plan string with indentation for readability.</returns>
+        /// <returns>The rendered plan string with indentation for readability.</returns>
         public string RenderFormatted()
         {
             ResolveAll();

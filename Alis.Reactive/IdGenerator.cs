@@ -8,14 +8,14 @@ namespace Alis.Reactive
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Format: <c>{Namespace_TypeName}__{MemberPath}</c> — double underscore separates
+    /// Format: <c>{Namespace_TypeName}__{MemberPath}</c>. Double underscore separates
     /// the model scope from the property path. Example:
     /// <c>Alis_Reactive_SandboxApp_Models_OrderModel__Address_City</c>.
     /// </para>
     /// <para>
     /// All component vendors (Syncfusion, native) produce the same ID for the same
     /// expression, so cross-component references resolve correctly. The <c>name</c>
-    /// attribute for MVC model binding is not affected — only the <c>id</c> attribute.
+    /// attribute for MVC model binding is not affected: only the <c>id</c> attribute.
     /// </para>
     /// </remarks>
     public static class IdGenerator
@@ -48,10 +48,15 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Generates element ID from a model Type and property path string.
-        /// Matches the format of For&lt;TModel, TProp&gt;() — "{Scope}__{PropertyPath}".
-        /// Dots in property path become underscores (matching Html.IdFor convention).
+        /// Generates an element ID from a model type and property path string.
         /// </summary>
+        /// <remarks>
+        /// Matches the format of <see cref="For{TModel, TProp}"/>: <c>{Scope}__{PropertyPath}</c>.
+        /// Dots in the property path become underscores, matching the <c>Html.IdFor</c> convention.
+        /// </remarks>
+        /// <param name="modelType">The model type used to derive the scope prefix.</param>
+        /// <param name="propertyPath">The dot-separated property path (e.g. <c>"Address.City"</c>).</param>
+        /// <returns>A scoped element ID like <c>Namespace_Model__Address_City</c>.</returns>
         public static string For(Type modelType, string propertyPath)
         {
             var scope = TypeScope(modelType);
@@ -59,9 +64,14 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Converts typeof(TModel).FullName to an HTML-safe scope string.
-        /// Dots and plus signs become underscores: "Alis.Reactive.Models.OrderModel" → "Alis_Reactive_Models_OrderModel".
+        /// Converts a type's full name to an HTML-safe scope string.
         /// </summary>
+        /// <remarks>
+        /// Dots and plus signs become underscores:
+        /// <c>Alis.Reactive.Models.OrderModel</c> becomes <c>Alis_Reactive_Models_OrderModel</c>.
+        /// </remarks>
+        /// <param name="type">The type whose full name provides the scope.</param>
+        /// <returns>An HTML-safe scope string with dots and plus signs replaced by underscores.</returns>
         public static string TypeScope(Type type)
         {
             return type.FullName!.Replace('.', '_').Replace('+', '_');

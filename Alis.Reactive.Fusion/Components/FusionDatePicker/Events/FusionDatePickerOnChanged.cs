@@ -17,7 +17,7 @@ namespace Alis.Reactive.Fusion.Components
         public bool IsInteracted { get; set; }
 
         /// <summary>
-        /// Creates a new instance. Framework-internal — instances are created by the event descriptor.
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
         /// </summary>
         public FusionDatePickerChangeArgs() { }
     }

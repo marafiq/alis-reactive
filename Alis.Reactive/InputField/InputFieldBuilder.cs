@@ -5,7 +5,7 @@ namespace Alis.Reactive.InputField
 {
     /// <summary>
     /// Renders a field wrapper: <c>&lt;div&gt;</c>, label with optional required marker,
-    /// child content slot, and validation error placeholder.
+    /// inner content slot, and validation error placeholder.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -14,7 +14,7 @@ namespace Alis.Reactive.InputField
     /// consistent field markup. Devs use <c>Html.InputField(...)</c> instead.
     /// </para>
     /// <para>
-    /// Pure BCL — no ASP.NET dependency. Writes directly to a <see cref="TextWriter"/>
+    /// Pure BCL with no ASP.NET dependency. Writes directly to a <see cref="TextWriter"/>
     /// so it works in any hosting environment.
     /// </para>
     /// </remarks>
@@ -48,7 +48,7 @@ namespace Alis.Reactive.InputField
         /// Writes the opening field wrapper HTML and returns a scope that writes closing
         /// tags (including the validation error placeholder) when disposed.
         /// </summary>
-        /// <returns>A disposable scope — use with <c>using</c> to wrap the component content.</returns>
+        /// <returns>A disposable scope. Use with <c>using</c> to wrap the component content.</returns>
         internal InputFieldRenderScope Begin()
         {
             _writer.Write("<div class=\"flex flex-col gap-1.5\">");
