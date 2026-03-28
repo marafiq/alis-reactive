@@ -1,8 +1,19 @@
 # Alis.Reactive — Session Memory
 
+## Vision
+- See [vision_working_principles.md](vision_working_principles.md) — READ FIRST every session. The WHY behind everything.
+
 ## Active Work
 - **Branch**: main (master deleted), refactor/api-surface-xml-docs for XML docs + ISP work
-- **Current**: XML docs tour (near-complete), conditions module docs in progress
+- **Current**: Layered harness system DONE. CLAUDE.md tightened (160 lines). 11 follow-up tasks planned.
+- See [session_2026_03_28_todo.md](session_2026_03_28_todo.md) — 11 open tasks, each with plan-first requirement
+- See [session_2026_03_28_reflection.md](session_2026_03_28_reflection.md) — session reflection + feedback actioned
+- See [forensic-master-index.md](forensic-master-index.md) — 32 git-grounded mistake patterns from 753 commits
+- See [feedback_session_2026_03_28_process_design.md](feedback_session_2026_03_28_process_design.md) — layered harness, not flat checklists
+- See [feedback_layered_harness_design.md](feedback_layered_harness_design.md) — per-layer skills, tests, thinking
+- See [feedback_harness_principles.md](feedback_harness_principles.md) — unexpected boundary = wrong plan
+- See [feedback_review_language.md](feedback_review_language.md) — positive framing ("pragmatic excellence")
+- See [feedback_review_output_design.md](feedback_review_output_design.md) — rank by value, don't cap findings
 - See [project_xml_docs_dev_audit.md](project_xml_docs_dev_audit.md) — dev perspective audit: 9/10 rating, 12/14 gaps closed
 - See [project_xml_docs_tour.md](project_xml_docs_tour.md) for docs tour progress + user style guide
 - ISP refactor plan removed — IReactivePlan interface was deleted, plan is moot

@@ -1,163 +1,96 @@
 # Alis.Reactive Framework
 
-ASP.NET MVC developers express reactive browser behavior in C# without writing JavaScript.
-Fluent builders (`Html.On`, `PipelineBuilder`, `ElementBuilder`) capture intent as descriptors.
-`Html.RenderPlan(plan)` serializes them to JSON validated against `reactive-plan.schema.json`.
-The JS runtime discovers the plan on page load and executes it — sets properties, calls methods,
-wires listeners, makes HTTP requests. It does not know what a checkbox is or what cascading
-dropdowns means. The plan is the only contract — C# never executes behavior, JS never invents it.
+C# fluent builders capture reactive browser intent as descriptors. `Html.RenderPlan(plan)`
+serializes to JSON validated against `reactive-plan.schema.json`. The JS runtime executes
+the plan — the only contract. C# never executes behavior, JS never invents it.
 
 ## Skills
 
-### Writing .cshtml Views
-
 | Skill | Status | Use for |
 |-------|--------|---------|
-| `reactive-dsl` | WIP | Plan, triggers, Element, Dispatch, Component, InputField, .Reactive(), SSE/SignalR |
+| `reactive-dsl` | WIP | Plan, triggers, Element, Dispatch, Component, InputField, .Reactive() |
 | `http-pipeline` | OK | Get/Post, Gather, Response, Chained, Parallel, WhileLoading, Into |
 | `conditions-dsl` | OK | When/Then/ElseIf/Else, operators, guard composition, source types |
 | `validation-rules-alis-reactive` | WIP | FluentValidation rules, Validate, ValidationErrors, WhenField |
-| `design-system` | Missing | Layout: vstack, hstack, card, grid, heading, text, divider |
-
-### Writing Core C# Framework
-
-Projects: `Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.Fusion`, `Alis.Reactive.FluentValidator`, `Alis.Reactive.Analyzers`, `Alis.Reactive.NativeTagHelpers`
-
-| Skill | Status | Use for |
-|-------|--------|---------|
-| `onboard-fusion-component` | WIP | Adding SF components, events, methods, props |
+| `onboard-fusion-component` | WIP | Adding SF components, 7-file vertical slice |
 | `dotnet-xml-docs` | OK | XML documentation on public types |
-| `technical-documentation-writing` | WIP | Writing docs-site pages, architecture guides |
 
-API reference auto-generated from XML docs: `npm run build:api-docs` → `tools/ApiDocGenerator`
-Documentation site: `docs-site/` (Starlight + astro-d2)
-
-Skills issues tracked in `docs/todo-skill-updates.md`.
-
-## Build & Run Commands
+## Build & Run
 
 ```bash
-# ── Build ──
-npm run build:all                # Two JS bundles + CSS, all loaded in _Layout.cshtml
+npm run build:all                # JS bundles + CSS
 dotnet build                     # All C# projects
-npm run build:api-docs           # Regenerate API reference from XML docs
+npm run build:api-docs           # API reference from XML docs
 
-# ── Development ──
-npm run watch                    # esbuild watch — rebuilds JS on save
-npm run watch:css                # Tailwind watch — rebuilds CSS on save
-# Mac/Linux: kill stale Kestrel on port 5220, then run
+npm run watch                    # esbuild watch
+npm run watch:css                # Tailwind watch
 lsof -ti:5220 | xargs kill -9 2>/dev/null; dotnet run --project Alis.Reactive.SandboxApp
-# Windows: netstat -ano | findstr :5220 | findstr LISTENING → taskkill /PID <pid> /F
-# then: dotnet run --project Alis.Reactive.SandboxApp
 
-# ── Quality ──
-npm run typecheck                # TypeScript type checking
+npm run typecheck                # TS type checking
 npm run lint                     # ESLint
-npm run lint:fix                 # ESLint auto-fix
 
-# ── Tests ──
 npm test                                                     # TS vitest
-dotnet test tests/Alis.Reactive.UnitTests                    # Core C# unit + schema
-dotnet test tests/Alis.Reactive.Native.UnitTests             # Native components
-dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion components
-dotnet test tests/Alis.Reactive.FluentValidator.UnitTests    # FluentValidation
-dotnet test tests/Alis.Reactive.Analyzers.Tests              # Roslyn analyzers
+dotnet test tests/Alis.Reactive.UnitTests                    # Core + schema
+dotnet test tests/Alis.Reactive.Native.UnitTests             # Native
+dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion
+dotnet test tests/Alis.Reactive.FluentValidator.UnitTests    # Validation
+dotnet test tests/Alis.Reactive.Analyzers.Tests              # Analyzers
 dotnet test tests/Alis.Reactive.DesignSystem.Tests           # Design system
 dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests       # Tag helpers
-# Playwright — always use trx logger so you can re-run only failed tests
 dotnet test tests/Alis.Reactive.PlaywrightTests \
   --logger "trx;LogFileName=playwright-results.trx" \
   --results-directory TestResults
-
-# Re-run only failed Playwright tests — Mac/Linux (saves hours)
-FAILED=$(grep 'outcome="Failed"' TestResults/playwright-results.trx \
-  | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
-  | grep -v "ResultSummary" | paste -sd '|' -)
-dotnet test tests/Alis.Reactive.PlaywrightTests --filter "$FAILED" \
-  -- NUnit.NumberOfTestWorkers=1
-# Windows: open playwright-results.trx, find Failed test names, use --filter "Name1|Name2"
-
-# Re-run a single test
-dotnet test tests/Alis.Reactive.PlaywrightTests --filter "TestName"
-
-# ── SonarQube (optional, requires Docker) ──
-./scripts/sonar-analyze.sh
+./scripts/sonar-analyze.sh                                   # SonarQube (Docker)
 ```
 
-**After any TS or CSS change:** `npm run build:all && dotnet build`, restart SandboxApp, then run Playwright.
-
-ALL tests must pass before every commit. Hooks enforce this.
+After TS/CSS changes: `npm run build:all && dotnet build`, restart SandboxApp.
+All tests pass before every commit.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| C# | .NET 10, **C# 8.0 enforced** in `Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.Fusion`, `Alis.Reactive.FluentValidator`. Apps/tests use latest. |
-| TS | TypeScript 5.8, esbuild (ESM bundle), Tailwind CSS v4 — no raw JS, all `.ts` files |
-| Components | `Alis.Reactive.Fusion` (wraps SF EJ2 32.x), `Alis.Reactive.Native` (wraps native HTML inputs). Never use raw `<input>` or SF builders directly — always through the DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` or `Html.InputField(plan, m => m.Country).FusionDropDownList(build: b => ...)` |
+| C# | .NET 10, **C# 8.0 enforced** in library projects. Apps/tests use latest. |
+| TS | TypeScript 5.8, esbuild ESM, Tailwind CSS v4 |
+| Components | Fusion (SF EJ2 32.x) + Native. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
 | Validation | FluentValidation 12.x |
 | Tests | NUnit 4.5 + Verify, Vitest 3.x + jsdom, Playwright 1.52 |
 
-## Process — Follow This Every Session
+## Process
 
-```
-Prompt → Clear? ──no──→ Ask / push back / don't let user be lazy
-  │yes
-  ▼
-Plan → Skills? Survey code? Mockups? → Master index (INVEST tasks)
-  │
-  ▼
-Per task: Context → Pre-flight → Execute → Post-flight → Next
-  │
-  ▼
-Commit (hooks enforce)
-```
+Pipeline: **C# → Schema → TS Types → TS Runtime → Browser → Docs**.
+Each layer has skills, thinking, and a test harness. A failing test drives every boundary crossing.
 
-Detailed per-task-type flows: `.claude/process-flows.md`
+Detailed flows in `.claude/rules/`: `process-pipeline.md`, `process-layers.md`, `process-task-types.md`
 
-### Step 1: Prompt Clarity — Gate
-Is the prompt clear and specific? If not — **stop**. Ask questions. Propose a checklist.
-Do NOT let the user be lazy. Do NOT start working on vague requests.
+### Prompt Clarity Gate
+Prompt must be clear and specific. If vague — stop, ask, push back, propose a checklist.
 
-### Step 2: Plan Mode
-- **Brainstorm skills:** which skills apply to this work? Load them.
-- **Survey code:** read existing implementation before proposing changes. Read, don't guess.
-- **Mockups:** for UI work, sketch or describe the expected outcome before coding.
+### Plan — Identify Layers
+1. Which layers does this touch?
+2. Load applicable skills FIRST, before reading code.
+3. Survey code at each layer. Read, don't guess.
+4. Build a master task index (INVEST: Independent, Negotiable, Valuable, Estimable, Small, Testable).
 
-### Step 3: Master Index
-The plan has a numbered task list. Tasks have dependencies. Nothing starts without the index.
+### Thoughtful Editing
+Before editing: understand the code path and blast radius. Design your strategy.
+Confirm right skills and processes are loaded and you are following the plan.
+If editing the same file multiple times, rethink your approach and design choices.
 
-### Step 4: INVEST Each Task
-- **I**ndependent — can be worked on in isolation (agent-ready)
-- **N**egotiable — scope discussed with user
-- **V**aluable — delivers a user-visible outcome
-- **E**stimable — clear enough to know when it's done
-- **S**mall — completable in one focused pass
-- **T**estable — has pass/fail criteria
+### Wrong Plan Protocol
+If touching an unexpected layer, the plan or task is wrong. Stop, save learnings, return to planning.
 
-### Step 5: Task Context
-Before dispatching an agent or starting work, each task carries:
-- **Files to read** — specific paths, not "explore the codebase"
-- **Skills to load** — which skills this task needs
-- **Expected outcome** — what done looks like
-- **Pre-checklist** — what to verify before writing code
-- **Post-checklist** — what to verify before marking complete
+### Pre-flight
+- [ ] Loaded skills? Read source code at each layer touched?
+- [ ] Understood WHY the current code works the way it does?
+- [ ] Visibility (`internal`/`public`) chosen deliberately? API surface unchanged?
+- [ ] Input evidence: what proves this change is needed?
 
-### Step 6: Per-Task Pre-flight
-- [ ] Loaded the right skills?
-- [ ] Read the relevant source code?
-- [ ] Understood WHY the current code is the way it is?
-- [ ] SOLID check: SRP, OCP, LSP, ISP, DIP (see `.claude/memory/solid-ts-research.md`)
-- [ ] Visibility: `private`/`internal`/`public` chosen deliberately?
-
-### Step 7: Per-Task Post-flight
-- [ ] All tests pass?
-- [ ] Verified in actual browser — not just Playwright?
-- [ ] On Playwright failure: opened traces/inspector/real browser?
-- [ ] No code smells: repeated switches, nested ifs >2, long methods, poor naming?
-- [ ] Sandbox index card updated if new page added?
-- [ ] Root cause fixed — not a patch?
-- [ ] This is a production system — not "v1", not "good enough for now"
+### Post-flight
+- [ ] All tests pass? Verified in actual browser?
+- [ ] Each boundary crossing driven by a failing test?
+- [ ] Root cause fixed, not a patch? No code smells?
+- [ ] Output evidence: what proves this change is correct?
 
 ## Rules
 
@@ -173,135 +106,54 @@ cd .worktrees/<feature-name>
 No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
 No inline `<script>` blocks — `root.ts` handles discovery and boot automatically.
 
-### 3. Every New Primitive Needs All Three Layers
+### 3. New or Changed Primitive — 10 Steps, All Layers
 
-Adding a new command kind, trigger kind, or reaction kind touches these files in order:
+1. C# descriptor — sealed class, `internal` constructor
+2. Polymorphic registration — `WriteOnlyPolymorphicConverter` switch
+3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
+4. JSON schema — failing `AssertSchemaValid()` test drives the update
+5. TS types — new interface in `Scripts/types/`, discriminated union
+6. Runtime handler — new switch case + `assertNever`
+7. C# unit test — `VerifyJson` snapshot + `AssertSchemaValid`
+8. TS unit test — runtime behavior via `boot()`
+9. Playwright test — browser behavior with sandbox view
+10. Sandbox view — demonstrate the primitive
 
-1. **C# descriptor** — `Alis.Reactive/Descriptors/` (new sealed class, `internal` constructor)
-2. **Polymorphic registration** — add to `WriteOnlyPolymorphicConverter` switch in parent type
-3. **Builder method** — on `PipelineBuilder`, `ElementBuilder`, or `TriggerBuilder`
-4. **JSON schema** — new `$ref` in `reactive-plan.schema.json` (schema MUST match descriptor output)
-5. **TS types** — new interface in `Scripts/types/`, add to discriminated union
-6. **Runtime handler** — new case in `commands.ts` or `execute.ts`
-7. **C# unit test** — snapshot (`VerifyJson`) + schema validation (`AssertSchemaValid`)
-8. **TS unit test** — runtime behavior in jsdom via `boot()`
-9. **Playwright test** — browser behavior with sandbox view
-10. **Sandbox view** — demonstrate the new primitive in a page
-
-**Schema drift is a known risk.** Descriptors and schema can silently diverge.
-TODO: Build a hook/script that validates descriptor JSON output against schema on every build.
-
-### 4. Two-Phase Boot Is Inviolable
-
-Custom-event listeners wire before dom-ready reactions execute. This ensures
-`dom-ready → dispatch("x")` fires after someone listens for `"x"`.
 
 ### 5. Vertical Slices — Duplication Over Abstraction
 
 Each module is self-contained. No shared base classes for behavior.
 Duplication between slices is intentional.
 
-### 6. Component Architecture — Vendor Isolation
+### 6. Vendor Isolation
 
-Adding a new component = new C# vertical slice with `IInputComponent`. Zero TS changes.
-`component.ts` is the ONLY module that maps vendor → root. All other modules call it:
+New component = C# vertical slice with `IInputComponent`. Zero TS runtime changes.
+`component.ts` is the ONLY module that maps vendor to root (`resolveRoot`, `evalRead`).
+Adding a third vendor must only touch `component.ts`. Vendor checks (`if vendor === "x"`)
+in other modules violate this rule — add exports to `component.ts` instead.
 
-```typescript
-// CORRECT — component.ts owns vendor knowledge
-const root = resolveRoot(el, vendor);   // native → el, fusion → el.ej2_instances[0]
-const value = evalRead(id, vendor, readExpr); // resolveRoot + walk(readExpr)
+### 7. Fail Fast — Fallbacks Are Exceptions
 
-// WRONG — vendor check leaked into trigger.ts:45
-if (trigger.vendor === "native") { detail = { [expr]: walk(el, expr) }; }
-else { detail = e ?? {}; }
+Default thinking is throw, not fallback. When something is missing or unknown, surface
+the error immediately. Fallbacks hide bugs for hours because wrong values propagate silently.
+A fallback is a rare, deliberate, justified exception — never the default response to uncertainty.
 
-// WRONG — vendor check leaked into live-clear.ts:44
-if (field.vendor === "native") { ... }
-```
+### 8. Plan-Driven IDs — No DOM Scanning
 
-Adding a third vendor must only touch `component.ts`. If you need vendor behavior elsewhere,
-add an export to `component.ts` — never `if (vendor === "x")` in other modules.
-Use the `onboard-fusion-component` skill for the full vertical slice pattern.
-
-### 7. No Fallbacks — Fail Fast
-
-When writing framework and core abstractions, there is only one way to build the right thing.
-Fallbacks and escape hatches are rare exceptions, not defaults.
-
-**Throw immediately when:**
-- Component not in `ComponentsMap` → `throw` — dev forgot `Html.InputField()`
-- Unknown vendor string → `throw` — typo or missing `IComponent.Vendor`
-- Missing `readExpr` → `throw` — component doesn't implement `IInputComponent`
-- Gather resolves to empty → `throw` — dev forgot to register component in plan
-- Unknown command kind in runtime → `assertNever()` — schema/descriptor drift
-
-**Never:**
-- Return `null` or empty string as "safe" default — hides the bug for hours
-- Silently skip an unregistered component — wrong field gets validated/gathered
-- Fall back to `"value"` when `readExpr` is missing — checkbox reads wrong property
-- Catch and swallow exceptions in builders — dev never sees the misconfiguration
-
-### 8. No DOM Scanning — IDs Are Plan-Driven
-
-The runtime never scans the DOM to discover components. Every element ID is generated by
-`IdGenerator` from the model expression at C# render time and carried in the plan JSON.
-
-```
-C#: Html.InputField(plan, m => m.Address.City)
-  → IdGenerator.For<OrderModel>(m => m.Address.City)
-  → "Alis_Reactive_SandboxApp_Models_OrderModel__Address_City"
-
-Format: {Namespace_TypeName}__{MemberPath}  (double underscore separates scope from property)
-
-Plan JSON: { "target": "Alis_Reactive_SandboxApp_Models_OrderModel__Address_City", "vendor": "fusion" }
-Runtime: document.getElementById("Alis_Reactive_...") — direct lookup, zero scanning
-```
-
-**Never write `querySelectorAll`, `getElementsByClassName`, or DOM traversal in runtime TS.**
-If you think you need to scan the DOM, the plan is missing information — fix the C# descriptor
-to carry it. Ask explicit user permission before adding any DOM scanning code.
+`IdGenerator` generates every element ID from the model expression at C# render time.
+The plan carries IDs. Runtime uses `getElementById` only — direct lookup, zero scanning.
+If you think you need `querySelectorAll` or DOM traversal, the plan is missing information.
+Fix the C# descriptor to carry it.
 
 ### 9. API Surface Is Frozen
 
-The public API surface is **frozen**. A hookify rule (`.claude/hookify.protect-api-surface.local.md`)
-enforces this at the tool level.
+Enforced by hookify rule `.claude/hookify.protect-api-surface.local.md`.
 
-**To change ANY public API, you must provide:**
-1. What is changing and why (specific problem, not "cleanup")
-2. Grep of all affected call sites
-3. Impact on views, tests, docs, examples, and skills
-4. Explicit user approval
+### 10. Root Cause, Not Patch
 
-**Locked conventions:**
-- Descriptor constructors: `internal`
-- Changing `internal` to `public`: **strictly forbidden**
-- Fusion methods use Fusion prefix: `.FusionDropDownList()`, `.FusionNumericTextBox()`, etc.
-- Parameter names: `pipeline`, `build`, `trigger`, `gather`, `response`, `request`, `guard`, `inner`
+Trace the full code path. Identify the exact line. Understand WHY before changing WHAT.
+If stuck after 2 attempts: research online, save findings to a temp file, dispatch agents
+with specific input and evidence-based output criteria. Fix the root cause. Verify in browser.
+Run all tests.
 
-### 10. Fixing Bugs — Root Cause, Not Patch
-
-Trace the full code path. Identify the exact line. Understand WHY the current code does
-what it does. Fix the root cause. Verify in the actual browser. Run ALL tests.
-Never revert agreed-upon architecture to fix a symptom.
-Never change `internal` to `public` to get around a compilation error.
-Never duplicate a core abstraction to "get by" — fix the existing one.
-
-### 11. ESM Only + Cache Busting
-
-ESM bundle via esbuild. `asp-append-version="true"` on CSS/JS tags for cache busting.
-No IIFE, no `window.alis`, no import maps.
-
-### 12. Verified Snapshots Are Co-Located
-
-`.verified.txt` files live next to their test class. Call `VerifyJson()` directly.
-
-### 13. BDD Tests — Public API Only
-
-Test classes: `When{Scenario}`. Test methods describe expected behavior.
-Tests verify what the system does for the user, not implementation details.
-Arrange tests using the public DSL (`Html.On`, `CreatePlan()`, `Trigger()`) only.
-
-**Known violation:** 30 instances across 10 test files directly construct internal types
-(`new SequentialReaction`, `new DispatchCommand`, `new Entry`, etc.). These need refactoring
-to use the builder API. See `docs/todo-skill-updates.md`.
 
