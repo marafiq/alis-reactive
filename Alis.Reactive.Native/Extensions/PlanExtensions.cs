@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Extensions
 {
     /// <summary>
-    /// Razor view extensions that open and close every reactive view — create the
+    /// Razor view extensions that open and close every reactive view: create the
     /// <see cref="ReactivePlan{TModel}"/> at the top, render it at the bottom.
     /// </summary>
     /// <remarks>
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Native.Extensions
         /// <see cref="ReactivePlan{TModel}(IHtmlHelper{TModel})"/>. Reactive behaviors from both
         /// merge and execute as a single unit in the browser.
         /// </remarks>
-        /// <typeparam name="TModel">The view model type — must match the view's model.</typeparam>
+        /// <typeparam name="TModel">The view model type must match the view's model.</typeparam>
         /// <returns>A plan instance that merges into the view's plan in the browser.</returns>
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class
