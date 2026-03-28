@@ -1,11 +1,12 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Syncfusion DateTimePicker component.
-    /// Phantom type — zero state. Used as type parameter in
-    /// p.Component&lt;FusionDateTimePicker&gt;(m => m.AppointmentTime) to unlock
-    /// the DateTimePicker-specific extension methods.
+    /// A Syncfusion DateTimePicker for selecting a date and time together.
     /// </summary>
+    /// <remarks>
+    /// Use as a type parameter in <c>p.Component&lt;FusionDateTimePicker&gt;(m =&gt; m.AppointmentTime)</c>
+    /// to access DateTimePicker-specific mutations and value reading.
+    /// </remarks>
     public sealed class FusionDateTimePicker : FusionComponent, IInputComponent
     {
         /// <inheritdoc />

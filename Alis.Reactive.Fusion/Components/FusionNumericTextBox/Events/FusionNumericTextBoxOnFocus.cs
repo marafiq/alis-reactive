@@ -1,12 +1,16 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionNumericTextBox.Focus (SF "focus" event).
-    /// Focus carries no data payload — this class is an empty marker
-    /// used by the generic inference chain in .Reactive().
+    /// Event payload delivered when a <see cref="FusionNumericTextBox"/> receives focus.
     /// </summary>
+    /// <remarks>
+    /// Focus carries no data — use for triggering side effects on focus gain.
+    /// </remarks>
     public class FusionNumericTextBoxFocusArgs
     {
+        /// <summary>
+        /// Creates a new instance. Framework-internal — instances are created by the event descriptor.
+        /// </summary>
         public FusionNumericTextBoxFocusArgs() { }
     }
 }

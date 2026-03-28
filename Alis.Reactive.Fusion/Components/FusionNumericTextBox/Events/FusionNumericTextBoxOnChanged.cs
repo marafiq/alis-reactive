@@ -1,22 +1,25 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionNumericTextBox.Changed (SF "change" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.Value).Gte(100)
-    /// ExpressionPathHelper resolves x => x.Value to "evt.value".
+    /// Event payload delivered when a <see cref="FusionNumericTextBox"/> value changes.
     /// </summary>
+    /// <remarks>
+    /// Access properties in conditions: <c>p.When(args, x =&gt; x.Value).Gte(100)</c>.
+    /// </remarks>
     public class FusionNumericTextBoxChangeArgs
     {
-        /// <summary>New numeric value.</summary>
+        /// <summary>Gets or sets the new numeric value.</summary>
         public decimal Value { get; set; }
 
-        /// <summary>Previous numeric value.</summary>
+        /// <summary>Gets or sets the previous numeric value.</summary>
         public decimal PreviousValue { get; set; }
 
-        /// <summary>True if the change was triggered by user interaction.</summary>
+        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
 
+        /// <summary>
+        /// Creates a new instance. Framework-internal — instances are created by the event descriptor.
+        /// </summary>
         public FusionNumericTextBoxChangeArgs() { }
     }
 }

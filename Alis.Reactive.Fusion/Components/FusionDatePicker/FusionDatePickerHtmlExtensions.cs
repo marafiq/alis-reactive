@@ -9,12 +9,19 @@ using Syncfusion.EJ2.Calendars;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating DatePickerBuilder bound to a model property.
+    /// Creates a Syncfusion DatePicker inside a field wrapper, bound to a model property.
     /// </summary>
     public static class FusionDatePickerHtmlExtensions
     {
         private static readonly FusionDatePicker Component = new FusionDatePicker();
 
+        /// <summary>
+        /// Renders a Syncfusion DatePicker bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="configure">Callback to configure the DatePicker (min/max date, format, etc.).</param>
         public static void DatePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<DatePickerBuilder> configure)

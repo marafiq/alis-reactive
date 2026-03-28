@@ -10,17 +10,24 @@ using Syncfusion.EJ2.DropDowns;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating DropDownListBuilder bound to a model property.
+    /// Creates a Syncfusion DropDownList inside a field wrapper, bound to a model property.
     /// </summary>
     public static class FusionDropDownListHtmlExtensions
     {
         private static readonly FusionDropDownList Component = new FusionDropDownList();
 
         /// <summary>
-        /// Typed Fields binding — derives text/value field names from DataSource item expressions.
-        /// Converts PascalCase C# member names to camelCase (matching global Newtonsoft serialization).
-        /// Usage: .Fields&lt;CountryItem&gt;(t =&gt; t.Text, v =&gt; v.Value)
+        /// Configures text and value field mappings using typed expressions.
         /// </summary>
+        /// <remarks>
+        /// Derives field names from the data source item type and converts them to camelCase
+        /// to match JSON serialization: <c>.Fields&lt;CountryItem&gt;(t =&gt; t.Text, v =&gt; v.Value)</c>.
+        /// </remarks>
+        /// <typeparam name="TItem">The data source item type.</typeparam>
+        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="text">Expression selecting the display text property.</param>
+        /// <param name="value">Expression selecting the value property.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static DropDownListBuilder Fields<TItem>(
             this DropDownListBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -34,9 +41,18 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Typed Fields with GroupBy — groups items in the dropdown popup.
-        /// Usage: .Fields&lt;CountryItem&gt;(t =&gt; t.Text, v =&gt; v.Value, g =&gt; g.Continent)
+        /// Configures text, value, and group-by field mappings using typed expressions.
         /// </summary>
+        /// <remarks>
+        /// Groups items in the dropdown popup:
+        /// <c>.Fields&lt;CountryItem&gt;(t =&gt; t.Text, v =&gt; v.Value, g =&gt; g.Continent)</c>.
+        /// </remarks>
+        /// <typeparam name="TItem">The data source item type.</typeparam>
+        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="text">Expression selecting the display text property.</param>
+        /// <param name="value">Expression selecting the value property.</param>
+        /// <param name="groupBy">Expression selecting the grouping property.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static DropDownListBuilder Fields<TItem>(
             this DropDownListBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -51,6 +67,13 @@ namespace Alis.Reactive.Fusion.Components
             });
         }
 
+        /// <summary>
+        /// Renders a Syncfusion DropDownList bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="configure">Callback to configure the DropDownList (data source, fields, etc.).</param>
         public static void DropDownList<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<DropDownListBuilder> configure)

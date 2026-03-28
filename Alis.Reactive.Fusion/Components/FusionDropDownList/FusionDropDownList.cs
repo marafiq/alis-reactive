@@ -1,11 +1,12 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Syncfusion DropDownList component.
-    /// Phantom type — zero state. Used as type parameter in
-    /// p.Component&lt;FusionDropDownList&gt;(m => m.Country) to unlock
-    /// the DropDownList-specific extension methods.
+    /// A Syncfusion DropDownList for selecting a single value from a list.
     /// </summary>
+    /// <remarks>
+    /// Use as a type parameter in <c>p.Component&lt;FusionDropDownList&gt;(m =&gt; m.Country)</c>
+    /// to access DropDownList-specific mutations and value reading.
+    /// </remarks>
     public sealed class FusionDropDownList : FusionComponent, IInputComponent
     {
         /// <inheritdoc />

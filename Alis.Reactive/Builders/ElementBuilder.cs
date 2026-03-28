@@ -7,35 +7,68 @@ using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive.Builders
 {
+    /// <summary>
+    /// Builds mutations on a DOM element — CSS classes, text content, HTML content, and visibility.
+    /// </summary>
+    /// <remarks>
+    /// Created by <see cref="PipelineBuilder{TModel}.Element(string)"/>. Each mutation method
+    /// adds a command to the pipeline and returns either this builder (for chaining more mutations
+    /// on the same element) or the pipeline builder (for continuing with other commands).
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
     public class ElementBuilder<TModel> where TModel : class
     {
         private readonly PipelineBuilder<TModel> _pipeline;
         private readonly string _elementId;
 
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by <see cref="PipelineBuilder{TModel}.Element(string)"/>.
+        /// Public constructors would let devs create builders detached from a pipeline.
+        /// </summary>
         internal ElementBuilder(PipelineBuilder<TModel> pipeline, string elementId)
         {
             _pipeline = pipeline;
             _elementId = elementId;
         }
 
+        /// <summary>
+        /// Adds a CSS class to the element.
+        /// </summary>
+        /// <param name="className">The CSS class name to add.</param>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> AddClass(string className)
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("add", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
             return _pipeline;
         }
 
+        /// <summary>
+        /// Removes a CSS class from the element.
+        /// </summary>
+        /// <param name="className">The CSS class name to remove.</param>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> RemoveClass(string className)
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("remove", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
             return _pipeline;
         }
 
+        /// <summary>
+        /// Toggles a CSS class on the element — adds it if absent, removes it if present.
+        /// </summary>
+        /// <param name="className">The CSS class name to toggle.</param>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> ToggleClass(string className)
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("toggle", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
             return _pipeline;
         }
 
+        /// <summary>
+        /// Sets the element's text content to a static string.
+        /// </summary>
+        /// <param name="text">The text to display.</param>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetText(string text)
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("textContent"), text));
@@ -85,6 +118,11 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
+        /// <summary>
+        /// Sets the element's inner HTML to a static string.
+        /// </summary>
+        /// <param name="html">The HTML markup to inject.</param>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetHtml(string html)
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("innerHTML"), html));
@@ -121,12 +159,20 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
+        /// <summary>
+        /// Shows the element by removing the <c>hidden</c> attribute.
+        /// </summary>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Show()
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("removeAttribute", args: new MethodArg[] { new LiteralArg("hidden") })));
             return _pipeline;
         }
 
+        /// <summary>
+        /// Hides the element by setting the <c>hidden</c> attribute.
+        /// </summary>
+        /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Hide()
         {
             _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("setAttribute", args: new MethodArg[] { new LiteralArg("hidden"), new LiteralArg("") })));

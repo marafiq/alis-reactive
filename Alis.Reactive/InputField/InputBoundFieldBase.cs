@@ -18,15 +18,32 @@ namespace Alis.Reactive.InputField
     /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
     public class InputBoundFieldBase<THelper, TModel, TProp> where TModel : class
     {
+        /// <summary>Gets the platform-specific HTML helper for rendering.</summary>
         public THelper Helper { get; }
+
+        /// <summary>Gets the plan this field belongs to.</summary>
         public ReactivePlan<TModel> Plan { get; }
+
+        /// <summary>Gets the model property expression this field is bound to.</summary>
         public Expression<Func<TModel, TProp>> Expression { get; }
+
+        /// <summary>Gets the label and required options for this field.</summary>
         public InputFieldOptions Options { get; }
 
+        /// <summary>Gets the generated HTML element ID for this field's input.</summary>
         internal string ElementId { get; }
+
+        /// <summary>Gets the model binding path (e.g. <c>"Address.City"</c>) for validation message targeting.</summary>
         internal string BindingPath { get; }
+
+        /// <summary>Gets the writer for emitting HTML output.</summary>
         internal TextWriter Writer { get; }
 
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by platform-specific factories
+        /// like <c>Html.InputField()</c>. Public constructors would bypass the ID generation
+        /// and component registration that field wrappers depend on.
+        /// </summary>
         internal InputBoundFieldBase(
             THelper helper,
             ReactivePlan<TModel> plan,

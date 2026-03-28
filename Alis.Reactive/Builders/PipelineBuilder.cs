@@ -7,6 +7,22 @@ using Alis.Reactive.Descriptors.Reactions;
 
 namespace Alis.Reactive.Builders
 {
+    /// <summary>
+    /// Builds the sequence of commands that execute when a trigger fires — element mutations,
+    /// event dispatches, HTTP calls, component interactions, and conditional logic.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Received as the <c>p</c> parameter inside trigger callbacks:
+    /// <c>t.DomReady(p =&gt; { p.Element("id").AddClass("x"); p.Dispatch("ready"); })</c>.
+    /// </para>
+    /// <para>
+    /// Commands execute in declaration order. Conditions (<c>When</c>/<c>Then</c>/<c>Else</c>)
+    /// and HTTP calls (<c>Get</c>/<c>Post</c>) create branching points that produce
+    /// separate reaction segments.
+    /// </para>
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
     public partial class PipelineBuilder<TModel> : ICommandEmitter where TModel : class
     {
         private enum PipelineMode { Sequential, Http, Parallel, Conditional }
@@ -33,18 +49,39 @@ namespace Alis.Reactive.Builders
             Commands.Add(command);
         }
 
+        /// <summary>
+        /// Fires a custom event in the browser that other triggers can listen for.
+        /// </summary>
+        /// <param name="eventName">The event name (e.g. <c>"order-submitted"</c>).</param>
+        /// <returns>This builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
             Commands.Add(new DispatchCommand(eventName));
             return this;
         }
 
+        /// <summary>
+        /// Fires a custom event with a payload object in the browser.
+        /// </summary>
+        /// <typeparam name="TPayload">The payload type — serialized as the event's detail data.</typeparam>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="payload">The data to attach to the event.</param>
+        /// <returns>This builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
             Commands.Add(new DispatchCommand(eventName, payload));
             return this;
         }
 
+        /// <summary>
+        /// Targets a DOM element by its ID for mutations (CSS classes, text, visibility).
+        /// </summary>
+        /// <remarks>
+        /// Use <c>Element()</c> for non-input display elements. For input components bound to
+        /// a model property, use <see cref="Component{TComponent}(Expression{Func{TModel, object}})"/> instead.
+        /// </remarks>
+        /// <param name="elementId">The HTML element ID.</param>
+        /// <returns>An element builder for chaining mutations like <c>AddClass</c>, <c>SetText</c>, <c>Show</c>.</returns>
         public ElementBuilder<TModel> Element(string elementId)
         {
             return new ElementBuilder<TModel>(this, elementId);

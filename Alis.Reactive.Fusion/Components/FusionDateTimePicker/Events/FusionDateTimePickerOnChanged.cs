@@ -3,20 +3,22 @@ using System;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionDateTimePicker.Changed (SF "change" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.Value).NotNull()
-    /// ExpressionPathHelper resolves x => x.Value to "evt.value".
-    /// CoercionTypes infers DateTime → "date" for runtime coercion.
+    /// Event payload delivered when a <see cref="FusionDateTimePicker"/> value changes.
     /// </summary>
+    /// <remarks>
+    /// Access properties in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.
+    /// </remarks>
     public class FusionDateTimePickerChangeArgs
     {
-        /// <summary>New date-time value.</summary>
+        /// <summary>Gets or sets the new date-time value.</summary>
         public DateTime? Value { get; set; }
 
-        /// <summary>True if the change was triggered by user interaction.</summary>
+        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
 
+        /// <summary>
+        /// Creates a new instance. Framework-internal — instances are created by the event descriptor.
+        /// </summary>
         public FusionDateTimePickerChangeArgs() { }
     }
 }

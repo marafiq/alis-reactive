@@ -1,16 +1,22 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Payload for NativeTextArea.Changed (DOM "change" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.Value).Eq("hello")
-    /// ExpressionPathHelper resolves x => x.Value to "evt.value".
+    /// Event args for <see cref="NativeTextAreaEvents.Changed"/>.
     /// </summary>
+    /// <remarks>
+    /// Properties provide typed access for conditions:
+    /// <code>p.When(args, x => x.Value).Eq("hello")</code>
+    /// </remarks>
     public class NativeTextAreaChangeArgs
     {
-        /// <summary>The textarea's value after the change.</summary>
+        /// <summary>
+        /// Gets or sets the textarea value after the change.
+        /// </summary>
         public string? Value { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance. Framework use only.
+        /// </summary>
         public NativeTextAreaChangeArgs() { }
     }
 }

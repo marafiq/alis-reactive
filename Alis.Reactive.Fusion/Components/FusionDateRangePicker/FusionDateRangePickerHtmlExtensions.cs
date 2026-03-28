@@ -9,14 +9,19 @@ using Syncfusion.EJ2.Calendars;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating DateRangePickerBuilder bound to a model property.
-    /// The expression targets the start date property. The component ID is based on
-    /// the start date binding path.
+    /// Creates a Syncfusion DateRangePicker inside a field wrapper, bound to a model property.
     /// </summary>
     public static class FusionDateRangePickerHtmlExtensions
     {
         private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();
 
+        /// <summary>
+        /// Renders a Syncfusion DateRangePicker bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="configure">Callback to configure the DateRangePicker (min/max, presets, format, etc.).</param>
         public static void DateRangePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<DateRangePickerBuilder> configure)

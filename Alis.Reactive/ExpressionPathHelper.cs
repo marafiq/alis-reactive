@@ -5,29 +5,55 @@ using System.Linq.Expressions;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Converts a member expression like x => x.Address.City into a camelCase dot-path
-    /// with a caller-specified prefix for use as a plan source binding.
-    ///
-    /// Prefixes map to ExecContext properties at runtime:
-    ///   "evt"          → ctx.evt.address.city       (event payloads)
-    ///   "responseBody" → ctx.responseBody.data.name  (HTTP success JSON)
-    ///
-    /// walk.ts resolves any prefix — the C# side just generates the path.
+    /// Converts lambda expressions like <c>x =&gt; x.Address.City</c> into camelCase
+    /// dot-paths for use as source bindings in the plan.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Each path gets a prefix that identifies where to resolve the value in the browser:
+    /// <c>"evt"</c> for event payloads (<c>evt.address.city</c>),
+    /// <c>"responseBody"</c> for HTTP response data (<c>responseBody.data.name</c>).
+    /// </para>
+    /// <para>
+    /// Only simple property-access chains are supported. Computed expressions
+    /// (method calls, arithmetic) throw <see cref="InvalidOperationException"/>.
+    /// </para>
+    /// </remarks>
     public static class ExpressionPathHelper
     {
+        /// <summary>
+        /// Converts an expression to a prefixed camelCase dot-path.
+        /// </summary>
+        /// <typeparam name="TSource">The source type containing the property chain.</typeparam>
+        /// <param name="prefix">The resolution context prefix (e.g. <c>"evt"</c>, <c>"responseBody"</c>).</param>
+        /// <param name="expression">The property-access expression to convert.</param>
+        /// <returns>A dot-path like <c>evt.address.city</c>.</returns>
         public static string ToPath<TSource>(string prefix, Expression<Func<TSource, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return prefix + "." + string.Join(".", members);
         }
 
+        /// <summary>
+        /// Converts a typed expression to a prefixed camelCase dot-path, avoiding boxing for value types.
+        /// </summary>
+        /// <typeparam name="TSource">The source type containing the property chain.</typeparam>
+        /// <typeparam name="TProp">The property type.</typeparam>
+        /// <param name="prefix">The resolution context prefix.</param>
+        /// <param name="expression">The property-access expression to convert.</param>
+        /// <returns>A dot-path like <c>evt.facilityId</c>.</returns>
         public static string ToPath<TSource, TProp>(string prefix, Expression<Func<TSource, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return prefix + "." + string.Join(".", members);
         }
 
+        /// <summary>
+        /// Converts an expression to an event payload dot-path (<c>evt.</c> prefix).
+        /// </summary>
+        /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <param name="expression">The property-access expression to convert.</param>
+        /// <returns>A dot-path like <c>evt.address.city</c>.</returns>
         public static string ToEventPath<TSource>(Expression<Func<TSource, object?>> expression)
             => ToPath("evt", expression);
 
@@ -38,6 +64,12 @@ namespace Alis.Reactive
         public static string ToEventPath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
             => ToPath<TSource, TProp>("evt", expression);
 
+        /// <summary>
+        /// Converts an expression to an HTTP response body dot-path (<c>responseBody.</c> prefix).
+        /// </summary>
+        /// <typeparam name="TSource">The response body type.</typeparam>
+        /// <param name="expression">The property-access expression to convert.</param>
+        /// <returns>A dot-path like <c>responseBody.data.name</c>.</returns>
         public static string ToResponsePath<TSource>(Expression<Func<TSource, object?>> expression)
             => ToPath("responseBody", expression);
 
@@ -90,6 +122,9 @@ namespace Alis.Reactive
             return string.Join("_", members.ConvertAll(PascalRestore));
         }
 
+        /// <summary>
+        /// Typed overload — converts a model expression to a DOM element ID without boxing.
+        /// </summary>
         public static string ToElementId<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);

@@ -7,6 +7,22 @@ using Alis.Reactive.Resolvers;
 
 namespace Alis.Reactive
 {
+    /// <summary>
+    /// Collects reactive behavior for a view — triggers, reactions, and component registrations —
+    /// then renders them as a JSON plan that executes in the browser.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Create a plan at the top of a view with <c>Html.ReactivePlan()</c>, pass it to
+    /// <see cref="Alis.Reactive.Builders.TriggerBuilder{TModel}"/> via <c>Html.On(plan, ...)</c>
+    /// to define behavior, and call <c>Html.RenderPlan(plan)</c> at the bottom to activate it.
+    /// </para>
+    /// <para>
+    /// Partial views that share the same <typeparamref name="TModel"/> use
+    /// <c>Html.ResolvePlan()</c> instead — both plans merge and execute as a single unit.
+    /// </para>
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
         private static readonly JsonSerializerOptions CompactOptions = new JsonSerializerOptions
@@ -31,16 +47,53 @@ namespace Alis.Reactive
         /// </summary>
         internal ReactivePlan(bool isPartial = false) { IsPartial = isPartial; }
 
+        /// <summary>
+        /// Gets the unique plan identifier, derived from the model's full type name.
+        /// </summary>
+        /// <remarks>
+        /// Used to scope validation summary elements — each view's summary div is
+        /// tagged with this ID so errors route to the correct view.
+        /// </remarks>
         public string PlanId { get; } = typeof(TModel).FullName!;
+
+        /// <summary>
+        /// Gets whether this plan belongs to a partial view.
+        /// </summary>
+        /// <remarks>
+        /// Partial plans merge into the parent view's plan in the browser.
+        /// The parent view emits the validation summary div — partials do not.
+        /// </remarks>
         public bool IsPartial { get; }
 
+        /// <summary>
+        /// Gets the registered components keyed by model binding path.
+        /// </summary>
+        /// <remarks>
+        /// Populated when component builders (e.g. <c>Html.InputField(...).NativeTextBox()</c>)
+        /// register themselves. Used by validation and gather resolvers to map model
+        /// properties to their component IDs, vendors, and read expressions.
+        /// </remarks>
         public IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
 
+        /// <summary>
+        /// Registers a trigger-reaction pair in the plan. Called by
+        /// <see cref="Builders.TriggerBuilder{TModel}"/> — not intended for direct use in views.
+        /// </summary>
         internal void AddEntry(Entry entry)
         {
             _entries.Add(entry);
         }
 
+        /// <summary>
+        /// Registers a component for a model property so validation and gather can find it.
+        /// Called by component builders — not intended for direct use in views.
+        /// </summary>
+        /// <param name="bindingPath">The model property path (e.g. <c>"FacilityId"</c>, <c>"Address.City"</c>).</param>
+        /// <param name="entry">The component registration describing ID, vendor, and read expression.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when a different component is already registered for <paramref name="bindingPath"/>.
+        /// Each model property maps to exactly one component.
+        /// </exception>
         internal void AddToComponentsMap(string bindingPath, ComponentRegistration entry)
         {
             if (_componentsMap.TryGetValue(bindingPath, out var existing))
@@ -62,6 +115,14 @@ namespace Alis.Reactive
             _componentsMap[bindingPath] = entry;
         }
 
+        /// <summary>
+        /// Serializes the plan to compact JSON for embedding in the page.
+        /// </summary>
+        /// <remarks>
+        /// Called by <c>Html.RenderPlan(plan)</c> — not called directly in views.
+        /// Resolves validation rules and component enrichment before serializing.
+        /// </remarks>
+        /// <returns>The JSON plan string consumed by the browser.</returns>
         public string Render()
         {
             ResolveAll();
@@ -73,6 +134,10 @@ namespace Alis.Reactive
             }, CompactOptions);
         }
 
+        /// <summary>
+        /// Serializes the plan to indented JSON for debugging and test snapshots.
+        /// </summary>
+        /// <returns>The JSON plan string with indentation for readability.</returns>
         public string RenderFormatted()
         {
             ResolveAll();
@@ -84,6 +149,7 @@ namespace Alis.Reactive
             }, FormattedOptions);
         }
 
+        // Flatten ComponentRegistration to anonymous objects for JSON serialization
         private Dictionary<string, object> SerializeComponentsMap()
         {
             var result = new Dictionary<string, object>();
@@ -101,6 +167,8 @@ namespace Alis.Reactive
             return result;
         }
 
+        // Resolve validation rules and component enrichment before serialization.
+        // Must run before every Render/RenderFormatted call.
         private void ResolveAll()
         {
             var extractor = ReactivePlanConfig.Extractor;
