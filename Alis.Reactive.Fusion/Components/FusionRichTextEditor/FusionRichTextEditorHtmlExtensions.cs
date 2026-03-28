@@ -25,10 +25,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="configure">Callback to configure the RichTextEditor (toolbar, iframe mode, etc.).</param>
+        /// <param name="build">Callback to build the RichTextEditor (toolbar, iframe mode, etc.).</param>
         public static void RichTextEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
-            Action<RichTextEditorBuilder> configure)
+            Action<RichTextEditorBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -38,14 +38,14 @@ namespace Alis.Reactive.Fusion.Components
             var builder = setup.Helper.EJS().RichTextEditorFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["name"] = setup.BindingPath });
 
-            // Override the SF-derived Id BEFORE configure so .Reactive() can read it.
+            // Override the SF-derived Id BEFORE build so .Reactive() can read it.
             // RichTextEditorFor sets model.Id from the expression member name, but
             // Render() uses model.Id for the textarea's id attribute AND for the
             // Script Manager's appendTo selector. Setting model.Id ensures a single,
             // correct id attribute and proper SF component initialization.
             builder.model.Id = setup.ElementId;
 
-            configure(builder);
+            build(builder);
 
             // RTE Render() writes directly to Output — set it to the field wrapper's writer.
             builder.Output = setup.Writer;

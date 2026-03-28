@@ -24,10 +24,10 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="configure">Callback to configure the Switch (label, CSS class, etc.).</param>
+        /// <param name="build">Callback to build the Switch (label, CSS class, etc.).</param>
         public static void Switch<TModel>(
             this InputBoundField<TModel, bool> setup,
-            Action<SwitchBuilder> configure)
+            Action<SwitchBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Fusion.Components
 
             var builder = setup.Helper.EJS().SwitchFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
-            configure(builder);
+            build(builder);
             setup.Render(builder.Render());
         }
     }

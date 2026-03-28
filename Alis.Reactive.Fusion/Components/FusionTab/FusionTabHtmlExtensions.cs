@@ -20,13 +20,13 @@ namespace Alis.Reactive.Fusion.Components
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,
             string elementId,
-            Action<TabBuilder> configure)
+            Action<TabBuilder> build)
             where TModel : class
         {
             // NO ComponentsMap registration — Tab is NOT an input component
 
             var builder = html.EJS().Tab(elementId);
-            configure(builder);
+            build(builder);
 
             return new FusionTabBuilder<TModel>(plan, elementId, builder.Render());
         }

@@ -19,10 +19,10 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="configure">Configures the radio group (items, CSS, reactive events).</param>
+        /// <param name="build">Configures the radio group (items, CSS, reactive events).</param>
         public static void NativeRadioGroup<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
-            Action<NativeRadioGroupBuilder<TModel, TProp>> configure)
+            Action<NativeRadioGroupBuilder<TModel, TProp>> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native.Components
                 CoercionTypes.InferFromType(typeof(TProp))));
 
             var builder = new NativeRadioGroupBuilder<TModel, TProp>(setup.Helper, setup.Expression);
-            configure(builder);
+            build(builder);
             setup.Render(builder);
         }
     }

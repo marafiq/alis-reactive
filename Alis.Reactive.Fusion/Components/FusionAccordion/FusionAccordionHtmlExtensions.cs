@@ -19,13 +19,13 @@ namespace Alis.Reactive.Fusion.Components
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,
             string elementId,
-            Action<AccordionBuilder> configure)
+            Action<AccordionBuilder> build)
             where TModel : class
         {
             // NO ComponentsMap registration — this is NOT an input component
 
             var builder = html.EJS().Accordion(elementId);
-            configure(builder);
+            build(builder);
 
             return new FusionAccordionBuilder<TModel>(plan, elementId, builder.Render());
         }

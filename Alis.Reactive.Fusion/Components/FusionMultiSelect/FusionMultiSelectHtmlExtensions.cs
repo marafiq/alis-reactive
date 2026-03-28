@@ -69,10 +69,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="configure">Callback to configure the MultiSelect (data source, fields, mode, etc.).</param>
+        /// <param name="build">Callback to build the MultiSelect (data source, fields, mode, etc.).</param>
         public static void MultiSelect<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
-            Action<MultiSelectBuilder> configure)
+            Action<MultiSelectBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -81,7 +81,7 @@ namespace Alis.Reactive.Fusion.Components
 
             var builder = setup.Helper.EJS().MultiSelectFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
-            configure(builder);
+            build(builder);
             setup.Render(builder.Render());
         }
 

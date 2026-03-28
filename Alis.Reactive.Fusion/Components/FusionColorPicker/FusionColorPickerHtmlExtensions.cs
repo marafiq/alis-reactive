@@ -25,10 +25,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="configure">Callback to configure the ColorPicker (mode, columns, palette, etc.).</param>
+        /// <param name="build">Callback to build the ColorPicker (mode, columns, palette, etc.).</param>
         public static void ColorPicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
-            Action<ColorPickerBuilder> configure)
+            Action<ColorPickerBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion.Components
                 ["name"] = setup.BindingPath
             };
             var builder = setup.Helper.EJS().ColorPickerFor(setup.Expression, attrs);
-            configure(builder);
+            build(builder);
             setup.Render(builder.Render());
         }
     }

@@ -69,10 +69,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="configure">Callback to configure the MultiColumnComboBox (columns, data source, etc.).</param>
+        /// <param name="build">Callback to build the MultiColumnComboBox (columns, data source, etc.).</param>
         public static void MultiColumnComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
-            Action<MultiColumnComboBoxBuilder> configure)
+            Action<MultiColumnComboBoxBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -81,7 +81,7 @@ namespace Alis.Reactive.Fusion.Components
 
             var builder = setup.Helper.EJS().MultiColumnComboBoxFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
-            configure(builder);
+            build(builder);
             setup.Render(builder.Render());
         }
 

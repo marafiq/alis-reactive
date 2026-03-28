@@ -18,10 +18,10 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="configure">Configures the checkbox (CSS, reactive events).</param>
+        /// <param name="build">Configures the checkbox (CSS, reactive events).</param>
         public static void NativeCheckBox<TModel>(
             this InputBoundField<TModel, bool> setup,
-            Action<NativeCheckBoxBuilder<TModel, bool>> configure)
+            Action<NativeCheckBoxBuilder<TModel, bool>> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Native.Components
                 CoercionTypes.InferFromType(typeof(bool))));
 
             var builder = new NativeCheckBoxBuilder<TModel, bool>(setup.Helper, setup.Expression);
-            configure(builder);
+            build(builder);
             setup.Render(builder);
         }
     }

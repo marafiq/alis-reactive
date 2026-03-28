@@ -25,10 +25,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="configure">Callback to configure the NumericTextBox (min, max, step, format, etc.).</param>
+        /// <param name="build">Callback to build the NumericTextBox (min, max, step, format, etc.).</param>
         public static void NumericTextBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
-            Action<NumericTextBoxBuilder> configure)
+            Action<NumericTextBoxBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
 
             var builder = setup.Helper.EJS().NumericTextBoxFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
-            configure(builder);
+            build(builder);
             setup.Render(builder.Render());
         }
     }
