@@ -176,12 +176,27 @@ Custom-event listeners wire before dom-ready reactions execute. This ensures
 Each module is self-contained. No shared base classes for behavior.
 Duplication between slices is intentional.
 
-### 6. Component Architecture — Zero Runtime Changes
+### 6. Component Architecture — Vendor Isolation
 
 Adding a new component = new C# vertical slice with `IInputComponent`. Zero TS changes.
-Three TS modules (`component.ts`, `resolver.ts`, `element.ts`) handle all vendors.
-`component.ts` is the ONLY module that knows about `ej2_instances`.
-Use the `onboard-fusion-component` skill for the full pattern.
+`component.ts` is the ONLY module that maps vendor → root. All other modules call it:
+
+```typescript
+// CORRECT — component.ts owns vendor knowledge
+const root = resolveRoot(el, vendor);   // native → el, fusion → el.ej2_instances[0]
+const value = evalRead(id, vendor, readExpr); // resolveRoot + walk(readExpr)
+
+// WRONG — vendor check leaked into trigger.ts:45
+if (trigger.vendor === "native") { detail = { [expr]: walk(el, expr) }; }
+else { detail = e ?? {}; }
+
+// WRONG — vendor check leaked into live-clear.ts:44
+if (field.vendor === "native") { ... }
+```
+
+Adding a third vendor must only touch `component.ts`. If you need vendor behavior elsewhere,
+add an export to `component.ts` — never `if (vendor === "x")` in other modules.
+Use the `onboard-fusion-component` skill for the full vertical slice pattern.
 
 ### 7. No Fallbacks — Fail Fast
 

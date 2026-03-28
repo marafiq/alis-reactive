@@ -39,6 +39,13 @@ TODO: Add a hook or test that verifies every controller has a corresponding card
 Vertical slices have needed rearranging multiple times. The `onboard-fusion-component` skill
 must include the exact file structure so new slices are arranged correctly from the start.
 
+### Vendor Isolation Leaks (2 known)
+
+- `trigger.ts:45` — `if (trigger.vendor === "native")` for event detail extraction
+- `live-clear.ts:44` — `if (field.vendor === "native")` for live validation clearing
+Both should be resolved through `component.ts` exports. Adding a third vendor would require
+touching these files, violating Open/Closed.
+
 ### DOM Scanning Detection (TODO)
 
 Build a hook that blocks `querySelectorAll`, `getElementsByClassName`, DOM traversal patterns
