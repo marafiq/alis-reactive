@@ -28,9 +28,9 @@ the `ReactivePlan`. Nothing executes at this point.
 
 ```csharp
 @{
-    IReactivePlan<MyModel> plan = new ReactivePlan<MyModel>();
+    var plan = Html.ReactivePlan<MyModel>();
 
-    Html.On(plan, t => t.DomReady(p =>
+    Html.On(plan, trigger: t => t.DomReady(pipeline: p =>
     {
         p.Element("status").AddClass("active");
         p.Element("status").SetText("loaded");
@@ -40,24 +40,23 @@ the `ReactivePlan`. Nothing executes at this point.
 @Html.RenderPlan(plan)
 ```
 
-**Key files:**
+**Key entry points (read XML docs on these for the full API):**
 
-| File | Purpose |
+| Entry point | What it does |
 |------|---------|
-| `Alis.Reactive/IReactivePlan.cs` | Plan interface + `ReactivePlan<T>` (collects entries, renders JSON) |
-| `Alis.Reactive/Builders/TriggerBuilder.cs` | `DomReady()`, `CustomEvent()`, `CustomEvent<T>()`, `ServerPush()`, `SignalR()` |
-| `Alis.Reactive/Builders/PipelineBuilder.cs` | `Dispatch()`, `Element()` — the reaction command builder |
-| `Alis.Reactive/Builders/ElementBuilder.cs` | `AddClass()`, `RemoveClass()`, `ToggleClass()`, `SetText()`, `SetHtml()`, `Show()`, `Hide()` |
-| `Alis.Reactive/Descriptors/Commands/Command.cs` | `DispatchCommand`, `MutateElementCommand` (polymorphic JSON) |
-| `Alis.Reactive/Descriptors/Triggers/Trigger.cs` | `DomReadyTrigger`, `CustomEventTrigger` (polymorphic JSON) |
-| `Alis.Reactive/Descriptors/Reactions/Reaction.cs` | `SequentialReaction` (list of commands) |
-| `Alis.Reactive/Descriptors/Entry.cs` | One entry = trigger + reaction |
-| `Alis.Reactive/ExpressionPathHelper.cs` | Converts `x => x.Address.City` to `"evt.address.city"` dot-path for source binding |
-| `Alis.Reactive/InputField/InputFieldSetup.cs` | Generic `InputFieldSetup<THelper, TModel, TProp>` — framework-agnostic base |
-| `Alis.Reactive/InputField/InputFieldOptions.cs` | `Required()`, `Label()` — field wrapper options |
-| `Alis.Reactive/InputField/InputFieldBuilder.cs` | Internal, BCL-only — renders label + validation slot wrapper HTML |
-| `Alis.Reactive.Native/Extensions/InputFieldExtensions.cs` | Closes `THelper` to `IHtmlHelper<TModel>`, provides `Html.InputField()` factory + `Render(IHtmlContent)` |
-| `Alis.Reactive.Native/Extensions/HtmlExtensions.cs` | `Html.On()` extension — the view entry point |
+| `Html.On(plan, trigger: t => ...)` | Wires triggers to reactions (`HtmlExtensions.cs`) |
+| `t.DomReady(pipeline: p => ...)` | Trigger on page load (`TriggerBuilder.cs`) |
+| `p.Element("id").SetText(...)` | DOM mutations (`PipelineBuilder.cs` + `ElementBuilder.cs`) |
+| `p.Component<T>(m => m.Prop).SetValue(...)` | Component mutations (`PipelineBuilder.cs`) |
+| `Html.InputField(plan, m => m.Prop).FusionXxx(build: b => ...)` | Component factories (`InputFieldExtensions.cs` + `*HtmlExtensions.cs`) |
+| `.Reactive(plan, evt => evt.Changed, pipeline: (args, p) => ...)` | Component events (`*ReactiveExtensions.cs`) |
+| `p.When(source).Eq(value).Then(pipeline: ...)` | Conditions (`PipelineBuilder.Conditions.cs`) |
+| `p.Post(url, gather: g => ...).Response(response: r => ...)` | HTTP pipeline (`PipelineBuilder.Http.cs`) |
+
+**XML docs are the source of truth for the API surface.** Every public type and member
+has accurate XML documentation. Read the XML docs in IntelliSense rather than maintaining
+a separate file list here. The docs-site API reference at `docs-site/src/content/docs/reference/api-reference.md`
+is the consolidated view.
 
 ### Layer 2: JSON Plan (Schema-Validated Contract)
 
@@ -527,7 +526,53 @@ No IIFE, no `window.alis`, no import maps, no inline `<script type="module">` bl
 appends `?v=SHA256hash` — browser always gets the latest build. This works because the
 layout uses `src=` (not inline `import from`), and ASP.NET's tag helpers compute the hash.
 
-### 12. Playwright Test Workflow — Report First, Fix Methodically
+### 12. API Surface Is Frozen — No Changes Without Evidence
+
+The public API surface (method names, parameter names, return types, constructor visibility)
+is **frozen**. Every change cascades across views, tests, docs-site, examples, and skills.
+
+**Parameter naming convention (locked):**
+
+| Callback type | Parameter name |
+|---|---|
+| `Action<PipelineBuilder>` | `pipeline` |
+| `Action<TArgs, PipelineBuilder>` | `pipeline` |
+| `Action<XxxBuilder>` (components) | `build` |
+| `Action<TriggerBuilder>` | `trigger` |
+| `Action<GatherBuilder>` | `gather` |
+| `Action<ResponseBuilder>` | `response` |
+| `Action<HttpRequestBuilder>` | `request` |
+| `Func<ConditionSourceBuilder, GuardBuilder>` | `guard` |
+| `Func<ConditionStart, GuardBuilder>` | `inner` |
+
+**Visibility rules (locked):**
+- Descriptor constructors: `internal` — devs use builders, not raw descriptors
+- `TriggerBuilder` constructor: `internal` — devs use `Html.On()`
+- `BuildReaction(s)`, `ComponentsMap`: `internal` — framework plumbing
+- Event args constructors: `public` (required by `new()` generic constraint)
+- Event args properties (Fusion): `{ get; private set; }` — read-only phantom types
+- Changing `internal` to `public` is **strictly forbidden** — internal members were
+  made internal deliberately to protect the API surface
+
+**Fusion HtmlExtension methods use the Fusion prefix:**
+`.FusionDropDownList()`, `.FusionNumericTextBox()`, `.FusionSwitch()`, `.FusionDatePicker()`,
+`.FusionTimePicker()`, `.FusionDateTimePicker()`, `.FusionDateRangePicker()`,
+`.FusionAutoComplete()`, `.FusionColorPicker()`, `.FusionInputMask()`, `.FusionMultiSelect()`,
+`.FusionMultiColumnComboBox()`, `.FusionRichTextEditor()`, `.FusionFileUpload()`
+
+**XML docs voice for event args:** "Gets the..." (not "Gets or sets") — these are read-only
+phantom types. No "Syncfusion" prefix in docs — use the framework class name directly
+(e.g., "FusionAutoComplete" not "Syncfusion FusionAutoComplete").
+
+**To change ANY of the above, you must provide:**
+1. What is changing and why (specific problem, not "cleanup")
+2. Grep of all affected call sites
+3. Impact on views, tests, docs, examples, and skills
+4. Explicit user approval
+
+A hookify rule (`.claude/hookify.protect-api-surface.local.md`) enforces this at the tool level.
+
+### 13. Playwright Test Workflow — Report First, Fix Methodically
 
 **Always run Playwright with trx report so failures are captured in one pass:**
 
