@@ -54,9 +54,10 @@ the `ReactivePlan`. Nothing executes at this point.
 | `p.Post(url, gather: g => ...).Response(response: r => ...)` | HTTP pipeline (`PipelineBuilder.Http.cs`) |
 
 **XML docs are the source of truth for the API surface.** Every public type and member
-has accurate XML documentation. Read the XML docs in IntelliSense rather than maintaining
-a separate file list here. The docs-site API reference at `docs-site/src/content/docs/reference/api-reference.md`
-is the consolidated view.
+has XML documentation. Read the XML docs in IntelliSense rather than maintaining
+a separate file list here. Run `npm run build:api-docs` to regenerate the consolidated
+API reference at `docs-site/src/content/docs/reference/api-reference.md` from the XML
+doc files (`<GenerateDocumentationFile>true</GenerateDocumentationFile>` in Core/Native/Fusion csproj).
 
 ### Layer 2: JSON Plan (Schema-Validated Contract)
 
@@ -210,18 +211,9 @@ Test classes follow `When{Scenario}`, test methods describe the expected behavio
 - **Snapshot verifies** (`VerifyJson(plan.Render())`) — captures exact JSON output
 - **Schema validates** (`AssertSchemaValid(plan.Render())`) — validates against `reactive-plan.schema.json`
 
-**Test files:**
-
-| File | What it tests |
-|------|--------------|
-| `Commands/WhenDispatchingAnEvent.cs` | Dispatch with/without payload, multiple commands |
-| `Commands/WhenMutatingAnElement.cs` | All 7 actions: AddClass, RemoveClass, ToggleClass, SetText, SetHtml, Show, Hide + mixed chains |
-| `Commands/WhenResolvingPayloadSource.cs` | Source-based SetText/SetHtml from event payload: flat primitives (int, long, double, string, bool) + nested dot-paths (address.city, address.zip) |
-| `Triggers/WhenTriggeringOnDomReady.cs` | DomReady trigger serialization |
-| `Triggers/WhenTriggeringOnCustomEvent.cs` | CustomEvent trigger, typed payload |
-| `Triggers/WhenTriggeringOnCustomEventWithAllSupportedTypes.cs` | All primitive types in payload |
-| `Plan/WhenComposingAPlan.cs` | Empty plan, multiple entries, empty pipeline |
-| `Schema/AllPlansConformToSchema.cs` | Every command kind × every trigger kind validated against JSON schema |
+Tests are organized by domain under `tests/Alis.Reactive.UnitTests/`: Commands, Triggers,
+Plan, Schema, Conditions, Descriptors, HTTP. Native/Fusion/FluentValidator have their own
+test projects. Each test class follows `When{Scenario}` naming.
 
 **Conventions:**
 - `.verified.txt` files live in the same folder as the test class
@@ -237,19 +229,10 @@ Test classes follow `When{Scenario}`, test methods describe the expected behavio
 **Pattern:** Integration tests call `boot()` and assert DOM state. Direct unit tests import
 resolver functions and test every edge case in isolation.
 
-| File | What it tests |
-|------|--------------|
-| `when-composing-a-plan.test.ts` | Plan structure, entry count |
-| `when-triggering-on-dom-ready.test.ts` | Dom-ready fires reaction |
-| `when-triggering-on-custom-event.test.ts` | Custom event listener → reaction |
-| `when-dom-ready-chains-into-custom-event.test.ts` | Two-phase boot regression test |
-| `when-dispatching-an-event.test.ts` | Dispatch fires CustomEvent on document |
-| `when-dispatching-a-custom-event-with-payload.test.ts` | All primitive types survive serialization |
-| `when-mutating-an-element.test.ts` | All 7 mutate actions + mixed chains |
-| `when-resolving-payload-source.test.ts` | Source dot-path resolution via boot(): flat int/string/bool, nested, missing path fallback |
-| `when-resolving-bind-expr.test.ts` | Direct resolveEventPath() + coerce() tests: flat/nested/edge cases, condition-ready patterns (numeric, presence, truthiness, emptiness, text, range) |
-| `when-coercing-resolved-values.test.ts` | Direct coerce() tests: string, number, boolean, raw with every boundary value (date and array tested separately) |
-| `when-using-unified-call-mutations.test.ts` | Unified call mutation: void, literal, source, multi-arg, mixed, component source, per-arg coerce |
+Tests are organized by module under `Alis.Reactive.SandboxApp/Scripts/__tests__/`:
+core behaviors (boot, dispatch, mutations, coercion), conditions, HTTP pipeline,
+validation, components (native + fusion), and gather. Each test file follows
+`when-{scenario}.test.ts` naming.
 
 **Run:** `npm test`
 
@@ -261,12 +244,16 @@ resolver functions and test every edge case in isolation.
 DOM state and trace output. `PlaywrightTestBase` captures all console messages and dumps them
 on test failure.
 
-| File | What it tests |
+| Directory | What it tests |
 |------|--------------|
-| `Events/WhenPageLoads.cs` | Page title, content sections, plan JSON rendered, nav links |
-| `Events/WhenEventChainFires.cs` | 3-hop dispatch chain, chronological order, payload, DOM mutations |
-| `Events/WhenTraceIsEnabled.cs` | Boot trace in console, trace format |
-| `Payload/WhenPayloadPropertiesResolve.cs` | All primitives (int, long, double, string, bool) + nested (address.street, city, zip) resolved from event payload to DOM text |
+| `CoreBehaviors/` | Plan boot, event chains, payload flow, trace output |
+| `Components/Native/` | TextBox, CheckBox, DropDown, RadioGroup, CheckList, Button, HiddenField, TextArea |
+| `Components/Fusion/` | DropDownList, NumericTextBox, DatePicker, TimePicker, Switch, AutoComplete, etc. |
+| `Components/AppLevel/` | Drawer open/close |
+| `Conditions/` | Guard execution, conditions after HTTP, component-driven conditions |
+| `HttpPipeline/` | Server data loads, response content types, SSE/SignalR real-time |
+| `Validation/` | Required fields, date rules, specialized rules, error clearing, hidden fields |
+| `AllModulesTogether/` | Cross-vendor plans, cascading selections, form patterns, workflows |
 
 **Infrastructure:**
 - `WebServerFixture.cs` — Assembly-level setup, starts Kestrel on port 5220
@@ -285,6 +272,9 @@ npm run build:css                # → wwwroot/css/design-system.css
 
 # Both JS + CSS
 npm run build:all
+
+# API reference (auto-generated from XML docs)
+npm run build:api-docs               # → docs-site/src/content/docs/reference/api-reference.md
 
 # TypeScript typecheck
 npm run typecheck
@@ -383,7 +373,7 @@ not at runtime via reflection.
 
 #### ComponentsMap — Single Source of Truth
 
-`IReactivePlan.ComponentsMap` is populated when component builders register their components.
+`ReactivePlan<TModel>.ComponentsMap` is populated when component builders register their components.
 It maps `bindingPath → ComponentRegistration(componentId, vendor, bindingPath, readExpr)`.
 Used by:
 - **GatherResolver** — resolves gather placeholders to structured `ComponentSource` at render time
@@ -550,7 +540,7 @@ is **frozen**. Every change cascades across views, tests, docs-site, examples, a
 - `TriggerBuilder` constructor: `internal` — devs use `Html.On()`
 - `BuildReaction(s)`, `ComponentsMap`: `internal` — framework plumbing
 - Event args constructors: `public` (required by `new()` generic constraint)
-- Event args properties (Fusion): `{ get; private set; }` — read-only phantom types
+- Event args properties: `{ get; set; }` — phantom types (values never read at runtime)
 - Changing `internal` to `public` is **strictly forbidden** — internal members were
   made internal deliberately to protect the API surface
 
@@ -560,8 +550,8 @@ is **frozen**. Every change cascades across views, tests, docs-site, examples, a
 `.FusionAutoComplete()`, `.FusionColorPicker()`, `.FusionInputMask()`, `.FusionMultiSelect()`,
 `.FusionMultiColumnComboBox()`, `.FusionRichTextEditor()`, `.FusionFileUpload()`
 
-**XML docs voice for event args:** "Gets the..." (not "Gets or sets") — these are read-only
-phantom types. No "Syncfusion" prefix in docs — use the framework class name directly
+**XML docs voice for event args:** "Gets or sets" for `{ get; set; }` properties per C#
+convention. No "Syncfusion" prefix in docs — use the framework class name directly
 (e.g., "FusionAutoComplete" not "Syncfusion FusionAutoComplete").
 
 **To change ANY of the above, you must provide:**
@@ -694,22 +684,22 @@ restart before running Playwright.
 # Full test suite — run all from the repo root:
 cd /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive
 
-# 1. TS unit tests (vitest + jsdom) — 944 tests
+# 1. TS unit tests (vitest + jsdom)
 npm test
 
-# 2. C# unit + schema tests — 282 tests
+# 2. C# unit + schema tests
 dotnet test tests/Alis.Reactive.UnitTests
 
-# 3. Native component unit tests — 73 tests
+# 3. Native component unit tests
 dotnet test tests/Alis.Reactive.Native.UnitTests
 
-# 4. Fusion component unit tests — 103 tests
+# 4. Fusion component unit tests
 dotnet test tests/Alis.Reactive.Fusion.UnitTests
 
-# 5. FluentValidator unit tests — 52 tests
+# 5. FluentValidator unit tests
 dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 
-# 6. Playwright browser tests (browser behavior) — 483 tests
+# 6. Playwright browser tests (browser behavior)
 dotnet test tests/Alis.Reactive.PlaywrightTests
 
 # 7. SonarQube quality gate (requires Docker running with SonarQube)
@@ -717,8 +707,6 @@ dotnet test tests/Alis.Reactive.PlaywrightTests
 # Exit code 1 = quality gate failed — fix reported issues before committing.
 # Skip if Docker/SonarQube is not running, but run at least once per feature branch.
 ```
-
-**Total: ~1,900+ tests (944 TS + 510 C# unit + 483 Playwright)**
 
 If any test fails, fix the issue and re-run ALL tests before committing.
 Never commit with failing tests. Never skip Playwright.
