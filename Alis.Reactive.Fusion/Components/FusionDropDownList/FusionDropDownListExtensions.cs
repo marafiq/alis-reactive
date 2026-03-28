@@ -9,6 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed mutations and value reading for <see cref="FusionDropDownList"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionDropDownList&gt;(m =&gt; m.Country).SetValue("US")</c>.
+    /// </remarks>
     public static class FusionDropDownListExtensions
     {
         private static readonly FusionDropDownList Component = new FusionDropDownList();

@@ -11,6 +11,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion ColorPicker inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.ThemeColor)</c>, then call
+    /// <c>.ColorPicker(b =&gt; { b.Mode(ColorPickerMode.Palette); })</c>.
+    /// </remarks>
     public static class FusionColorPickerHtmlExtensions
     {
         private static readonly FusionColorPicker Component = new FusionColorPicker();

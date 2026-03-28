@@ -68,12 +68,12 @@ namespace Alis.Reactive.Builders
         /// Wires a reaction with a typed payload that executes when the named custom event fires.
         /// </summary>
         /// <remarks>
-        /// The <typeparamref name="TPayload"/> instance is a phantom used for compile-time
-        /// expression paths. Its property values are not read at build time.
+        /// The <typeparamref name="TPayload"/> instance is used only for compile-time type inference;
+        /// its property values are never read.
         /// </remarks>
         /// <typeparam name="TPayload">The event payload type, providing typed access to payload properties.</typeparam>
         /// <param name="eventName">The event name to listen for.</param>
-        /// <param name="configure">Receives the typed payload phantom and the pipeline builder.</param>
+        /// <param name="configure">Receives the typed payload instance and the pipeline builder.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> CustomEvent<TPayload>(string eventName,
             Action<TPayload, PipelineBuilder<TModel>> configure)
@@ -120,7 +120,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">The event payload type, providing typed access to payload properties.</typeparam>
         /// <param name="url">The SSE endpoint URL.</param>
         /// <param name="eventType">The SSE event type to filter for.</param>
-        /// <param name="configure">Receives the typed payload phantom and the pipeline builder.</param>
+        /// <param name="configure">Receives the typed payload instance and the pipeline builder.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> ServerPush<TPayload>(string url, string eventType,
             Action<TPayload, PipelineBuilder<TModel>> configure)
@@ -154,7 +154,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">The event payload type, providing typed access to payload properties.</typeparam>
         /// <param name="hubUrl">The SignalR hub endpoint URL.</param>
         /// <param name="methodName">The hub method name to listen for.</param>
-        /// <param name="configure">Receives the typed payload phantom and the pipeline builder.</param>
+        /// <param name="configure">Receives the typed payload instance and the pipeline builder.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> SignalR<TPayload>(string hubUrl, string methodName,
             Action<TPayload, PipelineBuilder<TModel>> configure)

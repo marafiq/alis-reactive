@@ -8,6 +8,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// <para>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).Value()</c>.
+    /// </para>
+    /// <para>
     /// <see cref="StartDate{TModel}"/> and <see cref="EndDate{TModel}"/> read individual
     /// dates for use in conditions. <see cref="Value{TModel}"/> reads both dates as an array.
     /// </para>

@@ -6,6 +6,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed mutations and value reading for <see cref="FusionColorPicker"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionColorPicker&gt;(m =&gt; m.ThemeColor).SetValue("#ff0000")</c>.
+    /// </remarks>
     public static class FusionColorPickerExtensions
     {
         private static readonly FusionColorPicker Component = new FusionColorPicker();

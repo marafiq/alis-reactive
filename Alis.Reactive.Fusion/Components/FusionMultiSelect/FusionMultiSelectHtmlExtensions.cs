@@ -12,6 +12,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion MultiSelect inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Skills)</c>, then call
+    /// <c>.MultiSelect(b =&gt; { b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value); })</c>.
+    /// </remarks>
     public static class FusionMultiSelectHtmlExtensions
     {
         private static readonly FusionMultiSelect Component = new FusionMultiSelect();

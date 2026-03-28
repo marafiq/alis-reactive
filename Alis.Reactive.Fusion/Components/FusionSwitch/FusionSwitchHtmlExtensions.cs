@@ -11,6 +11,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion Switch inside a field wrapper, bound to a boolean model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.IsActive)</c>, then call
+    /// <c>.Switch(b =&gt; { b.CssClass("custom-switch"); })</c>.
+    /// </remarks>
     public static class FusionSwitchHtmlExtensions
     {
         private static readonly FusionSwitch Component = new FusionSwitch();

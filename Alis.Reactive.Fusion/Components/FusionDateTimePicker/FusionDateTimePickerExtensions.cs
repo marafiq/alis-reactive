@@ -8,6 +8,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed mutations and value reading for <see cref="FusionDateTimePicker"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionDateTimePicker&gt;(m =&gt; m.AppointmentTime).SetValue(DateTime.Now)</c>.
+    /// </remarks>
     public static class FusionDateTimePickerExtensions
     {
         private static readonly FusionDateTimePicker Component = new FusionDateTimePicker();

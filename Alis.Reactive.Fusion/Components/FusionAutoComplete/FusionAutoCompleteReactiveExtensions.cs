@@ -11,11 +11,17 @@ namespace Alis.Reactive.Fusion.Components
     /// Wires browser events from a <see cref="FusionAutoComplete"/> into the reactive plan.
     /// </summary>
     /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionAutoCompleteHtmlExtensions.AutoComplete{TModel, TProp}"/>:
     /// <code>
-    /// .Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt;
+    /// Html.InputField(plan, m =&gt; m.Physician).AutoComplete(b =&gt;
     /// {
-    ///     p.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician).SetValue("Dr. Smith");
-    /// })
+    ///     b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value);
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt;
+    ///     {
+    ///         p.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician).SetValue("Dr. Smith");
+    ///     });
+    /// });
     /// </code>
     /// </remarks>
     public static class FusionAutoCompleteReactiveExtensions

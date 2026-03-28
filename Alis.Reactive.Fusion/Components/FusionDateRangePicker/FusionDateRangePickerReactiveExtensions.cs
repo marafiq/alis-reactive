@@ -10,6 +10,17 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionDateRangePicker"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionDateRangePickerHtmlExtensions.DateRangePicker{TModel, TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.StayDates).DateRangePicker(b =&gt;
+    /// {
+    ///     b.Format("MM/dd/yyyy");
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionDateRangePickerReactiveExtensions
     {
         private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();

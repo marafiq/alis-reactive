@@ -9,6 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed mutations and value reading for <see cref="FusionMultiColumnComboBox"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionMultiColumnComboBox&gt;(m =&gt; m.Facility).SetValue("FAC-001")</c>.
+    /// </remarks>
     public static class FusionMultiColumnComboBoxExtensions
     {
         private static readonly FusionMultiColumnComboBox Component = new FusionMultiColumnComboBox();

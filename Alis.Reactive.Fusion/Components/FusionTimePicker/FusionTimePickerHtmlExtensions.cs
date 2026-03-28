@@ -11,6 +11,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion TimePicker inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.CheckInTime)</c>, then call
+    /// <c>.TimePicker(b =&gt; { b.Step(15).Format("hh:mm a"); })</c>.
+    /// </remarks>
     public static class FusionTimePickerHtmlExtensions
     {
         private static readonly FusionTimePicker Component = new FusionTimePicker();

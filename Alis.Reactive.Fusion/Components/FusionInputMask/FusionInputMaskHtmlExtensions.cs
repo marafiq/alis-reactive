@@ -11,6 +11,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion MaskedTextBox inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Phone)</c>, then call
+    /// <c>.InputMask(b =&gt; { b.Mask("(999) 000-0000"); })</c>.
+    /// </remarks>
     public static class FusionInputMaskHtmlExtensions
     {
         private static readonly FusionInputMask Component = new FusionInputMask();

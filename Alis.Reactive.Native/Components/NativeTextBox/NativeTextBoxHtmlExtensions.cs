@@ -8,6 +8,14 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Factory extension for creating a <see cref="NativeTextBox"/> inside a field wrapper.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <see cref="Alis.Reactive.Native.Extensions.InputFieldExtensions.InputField{TModel, TProp}"/>
+    /// and call <c>.NativeTextBox()</c> to choose the text input:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.Name, o =&gt; o.Required().Label("Name"))
+    ///     .NativeTextBox(b =&gt; b.Placeholder("Enter name"));
+    /// </code>
+    /// </remarks>
     public static class NativeTextBoxHtmlExtensions
     {
         private static readonly NativeTextBox _component = new NativeTextBox();

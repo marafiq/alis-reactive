@@ -11,6 +11,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion RichTextEditor inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Notes)</c>, then call
+    /// <c>.RichTextEditor(b =&gt; { b.Height(200); })</c>.
+    /// </remarks>
     public static class FusionRichTextEditorHtmlExtensions
     {
         private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();

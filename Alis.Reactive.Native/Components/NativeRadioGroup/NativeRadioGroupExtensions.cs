@@ -9,6 +9,11 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Pipeline extensions for <see cref="NativeRadioGroup"/>: set selected value, focus, and read.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
+    /// <see cref="Builders.PipelineBuilder{TModel}.Component{TComponent}(System.Linq.Expressions.Expression{System.Func{TModel, object}})"/>:
+    /// <code>p.Component&lt;NativeRadioGroup&gt;(m =&gt; m.Priority).SetValue("high")</code>
+    /// </remarks>
     public static class NativeRadioGroupExtensions
     {
         private static readonly NativeRadioGroup _component = new NativeRadioGroup();

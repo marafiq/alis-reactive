@@ -9,6 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed mutations and value reading for <see cref="FusionMultiSelect"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Skills).SetValue(new[] { "C#", "SQL" })</c>.
+    /// </remarks>
     public static class FusionMultiSelectExtensions
     {
         private static readonly FusionMultiSelect Component = new FusionMultiSelect();

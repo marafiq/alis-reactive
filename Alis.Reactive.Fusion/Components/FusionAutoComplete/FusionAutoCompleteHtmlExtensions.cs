@@ -12,6 +12,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion AutoComplete inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Physician)</c>, then call
+    /// <c>.AutoComplete(b =&gt; { b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value); })</c>.
+    /// </remarks>
     public static class FusionAutoCompleteHtmlExtensions
     {
         private static readonly FusionAutoComplete Component = new FusionAutoComplete();

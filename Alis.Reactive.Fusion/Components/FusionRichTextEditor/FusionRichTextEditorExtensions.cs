@@ -6,6 +6,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed mutations and value reading for <see cref="FusionRichTextEditor"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.Notes).SetValue("&lt;p&gt;Hello&lt;/p&gt;")</c>.
+    /// </remarks>
     public static class FusionRichTextEditorExtensions
     {
         private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();

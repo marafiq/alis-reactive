@@ -10,15 +10,20 @@ namespace Alis.Reactive.Native.Extensions
     public static class HtmlExtensions
     {
         /// <summary>
-        /// Adds reactive behavior to <paramref name="plan"/> by configuring triggers and
-        /// what happens when the producer dispatches an event in the browser.
+        /// Adds reactive behavior to <paramref name="plan"/> by configuring browser triggers
+        /// and the commands that run when each trigger fires.
         /// </summary>
         /// <remarks>
-        /// Triggers execute the intent expressed in the body of <c>DomReady</c>,
-        /// <c>CustomEvent</c>, <c>ServerPush</c> (SSE), and <c>SignalR</c> in the browser, in declaration order,
-        /// when the producer dispatches the particular event via the <see cref="TriggerBuilder{TModel}"/> API.
-        /// Avoid defining the same event twice in the same view — duplicate listeners are an antipattern
-        /// unless there is a legitimate reason to split the reaction across multiple blocks.
+        /// <para>
+        /// A trigger is a browser event that starts a reaction: the page loading (<c>DomReady</c>),
+        /// a custom event (<c>CustomEvent</c>), a server-sent event (<c>ServerPush</c>), or a
+        /// SignalR message (<c>SignalR</c>). When the trigger fires, the commands declared in
+        /// its callback execute in declaration order.
+        /// </para>
+        /// <para>
+        /// Avoid defining the same event twice in the same view. Duplicate listeners are
+        /// rarely needed and usually indicate the reaction should be combined into one block.
+        /// </para>
         /// </remarks>
         /// <typeparam name="TModel">The view model type</typeparam>
         /// <param name="html">The Razor HTML helper.</param>

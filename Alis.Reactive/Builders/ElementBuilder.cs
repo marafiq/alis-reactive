@@ -79,10 +79,11 @@ namespace Alis.Reactive.Builders
         /// Sets the element text from an event payload property resolved in the browser.
         /// </summary>
         /// <remarks>
-        /// The <paramref name="source"/> instance is used only for generic type inference. Its value is ignored.
+        /// The <paramref name="source"/> instance is used only for compile-time type inference;
+        /// its property values are never read.
         /// </remarks>
         /// <typeparam name="TSource">The event payload type.</typeparam>
-        /// <param name="source">The phantom payload instance for type inference.</param>
+        /// <param name="source">The payload instance providing compile-time type inference.</param>
         /// <param name="path">The property-access expression into the payload.</param>
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object?>> path)
@@ -96,7 +97,7 @@ namespace Alis.Reactive.Builders
         /// Sets the element text from an HTTP response body property.
         /// </summary>
         /// <typeparam name="TResponse">The response body type.</typeparam>
-        /// <param name="source">The phantom response body instance for type inference.</param>
+        /// <param name="source">The response body instance providing compile-time type inference.</param>
         /// <param name="path">The property-access expression into the response body.</param>
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
@@ -110,6 +111,15 @@ namespace Alis.Reactive.Builders
         /// <summary>
         /// Sets the element text from a <see cref="BindSource"/> (event or component).
         /// </summary>
+        /// <remarks>
+        /// Resolves the source value in the browser and assigns it to the element's text content.
+        /// Typically used with <see cref="ComponentSource"/> or <see cref="EventSource"/>:
+        /// <code>
+        /// p.Element("echo").SetText(new ComponentSource(id, vendor, readExpr));
+        /// </code>
+        /// Prefer the <see cref="SetText{TProp}(TypedSource{TProp})"/> overload when a
+        /// component's <c>Value()</c> method is available, as it preserves type safety.
+        /// </remarks>
         /// <param name="source">The source binding to resolve in the browser.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>
         public ElementBuilder<TModel> SetText(BindSource source)
@@ -122,6 +132,13 @@ namespace Alis.Reactive.Builders
         /// <summary>
         /// Sets the element text from a typed source (type-safe for conditions).
         /// </summary>
+        /// <remarks>
+        /// Use with a component's <c>Value()</c> method to display its current value:
+        /// <code>
+        /// var comp = p.Component&lt;NativeTextBox&gt;(m => m.Name);
+        /// p.Element("name-echo").SetText(comp.Value());
+        /// </code>
+        /// </remarks>
         /// <typeparam name="TProp">The source property type.</typeparam>
         /// <param name="source">The typed source to resolve.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>
@@ -147,7 +164,7 @@ namespace Alis.Reactive.Builders
         /// Sets the element HTML from an event payload property resolved in the browser.
         /// </summary>
         /// <typeparam name="TSource">The event payload type.</typeparam>
-        /// <param name="source">The phantom payload instance for type inference.</param>
+        /// <param name="source">The payload instance providing compile-time type inference.</param>
         /// <param name="path">The property-access expression into the payload.</param>
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object?>> path)
@@ -160,6 +177,11 @@ namespace Alis.Reactive.Builders
         /// <summary>
         /// Sets the element HTML from a <see cref="BindSource"/> (event or component).
         /// </summary>
+        /// <remarks>
+        /// Resolves the source value in the browser and assigns it to the element's inner HTML.
+        /// Prefer the <see cref="SetHtml{TProp}(TypedSource{TProp})"/> overload when a
+        /// component's <c>Value()</c> method is available, as it preserves type safety.
+        /// </remarks>
         /// <param name="source">The source binding to resolve in the browser.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>
         public ElementBuilder<TModel> SetHtml(BindSource source)
@@ -172,6 +194,13 @@ namespace Alis.Reactive.Builders
         /// <summary>
         /// Sets the element HTML from a typed source (type-safe for conditions).
         /// </summary>
+        /// <remarks>
+        /// Use with a component's <c>Value()</c> method to display its current value as HTML:
+        /// <code>
+        /// var comp = p.Component&lt;NativeTextBox&gt;(m => m.Name);
+        /// p.Element("name-html").SetHtml(comp.Value());
+        /// </code>
+        /// </remarks>
         /// <typeparam name="TProp">The source property type.</typeparam>
         /// <param name="source">The typed source to resolve.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>
@@ -208,7 +237,7 @@ namespace Alis.Reactive.Builders
         /// </summary>
         /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <typeparam name="TProp">The property type used by the condition.</typeparam>
-        /// <param name="payload">The phantom payload instance for type inference.</param>
+        /// <param name="payload">The payload instance providing compile-time type inference.</param>
         /// <param name="path">The property-access expression into the payload.</param>
         /// <param name="configure">Configures the condition operator and produces a guard.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>

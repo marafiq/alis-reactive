@@ -11,6 +11,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion NumericTextBox inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Quantity)</c>, then call
+    /// <c>.NumericTextBox(b =&gt; { b.Min(0).Max(100).Step(1); })</c>.
+    /// </remarks>
     public static class FusionNumericTextBoxHtmlExtensions
     {
         private static readonly FusionNumericTextBox Component = new FusionNumericTextBox();

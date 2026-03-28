@@ -7,6 +7,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed mutations and value reading for <see cref="FusionNumericTextBox"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Quantity).SetValue(10m)</c>.
+    /// </remarks>
     public static class FusionNumericTextBoxExtensions
     {
         private static readonly FusionNumericTextBox Component = new FusionNumericTextBox();

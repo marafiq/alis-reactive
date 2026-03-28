@@ -6,6 +6,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed mutations and value reading for <see cref="FusionSwitch"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionSwitch&gt;(m =&gt; m.IsActive).SetChecked(true)</c>.
+    /// </remarks>
     public static class FusionSwitchExtensions
     {
         private static readonly FusionSwitch Component = new FusionSwitch();

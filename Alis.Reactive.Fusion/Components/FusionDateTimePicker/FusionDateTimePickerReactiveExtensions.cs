@@ -10,6 +10,17 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionDateTimePicker"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <see cref="FusionDateTimePickerHtmlExtensions.DateTimePicker{TModel, TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.AppointmentTime).DateTimePicker(b =&gt;
+    /// {
+    ///     b.Format("MM/dd/yyyy hh:mm a");
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionDateTimePickerReactiveExtensions
     {
         private static readonly FusionDateTimePicker Component = new FusionDateTimePicker();

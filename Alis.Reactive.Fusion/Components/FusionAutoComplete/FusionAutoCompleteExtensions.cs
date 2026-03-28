@@ -9,6 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed mutations and value reading for <see cref="FusionAutoComplete"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician).SetValue("Dr. Smith")</c>.
+    /// </remarks>
     public static class FusionAutoCompleteExtensions
     {
         private static readonly FusionAutoComplete Component = new FusionAutoComplete();

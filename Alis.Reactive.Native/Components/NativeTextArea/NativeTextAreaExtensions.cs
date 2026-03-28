@@ -6,6 +6,11 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Pipeline extensions for <see cref="NativeTextArea"/>: set value, focus, and read.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
+    /// <see cref="Builders.PipelineBuilder{TModel}.Component{TComponent}(System.Linq.Expressions.Expression{System.Func{TModel, object}})"/>:
+    /// <code>p.Component&lt;NativeTextArea&gt;(m =&gt; m.Notes).SetValue("updated")</code>
+    /// </remarks>
     public static class NativeTextAreaExtensions
     {
         private static readonly NativeTextArea _component = new NativeTextArea();

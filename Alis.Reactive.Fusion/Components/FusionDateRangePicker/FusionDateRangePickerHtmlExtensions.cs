@@ -11,6 +11,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion DateRangePicker inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.StayDates)</c>, then call
+    /// <c>.DateRangePicker(b =&gt; { b.Format("MM/dd/yyyy"); })</c>.
+    /// </remarks>
     public static class FusionDateRangePickerHtmlExtensions
     {
         private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();

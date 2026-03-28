@@ -6,6 +6,11 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Pipeline extensions for <see cref="NativeCheckBox"/>: set checked state, focus, and read.
     /// </summary>
+    /// <remarks>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
+    /// <see cref="Builders.PipelineBuilder{TModel}.Component{TComponent}(System.Linq.Expressions.Expression{System.Func{TModel, object}})"/>:
+    /// <code>p.Component&lt;NativeCheckBox&gt;(m =&gt; m.IsActive).SetChecked(true)</code>
+    /// </remarks>
     public static class NativeCheckBoxExtensions
     {
         private static readonly NativeCheckBox _component = new NativeCheckBox();

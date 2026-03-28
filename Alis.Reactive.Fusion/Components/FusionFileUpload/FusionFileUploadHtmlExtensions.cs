@@ -11,6 +11,10 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Creates a Syncfusion Uploader inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Document)</c>, then call
+    /// <c>.FileUpload(b =&gt; { b.AllowedExtensions(".pdf,.docx"); })</c>.
+    /// </remarks>
     public static class FusionFileUploadHtmlExtensions
     {
         private static readonly FusionFileUpload Component = new FusionFileUpload();

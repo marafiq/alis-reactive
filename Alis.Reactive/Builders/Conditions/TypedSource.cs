@@ -5,6 +5,11 @@ using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive.Builders.Conditions
 {
+    /// <summary>
+    /// Base class for typed source bindings that preserve the property type through
+    /// the condition and mutation pipeline.
+    /// </summary>
+    /// <typeparam name="TProp">The property type, used by condition operators for compile-time type safety.</typeparam>
     public abstract class TypedSource<TProp>
     {
         public abstract BindSource ToBindSource();

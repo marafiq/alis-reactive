@@ -6,7 +6,13 @@ namespace Alis.Reactive.Fusion.Components
     /// Typed value reading for <see cref="FusionFileUpload"/> in a reactive pipeline.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Document).Value()</c>.
+    /// </para>
+    /// <para>
     /// No <c>SetValue()</c> is provided. Files are set by user interaction only.
+    /// </para>
     /// </remarks>
     public static class FusionFileUploadExtensions
     {

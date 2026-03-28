@@ -11,8 +11,17 @@ namespace Alis.Reactive.Native.Extensions
     /// type is specified.
     /// </summary>
     /// <remarks>
-    /// Use the typed <see cref="Builders.Requests.GatherExtensions"/> overload
-    /// when gathering from a non-textbox component.
+    /// <para>
+    /// "Gather" collects the current values of form components and includes them in the
+    /// HTTP request payload before sending. Each <c>Include</c>
+    /// call adds one component's value to the request body.
+    /// </para>
+    /// <para>
+    /// This class provides a convenience overload that assumes <see cref="NativeTextBox"/>.
+    /// For other component types, use the typed
+    /// <see cref="Builders.Requests.GatherExtensions"/> overload:
+    /// <c>g.Include&lt;NativeDropDown, MyModel&gt;(m =&gt; m.Status)</c>.
+    /// </para>
     /// </remarks>
     public static class NativeGatherExtensions
     {
@@ -22,7 +31,7 @@ namespace Alis.Reactive.Native.Extensions
         /// Gathers the value of a native text input bound to <paramref name="expr"/>.
         /// </summary>
         /// <remarks>
-        /// Shorthand for <see cref="NativeTextBox"/> — use the typed overload
+        /// Shorthand for <see cref="NativeTextBox"/>. Use the typed overload
         /// when gathering from a different component type.
         /// </remarks>
         /// <typeparam name="TModel">The view model type.</typeparam>

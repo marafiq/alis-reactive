@@ -22,7 +22,7 @@ namespace Alis.Reactive.Native.Extensions
         /// Creates a <see cref="ReactivePlan{TModel}"/> for a view.
         /// </summary>
         /// <remarks>
-        /// This is the first call in a view — the returned plan is passed to
+        /// This is the first call in a view. The returned plan is passed to
         /// <see cref="HtmlExtensions.On{TModel}"/> to define behavior and to
         /// <see cref="RenderPlan{TModel}"/> to render reactive behaviors that will execute in browser.
         /// Partial views that share the same <typeparamref name="TModel"/> use
@@ -41,9 +41,15 @@ namespace Alis.Reactive.Native.Extensions
         /// to an existing plan.
         /// </summary>
         /// <remarks>
-        /// The returned plan contributes to the same plan as the view that called
-        /// <see cref="ReactivePlan{TModel}(IHtmlHelper{TModel})"/>. Reactive behaviors from both
-        /// merge and execute as a single unit in the browser.
+        /// <para>
+        /// Partials follow the same create-at-top, render-at-bottom pattern as views:
+        /// call <c>ResolvePlan</c> at the top and <see cref="RenderPlan{TModel}"/> at the bottom.
+        /// Both calls are required for the partial's reactive behavior to work.
+        /// </para>
+        /// <para>
+        /// The returned plan's behaviors merge with the owning view's plan and execute
+        /// as a single unit in the browser.
+        /// </para>
         /// </remarks>
         /// <typeparam name="TModel">The view model type must match the view's model.</typeparam>
         /// <returns>A plan instance that merges into the view's plan in the browser.</returns>
@@ -58,7 +64,7 @@ namespace Alis.Reactive.Native.Extensions
         /// execute in the browser as expressed.
         /// </summary>
         /// <remarks>
-        /// This must be the last call in every view — a plan that is not rendered
+        /// This must be the last call in every view. A plan that is not rendered
         /// produces no reactive behavior in the browser.
         /// </remarks>
         /// <typeparam name="TModel">The view model type.</typeparam>
