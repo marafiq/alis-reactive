@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static UploaderBuilder Reactive<TModel, TArgs>(
             this UploaderBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionFileUploadEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

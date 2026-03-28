@@ -3,7 +3,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.SandboxApp.Hubs
 @{
-    IReactivePlan<ResidentPanelModel> plan = new ReactivePlan<ResidentPanelModel>();
+    ReactivePlan<ResidentPanelModel> plan = new ReactivePlan<ResidentPanelModel>();
 
     // Partial connects to the SAME hub as parent — runtime reuses the connection
     Html.On(plan, t => t.SignalR<ResidentStatusPayload>("/hubs/resident-status", "StatusChanged",

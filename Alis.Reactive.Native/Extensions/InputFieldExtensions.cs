@@ -19,7 +19,7 @@ namespace Alis.Reactive.Native.Extensions
     {
         internal InputFieldSetup(
             IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             InputFieldOptions options,
             string elementId,
@@ -43,7 +43,7 @@ namespace Alis.Reactive.Native.Extensions
     {
         public static InputFieldSetup<TModel, TProp> InputField<TModel, TProp>(
             this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             Action<InputFieldOptions>? options = null)
             where TModel : class

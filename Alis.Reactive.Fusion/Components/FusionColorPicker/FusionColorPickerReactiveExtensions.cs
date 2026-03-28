@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static ColorPickerBuilder Reactive<TModel, TArgs>(
             this ColorPickerBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionColorPickerEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

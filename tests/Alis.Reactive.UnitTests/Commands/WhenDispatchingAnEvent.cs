@@ -19,7 +19,7 @@ public class WhenDispatchingAnEvent : PlanTestBase
             p.Dispatch("second", new TestModel { Id = "x" });
         }).Render());
 
-    private static IReactivePlan<TestModel> Build(Action<Builders.PipelineBuilder<TestModel>> configure)
+    private static ReactivePlan<TestModel> Build(Action<Builders.PipelineBuilder<TestModel>> configure)
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(configure);

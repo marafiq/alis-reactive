@@ -49,7 +49,7 @@ public class WhenMutatingAnElement : PlanTestBase
     public Task SetHtml_produces_correct_action() =>
         VerifyJson(Build(p => p.Element("container").SetHtml("<strong>done</strong>")).Render());
 
-    private static IReactivePlan<TestModel> Build(Action<Builders.PipelineBuilder<TestModel>> configure)
+    private static ReactivePlan<TestModel> Build(Action<Builders.PipelineBuilder<TestModel>> configure)
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(configure);

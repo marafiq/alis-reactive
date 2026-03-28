@@ -6,7 +6,7 @@
 @{
     ViewData["Title"] = "Real-Time Triggers";
 
-    IReactivePlan<RealTimeModel> plan = new ReactivePlan<RealTimeModel>();
+    ReactivePlan<RealTimeModel> plan = new ReactivePlan<RealTimeModel>();
 
     // SSE: facility alerts (native EventSource, zero library, auto-reconnect)
     Html.On(plan, t => t.ServerPush<FacilityAlert>("/api/facility-alerts", "facility-alert",

@@ -36,7 +36,7 @@ public abstract class NativeTestBase
 
     protected static ReactivePlan<NativeTestModel> CreatePlan() => new();
 
-    protected static TriggerBuilder<NativeTestModel> Trigger(IReactivePlan<NativeTestModel> plan) => new(plan);
+    protected static TriggerBuilder<NativeTestModel> Trigger(ReactivePlan<NativeTestModel> plan) => new(plan);
 
     protected static void AssertSchemaValid(string planJson)
     {

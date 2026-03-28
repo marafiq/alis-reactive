@@ -17,6 +17,9 @@
         <InternalsVisibleTo Include="Alis.Reactive.UnitTests" />
         <InternalsVisibleTo Include="Alis.Reactive.FluentValidator" />
         <InternalsVisibleTo Include="Alis.Reactive.FluentValidator.UnitTests" />
+        <InternalsVisibleTo Include="Alis.Reactive.Native.UnitTests" />
+        <InternalsVisibleTo Include="Alis.Reactive.Fusion.UnitTests" />
+        <InternalsVisibleTo Include="Alis.Reactive.SandboxApp" />
     </ItemGroup>
 
 </Project>

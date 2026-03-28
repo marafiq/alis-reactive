@@ -15,7 +15,7 @@ namespace Alis.Reactive.Native.Extensions
         /// Creates a ReactivePlan for the parent view.
         /// Validation extractor configured once via ReactivePlan.UseValidationExtractor() at startup.
         /// </summary>
-        public static IReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
+        public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class
         {
             return new ReactivePlan<TModel>();
@@ -25,7 +25,7 @@ namespace Alis.Reactive.Native.Extensions
         /// Creates a ReactivePlan for a partial that belongs to the parent's plan.
         /// Same planId — runtime merges by planId. Same code as ReactivePlan.
         /// </summary>
-        public static IReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
+        public static ReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class
         {
             return new ReactivePlan<TModel>(isPartial: true);
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Native.Extensions
         /// Same call for parent views and partials — runtime merges by planId.
         /// </summary>
         public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan) where TModel : class
+            ReactivePlan<TModel> plan) where TModel : class
         {
             var json = plan.Render();
             var script = $"<script type=\"application/json\" data-reactive-plan data-trace=\"trace\">{json}</script>";

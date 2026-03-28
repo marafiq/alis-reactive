@@ -20,7 +20,7 @@ namespace Alis.Reactive.Native.Components
 
         public static NativeCheckListBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeCheckListBuilder<TModel, TProp> builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<NativeCheckListEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

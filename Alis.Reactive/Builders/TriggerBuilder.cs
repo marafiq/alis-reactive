@@ -10,10 +10,10 @@ namespace Alis.Reactive.Builders
     /// </summary>
     public sealed class TriggerBuilder<TModel> where TModel : class
     {
-        private readonly IReactivePlan<TModel> _plan;
+        private readonly ReactivePlan<TModel> _plan;
 
         /// <summary>Creates a trigger builder that adds entries to the given plan.</summary>
-        public TriggerBuilder(IReactivePlan<TModel> plan)
+        public TriggerBuilder(ReactivePlan<TModel> plan)
         {
             _plan = plan;
         }

@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native.Extensions
         /// Configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.
         /// Triggers can be chained: <c>t.DomReady(...).CustomEvent(...).SignalR(...).ServerPush(...)</c>.
         /// </param>
-        public static void On<TModel>(this IHtmlHelper<TModel> html, IReactivePlan<TModel> plan,
+        public static void On<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan,
             Action<TriggerBuilder<TModel>> triggerBuilder) where TModel : class
         {
             var trigger = new TriggerBuilder<TModel>(plan);

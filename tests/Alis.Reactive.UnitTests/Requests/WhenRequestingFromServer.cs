@@ -181,7 +181,7 @@ public class WhenRequestingFromServer : PlanTestBase
         AssertSchemaValid(plan.Render());
     }
 
-    private static IReactivePlan<TestModel> Build(Action<Builders.PipelineBuilder<TestModel>> configure)
+    private static ReactivePlan<TestModel> Build(Action<Builders.PipelineBuilder<TestModel>> configure)
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(configure);

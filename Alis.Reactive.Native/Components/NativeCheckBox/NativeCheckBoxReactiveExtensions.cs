@@ -15,7 +15,7 @@ namespace Alis.Reactive.Native.Components
 
         public static NativeCheckBoxBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeCheckBoxBuilder<TModel, TProp> builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<NativeCheckBoxEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

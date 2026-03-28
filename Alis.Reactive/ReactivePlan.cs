@@ -7,7 +7,7 @@ using Alis.Reactive.Resolvers;
 
 namespace Alis.Reactive
 {
-    public class ReactivePlan<TModel> : IReactivePlan<TModel> where TModel : class
+    public sealed class ReactivePlan<TModel> where TModel : class
     {
         private static readonly JsonSerializerOptions CompactOptions = new JsonSerializerOptions
         {
@@ -25,19 +25,19 @@ namespace Alis.Reactive
         private readonly List<Entry> _entries = new List<Entry>();
         private readonly Dictionary<string, ComponentRegistration> _componentsMap = new Dictionary<string, ComponentRegistration>();
 
-        public ReactivePlan(bool isPartial = false) { IsPartial = isPartial; }
+        internal ReactivePlan(bool isPartial = false) { IsPartial = isPartial; }
 
         public string PlanId { get; } = typeof(TModel).FullName!;
         public bool IsPartial { get; }
 
         public IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
 
-        public void AddEntry(Entry entry)
+        internal void AddEntry(Entry entry)
         {
             _entries.Add(entry);
         }
 
-        public void AddToComponentsMap(string bindingPath, ComponentRegistration entry)
+        internal void AddToComponentsMap(string bindingPath, ComponentRegistration entry)
         {
             if (_componentsMap.TryGetValue(bindingPath, out var existing))
             {

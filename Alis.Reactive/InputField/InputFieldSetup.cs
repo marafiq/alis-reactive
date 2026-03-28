@@ -12,7 +12,7 @@ namespace Alis.Reactive.InputField
     public class InputFieldSetup<THelper, TModel, TProp> where TModel : class
     {
         public THelper Helper { get; }
-        public IReactivePlan<TModel> Plan { get; }
+        public ReactivePlan<TModel> Plan { get; }
         public Expression<Func<TModel, TProp>> Expression { get; }
         public InputFieldOptions Options { get; }
 
@@ -22,7 +22,7 @@ namespace Alis.Reactive.InputField
 
         internal InputFieldSetup(
             THelper helper,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             InputFieldOptions options,
             string elementId,

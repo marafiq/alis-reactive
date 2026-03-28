@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static MultiColumnComboBoxBuilder Reactive<TModel, TArgs>(
             this MultiColumnComboBoxBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionMultiColumnComboBoxEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

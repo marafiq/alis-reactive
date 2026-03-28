@@ -17,7 +17,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         public static FusionAccordionBuilder<TModel> FusionAccordion<TModel>(
             this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             string elementId,
             Action<AccordionBuilder> configure)
             where TModel : class

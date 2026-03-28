@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Events & Dispatch";
 
-    IReactivePlan<EventsViewModel> plan = new ReactivePlan<EventsViewModel>();
+    ReactivePlan<EventsViewModel> plan = new ReactivePlan<EventsViewModel>();
 
     // Entry 1: On page load, dispatch "test" event and mark step 1 complete
     Html.On(plan, t => t.DomReady(p =>

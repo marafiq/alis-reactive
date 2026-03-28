@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static MaskedTextBoxBuilder Reactive<TModel, TArgs>(
             this MaskedTextBoxBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionInputMaskEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

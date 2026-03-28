@@ -24,7 +24,7 @@ namespace Alis.Reactive.Native.Components
 
         public static NativeTextBoxBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeTextBoxBuilder<TModel, TProp> builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<NativeTextBoxEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

@@ -18,7 +18,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         public static FusionTabBuilder<TModel> FusionTab<TModel>(
             this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             string elementId,
             Action<TabBuilder> configure)
             where TModel : class

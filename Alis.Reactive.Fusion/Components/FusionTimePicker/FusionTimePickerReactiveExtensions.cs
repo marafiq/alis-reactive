@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static TimePickerBuilder Reactive<TModel, TArgs>(
             this TimePickerBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionTimePickerEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static AutoCompleteBuilder Reactive<TModel, TArgs>(
             this AutoCompleteBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionAutoCompleteEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

@@ -25,7 +25,7 @@ namespace Alis.Reactive.Native.Components
 
         public static NativeDropDownBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeDropDownBuilder<TModel, TProp> builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<NativeDropDownEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

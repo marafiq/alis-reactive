@@ -6,7 +6,7 @@ public class WhenEnforcingArchitectureRules
     [Test]
     public void All_descriptor_classes_are_sealed()
     {
-        var assembly = typeof(IReactivePlan<>).Assembly;
+        var assembly = typeof(ReactivePlan<>).Assembly;
         var descriptorNamespace = "Alis.Reactive.Descriptors";
 
         var unsealed = assembly.GetTypes()

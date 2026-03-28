@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static SwitchBuilder Reactive<TModel, TArgs>(
             this SwitchBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionSwitchEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

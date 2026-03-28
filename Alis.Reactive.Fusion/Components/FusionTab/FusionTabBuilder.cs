@@ -13,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
     {
         private readonly IHtmlContent _inner;
 
-        internal FusionTabBuilder(IReactivePlan<TModel> plan, string elementId, IHtmlContent inner)
+        internal FusionTabBuilder(ReactivePlan<TModel> plan, string elementId, IHtmlContent inner)
         {
             Plan = plan;
             ElementId = elementId;
@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>The reactive plan — used by .Reactive() to add entries.</summary>
-        internal IReactivePlan<TModel> Plan { get; }
+        internal ReactivePlan<TModel> Plan { get; }
 
         /// <summary>The element ID — used by .Reactive() to wire events.</summary>
         internal string ElementId { get; }
