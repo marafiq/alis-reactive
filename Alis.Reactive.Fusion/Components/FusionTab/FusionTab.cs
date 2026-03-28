@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Syncfusion Tab (ej2.navigations.Tab) component.
+    /// FusionTab (ej2.navigations.Tab) component.
     /// Non-input component — container with no form value.
     /// No ReadExpr, no ComponentsMap registration, no validation, no gather.
     /// </summary>

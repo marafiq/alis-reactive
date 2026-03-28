@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         public static NativeHiddenFieldBuilder<TModel, TProp> HiddenFieldFor<TModel, TProp>(
             this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression)
             where TModel : class
         {

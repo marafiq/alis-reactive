@@ -8,9 +8,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Renders a native HTML &lt;textarea&gt; element bound to a model property.
-    /// Uses IdGenerator for element ID and MVC NameFor for the name attribute.
+    /// Configures and renders a native HTML <c>&lt;textarea&gt;</c> element bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Created by the <c>.NativeTextArea()</c> factory on
+    /// <see cref="InputBoundField{TModel,TProp}"/>.
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TProp">The bound property type.</typeparam>
     public class NativeTextAreaBuilder<TModel, TProp> : IHtmlContent
     {
         private readonly IHtmlHelper<TModel> _html;
@@ -22,6 +27,8 @@ namespace Alis.Reactive.Native.Components
         private string? _cssClass;
         private string? _placeholder;
 
+        // NEVER make public — devs create builders via the .NativeTextArea() factory,
+        // which also registers the component in the plan's ComponentsMap.
         internal NativeTextAreaBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
         {
             _html = html;
@@ -30,27 +37,46 @@ namespace Alis.Reactive.Native.Components
             _bindingPath = html.NameFor(expression);
         }
 
+        /// <summary>Gets the resolved element ID for this textarea.</summary>
         internal string ElementId => _elementId;
+
+        /// <summary>Gets the model binding path (e.g. <c>"CareNotes"</c>).</summary>
         internal string BindingPath => _bindingPath;
 
+        /// <summary>
+        /// Sets the visible row count. Defaults to 4.
+        /// </summary>
+        /// <param name="rows">Number of visible text rows.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeTextAreaBuilder<TModel, TProp> Rows(int rows)
         {
             _rows = rows;
             return this;
         }
 
+        /// <summary>
+        /// Adds CSS classes to the textarea element.
+        /// </summary>
+        /// <param name="css">One or more CSS class names.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeTextAreaBuilder<TModel, TProp> CssClass(string css)
         {
             _cssClass = css;
             return this;
         }
 
+        /// <summary>
+        /// Sets the placeholder text shown when the textarea is empty.
+        /// </summary>
+        /// <param name="placeholder">The placeholder text.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeTextAreaBuilder<TModel, TProp> Placeholder(string placeholder)
         {
             _placeholder = placeholder;
             return this;
         }
 
+        /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             var attrs = new System.Collections.Generic.Dictionary<string, object>

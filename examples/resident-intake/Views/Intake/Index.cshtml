@@ -76,7 +76,7 @@
                     .Placeholder("Doe")); }
 
             @{ Html.InputField(plan, m => m.DateOfBirth, o => o.Required().Label("Date of Birth"))
-                .DatePicker(b => b
+                .FusionDatePicker(b => b
                     .Placeholder("Select date of birth")); }
 
             @* ═══════════════════════════════════════════════════════ *@
@@ -87,7 +87,7 @@
             </div>
 
             @{ Html.InputField(plan, m => m.FacilityId, o => o.Required().Label("Facility"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .Placeholder("Select facility")
                     .Fields<LookupItem>(t => t.Name, v => v.Id)
                     .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
@@ -121,12 +121,12 @@
             <div id="facility-requirements" class="col-span-full"></div>
 
             @{ Html.InputField(plan, m => m.UnitId, o => o.Label("Unit"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .Placeholder("Select unit — pick a facility first")
                     .Fields<LookupItem>(t => t.Name, v => v.Id)); }
 
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .Placeholder("Select care level")
                     .Fields<LookupItem>(t => t.Name, v => v.Id)
                     .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
@@ -138,17 +138,17 @@
                     })); }
 
             @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
-                .DatePicker(b => b
+                .FusionDatePicker(b => b
                     .Placeholder("Select admission date")); }
 
             @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(0).Step(100)); }
 
             <div id="cognitive-section" class="col-span-full" hidden>
                 @{ Html.InputField(plan, m => m.CognitiveAssessmentDate,
                     o => o.Label("Last Cognitive Assessment"))
-                    .DatePicker(b => b
+                    .FusionDatePicker(b => b
                         .Placeholder("Assessment date")); }
             </div>
 
@@ -196,7 +196,7 @@
 
             @{ Html.InputField(plan, m => m.EmergencyContactPhone,
                 o => o.Required().Label("Contact Phone"))
-                .InputMask(b => b
+                .FusionInputMask(b => b
                     .Mask("(000) 000-0000")
                     .Placeholder("(555) 123-4567")); }
 

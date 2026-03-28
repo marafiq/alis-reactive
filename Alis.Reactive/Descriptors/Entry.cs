@@ -13,7 +13,11 @@ namespace Alis.Reactive.Descriptors
         public Trigger Trigger { get; }
         public Reaction Reaction { get; }
 
-        public Entry(Trigger trigger, Reaction reaction)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal Entry(Trigger trigger, Reaction reaction)
         {
             Trigger = trigger ?? throw new ArgumentNullException(nameof(trigger));
             Reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));

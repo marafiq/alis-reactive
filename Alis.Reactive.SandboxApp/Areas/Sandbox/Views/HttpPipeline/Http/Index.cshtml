@@ -5,7 +5,7 @@
 @{
     ViewData["Title"] = "HTTP Requests";
 
-    IReactivePlan<HttpShowcaseModel> plan = new ReactivePlan<HttpShowcaseModel>();
+    var plan = Html.ReactivePlan<HttpShowcaseModel>();
 
     // Section 1: DomReady → GET /Sandbox/HttpPipeline/Http/Residents → bind response data to DOM
     Html.On(plan, t => t.DomReady(p =>

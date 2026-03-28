@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/NumericTextBox
 ///
-/// Syncfusion NumericTextBox renders an inner input element inside the wrapper div.
+/// FusionNumericTextBox renders an inner input element inside the wrapper div.
 /// The wrapper element gets the IdGenerator-based ID. Tests use
 /// NumericTextBoxLocator to interact via real browser gestures.
 /// </summary>

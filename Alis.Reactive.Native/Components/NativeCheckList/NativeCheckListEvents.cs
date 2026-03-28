@@ -1,16 +1,23 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Events available on NativeCheckList.
-    /// Singleton instance — used with .Reactive() event selector lambda:
-    ///   .Reactive(plan, evt => evt.Changed, (args, p) => { ... })
+    /// Typed event descriptors for <see cref="NativeCheckList"/>.
     /// </summary>
+    /// <remarks>
+    /// Used with the <c>.Reactive()</c> event selector lambda:
+    /// <code>.Reactive(plan, evt => evt.Changed, (args, p) => { ... })</code>
+    /// </remarks>
     public sealed class NativeCheckListEvents
     {
+        /// <summary>
+        /// Shared instance used by the <c>.Reactive()</c> extension.
+        /// </summary>
         public static readonly NativeCheckListEvents Instance = new NativeCheckListEvents();
         private NativeCheckListEvents() { }
 
-        /// <summary>Fires when the user checks or unchecks a checkbox option (DOM "change" event).</summary>
+        /// <summary>
+        /// Fires when the user checks or unchecks any checkbox in the list.
+        /// </summary>
         public TypedEventDescriptor<NativeCheckListChangeArgs> Changed =>
             new TypedEventDescriptor<NativeCheckListChangeArgs>(
                 "change", new NativeCheckListChangeArgs());

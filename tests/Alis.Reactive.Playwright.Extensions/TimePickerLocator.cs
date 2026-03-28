@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for Syncfusion TimePicker.
+/// User interaction primitives for FusionTimePicker.
 /// Provides gestures (what a user does) and surfaces (what a user sees).
 /// Does NOT provide assertions — the test decides what to verify.
 ///

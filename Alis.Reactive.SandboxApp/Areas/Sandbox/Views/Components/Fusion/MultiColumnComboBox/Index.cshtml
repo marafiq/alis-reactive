@@ -48,7 +48,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.Facility, o => o.Label("Facility (SF MultiColumnComboBox)"))
-                .MultiColumnComboBox(b => b
+                .FusionMultiColumnComboBox(b => b
                     .DataSource(facilities)
                     .Fields<FacilityItem>(t => t.Text, v => v.Value)
                     .Columns(col =>

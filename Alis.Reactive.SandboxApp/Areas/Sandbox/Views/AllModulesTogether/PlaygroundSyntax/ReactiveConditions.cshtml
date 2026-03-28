@@ -10,7 +10,7 @@
     var cityItems = (IEnumerable<SelectListItem>)ViewBag.CityItems;
     var stateItems = (IEnumerable<SelectListItem>)ViewBag.StateItems;
 
-    var plan = new ReactivePlan<PlaygroundSyntaxModel>();
+    var plan = Html.ReactivePlan<PlaygroundSyntaxModel>();
 }
 
 <native-vstack gap="Lg">
@@ -78,7 +78,7 @@
                  >= 1000 → "Standard order"
                  else    → "Small order" -->
             @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount"))
-               .NumericTextBox(b => b
+               .FusionNumericTextBox(b => b
                    .Min(0).Max(99999).Step(100)
                    .Reactive(plan, evt => evt.Changed, (args, p) =>
                    {
@@ -155,7 +155,7 @@
                    .Items(stateItems)); }
 
             @{ Html.InputField(plan, m => m.Address!.PostalCode, o => o.Label("Postal Code"))
-               .NumericTextBox(b => b
+               .FusionNumericTextBox(b => b
                    .Min(10000).Max(99999).Step(1)); }
         </div>
 

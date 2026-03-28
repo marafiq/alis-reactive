@@ -16,7 +16,7 @@
     <!-- Row 1: Systolic BP + Has Pacemaker -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.SystolicBP, o => o.Label("Systolic BP (mmHg)"))
-            .NumericTextBox(b => b
+            .FusionNumericTextBox(b => b
                 .Min(0).Max(300).Step(1)
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
@@ -45,7 +45,7 @@
                 })); }
 
         @{ Html.InputField(plan, m => m.HasPacemaker, o => o.Label("Has Pacemaker"))
-            .Switch(b => b
+            .FusionSwitch(b => b
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var pm = p.Component<FusionSwitch>(m => m.HasPacemaker);
@@ -69,7 +69,7 @@
                 .NativeTextBox(b => b.Placeholder("e.g. Medtronic Azure")); }
 
             @{ Html.InputField(plan, m => m.LastDeviceCheck, o => o.Label("Last Device Check"))
-                .DatePicker(b => b.Placeholder("Select date")); }
+                .FusionDatePicker(b => b.Placeholder("Select date")); }
         </div>
     </div>
 

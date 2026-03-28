@@ -1,11 +1,12 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Syncfusion ColorPicker component.
-    /// Phantom type — zero state. Used as type parameter in
-    /// p.Component&lt;FusionColorPicker&gt;(m => m.ThemeColor) to unlock
-    /// the ColorPicker-specific extension methods.
+    /// A FusionColorPicker for selecting a color value.
     /// </summary>
+    /// <remarks>
+    /// Use as a type parameter in <c>p.Component&lt;FusionColorPicker&gt;(m =&gt; m.ThemeColor)</c>
+    /// to access FusionColorPicker-specific mutations and value reading.
+    /// </remarks>
     public sealed class FusionColorPicker : FusionComponent, IInputComponent
     {
         /// <inheritdoc />

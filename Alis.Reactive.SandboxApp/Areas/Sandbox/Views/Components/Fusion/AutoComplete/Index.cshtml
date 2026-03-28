@@ -51,7 +51,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.Physician, o => o.Label("Physician (SF AutoComplete)"))
-                .AutoComplete(b => b
+                .FusionAutoComplete(b => b
                     .DataSource(physicians)
                     .Fields<PhysicianItem>(t => t.Text, v => v.Value)
                     .Placeholder("Select a physician")
@@ -143,7 +143,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.MedicationType, o => o.Label("Medication (Server-Filtered)"))
-                .AutoComplete(b => b
+                .FusionAutoComplete(b => b
                     .Fields<MedicationTypeItem>(t => t.Text, v => v.Value)
                     .Placeholder("Type to search medications...")
                     .DebounceDelay(500)

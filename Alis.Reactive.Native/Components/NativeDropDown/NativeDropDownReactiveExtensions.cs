@@ -6,26 +6,38 @@ using Alis.Reactive.Descriptors.Triggers;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto the NativeDropDownBuilder.
-    ///
-    /// Usage (in .cshtml):
-    ///   Html.NativeDropDownFor(m => m.Status)
-    ///       .Items(statusItems)
-    ///       .Reactive(plan, evt => evt.Changed, (args, p) =>
-    ///       {
-    ///           p.Component&lt;NativeDropDown&gt;(m => m.Status).SetValue("active");
-    ///       })
-    ///
-    /// .Reactive() is always the last call — native builders are IHtmlContent
-    /// directly (no .Render() needed).
+    /// Wires browser events from <see cref="NativeDropDown"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call in the builder chain.
+    /// <code>
+    /// .NativeDropDown(b => b
+    ///     .Items(statusItems)
+    ///     .Placeholder("-- Select --")
+    ///     .Reactive(plan, evt => evt.Changed, (args, p) =>
+    ///     {
+    ///         p.Element("status").SetText("changed!");
+    ///     }))
+    /// </code>
+    /// </remarks>
     public static class NativeDropDownReactiveExtensions
     {
         private static readonly NativeDropDown _component = new NativeDropDown();
 
+        /// <summary>
+        /// Wires a <see cref="NativeDropDown"/> browser event into a reactive pipeline.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <typeparam name="TArgs">The event args type selected by <paramref name="eventSelector"/>.</typeparam>
+        /// <param name="builder">The dropdown builder to wire events on.</param>
+        /// <param name="plan">The plan to add the reactive entry to.</param>
+        /// <param name="eventSelector">Selects which event to listen for (e.g. <c>evt => evt.Changed</c>).</param>
+        /// <param name="pipeline">Configures the reactive pipeline that runs when the event fires.</param>
+        /// <returns>The builder for continued chaining.</returns>
         public static NativeDropDownBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeDropDownBuilder<TModel, TProp> builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<NativeDropDownEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

@@ -47,7 +47,7 @@ public sealed class PageScope<TModel> where TModel : class
 
     // ─── Component Locators (Fusion) ───
 
-    /// <summary>Syncfusion AutoComplete.</summary>
+    /// <summary>FusionAutoComplete.</summary>
     public AutoCompleteLocator AutoComplete(Expression<Func<TModel, object?>> expr)
         => new(_page, IdFor(expr));
 

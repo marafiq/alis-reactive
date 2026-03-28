@@ -4,6 +4,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public string? NativeValue { get; set; }
         public string? FusionValue { get; set; }
+
+        // Section 6: Cross-vendor validation
+        public string? NativeRequired { get; set; }
+        public string? FusionRequired { get; set; }
+
+        // Section 7: Cross-vendor equalTo
+        public string? Password { get; set; }
+        public string? ConfirmPassword { get; set; }
     }
 
     // Typed payloads for architecture regression tests (Sections 4 & 5)

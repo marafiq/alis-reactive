@@ -8,23 +8,36 @@ using Syncfusion.EJ2.RichTextEditor;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto the Syncfusion RichTextEditorBuilder.
-    ///
-    /// Usage (in .cshtml):
-    ///   Html.RichTextEditorFor(expr)
-    ///       .Reactive(plan, evt => evt.Changed, (args, p) =>
-    ///       {
-    ///           p.Component&lt;FusionRichTextEditor&gt;(m => m.CarePlan).SetValue("&lt;p&gt;Updated&lt;/p&gt;");
-    ///       })
-    ///       .Render()
+    /// Wires browser events from a <see cref="FusionRichTextEditor"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the build callback passed to
+    /// <see cref="FusionRichTextEditorHtmlExtensions.FusionRichTextEditor{TModel,TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.Notes).FusionRichTextEditor(b =&gt;
+    /// {
+    ///     b.Height(200);
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionRichTextEditorReactiveExtensions
     {
         private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();
 
+        /// <summary>
+        /// Wires a FusionRichTextEditor event to a reactive pipeline that executes in the browser.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
+        /// <param name="builder">The Fusion builder.</param>
+        /// <param name="plan">The plan to add the reactive behavior to.</param>
+        /// <param name="eventSelector">Selects which event to react to (e.g. <c>evt =&gt; evt.Changed</c>).</param>
+        /// <param name="pipeline">Configures the commands to run when the event fires.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static RichTextEditorBuilder Reactive<TModel, TArgs>(
             this RichTextEditorBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionRichTextEditorEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

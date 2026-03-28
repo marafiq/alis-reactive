@@ -71,7 +71,7 @@ Html.InputField(plan, m => m.HasDietaryRestrictions, o => o.Label("Has Dietary R
 
 ```csharp
 Html.InputField(plan, m => m.Category, o => o.Label("Category"))
-    .DropDownList(b => b
+    .FusionDropDownList(b => b
         .DataSource(categories)
         .Placeholder("Select a category")
         .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -227,7 +227,7 @@ p.Post("/api/residents", g => g.IncludeAll())
 
 ```csharp
 Html.InputField(plan, m => m.Country, o => o.Label("Country"))
-    .DropDownList(b => b
+    .FusionDropDownList(b => b
         .DataSource(countries)
         .Reactive(plan, evt => evt.Changed, (args, p) =>
         {

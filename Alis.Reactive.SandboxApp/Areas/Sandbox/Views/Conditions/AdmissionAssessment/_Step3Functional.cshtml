@@ -27,7 +27,7 @@
     <!-- Age uses NumericTextBox (hidden) so compound condition gets decimal type for .Gte(80m) -->
     <div hidden>
         @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))
-            .NumericTextBox(b => b.Min(0).Max(120).Step(1)); }
+            .FusionNumericTextBox(b => b.Min(0).Max(120).Step(1)); }
     </div>
     @Html.HiddenFieldFor(plan, m => m.ResidentName)
     @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
@@ -35,7 +35,7 @@
     <!-- Row 1: Fall History + Fall Risk Score -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.FallHistory, o => o.Label("Fall History"))
-            .DropDownList(b => b
+            .FusionDropDownList(b => b
                 .DataSource(fallOptions)
                 .Placeholder("Select fall history")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -47,7 +47,7 @@
                 })); }
 
         @{ Html.InputField(plan, m => m.FallRiskScore, o => o.Label("Fall Risk Score"))
-            .NumericTextBox(b => b.Min(0).Max(10).Step(1)); }
+            .FusionNumericTextBox(b => b.Min(0).Max(10).Step(1)); }
     </div>
 
     <!-- Fall Risk Check button -->
@@ -78,7 +78,7 @@
     <!-- Row 2: Mobility Aid + Medication Count -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.MobilityAid, o => o.Label("Mobility Aid"))
-            .DropDownList(b => b
+            .FusionDropDownList(b => b
                 .DataSource(mobilityAids)
                 .Placeholder("Select mobility aid")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -106,7 +106,7 @@
                 })); }
 
         @{ Html.InputField(plan, m => m.MedicationCount, o => o.Label("Medication Count"))
-            .NumericTextBox(b => b
+            .FusionNumericTextBox(b => b
                 .Min(0).Max(50).Step(1)
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
@@ -132,7 +132,7 @@
     <!-- Row 3: Blood Thinners + Pain Medication -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.TakesBloodThinners, o => o.Label("Takes Blood Thinners"))
-            .Switch(b => b
+            .FusionSwitch(b => b
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var bt = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
@@ -142,7 +142,7 @@
                 })); }
 
         @{ Html.InputField(plan, m => m.TakesPainMedication, o => o.Label("Takes Pain Medication"))
-            .Switch(b => b
+            .FusionSwitch(b => b
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var pm = p.Component<FusionSwitch>(m => m.TakesPainMedication);

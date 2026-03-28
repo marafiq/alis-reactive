@@ -66,7 +66,7 @@
                     })); }
 
             @{ Html.InputField(plan, m => m.Physician, o => o.Required().Label("Physician"))
-                .AutoComplete(b => b
+                .FusionAutoComplete(b => b
                     .DataSource(physicians)
                     .Fields<PhysicianOption>(t => t.Text, v => v.Value)
                     .Placeholder("Search physician...")
@@ -76,7 +76,7 @@
                     })); }
 
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .DataSource(careLevels)
                     .Fields<CareLevelOption>(t => t.Text, v => v.Value)
                     .Placeholder("Select care level")
@@ -86,7 +86,7 @@
                     })); }
 
             @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(0).Max(99999).Step(100)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -94,7 +94,7 @@
                     })); }
 
             @{ Html.InputField(plan, m => m.IsActive, o => o.Label("Active Status"))
-                .Switch(b => b
+                .FusionSwitch(b => b
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("active-echo").SetText(args, x => x.Checked);

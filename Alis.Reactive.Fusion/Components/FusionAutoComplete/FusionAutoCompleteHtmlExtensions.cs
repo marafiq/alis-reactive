@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
@@ -9,18 +10,24 @@ using Syncfusion.EJ2.DropDowns;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating AutoCompleteBuilder bound to a model property.
-    /// SF EJ2 ASP.NET Core exposes the AutoComplete concept via AutoCompleteBuilder.
+    /// Creates a FusionAutoComplete inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Physician)</c>, then call
+    /// <c>.FusionAutoComplete(b =&gt; { b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value); })</c>.
+    /// </remarks>
     public static class FusionAutoCompleteHtmlExtensions
     {
         private static readonly FusionAutoComplete Component = new FusionAutoComplete();
 
         /// <summary>
-        /// Typed Fields binding — derives text/value field names from DataSource item expressions.
-        /// Converts PascalCase C# to camelCase (matching global Newtonsoft serialization).
-        /// Usage: .Fields&lt;PhysicianItem&gt;(t =&gt; t.Text, v =&gt; v.Value)
+        /// Configures text and value field mappings using typed expressions.
         /// </summary>
+        /// <typeparam name="TItem">The data source item type.</typeparam>
+        /// <param name="builder">The Fusion builder.</param>
+        /// <param name="text">Expression selecting the display text property.</param>
+        /// <param name="value">Expression selecting the value property.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static AutoCompleteBuilder Fields<TItem>(
             this AutoCompleteBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -33,6 +40,15 @@ namespace Alis.Reactive.Fusion.Components
             });
         }
 
+        /// <summary>
+        /// Configures text, value, and group-by field mappings using typed expressions.
+        /// </summary>
+        /// <typeparam name="TItem">The data source item type.</typeparam>
+        /// <param name="builder">The Fusion builder.</param>
+        /// <param name="text">Expression selecting the display text property.</param>
+        /// <param name="value">Expression selecting the value property.</param>
+        /// <param name="groupBy">Expression selecting the grouping property.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static AutoCompleteBuilder Fields<TItem>(
             this AutoCompleteBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -47,9 +63,16 @@ namespace Alis.Reactive.Fusion.Components
             });
         }
 
-        public static void AutoComplete<TModel, TProp>(
-            this InputFieldSetup<TModel, TProp> setup,
-            Action<AutoCompleteBuilder> configure)
+        /// <summary>
+        /// Renders a FusionAutoComplete bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="build">Callback to build the FusionAutoComplete (data source, fields, etc.).</param>
+        public static void FusionAutoComplete<TModel, TProp>(
+            this InputBoundField<TModel, TProp> setup,
+            Action<AutoCompleteBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -58,7 +81,7 @@ namespace Alis.Reactive.Fusion.Components
 
             var builder = setup.Helper.EJS().AutoCompleteFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
-            configure(builder);
+            build(builder);
             setup.Render(builder.Render());
         }
 

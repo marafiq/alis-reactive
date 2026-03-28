@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for Syncfusion MultiColumnComboBox.
+/// User interaction primitives for FusionMultiColumnComboBox.
 /// Like DropDownList — click wrapper to open, type text to filter, Enter to select.
 /// Does NOT provide assertions — the test decides what to verify.
 ///

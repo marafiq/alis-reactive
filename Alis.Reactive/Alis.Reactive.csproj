@@ -5,6 +5,7 @@
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,6 +18,8 @@
         <InternalsVisibleTo Include="Alis.Reactive.UnitTests" />
         <InternalsVisibleTo Include="Alis.Reactive.FluentValidator" />
         <InternalsVisibleTo Include="Alis.Reactive.FluentValidator.UnitTests" />
+        <InternalsVisibleTo Include="Alis.Reactive.Native.UnitTests" />
+        <InternalsVisibleTo Include="Alis.Reactive.Fusion.UnitTests" />
     </ItemGroup>
 
 </Project>

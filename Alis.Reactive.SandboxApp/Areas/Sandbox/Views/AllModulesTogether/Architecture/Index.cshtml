@@ -3,17 +3,13 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.Validation
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "Architecture";
 
     var plan = Html.ReactivePlan<ArchitectureModel>();
 
-    // Register raw validation fields (architecture test page uses manual inline descriptors, not model-bound builders)
-    plan.AddToComponentsMap("native-val-field", new ComponentRegistration("native-val-field", "native", "native-val-field", "value", "textbox", "string"));
-    plan.AddToComponentsMap("fusion-val-field", new ComponentRegistration("fusion-val-field", "fusion", "fusion-val-field", "value", "textbox", "string"));
-    plan.AddToComponentsMap("native-password", new ComponentRegistration("native-password", "native", "native-password", "value", "textbox", "string"));
-    plan.AddToComponentsMap("fusion-confirm", new ComponentRegistration("fusion-confirm", "fusion", "fusion-confirm", "value", "textbox", "string"));
+    // Validation fields registered via proper builders in Sections 6 & 7 below
 
     // ── Section 1: Property Write (structured prop) — dom-ready writes to both vendors ──
 
@@ -229,40 +225,24 @@
         </div>
     </native-card-body></native-card>
 
-    <!-- Section 6: Validation (Cross-Vendor) -->
+    <!-- Section 6: Validation — uses proper model-bound InputField builders -->
     <native-card><native-card-body>
-        <native-heading level="H2">6. Validation (Cross-Vendor)</native-heading>
+        <native-heading level="H2">6. Validation (Model-Bound)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Native input and fusion TestWidget both validated with readExpr <code>"value"</code>.
+            Both fields use <code>Html.InputField()</code> with <code>NativeTextBox</code> — proper framework primitives.
         </p>
         <form id="arch-val-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Native (required)</label>
-                <input id="native-val-field" type="text"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm w-full" />
-                <span data-valmsg-for="native-val-field" hidden
-                      class="text-red-600 text-xs mt-1 block"></span>
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Fusion (required)</label>
-                <div id="fusion-val-field" data-test-widget
-                     class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
-                <span data-valmsg-for="fusion-val-field" hidden
-                      class="text-red-600 text-xs mt-1 block"></span>
-            </div>
+            @{ Html.InputField(plan, m => m.NativeRequired, o => o.Required().Label("Native (required)"))
+                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.FusionRequired, o => o.Required().Label("Fusion (required)"))
+                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
         </form>
         @(Html.NativeButton("validate-btn", "Validate")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/AllModulesTogether/Architecture/ValidateClient")
-                 .Validate(new ValidationDescriptor("arch-val-form", new List<ValidationField>
-                 {
-                     new ValidationField("native-val-field",
-                         new List<ValidationRule> { new ValidationRule("required", "Required") }),
-                     new ValidationField("fusion-val-field",
-                         new List<ValidationRule> { new ValidationRule("required", "Required") })
-                 }))
+                 .Validate<ArchitectureValidator>("arch-val-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
@@ -276,44 +256,24 @@
         </div>
     </native-card-body></native-card>
 
-    <!-- Section 7: Cross-Vendor EqualTo -->
+    <!-- Section 7: EqualTo Validation — model-bound -->
     <native-card><native-card-body>
-        <native-heading level="H2">7. Cross-Vendor EqualTo</native-heading>
+        <native-heading level="H2">7. EqualTo Validation</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Native password + fusion confirm. EqualTo rule compares across vendors.
+            Password + confirm. EqualTo rule compares across fields.
         </p>
         <form id="equalto-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Password (native)</label>
-                <input id="native-password" type="password"
-                       class="rounded-md border border-border px-3 py-1.5 text-sm w-full" />
-                <span id="native-password_error" data-valmsg-for="native-password" hidden
-                      class="text-red-600 text-xs mt-1 block"></span>
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Confirm (fusion)</label>
-                <div id="fusion-confirm" data-test-widget
-                     class="rounded-md border border-border px-3 py-1.5 text-sm w-full"></div>
-                <span id="fusion-confirm_error" data-valmsg-for="fusion-confirm" hidden
-                      class="text-red-600 text-xs mt-1 block"></span>
-            </div>
+            @{ Html.InputField(plan, m => m.Password, o => o.Required().Label("Password"))
+                .NativeTextBox(b => b.Type("password").CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
+            @{ Html.InputField(plan, m => m.ConfirmPassword, o => o.Required().Label("Confirm"))
+                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
         </form>
         @(Html.NativeButton("cross-validate-btn", "Validate EqualTo")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/AllModulesTogether/Architecture/ValidateClient")
-                 .Validate(new ValidationDescriptor("equalto-form", new List<ValidationField>
-                 {
-                     new ValidationField("native-password",
-                         new List<ValidationRule> { new ValidationRule("required", "Required") }),
-                     new ValidationField("fusion-confirm",
-                         new List<ValidationRule>
-                         {
-                             new ValidationRule("required", "Required"),
-                             new ValidationRule("equalTo", "Must match", field: "native-password")
-                         })
-                 }))
+                 .Validate<ArchitectureValidator>("equalto-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {

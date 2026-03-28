@@ -12,10 +12,10 @@ namespace Alis.Reactive.Fusion.Components
     {
         private readonly IHtmlContent _inner;
 
-        internal IReactivePlan<TModel> Plan { get; }
+        internal ReactivePlan<TModel> Plan { get; }
         internal string ElementId { get; }
 
-        internal FusionAccordionBuilder(IReactivePlan<TModel> plan, string elementId, IHtmlContent inner)
+        internal FusionAccordionBuilder(ReactivePlan<TModel> plan, string elementId, IHtmlContent inner)
         {
             Plan = plan;
             ElementId = elementId;

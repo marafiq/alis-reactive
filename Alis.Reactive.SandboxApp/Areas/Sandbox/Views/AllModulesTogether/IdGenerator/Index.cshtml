@@ -20,7 +20,7 @@
         new("Denver", "Denver")
     };
 
-    IReactivePlan<IdGeneratorModel> plan = new ReactivePlan<IdGeneratorModel>();
+    var plan = Html.ReactivePlan<IdGeneratorModel>();
 }
 
 <native-vstack gap="Lg" class="max-w-3xl mx-auto">
@@ -39,7 +39,7 @@
             @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
                 .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
             @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount (SF)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(0).Max(99999).Step(1)); }
             @{ Html.InputField(plan, m => m.Status, o => o.Label("Status (Native)"))
                 .NativeDropDown(b => b
@@ -52,7 +52,7 @@
                     .Placeholder("-- Select --")
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
             @{ Html.InputField(plan, m => m.Address!.PostalCode, o => o.Label("Postal Code (SF)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(10000).Max(99999).Step(1)); }
         </form>
         @(Html.NativeButton("json-submit-btn", "Submit JSON")
@@ -83,7 +83,7 @@
             @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
                 .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
             @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount (SF)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(0).Max(99999).Step(1)); }
             @{ Html.InputField(plan, m => m.Status, o => o.Label("Status (Native)"))
                 .NativeDropDown(b => b

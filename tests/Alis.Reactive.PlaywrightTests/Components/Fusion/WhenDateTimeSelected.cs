@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/DateTimePicker
 ///
-/// Syncfusion DateTimePicker renders an input element inside a wrapper span.
+/// FusionDateTimePicker renders an input element inside a wrapper span.
 /// The wrapper element gets the IdGenerator-based ID. Tests use
 /// DateTimePickerLocator to interact via real browser gestures (calendar
 /// and time popup clicks) rather than ej2 instance manipulation.
@@ -67,7 +67,7 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         // Verify the value was applied by checking the visible input element's value.
         var inputValue = await MedicationTime.Input.InputValueAsync();
         Assert.That(inputValue, Is.Not.Null.And.Not.Empty,
-            $"Expected DateTimePicker input to have a value but got '{inputValue}'");
+            $"Expected FusionDateTimePicker input to have a value but got '{inputValue}'");
 
         AssertNoConsoleErrors();
     }

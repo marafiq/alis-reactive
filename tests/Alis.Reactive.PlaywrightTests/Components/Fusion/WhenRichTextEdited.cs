@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/RichTextEditor
 ///
-/// Syncfusion RichTextEditor hides the textarea and renders a
+/// FusionRichTextEditor hides the textarea and renders a
 /// contenteditable div inside a wrapper with class e-richtexteditor.
 /// Tests use RichTextEditorLocator to interact via real browser gestures
 /// (typing into the contenteditable area) rather than ej2 instance manipulation.

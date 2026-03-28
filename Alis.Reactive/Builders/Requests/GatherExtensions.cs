@@ -5,10 +5,18 @@ using Alis.Reactive.Descriptors.Requests;
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Vendor-agnostic gather extensions for any IComponent + IInputComponent.
-    /// Works for both Native and Fusion components — vendor and readExpr
+    /// Vendor-agnostic gather extensions for any <see cref="IComponent"/> + <see cref="IInputComponent"/>.
+    /// Works for both Native and Fusion components: vendor and readExpr
     /// are resolved from the component instance at build time.
     /// </summary>
+    /// <remarks>
+    /// Gather collects current component values from the browser and includes them
+    /// in the HTTP request payload before sending. Use inside
+    /// <see cref="HttpRequestBuilder{TModel}.Gather"/> to specify which components contribute values:
+    /// <code>
+    /// p.Post("/api/save", g => g.Include&lt;NativeTextBox, MyModel&gt;(m => m.Name));
+    /// </code>
+    /// </remarks>
     public static class GatherExtensions
     {
         /// <summary>

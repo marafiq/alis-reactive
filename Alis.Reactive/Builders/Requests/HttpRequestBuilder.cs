@@ -7,6 +7,23 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    /// <summary>
+    /// Configures an HTTP request: URL, verb, request body (gather), loading state,
+    /// client-side validation, and response handlers.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Accessed via the pipeline's HTTP methods:
+    /// <c>p.Post("/api/save", gather: g =&gt; g.IncludeAll()).Response(response: r =&gt; r.OnSuccess(...))</c>.
+    /// </para>
+    /// <para>
+    /// Typical call order: verb (set by <see cref="PipelineBuilder{TModel}"/>)
+    /// → <see cref="Gather"/> → <see cref="WhileLoading"/>
+    /// → <see cref="Validate{TValidator}"/> → <see cref="Response"/>.
+    /// All steps are optional except the verb and URL.
+    /// </para>
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
     {
         private string _verb = "GET";
@@ -32,18 +49,30 @@ namespace Alis.Reactive.Builders.Requests
 
         // ── Public convenience verbs (used in Chained / Parallel lambdas) ──
 
+        /// <summary>Sets the request verb to GET. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
+        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Get(string url) { _verb = "GET"; _url = url; return this; }
+
+        /// <summary>Sets the request verb to POST. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
+        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Post(string url) { _verb = "POST"; _url = url; return this; }
+
+        /// <summary>Sets the request verb to PUT. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
+        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Put(string url) { _verb = "PUT"; _url = url; return this; }
+
+        /// <summary>Sets the request verb to DELETE. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
+        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Delete(string url) { _verb = "DELETE"; _url = url; return this; }
 
         /// <summary>
         /// Configures gather items for the request body/URL params.
         /// </summary>
-        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> configure)
+        /// <param name="gather">Adds gather items for the request body or URL params.</param>
+        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {
             var builder = new GatherBuilder<TModel>();
-            configure(builder);
+            gather(builder);
             _gather = builder.Items;
             return this;
         }
@@ -62,10 +91,11 @@ namespace Alis.Reactive.Builders.Requests
         /// Configures commands to execute while the request is in-flight.
         /// These commands are reverted after the response arrives.
         /// </summary>
-        public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> configure)
+        /// <param name="pipeline">Builds the loading-state commands (reverted after the response arrives).</param>
+        public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
             var builder = new PipelineBuilder<TModel>();
-            configure(builder);
+            pipeline(builder);
             var reaction = builder.BuildReaction();
             if (!(reaction is SequentialReaction sr))
                 throw new InvalidOperationException(
@@ -102,10 +132,11 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Configures success/error response handlers.
         /// </summary>
-        public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> configure)
+        /// <param name="response">Defines the success and error handlers for the response.</param>
+        public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response)
         {
             var builder = new ResponseBuilder<TModel>();
-            configure(builder);
+            response(builder);
             _response = builder;
             return this;
         }

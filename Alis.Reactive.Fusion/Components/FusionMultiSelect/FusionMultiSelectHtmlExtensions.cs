@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
@@ -9,17 +10,24 @@ using Syncfusion.EJ2.DropDowns;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating MultiSelectBuilder bound to a model property.
+    /// Creates a FusionMultiSelect inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Skills)</c>, then call
+    /// <c>.FusionMultiSelect(b =&gt; { b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value); })</c>.
+    /// </remarks>
     public static class FusionMultiSelectHtmlExtensions
     {
         private static readonly FusionMultiSelect Component = new FusionMultiSelect();
 
         /// <summary>
-        /// Typed Fields binding — derives text/value field names from DataSource item expressions.
-        /// Converts PascalCase C# member names to camelCase (matching global Newtonsoft serialization).
-        /// Usage: .Fields&lt;AllergyItem&gt;(t =&gt; t.Text, v =&gt; v.Value)
+        /// Configures text and value field mappings using typed expressions.
         /// </summary>
+        /// <typeparam name="TItem">The data source item type.</typeparam>
+        /// <param name="builder">The Fusion builder.</param>
+        /// <param name="text">Expression selecting the display text property.</param>
+        /// <param name="value">Expression selecting the value property.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static MultiSelectBuilder Fields<TItem>(
             this MultiSelectBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -33,10 +41,14 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Typed Fields binding with GroupBy — derives text/value/groupBy field names from DataSource item expressions.
-        /// Converts PascalCase C# member names to camelCase (matching global Newtonsoft serialization).
-        /// Usage: .Fields&lt;AllergyItem&gt;(t =&gt; t.Text, v =&gt; v.Value, g =&gt; g.Category)
+        /// Configures text, value, and group-by field mappings using typed expressions.
         /// </summary>
+        /// <typeparam name="TItem">The data source item type.</typeparam>
+        /// <param name="builder">The Fusion builder.</param>
+        /// <param name="text">Expression selecting the display text property.</param>
+        /// <param name="value">Expression selecting the value property.</param>
+        /// <param name="groupBy">Expression selecting the grouping property.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static MultiSelectBuilder Fields<TItem>(
             this MultiSelectBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -51,9 +63,16 @@ namespace Alis.Reactive.Fusion.Components
             });
         }
 
-        public static void MultiSelect<TModel, TProp>(
-            this InputFieldSetup<TModel, TProp> setup,
-            Action<MultiSelectBuilder> configure)
+        /// <summary>
+        /// Renders a FusionMultiSelect bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="build">Callback to build the FusionMultiSelect (data source, fields, mode, etc.).</param>
+        public static void FusionMultiSelect<TModel, TProp>(
+            this InputBoundField<TModel, TProp> setup,
+            Action<MultiSelectBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -62,7 +81,7 @@ namespace Alis.Reactive.Fusion.Components
 
             var builder = setup.Helper.EJS().MultiSelectFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
-            configure(builder);
+            build(builder);
             setup.Render(builder.Render());
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Calendars;
@@ -8,17 +9,26 @@ using Syncfusion.EJ2.Calendars;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating DateRangePickerBuilder bound to a model property.
-    /// The expression targets the start date property. The component ID is based on
-    /// the start date binding path.
+    /// Creates a FusionDateRangePicker inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.StayDates)</c>, then call
+    /// <c>.FusionDateRangePicker(b =&gt; { b.Format("MM/dd/yyyy"); })</c>.
+    /// </remarks>
     public static class FusionDateRangePickerHtmlExtensions
     {
         private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();
 
-        public static void DateRangePicker<TModel, TProp>(
-            this InputFieldSetup<TModel, TProp> setup,
-            Action<DateRangePickerBuilder> configure)
+        /// <summary>
+        /// Renders a FusionDateRangePicker bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="build">Callback to build the FusionDateRangePicker (min/max, presets, format, etc.).</param>
+        public static void FusionDateRangePicker<TModel, TProp>(
+            this InputBoundField<TModel, TProp> setup,
+            Action<DateRangePickerBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -27,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
 
             var builder = setup.Helper.EJS().DateRangePickerFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
-            configure(builder);
+            build(builder);
             setup.Render(builder.Render());
         }
     }

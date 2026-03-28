@@ -8,23 +8,36 @@ using Syncfusion.EJ2.Calendars;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto the Syncfusion DateRangePickerBuilder.
-    ///
-    /// Usage (in .cshtml):
-    ///   Html.DateRangePickerFor(expr)
-    ///       .Reactive(plan, evt => evt.Changed, (args, p) =>
-    ///       {
-    ///           p.Element("echo").SetText(args, x => x.StartDate);
-    ///       })
-    ///       .Render()
+    /// Wires browser events from a <see cref="FusionDateRangePicker"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the build callback passed to
+    /// <see cref="FusionDateRangePickerHtmlExtensions.FusionDateRangePicker{TModel,TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.StayDates).FusionDateRangePicker(b =&gt;
+    /// {
+    ///     b.Format("MM/dd/yyyy");
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionDateRangePickerReactiveExtensions
     {
         private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();
 
+        /// <summary>
+        /// Wires a FusionDateRangePicker event to a reactive pipeline that executes in the browser.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
+        /// <param name="builder">The Fusion builder.</param>
+        /// <param name="plan">The plan to add the reactive behavior to.</param>
+        /// <param name="eventSelector">Selects which event to react to (e.g. <c>evt =&gt; evt.Changed</c>).</param>
+        /// <param name="pipeline">Configures the commands to run when the event fires.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static DateRangePickerBuilder Reactive<TModel, TArgs>(
             this DateRangePickerBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionDateRangePickerEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
