@@ -4,7 +4,7 @@ namespace Alis.Reactive.Fusion.Components
     /// Event payload delivered when a <see cref="FusionNumericTextBox"/> value changes.
     /// </summary>
     /// <remarks>
-    /// Access properties in conditions: <c>p.When(args, x =&gt; x.Value).Gte(100)</c>.
+    /// Access properties in conditions: <c>p.When(args, x =&gt; x.Value).Gte(100m)</c>.
     /// </remarks>
     public class FusionNumericTextBoxChangeArgs
     {

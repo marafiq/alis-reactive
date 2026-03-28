@@ -39,7 +39,7 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TSource">The source type containing the value.</typeparam>
         /// <param name="self">The check list component reference.</param>
         /// <param name="source">The source object (e.g. event args).</param>
-        /// <param name="path">Expression selecting the property to read (e.g. <c>x => x.Values</c>).</param>
+        /// <param name="path">Expression selecting the property to read (e.g. <c>x => x.Value</c>).</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeCheckList, TModel> SetValue<TModel, TSource>(
             this ComponentRef<NativeCheckList, TModel> self,

@@ -8,10 +8,9 @@ namespace Alis.Reactive.InputField
     /// Framework-agnostic base for a model-bound input field.
     /// </summary>
     /// <remarks>
-    /// Captures the model expression, plan, and field options. <typeparamref name="THelper"/>
-    /// is left open here and closed by the platform-specific subclass (e.g.
-    /// <c>InputBoundField&lt;TModel, TProp&gt;</c> closes it to <c>IHtmlHelper</c>
-    /// for ASP.NET Core).
+    /// Captures the model expression, plan, and field options. Devs interact with the
+    /// platform-specific subclass (<c>InputBoundField&lt;TModel, TProp&gt;</c> for ASP.NET Core)
+    /// returned by <c>Html.InputField()</c>.
     /// </remarks>
     /// <typeparam name="THelper">The platform-specific HTML helper type.</typeparam>
     /// <typeparam name="TModel">The view model type.</typeparam>
