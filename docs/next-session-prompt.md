@@ -14,16 +14,7 @@ Last session (2026-03-28) built the layered harness system:
 - `.claude/memory/session_2026_03_28_todo.md` — 11 open tasks, each plan-first
 - `.claude/memory/session_2026_03_28_reflection.md` — what went right/wrong, all feedback actioned
 
-## Step 1: Commit Last Session's Work
-
-Uncommitted changes:
-- Modified: `CLAUDE.md`, `.claude/memory/MEMORY.md`
-- New: `.claude/rules/process-pipeline.md`, `process-layers.md`, `process-task-types.md`
-- New: 7 memory files (forensic index, 5 feedback, todo, reflection)
-
-Review the diff, then one clean commit.
-
-## Step 2: Review Priority Order With User
+## Step 1: Review Priority Order With User
 
 Present the 11 open tasks from `session_2026_03_28_todo.md` and review priority with user
 BEFORE starting any work. Focus is **process and harness** — no code changes this phase.
