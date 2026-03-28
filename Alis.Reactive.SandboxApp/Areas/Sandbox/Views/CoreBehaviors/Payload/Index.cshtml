@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Payload Access";
 
-    ReactivePlan<PayloadShowcaseModel> plan = new ReactivePlan<PayloadShowcaseModel>();
+    var plan = Html.ReactivePlan<PayloadShowcaseModel>();
 
     // Entry 1: On page load, dispatch event with rich payload containing all types + nested props
     Html.On(plan, t => t.DomReady(p =>

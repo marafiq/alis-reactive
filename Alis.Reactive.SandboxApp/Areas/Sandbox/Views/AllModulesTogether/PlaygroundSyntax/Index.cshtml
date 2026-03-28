@@ -12,7 +12,7 @@
     var stateItems = (IEnumerable<SelectListItem>)ViewBag.StateItems;
 
     // ── Create the plan instance — one per view ──
-    var plan = new ReactivePlan<PlaygroundSyntaxModel>();
+    var plan = Html.ReactivePlan<PlaygroundSyntaxModel>();
 
     // ── One custom event to demo cross-vendor pipeline ──
     Html.On(plan, t => t.CustomEvent("reset-all", p =>

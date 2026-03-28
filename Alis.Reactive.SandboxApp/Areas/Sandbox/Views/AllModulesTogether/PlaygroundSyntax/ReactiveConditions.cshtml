@@ -10,7 +10,7 @@
     var cityItems = (IEnumerable<SelectListItem>)ViewBag.CityItems;
     var stateItems = (IEnumerable<SelectListItem>)ViewBag.StateItems;
 
-    var plan = new ReactivePlan<PlaygroundSyntaxModel>();
+    var plan = Html.ReactivePlan<PlaygroundSyntaxModel>();
 }
 
 <native-vstack gap="Lg">
