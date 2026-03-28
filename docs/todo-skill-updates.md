@@ -19,6 +19,26 @@ Created `.claude/hookify.no-raw-inputs.local.md` — blocks `<input>`, `<select>
 MVC `Html.TextBoxFor` etc., and direct SF builders (`.DropDownListFor()`, `.AutoCompleteFor()`, etc.)
 in `.cshtml` files. All inputs must go through `Html.InputField().NativeXxx()` or `.FusionXxx()`.
 
+### BDD Internal Constructor Violations (30 instances in 10 files)
+
+Refactor these test files to use public DSL instead of constructing internal types directly:
+- `tests/Alis.Reactive.UnitTests/Descriptors/WhenEnforcingEntryInvariants.cs`
+- `tests/Alis.Reactive.Fusion.UnitTests/Components/FusionDropDownList/` (2 files)
+- `tests/Alis.Reactive.Fusion.UnitTests/Components/FusionNumericTextBox/` (3 files)
+- `tests/Alis.Reactive.Native.UnitTests/Components/NativeCheckList/` (1 file)
+- `tests/Alis.Reactive.Native.UnitTests/Components/NativeDropDown/` (2 files)
+- `tests/Alis.Reactive.Native.UnitTests/Components/NativeRadioGroup/` (1 file)
+
+### Sandbox Index Cards Always Missing
+
+When adding new sandbox pages, the index card on the Sandbox home page is frequently forgotten.
+TODO: Add a hook or test that verifies every controller has a corresponding card on the index.
+
+### Vertical Slice Arrangement
+
+Vertical slices have needed rearranging multiple times. The `onboard-fusion-component` skill
+must include the exact file structure so new slices are arranged correctly from the start.
+
 ### DOM Scanning Detection (TODO)
 
 Build a hook that blocks `querySelectorAll`, `getElementsByClassName`, DOM traversal patterns

@@ -98,6 +98,42 @@ ALL tests must pass before every commit. Hooks enforce this.
 | Validation | FluentValidation 12.x |
 | Tests | NUnit 4.5 + Verify, Vitest 3.x + jsdom, Playwright 1.52 |
 
+## SOLID Design Principles — Applied to This Codebase
+
+**Single Responsibility:** Each vertical slice owns one component end-to-end (C# descriptor,
+builder, extensions, events, reactive wiring, gather, tests). Each TS module does one job
+(`component.ts` = vendor roots, `resolver.ts` = source binding, `element.ts` = mutations).
+When adding behavior, put it in the module that owns that concern — don't spread it.
+
+**Open/Closed:** New components and command kinds extend the framework without modifying
+existing modules. A new Fusion component = new C# vertical slice, zero TS changes.
+A new command kind = new handler in `commands.ts`, existing handlers untouched.
+
+**Liskov Substitution:** All components implement `IComponent`/`IInputComponent` — the runtime
+treats Native and Fusion identically through `resolveRoot()`. Adding a third vendor must
+work without `if (vendor === "newVendor")` hacks in existing modules.
+
+**Interface Segregation:** `IComponent` (vendor only), `IInputComponent` (vendor + readExpr),
+`IAppLevelComponent` (vendor + defaultId). Components implement only what they need.
+`ICommandEmitter` is the narrow interface for adding commands — not the full `PipelineBuilder`.
+
+**Dependency Inversion:** Builders depend on descriptor interfaces, not concrete types.
+Runtime depends on plan JSON shape, not C# types. The schema is the shared contract —
+neither side references the other's implementation.
+
+**Recurring violations to watch for:**
+- Making `internal` → `public` to "fix" a compilation error (breaks encapsulation)
+- Adding `if (type === "checkbox")` heuristics in runtime (plan should carry the info)
+- Creating duplicate abstractions to "get by" instead of fixing the existing one
+- String-matching on type names instead of using proper interfaces
+- Silent fallbacks that hide misconfiguration for hours
+- Poor naming — types, methods, variables must describe their domain role, not their implementation
+- Tests using internal constructors instead of the public DSL
+- Forgetting sandbox index cards when adding new pages
+- Vertical slices arranged inconsistently — follow the skill exactly
+- Vertical slice isolation not enforced in tests and sandbox views
+- Root cause analysis skipped — patch-fix cycles that create 10+ commits fixing symptoms
+
 ## Rules
 
 ### 1. Git Worktrees for Feature Work
@@ -219,9 +255,13 @@ No IIFE, no `window.alis`, no import maps.
 
 `.verified.txt` files live next to their test class. Call `VerifyJson()` directly.
 
-### 13. BDD Test Naming
+### 13. BDD Tests — Public API Only
 
 Test classes: `When{Scenario}`. Test methods describe expected behavior.
 Tests verify what the system does for the user, not implementation details.
-Do not use internal API to arrange tests — use the public DSL entry points only.
+Arrange tests using the public DSL (`Html.On`, `CreatePlan()`, `Trigger()`) only.
+
+**Known violation:** 30 instances across 10 test files directly construct internal types
+(`new SequentialReaction`, `new DispatchCommand`, `new Entry`, etc.). These need refactoring
+to use the builder API. See `docs/todo-skill-updates.md`.
 
