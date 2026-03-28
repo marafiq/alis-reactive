@@ -230,7 +230,7 @@ namespace Alis.Reactive.Builders
         /// </remarks>
         /// <returns>The single reaction built from the pipeline commands.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the pipeline contains multiple reaction segments.</exception>
-        public Reaction BuildReaction()
+        internal Reaction BuildReaction()
         {
             var reactions = BuildReactions();
             if (reactions.Count > 1)
@@ -246,7 +246,7 @@ namespace Alis.Reactive.Builders
         /// Commands between/around conditions produce sequential reactions.
         /// </summary>
         /// <returns>All reaction segments built from the pipeline commands.</returns>
-        public List<Reaction> BuildReactions()
+        internal List<Reaction> BuildReactions()
         {
             // If no segments were flushed, build a single reaction (common case)
             if (_segments == null || _segments.Count == 0)

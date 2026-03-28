@@ -27,7 +27,7 @@ namespace Alis.Reactive.Builders
         /// NEVER make public. Constructed exclusively by <c>Html.On(plan, ...)</c>.
         /// Public constructors would let devs create orphaned builders not connected to a plan.
         /// </summary>
-        public TriggerBuilder(ReactivePlan<TModel> plan)
+        internal TriggerBuilder(ReactivePlan<TModel> plan)
         {
             _plan = plan;
         }

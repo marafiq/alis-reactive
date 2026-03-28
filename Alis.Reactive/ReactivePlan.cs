@@ -73,7 +73,7 @@ namespace Alis.Reactive
         /// register themselves. Used by validation and gather resolvers to map model
         /// properties to their component IDs, vendors, and read expressions.
         /// </remarks>
-        public IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
+        internal IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
 
         /// <summary>
         /// Registers a trigger-reaction pair in the plan. Called by
