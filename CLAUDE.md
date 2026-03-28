@@ -98,28 +98,41 @@ ALL tests must pass before every commit. Hooks enforce this.
 | Validation | FluentValidation 12.x |
 | Tests | NUnit 4.5 + Verify, Vitest 3.x + jsdom, Playwright 1.52 |
 
-## SOLID Design Principles — Applied to This Codebase
+## SOLID Design Principles
 
-**Single Responsibility:** Each vertical slice owns one component end-to-end (C# descriptor,
-builder, extensions, events, reactive wiring, gather, tests). Each TS module does one job
-(`component.ts` = vendor roots, `resolver.ts` = source binding, `element.ts` = mutations).
-When adding behavior, put it in the module that owns that concern — don't spread it.
+Sources: Robert C. Martin (Clean Architecture, Functional Design 2023), Martin Fowler (Refactoring 2nd Ed),
+TanStack patterns, Kent Beck (Tidy First?). Full research in `.claude/memory/solid-ts-research.md`.
 
-**Open/Closed:** New components and command kinds extend the framework without modifying
-existing modules. A new Fusion component = new C# vertical slice, zero TS changes.
-A new command kind = new handler in `commands.ts`, existing handlers untouched.
+**S — Single Responsibility: "One actor, not one thing" (Uncle Bob)**
+A module is responsible to one actor — the person who would request changes to it.
+Ask "WHO requests changes?" not "does it do one thing?"
+- `component.ts` changes when vendor integration changes (one actor: vendor team)
+- `resolver.ts` changes when source binding changes (one actor: plan schema)
+- Each C# vertical slice changes when its component API changes (one actor: that component)
+- Violation: a module that changes for both "new component" AND "new command kind" reasons
 
-**Liskov Substitution:** All components implement `IComponent`/`IInputComponent` — the runtime
-treats Native and Fusion identically through `resolveRoot()`. Adding a third vendor must
-work without `if (vendor === "newVendor")` hacks in existing modules.
+**O — Open/Closed: extend without modifying**
+New components and command kinds extend the framework without touching existing modules.
+- New Fusion component = new C# vertical slice, zero TS changes
+- New command kind = new case in `commands.ts` switch + `assertNever` catches missing cases
+- Anti-pattern: `if (newType)` branches grafted into existing handlers
+- TanStack Table uses `TableFeature[]` registration — our vertical slices are the same pattern
 
-**Interface Segregation:** `IComponent` (vendor only), `IInputComponent` (vendor + readExpr),
-`IAppLevelComponent` (vendor + defaultId). Components implement only what they need.
-`ICommandEmitter` is the narrow interface for adding commands — not the full `PipelineBuilder`.
+**L — Liskov Substitution: "All duck-types are subtypes" (Uncle Bob)**
+Every `IComponent` implementation (Native, Fusion) is substitutable through `resolveRoot()`.
+Adding a third vendor must work without `if (vendor === "newVendor")` in existing modules.
+- Violation symptom: `if (trigger.vendor === "native")` in `trigger.ts:45` — this is a known leak
 
-**Dependency Inversion:** Builders depend on descriptor interfaces, not concrete types.
-Runtime depends on plan JSON shape, not C# types. The schema is the shared contract —
-neither side references the other's implementation.
+**I — Interface Segregation: no client depends on methods it doesn't use**
+- `IComponent` (vendor only) → `IInputComponent` (+ readExpr) → `IAppLevelComponent` (+ defaultId)
+- `ICommandEmitter` is the narrow interface for adding commands — not the full `PipelineBuilder`
+- Violation: exporting 10 functions from a module when callers use 1 (fat barrel exports)
+
+**D — Dependency Inversion: depend toward stability**
+Pure utilities (`walk.ts`, `coerce.ts`) are the most stable — everything depends inward on them.
+Vendor-aware code (`component.ts`) is volatile detail — depended ON, never depends outward.
+The JSON schema is the shared contract — C# and TS never reference each other's implementation.
+- Kent Beck: `cost(software) ≈ coupling` — concentrate vendor coupling in ONE module
 
 **Recurring violations — these cost hours every session:**
 
