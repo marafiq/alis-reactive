@@ -11,7 +11,7 @@ namespace Alis.Reactive.Fusion.Components
     /// Wires browser events from a <see cref="FusionDropDownList"/> into the reactive plan.
     /// </summary>
     /// <remarks>
-    /// <c>.Reactive()</c> is always the last call inside the configure callback passed to
+    /// <c>.Reactive()</c> is always the last call inside the build callback passed to
     /// <see cref="FusionDropDownListHtmlExtensions.DropDownList{TModel, TProp}"/>:
     /// <code>
     /// Html.InputField(plan, m =&gt; m.Country).DropDownList(b =&gt;

@@ -239,16 +239,16 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TProp">The property type used by the condition.</typeparam>
         /// <param name="payload">The payload instance providing compile-time type inference.</param>
         /// <param name="path">The property-access expression into the payload.</param>
-        /// <param name="configure">Configures the condition operator and produces a guard.</param>
+        /// <param name="guard">Builds the condition operator and produces a guard.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>
         public ElementBuilder<TModel> When<TPayload, TProp>(
             TPayload payload,
             Expression<Func<TPayload, TProp>> path,
-            Func<ConditionSourceBuilder<TModel, TProp>, GuardBuilder<TModel>> configure)
+            Func<ConditionSourceBuilder<TModel, TProp>, GuardBuilder<TModel>> guard)
         {
             var source = new EventArgSource<TPayload, TProp>(path);
             var csb = new ConditionSourceBuilder<TModel, TProp>(source);
-            var gb = configure(csb);
+            var gb = guard(csb);
             if (_pipeline.Commands.Count > 0)
             {
                 var idx = _pipeline.Commands.Count - 1;
