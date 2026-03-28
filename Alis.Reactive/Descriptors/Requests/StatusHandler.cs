@@ -16,29 +16,41 @@ namespace Alis.Reactive.Descriptors.Requests
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Reaction? Reaction { get; }
 
-        /// <summary>Default handler — sequential commands only.</summary>
-        public StatusHandler(List<Command> commands)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal StatusHandler(List<Command> commands)
         {
             StatusCode = null;
             Commands = commands;
         }
 
-        /// <summary>Status-specific handler — sequential commands only.</summary>
-        public StatusHandler(int statusCode, List<Command> commands)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal StatusHandler(int statusCode, List<Command> commands)
         {
             StatusCode = statusCode;
             Commands = commands;
         }
 
-        /// <summary>Default handler — full reaction (conditional, http, etc.).</summary>
-        public StatusHandler(Reaction reaction)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal StatusHandler(Reaction reaction)
         {
             StatusCode = null;
             Reaction = reaction;
         }
 
-        /// <summary>Status-specific handler — full reaction.</summary>
-        public StatusHandler(int statusCode, Reaction reaction)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal StatusHandler(int statusCode, Reaction reaction)
         {
             StatusCode = statusCode;
             Reaction = reaction;

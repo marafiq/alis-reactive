@@ -14,7 +14,11 @@ namespace Alis.Reactive.Descriptors.Commands
 
         public string Target { get; }
 
-        public IntoCommand(string target, Guard? when = null)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal IntoCommand(string target, Guard? when = null)
             : base(when)
         {
             Target = target;

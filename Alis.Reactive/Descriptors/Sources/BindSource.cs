@@ -13,7 +13,11 @@ namespace Alis.Reactive.Descriptors.Sources
 
         public string Path { get; }
 
-        public EventSource(string path)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal EventSource(string path)
         {
             Path = path;
         }
@@ -28,6 +32,10 @@ namespace Alis.Reactive.Descriptors.Sources
         public string Vendor { get; }
         public string ReadExpr { get; }
 
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
         internal ComponentSource(string componentId, string vendor, string readExpr)
         {
             ComponentId = componentId;

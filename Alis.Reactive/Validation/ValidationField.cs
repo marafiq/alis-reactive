@@ -30,6 +30,10 @@ namespace Alis.Reactive.Validation
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? CoerceAs { get; internal set; }
 
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
         internal ValidationField(string fieldName, List<ValidationRule> rules)
         {
             FieldName = fieldName;

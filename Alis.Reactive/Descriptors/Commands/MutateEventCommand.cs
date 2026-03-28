@@ -27,7 +27,11 @@ namespace Alis.Reactive.Descriptors.Commands
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public BindSource? Source { get; }
 
-        public MutateEventCommand(Mutation mutation, object? value = null, BindSource? source = null, Guard? when = null)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal MutateEventCommand(Mutation mutation, object? value = null, BindSource? source = null, Guard? when = null)
             : base(when)
         {
             Mutation = mutation;

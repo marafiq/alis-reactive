@@ -14,7 +14,11 @@ namespace Alis.Reactive.Descriptors.Mutations
 
         public object Value { get; }
 
-        public LiteralArg(object value)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal LiteralArg(object value)
         {
             Value = value;
         }
@@ -30,7 +34,11 @@ namespace Alis.Reactive.Descriptors.Mutations
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Coerce { get; }
 
-        public SourceArg(BindSource source, string? coerce = null)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal SourceArg(BindSource source, string? coerce = null)
         {
             Source = source;
             Coerce = coerce;

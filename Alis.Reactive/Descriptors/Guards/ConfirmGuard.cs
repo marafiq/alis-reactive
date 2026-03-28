@@ -10,7 +10,11 @@ namespace Alis.Reactive.Descriptors.Guards
 
         public string Message { get; }
 
-        public ConfirmGuard(string message)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ConfirmGuard(string message)
         {
             Message = message ?? throw new ArgumentNullException(nameof(message));
         }

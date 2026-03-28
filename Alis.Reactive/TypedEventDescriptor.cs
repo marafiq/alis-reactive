@@ -14,7 +14,11 @@ namespace Alis.Reactive
         public string JsEvent { get; }
         public TArgs Args { get; }
 
-        public TypedEventDescriptor(string jsEvent, TArgs args)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal TypedEventDescriptor(string jsEvent, TArgs args)
         {
             JsEvent = jsEvent;
             Args = args;

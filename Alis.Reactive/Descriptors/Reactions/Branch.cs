@@ -9,7 +9,11 @@ namespace Alis.Reactive.Descriptors.Reactions
         public Guard? Guard { get; }
         public Reaction Reaction { get; }
 
-        public Branch(Guard? guard, Reaction reaction)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal Branch(Guard? guard, Reaction reaction)
         {
             Guard = guard;
             Reaction = reaction;

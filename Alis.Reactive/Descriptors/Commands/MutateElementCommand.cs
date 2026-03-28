@@ -22,7 +22,11 @@ namespace Alis.Reactive.Descriptors.Commands
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Vendor { get; }
 
-        public MutateElementCommand(
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal MutateElementCommand(
             string target,
             Mutation mutation,
             object? value = null,

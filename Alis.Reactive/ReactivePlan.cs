@@ -25,6 +25,10 @@ namespace Alis.Reactive
         private readonly List<Entry> _entries = new List<Entry>();
         private readonly Dictionary<string, ComponentRegistration> _componentsMap = new Dictionary<string, ComponentRegistration>();
 
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
         internal ReactivePlan(bool isPartial = false) { IsPartial = isPartial; }
 
         public string PlanId { get; } = typeof(TModel).FullName!;

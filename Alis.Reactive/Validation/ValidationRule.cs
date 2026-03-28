@@ -46,6 +46,10 @@ namespace Alis.Reactive.Validation
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ValidationCondition? When { get; }
 
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
         internal ValidationRule(string rule, string message, object? constraint = null,
             ValidationCondition? when = null, string? field = null, string? coerceAs = null)
         {

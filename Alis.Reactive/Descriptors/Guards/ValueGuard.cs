@@ -29,7 +29,11 @@ namespace Alis.Reactive.Descriptors.Guards
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? ElementCoerceAs { get; }
 
-        public ValueGuard(BindSource source, string coerceAs, string op, object? operand = null)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ValueGuard(BindSource source, string coerceAs, string op, object? operand = null)
         {
             Source = source;
             CoerceAs = coerceAs;
@@ -37,8 +41,11 @@ namespace Alis.Reactive.Descriptors.Guards
             Operand = operand;
         }
 
-        /// <summary>Array operator constructor with element-level coercion.</summary>
-        public ValueGuard(BindSource source, string coerceAs, string op, object? operand, string? elementCoerceAs)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ValueGuard(BindSource source, string coerceAs, string op, object? operand, string? elementCoerceAs)
         {
             Source = source;
             CoerceAs = coerceAs;
@@ -47,8 +54,11 @@ namespace Alis.Reactive.Descriptors.Guards
             ElementCoerceAs = elementCoerceAs;
         }
 
-        /// <summary>Source-vs-source constructor.</summary>
-        public ValueGuard(BindSource left, string coerceAs, string op, BindSource right)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ValueGuard(BindSource left, string coerceAs, string op, BindSource right)
         {
             Source = left;
             CoerceAs = coerceAs;
