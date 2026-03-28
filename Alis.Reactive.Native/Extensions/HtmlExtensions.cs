@@ -28,15 +28,15 @@ namespace Alis.Reactive.Native.Extensions
         /// <typeparam name="TModel">The view model type</typeparam>
         /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The plan to add reactive behavior to.</param>
-        /// <param name="triggerBuilder">
+        /// <param name="trigger">
         /// Configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.
         /// Triggers can be chained: <c>t.DomReady(...).CustomEvent(...).SignalR(...).ServerPush(...)</c>.
         /// </param>
         public static void On<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan,
-            Action<TriggerBuilder<TModel>> triggerBuilder) where TModel : class
+            Action<TriggerBuilder<TModel>> trigger) where TModel : class
         {
-            var trigger = new TriggerBuilder<TModel>(plan);
-            triggerBuilder(trigger);
+            var builder = new TriggerBuilder<TModel>(plan);
+            trigger(builder);
         }
     }
 }

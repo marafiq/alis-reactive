@@ -15,10 +15,10 @@ namespace Alis.Reactive.Builders.Requests
         private readonly List<RequestDescriptor> _branches = new List<RequestDescriptor>();
         private PipelineBuilder<TModel>? _onAllSettled;
 
-        internal void AddBranch(Action<HttpRequestBuilder<TModel>> configure)
+        internal void AddBranch(Action<HttpRequestBuilder<TModel>> request)
         {
             var builder = new HttpRequestBuilder<TModel>();
-            configure(builder);
+            request(builder);
             _branches.Add(builder.BuildRequestDescriptor());
         }
 

@@ -57,10 +57,11 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Chains a sequential HTTP request that fires after the current request succeeds.
         /// </summary>
-        public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> configure)
+        /// <param name="request">Configures the chained HTTP request.</param>
+        public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> request)
         {
             var chainedBuilder = new HttpRequestBuilder<TModel>();
-            configure(chainedBuilder);
+            request(chainedBuilder);
             ChainedRequest = chainedBuilder.BuildRequestDescriptor();
             return this;
         }

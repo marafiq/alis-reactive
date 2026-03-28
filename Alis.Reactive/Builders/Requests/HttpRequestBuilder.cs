@@ -40,10 +40,11 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Configures gather items for the request body/URL params.
         /// </summary>
-        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> configure)
+        /// <param name="gather">Adds gather items for the request body or URL params.</param>
+        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {
             var builder = new GatherBuilder<TModel>();
-            configure(builder);
+            gather(builder);
             _gather = builder.Items;
             return this;
         }
@@ -103,10 +104,11 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Configures success/error response handlers.
         /// </summary>
-        public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> configure)
+        /// <param name="response">Defines the success and error handlers for the response.</param>
+        public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response)
         {
             var builder = new ResponseBuilder<TModel>();
-            configure(builder);
+            response(builder);
             _response = builder;
             return this;
         }
