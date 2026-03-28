@@ -46,6 +46,31 @@ must include the exact file structure so new slices are arranged correctly from 
 Both should be resolved through `component.ts` exports. Adding a third vendor would require
 touching these files, violating Open/Closed.
 
+### Code Smells Skill (TODO — create new)
+
+Build a `code-smells` skill based on Fowler's catalog, mapped to our recurring violations:
+- **Repeated Switches** — same vendor/kind checks in multiple files (trigger.ts, live-clear.ts)
+- **Long Function** — methods doing 3+ things separated by comments
+- **Feature Envy** — function uses more of another module's data than its own
+- **Divergent Change** — module changes for multiple unrelated reasons
+- **Shotgun Surgery** — one logical change touches many files
+- **Data Clumps** — `(vendor, readExpr, componentId)` traveling together → Parameter Object
+- **Insider Trading** — modules knowing each other's internals
+
+Diagnostic questions from research:
+- "How many files to add a new command kind?" — if >2, Shotgun Surgery
+- "Does this module change for more than one reason?" — Divergent Change
+- "Does this switch appear in more than one file?" — Repeated Switches
+
+### Code Smells Hook (TODO)
+
+Build a hookify rule that warns on common smells in C# and TS:
+- Methods > 30 lines
+- Nested `if` > 2 levels deep
+- `vendor ===` checks outside `component.ts`
+- `ej2_instances` outside `component.ts`
+- `querySelectorAll` / `getElementsByClassName` in runtime TS
+
 ### DOM Scanning Detection (TODO)
 
 Build a hook that blocks `querySelectorAll`, `getElementsByClassName`, DOM traversal patterns
