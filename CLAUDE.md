@@ -101,67 +101,63 @@ ALL tests must pass before every commit. Hooks enforce this.
 ## Process — Follow This Every Session
 
 ```
-Prompt → Clear? ──no──→ Ask questions / push back
-           │yes
-           ▼
-     Plan mode → Load skills → Research code → Brainstorm
-           │
-           ▼
-     Decompose (INVEST) → Master index → Task context for agents
-           │
-           ▼
-     Pre-flight checklist → SOLID? Visibility? Skills loaded?
-           │
-           ▼
-     Execute → One task at a time → Verify in browser
-           │
-           ▼
-     Post-flight checklist → Tests pass? Root cause? No smells?
-           │
-           ▼
-     Commit (hooks enforce)
+Prompt → Clear? ──no──→ Ask / push back / don't let user be lazy
+  │yes
+  ▼
+Plan → Skills? Survey code? Mockups? → Master index (INVEST tasks)
+  │
+  ▼
+Per task: Context → Pre-flight → Execute → Post-flight → Next
+  │
+  ▼
+Commit (hooks enforce)
 ```
 
-### Step 1: Understand the Prompt
-- Is it clear and specific? If not — ask questions. Do not start working on vague requests.
-- Push back if the request is lazy or underspecified. Propose a checklist.
-- Load relevant skills before responding (even for clarifying questions).
+Detailed per-task-type flows: `.claude/process-flows.md`
 
-### Step 2: Plan (enter plan mode)
-- Brainstorm: what skills apply? What research is needed? What mockups?
-- Survey existing code before proposing changes — read it, don't guess.
-- Create a master task index with dependencies.
+### Step 1: Prompt Clarity — Gate
+Is the prompt clear and specific? If not — **stop**. Ask questions. Propose a checklist.
+Do NOT let the user be lazy. Do NOT start working on vague requests.
 
-### Step 3: Decompose Tasks (INVEST)
-Each task must be:
-- **I**ndependent — can be worked on in isolation
+### Step 2: Plan Mode
+- **Brainstorm skills:** which skills apply to this work? Load them.
+- **Survey code:** read existing implementation before proposing changes. Read, don't guess.
+- **Mockups:** for UI work, sketch or describe the expected outcome before coding.
+
+### Step 3: Master Index
+The plan has a numbered task list. Tasks have dependencies. Nothing starts without the index.
+
+### Step 4: INVEST Each Task
+- **I**ndependent — can be worked on in isolation (agent-ready)
 - **N**egotiable — scope discussed with user
 - **V**aluable — delivers a user-visible outcome
 - **E**stimable — clear enough to know when it's done
 - **S**mall — completable in one focused pass
 - **T**estable — has pass/fail criteria
 
-### Step 4: Task Context (for agents working in isolation)
-Each task carries: files to read, skills to load, expected outcome, pre-checklist, post-checklist.
-Agents get a role, input context, and demand for explicit evidence with reasoning.
+### Step 5: Task Context
+Before dispatching an agent or starting work, each task carries:
+- **Files to read** — specific paths, not "explore the codebase"
+- **Skills to load** — which skills this task needs
+- **Expected outcome** — what done looks like
+- **Pre-checklist** — what to verify before writing code
+- **Post-checklist** — what to verify before marking complete
 
-### Step 5: Pre-flight (before writing code)
+### Step 6: Per-Task Pre-flight
 - [ ] Loaded the right skills?
-- [ ] Read the relevant source code — not guessed?
+- [ ] Read the relevant source code?
 - [ ] Understood WHY the current code is the way it is?
-- [ ] Checked SOLID: SRP (one actor), OCP (extend not modify), LSP (substitutable), ISP (narrow interfaces), DIP (depend toward stability)?
-- [ ] No `internal` → `public` shortcuts, no duplicate abstractions, no fallbacks?
-- [ ] Visibility discipline: `private`/`internal`/`public` chosen deliberately?
+- [ ] SOLID check: SRP, OCP, LSP, ISP, DIP (see `.claude/memory/solid-ts-research.md`)
+- [ ] Visibility: `private`/`internal`/`public` chosen deliberately?
 
-### Step 6: Post-flight (before committing)
-- [ ] All tests pass (`npm test` + all `dotnet test` commands)?
+### Step 7: Per-Task Post-flight
+- [ ] All tests pass?
 - [ ] Verified in actual browser — not just Playwright?
 - [ ] On Playwright failure: opened traces/inspector/real browser?
-- [ ] No code smells: repeated switches, nested ifs, long methods, poor naming?
+- [ ] No code smells: repeated switches, nested ifs >2, long methods, poor naming?
 - [ ] Sandbox index card updated if new page added?
 - [ ] Root cause fixed — not a patch?
-
-SOLID research: `.claude/memory/solid-ts-research.md` (Uncle Bob, Fowler, TanStack, Kent Beck)
+- [ ] This is a production system — not "v1", not "good enough for now"
 
 ## Rules
 
