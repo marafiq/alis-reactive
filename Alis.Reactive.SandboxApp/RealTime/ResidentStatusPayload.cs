@@ -1,8 +1,4 @@
-using Microsoft.AspNetCore.SignalR;
-
-namespace Alis.Reactive.SandboxApp.Hubs;
-
-public class ResidentStatusHub : Hub { }
+namespace Alis.Reactive.SandboxApp.RealTime;
 
 public class ResidentStatusPayload
 {

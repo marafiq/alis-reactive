@@ -1,6 +1,6 @@
 using Alis.Reactive;
 using Alis.Reactive.FluentValidator;
-using Alis.Reactive.SandboxApp.Hubs;
+using Alis.Reactive.SandboxApp.RealTime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -44,6 +44,7 @@ app.UseAuthorization();
 
 app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapHub<ResidentStatusHub>("/hubs/resident-status");
+app.MapGet("/api/facility-alerts", FacilityAlertEndpoint.Stream);
 
 app.MapControllerRoute(
         name: "areas",

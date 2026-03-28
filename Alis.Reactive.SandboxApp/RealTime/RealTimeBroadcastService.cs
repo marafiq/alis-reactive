@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace Alis.Reactive.SandboxApp.Hubs;
+namespace Alis.Reactive.SandboxApp.RealTime;
 
 /// <summary>
 /// Background service that pushes live updates every 2 seconds via both hubs.
 /// Proves real-time server→client push without user interaction.
 /// </summary>
 public class RealTimeBroadcastService(
-    IHubContext<NotificationHub> notificationHub,
-    IHubContext<ResidentStatusHub> residentHub,
+    IHubContext<NotificationHub, INotificationClient> notificationHub,
+    IHubContext<ResidentStatusHub, IResidentStatusClient> residentHub,
     ILogger<RealTimeBroadcastService> logger) : BackgroundService
 {
     private static readonly string[] Residents =
@@ -41,20 +41,20 @@ public class RealTimeBroadcastService(
 
             try
             {
-                await notificationHub.Clients.All.SendAsync("ReceiveNotification", new NotificationPayload
+                await notificationHub.Clients.All.ReceiveNotification(new NotificationPayload
                 {
                     Count = counter,
                     Message = $"[{now}] #{counter} — {Residents[idx]} status update",
                     Priority = counter % 3 == 0 ? "high" : "normal"
-                }, stoppingToken);
+                });
 
-                await residentHub.Clients.All.SendAsync("StatusChanged", new ResidentStatusPayload
+                await residentHub.Clients.All.StatusChanged(new ResidentStatusPayload
                 {
                     ResidentName = Residents[idx],
                     Status = Statuses[idx],
                     CareLevel = CareLevels[idx],
                     UpdatedAt = DateTime.UtcNow
-                }, stoppingToken);
+                });
             }
             catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
             {
