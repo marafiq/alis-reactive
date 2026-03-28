@@ -12,9 +12,8 @@ namespace Alis.Reactive.Fusion.Components
     /// <c>.Reactive()</c> is called on the builder returned by
     /// <see cref="FusionTabHtmlExtensions.FusionTab{TModel}"/>:
     /// <code>
-    /// Html.FusionTab(plan, "my-tabs", b =&gt; { /* items */ })
-    ///     .Reactive(evt =&gt; evt.Selected, (args, p) =&gt; { /* commands */ })
-    ///     .Render();
+    /// @(Html.FusionTab(plan, "my-tabs", b =&gt; { /* items */ })
+    ///     .Reactive(evt =&gt; evt.Selected, (args, p) =&gt; { /* commands */ }))
     /// </code>
     /// </remarks>
     public static class FusionTabReactiveExtensions

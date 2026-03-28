@@ -12,9 +12,8 @@ namespace Alis.Reactive.Fusion.Components
     /// <c>.Reactive()</c> is called on the builder returned by
     /// <see cref="FusionAccordionHtmlExtensions.FusionAccordion{TModel}"/>:
     /// <code>
-    /// Html.FusionAccordion(plan, "my-accordion", b =&gt; { /* items */ })
-    ///     .Reactive(evt =&gt; evt.Expanded, (args, p) =&gt; { /* commands */ })
-    ///     .Render();
+    /// @(Html.FusionAccordion(plan, "my-accordion", b =&gt; { /* items */ })
+    ///     .Reactive(evt =&gt; evt.Expanded, (args, p) =&gt; { /* commands */ }))
     /// </code>
     /// </remarks>
     public static class FusionAccordionReactiveExtensions
