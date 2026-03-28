@@ -5,11 +5,18 @@ using System.Linq.Expressions;
 namespace Alis.Reactive.InputField
 {
     /// <summary>
-    /// Captures expression, plan, and options for a model-bound input field.
-    /// <typeparamref name="THelper"/> is the framework-specific HTML helper —
-    /// left open here, closed at the app level (e.g. IHtmlHelper for ASP.NET Core).
+    /// Framework-agnostic base for a model-bound input field.
     /// </summary>
-    public class InputFieldSetup<THelper, TModel, TProp> where TModel : class
+    /// <remarks>
+    /// Captures the model expression, plan, and field options. <typeparamref name="THelper"/>
+    /// is left open here and closed by the platform-specific subclass (e.g.
+    /// <c>InputBoundField&lt;TModel, TProp&gt;</c> closes it to <c>IHtmlHelper</c>
+    /// for ASP.NET Core).
+    /// </remarks>
+    /// <typeparam name="THelper">The platform-specific HTML helper type.</typeparam>
+    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
+    public class InputBoundFieldBase<THelper, TModel, TProp> where TModel : class
     {
         public THelper Helper { get; }
         public ReactivePlan<TModel> Plan { get; }
@@ -20,7 +27,7 @@ namespace Alis.Reactive.InputField
         internal string BindingPath { get; }
         internal TextWriter Writer { get; }
 
-        internal InputFieldSetup(
+        internal InputBoundFieldBase(
             THelper helper,
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
@@ -39,9 +46,10 @@ namespace Alis.Reactive.InputField
         }
 
         /// <summary>
-        /// Renders the field wrapper (label + validation slot) around content written by the callback.
-        /// Throws if the component was not registered via AddToComponentsMap — unregistered components
-        /// are invisible to validation and gather, causing silent failures.
+        /// Renders the field wrapper (label + validation error HTML elements) around content
+        /// written by the callback. Throws if the component was not registered via
+        /// <c>AddToComponentsMap</c> — unregistered components are invisible to validation
+        /// and gather, causing silent failures.
         /// </summary>
         internal void Render(Action writeContent)
         {

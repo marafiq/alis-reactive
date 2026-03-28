@@ -5,10 +5,10 @@ namespace Alis.Reactive.UnitTests.ValidationEnrichment;
 
 /// <summary>
 /// Overview #3 — Component registration enforcement.
-/// InputFieldSetup.Render() must throw if the component was not registered
+/// InputBoundFieldBase.Render() must throw if the component was not registered
 /// via AddToComponentsMap. Silent skips in validation and gather are forbidden.
 ///
-/// These tests use the internal InputFieldSetup constructor because the public
+/// These tests use the internal InputBoundFieldBase constructor because the public
 /// DSL (Html.InputField) requires ASP.NET IHtmlHelper, which lives in
 /// Alis.Reactive.Native. The Native test project has integration tests that
 /// exercise registration through the full public DSL.
@@ -16,13 +16,13 @@ namespace Alis.Reactive.UnitTests.ValidationEnrichment;
 [TestFixture]
 public class WhenEnforcingComponentRegistration
 {
-    private static InputFieldSetup<object, EnrichmentTestModel, string> CreateSetup(
+    private static InputBoundFieldBase<object, EnrichmentTestModel, string> CreateSetup(
         ReactivePlan<EnrichmentTestModel> plan,
         StringWriter writer,
         System.Linq.Expressions.Expression<System.Func<EnrichmentTestModel, string?>> expr,
         string bindingPath)
     {
-        return new InputFieldSetup<object, EnrichmentTestModel, string>(
+        return new InputBoundFieldBase<object, EnrichmentTestModel, string>(
             new object(), plan, expr!, new InputFieldOptions(),
             bindingPath, bindingPath, writer);
     }

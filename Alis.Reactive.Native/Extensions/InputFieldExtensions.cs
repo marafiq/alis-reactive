@@ -1,47 +1,32 @@
 using System;
-using System.IO;
 using System.Linq.Expressions;
-using System.Text.Encodings.Web;
 using Alis.Reactive.InputField;
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.Extensions
 {
     /// <summary>
-    /// Closes <c>THelper</c> to <c>IHtmlHelper&lt;TModel&gt;</c> for ASP.NET Core.
-    /// For net48: one #if swaps to <c>HtmlHelper&lt;TModel&gt;</c>.
-    /// This is the ONLY file that binds the framework to the InputField infrastructure.
+    /// Razor view extension for starting a model-bound input field.
     /// </summary>
-    public class InputFieldSetup<TModel, TProp>
-        : InputFieldSetup<IHtmlHelper<TModel>, TModel, TProp>
-        where TModel : class
-    {
-        internal InputFieldSetup(
-            IHtmlHelper<TModel> html,
-            ReactivePlan<TModel> plan,
-            Expression<Func<TModel, TProp>> expression,
-            InputFieldOptions options,
-            string elementId,
-            string bindingPath,
-            TextWriter writer)
-            : base(html, plan, expression, options, elementId, bindingPath, writer)
-        {
-        }
-
-        /// <summary>
-        /// Renders IHtmlContent inside the field wrapper.
-        /// All framework rendering noise (WriteTo, HtmlEncoder) is here — extensions just pass content.
-        /// </summary>
-        public void Render(IHtmlContent content)
-        {
-            Render(() => content.WriteTo(Writer, HtmlEncoder.Default));
-        }
-    }
-
     public static class InputFieldExtensions
     {
-        public static InputFieldSetup<TModel, TProp> InputField<TModel, TProp>(
+        /// <summary>
+        /// Starts a model-bound input field for <paramref name="expression"/>, with optional
+        /// label and required marker.
+        /// </summary>
+        /// <remarks>
+        /// Chain a component extension on the result to choose what renders inside the field —
+        /// e.g. <c>.NativeTextBox()</c>, <c>.FusionDropDownList()</c>. The field wrapper handles
+        /// label display and validation error placement automatically.
+        /// </remarks>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The plan this field belongs to.</param>
+        /// <param name="expression">The model property to bind the field to.</param>
+        /// <param name="options">Optional configuration for label text and required marker.</param>
+        /// <returns>A bound field ready to receive a component extension.</returns>
+        public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
@@ -50,12 +35,12 @@ namespace Alis.Reactive.Native.Extensions
         {
             var opts = new InputFieldOptions();
             options?.Invoke(opts);
-            return new InputFieldSetup<TModel, TProp>(
+            return new InputBoundField<TModel, TProp>(
                 html,
                 plan,
                 expression,
                 opts,
-                IdGenerator.For<TModel, TProp>(expression),
+                IdGenerator.For(expression),
                 html.NameFor(expression),
                 html.ViewContext.Writer);
         }

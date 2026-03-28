@@ -16,6 +16,7 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="Alis.Reactive.Native.UnitTests" />
+        <InternalsVisibleTo Include="Alis.Reactive.Fusion" />
     </ItemGroup>
 
 </Project>

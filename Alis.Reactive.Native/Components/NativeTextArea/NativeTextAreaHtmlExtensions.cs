@@ -1,5 +1,6 @@
 using System;
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
 namespace Alis.Reactive.Native.Components
@@ -12,7 +13,7 @@ namespace Alis.Reactive.Native.Components
         private static readonly NativeTextArea _component = new NativeTextArea();
 
         public static void NativeTextArea<TModel, TProp>(
-            this InputFieldSetup<TModel, TProp> setup,
+            this InputBoundField<TModel, TProp> setup,
             Action<NativeTextAreaBuilder<TModel, TProp>> configure)
             where TModel : class
         {

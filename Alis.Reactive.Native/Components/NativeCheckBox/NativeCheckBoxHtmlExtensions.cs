@@ -1,5 +1,6 @@
 using System;
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
 namespace Alis.Reactive.Native.Components
@@ -12,7 +13,7 @@ namespace Alis.Reactive.Native.Components
         private static readonly NativeCheckBox _component = new NativeCheckBox();
 
         public static void NativeCheckBox<TModel>(
-            this InputFieldSetup<TModel, bool> setup,
+            this InputBoundField<TModel, bool> setup,
             Action<NativeCheckBoxBuilder<TModel, bool>> configure)
             where TModel : class
         {

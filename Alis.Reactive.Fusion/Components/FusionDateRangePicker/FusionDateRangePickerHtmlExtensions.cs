@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Calendars;
@@ -17,7 +18,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();
 
         public static void DateRangePicker<TModel, TProp>(
-            this InputFieldSetup<TModel, TProp> setup,
+            this InputBoundField<TModel, TProp> setup,
             Action<DateRangePickerBuilder> configure)
             where TModel : class
         {

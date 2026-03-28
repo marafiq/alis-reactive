@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.MultiColumnComboBox;
@@ -47,7 +48,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         public static void MultiColumnComboBox<TModel, TProp>(
-            this InputFieldSetup<TModel, TProp> setup,
+            this InputBoundField<TModel, TProp> setup,
             Action<MultiColumnComboBoxBuilder> configure)
             where TModel : class
         {

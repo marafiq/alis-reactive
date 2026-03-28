@@ -2,6 +2,7 @@ using System;
 using Alis.Reactive.Builders;
 using Alis.Reactive.Descriptors;
 using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
 namespace Alis.Reactive.Native.Components
@@ -22,7 +23,7 @@ namespace Alis.Reactive.Native.Components
         private static readonly NativeCheckList _component = new NativeCheckList();
 
         public static void NativeCheckList<TModel, TProp>(
-            this InputFieldSetup<TModel, TProp> setup,
+            this InputBoundField<TModel, TProp> setup,
             Action<NativeCheckListBuilder<TModel, TProp>> configure)
             where TModel : class
         {
