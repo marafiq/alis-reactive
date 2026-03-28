@@ -1,29 +1,58 @@
 # Next Session Prompt
 
-Copy-paste this into Claude Code:
-
----
-
 We're on branch `refactor/api-surface-xml-docs`. Run `git log --oneline -10` to see recent work.
 
-Read these before starting:
-- `docs/next-session-api-docs.md` — full briefing with file paths and line numbers
-- `docs/reviews/api-surface-code-review.md` — 5 blocking constructor issues
-- `docs/reviews/dev-experience-review.md` — 7 dev experience gaps
-- Memory: `feedback_api_surface_frozen.md` — API surface is frozen, read before any changes
+Read before starting:
+- `docs/todo-skill-updates.md` — full skill/hook todo list with priorities
+- `docs/cs1591-xml-docs-remaining.md` — 758 XML doc warnings by module
+- `docs/reviews/anthropic-claude-md-research.md` — Anthropic best practices research
+- `.claude/memory/MEMORY.md` — session memory index
 
-## Tasks (in order)
+## Tasks (in priority order)
 
-1. **Fix 5 pre-existing public constructors** — make internal on AllGuard, AnyGuard, ConditionalReaction, SequentialReaction, HttpReaction. Grep call sites first, run all tests after.
+### 1. CLAUDE.md Rules — Positive Language Rewrite
+Rules still use "Never", "No", "Don't". Research says positive directives cut violations ~50%.
+Rewrite each rule as what TO DO. Example: "No manual JS in views" → "All browser behavior flows
+through the reactive plan." Read current CLAUDE.md (227 lines, target under 200).
 
-2. **Fix 2 grammar issues + 7 dev experience doc gaps** — "an FusionAutoComplete" -> "a FusionAutoComplete" (2 files). Then add missing class-level summaries on HttpRequestBuilder, ResponseBuilder, GatherBuilder and the other 4 gaps from the dev experience review.
+### 2. Fix `reactive-dsl` Skill (WIP)
+Expand scope: merge InputField + component rendering + SSE/SignalR triggers.
+Verify all code examples against current API. Keep under 500 lines.
+Use `references/` for depth. Run `/verify-skill-top-10-things reactive-dsl` after.
 
-3. **Build the API Doc Generator tool** — enable `<GenerateDocumentationFile>true</GenerateDocumentationFile>` in Core/Native/Fusion csproj files. Create `tools/ApiDocGenerator/` C# console app that reads the 3 XML doc files, filters to public members, groups by namespace/class, and outputs `docs-site/src/content/docs/reference/api-reference.md` in our existing format. Add `npm run build:api-docs`. Then update CLAUDE.md and skills to reference the generated XML as API source of truth.
+### 3. Fix `onboard-fusion-component` Skill (6 errors)
+- `ReactiveWiringHelper.Wire<>()` does not exist — code inlines wiring
+- `FusionGatherExtensions` does not exist — actual: `GatherExtensions` in core
+- Gather constraint wrong — `IComponent` not `FusionComponent`
+- `PreventDefault`/`UpdateData` param type — `ICommandEmitter` not `PipelineBuilder<TModel>`
+- `UpdateData` signature — `<TResponse>` not `<TModel, TResponse>`
+- File count — 6-8 per component, not fixed 7
 
-4. **CLAUDE.md cleanup** — Remove stale references: `IReactivePlan` mentions, old test counts (now 1,744+ non-Playwright, 742 Playwright), stale "Remaining Onboarding" list (many already onboarded). Verify every file path and class name mentioned in CLAUDE.md still exists. Remove any section that duplicates what the XML docs now cover.
+### 4. Fix `validation-rules-alis-reactive` Skill (5 gaps from blind test)
+- Missing `OnError(400, e => e.ValidationErrors("form"))` pattern
+- Missing `.WithMessage()` — every real validator uses custom messages
+- No numeric threshold docs — WhenField only supports truthy/eq/neq
+- No Gather + Validate relationship
+- No component selection guidance by data type
 
-5. **Skills cleanup** — Read each skill file at `~/.claude/skills/` and verify code examples match current API (Fusion prefix, `build`/`pipeline` params, `InputBoundField`). Stale skills: `reactive-dsl` (partially updated this session, verify all examples), `http-pipeline` (check parameter names in examples), `conditions-dsl` (verify), `onboard-fusion-component` (partially updated), `validation-rules` (check InputFieldSetup references), `bdd-testing` (check component method names).
+### 5. Build Schema Drift Hook (HIGH PRIORITY)
+Descriptors and schema have drifted in the past. Build a hook or build-time script
+that validates C# descriptor JSON output against `reactive-plan.schema.json`.
+See `docs/todo-skill-updates.md` for options.
 
-6. **Memory cleanup** — Read `MEMORY.md` index. Remove or update stale entries: `project_isp_refactor_plan.md` (IReactivePlan deleted, ISP plan is moot), stale test counts, stale "Remaining Onboarding" list, any reference to `InputFieldSetup`. Update `project_xml_docs_dev_audit.md` with current state (gaps closed this session).
+### 6. Create Missing Skills
+- `design-system` — layout primitives: vstack, hstack, card, grid, heading, text
+- `technical-documentation-writing` — docs-site pages, architecture guides
 
-Load the `dotnet-xml-docs` skill before any doc work. Run all tests before committing.
+### 7. CS1591 XML Doc Warnings (758 across 81 files)
+Module-by-module approach. Start with DesignSystem (276 warnings) — check if types
+should be `internal` first. See `docs/cs1591-xml-docs-remaining.md` for full breakdown.
+
+### 8. Run `/verify-skill-top-10-things` on Each Skill
+Audit every skill's YAML `description` against Anthropic's top 10 best practices.
+Descriptions must say WHAT + WHEN with trigger phrases front-loaded in first 250 chars.
+
+### 9. API Doc Generator Improvements
+- Multiline summaries run together in output
+- Add `<remarks>` as collapsible sections
+- Wire into CI pipeline
