@@ -24,7 +24,7 @@ BEFORE starting any work. Focus is **process and harness** — no code changes t
 1. **API Surface hook** — enhance to catch `internal` → `public` across 3 library projects
 2. **BDD test enforcement** — skill in agent prompt + post-hook for test patterns
 3. **BDD public API only** — analyzer or hook to catch internal constructor usage (53 violations)
-4. **Review all skills** — accuracy + effectiveness testing (6 errors in onboard-fusion, 5 gaps in validation-rules)
+4. **Review all skills** — first: build prioritized skill list based on repo history and upcoming work. Then review accuracy + test effectiveness for each, highest-priority first. Known: onboard-fusion has 6 errors, validation-rules has 5 gaps
 5. **Claude optimization findings** — reduce emphasis, add "why", questions → commands in rules files
 
 ### Docs Cleanup (still process, not code)
