@@ -1,58 +1,57 @@
 # Next Session Prompt
 
-We're on branch `refactor/api-surface-xml-docs`. Run `git log --oneline -10` to see recent work.
+Branch: `refactor/api-surface-xml-docs`. Run `git log --oneline -15` to see recent work.
 
-Read before starting:
-- `docs/todo-skill-updates.md` — full skill/hook todo list with priorities
-- `docs/cs1591-xml-docs-remaining.md` — 758 XML doc warnings by module
-- `docs/reviews/anthropic-claude-md-research.md` — Anthropic best practices research
+## PRIMARY TASK: Build `.claude/process-flows.md`
+
+CLAUDE.md now has a simple 4-line ASCII flow linking to `.claude/process-flows.md` (not yet created).
+This file needs detailed per-task-type flows. Take your time. Fire multiple agents.
+
+### Approach
+1. Fire **Claude Code workflow experts** — research Anthropic's latest on workflows, hooks, skills orchestration
+2. Fire **code analysts** — read actual code, past mistakes (`.claude/memory/feedback_*.md`), sandbox views
+3. Fire **process designers** — design the per-task-type flows with pre/post checklists
+
+### Task Types to Cover
+
+| Task Type | Key Skills | Nuances |
+|-----------|-----------|---------|
+| Writing a .cshtml view | reactive-dsl, http-pipeline, conditions-dsl, validation-rules | InputField + component selection, browser verify |
+| Onboarding a new component | onboard-fusion-component | 8-file vertical slice, zero TS changes |
+| Fixing a bug | — | Root cause analysis, trace full path, browser first, NEVER patch |
+| Adding a new primitive | — | 10-step checklist, schema alignment |
+| Refactoring | solid-ts-audit | SOLID check, code smells, coupling analysis |
+| Reviewing (code review) | — | Evidence-based, 9-point audit criteria |
+| SOLID enforcement | solid-ts-audit | SRP/OCP/LSP/ISP/DIP per module |
+| SonarQube cleanup | — | Quality gate, BDD coverage 80% on touched code |
+| Rider warnings | — | CS1591, nullable, unused, etc. |
+| Writing docs | technical-documentation-writing | Sandbox-verified examples, question-driven style |
+| Writing tests | bdd-testing | Public API only, full user journeys, no internals |
+
+### For Each Task Type, Define:
+1. **Pre-flight checklist** — what to verify before starting
+2. **Skills to load** — which skills this task needs
+3. **Process steps** — the exact flow
+4. **Post-flight checklist** — what to verify before marking done
+5. **Common mistakes** — from feedback memories, specific to this task type
+6. **Agent context template** — what to include when dispatching an agent for this task
+
+### Read Before Starting
 - `.claude/memory/MEMORY.md` — session memory index
+- `.claude/memory/solid-ts-research.md` — SOLID research (Uncle Bob, Fowler, TanStack, Beck)
+- `.claude/memory/feedback_validation_session_mistakes.md` — biggest session failure
+- `.claude/memory/feedback_no_tech_debt.md` — no shortcuts
+- `.claude/memory/feedback_rubber_stamping.md` — no lazy audits
+- `docs/todo-skill-updates.md` — skill/hook todo list
+- `docs/reviews/anthropic-claude-md-research.md` — Anthropic best practices
+- Current CLAUDE.md — the process section and rules
 
-## Tasks (in priority order)
-
-### 1. CLAUDE.md Rules — Positive Language Rewrite
-Rules still use "Never", "No", "Don't". Research says positive directives cut violations ~50%.
-Rewrite each rule as what TO DO. Example: "No manual JS in views" → "All browser behavior flows
-through the reactive plan." Read current CLAUDE.md (227 lines, target under 200).
-
-### 2. Fix `reactive-dsl` Skill (WIP)
-Expand scope: merge InputField + component rendering + SSE/SignalR triggers.
-Verify all code examples against current API. Keep under 500 lines.
-Use `references/` for depth. Run `/verify-skill-top-10-things reactive-dsl` after.
-
-### 3. Fix `onboard-fusion-component` Skill (6 errors)
-- `ReactiveWiringHelper.Wire<>()` does not exist — code inlines wiring
-- `FusionGatherExtensions` does not exist — actual: `GatherExtensions` in core
-- Gather constraint wrong — `IComponent` not `FusionComponent`
-- `PreventDefault`/`UpdateData` param type — `ICommandEmitter` not `PipelineBuilder<TModel>`
-- `UpdateData` signature — `<TResponse>` not `<TModel, TResponse>`
-- File count — 6-8 per component, not fixed 7
-
-### 4. Fix `validation-rules-alis-reactive` Skill (5 gaps from blind test)
-- Missing `OnError(400, e => e.ValidationErrors("form"))` pattern
-- Missing `.WithMessage()` — every real validator uses custom messages
-- No numeric threshold docs — WhenField only supports truthy/eq/neq
-- No Gather + Validate relationship
-- No component selection guidance by data type
-
-### 5. Build Schema Drift Hook (HIGH PRIORITY)
-Descriptors and schema have drifted in the past. Build a hook or build-time script
-that validates C# descriptor JSON output against `reactive-plan.schema.json`.
-See `docs/todo-skill-updates.md` for options.
-
-### 6. Create Missing Skills
-- `design-system` — layout primitives: vstack, hstack, card, grid, heading, text
-- `technical-documentation-writing` — docs-site pages, architecture guides
-
-### 7. CS1591 XML Doc Warnings (758 across 81 files)
-Module-by-module approach. Start with DesignSystem (276 warnings) — check if types
-should be `internal` first. See `docs/cs1591-xml-docs-remaining.md` for full breakdown.
-
-### 8. Run `/verify-skill-top-10-things` on Each Skill
-Audit every skill's YAML `description` against Anthropic's top 10 best practices.
-Descriptions must say WHAT + WHEN with trigger phrases front-loaded in first 250 chars.
-
-### 9. API Doc Generator Improvements
-- Multiline summaries run together in output
-- Add `<remarks>` as collapsible sections
-- Wire into CI pipeline
+### Other Pending Tasks (lower priority)
+- Fix `reactive-dsl` skill (WIP — expand scope, verify examples)
+- Fix `onboard-fusion-component` skill (6 errors)
+- Fix `validation-rules-alis-reactive` skill (5 gaps)
+- Build schema drift hook
+- Create `design-system` and `technical-documentation-writing` skills
+- CS1591 XML doc warnings (758 across 81 files)
+- CLAUDE.md positive language rewrite for rules
+- Audit all skill YAML descriptions via `/verify-skill-top-10-things`
