@@ -3,7 +3,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
-@using Alis.Reactive.Validation
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @{
     ViewData["Title"] = "Architecture";
 
@@ -242,13 +242,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/AllModulesTogether/Architecture/ValidateClient")
-                 .Validate(new ValidationDescriptor("arch-val-form", new List<ValidationField>
-                 {
-                     new ValidationField("NativeRequired",
-                         new List<ValidationRule> { new ValidationRule("required", "Required") }),
-                     new ValidationField("FusionRequired",
-                         new List<ValidationRule> { new ValidationRule("required", "Required") })
-                 }))
+                 .Validate<ArchitectureValidator>("arch-val-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
@@ -279,17 +273,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post("/Sandbox/AllModulesTogether/Architecture/ValidateClient")
-                 .Validate(new ValidationDescriptor("equalto-form", new List<ValidationField>
-                 {
-                     new ValidationField("Password",
-                         new List<ValidationRule> { new ValidationRule("required", "Required") }),
-                     new ValidationField("ConfirmPassword",
-                         new List<ValidationRule>
-                         {
-                             new ValidationRule("required", "Required"),
-                             new ValidationRule("equalTo", "Must match", field: "Password")
-                         })
-                 }))
+                 .Validate<ArchitectureValidator>("equalto-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
