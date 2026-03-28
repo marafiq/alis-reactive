@@ -10,11 +10,11 @@ using Syncfusion.EJ2.DropDowns;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a Syncfusion DropDownList inside a field wrapper, bound to a model property.
+    /// Creates a FusionDropDownList inside a field wrapper, bound to a model property.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Country)</c>, then call
-    /// <c>.DropDownList(b =&gt; { b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value); })</c>.
+    /// <c>.FusionDropDownList(b =&gt; { b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value); })</c>.
     /// </remarks>
     public static class FusionDropDownListHtmlExtensions
     {
@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
         /// to match the data source property names: <c>.Fields&lt;CountryItem&gt;(t =&gt; t.Text, v =&gt; v.Value)</c>.
         /// </remarks>
         /// <typeparam name="TItem">The data source item type.</typeparam>
-        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="builder">The Fusion builder.</param>
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>
         /// <returns>The builder for method chaining.</returns>
@@ -52,7 +52,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <c>.Fields&lt;CountryItem&gt;(t =&gt; t.Text, v =&gt; v.Value, g =&gt; g.Continent)</c>.
         /// </remarks>
         /// <typeparam name="TItem">The data source item type.</typeparam>
-        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="builder">The Fusion builder.</param>
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>
         /// <param name="groupBy">Expression selecting the grouping property.</param>
@@ -72,13 +72,13 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Renders a Syncfusion DropDownList bound to the field's model property.
+        /// Renders a FusionDropDownList bound to the field's model property.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the DropDownList (data source, fields, etc.).</param>
-        public static void DropDownList<TModel, TProp>(
+        /// <param name="build">Callback to build the FusionDropDownList (data source, fields, etc.).</param>
+        public static void FusionDropDownList<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<DropDownListBuilder> build)
             where TModel : class

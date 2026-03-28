@@ -9,24 +9,24 @@ using Syncfusion.EJ2.Calendars;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a Syncfusion DatePicker inside a field wrapper, bound to a model property.
+    /// Creates a FusionDatePicker inside a field wrapper, bound to a model property.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.BirthDate)</c>, then call
-    /// <c>.DatePicker(b =&gt; { b.Format("MM/dd/yyyy"); })</c>.
+    /// <c>.FusionDatePicker(b =&gt; { b.Format("MM/dd/yyyy"); })</c>.
     /// </remarks>
     public static class FusionDatePickerHtmlExtensions
     {
         private static readonly FusionDatePicker Component = new FusionDatePicker();
 
         /// <summary>
-        /// Renders a Syncfusion DatePicker bound to the field's model property.
+        /// Renders a FusionDatePicker bound to the field's model property.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the DatePicker (min/max date, format, etc.).</param>
-        public static void DatePicker<TModel, TProp>(
+        /// <param name="build">Callback to build the FusionDatePicker (min/max date, format, etc.).</param>
+        public static void FusionDatePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<DatePickerBuilder> build)
             where TModel : class

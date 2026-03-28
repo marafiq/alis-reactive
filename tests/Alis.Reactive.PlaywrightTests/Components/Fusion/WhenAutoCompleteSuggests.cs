@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/AutoComplete
 ///
-/// Syncfusion AutoComplete renders an input element inside the wrapper div.
+/// FusionAutoComplete renders an input element inside the wrapper div.
 /// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
 /// Tests use AutoCompleteLocator to interact via real browser gestures.
 /// </summary>

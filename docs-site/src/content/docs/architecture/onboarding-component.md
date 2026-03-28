@@ -115,7 +115,7 @@ using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Mutations;
 using Alis.Reactive.Descriptors.Sources;
 using Alis.Reactive.Descriptors.Triggers;
-using Alis.Reactive.Native.Extensions;     // for InputFieldSetup<TModel, TProp>
+using Alis.Reactive.Native.Extensions;     // for InputBoundField<TModel, TProp>
 using Syncfusion.EJ2;                       // for setup.Helper.EJS()
 using Syncfusion.EJ2.DropDowns;             // SF component namespace (varies)
 ```
@@ -285,9 +285,9 @@ public static class FusionXxxHtmlExtensions
 {
     private static readonly FusionXxx Component = new();
 
-    public static void Xxx<TModel, TProp>(
-        this InputFieldSetup<TModel, TProp> setup,
-        Action<XxxBuilder> configure)
+    public static void FusionXxx<TModel, TProp>(
+        this InputBoundField<TModel, TProp> setup,
+        Action<XxxBuilder> build)
         where TModel : class
     {
         // 1. Register in ComponentsMap
@@ -310,8 +310,8 @@ public static class FusionXxxHtmlExtensions
         };
         var builder = setup.Helper.EJS().XxxFor(setup.Expression, attrs);
 
-        // 3. Let the user configure (DataSource, Placeholder, etc.)
-        configure(builder);
+        // 3. Let the user build (DataSource, Placeholder, etc.)
+        build(builder);
 
         // 4. Render — pass builder.Render() which returns IHtmlContent
         setup.Render(builder.Render());
@@ -719,10 +719,10 @@ SF AutoComplete has filtering built-in. MultiSelect and DropDownList require `.A
 
 ```csharp
 // AutoComplete — filtering works out of the box
-.AutoComplete(b => b.Reactive(plan, evt => evt.Filtering, ...))
+.FusionAutoComplete(b => b.Reactive(plan, evt => evt.Filtering, ...))
 
 // MultiSelect/DropDownList — MUST set AllowFiltering
-.MultiSelect(b => b.AllowFiltering(true).Reactive(plan, evt => evt.Filtering, ...))
+.FusionMultiSelect(b => b.AllowFiltering(true).Reactive(plan, evt => evt.Filtering, ...))
 ```
 
 ### HtmlAttributes — parameter, not fluent method
@@ -896,13 +896,13 @@ public static class FusionXxxHtmlExtensions
         this IHtmlHelper<TModel> html,
         IReactivePlan<TModel> plan,
         string elementId,
-        Action<XxxBuilder> configure)
+        Action<XxxBuilder> build)
         where TModel : class
     {
         // NO ComponentsMap registration — this is NOT an input component
 
         var builder = html.EJS().Xxx(elementId);
-        configure(builder);
+        build(builder);
 
         return new FusionXxxBuilder<TModel>(plan, elementId, builder.Render());
     }
@@ -910,7 +910,7 @@ public static class FusionXxxHtmlExtensions
 ```
 
 **Key differences from input component factory:**
-- Takes `IHtmlHelper<TModel>` directly (not `InputFieldSetup`)
+- Takes `IHtmlHelper<TModel>` directly (not `InputBoundField`)
 - Takes explicit `string elementId` (not model-expression-derived)
 - Takes `IReactivePlan<TModel>` for passing to `.Reactive()`
 - NO `plan.AddToComponentsMap()` call

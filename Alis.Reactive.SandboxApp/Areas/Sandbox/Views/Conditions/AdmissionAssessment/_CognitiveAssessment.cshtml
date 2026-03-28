@@ -16,7 +16,7 @@
     <!-- Row 1: Cognitive Score + Wanders -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.CognitiveScore, o => o.Label("Cognitive Score (MMSE)"))
-            .NumericTextBox(b => b
+            .FusionNumericTextBox(b => b
                 .Min(0).Max(30).Step(1)
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
@@ -45,7 +45,7 @@
                 })); }
 
         @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
-            .Switch(b => b
+            .FusionSwitch(b => b
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var sw = p.Component<FusionSwitch>(m => m.Wanders);
@@ -66,7 +66,7 @@
     <div id="wander-details" hidden>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.WanderFrequency, o => o.Label("Wander Frequency"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .DataSource(new[] { "Rarely", "Occasionally", "Frequently" })
                     .Placeholder("Select frequency")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>

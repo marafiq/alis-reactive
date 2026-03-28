@@ -12,9 +12,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// <c>.Reactive()</c> is always the last call inside the build callback passed to
-    /// <see cref="FusionColorPickerHtmlExtensions.ColorPicker{TModel, TProp}"/>:
+    /// <see cref="FusionColorPickerHtmlExtensions.FusionColorPicker{TModel,TProp}"/>:
     /// <code>
-    /// Html.InputField(plan, m =&gt; m.ThemeColor).ColorPicker(b =&gt;
+    /// Html.InputField(plan, m =&gt; m.ThemeColor).FusionColorPicker(b =&gt;
     /// {
     ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
     /// });
@@ -25,11 +25,11 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly FusionColorPicker Component = new FusionColorPicker();
 
         /// <summary>
-        /// Wires a ColorPicker event to a reactive pipeline that executes in the browser.
+        /// Wires a FusionColorPicker event to a reactive pipeline that executes in the browser.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
-        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="builder">The Fusion builder.</param>
         /// <param name="plan">The plan to add the reactive behavior to.</param>
         /// <param name="eventSelector">Selects which event to react to (e.g. <c>evt =&gt; evt.Changed</c>).</param>
         /// <param name="pipeline">Configures the commands to run when the event fires.</param>

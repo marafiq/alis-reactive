@@ -12,9 +12,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// <c>.Reactive()</c> is always the last call inside the build callback passed to
-    /// <see cref="FusionDateTimePickerHtmlExtensions.DateTimePicker{TModel, TProp}"/>:
+    /// <see cref="FusionDateTimePickerHtmlExtensions.FusionDateTimePicker{TModel,TProp}"/>:
     /// <code>
-    /// Html.InputField(plan, m =&gt; m.AppointmentTime).DateTimePicker(b =&gt;
+    /// Html.InputField(plan, m =&gt; m.AppointmentTime).FusionDateTimePicker(b =&gt;
     /// {
     ///     b.Format("MM/dd/yyyy hh:mm a");
     ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
@@ -26,11 +26,11 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly FusionDateTimePicker Component = new FusionDateTimePicker();
 
         /// <summary>
-        /// Wires a DateTimePicker event to a reactive pipeline that executes in the browser.
+        /// Wires a FusionDateTimePicker event to a reactive pipeline that executes in the browser.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
-        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="builder">The Fusion builder.</param>
         /// <param name="plan">The plan to add the reactive behavior to.</param>
         /// <param name="eventSelector">Selects which event to react to (e.g. <c>evt =&gt; evt.Changed</c>).</param>
         /// <param name="pipeline">Configures the commands to run when the event fires.</param>

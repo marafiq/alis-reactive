@@ -29,7 +29,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .DataSource(careLevels)
                     .Placeholder("Select care level")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -60,7 +60,7 @@
                     })); }
 
             @{ Html.InputField(plan, m => m.Protocol, o => o.Label("Protocol (auto-set by care level)"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .DataSource(protocols)
                     .Placeholder("Auto-assigned")); }
         </div>
@@ -81,7 +81,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.RequiresEscort, o => o.Label("Requires Escort"))
-                .Switch(b => { }); }
+                .FusionSwitch(b => { }); }
         </div>
         <div class="mt-3">
             @(Html.NativeButton("s2-apply-btn", "Apply Escort Policy")

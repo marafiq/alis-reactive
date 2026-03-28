@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/Switch
 ///
-/// Syncfusion Switch renders an input element inside a wrapper.
+/// FusionSwitch renders an input element inside a wrapper.
 /// The wrapper element gets the IdGenerator-based ID. Tests use
 /// SwitchLocator.Toggle() to click the wrapper, which reliably
 /// triggers the SF change event via real browser interaction.

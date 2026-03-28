@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/InputMask
 ///
-/// Syncfusion MaskedTextBox renders an input element inside a wrapper span.
+/// FusionInputMask renders an input element inside a wrapper span.
 /// The wrapper element gets the IdGenerator-based ID. Tests use
 /// InputMaskLocator to interact via real browser gestures (typing into
 /// the masked input) rather than ej2 instance manipulation.
@@ -68,7 +68,7 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         // Verify the value was applied by checking the visible input element's value.
         var inputValue = await PhoneNumber.Input.InputValueAsync();
         Assert.That(inputValue, Is.Not.Null.And.Not.Empty,
-            $"Expected InputMask input to have a value but got '{inputValue}'");
+            $"Expected FusionInputMask input to have a value but got '{inputValue}'");
 
         AssertNoConsoleErrors();
     }

@@ -36,7 +36,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.ReceiveNotifications, o => o.Label("Receive Notifications"))
-                .Switch(b => b
+                .FusionSwitch(b => b
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Checked);
@@ -65,7 +65,7 @@
             On DomReady, reads the email alerts switch's <code>checked</code> property and displays it in a text element.
         </p>
         @{ Html.InputField(plan, m => m.EmailAlerts, o => o.Label("Email Alerts"))
-            .Switch(b => { }); }
+            .FusionSwitch(b => { }); }
         <div class="font-mono text-sm mt-2">
             <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
         </div>
@@ -93,7 +93,7 @@
             and shows a confirmation or warning.
         </p>
         @{ Html.InputField(plan, m => m.SmsAlerts, o => o.Label("SMS Alerts"))
-            .Switch(b => { }); }
+            .FusionSwitch(b => { }); }
         <div class="mt-3">
             @(Html.NativeButton("check-sms-btn", "Check SMS Alert Status")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")

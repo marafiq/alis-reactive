@@ -171,7 +171,7 @@ The facility requirements partial uses `Html.ResolvePlan<T>()` — a partial pla
 
         @{ Html.InputField(plan, m => m.DepositAmount,
             o => o.Required().Label("Move-in Deposit ($)"))
-            .NumericTextBox(b => b
+            .FusionNumericTextBox(b => b
                 .Min(0).Step(500)); }
     </div>
 </native-vstack>
@@ -270,7 +270,7 @@ The emergency contact phone uses `FusionInputMask` with a phone number mask. The
 ```csharp title="InputMask — formatted phone input"
 Html.InputField(plan, m => m.EmergencyContactPhone,
     o => o.Required().Label("Contact Phone"))
-    .InputMask(b => b
+    .FusionInputMask(b => b
         .Mask("(000) 000-0000")
         .Placeholder("(555) 123-4567"));
 ```
@@ -445,14 +445,14 @@ Every file in the project, for reference.
                     .Placeholder("Doe")); }
 
             @{ Html.InputField(plan, m => m.DateOfBirth, o => o.Required().Label("Date of Birth"))
-                .DatePicker(b => b.Placeholder("Select date of birth")); }
+                .FusionDatePicker(b => b.Placeholder("Select date of birth")); }
 
             <div class="col-span-full mt-2">
                 <native-heading level="H3">Placement</native-heading>
             </div>
 
             @{ Html.InputField(plan, m => m.FacilityId, o => o.Required().Label("Facility"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .Placeholder("Select facility")
                     .Fields<LookupItem>(t => t.Name, v => v.Id)
                     .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
@@ -478,12 +478,12 @@ Every file in the project, for reference.
             <div id="facility-requirements" class="col-span-full"></div>
 
             @{ Html.InputField(plan, m => m.UnitId, o => o.Label("Unit"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .Placeholder("Select unit — pick a facility first")
                     .Fields<LookupItem>(t => t.Name, v => v.Id)); }
 
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .Placeholder("Select care level")
                     .Fields<LookupItem>(t => t.Name, v => v.Id)
                     .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
@@ -494,15 +494,15 @@ Every file in the project, for reference.
                     })); }
 
             @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
-                .DatePicker(b => b.Placeholder("Select admission date")); }
+                .FusionDatePicker(b => b.Placeholder("Select admission date")); }
 
             @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate ($)"))
-                .NumericTextBox(b => b.Min(0).Step(100)); }
+                .FusionNumericTextBox(b => b.Min(0).Step(100)); }
 
             <div id="cognitive-section" class="col-span-full" hidden>
                 @{ Html.InputField(plan, m => m.CognitiveAssessmentDate,
                     o => o.Label("Last Cognitive Assessment"))
-                    .DatePicker(b => b.Placeholder("Assessment date")); }
+                    .FusionDatePicker(b => b.Placeholder("Assessment date")); }
             </div>
 
             <div class="col-span-full mt-2">
@@ -541,7 +541,7 @@ Every file in the project, for reference.
 
             @{ Html.InputField(plan, m => m.EmergencyContactPhone,
                 o => o.Required().Label("Contact Phone"))
-                .InputMask(b => b.Mask("(000) 000-0000").Placeholder("(555) 123-4567")); }
+                .FusionInputMask(b => b.Mask("(000) 000-0000").Placeholder("(555) 123-4567")); }
         </form>
 
         <div id="form-actions" class="mt-6 flex items-center gap-3" hidden>
@@ -765,7 +765,7 @@ public class IntakeController : Controller
 
         @{ Html.InputField(plan, m => m.DepositAmount,
             o => o.Required().Label("Move-in Deposit ($)"))
-            .NumericTextBox(b => b.Min(0).Step(500)); }
+            .FusionNumericTextBox(b => b.Min(0).Step(500)); }
     </div>
 </native-vstack>
 

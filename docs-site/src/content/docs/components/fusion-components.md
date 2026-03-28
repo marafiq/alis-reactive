@@ -25,7 +25,7 @@ A text input with server-side or client-side filtering and autocomplete suggesti
 
 ```csharp
 Html.InputField(plan, m => m.Physician, o => o.Label("Physician"))
-    .AutoComplete(b => b
+    .FusionAutoComplete(b => b
         .DataSource(physicians)
         .Fields<PhysicianItem>(t => t.Text, v => v.Value)
         .Placeholder("Select a physician"));
@@ -115,7 +115,7 @@ A numeric input with spin buttons, formatting, and min/max constraints.
 
 ```csharp
 Html.InputField(plan, m => m.Amount, o => o.Label("Amount"))
-    .NumericTextBox(b => b
+    .FusionNumericTextBox(b => b
         .Min(-100).Max(99999).Step(1));
 ```
 
@@ -161,7 +161,7 @@ A date-only picker with calendar popup.
 
 ```csharp
 Html.InputField(plan, m => m.AdmissionDate, o => o.Label("Admission Date"))
-    .DatePicker(b => b
+    .FusionDatePicker(b => b
         .Placeholder("Select admission date")
         .Reactive(plan, evt => evt.Changed, (args, p) =>
         {
@@ -204,7 +204,7 @@ A combined date and time picker.
 
 ```csharp
 Html.InputField(plan, m => m.AppointmentTime, o => o.Label("Appointment Time"))
-    .DateTimePicker(b => b
+    .FusionDateTimePicker(b => b
         .Placeholder("Select date and time"));
 ```
 
@@ -240,7 +240,7 @@ A time-only picker.
 
 ```csharp
 Html.InputField(plan, m => m.MedicationTime, o => o.Label("Medication Time"))
-    .TimePicker(b => b
+    .FusionTimePicker(b => b
         .Placeholder("Select time"));
 ```
 
@@ -282,7 +282,7 @@ public DateTime[]? StayPeriod { get; set; }
 
 // View
 Html.InputField(plan, m => m.StayPeriod, o => o.Required().Label("Stay Period"))
-    .DateRangePicker(b => b
+    .FusionDateRangePicker(b => b
         .Placeholder("Select date range"));
 ```
 
@@ -334,7 +334,7 @@ A single-select dropdown with search and filtering.
 
 ```csharp
 Html.InputField(plan, m => m.Category, o => o.Label("Category"))
-    .DropDownList(b => b
+    .FusionDropDownList(b => b
         .DataSource(categories)
         .Placeholder("Select a category")
         .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -351,7 +351,7 @@ Html.InputField(plan, m => m.Category, o => o.Label("Category"))
 When your data source has complex objects, use `.Fields<T>()` to bind text and value:
 
 ```csharp
-.DropDownList(b => b
+.FusionDropDownList(b => b
     .DataSource(facilityRecords)
     .Fields<FacilityRecord>(x => x.Name, x => x.Id)
     .Placeholder("Select facility"))
@@ -401,7 +401,7 @@ A multi-select dropdown. Selected values are a `string[]`.
 
 ```csharp
 Html.InputField(plan, m => m.Allergies, o => o.Label("Allergies"))
-    .MultiSelect(b => b
+    .FusionMultiSelect(b => b
         .DataSource(allergies)
         .Fields<AllergyItem>(x => x.Text, x => x.Value));
 ```
@@ -477,7 +477,7 @@ A toggle switch. Uses `ReadExpr => "checked"`, same concept as NativeCheckBox bu
 
 ```csharp
 Html.InputField(plan, m => m.ReceiveNotifications, o => o.Label("Receive Notifications"))
-    .Switch(b => b
+    .FusionSwitch(b => b
         .Reactive(plan, evt => evt.Changed, (args, p) =>
         {
             p.Element("change-value").SetText(args, x => x.Checked);
@@ -515,7 +515,7 @@ A masked text input that enforces a specific format (phone numbers, SSNs, zip co
 
 ```csharp
 Html.InputField(plan, m => m.PhoneNumber, o => o.Label("Phone Number"))
-    .InputMask(b => b
+    .FusionInputMask(b => b
         .Mask("(000) 000-0000"));
 ```
 
@@ -542,7 +542,7 @@ A WYSIWYG rich text editor.
 
 ```csharp
 Html.InputField(plan, m => m.CarePlanNotes, o => o.Label("Care Plan"))
-    .RichTextEditor(b => b);
+    .FusionRichTextEditor(b => b);
 ```
 
 ### Mutation extensions
@@ -568,7 +568,7 @@ A file upload component in form mode (no auto-upload). Read-only -- the framewor
 
 ```csharp
 Html.InputField(plan, m => m.Documents, o => o.Label("Supporting Documents"))
-    .FileUpload(b => b);
+    .FusionFileUpload(b => b);
 ```
 
 ---

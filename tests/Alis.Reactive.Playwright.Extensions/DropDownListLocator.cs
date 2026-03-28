@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for Syncfusion DropDownList.
+/// User interaction primitives for FusionDropDownList.
 ///
 /// Verified: click input to open popup, click list item to select.
 /// SF DDL popup: #{componentId}_popup contains .e-list-item elements.

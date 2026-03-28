@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/MultiColumnComboBox
 ///
-/// Syncfusion MultiColumnComboBox renders an input element inside the wrapper div.
+/// FusionMultiColumnComboBox renders an input element inside the wrapper div.
 /// The wrapper element gets the IdGenerator-based ID. Tests use
 /// MultiColumnComboBoxLocator to interact via real browser gestures.
 /// </summary>
@@ -57,7 +57,7 @@ public class WhenMultiColumnItemSelected : PlaywrightTestBase
     public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
-        // SF MultiColumnComboBox renders an input with the IdGenerator-based ID
+        // SF FusionMultiColumnComboBox renders an input with the IdGenerator-based ID
         await Expect(Facility.Input).ToBeVisibleAsync();
 
         // Wait for the value to be set by dom-ready — verify via the visible input

@@ -9,24 +9,24 @@ using Syncfusion.EJ2.Inputs;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a Syncfusion NumericTextBox inside a field wrapper, bound to a model property.
+    /// Creates a FusionNumericTextBox inside a field wrapper, bound to a model property.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Quantity)</c>, then call
-    /// <c>.NumericTextBox(b =&gt; { b.Min(0).Max(100).Step(1); })</c>.
+    /// <c>.FusionNumericTextBox(b =&gt; { b.Min(0).Max(100).Step(1); })</c>.
     /// </remarks>
     public static class FusionNumericTextBoxHtmlExtensions
     {
         private static readonly FusionNumericTextBox Component = new FusionNumericTextBox();
 
         /// <summary>
-        /// Renders a Syncfusion NumericTextBox bound to the field's model property.
+        /// Renders a FusionNumericTextBox bound to the field's model property.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the NumericTextBox (min, max, step, format, etc.).</param>
-        public static void NumericTextBox<TModel, TProp>(
+        /// <param name="build">Callback to build the FusionNumericTextBox (min, max, step, format, etc.).</param>
+        public static void FusionNumericTextBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<NumericTextBoxBuilder> build)
             where TModel : class

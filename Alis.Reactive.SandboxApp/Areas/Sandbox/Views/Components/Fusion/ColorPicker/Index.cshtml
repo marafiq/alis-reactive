@@ -37,7 +37,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
-                .ColorPicker(b => b
+                .FusionColorPicker(b => b
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
@@ -80,7 +80,7 @@
             Button calls <code>toggle()</code> on the accent color picker to open/close its popup.
         </p>
         @{ Html.InputField(plan, m => m.AccentColor, o => o.Label("Accent Color"))
-            .ColorPicker(b => { }); }
+            .FusionColorPicker(b => { }); }
         <div class="mt-3">
             @(Html.NativeButton("toggle-btn", "Toggle Accent Picker")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")

@@ -146,7 +146,7 @@ Create `Views/Todo/Index.cshtml`:
 
     <div id="due-date-section" hidden>
         @{ Html.InputField(plan, m => m.DueDate, o => o.Label("Due Date"))
-            .DatePicker(b => b.Placeholder("Select due date")); }
+            .FusionDatePicker(b => b.Placeholder("Select due date")); }
     </div>
 
     @(Html.NativeButton("save-btn", "Save Todo")

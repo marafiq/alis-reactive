@@ -9,24 +9,24 @@ using Syncfusion.EJ2.Inputs;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a Syncfusion ColorPicker inside a field wrapper, bound to a model property.
+    /// Creates a FusionColorPicker inside a field wrapper, bound to a model property.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.ThemeColor)</c>, then call
-    /// <c>.ColorPicker(b =&gt; { b.Mode(ColorPickerMode.Palette); })</c>.
+    /// <c>.FusionColorPicker(b =&gt; { b.Mode(ColorPickerMode.Palette); })</c>.
     /// </remarks>
     public static class FusionColorPickerHtmlExtensions
     {
         private static readonly FusionColorPicker Component = new FusionColorPicker();
 
         /// <summary>
-        /// Renders a Syncfusion ColorPicker bound to the field's model property.
+        /// Renders a FusionColorPicker bound to the field's model property.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the ColorPicker (mode, columns, palette, etc.).</param>
-        public static void ColorPicker<TModel, TProp>(
+        /// <param name="build">Callback to build the FusionColorPicker (mode, columns, palette, etc.).</param>
+        public static void FusionColorPicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<ColorPickerBuilder> build)
             where TModel : class
@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
 
             // CRITICAL: Pass htmlAttributes as a parameter to ColorPickerFor(), NOT as a fluent
             // .HtmlAttributes() call. The fluent method does not override the element ID on
-            // ColorPicker — passing as a parameter bakes the custom ID into both the HTML
+            // FusionColorPicker — passing as a parameter bakes the custom ID into both the HTML
             // output and the JS appendTo() target.
             var attrs = new Dictionary<string, object>
             {

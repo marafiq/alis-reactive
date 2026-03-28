@@ -30,7 +30,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
     /// <summary>
     /// Selecting "active" triggers the first ElseIf branch which:
-    /// - Sets Fusion NumericTextBox Amount to 100 (cross-vendor: native event -> fusion mutation)
+    /// - Sets Fusion FusionNumericTextBox Amount to 100 (cross-vendor: native event -> fusion mutation)
     /// - Sets Native DropDown City to "seattle" (native -> native mutation)
     /// - Shows the address section
     /// - Sets status-result text green with "Active" message
@@ -50,7 +50,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
 
         // Cross-vendor: native dropdown event set Fusion numeric to 100
-        // SF NumericTextBox renders TWO inputs with the same ID — use .First for the visible one
+        // SF FusionNumericTextBox renders TWO inputs with the same ID — use .First for the visible one
         // SF formats numeric display (e.g. "100.00"), so use regex to match the numeric value
         var amountInput = Page.Locator($"#{S}__Amount").First;
         await Expect(amountInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex(@"^100(\.00)?$"), new() { Timeout = 3000 });
@@ -67,7 +67,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
     /// <summary>
     /// Selecting "inactive" triggers the second ElseIf branch which:
-    /// - Sets Fusion NumericTextBox Amount to 0
+    /// - Sets Fusion FusionNumericTextBox Amount to 0
     /// - Hides the address section entirely
     /// - Sets status-result text amber with "Inactive" message
     ///
@@ -111,7 +111,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // SF NumericTextBox renders TWO inputs with the same ID — use .First for the visible one
+        // SF FusionNumericTextBox renders TWO inputs with the same ID — use .First for the visible one
         var input = Page.Locator($"#{S}__Amount").First;
         var tier = Page.Locator("#amount-tier");
 
@@ -159,7 +159,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         var citySelect = Page.Locator($"#{S}__Address_City");
         var stateSelect = Page.Locator($"#{S}__Address_State");
-        // SF NumericTextBox renders TWO inputs — .First targets the visible one
+        // SF FusionNumericTextBox renders TWO inputs — .First targets the visible one
         var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
         var autoText = Page.Locator("#city-auto");
 
@@ -336,8 +336,8 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     /// <summary>
     /// After selecting a city (which auto-fills State and PostalCode), selecting the
     /// empty "-- Select City --" option must trigger the Else branch, which clears
-    /// State to "" and sets PostalCode to 0. Because the Fusion NumericTextBox has
-    /// Min(10000), it clamps the 0 to 10000 — that's Syncfusion enforcing its range.
+    /// State to "" and sets PostalCode to 0. Because the Fusion FusionNumericTextBox has
+    /// Min(10000), it clamps the 0 to 10000 — that's Fusion enforcing its range.
     /// The auto-fill text resets to "Select a city".
     ///
     /// WHY: proves the Else branch of the City condition chain fires on non-matching
@@ -512,14 +512,14 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
     /// <summary>
     /// When Status "active" programmatically sets Amount to 100 via SetValue on the
-    /// Fusion NumericTextBox, Syncfusion fires a change event on the component. This
+    /// FusionNumericTextBox, Fusion fires a change event on the component. This
     /// triggers Amount's .Reactive() tier pipeline, which evaluates 100 as "Small order"
     /// (< 1000). The tier text and color update as a cascading side effect of the
     /// Status change.
     ///
     /// WHY: proves that Fusion SetValue fires the component's change event, creating
     /// a cascading reactive chain (Status change -> Amount SetValue -> tier update).
-    /// This is real Syncfusion behavior — programmatic property writes fire events.
+    /// This is real Fusion behavior — programmatic property writes fire events.
     /// </summary>
     [Test]
     public async Task programmatic_amount_set_cascades_into_tier_pipeline()

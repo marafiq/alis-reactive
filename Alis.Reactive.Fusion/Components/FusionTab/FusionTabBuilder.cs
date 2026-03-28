@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wrapper builder for the Syncfusion Tab component.
+    /// Wrapper builder for the FusionTab component.
     /// Wraps SF-rendered IHtmlContent and exposes ElementId + Plan for .Reactive() chaining.
     /// Non-input component — no InputField wrapper, no label, no validation slot.
     /// </summary>

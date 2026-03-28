@@ -9,24 +9,24 @@ using Syncfusion.EJ2.RichTextEditor;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a Syncfusion RichTextEditor inside a field wrapper, bound to a model property.
+    /// Creates a FusionRichTextEditor inside a field wrapper, bound to a model property.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Notes)</c>, then call
-    /// <c>.RichTextEditor(b =&gt; { b.Height(200); })</c>.
+    /// <c>.FusionRichTextEditor(b =&gt; { b.Height(200); })</c>.
     /// </remarks>
     public static class FusionRichTextEditorHtmlExtensions
     {
         private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();
 
         /// <summary>
-        /// Renders a Syncfusion RichTextEditor bound to the field's model property.
+        /// Renders a FusionRichTextEditor bound to the field's model property.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the RichTextEditor (toolbar, iframe mode, etc.).</param>
-        public static void RichTextEditor<TModel, TProp>(
+        /// <param name="build">Callback to build the FusionRichTextEditor (toolbar, iframe mode, etc.).</param>
+        public static void FusionRichTextEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<RichTextEditorBuilder> build)
             where TModel : class

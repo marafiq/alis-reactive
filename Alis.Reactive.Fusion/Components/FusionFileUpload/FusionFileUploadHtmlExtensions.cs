@@ -9,24 +9,24 @@ using Syncfusion.EJ2.Inputs;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a Syncfusion Uploader inside a field wrapper, bound to a model property.
+    /// Creates a FusionFileUpload inside a field wrapper, bound to a model property.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Document)</c>, then call
-    /// <c>.FileUpload(b =&gt; { b.AllowedExtensions(".pdf,.docx"); })</c>.
+    /// <c>.FusionFileUpload(b =&gt; { b.AllowedExtensions(".pdf,.docx"); })</c>.
     /// </remarks>
     public static class FusionFileUploadHtmlExtensions
     {
         private static readonly FusionFileUpload Component = new FusionFileUpload();
 
         /// <summary>
-        /// Renders a Syncfusion Uploader bound to the field's model property.
+        /// Renders a FusionFileUpload bound to the field's model property.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the Uploader (allowed extensions, max size, etc.).</param>
-        public static void FileUpload<TModel, TProp>(
+        public static void FusionFileUpload<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<UploaderBuilder> build)
             where TModel : class

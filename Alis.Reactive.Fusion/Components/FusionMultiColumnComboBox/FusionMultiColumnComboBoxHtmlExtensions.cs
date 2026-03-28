@@ -10,11 +10,11 @@ using Syncfusion.EJ2.MultiColumnComboBox;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a Syncfusion MultiColumnComboBox inside a field wrapper, bound to a model property.
+    /// Creates a FusionMultiColumnComboBox inside a field wrapper, bound to a model property.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Facility)</c>, then call
-    /// <c>.MultiColumnComboBox(b =&gt; { b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value); })</c>.
+    /// <c>.FusionMultiColumnComboBox(b =&gt; { b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value); })</c>.
     /// </remarks>
     public static class FusionMultiColumnComboBoxHtmlExtensions
     {
@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Configures text and value field mappings using typed expressions.
         /// </summary>
         /// <typeparam name="TItem">The data source item type.</typeparam>
-        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="builder">The Fusion builder.</param>
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>
         /// <returns>The builder for method chaining.</returns>
@@ -44,7 +44,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Configures text, value, and group-by field mappings using typed expressions.
         /// </summary>
         /// <typeparam name="TItem">The data source item type.</typeparam>
-        /// <param name="builder">The Syncfusion builder.</param>
+        /// <param name="builder">The Fusion builder.</param>
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>
         /// <param name="groupBy">Expression selecting the grouping property.</param>
@@ -64,13 +64,13 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Renders a Syncfusion MultiColumnComboBox bound to the field's model property.
+        /// Renders a FusionMultiColumnComboBox bound to the field's model property.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the MultiColumnComboBox (columns, data source, etc.).</param>
-        public static void MultiColumnComboBox<TModel, TProp>(
+        /// <param name="build">Callback to build the FusionMultiColumnComboBox (columns, data source, etc.).</param>
+        public static void FusionMultiColumnComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<MultiColumnComboBoxBuilder> build)
             where TModel : class

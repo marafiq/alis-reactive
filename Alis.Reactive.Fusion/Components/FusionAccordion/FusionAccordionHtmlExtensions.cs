@@ -12,7 +12,7 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionAccordionHtmlExtensions
     {
         /// <summary>
-        /// Creates a Syncfusion Accordion with the given element ID.
+        /// Creates a FusionAccordion with the given element ID.
         /// Non-input component: renders directly, no label/validation wrapper.
         /// </summary>
         public static FusionAccordionBuilder<TModel> FusionAccordion<TModel>(

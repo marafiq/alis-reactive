@@ -53,7 +53,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.Amount, o => o.Label("Amount (SF NumericTextBox)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(-100).Max(99999).Step(1)); }
         </div>
     </native-card-body></native-card>
@@ -104,7 +104,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.Temperature, o => o.Label("Temperature (SF NumericTextBox)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(-50).Max(150).Step(1)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -188,7 +188,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.Quantity, o => o.Label("Quantity (SF NumericTextBox)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(0).Max(100).Step(1).Value(1)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {

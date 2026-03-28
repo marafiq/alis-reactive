@@ -41,7 +41,7 @@
         </p>
         <div class="grid grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount"))
-               .NumericTextBox(b => b
+               .FusionNumericTextBox(b => b
                    .Min(0).Max(10000).Step(1)
                    .Reactive(plan, evt => evt.Changed, (args, p) =>
                    {
@@ -135,7 +135,7 @@
                        p.Element("city-echo").SetText("City changed");
                    })); }
             @{ Html.InputField(plan, m => m.Address!.PostalCode, o => o.Label("Postal Code"))
-               .NumericTextBox(b => b
+               .FusionNumericTextBox(b => b
                    .Min(10000).Max(99999).Step(1)
                    .Reactive(plan, evt => evt.Changed, (args, p) =>
                    {

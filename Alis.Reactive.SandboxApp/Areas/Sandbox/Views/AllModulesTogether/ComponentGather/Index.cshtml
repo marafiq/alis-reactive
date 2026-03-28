@@ -77,12 +77,12 @@
         <div class="space-y-4">
             <native-grid cols="C2" gap="Base">
                 @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Required().Label("Monthly Rate"))
-                    .NumericTextBox(b => b
+                    .FusionNumericTextBox(b => b
                         .Min(0).Max(99999).Step(50)
                         .Format("c2")); }
 
                 @{ Html.InputField(plan, m => m.FacilityId, o => o.Required().Label("Facility"))
-                    .DropDownList(b => b
+                    .FusionDropDownList(b => b
                         .DataSource(facilities)
                         .Fields<GatherFacilityItem>(t => t.Text, v => v.Value)
                         .Placeholder("Select a facility")); }
@@ -90,29 +90,29 @@
 
             <native-grid cols="C2" gap="Base">
                 @{ Html.InputField(plan, m => m.PhysicianName, o => o.Required().Label("Physician"))
-                    .AutoComplete(b => b
+                    .FusionAutoComplete(b => b
                         .DataSource(physicians)
                         .Fields<GatherPhysicianItem>(t => t.Text, v => v.Value)
                         .Placeholder("Search physician")); }
 
                 @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
-                    .DatePicker(b => b.Placeholder("Select admission date")); }
+                    .FusionDatePicker(b => b.Placeholder("Select admission date")); }
             </native-grid>
 
             <native-grid cols="C2" gap="Base">
                 @{ Html.InputField(plan, m => m.MedicationTime, o => o.Required().Label("Medication Time"))
-                    .TimePicker(b => b.Placeholder("Select medication time")); }
+                    .FusionTimePicker(b => b.Placeholder("Select medication time")); }
 
                 @{ Html.InputField(plan, m => m.AppointmentTime, o => o.Required().Label("Appointment Time"))
-                    .DateTimePicker(b => b.Placeholder("Select appointment time")); }
+                    .FusionDateTimePicker(b => b.Placeholder("Select appointment time")); }
             </native-grid>
 
             <native-grid cols="C2" gap="Base">
                 @{ Html.InputField(plan, m => m.StayPeriod, o => o.Required().Label("Stay Period"))
-                    .DateRangePicker(b => b.Placeholder("Select stay period")); }
+                    .FusionDateRangePicker(b => b.Placeholder("Select stay period")); }
 
                 @{ Html.InputField(plan, m => m.InsuranceProvider, o => o.Required().Label("Insurance Provider"))
-                    .MultiColumnComboBox(b => b
+                    .FusionMultiColumnComboBox(b => b
                         .DataSource(insuranceProviders)
                         .Fields<GatherInsuranceItem>(t => t.Text, v => v.Value)
                         .Columns(col =>
@@ -125,22 +125,22 @@
             </native-grid>
 
             @{ Html.InputField(plan, m => m.PhoneNumber, o => o.Required().Label("Phone Number"))
-                .InputMask(b => b
+                .FusionInputMask(b => b
                     .Mask("(000) 000-0000")
                     .Placeholder("Enter phone number")); }
 
             @{ Html.InputField(plan, m => m.CarePlan, o => o.Required().Label("Care Plan"))
-                .RichTextEditor(b => b.Placeholder("Enter care plan notes...")); }
+                .FusionRichTextEditor(b => b.Placeholder("Enter care plan notes...")); }
 
             @{ Html.InputField(plan, m => m.ReceiveNotifications, o => o.Label("Receive Notifications"))
-                .Switch(b => { }); }
+                .FusionSwitch(b => { }); }
         </div>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
         <native-heading level="H2">Fusion Array Components</native-heading>
         @{ Html.InputField(plan, m => m.DietaryRestrictions, o => o.Required().Label("Dietary Restrictions"))
-            .MultiSelect(b => b
+            .FusionMultiSelect(b => b
                 .DataSource(dietaryItems)
                 .Fields<GatherDietaryItem>(t => t.Text, v => v.Value)
                 .Placeholder("Select dietary restrictions")

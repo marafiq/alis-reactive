@@ -46,7 +46,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.MedicationTime, o => o.Label("Medication Time (SF TimePicker)"))
-                .TimePicker(b => { }); }
+                .FusionTimePicker(b => { }); }
         </div>
     </native-card-body></native-card>
 
@@ -71,7 +71,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.WakeUpTime, o => o.Label("Wake-Up Time (SF TimePicker)"))
-                .TimePicker(b => b
+                .FusionTimePicker(b => b
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         p.Element("change-value").SetText(args, x => x.Value);

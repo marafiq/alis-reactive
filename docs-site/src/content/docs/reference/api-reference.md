@@ -44,7 +44,7 @@ TriggerBuilder<TModel> t.SignalR<TPayload>(string hubUrl, string methodName,
 ### InputField
 
 ```csharp
-InputFieldSetup<TModel, TProp> Html.InputField<TModel, TProp>(
+InputBoundField<TModel, TProp> Html.InputField<TModel, TProp>(
     IReactivePlan<TModel> plan,
     Expression<Func<TModel, TProp>> expression,
     Action<InputFieldOptions>? options = null)
@@ -84,7 +84,7 @@ IHtmlContent Html.FusionToast()
 
 ```csharp
 // Factory
-void InputFieldSetup.NativeTextBox(Action<NativeTextBoxBuilder<TModel, TProp>> configure)
+void InputBoundField.NativeTextBox(Action<NativeTextBoxBuilder<TModel, TProp>> build)
 
 // Builder
 NativeTextBoxBuilder Type(string type)
@@ -107,7 +107,7 @@ TypedComponentSource<string> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.NativeCheckBox(Action<NativeCheckBoxBuilder<TModel, bool>> configure)
+void InputBoundField.NativeCheckBox(Action<NativeCheckBoxBuilder<TModel, bool>> build)
 
 // Builder
 NativeCheckBoxBuilder CssClass(string css)
@@ -126,7 +126,7 @@ TypedComponentSource<bool> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.NativeDropDown(Action<NativeDropDownBuilder<TModel, TProp>> configure)
+void InputBoundField.NativeDropDown(Action<NativeDropDownBuilder<TModel, TProp>> build)
 
 // Builder
 NativeDropDownBuilder Items(IEnumerable<SelectListItem> items)
@@ -148,7 +148,7 @@ TypedComponentSource<string> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.NativeTextArea(Action<NativeTextAreaBuilder<TModel, TProp>> configure)
+void InputBoundField.NativeTextArea(Action<NativeTextAreaBuilder<TModel, TProp>> build)
 
 // Builder
 NativeTextAreaBuilder Rows(int rows)
@@ -169,7 +169,7 @@ TypedComponentSource<string> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.NativeCheckList(Action<NativeCheckListBuilder<TModel, TProp>> configure)
+void InputBoundField.NativeCheckList(Action<NativeCheckListBuilder<TModel, TProp>> build)
 
 // Builder
 NativeCheckListBuilder Items(IEnumerable<RadioButtonItem> items)
@@ -194,7 +194,7 @@ TypedComponentSource<string[]> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.NativeRadioGroup(Action<NativeRadioGroupBuilder<TModel, TProp>> configure)
+void InputBoundField.NativeRadioGroup(Action<NativeRadioGroupBuilder<TModel, TProp>> build)
 
 // Builder
 NativeRadioGroupBuilder Items(IEnumerable<RadioButtonItem> items)
@@ -279,7 +279,7 @@ ComponentRef Hide()
 
 ```csharp
 // Factory
-void InputFieldSetup.DropDownList(Action<DropDownListBuilder> configure)
+void InputBoundField.FusionDropDownList(Action<DropDownListBuilder> build)
 
 // Builder (Syncfusion EJ2 + Reactive Extensions)
 DropDownListBuilder Fields<TItem>(Expression text, Expression value)
@@ -308,7 +308,7 @@ TypedComponentSource<string> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.AutoComplete(Action<AutoCompleteBuilder> configure)
+void InputBoundField.FusionAutoComplete(Action<AutoCompleteBuilder> build)
 
 // Builder
 AutoCompleteBuilder Fields<TItem>(Expression text, Expression value)
@@ -343,7 +343,7 @@ TypedComponentSource<string> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.MultiSelect(Action<MultiSelectBuilder> configure)
+void InputBoundField.FusionMultiSelect(Action<MultiSelectBuilder> build)
 
 // Builder
 MultiSelectBuilder Fields<TItem>(Expression text, Expression value)
@@ -373,7 +373,7 @@ TypedComponentSource<string[]> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.MultiColumnComboBox(Action<MultiColumnComboBoxBuilder> configure)
+void InputBoundField.FusionMultiColumnComboBox(Action<MultiColumnComboBoxBuilder> build)
 
 // Builder
 MultiColumnComboBoxBuilder Fields<TItem>(Expression text, Expression value)
@@ -400,7 +400,7 @@ TypedComponentSource<string> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.NumericTextBox(Action<NumericTextBoxBuilder> configure)
+void InputBoundField.FusionNumericTextBox(Action<NumericTextBoxBuilder> build)
 
 // Builder (Syncfusion EJ2 + Reactive Extensions)
 NumericTextBoxBuilder Reactive<TArgs>(...)
@@ -424,7 +424,7 @@ TypedComponentSource<decimal> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.DatePicker(Action<DatePickerBuilder> configure)
+void InputBoundField.FusionDatePicker(Action<DatePickerBuilder> build)
 
 // Events
 evt.Changed → FusionDatePickerChangeArgs { DateTime? Value, bool IsInteracted }
@@ -440,7 +440,7 @@ TypedComponentSource<DateTime> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.DateTimePicker(Action<DateTimePickerBuilder> configure)
+void InputBoundField.FusionDateTimePicker(Action<DateTimePickerBuilder> build)
 
 // Events
 evt.Changed → FusionDateTimePickerChangeArgs { DateTime? Value, bool IsInteracted }
@@ -456,7 +456,7 @@ TypedComponentSource<DateTime> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.DateRangePicker(Action<DateRangePickerBuilder> configure)
+void InputBoundField.FusionDateRangePicker(Action<DateRangePickerBuilder> build)
 
 // Events
 evt.Changed → FusionDateRangePickerChangeArgs { DateTime? StartDate, DateTime? EndDate, bool IsInteracted }
@@ -471,7 +471,7 @@ TypedComponentSource<DateTime> Value()        // alias for StartDate()
 
 ```csharp
 // Factory
-void InputFieldSetup.TimePicker(Action<TimePickerBuilder> configure)
+void InputBoundField.FusionTimePicker(Action<TimePickerBuilder> build)
 
 // Events
 evt.Changed → FusionTimePickerChangeArgs { DateTime? Value, bool IsInteracted }
@@ -487,7 +487,7 @@ TypedComponentSource<DateTime> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.Switch(Action<SwitchBuilder> configure)
+void InputBoundField.FusionSwitch(Action<SwitchBuilder> build)
 
 // Events
 evt.Changed → FusionSwitchChangeArgs { bool Checked, bool IsInteracted }
@@ -501,7 +501,7 @@ TypedComponentSource<bool> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.InputMask(Action<MaskedTextBoxBuilder> configure)
+void InputBoundField.FusionInputMask(Action<MaskedTextBoxBuilder> build)
 
 // Events
 evt.Changed → FusionInputMaskChangeArgs { string? Value, bool IsInteracted }
@@ -516,7 +516,7 @@ TypedComponentSource<string> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.RichTextEditor(Action<RichTextEditorBuilder> configure)
+void InputBoundField.FusionRichTextEditor(Action<RichTextEditorBuilder> build)
 
 // Events
 evt.Changed → FusionRichTextEditorChangeArgs { string? Value, bool IsInteracted }
@@ -531,7 +531,7 @@ TypedComponentSource<string> Value()
 
 ```csharp
 // Factory
-void InputFieldSetup.FileUpload(Action<UploaderBuilder> configure)
+void InputBoundField.FusionFileUpload(Action<UploaderBuilder> build)
 
 // Events
 evt.Selected → FusionFileUploadSelectedArgs { int FilesCount, bool IsInteracted }

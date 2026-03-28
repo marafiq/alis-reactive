@@ -77,7 +77,7 @@
 
         <div id="memory-section" hidden class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.MemoryAssessmentScore, o => o.Label("Memory Assessment Score"))
-               .NumericTextBox(b => b
+               .FusionNumericTextBox(b => b
                    .Placeholder("Score")
                    .CssClass("rounded-md border border-border")); }
         </div>

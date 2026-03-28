@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/TimePicker
 ///
-/// Syncfusion TimePicker renders an inner input element inside the wrapper div.
+/// FusionTimePicker renders an inner input element inside the wrapper div.
 /// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
 /// Tests use TimePickerLocator to interact via real browser gestures.
 /// </summary>

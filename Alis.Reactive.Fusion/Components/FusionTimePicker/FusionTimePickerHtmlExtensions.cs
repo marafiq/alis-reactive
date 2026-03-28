@@ -9,24 +9,24 @@ using Syncfusion.EJ2.Calendars;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a Syncfusion TimePicker inside a field wrapper, bound to a model property.
+    /// Creates a FusionTimePicker inside a field wrapper, bound to a model property.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.CheckInTime)</c>, then call
-    /// <c>.TimePicker(b =&gt; { b.Step(15).Format("hh:mm a"); })</c>.
+    /// <c>.FusionTimePicker(b =&gt; { b.Step(15).Format("hh:mm a"); })</c>.
     /// </remarks>
     public static class FusionTimePickerHtmlExtensions
     {
         private static readonly FusionTimePicker Component = new FusionTimePicker();
 
         /// <summary>
-        /// Renders a Syncfusion TimePicker bound to the field's model property.
+        /// Renders a FusionTimePicker bound to the field's model property.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the TimePicker (step, min/max, format, etc.).</param>
-        public static void TimePicker<TModel, TProp>(
+        /// <param name="build">Callback to build the FusionTimePicker (step, min/max, format, etc.).</param>
+        public static void FusionTimePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<TimePickerBuilder> build)
             where TModel : class

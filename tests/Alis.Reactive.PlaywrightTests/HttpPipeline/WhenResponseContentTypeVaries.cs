@@ -75,7 +75,7 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
         //
         // The partial contains:
         //   1. Native <input> via Html.NativeTextBoxFor() — must have value "native-partial-value"
-        //   2. Syncfusion NumericTextBox via Html.NumericTextBoxFor() — must initialize (has .e-numerictextbox class)
+        //   2. FusionNumericTextBox via Html.NumericTextBoxFor() — must initialize (has .e-numerictextbox class)
         //   3. Marker element #partial-loaded-marker — proves the HTML was actually injected
         //
         // If Into() uses innerHTML instead of ej.base.append, the SF component won't initialize
@@ -93,7 +93,7 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
         // Native input rendered via Html.NativeTextBoxFor — value comes from server model
         await Expect(Page.Locator($"#{S}__NativeValue")).ToHaveValueAsync("native-partial-value");
 
-        // Syncfusion NumericTextBox initialized via ej.base.append — the SF wrapper class proves
+        // FusionNumericTextBox initialized via ej.base.append — the SF wrapper class proves
         // the component constructor ran (not just raw HTML injection)
         await Expect(Page.Locator("#partial-container .e-numerictextbox")).ToBeVisibleAsync(new() { Timeout = 5000 });
 

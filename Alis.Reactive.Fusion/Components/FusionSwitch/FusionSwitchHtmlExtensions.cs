@@ -9,23 +9,23 @@ using Syncfusion.EJ2.Buttons;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a Syncfusion Switch inside a field wrapper, bound to a boolean model property.
+    /// Creates a FusionSwitch inside a field wrapper, bound to a boolean model property.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.IsActive)</c>, then call
-    /// <c>.Switch(b =&gt; { b.CssClass("custom-switch"); })</c>.
+    /// <c>.FusionSwitch(b =&gt; { b.CssClass("custom-switch"); })</c>.
     /// </remarks>
     public static class FusionSwitchHtmlExtensions
     {
         private static readonly FusionSwitch Component = new FusionSwitch();
 
         /// <summary>
-        /// Renders a Syncfusion Switch bound to the field's boolean model property.
+        /// Renders a FusionSwitch bound to the field's boolean model property.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the Switch (label, CSS class, etc.).</param>
-        public static void Switch<TModel>(
+        /// <param name="build">Callback to build the FusionSwitch (label, CSS class, etc.).</param>
+        public static void FusionSwitch<TModel>(
             this InputBoundField<TModel, bool> setup,
             Action<SwitchBuilder> build)
             where TModel : class
