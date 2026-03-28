@@ -26,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly FusionInputMask Component = new FusionInputMask();
 
         /// <summary>
-        /// Wires an FusionInputMask event to a reactive pipeline that executes in the browser.
+        /// Wires a FusionInputMask event to a reactive pipeline that executes in the browser.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>

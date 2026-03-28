@@ -92,7 +92,18 @@ namespace Alis.Reactive.Builders
         /// <summary>
         /// Targets a component by model expression (input components bound to a model property).
         /// </summary>
-        /// <typeparam name="TComponent">The component type.</typeparam>
+        /// <remarks>
+        /// Available component types include:
+        /// <b>Native</b> — <c>NativeTextBox</c>, <c>NativeCheckBox</c>, <c>NativeHiddenField</c>,
+        /// <c>NativeSelect</c>, <c>NativeButton</c>, <c>NativeRadioButton</c>.
+        /// <b>Fusion</b> — <c>FusionDropDownList</c>, <c>FusionNumericTextBox</c>,
+        /// <c>FusionDatePicker</c>, <c>FusionTimePicker</c>, <c>FusionSwitch</c>,
+        /// <c>FusionAutoComplete</c>, <c>FusionColorPicker</c>, <c>FusionInputMask</c>,
+        /// <c>FusionMultiSelect</c>, <c>FusionRichTextEditor</c>, <c>FusionFileUpload</c>,
+        /// <c>FusionMultiColumnComboBox</c>, <c>FusionDateTimePicker</c>,
+        /// <c>FusionDateRangePicker</c>.
+        /// </remarks>
+        /// <typeparam name="TComponent">The component type (implements <see cref="IComponent"/> with <c>new()</c>).</typeparam>
         /// <param name="expr">The model property expression (e.g. <c>m =&gt; m.Address.City</c>).</param>
         /// <returns>A component reference for chaining mutations like <c>SetValue</c> or <c>Focus</c>.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(
@@ -148,6 +159,11 @@ namespace Alis.Reactive.Builders
         /// Displays server-side validation errors returned in the 400 response body
         /// at the correct form fields.
         /// </summary>
+        /// <remarks>
+        /// Typically used inside a <c>.Response(r =&gt; r.OnError(400, ...))</c> handler.
+        /// Pair with <see cref="Requests.HttpRequestBuilder{TModel}.Validate{TValidator}"/>
+        /// for client-side validation before the request fires.
+        /// </remarks>
         /// <param name="formId">The form element ID to scope error display to.</param>
         /// <returns>This builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
@@ -160,11 +176,13 @@ namespace Alis.Reactive.Builders
         /// Injects the HTTP response body as inner HTML of the target element.
         /// </summary>
         /// <remarks>
-        /// Used for loading partial views:
-        /// <c>p.Get("/url").Response(r =&gt; r.OnSuccess(s =&gt; s.Into("container")))</c>.
+        /// Typically used inside a <c>.Response(r =&gt; r.OnSuccess(...))</c> handler for
+        /// loading partial views:
+        /// <c>p.Get("/url").Response(response: r =&gt; r.OnSuccess(pipeline: s =&gt; s.Into("container")))</c>.
         /// </remarks>
         /// <param name="elementId">The HTML element ID to inject content into.</param>
         /// <returns>This builder for chaining additional commands.</returns>
+        /// <seealso cref="ValidationErrors"/>
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Commands.Add(new IntoCommand(elementId));

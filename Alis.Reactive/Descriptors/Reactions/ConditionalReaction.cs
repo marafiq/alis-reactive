@@ -41,7 +41,7 @@ namespace Alis.Reactive.Descriptors.Reactions
         /// NEVER make public. Constructed exclusively by framework builders. Public constructors
         /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
         /// </summary>
-        public ConditionalReaction(List<Command>? commands, IReadOnlyList<Branch> branches)
+        internal ConditionalReaction(List<Command>? commands, IReadOnlyList<Branch> branches)
         {
             Commands = commands;
             Branches = branches;

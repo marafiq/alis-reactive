@@ -9,6 +9,8 @@ namespace Alis.Reactive.Builders
     /// </summary>
     public interface ICommandEmitter
     {
+        /// <summary>Appends a command to the current pipeline sequence.</summary>
+        /// <param name="command">The command descriptor to add.</param>
         void AddCommand(Command command);
     }
 }

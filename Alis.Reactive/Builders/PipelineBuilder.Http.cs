@@ -26,6 +26,12 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Starts a POST request with a gather configuration.</summary>
+        /// <remarks>
+        /// <code>
+        /// p.Post("/api/save", gather: g =&gt; g.IncludeAll())
+        ///  .Response(response: r =&gt; r.OnSuccess(pipeline: s =&gt; s.Into("result")));
+        /// </code>
+        /// </remarks>
         public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
         {
             SetMode(PipelineMode.Http);

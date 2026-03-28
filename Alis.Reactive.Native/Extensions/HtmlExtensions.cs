@@ -15,6 +15,20 @@ namespace Alis.Reactive.Native.Extensions
         /// </summary>
         /// <remarks>
         /// <para>
+        /// Minimal reactive view:
+        /// </para>
+        /// <code>
+        /// @{
+        ///     var plan = Html.ReactivePlan&lt;MyModel&gt;();
+        ///
+        ///     Html.On(plan, trigger: t =&gt; t.DomReady(pipeline: p =&gt;
+        ///     {
+        ///         p.Element("status").SetText("Ready");
+        ///     }));
+        /// }
+        /// @Html.RenderPlan(plan)
+        /// </code>
+        /// <para>
         /// A trigger is a browser event that starts a reaction: the page loading (<c>DomReady</c>),
         /// a custom event (<c>CustomEvent</c>), a server-sent event (<c>ServerPush</c>), or a
         /// SignalR message (<c>SignalR</c>). When the trigger fires, the commands declared in

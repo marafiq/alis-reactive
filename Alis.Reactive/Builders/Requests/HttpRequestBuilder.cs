@@ -7,6 +7,23 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    /// <summary>
+    /// Configures an HTTP request: URL, verb, request body (gather), loading state,
+    /// client-side validation, and response handlers.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Accessed via the pipeline's HTTP methods:
+    /// <c>p.Post("/api/save", gather: g =&gt; g.IncludeAll()).Response(response: r =&gt; r.OnSuccess(...))</c>.
+    /// </para>
+    /// <para>
+    /// Typical call order: verb (set by <see cref="PipelineBuilder{TModel}"/>)
+    /// → <see cref="Gather"/> → <see cref="WhileLoading"/>
+    /// → <see cref="Validate{TValidator}"/> → <see cref="Response"/>.
+    /// All steps are optional except the verb and URL.
+    /// </para>
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
     {
         private string _verb = "GET";
@@ -32,9 +49,20 @@ namespace Alis.Reactive.Builders.Requests
 
         // ── Public convenience verbs (used in Chained / Parallel lambdas) ──
 
+        /// <summary>Sets the request verb to GET. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
+        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Get(string url) { _verb = "GET"; _url = url; return this; }
+
+        /// <summary>Sets the request verb to POST. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
+        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Post(string url) { _verb = "POST"; _url = url; return this; }
+
+        /// <summary>Sets the request verb to PUT. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
+        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Put(string url) { _verb = "PUT"; _url = url; return this; }
+
+        /// <summary>Sets the request verb to DELETE. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
+        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Delete(string url) { _verb = "DELETE"; _url = url; return this; }
 
         /// <summary>

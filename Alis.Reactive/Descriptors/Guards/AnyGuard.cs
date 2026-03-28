@@ -27,7 +27,7 @@ namespace Alis.Reactive.Descriptors.Guards
         /// </summary>
         /// <param name="guards">At least two child guards to combine with logical OR.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="guards"/> is <see langword="null"/> or contains fewer than two entries.</exception>
-        public AnyGuard(IReadOnlyList<Guard> guards)
+        internal AnyGuard(IReadOnlyList<Guard> guards)
         {
             if (guards == null || guards.Count < 2)
                 throw new ArgumentException("AnyGuard requires at least two guards.", nameof(guards));

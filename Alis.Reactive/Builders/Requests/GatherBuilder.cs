@@ -5,6 +5,21 @@ using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    /// <summary>
+    /// Collects values from form components, event payloads, and static data to build the
+    /// HTTP request body or URL parameters.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// "Gather" is the framework term for collecting input values at request time.
+    /// Each gather item resolves to a key/value pair in the request payload.
+    /// </para>
+    /// <para>
+    /// Component-specific gather methods (e.g., <c>g.Include(m =&gt; m.Name)</c>) are provided
+    /// by vendor extensions in <c>Alis.Reactive.Native</c> and <c>Alis.Reactive.Fusion</c>.
+    /// </para>
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
     public class GatherBuilder<TModel> where TModel : class
     {
         internal List<GatherItem> Items { get; } = new List<GatherItem>();

@@ -5,6 +5,22 @@ using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    /// <summary>
+    /// Configures success and error response handlers for an HTTP request, plus optional
+    /// chained follow-up requests.
+    /// </summary>
+    /// <remarks>
+    /// Accessed via <see cref="HttpRequestBuilder{TModel}.Response"/>:
+    /// <code>
+    /// p.Post("/api/save", gather: g =&gt; g.IncludeAll())
+    ///  .Response(response: r =&gt;
+    ///  {
+    ///      r.OnSuccess(pipeline: s =&gt; s.Into("result"));
+    ///      r.OnError(400, pipeline: s =&gt; s.ValidationErrors("myForm"));
+    ///  });
+    /// </code>
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
     public class ResponseBuilder<TModel> where TModel : class
     {
         internal List<StatusHandler> SuccessHandlers { get; } = new List<StatusHandler>();
