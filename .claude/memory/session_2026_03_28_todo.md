@@ -1,12 +1,12 @@
 ---
 name: session_2026_03_28_todo
-description: Persistent todo list from 2026-03-28 process-flows session — tasks need follow-up, each requires a plan first
+description: Persistent todo list — updated 2026-03-28 evening session. 6 done, 1 partial, 5 open.
 type: project
 ---
 
-# Session 2026-03-28 — Persistent Todo List
+# Persistent Todo List
 
-## Completed This Session
+## Completed — Session 2026-03-28 (morning)
 - [x] Forensic git analysis (9 agents, 32 patterns, commit hashes)
 - [x] process-flows v1 → v2 (flat checklists → layered harness)
 - [x] CLAUDE.md tightened (323 → 160 lines)
@@ -15,81 +15,68 @@ type: project
 - [x] Expert review (4 reviewers with evidence-based output)
 - [x] Removed redundant rules (ESM, Snapshots, Two-Phase Boot, BDD — enforceable elsewhere)
 
-## Open — Each Requires a Plan Before Execution
+## Completed — Session 2026-03-28 (evening)
 
-### Hooks & Enforcement (Layer: Process)
+**Task 0. Agent dispatch template** — `agent-dispatch.md` (192 lines)
+- 4 task-specific templates (implementation, audit, review, BDD)
+- 9-point evidence contract embedded, layer-skill lookup table
+- Replaced fragmented sections in process-pipeline.md + process-task-types.md
 
-**1. API Surface hook — enhance to catch `internal` → `public`**
-- Plan first: read current hookify rule, identify what it catches today, design the `internal` → `public` detection across 3 library projects (Alis.Reactive, Native, Fusion), test with a deliberate violation
-- Layers: 1 (C#)
-- Input: current `.claude/hookify.protect-api-surface.local.md`
-- Output: hook catches `internal` → `public` changes, verified with test
+**Task 1. API Surface hook** — `hookify.no-public-in-libraries.local.md`
+- Blocks `public` declarations across all 4 library projects
+- Covers Alis.Reactive, Native, Fusion, FluentValidator
 
-**2. BDD test enforcement — skill in agent prompt + post-hook**
-- Plan first: design what the post-hook checks (test file patterns, naming conventions, `page.evaluate()` usage), how to inject `bdd-testing` skill into agent prompts automatically
-- Layers: 4 (Browser/Tests)
-- Input: `feedback_bdd_constitution`, current test patterns
-- Output: hook warns on BDD violations, skill loads automatically for test-writing agents
+**Task 2. BDD test enforcement** — `hookify.bdd-test-enforcement.local.md`
+- Warns on page.evaluate, Thread.Sleep, Task.Delay, [Retry], try/catch assertions
+- References BDD Constitution and bdd-testing skill
 
-**3. BDD public API only — analyzer or hook**
-- Plan first: decide Roslyn analyzer vs hookify rule. Analyzer catches at compile time (stronger). Hook catches at edit time (faster feedback). 53 existing violations to handle (allow-list? gradual migration?)
-- Layers: 1 (C#), 4 (Tests)
-- Input: grep of 53 violations, `InternalsVisibleTo` usage
-- Output: new violations blocked, existing ones tracked for migration
+**Task 3. BDD public API only** — `hookify.bdd-public-api-only.local.md`
+- Warns on internal constructor usage in test files
+- 50 existing violations tracked for gradual migration (9 files in Native + Fusion)
 
-### Skills (Layer: Process)
+**Task 5. Claude optimization findings**
+- 9-point evidence contract: questions → imperative commands
+- Added "why" to 10 critical rules in process-layers.md (with forensic commit evidence)
+- Reduced ALL CAPS, added `<important>` tags for inviolable rules
 
-**4. Review all skills for accuracy + test effectiveness**
-- Plan first: which skills to review (prioritize by usage — reactive-dsl, onboard-fusion-component, bdd-testing, conditions-dsl, http-pipeline), design the effectiveness test (agent WITH skill vs WITHOUT, compare output quality), verify descriptions trigger at the right time
-- Known issues: onboard-fusion-component has 6 errors, validation-rules has 5 gaps
-- Input: `docs/todo-skill-updates.md`, current skill files
-- Output: each skill either verified accurate or corrected, effectiveness tested
+**Task 6. docs/ folder cleanup**
+- 78 → 24 active files (14 deleted, 40 archived to docs/archive/, -6,600 lines)
+- Archive preserves historical plans, reviews, and specs
 
-### Review Findings (Layer: 5 Docs)
+## Partially Done
 
-**5. Apply remaining Claude optimization findings**
-- Finding 3: Reduce NEVER/MUST emphasis (Claude 4.6 overtriggers)
-- Finding 5: Add "why" to critical rules (Anthropic recommends motivation)
-- Finding 7: XML tags for truly inviolable rules
-- Finding 9: Questions → commands in process-layers.md
-- Plan first: read the 3 rules files, identify all instances, batch the changes
-- Input: current `.claude/rules/process-*.md` files
-- Output: language tightened, verified against Anthropic guidance
+**Task 4. Review all skills** — 4 of 8 reviewed
+- [x] onboard-fusion-component: 12 fixes (6 review + 6 A/B). FusionComponent base, ComponentRegistration, sandbox paths, references/ extracted. Score: ~9/10
+- [x] validation-rules: 10 fixes (6 review + 4 A/B). DateTime.Today warning, nullable gt, case sensitivity, verification steps. Score: ~9/10
+- [x] bdd-testing: 13 fixes (8 review + 5 A/B). ComponentScope, 13 components, SelectDate guidance, popup surfaces, journey granularity. Score: ~9/10
+- [x] solid-ts-audit: 11 fixes (7 review + 4 A/B). Module map, dispatcher exception, sync/async coupling, non-null assertion. Score: ~9/10
+- [ ] reactive-dsl — NOT REVIEWED
+- [ ] http-pipeline — NOT REVIEWED
+- [ ] conditions-dsl — NOT REVIEWED
+- [ ] modern-csharp — NOT REVIEWED (1,272 lines, needs condensing)
 
-### Docs Cleanup (Layer: 5)
+Common remaining gap: Rule 10 (A/B test log not persisted as references/ file)
 
-**6. docs/ folder cleanup**
-- Plan first: verify the 14-delete and 28-archive lists are still accurate (files may have changed since forensic analysis), design archive structure
-- Input: forensic docs audit findings
-- Output: clean docs/ folder with index
+## Open — Future Sessions
 
-**7. docs-site drift fixes**
-- Plan first: list all 5 IReactivePlan references + 3 wrong API names with file:line, verify each against current code, batch the fixes
-- Input: docs-site drift reviewer output
-- Output: zero stale references, test counts updated
+**Task 7. docs-site drift** — needs own session + plan
+- 5 pages reference deleted IReactivePlan
+- 3 pages wrong API name
+- Test counts 30-54% stale
+- Scope: content accuracy + code examples + sandbox verification
 
-### Code Issues (Layer: varies)
+**Task 8. SonarQube CRITICALs** — code change (Layer 3)
+- 3 complexity hotspots: conditions.ts 24, commands.ts 17, rule-engine.ts 26
+- Plan: extraction refactors to get under complexity 15
 
-**8. SonarQube quality gate — 3 CRITICALs from CoerceResult**
-- Plan first: read issue #54, understand each complexity hotspot, design extraction refactors
-- Layers: 3 (TS Runtime)
-- Input: issue #54, current `conditions.ts`, `commands.ts`, `rule-engine.ts`
-- Output: all 3 under complexity 15, quality gate passes
+**Task 9. Vendor isolation leaks** — code change (Layer 3)
+- trigger.ts:45, live-clear.ts:44 still have vendor string checks
+- Plan: move vendor logic into component.ts exports
 
-**9. Vendor isolation leaks — trigger.ts:45, live-clear.ts:44**
-- Plan first: design how to move vendor logic into `component.ts` exports without changing behavior
-- Layers: 3 (TS Runtime)
-- Input: current trigger.ts, live-clear.ts, component.ts
-- Output: zero vendor checks outside component.ts, all tests pass
+**Task 10. Schema drift detection tool** — code change (Layer 1→2)
+- Automated C# descriptor → schema validation
+- No approach decided yet
 
-**10. Schema drift detection tool**
-- Plan first: decide approach (build-time MSBuild target vs standalone tool vs hook), design what it validates (every descriptor class → serialize sample → validate against schema)
-- Layers: 1→2 boundary
-- Input: CLAUDE.md TODO, current schema tests
-- Output: automated tool runs on build, catches drift before commit
-
-**11. TS-to-schema validation**
-- Plan first: research approaches (generate TS types from schema? validate existing types against schema? manual conformance test suite?)
-- Layers: 2→3 boundary
-- Input: current TS types, schema, the 4 known discrepancies
-- Output: automated check that TS types match schema
+**Task 11. TS-to-schema validation** — code change (Layer 2→3)
+- Automated schema → TS type conformance
+- No approach decided yet
