@@ -1,6 +1,6 @@
 ---
 name: solid-ts-audit
-description: Use when auditing, refactoring, or reviewing TypeScript modules for SOLID violations, coupling issues, or code smells. Use before proposing structural changes to TS runtime modules. Use when adding new command kinds, trigger kinds, or vendor types to verify extensibility.
+description: Audits TypeScript modules for SOLID violations, coupling issues, and code smells. Applies before proposing structural changes to TS runtime modules. Covers adding new command kinds, trigger kinds, or vendor types to verify extensibility.
 ---
 
 # SOLID TypeScript Module Audit
@@ -43,8 +43,6 @@ digraph audit {
 
 ### Step 1: Actor Analysis (SRP)
 
-SRP is NOT "does one thing." It IS "one actor requests changes."
-
 For each module, ask: **"WHO would request changes to this module?"**
 
 | Actor | Meaning | Example |
@@ -54,15 +52,9 @@ For each module, ask: **"WHO would request changes to this module?"**
 | "Anyone changing coercion semantics" | Data transformation actor | resolver.ts |
 | "Anyone changing validation display" | UI actor | error-display.ts |
 
-**If a module has 2+ actors, it has Divergent Change.** Split along actor boundaries.
-
-**Exception:** A module that serves one actor through multiple operations is fine. `resolver.ts` doing resolve + coerce for the same "data resolution" actor is cohesive, not divergent.
+2+ actors = Divergent Change. One actor through multiple operations (e.g., `resolver.ts` resolve + coerce) is cohesive.
 
 ### Step 2: Change-Relative Coupling Analysis
-
-**Don't measure coupling abstractly. Measure it against real changes.**
-
-Diagnostic questions (answer with file counts):
 
 | Change scenario | Files touched | Verdict |
 |-----------------|---------------|---------|
@@ -71,15 +63,12 @@ Diagnostic questions (answer with file counts):
 | Add new vendor | ? | >1 = coupling leak |
 | Add new coercion type | ? | >2 = Shotgun Surgery |
 | Add new validation rule | ? | >2 = Shotgun Surgery |
+| Make a command kind async | ? | >1 = sync/async boundary cascade |
 | Fix a bug in conditions | ? | >1 = cascade risk |
 
-**How to measure:** `git log --name-only` on related commits. Files that change together ARE coupled.
-
-**Kent Beck's test:** "If two elements are coupled with respect to a change that never happens, it doesn't matter." Only audit coupling for changes that ACTUALLY happen or are LIKELY to happen.
+**How to measure:** `git log --name-only` on related commits. Files that change together ARE coupled. Only audit coupling for changes that ACTUALLY happen or are LIKELY to happen.
 
 ### Step 3: Smell Detection
-
-Run these diagnostic questions against each module:
 
 | Question | If yes | Smell |
 |----------|--------|-------|
@@ -106,11 +95,16 @@ Most stable (pure, no deps)     ←  Everything depends inward
 ├── condition.ts (validation)       (depends on types only)
 │
 ├── element.ts                      (depends on resolver, component)
-├── conditions.ts (guards)          (depends on resolver)
+├── conditions.ts (guards)          (depends on resolver, coerce, trace, assert-never)
 ├── commands.ts                     (depends on element, conditions, validation, inject)
 ├── execute.ts                      (depends on commands, conditions, pipeline)
 ├── pipeline/http/gather            (colocated in execution/ — same actor)
+├── gather.ts                       (depends on component, walk, coerce, trace, assert-never)
+├── retry-indicator.ts              (depends on types, trace)
+├── server-push.ts                  (depends on execute, retry-indicator, trace)
+├── signalr.ts                      (depends on execute, retry-indicator, trace, @microsoft/signalr)
 │
+├── trigger.ts                      (depends on execute, server-push, signalr)
 ├── boot.ts                         (depends on trigger, enrichment, validation, walk-reactions)
 ├── root.ts                         (depends on boot — entry point)
 Least stable (side effects, DOM)
@@ -120,9 +114,9 @@ Least stable (side effects, DOM)
 
 ### Step 5: Extension Check (OCP + LSP)
 
-For each discriminated union (`Command`, `Trigger`, `Mutation`, `Guard`, `Reaction`):
+For each discriminated union (`Command`, `Trigger`, `Mutation`, `Guard`, `Reaction`, `BindSource`, `GatherItem`, `MethodArg`):
 
-1. **Where is the switch?** One switch in one place = acceptable (TanStack pattern). Same switch in 2+ files = violation.
+1. **Where is the switch?** One switch in one place = acceptable (TanStack pattern). Same switch in 2+ files = violation. **Nuance:** Repeated switches on the SAME discriminated union but with DIFFERENT target types (e.g., event object vs DOM element) may be acceptable duplication. Weigh the cost of introducing a target abstraction against the cost of the duplication before refactoring.
 2. **Is the resolved root substitutable?** After `resolveRoot()`, does ANY downstream code check vendor? If yes = LSP violation.
 3. **Can you add a new kind by writing NEW code only?** If modifying existing code = OCP violation.
 
@@ -134,12 +128,15 @@ For each module, count: exports used by other modules vs total exports.
 
 ```
 Module: resolver.ts
-  Exports: resolveSource, resolveEventPath, resolveSourceAs, coerce (4)
-  Used by element.ts: resolveSource, coerce (2/4)
-  Used by conditions.ts: resolveSource, resolveSourceAs, coerce (3/4)
+  Exports: resolveSource, resolveEventPath, resolveSourceAs (3)
+  Used by element.ts: resolveSource (1/3)
+  Used by conditions.ts: resolveSource, resolveSourceAs (2/3)
+  Note: coerce lives in core/coerce.ts, not resolver.ts
 ```
 
 **If <50% of exports are used by any single consumer,** the module may be too broad. Consider splitting.
+
+**Concrete ISP violation:** `PlanRegistry` is exported from `merge-plan.ts` but has zero external importers. All consumers use the delegating functions (`mergePlan`, `getPlan`, etc.). The class export violates ISP — it exposes internals that no consumer needs.
 
 **Exception:** Utility modules (walk.ts) can have broad exports — they serve many consumers by design.
 
@@ -194,7 +191,7 @@ Zero cost. Compile-time enforcement. Strict improvement over silent miss.
 - Introduce Parameter Object only when same group travels across multiple call sites
 
 ### Types
-- ~40 types for our plan executor = lean (TanStack Query has 60+, tsc has hundreds)
+- ~60 types for our plan executor = lean (TanStack Query has 60+, tsc has hundreds)
 - Types should map 1:1 to JSON plan primitives — correct for schema-validated contract
 - Optional fields handle variants — don't create per-variant subtypes (type explosion)
 
@@ -221,7 +218,7 @@ Zero cost. Compile-time enforcement. Strict improvement over silent miss.
 
 ## Red Flags — STOP and Investigate
 
-- Module imports from 5+ other modules (possible god module)
+- Module imports from 5+ other modules (possible god module). Exception: dispatcher modules (like commands.ts) that coordinate N command handlers MUST import those handlers. Check whether each import maps to a distinct case in a switch — if so, it is coordination, not a god module.
 - Circular imports between any two modules
 - `vendor` string checked outside component.ts
 - Module-level `let` mutated by 3+ functions
@@ -230,7 +227,10 @@ Zero cost. Compile-time enforcement. Strict improvement over silent miss.
 - Wide selectors (`querySelector("input")`, `querySelectorAll("div")`)
 - Fallback defaults for missing data
 - Caching or memoization (premature — not yet needed)
+- Non-null assertion (`!`) hiding potential null paths — the `!` bypasses TypeScript's null check. Verify the runtime path handles null before accepting `!`.
 - Test file exists but tests don't cover the change scenario
+
+**Test coverage note:** Only 3 of these red flags have automated architecture tests: `ej2_instances`, `ej.base`, and `window.alis` writes. The vendor string checks at `trigger.ts:45` and `live-clear.ts:44` are NOT caught by architecture tests.
 
 ## What This Skill Does NOT Cover
 

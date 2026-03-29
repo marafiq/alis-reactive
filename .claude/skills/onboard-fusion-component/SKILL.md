@@ -1,6 +1,7 @@
 ---
 name: onboard-fusion-component
-description: Use when onboarding a new Syncfusion EJ2 component, adding events, methods, or props to an existing component, or when unsure if a SF API is supported. Also use when needing to experiment with SF APIs to verify behavior before onboarding.
+description: Guides onboarding of Syncfusion EJ2 components — adding new vertical slices, events, methods, or props to existing components, and experimenting with SF APIs to verify behavior before integration.
+disable-model-invocation: true
 ---
 
 # Onboard Fusion Component
@@ -123,13 +124,23 @@ public static ComponentRef<FusionXxx, TModel> Disable<TModel>(
     this ComponentRef<FusionXxx, TModel> self) where TModel : class
     => self.Emit(new SetPropMutation("enabled"), value: false);
 
-// Property set from response → SetPropMutation + EventSource
+// Property set from response → SetPropMutation + EventSource (ResponseBody overload)
 public static ComponentRef<FusionXxx, TModel> SetDataSource<TModel, TResponse>(
     this ComponentRef<FusionXxx, TModel> self,
     ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
     where TModel : class where TResponse : class
 {
     var sourcePath = ExpressionPathHelper.ToResponsePath(path);
+    return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+}
+
+// Property set from generic event payload → SetPropMutation + EventSource (TSource overload)
+public static ComponentRef<FusionXxx, TModel> SetDataSource<TModel, TSource>(
+    this ComponentRef<FusionXxx, TModel> self,
+    TSource source, Expression<Func<TSource, object?>> path)
+    where TModel : class
+{
+    var sourcePath = ExpressionPathHelper.ToEventPath(path);
     return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
 }
 
@@ -143,7 +154,7 @@ public static TypedComponentSource<string> Value<TModel>(
 
 Reference: `Events/FusionAutoCompleteOnChanged.cs` + `FusionAutoCompleteEvents.cs`
 
-**File 1:** Create `Events/FusionXxxOnYyyEvent.cs`:
+**File 1:** Create `Events/FusionXxxOnYyy.cs`:
 ```csharp
 public class FusionXxxYyyArgs
 {
@@ -177,21 +188,21 @@ public class FusionXxxFilteringArgs
 public static class FusionXxxFilteringArgsExtensions
 {
     // set-prop on event args
-    public static void PreventDefault<TModel>(
+    public static void PreventDefault(
         this FusionXxxFilteringArgs args,
-        PipelineBuilder<TModel> pipeline) where TModel : class
+        ICommandEmitter pipeline)
     {
         pipeline.AddCommand(new MutateEventCommand(
             new SetPropMutation("preventDefaultAction"), value: true));
     }
 
     // call on event args with response data
-    public static void UpdateData<TModel, TResponse>(
+    public static void UpdateData<TResponse>(
         this FusionXxxFilteringArgs args,
-        PipelineBuilder<TModel> pipeline,
+        ICommandEmitter pipeline,
         ResponseBody<TResponse> source,
         Expression<Func<TResponse, object?>> path)
-        where TModel : class where TResponse : class
+        where TResponse : class
     {
         var sourcePath = ExpressionPathHelper.ToResponsePath(path);
         pipeline.AddCommand(new MutateEventCommand(
@@ -227,17 +238,49 @@ public static class FusionXxxFilteringArgsExtensions
 
 ### New Component (Full Vertical Slice)
 
-Read ALL files in `FusionAutoComplete/` as reference. The 7 files:
+Read ALL files in `FusionAutoComplete/` as reference. The pattern is 5 base files + 1 event file per event:
 
-1. `FusionXxx.cs` — phantom type, `IInputComponent`, declares `ReadExpr`
+1. `FusionXxx.cs` — extends `FusionComponent` (abstract base that provides `Vendor => "fusion"`), implements `IInputComponent`, declares `ReadExpr`
 2. `FusionXxxExtensions.cs` — mutations (SetValue, Enable, ShowPopup, Value, etc.)
-3. `FusionXxxHtmlExtensions.cs` — `Html.InputField().Xxx()` factory + `Fields<TItem>()`
+3. `FusionXxxHtmlExtensions.cs` — `Html.InputField().Xxx()` factory + `Fields<TItem>()` + `ComponentRegistration`
 4. `FusionXxxEvents.cs` — singleton, one `TypedEventDescriptor` per event
 5. `FusionXxxReactiveExtensions.cs` — `.Reactive()` on builder, generic `TArgs`
-6. `Events/FusionXxxOnChanged.cs` — args class (simple or with extensions)
-7. Gather extension — `Include<FusionXxx, TModel>(m => m.Prop)`
+
+Plus under `Events/`: one file per event (e.g., `FusionXxxOnChanged.cs`, `FusionXxxOnFiltering.cs`). The number of event files varies by component.
+
+Note: Gather extensions (`Include<FusionXxx, TModel>`) live in the core project (`GatherExtensions.cs`), not in the component directory.
 
 Copy each file, rename class/type names. Do not invent structure.
+
+### ComponentRegistration (Critical — Inside HtmlExtensions)
+
+The `FusionXxxHtmlExtensions.cs` factory method MUST call `AddToComponentsMap` to register the component with the plan. Without this, the runtime cannot find or gather from the component. Template from `FusionAutoCompleteHtmlExtensions.cs`:
+
+```csharp
+public static void FusionXxx<TModel, TProp>(
+    this InputBoundField<TModel, TProp> setup,
+    Action<XxxBuilder> build)
+    where TModel : class
+{
+    setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
+        setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "xxx",
+        CoercionTypes.InferFromType(typeof(TProp))));
+
+    var builder = setup.Helper.EJS().XxxFor(setup.Expression)
+        .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
+    build(builder);
+    setup.Render(builder.Render());
+}
+```
+
+Parameters: `elementId`, `vendor` (from `Component.Vendor`), `bindingPath`, `readExpr` (from `Component.ReadExpr`), `componentType` string (SF component name, lowercase), `CoercionTypes.InferFromType(typeof(TProp))`.
+
+### Event Naming Convention
+
+Three distinct names per event follow different conventions:
+- **Property name** on the events class: past tense (e.g. `Changed`, `Filtering`)
+- **SF event string** in `TypedEventDescriptor`: present tense (e.g. `"change"`, `"filtering"`)
+- **Args class name**: uses the SF event string style, not the property name (e.g. `FusionAutoCompleteChangeArgs`, NOT `FusionAutoCompleteChangedArgs`)
 
 ## What Does NOT Change
 
@@ -274,73 +317,7 @@ Every onboarded component/event needs tests at the layers it touches.
 
 ### Playwright Tests (Always Required)
 
-Reference: `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/WhenUsingFusionAutoComplete.cs`
-
-Test file goes in `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/WhenUsingFusionXxx.cs`.
-
-```csharp
-[TestFixture]
-public class WhenUsingFusionXxx : PlaywrightTestBase
-{
-    private const string Path = "/Sandbox/XxxPage";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_XxxModel";
-    private const string ComponentId = Scope + "__PropertyName";
-
-    private async Task NavigateAndBoot()
-    {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-    }
-}
-```
-
-**For filtering events**, use `PressSequentiallyAsync` (not `FillAsync`) to trigger SF events.
-
-**AutoComplete filtering** — type directly into the component input:
-```csharp
-private async Task TypeInComponent(string text)
-{
-    var input = Page.Locator($"#{ComponentId}");
-    await Expect(input).ToBeVisibleAsync();
-    await input.ClickAsync();
-    await input.PressSequentiallyAsync(text, new() { Delay = 50 });
-}
-```
-
-**MultiSelect filtering** — SF MultiSelect creates a SEPARATE filter input (sibling `input.e-dropdownbase`).
-You CANNOT type into the component input itself — you must target the filter input:
-
-```
-SF MultiSelect DOM with AllowFiltering:
-  .e-multi-select-wrapper (grandparent)
-    └── span.e-searcher (parent)
-        ├── input.e-dropdownbase (filter input — TYPE HERE)
-        └── input#ComponentId (component input — NOT here)
-```
-
-```csharp
-private async Task TypeInComponent(string text)
-{
-    // Target the filter input sibling, not the component input
-    var filterInput = Page.Locator($"#{ComponentId}")
-        .Locator("xpath=preceding-sibling::input[contains(@class,'e-dropdownbase')]");
-    await Expect(filterInput).ToBeVisibleAsync(new() { Timeout = 5000 });
-    await filterInput.ClickAsync();
-    await filterInput.PressSequentiallyAsync(text, new() { Delay = 50 });
-}
-```
-
-**Test the user-visible behavior**, not framework internals:
-- Filtering: type → HTTP fires → popup shows results → status element updates
-- Changed: select item → value displayed in echo element
-- Cascade: parent change → child populated from server
-- Conditions: value matches → then branch, doesn't → else branch
-
-**For `updateData` popup verification**, check popup items (not ej2.dataSource):
-```csharp
-var popupItems = Page.Locator(".e-ddl.e-popup .e-list-item");
-await Expect(popupItems.First).ToBeVisibleAsync(new() { Timeout = 5000 });
-```
+See `references/playwright-patterns.md` for DOM structure details and test templates.
 
 ### C# Unit Tests (If Adding New Descriptor Patterns)
 
@@ -348,86 +325,7 @@ Only needed when adding a pattern that doesn't exist yet. If you're just adding 
 
 ### Sandbox Demo (Always Required — Full Vertical Slice)
 
-A sandbox demo is a vertical slice across 3 files. All 3 must be updated.
-
-**File 1: Model** (`Areas/Sandbox/Models/XxxModel.cs`)
-
-Add a model property for the new capability. For server-filtered events, also add the item class
-and response class:
-
-```csharp
-// Model property
-public string[]? Supplies { get; set; }
-
-// Item class for DataSource
-public class SupplyItem
-{
-    public string Value { get; set; } = "";
-    public string Text { get; set; } = "";
-    public string Category { get; set; } = "";
-}
-
-// Response class for HTTP endpoint
-public class SupplySearchResponse
-{
-    public List<SupplyItem> Supplies { get; set; } = new();
-    public int Count { get; set; }
-}
-```
-
-**File 2: Controller** (`Areas/Sandbox/Controllers/XxxController.cs`)
-
-For server-filtered events, add an HTTP GET endpoint with server-side text filtering:
-
-```csharp
-[HttpGet]
-public IActionResult Supplies([FromQuery] string? Supplies)
-{
-    var all = new List<SupplyItem> { /* ... */ };
-
-    // Gather sends "null" string when nothing selected — treat same as empty
-    var search = Supplies == "null" ? null : Supplies;
-    var filtered = string.IsNullOrEmpty(search)
-        ? all
-        : all.Where(s => s.Text.Contains(search, StringComparison.OrdinalIgnoreCase)
-                      || s.Value.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
-
-    return Ok(new SupplySearchResponse { Supplies = filtered, Count = filtered.Count });
-}
-```
-
-**File 3: View** (`Areas/Sandbox/Views/Xxx/Index.cshtml`)
-
-Add a numbered section. Include `<span id="xxx">` elements for Playwright assertions:
-
-```html
-<section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-    <h2 class="text-base font-semibold mb-4">N. Filtering Event (Server-Filtered HTTP)</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        @{ Html.InputField(plan, m => m.Supplies, o => o.Label("Supplies (Server-Filtered)"))
-            .MultiSelect(b => b
-                .Fields<SupplyItem>(t => t.Text, v => v.Value)
-                .AllowFiltering(true)       <!-- REQUIRED for MultiSelect filtering -->
-                .Reactive(plan, evt => evt.Filtering, (args, p) =>
-                {
-                    args.PreventDefault(p);
-                    p.Get("/Sandbox/Xxx/Supplies")
-                     .Gather(g => g.FromEvent(args, x => x.Text, "Supplies"))
-                     .Response(r => r.OnSuccess<SupplySearchResponse>((json, s) =>
-                     {
-                         args.UpdateData(s, json, j => j.Supplies);
-                         s.Element("filter-status").SetText("results loaded");
-                     }));
-                })); }
-    </div>
-    <div class="font-mono text-sm mt-2">
-        <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
-    </div>
-</section>
-```
-
-**AllowFiltering note:** SF AutoComplete has filtering built-in. SF MultiSelect and DropDownList
-require `.AllowFiltering(true)` explicitly — without it, the filtering event never fires.
+See `references/sandbox-templates.md` for complete model, controller, and view templates.
 
 ### Run All Tests Before Done
 
