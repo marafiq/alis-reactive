@@ -100,24 +100,4 @@ For each layer the PR touches:
 
 ## Agent Dispatch Template
 
-```
-Task: [description]
-Layers touched: [1, 2, 3, 4, 5]
-Boundary crossings: [1→2, 2→3, 3→4, 4→5]
-
-You are working on a Senior Living App Framework. Any lack of focus, guessing,
-or skipped verification will cost dearly. Root yourself in pragmatic excellence.
-
-FIRST: Load skills — [skill list]
-THEN: Read [specific file paths]
-
-Input evidence: [what proves this change is needed]
-Output evidence: [what proves this change is correct]
-
-If touching an unexpected layer, stop — the plan is wrong.
-A failing test drives every boundary crossing.
-Verify in browser before claiming done.
-
-Rank findings by value. Most impactful first. Stop when remaining findings
-add no meaningful value.
-```
+See `agent-dispatch.md` — four task-specific templates with filled examples.

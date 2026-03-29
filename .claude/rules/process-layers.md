@@ -8,10 +8,15 @@ Related: `process-pipeline.md` (overview) | `process-task-types.md` (tasks by la
 
 **Before writing code, verify:**
 - Confirm this is a Value Object with invariants enforced by the constructor.
+  Why: Invalid state propagates through the pipeline and surfaces as wrong JSON in the browser.
 - Write out the expected JSON shape. Check whether it requires a schema change.
+  Why: Schema is the contract — knowing the JSON shape first prevents drift (3 incidents: M21).
 - Confirm visibility is deliberate: `internal` for API protection, `public` only for exposed surface.
+  Why: 5 constructors left public cascaded across 170+ files (M17).
 - Confirm the plan carries all information the runtime needs — runtime is a dumb executor.
+  Why: Logic in the runtime splits behavior across two languages — untestable with C# unit tests.
 - Confirm adding a new component does not require modifying existing descriptors (OCP).
+  Why: 100+ vertical slices planned — each shared descriptor change risks all existing slices.
 
 **Harness:** Write failing test first. `VerifyJson()` captures exact JSON. `AssertSchemaValid()`
 validates against schema. Both run every commit.
@@ -70,10 +75,14 @@ from TS while present in C# and schema for weeks.
 
 **Before writing code, verify:**
 - Confirm this is the runtime's job, not information the plan should carry.
-- Confirm no vendor knowledge leaks outside `component.ts`. Adding a third vendor must only touch component.ts — leaks force changes across the entire runtime.
-- Confirm no fallbacks. Fallbacks hide bugs for hours because wrong values propagate silently.
-- Confirm no DOM scanning. Plan carries IDs; DOM scanning breaks when IDs change.
-- SOLID: SRP ("who requests changes?"), OCP (one switch case + assertNever), LSP (no vendor checks downstream), ISP (narrow exports), DIP (depend inward).
+  Why: Logic in the runtime is invisible to C# unit tests and schema validation.
+- Confirm no vendor knowledge leaks outside `component.ts`.
+  Why: Adding a third vendor must only touch component.ts — leaks force changes across entire runtime.
+- Confirm no fallbacks. Wrong values propagate silently for hours before surfacing.
+  Why: Fail-fast surfaces errors at the source. Fallbacks hide them until they reach the browser.
+- Confirm no DOM scanning. Plan carries IDs; runtime uses getElementById only.
+  Why: DOM scanning breaks when IDs change. Plan-driven IDs are stable by construction.
+- Apply SOLID: SRP ("who requests changes?"), OCP (one switch case + assertNever), LSP (no vendor checks downstream), ISP (narrow exports), DIP (depend inward).
 
 **Harness:** vitest + jsdom via `boot()`. Architecture enforcement tests. `npm run typecheck`.
 
@@ -82,8 +91,10 @@ from TS while present in C# and schema for weeks.
 
 ## Boundary: Runtime → Browser
 
-Browser first. Not Playwright first. Eyes before automation.
+<important>Browser first. Not Playwright first. Eyes before automation.</important>
 "Tests pass" is necessary but not sufficient. Browser is truth.
+Why: C# unit tests caught 11 bugs. Playwright caught 1 in comparable time. Quick browser
+smoke test catches more than elaborate test infrastructure.
 
 **Process:**
 1. `npm run build:all && dotnet build` → start SandboxApp

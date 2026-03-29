@@ -82,18 +82,7 @@ accepting any finding. The code is the authority, not the review comment.
 
 ## Agent Dispatch
 
-Every dispatched agent receives:
-1. Which layers this task touches
-2. Which skills to load first
-3. Input evidence — what they read before acting
-4. Output evidence — what they prove before claiming done
-5. Boundary crossings — which boundaries and how to verify each
-
-Frame the stakes: "You are working on a Senior Living App Framework. Any lack of focus,
-guessing, or skipped verification will cost dearly. Root yourself in pragmatic excellence."
-
-Rank findings by value they bring. Most impactful first. Stop when remaining findings
-add no meaningful value.
+See `agent-dispatch.md` — the single reference for constructing all agent prompts.
 
 ## Reference
 
