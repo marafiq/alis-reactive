@@ -127,6 +127,12 @@ Output design:
 - Stop when remaining findings add no meaningful value.
 - Verify against actual code before accepting any finding.
 
+Coverage completeness (MANDATORY for test suite reviews):
+- List every item in the scope (schema $defs, TS exports, API members, etc.)
+- Map each to the test that covers it — by name, not by assumption
+- Report uncovered items as findings ranked by risk
+- "All tests pass" is not a sign-off. "All items are covered or justified" is.
+
 5 documented false alarms confirm: the code is the authority, not the review.
 ```
 
@@ -136,6 +142,15 @@ Task: Review PR #42 — CoerceResult extraction
 Layers touched by PR: 3 | Skills: solid-ts-audit
 Input: git diff main...fix/coerce-extraction
 Output: ranked findings with file:line evidence, most impactful first
+```
+
+**Example — Test Suite Review (with coverage gate):**
+```
+Task: Review drift detection test suite for completeness
+Scope: all $defs in reactive-plan.schema.json (51 definitions)
+Input: tests/Alis.Reactive.DriftDetection.Tests/**/*.cs
+Output: coverage matrix (definition → test name), uncovered items ranked by risk
+Sign-off requires: every definition mapped to a test or justified as untestable
 ```
 
 ## Template 4: BDD Agent

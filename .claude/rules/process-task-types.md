@@ -77,10 +77,30 @@ If TS changes seem needed, the plan is missing information — fix the C# descri
 |-----------|-------|---------|
 | C# unit (VerifyJson) | 1 | Snapshot + schema validation |
 | C# unit (BDD) | 1 | Public DSL only |
+| Drift detection | 1→2 | Coverage matrix against schema `$defs` |
 | TS vitest | 3 | `boot()` in jsdom |
 | Playwright | 4 | 5 BDD rules + blind review |
 
 Arrange using public DSL: `Html.On`, `CreatePlan()`, `Trigger()`, builders.
+
+### Coverage Completeness Gate
+
+A test suite is not complete until every item in its scope is either tested or explicitly
+justified as untestable. "Tests pass" proves quality of what exists — not completeness.
+
+**Before any test suite is declared done:**
+1. List every item in scope (schema `$defs`, TS exports, public API members, etc.)
+2. Map each item to the test that covers it — by name, not by assumption
+3. Items with zero coverage must be marked with a justification and tracked as a gap
+4. Produce the coverage matrix BEFORE requesting review
+
+**Reviewers MUST verify the matrix** — not just the tests. If the matrix is missing,
+the review is incomplete. This gate exists because drift detection PR #76 shipped
+59 passing tests while 16/51 schema definitions (31%) had zero coverage, and two
+full review rounds missed it.
+
+Why: Reviewing what IS written is necessary. Checking what is NOT written catches
+the gaps that passing tests hide.
 
 ## Writing Docs (Layers 4→5)
 
@@ -97,6 +117,10 @@ For each layer the PR touches:
 2. Confirm each boundary crossing was driven by a failing test.
 3. Apply 9-point evidence criteria to every finding.
 4. Trace actual runtime paths — both SF and native components.
+5. **Verify coverage completeness** — list every item in scope, map each to a test.
+   Report uncovered items. "Tests pass" is not sign-off; "all items covered or justified" is.
+   Why: PR #76 shipped 59 passing tests with 31% of schema definitions uncovered.
+   Two review rounds checked test quality but never asked what was missing.
 
 ## Agent Dispatch Template
 
