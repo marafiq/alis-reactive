@@ -65,7 +65,7 @@ namespace Alis.Reactive.Components
 ";
 
     private static CSharpAnalyzerTest<DuplicateReactiveEventAnalyzer, DefaultVerifier> CreateTest(
-        string source, string fileName = "View.g.cs", params DiagnosticResult[] expected)
+        string source, string fileName = "View.cshtml.g.cs", params DiagnosticResult[] expected)
     {
         var test = new CSharpAnalyzerTest<DuplicateReactiveEventAnalyzer, DefaultVerifier>
         {
@@ -73,7 +73,7 @@ namespace Alis.Reactive.Components
         };
 
         test.TestState.Sources.Add(("TypeStubs.cs", TypeStubs));
-        if (fileName == "View.g.cs")
+        if (fileName == "View.cshtml.g.cs")
         {
             test.TestCode = string.Empty;
             test.TestState.Sources.Add((fileName, source));

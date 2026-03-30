@@ -121,8 +121,7 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
             if (string.IsNullOrEmpty(path)) return false;
 
             return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".g.cs", StringComparison.OrdinalIgnoreCase);
+                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

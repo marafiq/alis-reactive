@@ -40,7 +40,7 @@ namespace Alis.Reactive.Builders
 ";
 
     private static CSharpAnalyzerTest<DuplicateChainedRequestAnalyzer, DefaultVerifier> CreateTest(
-        string source, string fileName = "View.g.cs", params DiagnosticResult[] expected)
+        string source, string fileName = "View.cshtml.g.cs", params DiagnosticResult[] expected)
     {
         var test = new CSharpAnalyzerTest<DuplicateChainedRequestAnalyzer, DefaultVerifier>
         {
@@ -48,7 +48,7 @@ namespace Alis.Reactive.Builders
         };
 
         test.TestState.Sources.Add(("TypeStubs.cs", TypeStubs));
-        if (fileName == "View.g.cs")
+        if (fileName == "View.cshtml.g.cs")
         {
             test.TestCode = string.Empty;
             test.TestState.Sources.Add((fileName, source));

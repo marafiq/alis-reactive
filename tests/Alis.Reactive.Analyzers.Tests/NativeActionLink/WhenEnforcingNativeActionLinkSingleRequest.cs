@@ -107,7 +107,7 @@ namespace Alis.Reactive.Native.Components
 }";
 
     private static CSharpAnalyzerTest<NativeActionLinkSingleRequestAnalyzer, DefaultVerifier> CreateTest(
-        string source, string fileName = "NativeActionLink.g.cs", params DiagnosticResult[] expected)
+        string source, string fileName = "NativeActionLink.cshtml.g.cs", params DiagnosticResult[] expected)
     {
         var test = new CSharpAnalyzerTest<NativeActionLinkSingleRequestAnalyzer, DefaultVerifier>
         {
@@ -178,7 +178,7 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, "NativeActionLink.g.cs", ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 
     [Test]
@@ -204,7 +204,7 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, "NativeActionLink.g.cs", ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 
     [Test]
@@ -230,7 +230,7 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, "NativeActionLink.g.cs", ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 
     [Test]
@@ -283,7 +283,7 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, "NativeActionLink.g.cs", ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 
     [Test]
@@ -310,7 +310,7 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, "NativeActionLink.g.cs", ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 
     [Test]
@@ -365,6 +365,6 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, "NativeActionLink.g.cs", ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 }

@@ -136,7 +136,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     // ── Flagged: two HTTP requests ───────────────────────────────
@@ -165,7 +165,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS008(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS008(0)).RunAsync();
     }
 
     // ── Clean: Parallel requests ─────────────────────────────────
@@ -194,7 +194,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     // ── Clean: Chained request ───────────────────────────────────
@@ -221,7 +221,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     // ── Scope: plain .cs file ────────────────────────────────────
@@ -280,7 +280,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS008(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS008(0)).RunAsync();
     }
 
     // ── Multiple: three HTTP requests reports on second and third ─
@@ -310,7 +310,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS008(0), ExpectALIS008(1)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS008(0), ExpectALIS008(1)).RunAsync();
     }
 
     // ── Clean: HTTP inside nested lambdas not counted ────────────
@@ -340,7 +340,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     // ── Mixed HTTP methods ───────────────────────────────────────
@@ -368,6 +368,6 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS008(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS008(0)).RunAsync();
     }
 }

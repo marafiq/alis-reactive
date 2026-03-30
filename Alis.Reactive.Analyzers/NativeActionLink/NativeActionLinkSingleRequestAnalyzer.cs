@@ -169,8 +169,7 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
             if (string.IsNullOrEmpty(path)) return false;
 
             return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".g.cs", StringComparison.OrdinalIgnoreCase);
+                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
 
         private readonly struct CachedTypes

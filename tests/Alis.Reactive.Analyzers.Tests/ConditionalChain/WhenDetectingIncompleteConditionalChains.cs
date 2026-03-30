@@ -188,7 +188,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "ReactiveConditions.g.cs", ExpectALIS001(0)).RunAsync();
+        await CreateTest(source, "ReactiveConditions.cshtml.g.cs", ExpectALIS001(0)).RunAsync();
     }
 
     [Test]
@@ -206,7 +206,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "ReactiveConditions.g.cs", ExpectALIS001(0)).RunAsync();
+        await CreateTest(source, "ReactiveConditions.cshtml.g.cs", ExpectALIS001(0)).RunAsync();
     }
 
     [Test]
@@ -229,7 +229,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "ReactiveConditions.g.cs", ExpectALIS001(0), ExpectALIS001(1)).RunAsync();
+        await CreateTest(source, "ReactiveConditions.cshtml.g.cs", ExpectALIS001(0), ExpectALIS001(1)).RunAsync();
     }
 
     [Test]
@@ -273,6 +273,6 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "ReactiveConditions.g.cs", ExpectALIS001(0)).RunAsync();
+        await CreateTest(source, "ReactiveConditions.cshtml.g.cs", ExpectALIS001(0)).RunAsync();
     }
 }
