@@ -1,0 +1,49 @@
+---
+description: Reviewer default on PRs — no commits on reviewed PR; evidence + runnable repro in comment; sign — Cursor.
+alwaysApply: true
+---
+
+# Code review (Cursor — source of truth)
+
+This rule defines **how** reviews run here. Extended reference: `.cursor/review/code-review-protocol-reference.md` (harness, tables, gates).
+
+## Scope
+
+Code review, PR / diff review, merge readiness, drafting or posting **GitHub** review feedback.
+
+## Reviewer role (default — repo owner)
+
+- **Always Reviewer** on PRs unless the user **explicitly** asks you to implement or push fixes to a branch.
+- **Do not change code on the PR under review** — no commits to that branch, no edits that land in that PR. Feedback stays in **comments** only.
+- **Repro = in-comment artifact:** **extracted** (minimal) and **runnable** from the comment (paste-ready test, exact CLI + output, self-contained steps). Not a dependency on your unpublished local state.
+
+## Workflow
+
+1. **Scope** — What's in/out; base + head SHA; **list every file you opened** (not diff-only).
+2. **Automation** — Trust CI or run: `npm run typecheck`, `npm run lint`, `npm test`, `dotnet build`, plus layer `dotnet test` projects from `.cursor/review/code-review-protocol-reference.md` harness table.
+3. **Layer map** — Owns C# vs schema vs TS vs browser; wrong layer → stop, trace full pipeline before LGTM.
+4. **Primitives** — If wire/command/trigger shape changes: `.cursor/review/code-review-protocol-reference.md` §Primitive checklist or explicit deferrals.
+5. **Every finding** (Blocking, Gap, **Polish**) — Full **Comment criteria**; no evidence-free nits.
+6. **Blocking bug** — Minimal red test + **runnable** repro **in the same GitHub comment** (extracted test body, or exact commands + full failure output; link + pasted excerpt if gist). No commits on the **reviewed** PR unless author explicitly invites.
+7. **GitHub** — End agent comments with `— Cursor`.
+8. **Role** — Same as §Reviewer role above; implement only when user clearly opts in.
+
+## Comment criteria (per finding)
+
+```
+Issue:        <what is wrong or unclear>
+Why:          <path:line | symbol | diff | test — no vibes>
+Change:       <what should change>
+Benefit:      <correctness | clarity | risk | maintainability>
+Files read:   <every file opened for this comment>
+Self-check:   <re-read cited lines after writing — yes/adjusted>
+Category:     Bug | Doc | API | Design | Process
+Severity:     Blocking | Gap | Polish
+Evidence:     <same as Why, or Not verified + next step>
+```
+
+**Blocking + Bug:** repro **in that comment** (mandatory), **runnable** from paste/commands. Else: **Issue / Why / Files read / Self-check** still mandatory.
+
+## Language
+
+**Verified** | **Not verified** | **Hypothesis** for behavior/contracts. No *probably / seems / likely* without Hypothesis + verify step.
