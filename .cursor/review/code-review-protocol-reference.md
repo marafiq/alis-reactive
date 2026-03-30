@@ -93,9 +93,3 @@ Align with [.mdc](../rules/code-review-protocol.mdc): **extracted**, **runnable*
 ## GitHub (agents)
 
 End review comments with: `— Cursor`
-
----
-
-## Extra depth (if branch has them)
-
-`docs/archive/architecture-review/.../issue-review-protocol.md`, `CODE-SMELLS.md`, `descriptor-solid-analysis-plan.md` — confirm path exists.
