@@ -10,6 +10,8 @@ on:
       - 'Alis.Reactive.FluentValidator/**'
       - 'Alis.Reactive.Analyzers/**'
       - 'Alis.Reactive.NativeTagHelpers/**'
+      - 'Alis.Reactive.SandboxApp/Scripts/**'
+      - 'Alis.Reactive.SandboxApp/Styles/**'
       - 'Directory.Build.props'
       - '.github/workflows/nuget-publish.yml'
   workflow_dispatch:
@@ -17,6 +19,7 @@ on:
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  PACKAGE_VERSION: 0.0.${{ github.run_number }}-preview
 
 jobs:
   test:
@@ -79,19 +82,27 @@ jobs:
       - name: Build JS + CSS bundles
         run: npm run build:all
 
+      - name: Copy assets into Alis.Reactive package source
+        run: |
+          cp Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js Alis.Reactive/assets/js/
+          cp Alis.Reactive.SandboxApp/wwwroot/css/design-system.css Alis.Reactive/assets/css/
+
       - name: Pack NuGet packages
         run: |
-          dotnet pack Alis.Reactive/Alis.Reactive.csproj --configuration Release --output ./nupkgs
-          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj --configuration Release --output ./nupkgs
-          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj --configuration Release --output ./nupkgs
-          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj --configuration Release --output ./nupkgs
-          dotnet pack Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj --configuration Release --output ./nupkgs
-          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj --configuration Release --output ./nupkgs
+          dotnet pack Alis.Reactive/Alis.Reactive.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
+          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
+          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
+          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
+          dotnet pack Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
+          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
+
+      - name: Log package versions
+        run: ls -1 ./nupkgs/
 
       - name: Upload NuGet artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nuget-packages
+          name: nuget-packages-${{ env.PACKAGE_VERSION }}
           path: ./nupkgs/*.nupkg
           retention-days: 30
 

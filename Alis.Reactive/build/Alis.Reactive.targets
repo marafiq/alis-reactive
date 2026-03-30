@@ -1,0 +1,36 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    Alis.Reactive static assets (JS + CSS).
+
+    Defaults:
+      JS  → wwwroot/js/alis-reactive.js
+      CSS → wwwroot/css/design-system.css
+
+    Override in your csproj:
+      <PropertyGroup>
+        <AlisReactiveJsPath>wwwroot/lib/alis/js</AlisReactiveJsPath>
+        <AlisReactiveCssPath>wwwroot/lib/alis/css</AlisReactiveCssPath>
+      </PropertyGroup>
+  -->
+
+  <PropertyGroup>
+    <AlisReactiveJsPath Condition="'$(AlisReactiveJsPath)' == ''">wwwroot/js</AlisReactiveJsPath>
+    <AlisReactiveCssPath Condition="'$(AlisReactiveCssPath)' == ''">wwwroot/css</AlisReactiveCssPath>
+    <AlisReactivePkgDir>$(MSBuildThisFileDirectory)</AlisReactivePkgDir>
+  </PropertyGroup>
+
+  <Target Name="CopyAlisReactiveAssets" AfterTargets="Build">
+    <MakeDir Directories="$(AlisReactiveJsPath)" Condition="!Exists('$(AlisReactiveJsPath)')" />
+    <MakeDir Directories="$(AlisReactiveCssPath)" Condition="!Exists('$(AlisReactiveCssPath)')" />
+
+    <Copy SourceFiles="$(AlisReactivePkgDir)assets/js/alis-reactive.js"
+          DestinationFolder="$(AlisReactiveJsPath)"
+          SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="$(AlisReactivePkgDir)assets/css/design-system.css"
+          DestinationFolder="$(AlisReactiveCssPath)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>
