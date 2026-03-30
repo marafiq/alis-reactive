@@ -15,7 +15,7 @@
 3. If new/changed plan primitive: complete §Primitive checklist or list explicit deferrals.
 4. Scan §CLAUDE gates if diff touches views, runtime, vendors, IDs, API visibility, slices.
 5. For each issue: emit §Finding block (no empty Evidence).
-6. Bug? Need minimal RED test + §Repro artifact (external to reviewed PR unless author asks).
+6. Bug (blocking)? **Mandatory:** minimal RED test exists AND the **same review comment** includes the repro artifact (no shortcuts). Paste full minimal test **or** paste failing command + output **or** gist/branch link **plus** pasted excerpt so the thread is self-contained. Do not claim blocking bug with only “add a test” / theory.
 7. Doc/API/SOLID claims? Match §Evidence-by-category.
 8. Consolidate thread; withdraw wrong claims; GitHub comment ends with — Cursor.
 9. Default: reviewer-only; no drive-by refactors. Load matching .claude/skills/ for DSL reviews.
@@ -33,7 +33,7 @@ Severity: Blocking | Gap | Polish
 Next:    <verify step | repro plan | n/a>
 ```
 
-**Severity:** Blocking = wrong/unsafe/contract break with evidence above. Bug blocking needs red test + external repro artifact. Gap = factual doc/API typo with cites. Polish = optional.
+**Severity:** Blocking = wrong/unsafe/contract break with evidence above. **Bug blocking** = red test + **artifact in this comment** (§Repro). Gap = factual doc/API typo with cites. Polish = optional.
 
 ---
 
@@ -82,16 +82,18 @@ Next:    <verify step | repro plan | n/a>
 
 | Category | Minimum evidence |
 |----------|------------------|
-| **Bug** | Failing NUnit / Vitest / Playwright at owning layer + **repro artifact outside reviewed PR** (gist, fork branch, pasted test, CI log). Else → Hypothesis/Gap. |
+| **Bug** | Failing test at owning layer + **repro submitted in the review comment** (paste minimal test, or paste `dotnet test` / `npm test` failure output, or link + required pasted excerpt). Artifact must **not** be a commit on the reviewed PR unless author asked. **No** blocking bug without in-comment artifact. Else → Hypothesis/Gap only. |
 | **Doc / XML** | Doc anchor + `path:line` or symbol; contradictions = side-by-side doc + code. |
 | **API surface** | `git diff` / build / analyzer; “breaking” = compile fail, test fail, schema break, or **named** in-repo consumers (`grep` paths). |
 | **SOLID / design** | Letter (S/O/L/I/D) + code cite + rule/metric (e.g. ctor arity). SRP needs 2 reasons-to-change tied to code — else non-blocking or Hypothesis. |
 
 ---
 
-## Repro artifact (bugs)
+## Repro artifact (bugs) — required in comment
 
-Not a commit **on the PR under review** unless author invites it. Prefer: separate branch/PR link, gist, full test in comment, or log snippet.
+**Reviewer obligation:** Do not post a blocking bug without attaching proof **in that GitHub comment**. Acceptable: (1) full minimal failing test as fenced code, (2) exact CLI + red output excerpt, (3) external link (gist / fork PR) **and** pasted minimal test or failure excerpt so readers need not leave GitHub to understand repro.
+
+Still **do not** push repro commits **onto the PR under review** unless the author explicitly invites a fix branch.
 
 ---
 
