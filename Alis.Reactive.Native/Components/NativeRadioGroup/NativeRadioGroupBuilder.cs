@@ -9,18 +9,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Renders a native HTML radio button group bound to a model property.
-    /// Uses a hidden input as the canonical element for evalRead + gather,
-    /// and Html.RadioButtonFor for each option for MVC model binding.
-    ///
-    /// Usage:
-    ///   Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
-    ///       .NativeRadioGroup(b => b
-    ///           .Items(careLevelItems)    // from controller
-    ///           .CssClass("flex flex-col gap-2")
-    ///           .OptionCssClass("flex items-start gap-3 p-3 rounded-lg border cursor-pointer")
-    ///           .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
+    /// Configures and renders a native HTML radio button group bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Created by the <c>.NativeRadioGroup()</c> factory on
+    /// <see cref="InputBoundField{TModel,TProp}"/>. A hidden input holds the selected
+    /// value for form submission and component reads, while individual radio buttons
+    /// use MVC model binding.
+    /// </para>
+    /// <code>
+    /// Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
+    ///     .NativeRadioGroup(b => b
+    ///         .Items(careLevelItems)
+    ///         .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
+    /// </code>
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TProp">The bound property type.</typeparam>
     public class NativeRadioGroupBuilder<TModel, TProp> : IHtmlContent
     {
         private readonly IHtmlHelper<TModel> _html;
@@ -31,6 +37,8 @@ namespace Alis.Reactive.Native.Components
         private string _cssClass = "flex flex-col gap-2";
         private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
 
+        // NEVER make public — devs create builders via the .NativeRadioGroup() factory,
+        // which also registers the component in the plan's ComponentsMap.
         internal NativeRadioGroupBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
         {
             _html = html;
@@ -39,16 +47,20 @@ namespace Alis.Reactive.Native.Components
             _bindingPath = html.NameFor(expression);
         }
 
-        /// <summary>The resolved element ID — used by .Reactive() to wire events.</summary>
+        /// <summary>Gets the resolved element ID for this radio group.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>The model binding path (e.g. "CareLevel") for MVC form submission.</summary>
+        /// <summary>Gets the model binding path (e.g. <c>"CareLevel"</c>).</summary>
         internal string BindingPath => _bindingPath;
 
-        /// <summary>The configured radio options — used by .Reactive() and factory for auto-sync entries.</summary>
+        /// <summary>Gets the configured radio options.</summary>
         internal IReadOnlyList<RadioButtonItem> Options => _options;
 
-        /// <summary>Adds typed RadioButtonItems (controller provides — carries value, text, and description).</summary>
+        /// <summary>
+        /// Adds radio options provided by the controller.
+        /// </summary>
+        /// <param name="items">The radio button items to display.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeRadioGroupBuilder<TModel, TProp> Items(IEnumerable<RadioButtonItem> items)
         {
             foreach (var item in items)
@@ -56,41 +68,65 @@ namespace Alis.Reactive.Native.Components
             return this;
         }
 
-        /// <summary>Adds a radio option where value = display text.</summary>
+        /// <summary>
+        /// Adds a radio option where the value is also used as the display text.
+        /// </summary>
+        /// <param name="value">The option value and display text.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeRadioGroupBuilder<TModel, TProp> Option(string value)
         {
             _options.Add(new RadioButtonItem(value, value));
             return this;
         }
 
-        /// <summary>Adds a radio option with explicit display text.</summary>
+        /// <summary>
+        /// Adds a radio option with a separate display text.
+        /// </summary>
+        /// <param name="value">The option value submitted in the form.</param>
+        /// <param name="text">The display text shown next to the radio button.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeRadioGroupBuilder<TModel, TProp> Option(string value, string text)
         {
             _options.Add(new RadioButtonItem(value, text));
             return this;
         }
 
-        /// <summary>Adds a radio option with display text and description.</summary>
+        /// <summary>
+        /// Adds a radio option with display text and a description.
+        /// </summary>
+        /// <param name="value">The option value submitted in the form.</param>
+        /// <param name="text">The display text shown next to the radio button.</param>
+        /// <param name="description">A secondary description shown below the text.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeRadioGroupBuilder<TModel, TProp> Option(string value, string text, string description)
         {
             _options.Add(new RadioButtonItem(value, text, description));
             return this;
         }
 
-        /// <summary>Appends CSS classes on the radio group container.</summary>
+        /// <summary>
+        /// Sets CSS classes on the radio group container.
+        /// </summary>
+        /// <param name="css">One or more CSS class names.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeRadioGroupBuilder<TModel, TProp> CssClass(string css)
         {
             _cssClass = css;
             return this;
         }
 
-        /// <summary>Appends CSS classes on each option wrapper label.</summary>
+        /// <summary>
+        /// Sets CSS classes on each radio option wrapper label.
+        /// </summary>
+        /// <param name="css">One or more CSS class names.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeRadioGroupBuilder<TModel, TProp> OptionCssClass(string css)
         {
             _optionCssClass = css;
             return this;
         }
 
+        /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             var modelValue = _html.ValueFor(_expression, "{0}")?.ToString() ?? "";

@@ -1,19 +1,22 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSwitch.Changed (SF "change" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.Checked).Truthy()
-    /// ExpressionPathHelper resolves x => x.Checked to "evt.checked".
+    /// Event payload delivered when a <see cref="FusionSwitch"/> state changes.
     /// </summary>
+    /// <remarks>
+    /// Access properties in conditions: <c>p.When(args, x =&gt; x.Checked).Truthy()</c>.
+    /// </remarks>
     public class FusionSwitchChangeArgs
     {
-        /// <summary>The switch's current checked state after the change.</summary>
+        /// <summary>Gets or sets the switch's checked state after the change.</summary>
         public bool Checked { get; set; }
 
-        /// <summary>True if the change was triggered by user interaction.</summary>
+        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
 
+        /// <summary>
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// </summary>
         public FusionSwitchChangeArgs() { }
     }
 }

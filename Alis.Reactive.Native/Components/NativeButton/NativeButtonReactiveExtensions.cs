@@ -25,7 +25,7 @@ namespace Alis.Reactive.Native.Components
 
         public static NativeButtonBuilder<TModel> Reactive<TModel, TArgs>(
             this NativeButtonBuilder<TModel> builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<NativeButtonEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

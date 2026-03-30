@@ -17,7 +17,7 @@
             .NativeTextBox(b => b.Placeholder("e.g. VA-12345")); }
 
         @{ Html.InputField(plan, m => m.ServiceBranch, o => o.Label("Service Branch"))
-            .DropDownList(b => b
+            .FusionDropDownList(b => b
                 .DataSource(new[] { "Army", "Navy", "Air Force", "Marines", "Coast Guard" })
                 .Placeholder("Select branch")); }
     </div>

@@ -8,10 +8,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Renders a native HTML &lt;input&gt; element bound to a model property.
-    /// Supports type="text" (default), "number", "email", "password", etc.
-    /// Uses IdGenerator for element ID and MVC NameFor for the name attribute.
+    /// Configures and renders a native HTML <c>&lt;input&gt;</c> element bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Supports <c>type="text"</c> (default), <c>"number"</c>, <c>"email"</c>,
+    /// <c>"password"</c>, etc. Created by the <c>.NativeTextBox()</c> factory on
+    /// <see cref="InputBoundField{TModel,TProp}"/>.
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TProp">The bound property type.</typeparam>
     public class NativeTextBoxBuilder<TModel, TProp> : IHtmlContent
     {
         private readonly IHtmlHelper<TModel> _html;
@@ -23,6 +28,8 @@ namespace Alis.Reactive.Native.Components
         private string? _cssClass;
         private string? _placeholder;
 
+        // NEVER make public — devs create builders via the .NativeTextBox() factory,
+        // which also registers the component in the plan's ComponentsMap.
         internal NativeTextBoxBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
         {
             _html = html;
@@ -31,27 +38,47 @@ namespace Alis.Reactive.Native.Components
             _bindingPath = html.NameFor(expression);
         }
 
+        /// <summary>Gets the resolved element ID for this input.</summary>
         internal string ElementId => _elementId;
+
+        /// <summary>Gets the model binding path (e.g. <c>"Address.City"</c>).</summary>
         internal string BindingPath => _bindingPath;
 
+        /// <summary>
+        /// Sets the HTML input type (e.g. <c>"email"</c>, <c>"password"</c>, <c>"number"</c>).
+        /// Defaults to <c>"text"</c>.
+        /// </summary>
+        /// <param name="type">The HTML input type attribute value.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeTextBoxBuilder<TModel, TProp> Type(string type)
         {
             _type = type;
             return this;
         }
 
+        /// <summary>
+        /// Adds CSS classes to the input element.
+        /// </summary>
+        /// <param name="css">One or more CSS class names.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeTextBoxBuilder<TModel, TProp> CssClass(string css)
         {
             _cssClass = css;
             return this;
         }
 
+        /// <summary>
+        /// Sets the placeholder text shown when the input is empty.
+        /// </summary>
+        /// <param name="placeholder">The placeholder text.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeTextBoxBuilder<TModel, TProp> Placeholder(string placeholder)
         {
             _placeholder = placeholder;
             return this;
         }
 
+        /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             var attrs = new System.Collections.Generic.Dictionary<string, object>

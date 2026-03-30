@@ -32,17 +32,17 @@ namespace Alis.Reactive.Builders
 
     public sealed class GuardBuilder<TModel> where TModel : class
     {
-        public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> configure) => new BranchBuilder<TModel>();
+        public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline) => new BranchBuilder<TModel>();
     }
 
     public sealed class BranchBuilder<TModel> where TModel : class
     {
-        public BranchBuilder<TModel> Else(Action<PipelineBuilder<TModel>> configure) => this;
+        public BranchBuilder<TModel> Else(Action<PipelineBuilder<TModel>> pipeline) => this;
     }
 
     public sealed class ParallelBuilder<TModel> where TModel : class
     {
-        public void OnAllSettled(Action<PipelineBuilder<TModel>> configure) { }
+        public void OnAllSettled(Action<PipelineBuilder<TModel>> pipeline) { }
     }
 
     public sealed class ElementBuilder<TModel> where TModel : class
@@ -72,18 +72,18 @@ namespace Alis.Reactive.Builders.Requests
         public HttpRequestBuilder<TModel> Post(string url) => this;
         public HttpRequestBuilder<TModel> Put(string url) => this;
         public HttpRequestBuilder<TModel> Delete(string url) => this;
-        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> configure) => this;
-        public HttpRequestBuilder<TModel> WhileLoading(Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> configure) => this;
+        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather) => this;
+        public HttpRequestBuilder<TModel> WhileLoading(Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> pipeline) => this;
         public HttpRequestBuilder<TModel> Validate<TValidator>(string formId) where TValidator : class => this;
         public HttpRequestBuilder<TModel> Validate(Validation.ValidationDescriptor validation) => this;
-        public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> configure) => this;
+        public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response) => this;
     }
 
     public class ResponseBuilder<TModel> where TModel : class
     {
-        public ResponseBuilder<TModel> OnSuccess(Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> configure) => this;
-        public ResponseBuilder<TModel> OnError(int statusCode, Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> configure) => this;
-        public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> configure) => this;
+        public ResponseBuilder<TModel> OnSuccess(Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> pipeline) => this;
+        public ResponseBuilder<TModel> OnError(int statusCode, Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> pipeline) => this;
+        public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> request) => this;
     }
 }
 
@@ -100,7 +100,7 @@ namespace Alis.Reactive.Native.Components
             this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel> html,
             string linkText,
             string url,
-            Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> configure)
+            Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> pipeline)
             where TModel : class
             => new NativeActionLinkBuilder<TModel>();
     }

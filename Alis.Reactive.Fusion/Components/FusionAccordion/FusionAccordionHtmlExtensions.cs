@@ -12,20 +12,20 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionAccordionHtmlExtensions
     {
         /// <summary>
-        /// Creates a Syncfusion Accordion with the given element ID.
+        /// Creates a FusionAccordion with the given element ID.
         /// Non-input component: renders directly, no label/validation wrapper.
         /// </summary>
         public static FusionAccordionBuilder<TModel> FusionAccordion<TModel>(
             this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             string elementId,
-            Action<AccordionBuilder> configure)
+            Action<AccordionBuilder> build)
             where TModel : class
         {
             // NO ComponentsMap registration — this is NOT an input component
 
             var builder = html.EJS().Accordion(elementId);
-            configure(builder);
+            build(builder);
 
             return new FusionAccordionBuilder<TModel>(plan, elementId, builder.Render());
         }

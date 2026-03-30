@@ -35,7 +35,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Label("Admission Date"))
-                .DatePicker(b => b
+                .FusionDatePicker(b => b
                     .Placeholder("Select admission date")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -91,7 +91,7 @@
             and shows a warning or confirmation.
         </p>
         @{ Html.InputField(plan, m => m.DischargeDate, o => o.Label("Discharge Date"))
-            .DatePicker(b => b
+            .FusionDatePicker(b => b
                 .Placeholder("Select discharge date")); }
         <div class="mt-3">
             @(Html.NativeButton("check-discharge-btn", "Check Discharge Date")

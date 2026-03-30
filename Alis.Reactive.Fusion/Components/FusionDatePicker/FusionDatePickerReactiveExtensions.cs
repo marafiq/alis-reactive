@@ -8,23 +8,36 @@ using Syncfusion.EJ2.Calendars;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto the Syncfusion DatePickerBuilder.
-    ///
-    /// Usage (in .cshtml):
-    ///   Html.DatePickerFor(expr)
-    ///       .Reactive(plan, evt => evt.Changed, (args, p) =>
-    ///       {
-    ///           p.Component&lt;FusionDatePicker&gt;(m => m.AdmissionDate).SetValue(new DateTime(...));
-    ///       })
-    ///       .Render()
+    /// Wires browser events from a <see cref="FusionDatePicker"/> into the reactive plan.
     /// </summary>
+    /// <remarks>
+    /// <c>.Reactive()</c> is always the last call inside the build callback passed to
+    /// <see cref="FusionDatePickerHtmlExtensions.FusionDatePicker{TModel,TProp}"/>:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.BirthDate).FusionDatePicker(b =&gt;
+    /// {
+    ///     b.Format("MM/dd/yyyy");
+    ///     b.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { /* commands */ });
+    /// });
+    /// </code>
+    /// </remarks>
     public static class FusionDatePickerReactiveExtensions
     {
         private static readonly FusionDatePicker Component = new FusionDatePicker();
 
+        /// <summary>
+        /// Wires a FusionDatePicker event to a reactive pipeline that executes in the browser.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
+        /// <param name="builder">The Fusion builder.</param>
+        /// <param name="plan">The plan to add the reactive behavior to.</param>
+        /// <param name="eventSelector">Selects which event to react to (e.g. <c>evt =&gt; evt.Changed</c>).</param>
+        /// <param name="pipeline">Configures the commands to run when the event fires.</param>
+        /// <returns>The builder for method chaining.</returns>
         public static DatePickerBuilder Reactive<TModel, TArgs>(
             this DatePickerBuilder builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<FusionDatePickerEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

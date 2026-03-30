@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/FusionDatePicker
 ///
-/// Syncfusion DatePicker renders an input element inside a wrapper span.
+/// FusionDatePicker renders an input element inside a wrapper span.
 /// The wrapper element gets the IdGenerator-based ID. Tests use
 /// DatePickerLocator to interact via real browser gestures (calendar popup
 /// clicks) rather than ej2 instance manipulation.
@@ -70,7 +70,7 @@ public class WhenDateSelected : PlaywrightTestBase
         var dp = AdmissionDate;
         var inputValue = await dp.Input.InputValueAsync();
         Assert.That(inputValue, Is.Not.Null.And.Not.Empty,
-            $"Expected DatePicker input to have a value but got '{inputValue}'");
+            $"Expected FusionDatePicker input to have a value but got '{inputValue}'");
 
         AssertNoConsoleErrors();
     }

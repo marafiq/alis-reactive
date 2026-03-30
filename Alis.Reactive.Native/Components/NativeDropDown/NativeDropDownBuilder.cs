@@ -10,16 +10,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Renders a native HTML &lt;select&gt; element bound to a model property.
-    /// Follows the same CRTP-style pattern as DesignSystem native input builders.
-    ///
-    /// Usage:
-    ///   Html.InputField(plan, m => m.Status, o => o.Required().Label("Status"))
-    ///       .NativeDropDown(b => b
-    ///           .Items(statusItems)
-    ///           .Placeholder("-- Select --")
-    ///           .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
+    /// Configures and renders a native HTML <c>&lt;select&gt;</c> element bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Created by the <c>.NativeDropDown()</c> factory on
+    /// <see cref="InputBoundField{TModel,TProp}"/>.
+    /// <code>
+    /// Html.InputField(plan, m => m.Status, o => o.Required().Label("Status"))
+    ///     .NativeDropDown(b => b
+    ///         .Items(statusItems)
+    ///         .Placeholder("-- Select --")
+    ///         .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
+    /// </code>
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TProp">The bound property type.</typeparam>
     public class NativeDropDownBuilder<TModel, TProp> : IHtmlContent
     {
         private readonly IHtmlHelper<TModel> _html;
@@ -32,6 +37,8 @@ namespace Alis.Reactive.Native.Components
         private bool _enabled = true;
         private string? _cssClass;
 
+        // NEVER make public — devs create builders via the .NativeDropDown() factory,
+        // which also registers the component in the plan's ComponentsMap.
         internal NativeDropDownBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
         {
             _html = html;
@@ -40,40 +47,57 @@ namespace Alis.Reactive.Native.Components
             _bindingPath = html.NameFor(expression);
         }
 
-        /// <summary>The resolved element ID — used by .Reactive() to wire events.</summary>
+        /// <summary>Gets the resolved element ID for this dropdown.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>The dot-notation model binding path (e.g. "Address.City") for future HTTP gather.</summary>
+        /// <summary>Gets the model binding path (e.g. <c>"Address.City"</c>).</summary>
         internal string BindingPath => _bindingPath;
 
-        /// <summary>Sets the selectable options.</summary>
+        /// <summary>
+        /// Sets the selectable options.
+        /// </summary>
+        /// <param name="items">The list of options to display.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeDropDownBuilder<TModel, TProp> Items(IEnumerable<SelectListItem> items)
         {
             _items = items;
             return this;
         }
 
-        /// <summary>Sets the empty-selection option label (e.g. "-- Select --").</summary>
+        /// <summary>
+        /// Sets the empty-selection placeholder label (e.g. <c>"-- Select --"</c>).
+        /// </summary>
+        /// <param name="optionLabel">The placeholder text for the empty option.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeDropDownBuilder<TModel, TProp> Placeholder(string optionLabel)
         {
             _placeholder = optionLabel;
             return this;
         }
 
-        /// <summary>Sets the disabled state (default: enabled).</summary>
+        /// <summary>
+        /// Enables or disables the dropdown. Defaults to enabled.
+        /// </summary>
+        /// <param name="enabled"><see langword="true"/> to enable, <see langword="false"/> to disable.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeDropDownBuilder<TModel, TProp> Enabled(bool enabled)
         {
             _enabled = enabled;
             return this;
         }
 
-        /// <summary>Appends additional CSS classes on the select element.</summary>
+        /// <summary>
+        /// Adds CSS classes to the select element.
+        /// </summary>
+        /// <param name="css">One or more CSS class names.</param>
+        /// <returns>The builder for method chaining.</returns>
         public NativeDropDownBuilder<TModel, TProp> CssClass(string css)
         {
             _cssClass = css;
             return this;
         }
 
+        /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             var attrs = new Dictionary<string, object> { ["id"] = _elementId };

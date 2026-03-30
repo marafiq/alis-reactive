@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Inputs;
@@ -8,15 +9,26 @@ using Syncfusion.EJ2.Inputs;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating MaskedTextBoxBuilder bound to a model property.
+    /// Creates a FusionInputMask inside a field wrapper, bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Phone)</c>, then call
+    /// <c>.FusionInputMask(b =&gt; { b.Mask("(999) 000-0000"); })</c>.
+    /// </remarks>
     public static class FusionInputMaskHtmlExtensions
     {
         private static readonly FusionInputMask Component = new FusionInputMask();
 
-        public static void InputMask<TModel, TProp>(
-            this InputFieldSetup<TModel, TProp> setup,
-            Action<MaskedTextBoxBuilder> configure)
+        /// <summary>
+        /// Renders a FusionInputMask bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="build">Callback to build the MaskedTextBox (mask format, placeholder, etc.).</param>
+        public static void FusionInputMask<TModel, TProp>(
+            this InputBoundField<TModel, TProp> setup,
+            Action<MaskedTextBoxBuilder> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -25,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
 
             var builder = setup.Helper.EJS().MaskedTextBoxFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
-            configure(builder);
+            build(builder);
             setup.Render(builder.Render());
         }
     }

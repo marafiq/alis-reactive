@@ -79,11 +79,11 @@ public class WhenResolvingPayloadSource : PlanTestBase
             p.Element("bool-value").SetText(payload, x => x.BoolValue);
         }).Render());
 
-    private static IReactivePlan<TestModel> BuildWithPayload(
-        Action<PayloadModel, Builders.PipelineBuilder<TestModel>> configure)
+    private static ReactivePlan<TestModel> BuildWithPayload(
+        Action<PayloadModel, Builders.PipelineBuilder<TestModel>> pipeline)
     {
         var plan = CreatePlan();
-        Trigger(plan).CustomEvent<PayloadModel>("test-event", configure);
+        Trigger(plan).CustomEvent<PayloadModel>("test-event", pipeline);
         return plan;
     }
 }

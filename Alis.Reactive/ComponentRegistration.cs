@@ -29,7 +29,11 @@ namespace Alis.Reactive
         /// </summary>
         public string CoerceAs { get; }
 
-        public ComponentRegistration(string componentId, string vendor, string bindingPath, string readExpr, string componentType, string coerceAs)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ComponentRegistration(string componentId, string vendor, string bindingPath, string readExpr, string componentType, string coerceAs)
         {
             ComponentId = componentId;
             Vendor = vendor;

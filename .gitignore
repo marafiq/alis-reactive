@@ -9,6 +9,7 @@ node_modules/
 .worktrees/
 tools/
 !tools/md-viewer/
+!tools/ApiDocGenerator/
 tools/md-viewer/node_modules/
 tools/md-viewer-mockup.html
 

@@ -5,6 +5,22 @@ using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    /// <summary>
+    /// Configures success and error response handlers for an HTTP request, plus optional
+    /// chained follow-up requests.
+    /// </summary>
+    /// <remarks>
+    /// Accessed via <see cref="HttpRequestBuilder{TModel}.Response"/>:
+    /// <code>
+    /// p.Post("/api/save", gather: g =&gt; g.IncludeAll())
+    ///  .Response(response: r =&gt;
+    ///  {
+    ///      r.OnSuccess(pipeline: s =&gt; s.Into("result"));
+    ///      r.OnError(400, pipeline: s =&gt; s.ValidationErrors("myForm"));
+    ///  });
+    /// </code>
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
     public class ResponseBuilder<TModel> where TModel : class
     {
         internal List<StatusHandler> SuccessHandlers { get; } = new List<StatusHandler>();
@@ -14,10 +30,11 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Registers a success handler (status 2xx, no specific code filter).
         /// </summary>
-        public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> configure)
+        /// <param name="pipeline">Builds the reaction commands that run on success.</param>
+        public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> pipeline)
         {
             var builder = new PipelineBuilder<TModel>();
-            configure(builder);
+            pipeline(builder);
             SuccessHandlers.Add(BuildHandler(null, builder));
             return this;
         }
@@ -31,11 +48,11 @@ namespace Alis.Reactive.Builders.Requests
         /// Generates: source = "responseBody.data.name" — resolved at runtime via walk(ctx, path).
         /// </summary>
         public ResponseBuilder<TModel> OnSuccess<TResponse>(
-            Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> configure)
+            Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> pipeline)
             where TResponse : class, new()
         {
             var builder = new PipelineBuilder<TModel>();
-            configure(new ResponseBody<TResponse>(new TResponse()), builder);
+            pipeline(new ResponseBody<TResponse>(new TResponse()), builder);
             SuccessHandlers.Add(BuildHandler(null, builder));
             return this;
         }
@@ -43,10 +60,12 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Registers an error handler for a specific HTTP status code.
         /// </summary>
-        public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> configure)
+        /// <param name="statusCode">The HTTP status code to handle.</param>
+        /// <param name="pipeline">Builds the reaction commands that run on this error status.</param>
+        public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> pipeline)
         {
             var builder = new PipelineBuilder<TModel>();
-            configure(builder);
+            pipeline(builder);
             ErrorHandlers.Add(BuildHandler(statusCode, builder));
             return this;
         }
@@ -54,10 +73,11 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Chains a sequential HTTP request that fires after the current request succeeds.
         /// </summary>
-        public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> configure)
+        /// <param name="request">Configures the chained HTTP request.</param>
+        public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> request)
         {
             var chainedBuilder = new HttpRequestBuilder<TModel>();
-            configure(chainedBuilder);
+            request(chainedBuilder);
             ChainedRequest = chainedBuilder.BuildRequestDescriptor();
             return this;
         }

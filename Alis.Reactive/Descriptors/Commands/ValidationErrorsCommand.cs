@@ -10,7 +10,11 @@ namespace Alis.Reactive.Descriptors.Commands
 
         public string FormId { get; }
 
-        public ValidationErrorsCommand(string formId, Guard? when = null)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ValidationErrorsCommand(string formId, Guard? when = null)
             : base(when)
         {
             FormId = formId;

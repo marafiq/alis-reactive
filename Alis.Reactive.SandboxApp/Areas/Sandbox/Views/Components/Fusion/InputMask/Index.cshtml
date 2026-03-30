@@ -35,7 +35,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.PhoneNumber, o => o.Label("Phone Number"))
-                .InputMask(b => b
+                .FusionInputMask(b => b
                     .Mask("(000) 000-0000")
                     .Placeholder("Enter phone number")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>

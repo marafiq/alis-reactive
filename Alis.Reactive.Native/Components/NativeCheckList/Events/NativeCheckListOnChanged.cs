@@ -1,17 +1,23 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Payload for NativeCheckList.Changed (DOM "change" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.Value).NotEmpty()
-    /// ExpressionPathHelper resolves x => x.Value to "evt.value".
-    /// Value holds the array of checked values (e.g. ["Peanuts","Dairy"]).
+    /// Event args for <see cref="NativeCheckListEvents.Changed"/>.
     /// </summary>
+    /// <remarks>
+    /// Properties provide typed access for conditions:
+    /// <code>p.When(args, x => x.Value).NotEmpty()</code>
+    /// </remarks>
     public class NativeCheckListChangeArgs
     {
-        /// <summary>Array of checked values after the change.</summary>
+        /// <summary>
+        /// Gets or sets the array of checked values after the change
+        /// (e.g. <c>["Peanuts", "Dairy"]</c>).
+        /// </summary>
         public string[]? Value { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance. Framework use only.
+        /// </summary>
         public NativeCheckListChangeArgs() { }
     }
 }

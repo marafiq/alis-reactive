@@ -4,42 +4,58 @@ using Alis.Reactive.Builders.Conditions;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Source extensions for FusionDateRangePicker (StartDate, EndDate, Value).
-    ///
-    /// StartDate() reads "startDate" from ej2 instance — returns single DateTime.
-    /// EndDate() reads "endDate" from ej2 instance — returns single DateTime.
-    /// Value() reads "value" from ej2 instance — returns DateTime[] (both dates).
-    ///
-    /// StartDate/EndDate use hardcoded readExpr independent of Component.ReadExpr.
-    /// They are targeted sub-reads for conditions. Value() reads the component's actual value.
-    /// No SetValue() — DateRangePicker is set by user interaction only.
+    /// Typed value reading for <see cref="FusionDateRangePicker"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).Value()</c>.
+    /// </para>
+    /// <para>
+    /// <see cref="StartDate{TModel}"/> and <see cref="EndDate{TModel}"/> read individual
+    /// dates for use in conditions. <see cref="Value{TModel}"/> reads both dates as an array.
+    /// </para>
+    /// <para>
+    /// No <c>SetValue()</c> is provided. The date range is set by user interaction only.
+    /// </para>
+    /// </remarks>
     public static class FusionDateRangePickerExtensions
     {
         private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();
 
-        /// <summary>
-        /// Returns a typed source reading the startDate property from the ej2 instance.
-        /// Uses hardcoded readExpr "startDate" — independent of Component.ReadExpr.
-        /// </summary>
+        /// <summary>Reads the start date for use in conditions or gather.</summary>
+        /// <remarks>
+        /// Pass to a <c>When()</c> condition guard:
+        /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).StartDate()).NotNull().Then(p =&gt; { ... })</c>.
+        /// </remarks>
+        /// <returns>A typed source representing the range's start date.</returns>
         public static TypedComponentSource<DateTime> StartDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
             => new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "startDate");
 
-        /// <summary>
-        /// Returns a typed source reading the endDate property from the ej2 instance.
-        /// Uses hardcoded readExpr "endDate" — independent of Component.ReadExpr.
-        /// </summary>
+        /// <summary>Reads the end date for use in conditions or gather.</summary>
+        /// <remarks>
+        /// Pass to a <c>When()</c> condition guard:
+        /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).EndDate()).NotNull().Then(p =&gt; { ... })</c>.
+        /// </remarks>
+        /// <returns>A typed source representing the range's end date.</returns>
         public static TypedComponentSource<DateTime> EndDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
             => new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "endDate");
 
-        /// <summary>
-        /// Returns the full value source — reads ej2.value which is [Date, Date] (DateTime[]).
-        /// Use StartDate() or EndDate() for individual date access in conditions.
-        /// </summary>
+        /// <summary>Reads both dates as an array for use in conditions or gather.</summary>
+        /// <remarks>
+        /// <para>
+        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations.
+        /// </para>
+        /// <para>
+        /// Use <see cref="StartDate{TModel}"/> or <see cref="EndDate{TModel}"/>
+        /// when you need individual date access in conditions.
+        /// </para>
+        /// </remarks>
+        /// <returns>A typed source representing the full date range (start and end).</returns>
         public static TypedComponentSource<DateTime[]> Value<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class

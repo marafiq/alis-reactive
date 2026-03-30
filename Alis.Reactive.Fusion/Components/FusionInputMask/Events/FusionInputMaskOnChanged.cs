@@ -1,20 +1,22 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionInputMask.Changed (SF "change" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.Value).NotNull()
-    /// ExpressionPathHelper resolves x => x.Value to "evt.value".
-    /// CoercionTypes infers string → "string" for runtime coercion.
+    /// Event payload delivered when a <see cref="FusionInputMask"/> value changes.
     /// </summary>
+    /// <remarks>
+    /// Access properties in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.
+    /// </remarks>
     public class FusionInputMaskChangeArgs
     {
-        /// <summary>New masked value.</summary>
+        /// <summary>Gets or sets the new masked value.</summary>
         public string? Value { get; set; }
 
-        /// <summary>True if the change was triggered by user interaction.</summary>
+        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
 
+        /// <summary>
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// </summary>
         public FusionInputMaskChangeArgs() { }
     }
 }

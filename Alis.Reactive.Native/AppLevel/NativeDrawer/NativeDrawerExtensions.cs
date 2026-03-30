@@ -5,10 +5,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.AppLevel
 {
+    /// <summary>
+    /// Pipeline and layout extensions for the <see cref="NativeDrawer"/>.
+    /// </summary>
     public static class NativeDrawerExtensions
     {
         private static readonly string[] SizeClasses = { "alis-drawer--sm", "alis-drawer--md", "alis-drawer--lg" };
 
+        /// <summary>
+        /// Sets the drawer panel width.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="self">The drawer component reference.</param>
+        /// <param name="size">The desired panel width.</param>
+        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeDrawer, TModel> SetSize<TModel>(
             this ComponentRef<NativeDrawer, TModel> self, DrawerSize size)
             where TModel : class
@@ -29,6 +39,11 @@ namespace Alis.Reactive.Native.AppLevel
                 new[] { new LiteralArg(sizeClass) }));
         }
 
+        /// <summary>
+        /// Opens the drawer, making it visible and accessible.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeDrawer, TModel> Open<TModel>(
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
@@ -39,6 +54,11 @@ namespace Alis.Reactive.Native.AppLevel
                            args: new MethodArg[] { new LiteralArg("aria-hidden") }));
         }
 
+        /// <summary>
+        /// Closes the drawer, hiding the panel.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeDrawer, TModel> Close<TModel>(
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
@@ -47,6 +67,14 @@ namespace Alis.Reactive.Native.AppLevel
                        new[] { new LiteralArg("alis-drawer--visible") }));
         }
 
+        /// <summary>
+        /// Renders the drawer HTML element in the layout.
+        /// </summary>
+        /// <remarks>
+        /// Call this once in <c>_Layout.cshtml</c>. The drawer is hidden by default
+        /// and opened via <see cref="Open{TModel}"/> in a reactive pipeline.
+        /// </remarks>
+        /// <returns>The drawer HTML element.</returns>
         public static IHtmlContent NativeDrawer(this IHtmlHelper html)
         {
             return new HtmlString(

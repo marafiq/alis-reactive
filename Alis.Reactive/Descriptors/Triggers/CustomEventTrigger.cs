@@ -9,7 +9,11 @@ namespace Alis.Reactive.Descriptors.Triggers
 
         public string Event { get; }
 
-        public CustomEventTrigger(string @event)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal CustomEventTrigger(string @event)
         {
             Event = @event;
         }

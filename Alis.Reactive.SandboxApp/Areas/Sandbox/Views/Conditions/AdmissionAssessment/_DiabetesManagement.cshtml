@@ -16,12 +16,12 @@
     <!-- Row 1: Diabetes Type + A1C Level -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.DiabetesType, o => o.Label("Diabetes Type"))
-            .DropDownList(b => b
+            .FusionDropDownList(b => b
                 .DataSource(new[] { "Type 1", "Type 2" })
                 .Placeholder("Select type")); }
 
         @{ Html.InputField(plan, m => m.A1cLevel, o => o.Label("A1C Level (%)"))
-            .NumericTextBox(b => b
+            .FusionNumericTextBox(b => b
                 .Min(0).Max(20).Step(0.1)
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
@@ -53,7 +53,7 @@
     <!-- Row 2: Insulin Dependent -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.InsulinDependent, o => o.Label("Insulin Dependent"))
-            .Switch(b => b
+            .FusionSwitch(b => b
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var sw = p.Component<FusionSwitch>(m => m.InsulinDependent);
@@ -74,7 +74,7 @@
     <div id="insulin-details" hidden>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.InsulinSchedule, o => o.Label("Insulin Schedule"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .DataSource(new[] { "Once daily", "Twice daily", "Before meals", "Sliding scale" })
                     .Placeholder("Select schedule")); }
         </div>

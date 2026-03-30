@@ -1,12 +1,15 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Events available on FusionAutoComplete.
-    /// Singleton instance — used with .Reactive() event selector lambda:
-    ///   .Reactive(plan, evt => evt.Changed, (args, p) => { ... })
+    /// Typed event descriptors for the <see cref="FusionAutoComplete"/> component.
     /// </summary>
+    /// <remarks>
+    /// Select an event via the <c>.Reactive()</c> lambda:
+    /// <c>.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { ... })</c>.
+    /// </remarks>
     public sealed class FusionAutoCompleteEvents
     {
+        /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionAutoCompleteEvents Instance = new FusionAutoCompleteEvents();
         private FusionAutoCompleteEvents() { }
 

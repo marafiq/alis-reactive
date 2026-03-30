@@ -1,20 +1,20 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionColorPicker.Changed (SF "change" event).
-    ///
-    /// SF ColorPicker change event shape (verified in browser):
-    ///   - value: string (hex+alpha, e.g. "#1dc7e1ff") ← USE THIS
-    ///   - currentValue: object { hex, rgba } ← NOT a string, do not use directly
-    ///   - previousValue: object { hex, rgba } ← NOT a string, do not use directly
-    ///
-    /// We expose `value` as the primary property since it's a plain string.
+    /// Event payload delivered when a <see cref="FusionColorPicker"/> color changes.
     /// </summary>
+    /// <remarks>
+    /// The value is a hex+alpha string (e.g. <c>"#1dc7e1ff"</c>).
+    /// Access it in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.
+    /// </remarks>
     public class FusionColorPickerChangeArgs
     {
-        /// <summary>Selected color as hex+alpha string (e.g. "#1dc7e1ff").</summary>
+        /// <summary>Gets or sets the selected color as a hex+alpha string (e.g. "#1dc7e1ff").</summary>
         public string? Value { get; set; }
 
+        /// <summary>
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// </summary>
         public FusionColorPickerChangeArgs() { }
     }
 }

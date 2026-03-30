@@ -11,6 +11,7 @@
     "typecheck": "tsc --project Alis.Reactive.SandboxApp/Scripts/tsconfig.json --noEmit",
     "lint": "eslint Alis.Reactive.SandboxApp/Scripts/",
     "lint:fix": "eslint Alis.Reactive.SandboxApp/Scripts/ --fix",
+    "build:api-docs": "dotnet run --project tools/ApiDocGenerator",
     "test": "vitest run",
     "test:watch": "vitest"
   },

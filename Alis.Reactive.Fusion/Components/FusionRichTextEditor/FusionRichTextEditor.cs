@@ -1,11 +1,12 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Syncfusion RichTextEditor component.
-    /// Phantom type — zero state. Used as type parameter in
-    /// p.Component&lt;FusionRichTextEditor&gt;(m => m.CarePlan) to unlock
-    /// the RichTextEditor-specific extension methods.
+    /// A FusionRichTextEditor for editing HTML content.
     /// </summary>
+    /// <remarks>
+    /// Use as a type parameter in <c>p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.CarePlan)</c>
+    /// to access FusionRichTextEditor-specific mutations and value reading.
+    /// </remarks>
     public sealed class FusionRichTextEditor : FusionComponent, IInputComponent
     {
         /// <inheritdoc />

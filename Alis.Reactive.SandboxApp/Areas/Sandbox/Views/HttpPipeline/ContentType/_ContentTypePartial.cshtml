@@ -4,7 +4,7 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    var plan = new ReactivePlan<ContentTypeModel>();
+    var plan = Html.ReactivePlan<ContentTypeModel>();
 }
 
 <native-vstack gap="Base">
@@ -16,7 +16,7 @@
            .NativeTextBox(b => b
                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
         @{ Html.InputField(plan, m => m.FusionAmount, o => o.Label("Fusion NumericTextBox (from partial)"))
-           .NumericTextBox(b => b
+           .FusionNumericTextBox(b => b
                .Min(0).Max(10000).Step(1)); }
     </native-grid>
     <p class="text-xs text-text-muted" id="partial-loaded-marker">Partial loaded successfully</p>

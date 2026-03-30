@@ -1,19 +1,22 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionMultiColumnComboBox.Changed (SF "change" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.Value).Eq("1")
-    /// ExpressionPathHelper resolves x => x.Value to "evt.value".
+    /// Event payload delivered when a <see cref="FusionMultiColumnComboBox"/> selection changes.
     /// </summary>
+    /// <remarks>
+    /// Access properties in conditions: <c>p.When(args, x =&gt; x.Value).Eq("1")</c>.
+    /// </remarks>
     public class FusionMultiColumnComboBoxChangeArgs
     {
-        /// <summary>The selected value.</summary>
+        /// <summary>Gets or sets the selected value.</summary>
         public string? Value { get; set; }
 
-        /// <summary>True if the change was triggered by user interaction.</summary>
+        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
 
+        /// <summary>
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// </summary>
         public FusionMultiColumnComboBoxChangeArgs() { }
     }
 }

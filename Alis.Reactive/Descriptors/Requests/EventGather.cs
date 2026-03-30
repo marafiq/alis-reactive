@@ -19,7 +19,11 @@ namespace Alis.Reactive.Descriptors.Requests
         /// <summary>Dot-notation path into event payload (e.g., "evt.text").</summary>
         public string Path { get; }
 
-        public EventGather(string param, string path)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal EventGather(string param, string path)
         {
             Param = param;
             Path = path;

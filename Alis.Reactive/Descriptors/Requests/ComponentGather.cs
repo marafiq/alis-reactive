@@ -12,7 +12,11 @@ namespace Alis.Reactive.Descriptors.Requests
         public string Name { get; }
         public string ReadExpr { get; }
 
-        public ComponentGather(string componentId, string vendor, string name, string readExpr)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ComponentGather(string componentId, string vendor, string name, string readExpr)
         {
             ComponentId = componentId;
             Vendor = vendor;

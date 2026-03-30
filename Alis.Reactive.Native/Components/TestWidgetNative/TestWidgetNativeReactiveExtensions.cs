@@ -11,7 +11,7 @@ namespace Alis.Reactive.Native.Components
 
         public static TestWidgetNativeBuilder<TModel> Reactive<TModel, TArgs>(
             this TestWidgetNativeBuilder<TModel> builder,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             Func<TestWidgetNativeEvents, TypedEventDescriptor<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class

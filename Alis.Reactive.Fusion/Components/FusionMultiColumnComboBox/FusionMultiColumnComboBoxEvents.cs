@@ -1,12 +1,15 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Events available on FusionMultiColumnComboBox.
-    /// Singleton instance — used with .Reactive() event selector lambda:
-    ///   .Reactive(plan, evt => evt.Changed, (args, p) => { ... })
+    /// Typed event descriptors for the <see cref="FusionMultiColumnComboBox"/> component.
     /// </summary>
+    /// <remarks>
+    /// Select an event via the <c>.Reactive()</c> lambda:
+    /// <c>.Reactive(plan, evt =&gt; evt.Changed, (args, p) =&gt; { ... })</c>.
+    /// </remarks>
     public sealed class FusionMultiColumnComboBoxEvents
     {
+        /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionMultiColumnComboBoxEvents Instance = new FusionMultiColumnComboBoxEvents();
         private FusionMultiColumnComboBoxEvents() { }
 

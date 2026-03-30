@@ -35,7 +35,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @{ Html.InputField(plan, m => m.MedicationTime, o => o.Label("Medication Time"))
-                .DateTimePicker(b => b
+                .FusionDateTimePicker(b => b
                     .Placeholder("Select medication time")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {

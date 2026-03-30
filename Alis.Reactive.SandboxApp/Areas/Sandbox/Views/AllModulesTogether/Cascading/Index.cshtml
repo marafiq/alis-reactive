@@ -45,7 +45,7 @@
             On change, sends ONLY the country value to fetch cities.
         </p>
         @{ Html.InputField(plan, m => m.Country, o => o.Required().Label("Country"))
-           .DropDownList(b => b
+           .FusionDropDownList(b => b
                 .DataSource(countries)
                 .Fields<CountryItem>(t => t.Text, v => v.Value)
                 .Placeholder("Select a country")
@@ -77,7 +77,7 @@
             Starts empty. Populated by SetDataSource + DataBind after country change.
         </p>
         @{ Html.InputField(plan, m => m.City, o => o.Label("City"))
-           .DropDownList(b => b
+           .FusionDropDownList(b => b
                 .Fields<CityItem>(t => t.Text, v => v.Value)
                 .Placeholder("Select a city (choose country first)")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>

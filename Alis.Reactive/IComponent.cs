@@ -33,6 +33,7 @@ namespace Alis.Reactive
     /// </summary>
     public interface IAppLevelComponent : IComponent
     {
+        /// <summary>Gets the well-known element ID for this app-level component.</summary>
         string DefaultId { get; }
     }
 }

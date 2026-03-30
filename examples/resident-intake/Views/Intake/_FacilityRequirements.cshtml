@@ -13,7 +13,7 @@
                 .Placeholder("e.g., Ground floor, near garden")); }
 
         @{ Html.InputField(plan, m => m.DepositAmount, o => o.Required().Label("Move-in Deposit ($)"))
-            .NumericTextBox(b => b
+            .FusionNumericTextBox(b => b
                 .Min(0).Step(500)); }
     </div>
 </native-vstack>

@@ -23,7 +23,11 @@ namespace Alis.Reactive.Descriptors.Triggers
         /// Maps to connection.on(methodName, handler).</summary>
         public string MethodName { get; }
 
-        public SignalRTrigger(string hubUrl, string methodName)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal SignalRTrigger(string hubUrl, string methodName)
         {
             if (string.IsNullOrWhiteSpace(hubUrl))
                 throw new System.ArgumentException("hubUrl is required", nameof(hubUrl));

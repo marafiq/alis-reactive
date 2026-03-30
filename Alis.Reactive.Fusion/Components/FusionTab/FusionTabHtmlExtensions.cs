@@ -13,20 +13,20 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionTabHtmlExtensions
     {
         /// <summary>
-        /// Creates a Syncfusion Tab component with reactive wiring support.
+        /// Creates a FusionTab component with reactive wiring support.
         /// Non-input component: renders directly, no label/validation wrapper.
         /// </summary>
         public static FusionTabBuilder<TModel> FusionTab<TModel>(
             this IHtmlHelper<TModel> html,
-            IReactivePlan<TModel> plan,
+            ReactivePlan<TModel> plan,
             string elementId,
-            Action<TabBuilder> configure)
+            Action<TabBuilder> build)
             where TModel : class
         {
             // NO ComponentsMap registration — Tab is NOT an input component
 
             var builder = html.EJS().Tab(elementId);
-            configure(builder);
+            build(builder);
 
             return new FusionTabBuilder<TModel>(plan, elementId, builder.Render());
         }

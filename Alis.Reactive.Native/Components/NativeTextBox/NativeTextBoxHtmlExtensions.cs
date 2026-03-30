@@ -1,19 +1,36 @@
 using System;
 using Alis.Reactive.Descriptors;
+using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Factory extensions for creating NativeTextBoxBuilder.
+    /// Factory extension for creating a <see cref="NativeTextBox"/> inside a field wrapper.
     /// </summary>
+    /// <remarks>
+    /// Start the chain with <see cref="Alis.Reactive.Native.Extensions.InputFieldExtensions.InputField{TModel, TProp}"/>
+    /// and call <c>.NativeTextBox()</c> to choose the text input:
+    /// <code>
+    /// Html.InputField(plan, m =&gt; m.Name, o =&gt; o.Required().Label("Name"))
+    ///     .NativeTextBox(b =&gt; b.Placeholder("Enter name"));
+    /// </code>
+    /// </remarks>
     public static class NativeTextBoxHtmlExtensions
     {
         private static readonly NativeTextBox _component = new NativeTextBox();
 
+        /// <summary>
+        /// Creates a <see cref="NativeTextBoxBuilder{TModel,TProp}"/> inside the field wrapper,
+        /// registers the component in the plan, and renders the input.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="build">Configures the text box (type, placeholder, CSS, reactive events).</param>
         public static void NativeTextBox<TModel, TProp>(
-            this InputFieldSetup<TModel, TProp> setup,
-            Action<NativeTextBoxBuilder<TModel, TProp>> configure)
+            this InputBoundField<TModel, TProp> setup,
+            Action<NativeTextBoxBuilder<TModel, TProp>> build)
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
@@ -21,7 +38,7 @@ namespace Alis.Reactive.Native.Components
                 CoercionTypes.InferFromType(typeof(TProp))));
 
             var builder = new NativeTextBoxBuilder<TModel, TProp>(setup.Helper, setup.Expression);
-            configure(builder);
+            build(builder);
             setup.Render(builder);
         }
     }

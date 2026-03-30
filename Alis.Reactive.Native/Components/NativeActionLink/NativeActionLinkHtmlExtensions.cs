@@ -10,13 +10,13 @@ namespace Alis.Reactive.Native.Components
             this IHtmlHelper<TModel> html,
             string linkText,
             string url,
-            Action<PipelineBuilder<TModel>> configure)
+            Action<PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
             ArgumentNullException.ThrowIfNull(html);
-            ArgumentNullException.ThrowIfNull(configure);
+            ArgumentNullException.ThrowIfNull(pipeline);
 
-            var contract = NativeActionLinkSerializer.CreateContract(url, configure);
+            var contract = NativeActionLinkSerializer.CreateContract(url, pipeline);
             var elementId = NativeActionLinkIdGenerator.Next<TModel>(html.ViewContext);
             return new NativeActionLinkBuilder<TModel>(elementId, linkText, url, contract.PayloadJson);
         }

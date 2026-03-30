@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Conditions";
 
-    IReactivePlan<ConditionsShowcaseModel> plan = new ReactivePlan<ConditionsShowcaseModel>();
+    var plan = Html.ReactivePlan<ConditionsShowcaseModel>();
 
     // ── Section 1: int — ElseIf grade ladder ──
     Html.On(plan, t => t.CustomEvent<ScorePayload>("set-score", (args, p) =>

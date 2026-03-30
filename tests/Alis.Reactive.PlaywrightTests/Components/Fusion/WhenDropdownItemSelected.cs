@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/DropDownList
 ///
-/// Syncfusion DropDownList renders an input element inside the wrapper div.
+/// FusionDropDownList renders an input element inside the wrapper div.
 /// The wrapper element gets the IdGenerator-based ID. Tests use
 /// DropDownListLocator to interact via real browser gestures.
 /// </summary>

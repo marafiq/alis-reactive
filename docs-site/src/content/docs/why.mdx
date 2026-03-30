@@ -31,7 +31,7 @@ ASP.NET's unobtrusive validation and AJAX recognized this pain. `data-val-requir
 - **No type safety.** `data-val-*` attributes are strings. Rename a property and they silently break.
 - **Limited validators.** "Required when another field is checked" or "greater than that field's value" means custom JS.
 - **No reactivity.** Cascading dropdowns, conditional panels, inter-field reactions -- you intercept jQuery Validation internals or hand-wire `$(document).on("change")` alongside the declarative attributes.
-- **Vendor components break it.** Syncfusion, Telerik, and others have their own lifecycle and APIs (`el.ej2_instances[0].value`). Unobtrusive attributes cannot express "read from a Syncfusion AutoComplete."
+- **Vendor components break it.** Syncfusion, Telerik, and others have their own lifecycle and APIs (`el.ej2_instances[0].value`). Unobtrusive attributes cannot express "read from a FusionAutoComplete."
 - **Not discoverable.** New developers see `data-val-*`, `data-ajax-*`, inline scripts, and separate `.js` files. No single place describes what the page does.
 
 </details>
@@ -135,7 +135,7 @@ A country dropdown cascades into a city dropdown:
 
 ```csharp
 Html.InputField(plan, m => m.Country, o => o.Required().Label("Country"))
-    .DropDownList(b => b.Fields<CountryItem>(t => t.Text, v => v.Value)
+    .FusionDropDownList(b => b.Fields<CountryItem>(t => t.Text, v => v.Value)
         .Reactive(plan, evt => evt.Changed, (args, p) =>
         {
             p.Get("/Sandbox/Cascading/Cities")

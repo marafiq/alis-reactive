@@ -1,19 +1,22 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionDropDownList.Changed (SF "change" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.Value).Eq("US")
-    /// ExpressionPathHelper resolves x => x.Value to "evt.value".
+    /// Event payload delivered when a <see cref="FusionDropDownList"/> selection changes.
     /// </summary>
+    /// <remarks>
+    /// Access properties in conditions: <c>p.When(args, x =&gt; x.Value).Eq("US")</c>.
+    /// </remarks>
     public class FusionDropDownListChangeArgs
     {
-        /// <summary>The selected value.</summary>
+        /// <summary>Gets or sets the selected value.</summary>
         public string? Value { get; set; }
 
-        /// <summary>True if the change was triggered by user interaction.</summary>
+        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
 
+        /// <summary>
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// </summary>
         public FusionDropDownListChangeArgs() { }
     }
 }

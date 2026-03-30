@@ -21,10 +21,10 @@
         <native-heading level="H2">Resident Stay Dates</native-heading>
         <form id="date-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Required().Label("Admission Date"))
-                .DatePicker(b => b
+                .FusionDatePicker(b => b
                     .Placeholder("Select admission date")); }
             @{ Html.InputField(plan, m => m.DischargeDate, o => o.Required().Label("Discharge Date"))
-                .DatePicker(b => b
+                .FusionDatePicker(b => b
                     .Placeholder("Select discharge date")); }
         </form>
         @(Html.NativeButton("validate-dates-btn", "Validate Dates")

@@ -2,10 +2,10 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
 /// Exercises FusionFileUpload vertical slice end-to-end in the browser:
-/// Syncfusion Uploader in form mode (no auto-upload), FormData POST transport,
+/// FusionFileUpload in form mode (no auto-upload), FormData POST transport,
 /// and server echo proving files survive the gather + multipart transport.
 ///
-/// Page under test: /Sandbox/Components/FileUpload
+/// Page under test: /Sandbox/Components/FusionFileUpload
 ///
 /// Senior living domain: resident document uploads (medical records, photos, consent forms).
 ///

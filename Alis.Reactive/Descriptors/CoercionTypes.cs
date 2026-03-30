@@ -3,15 +3,31 @@ using System.Collections.Generic;
 
 namespace Alis.Reactive.Descriptors
 {
+    /// <summary>
+    /// Constants and inference logic for the <c>coerce</c> field in the JSON plan.
+    /// The runtime uses coercion to convert string values to the correct JavaScript type.
+    /// </summary>
     public static class CoercionTypes
     {
+        /// <summary>Coerce to JavaScript string.</summary>
         public const string String = "string";
+        /// <summary>Coerce to JavaScript number.</summary>
         public const string Number = "number";
+        /// <summary>Coerce to JavaScript boolean.</summary>
         public const string Boolean = "boolean";
+        /// <summary>Coerce to JavaScript Date.</summary>
         public const string Date = "date";
+        /// <summary>Pass the value through without coercion.</summary>
         public const string Raw = "raw";
+        /// <summary>Coerce to JavaScript array.</summary>
         public const string Array = "array";
 
+        /// <summary>
+        /// Infers the coercion type from a .NET <see cref="Type"/>.
+        /// Maps CLR primitives to their JavaScript equivalents.
+        /// </summary>
+        /// <param name="type">The .NET type to infer coercion for.</param>
+        /// <returns>One of the coercion type constants.</returns>
         public static string InferFromType(Type type)
         {
             var underlying = Nullable.GetUnderlyingType(type) ?? type;

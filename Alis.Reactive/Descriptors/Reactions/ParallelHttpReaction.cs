@@ -18,7 +18,11 @@ namespace Alis.Reactive.Descriptors.Reactions
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<Command>? OnAllSettled { get; }
 
-        public ParallelHttpReaction(
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ParallelHttpReaction(
             List<Command>? preFetch,
             List<RequestDescriptor> requests,
             List<Command>? onAllSettled = null)

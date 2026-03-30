@@ -25,7 +25,11 @@ namespace Alis.Reactive.Descriptors.Triggers
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? EventType { get; }
 
-        public ServerPushTrigger(string url, string? eventType = null)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ServerPushTrigger(string url, string? eventType = null)
         {
             if (string.IsNullOrWhiteSpace(url))
                 throw new System.ArgumentException("url is required", nameof(url));

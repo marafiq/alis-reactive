@@ -13,7 +13,11 @@ namespace Alis.Reactive.Descriptors.Commands
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object? Payload { get; }
 
-        public DispatchCommand(string @event, object? payload = null, Guard? when = null)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal DispatchCommand(string @event, object? payload = null, Guard? when = null)
             : base(when)
         {
             Event = @event;

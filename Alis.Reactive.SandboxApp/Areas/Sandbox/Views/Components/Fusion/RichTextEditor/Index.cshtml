@@ -35,7 +35,7 @@
         </p>
         <div class="grid grid-cols-1 gap-4">
             @{ Html.InputField(plan, m => m.CarePlan, o => o.Label("Care Plan"))
-                .RichTextEditor(b => b
+                .FusionRichTextEditor(b => b
                     .Placeholder("Enter care plan notes...")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {

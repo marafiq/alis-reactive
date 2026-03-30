@@ -19,13 +19,13 @@ namespace Alis.Reactive.Native.Components
 
         internal static NativeActionLinkContract CreateContract<TModel>(
             string href,
-            Action<PipelineBuilder<TModel>> configure)
+            Action<PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var pipeline = new PipelineBuilder<TModel>();
-            configure(pipeline);
+            var pb = new PipelineBuilder<TModel>();
+            pipeline(pb);
 
-            var reaction = pipeline.BuildReaction();
+            var reaction = pb.BuildReaction();
             var state = new RequestProjectionState();
             var projectedReaction = ProjectReaction(reaction, href, state);
             if (state.RequestCount != 1)

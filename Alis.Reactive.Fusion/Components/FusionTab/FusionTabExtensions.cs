@@ -3,9 +3,17 @@ using Alis.Reactive.Descriptors.Mutations;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Mutation extensions for FusionTab — Select, HideTab, SetSelectedItem.
-    /// Non-input component: no Value() read, no SetValue.
+    /// Mutation extensions for <see cref="FusionTab"/> in a reactive pipeline.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// <c>p.Component&lt;FusionTab&gt;("my-tabs").Select(1)</c>.
+    /// </para>
+    /// <para>
+    /// Non-input component: no <c>Value()</c> read or <c>SetValue()</c>.
+    /// </para>
+    /// </remarks>
     public static class FusionTabExtensions
     {
         /// <summary>

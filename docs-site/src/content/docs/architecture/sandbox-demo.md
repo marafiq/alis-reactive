@@ -158,7 +158,7 @@ Each section tests one capability. Include echo `<span>` elements for every valu
         </p>
 
         @{ Html.InputField(plan, m => m.Category, o => o.Label("Category"))
-            .DropDownList(b => b
+            .FusionDropDownList(b => b
                 .DataSource(categories)
                 .Placeholder("Select a category")); }
 

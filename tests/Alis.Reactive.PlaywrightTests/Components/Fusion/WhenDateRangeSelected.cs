@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/DateRangePicker
 ///
-/// Syncfusion DateRangePicker renders an input element inside a wrapper span.
+/// FusionDateRangePicker renders an input element inside a wrapper span.
 /// The wrapper element gets the IdGenerator-based ID. Tests use
 /// DateRangePickerLocator to interact via real browser gestures (calendar
 /// popup clicks and Apply button) rather than ej2 instance manipulation.

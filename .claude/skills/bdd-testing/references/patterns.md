@@ -17,15 +17,24 @@
 
 ```
 tests/Alis.Reactive.PlaywrightTests/
-├── ValidationContract/
-│   ├── WhenValidatingAllFieldsOnOnePage.cs          → /Sandbox/ValidationContract
-│   ├── WhenValidatingWithConditionalVisibility.cs   → /Sandbox/ValidationContract/ConditionalHide
-│   ├── WhenValidatingWithServerPartials.cs           → /Sandbox/ValidationContract/ServerPartial
-│   └── WhenValidatingWithAjaxPartials.cs             → /Sandbox/ValidationContract/AjaxPartial
+├── AllModulesTogether/
+│   ├── Cascading/
+│   ├── CrossVendor/
+│   ├── FormPatterns/
+│   ├── ReactiveWiring/
+│   └── Workflows/
 ├── Components/
-│   ├── Native/
-│   └── Fusion/
-└── Events/
+│   ├── AppLevel/
+│   ├── Fusion/
+│   └── Native/
+├── Conditions/
+│   └── WithComponents/
+├── CoreBehaviors/
+├── HttpPipeline/
+│   └── RealTime/
+└── Validation/
+    ├── Contract/
+    └── Rules/
 ```
 
 Each fixture has:
@@ -35,6 +44,10 @@ Each fixture has:
 - No shared state between fixtures
 
 ```csharp
+// NOTE: This pattern uses hardcoded IDs and string-based locators (legacy).
+// New tests should prefer PagePlan<TModel> for compile-time safety.
+// The codebase is mid-migration; both patterns coexist.
+
 [TestFixture]
 public class WhenValidatingResidentAdmission : PlaywrightTestBase
 {
@@ -43,7 +56,7 @@ public class WhenValidatingResidentAdmission : PlaywrightTestBase
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator ErrorFor(string field) => Page.Locator($"#resident-form span[data-valmsg-for='{field}']");
-    private ILocator SummaryDiv => Page.Locator("[data-alis-validation-summary]");
+    private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
     private ILocator Input(string suffix) => Page.Locator($"#{R}{suffix}");
     private ILocator Result => Page.Locator("#result");
 }
@@ -187,7 +200,7 @@ const desc = { formId: "form", fields: [...] };
 ```
 
 Required DOM elements:
-- Summary div: `data-alis-validation-summary="{planId}"`
+- Summary div: `data-reactive-validation-summary="{planId}"`
 - Form: `id` matches descriptor's `formId`
 - Error spans: `data-valmsg-for="{fieldName}"`
 - Hidden sections: `hidden` attribute

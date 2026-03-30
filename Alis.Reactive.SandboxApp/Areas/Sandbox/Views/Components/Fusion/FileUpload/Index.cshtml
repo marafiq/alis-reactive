@@ -33,7 +33,7 @@
                     .Placeholder("Enter resident name")
                     .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
             @{ Html.InputField(plan, m => m.Documents, o => o.Required().Label("Documents"))
-                .FileUpload(b => b.AllowedExtensions(".pdf,.jpg,.png,.txt").Multiple(true)); }
+                .FusionFileUpload(b => b.AllowedExtensions(".pdf,.jpg,.png,.txt").Multiple(true)); }
         </form>
     </native-card-body></native-card>
 

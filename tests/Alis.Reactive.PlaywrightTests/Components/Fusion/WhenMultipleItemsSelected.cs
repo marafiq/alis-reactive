@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 ///
 /// Page under test: /Sandbox/Components/MultiSelect
 ///
-/// Syncfusion MultiSelect renders an input element inside a wrapper div.
+/// FusionMultiSelect renders an input element inside a wrapper div.
 /// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
 /// SF MultiSelect uses array-based values (unlike DropDownList which uses scalar values).
 /// Pre-selection is done via SF builder Value() at render time, not via DomReady SetValue.

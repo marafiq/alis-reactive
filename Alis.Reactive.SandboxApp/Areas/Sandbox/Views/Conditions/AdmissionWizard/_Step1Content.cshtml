@@ -18,7 +18,7 @@
             .NativeTextBox(b => b.Placeholder("Full name")); }
 
         @{ Html.InputField(plan, m => m.Age, o => o.Required().Label("Age"))
-            .NumericTextBox(b => b
+            .FusionNumericTextBox(b => b
                 .Min(0).Max(120).Step(1)
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
@@ -33,9 +33,9 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.PrimaryDiagnosis, o => o.Required().Label("Primary Diagnosis"))
-            .DropDownList(b => b.DataSource(diagnoses).Placeholder("Select diagnosis")); }
+            .FusionDropDownList(b => b.DataSource(diagnoses).Placeholder("Select diagnosis")); }
         @{ Html.InputField(plan, m => m.AttendingPhysician, o => o.Label("Attending Physician"))
-            .AutoComplete(b => b.Placeholder("Type to search...").DebounceDelay(300)
+            .FusionAutoComplete(b => b.Placeholder("Type to search...").DebounceDelay(300)
                 .Reactive(plan, evt => evt.Filtering, (args, p) =>
                 {
                     args.PreventDefault(p);
@@ -47,9 +47,9 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.RiskTier, o => o.Label("Risk Tier (auto)"))
-            .DropDownList(b => b.DataSource(new[] { "", "Low", "Standard", "High" }).Placeholder("Set by age")); }
+            .FusionDropDownList(b => b.DataSource(new[] { "", "Low", "Standard", "High" }).Placeholder("Set by age")); }
         @{ Html.InputField(plan, m => m.IsVeteran, o => o.Label("Is Veteran"))
-            .Switch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
+            .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
             {
                 var sw = p.Component<FusionSwitch>(m => m.IsVeteran);
                 p.When(sw.Value()).Truthy()
@@ -65,7 +65,7 @@
             @{ Html.InputField(plan, m => m.VaId, o => o.Label("VA ID"))
                 .NativeTextBox(b => b.Placeholder("e.g. VA-12345")); }
             @{ Html.InputField(plan, m => m.ServiceBranch, o => o.Label("Service Branch"))
-                .DropDownList(b => b.DataSource(serviceBranches).Placeholder("Select branch")); }
+                .FusionDropDownList(b => b.DataSource(serviceBranches).Placeholder("Select branch")); }
         </div>
     </div>
 

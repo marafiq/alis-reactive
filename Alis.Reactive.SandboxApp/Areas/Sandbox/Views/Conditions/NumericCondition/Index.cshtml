@@ -38,7 +38,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.HeartRate, o => o.Label("Heart Rate (bpm)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -94,7 +94,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.BloodPressure, o => o.Label("Systolic BP (mmHg)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1)
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -126,7 +126,7 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.ThresholdValue, o => o.Label("Threshold (bpm)"))
-                .NumericTextBox(b => b
+                .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1)); }
         </div>
         <div class="mt-3">

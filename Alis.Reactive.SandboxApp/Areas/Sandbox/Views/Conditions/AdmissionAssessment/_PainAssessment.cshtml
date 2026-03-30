@@ -15,7 +15,7 @@
     <!-- Row 1: Pain Level + Pain Location -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.PainLevel, o => o.Label("Pain Level (0-10)"))
-            .NumericTextBox(b => b
+            .FusionNumericTextBox(b => b
                 .Min(0).Max(10).Step(1)
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {

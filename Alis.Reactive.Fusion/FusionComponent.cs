@@ -1,11 +1,13 @@
 namespace Alis.Reactive.Fusion
 {
     /// <summary>
-    /// Base marker for all Syncfusion-backed components.
-    /// Phantom type — sealed subclasses carry zero state.
-    /// Used as generic type parameter in p.Component&lt;T&gt;() to constrain
-    /// which extension methods (vertical slice) are available.
+    /// Base type for all Syncfusion-backed components.
     /// </summary>
+    /// <remarks>
+    /// Sealed subclasses (e.g. <see cref="Components.FusionDropDownList"/>,
+    /// <see cref="Components.FusionDatePicker"/>) serve as type parameters in
+    /// <c>p.Component&lt;T&gt;()</c> to scope which extension methods are available.
+    /// </remarks>
     public abstract class FusionComponent : IComponent
     {
         /// <inheritdoc />

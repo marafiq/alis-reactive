@@ -1,10 +1,14 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Native HTML checkbox list — multi-select sibling of NativeRadioGroup.
-    /// Phantom type — constrains which vertical slice extensions are available.
-    /// Canonical element is the container div. Its .value (set by checklist.ts) holds a string[].
+    /// A native HTML checkbox list for multi-select scenarios.
     /// </summary>
+    /// <remarks>
+    /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the
+    /// <c>.NativeCheckList()</c> factory to create a model-bound checkbox list with
+    /// label, validation, and reactive event support. The container element holds
+    /// the selected values as a <c>string[]</c>.
+    /// </remarks>
     public sealed class NativeCheckList : NativeComponent, IInputComponent
     {
         /// <inheritdoc />

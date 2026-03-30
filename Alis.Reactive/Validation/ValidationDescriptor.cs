@@ -17,7 +17,11 @@ namespace Alis.Reactive.Validation
 
         public List<ValidationField> Fields { get; }
 
-        public ValidationDescriptor(string formId, List<ValidationField> fields)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ValidationDescriptor(string formId, List<ValidationField> fields)
         {
             FormId = formId;
             Fields = fields;

@@ -1,12 +1,16 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionNumericTextBox.Blur (SF "blur" event).
-    /// Blur carries no data payload — this class is an empty marker
-    /// used by the generic inference chain in .Reactive().
+    /// Event payload delivered when a <see cref="FusionNumericTextBox"/> loses focus.
     /// </summary>
+    /// <remarks>
+    /// Blur carries no data. Use for triggering side effects on focus loss.
+    /// </remarks>
     public class FusionNumericTextBoxBlurArgs
     {
+        /// <summary>
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// </summary>
         public FusionNumericTextBoxBlurArgs() { }
     }
 }

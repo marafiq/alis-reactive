@@ -15,7 +15,7 @@
     <!-- Row 1: Caused Injury -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @{ Html.InputField(plan, m => m.CausedInjury, o => o.Label("Caused Injury"))
-            .Switch(b => b
+            .FusionSwitch(b => b
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var sw = p.Component<FusionSwitch>(m => m.CausedInjury);
@@ -29,7 +29,7 @@
     <div id="injury-details" hidden>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.InjuryType, o => o.Label("Injury Type"))
-                .DropDownList(b => b
+                .FusionDropDownList(b => b
                     .DataSource(new[] { "Bruise", "Fracture", "Laceration", "Head Injury", "Other" })
                     .Placeholder("Select injury type")
                     .Reactive(plan, evt => evt.Changed, (args, p) =>

@@ -49,7 +49,11 @@ namespace Alis.Reactive.Descriptors.Requests
             Validation = resolved;
         }
 
-        public RequestDescriptor(
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal RequestDescriptor(
             string verb,
             string url,
             List<GatherItem>? gather = null,

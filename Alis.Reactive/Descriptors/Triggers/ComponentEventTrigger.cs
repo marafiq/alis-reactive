@@ -36,7 +36,11 @@ namespace Alis.Reactive.Descriptors.Triggers
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? ReadExpr { get; }
 
-        public ComponentEventTrigger(string componentId, string jsEvent, string vendor, string? bindingPath = null, string? readExpr = null)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
+        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// </summary>
+        internal ComponentEventTrigger(string componentId, string jsEvent, string vendor, string? bindingPath = null, string? readExpr = null)
         {
             ComponentId = componentId;
             JsEvent = jsEvent;
