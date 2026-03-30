@@ -91,6 +91,7 @@ If touching an unexpected layer, the plan or task is wrong. Stop, save learnings
 - [ ] Each boundary crossing driven by a failing test?
 - [ ] Root cause fixed, not a patch? No code smells?
 - [ ] Output evidence: what proves this change is correct?
+- [ ] Coverage matrix: every item in scope mapped to a test or justified as untestable?
 
 ## Rules
 
