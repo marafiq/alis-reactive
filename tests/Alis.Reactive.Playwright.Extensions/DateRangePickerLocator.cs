@@ -64,7 +64,7 @@ public sealed class DateRangePickerLocator
     /// <summary>Click and fill the input with a date range value.</summary>
     public async Task Fill(string dateRangeText)
     {
-        await Input.ClickAsync();
+        await Input.ClickWhenStableAsync(_page);
         await Input.PressAsync("Meta+a");
         await Input.PressSequentiallyAsync(dateRangeText, new() { Delay = 30 });
     }
@@ -72,13 +72,13 @@ public sealed class DateRangePickerLocator
     /// <summary>Click, select all, and delete.</summary>
     public async Task Clear()
     {
-        await Input.ClickAsync();
+        await Input.ClickWhenStableAsync(_page);
         await Input.PressAsync("Meta+a");
         await Input.PressAsync("Backspace");
     }
 
     /// <summary>Click the input to focus it.</summary>
-    public async Task Focus() => await Input.ClickAsync();
+    public async Task Focus() => await Input.ClickWhenStableAsync(_page);
 
     /// <summary>Press Tab to leave the field.</summary>
     public async Task Blur() => await Input.PressAsync("Tab");
@@ -102,14 +102,14 @@ public sealed class DateRangePickerLocator
     public async Task SelectRange(int startYear, int startMonth, int startDay,
         int endYear, int endMonth, int endDay)
     {
-        await RangeIcon.ClickAsync();
+        await RangeIcon.ClickWhenStableAsync(_page);
         await RangePopup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
 
         // Navigate left calendar to start month and click start day
         await NavigateCalendarToMonth(LeftCalendar, startYear, startMonth);
         await LeftCalendar
             .Locator($"td.e-cell:not(.e-other-month) span.e-day:text-is(\"{startDay}\")")
-            .ClickAsync();
+            .ClickWhenStableAsync(_page);
 
         // After clicking start date, determine where to click end date.
         // The right calendar always shows left + 1 month.
@@ -122,14 +122,14 @@ public sealed class DateRangePickerLocator
             // Same month — end day is also in left calendar
             await LeftCalendar
                 .Locator($"td.e-cell:not(.e-other-month) span.e-day:text-is(\"{endDay}\")")
-                .ClickAsync();
+                .ClickWhenStableAsync(_page);
         }
         else if (endTarget == startTarget.AddMonths(1))
         {
             // End is in the right calendar (left + 1)
             await RightCalendar
                 .Locator($"td.e-cell:not(.e-other-month) span.e-day:text-is(\"{endDay}\")")
-                .ClickAsync();
+                .ClickWhenStableAsync(_page);
         }
         else
         {
@@ -138,11 +138,11 @@ public sealed class DateRangePickerLocator
                 endTarget.AddMonths(-1).Month);
             await RightCalendar
                 .Locator($"td.e-cell:not(.e-other-month) span.e-day:text-is(\"{endDay}\")")
-                .ClickAsync();
+                .ClickWhenStableAsync(_page);
         }
 
         // Click Apply to confirm the range selection
-        await ApplyButton.ClickAsync();
+        await ApplyButton.ClickWhenStableAsync(_page);
     }
 
     // ─── Private Helpers ───
@@ -151,10 +151,11 @@ public sealed class DateRangePickerLocator
     private async Task NavigateCalendarToMonth(ILocator calendar, int targetYear, int targetMonth)
     {
         var target = new DateTime(targetYear, targetMonth, 1);
+        var title = calendar.Locator(".e-title");
 
         for (var i = 0; i < 24; i++) // max 2 years of navigation
         {
-            var titleText = await calendar.Locator(".e-title").TextContentAsync() ?? "";
+            var titleText = await title.TextContentAsync() ?? "";
 
             if (DateTime.TryParseExact(titleText.Trim(), "MMMM yyyy",
                     CultureInfo.InvariantCulture, DateTimeStyles.None, out var current))
@@ -164,12 +165,27 @@ public sealed class DateRangePickerLocator
                     return;
 
                 if (target < currentMonth)
-                    await calendar.Locator(".e-prev").ClickAsync();
+                    await calendar.Locator(".e-prev").ClickWhenStableAsync(_page);
                 else
-                    await calendar.Locator(".e-next").ClickAsync();
+                    await calendar.Locator(".e-next").ClickWhenStableAsync(_page);
 
-                await _page.WaitForTimeoutAsync(100); // allow calendar animation
+                await WaitForTitleChange(title, titleText.Trim());
             }
         }
+    }
+
+    private static async Task WaitForTitleChange(ILocator title, string previousText, int timeoutMs = 5000)
+    {
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+        while (DateTime.UtcNow < deadline)
+        {
+            var currentText = (await title.TextContentAsync())?.Trim();
+            if (!string.Equals(currentText, previousText, StringComparison.Ordinal))
+                return;
+
+            await Task.Delay(50);
+        }
+
+        throw new TimeoutException($"Calendar title did not change from '{previousText}' within {timeoutMs}ms.");
     }
 }

@@ -51,7 +51,7 @@ public sealed class TimePickerLocator
     /// <summary>Click and fill the input with a time value.</summary>
     public async Task Fill(string timeText)
     {
-        await Input.ClickAsync();
+        await Input.ClickWhenStableAsync(_page);
         await Input.PressAsync("Meta+a");
         await Input.PressSequentiallyAsync(timeText, new() { Delay = 30 });
     }
@@ -59,13 +59,13 @@ public sealed class TimePickerLocator
     /// <summary>Click, select all, and delete.</summary>
     public async Task Clear()
     {
-        await Input.ClickAsync();
+        await Input.ClickWhenStableAsync(_page);
         await Input.PressAsync("Meta+a");
         await Input.PressAsync("Backspace");
     }
 
     /// <summary>Click the input to focus it.</summary>
-    public async Task Focus() => await Input.ClickAsync();
+    public async Task Focus() => await Input.ClickWhenStableAsync(_page);
 
     /// <summary>Press Tab to leave the field.</summary>
     public async Task Blur() => await Input.PressAsync("Tab");
@@ -82,10 +82,10 @@ public sealed class TimePickerLocator
     /// Time items use 30-minute intervals (e.g., "8:00 AM", "8:30 AM", ..., "11:30 PM").</summary>
     public async Task SelectTime(string timeText)
     {
-        await ClockIcon.ClickAsync();
+        await ClockIcon.ClickWhenStableAsync(_page);
         await TimePopup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
 
         var item = TimePopup.Locator($".e-list-item[data-value='{timeText}']");
-        await item.ClickAsync();
+        await item.ClickWhenStableAsync(_page);
     }
 }

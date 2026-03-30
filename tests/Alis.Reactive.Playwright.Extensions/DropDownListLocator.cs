@@ -48,7 +48,7 @@ public sealed class DropDownListLocator
         // Clear stale focus from any prior DDL — prevents keyboard events going to wrong popup
         await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
 
-        await DropdownIcon.ClickAsync();
+        await DropdownIcon.ClickWhenStableAsync(_page);
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
 
         // Navigate with ArrowDown until the highlighted item matches the target text
@@ -62,11 +62,13 @@ public sealed class DropDownListLocator
             if (activeText?.Trim() == text)
             {
                 await _page.Keyboard.PressAsync("Enter");
+                await Popup.WaitForAsync(new() { State = WaitForSelectorState.Hidden, Timeout = 5000 });
                 return;
             }
         }
 
         // Fallback: if exact match not found, just press Enter on whatever is highlighted
         await _page.Keyboard.PressAsync("Enter");
+        await Popup.WaitForAsync(new() { State = WaitForSelectorState.Hidden, Timeout = 5000 });
     }
 }

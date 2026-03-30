@@ -89,7 +89,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     private async Task SubmitJsonAndWaitForEcho()
     {
         await Page.RunAndWaitForRequestAsync(
-            async () => await Page.Locator("#submit-json-btn").ClickAsync(),
+            async () => await ClickWhenStable(Page.Locator("#submit-json-btn")),
             "**/AllModulesTogether/ComponentGather/EchoJson");
         // Wait for the echo response to populate
         await Expect(Page.Locator("#echo-resident-name"))
@@ -99,7 +99,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     private async Task SubmitFormDataAndWaitForEcho()
     {
         await Page.RunAndWaitForRequestAsync(
-            async () => await Page.Locator("#submit-form-btn").ClickAsync(),
+            async () => await ClickWhenStable(Page.Locator("#submit-form-btn")),
             "**/AllModulesTogether/ComponentGather/EchoFormData");
         // Wait for the echo response to populate
         await Expect(Page.Locator("#echo-resident-name"))

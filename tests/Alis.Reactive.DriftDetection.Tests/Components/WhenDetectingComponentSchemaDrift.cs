@@ -25,9 +25,9 @@ public class WhenDetectingComponentSchemaDrift : DriftTestBase
     [Test]
     public void fusion_component_entry_conforms()
     {
-        // Fusion component registration requires Syncfusion EJS infrastructure
-        // not available in drift detection tests. NativeTextBox tests above cover
-        // the ComponentEntry schema shape — vendor="fusion" is the only difference.
+        // Fusion component registration requires Syncfusion's EJS() helper, which needs
+        // a real MVC service context. The minimal TestHtmlHelper intentionally does not
+        // provide that infrastructure, so this public path cannot be exercised here.
         Assert.Inconclusive(
             "Fusion component registration requires Syncfusion EJS infrastructure " +
             "not available in drift detection tests.");

@@ -10,13 +10,17 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
     {
         // RequestDescriptor: verb, url (+ 7 optional properties)
         // Minimal GET exercises only required properties.
+        AssertDefinitionPropertiesExactly("RequestDescriptor",
+            "verb", "url", "gather", "contentType", "whileLoading",
+            "onSuccess", "onError", "chained", "validation");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
             p.Get("/api/residents")));
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        AssertPropertiesPresent(json, "entries[0].reaction.request",
+        AssertPropertiesExactly(json, "entries[0].reaction.request",
             "verb", "url");
     }
 
@@ -27,6 +31,10 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
         //   onSuccess, onError, chained, validation
         // Exercises 8 of 9 properties. 'validation' requires a registered
         // IValidationExtractor and is tested in the Validation test file.
+        AssertDefinitionPropertiesExactly("RequestDescriptor",
+            "verb", "url", "gather", "contentType", "whileLoading",
+            "onSuccess", "onError", "chained", "validation");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("submit-form", p =>
         {
@@ -50,7 +58,7 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
 
         // AssertAllPropertiesPresent not used: 'validation' requires IValidationExtractor
         // infrastructure tested separately in WhenDetectingValidationSchemaDrift.
-        AssertPropertiesPresent(json, "entries[0].reaction.request",
+        AssertPropertiesExactly(json, "entries[0].reaction.request",
             "verb", "url", "gather", "contentType", "whileLoading",
             "onSuccess", "onError", "chained");
     }
@@ -59,13 +67,17 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
     public void put_request_conforms()
     {
         // RequestDescriptor: verb, url, gather (minimal PUT with gather)
+        AssertDefinitionPropertiesExactly("RequestDescriptor",
+            "verb", "url", "gather", "contentType", "whileLoading",
+            "onSuccess", "onError", "chained", "validation");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("update-resident", p =>
             p.Put("/api/residents/42", g => g.IncludeAll())));
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        AssertPropertiesPresent(json, "entries[0].reaction.request",
+        AssertPropertiesExactly(json, "entries[0].reaction.request",
             "verb", "url", "gather");
     }
 
@@ -73,13 +85,17 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
     public void delete_request_conforms()
     {
         // RequestDescriptor: verb, url (minimal DELETE)
+        AssertDefinitionPropertiesExactly("RequestDescriptor",
+            "verb", "url", "gather", "contentType", "whileLoading",
+            "onSuccess", "onError", "chained", "validation");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("remove-resident", p =>
             p.Delete("/api/residents/42")));
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        AssertPropertiesPresent(json, "entries[0].reaction.request",
+        AssertPropertiesExactly(json, "entries[0].reaction.request",
             "verb", "url");
     }
 
@@ -87,6 +103,10 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
     public void form_data_content_type_conforms()
     {
         // RequestDescriptor: contentType property
+        AssertDefinitionPropertiesExactly("RequestDescriptor",
+            "verb", "url", "gather", "contentType", "whileLoading",
+            "onSuccess", "onError", "chained", "validation");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("upload", p =>
             p.Post("/api/documents/upload", g => g.IncludeAll())
@@ -94,7 +114,7 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        AssertPropertiesPresent(json, "entries[0].reaction.request",
+        AssertPropertiesExactly(json, "entries[0].reaction.request",
             "verb", "url", "gather", "contentType");
     }
 
@@ -102,6 +122,10 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
     public void while_loading_conforms()
     {
         // RequestDescriptor: whileLoading property
+        AssertDefinitionPropertiesExactly("RequestDescriptor",
+            "verb", "url", "gather", "contentType", "whileLoading",
+            "onSuccess", "onError", "chained", "validation");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("fetch", p =>
         {
@@ -111,7 +135,7 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        AssertPropertiesPresent(json, "entries[0].reaction.request",
+        AssertPropertiesExactly(json, "entries[0].reaction.request",
             "verb", "url", "whileLoading");
     }
 
@@ -119,6 +143,8 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
     public void success_handler_with_commands_conforms()
     {
         // StatusHandler with commands (sequential handler): statusCode, commands
+        AssertDefinitionPropertiesExactly("StatusHandler", "statusCode", "commands", "reaction");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("save", p =>
         {
@@ -135,7 +161,7 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
 
         // StatusHandler: commands variant (mutually exclusive with reaction).
         // OnSuccess without status code omits statusCode from JSON.
-        AssertPropertiesPresent(json,
+        AssertPropertiesExactly(json,
             "entries[0].reaction.request.onSuccess[0]",
             "commands");
     }
@@ -144,6 +170,8 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
     public void success_handler_with_reaction_conforms()
     {
         // StatusHandler with reaction (conditional handler inside response)
+        AssertDefinitionPropertiesExactly("StatusHandler", "statusCode", "commands", "reaction");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("save", (args, p) =>
         {
@@ -160,7 +188,7 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
         AssertSchemaValid(json);
 
         // StatusHandler: reaction variant (mutually exclusive with commands).
-        AssertPropertiesPresent(json,
+        AssertPropertiesExactly(json,
             "entries[0].reaction.request.onSuccess[0]",
             "reaction");
     }
@@ -169,6 +197,8 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
     public void error_handler_with_status_code_conforms()
     {
         // StatusHandler with statusCode + commands
+        AssertDefinitionPropertiesExactly("StatusHandler", "statusCode", "commands", "reaction");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("save", p =>
         {
@@ -184,7 +214,7 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
         AssertSchemaValid(json);
 
         // StatusHandler: statusCode + commands variant.
-        AssertPropertiesPresent(json,
+        AssertPropertiesExactly(json,
             "entries[0].reaction.request.onError[0]",
             "statusCode", "commands");
     }
@@ -193,6 +223,10 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
     public void chained_request_conforms()
     {
         // RequestDescriptor: chained property (nested RequestDescriptor)
+        AssertDefinitionPropertiesExactly("RequestDescriptor",
+            "verb", "url", "gather", "contentType", "whileLoading",
+            "onSuccess", "onError", "chained", "validation");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("save-and-load", p =>
         {
@@ -207,10 +241,10 @@ public class WhenDetectingRequestSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        AssertPropertiesPresent(json, "entries[0].reaction.request",
+        AssertPropertiesExactly(json, "entries[0].reaction.request",
             "verb", "url", "gather", "onSuccess", "chained");
         // Chained is itself a RequestDescriptor
-        AssertPropertiesPresent(json, "entries[0].reaction.request.chained",
+        AssertPropertiesExactly(json, "entries[0].reaction.request.chained",
             "verb", "url", "onSuccess");
     }
 }

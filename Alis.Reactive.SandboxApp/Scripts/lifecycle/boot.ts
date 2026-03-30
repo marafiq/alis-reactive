@@ -19,6 +19,7 @@ import {
 } from "./merge-plan";
 
 const log = scope("boot");
+const BOOTED_ATTR = "alisBooted";
 
 let bootAbort = new AbortController();
 
@@ -30,6 +31,7 @@ export function boot(plan: Plan): void {
   wireEntries(plan.entries, plan.components, bootAbort.signal);
 
   registerBootedPlan(plan);
+  document.documentElement.dataset[BOOTED_ATTR] = "true";
   log.info("booted");
 }
 
@@ -68,6 +70,7 @@ export function resetBootStateForTests(): void {
   bootAbort.abort();
   bootAbort = new AbortController();
   resetMergePlanState();
+  delete document.documentElement.dataset[BOOTED_ATTR];
 }
 
 export const trace = { setLevel };

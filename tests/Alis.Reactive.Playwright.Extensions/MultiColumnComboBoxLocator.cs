@@ -38,7 +38,7 @@ public sealed class MultiColumnComboBoxLocator
     // ─── Gestures — What the User Does ───
 
     /// <summary>Click the wrapper to focus/open the dropdown.</summary>
-    public async Task Focus() => await Wrapper.ClickAsync();
+    public async Task Focus() => await Wrapper.ClickWhenStableAsync(_page);
 
     /// <summary>
     /// Select by typing text then Enter. SF highlights the match, Enter confirms.
@@ -46,6 +46,7 @@ public sealed class MultiColumnComboBoxLocator
     /// </summary>
     public async Task Select(string text)
     {
+        await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
         await Focus();
         await _page.Keyboard.TypeAsync(text);
         await _page.Keyboard.PressAsync("Enter");

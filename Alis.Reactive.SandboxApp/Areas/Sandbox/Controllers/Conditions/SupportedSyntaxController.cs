@@ -12,7 +12,10 @@ public class SupportedSyntaxController : Controller
     {
         return View("~/Areas/Sandbox/Views/Conditions/SupportedSyntax/Index.cshtml", new SupportedSyntaxModel
         {
-            RiskScore = 0
+            RiskScore = 0,
+            AssessmentScore = 0,
+            SupervisorOverride = false,
+            CareTrack = ""
         });
     }
 }

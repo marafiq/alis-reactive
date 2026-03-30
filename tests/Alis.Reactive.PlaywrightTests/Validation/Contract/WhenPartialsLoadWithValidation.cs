@@ -35,7 +35,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         // Parent fields should show inline errors
         await Expect(ErrorFor("Name")).ToContainTextAsync("required");
@@ -52,7 +52,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         // Address fields from partial should show inline
         await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
@@ -70,7 +70,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         // Parent fields
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
@@ -97,7 +97,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await FillAllRequired();
         await Input("IsVeteran").CheckAsync();
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
         await Expect(SummaryDiv).ToBeHiddenAsync();
@@ -113,7 +113,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await FillAllRequired();
         await Input("Address_ZipCode").FillAsync("abc");
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("5 digits");
         await Expect(SummaryDiv).ToBeHiddenAsync();
@@ -132,7 +132,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await Input("Email").FillAsync("a@b.com");
         await Input("ConfirmEmail").FillAsync("x@y.com");
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
         await Expect(SummaryDiv).ToBeHiddenAsync();
@@ -181,12 +181,15 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         // Trigger partial reactive behavior
-        await Input("Address_ZipCode").FillAsync("90210");
-        await Page.WaitForTimeoutAsync(500);
+        await Input("Address_ZipCode").ClickAsync();
+        await Input("Address_ZipCode").PressSequentiallyAsync("90210");
+        await Page.Keyboard.PressAsync("Tab");
+        await Expect(Page.Locator("#zipcode-status"))
+            .ToContainTextAsync("Zip validated", new() { Timeout = 5000 });
 
         // Then submit form — validation should work normally
         await FillAllRequired();
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         var result = Page.Locator("#result");
         await Expect(result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
@@ -202,14 +205,14 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         // Submit empty → errors
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // Fill everything
         await FillAllRequired();
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
         await Expect(SummaryDiv).ToBeHiddenAsync();

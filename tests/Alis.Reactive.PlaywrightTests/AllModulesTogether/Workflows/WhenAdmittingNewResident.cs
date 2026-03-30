@@ -17,8 +17,7 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
 
     private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await NavigateToAndWaitForVisibleSignal(Path, "#submit-btn");
         _plan = await PagePlan<BddExperimentModel>.FromPage(Page);
     }
 

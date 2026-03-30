@@ -42,7 +42,7 @@ public sealed class RichTextEditorLocator
     // ─── Gestures — What the User Does ───
 
     /// <summary>Click the editor to focus it.</summary>
-    public async Task Focus() => await Editor.ClickAsync();
+    public async Task Focus() => await Editor.ClickWhenStableAsync(_page);
 
     /// <summary>Select all existing content and type new text.</summary>
     public async Task Fill(string text)

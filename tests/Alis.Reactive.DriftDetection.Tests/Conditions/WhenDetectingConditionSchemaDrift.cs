@@ -12,6 +12,9 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
     {
         // ValueGuard properties exercised: kind, source, coerceAs, op, operand
         // rightSource and elementCoerceAs are mutually exclusive alternatives tested separately
+        AssertDefinitionPropertiesExactly("ValueGuard",
+            "kind", "source", "coerceAs", "op", "operand", "rightSource", "elementCoerceAs");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("check", (args, p) =>
         {
@@ -25,7 +28,7 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
         // AssertAllPropertiesPresent not used: ValueGuard has mutually exclusive
         // optional properties (operand vs rightSource vs elementCoerceAs).
         // This variant exercises: kind, source, coerceAs, op, operand.
-        AssertPropertiesPresent(json, "entries[0].reaction.branches[0].guard",
+        AssertPropertiesExactly(json, "entries[0].reaction.branches[0].guard",
             "kind", "source", "coerceAs", "op", "operand");
     }
 
@@ -33,6 +36,9 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
     public void value_guard_source_vs_source_conforms()
     {
         // ValueGuard with rightSource: kind, source, coerceAs, op, rightSource
+        AssertDefinitionPropertiesExactly("ValueGuard",
+            "kind", "source", "coerceAs", "op", "operand", "rightSource", "elementCoerceAs");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
         {
@@ -50,32 +56,29 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
         AssertSchemaValid(json);
 
         // This variant exercises: kind, source, coerceAs, op, rightSource.
-        AssertPropertiesPresent(json, "entries[0].reaction.branches[0].guard",
+        AssertPropertiesExactly(json, "entries[0].reaction.branches[0].guard",
             "kind", "source", "coerceAs", "op", "rightSource");
     }
 
     [Test]
     public void value_guard_with_element_coerce_conforms()
     {
-        // ValueGuard with elementCoerceAs: requires array-typed model property.
-        // ResidentModel.CareLevel is string (not array), so elementCoerceAs is null.
-        // ArrayContains still exercises the op correctly; elementCoerceAs would need
-        // a List<T> property on the model to produce a non-null value.
+        // ValueGuard with elementCoerceAs: array-typed event payload property.
+        AssertDefinitionPropertiesExactly("ValueGuard",
+            "kind", "source", "coerceAs", "op", "operand", "rightSource", "elementCoerceAs");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("check", (args, p) =>
         {
-            p.When(args, x => x.CareLevel!).ArrayContains("Memory Care")
+            p.When(args, x => x.CareTags!).ArrayContains("Memory Care")
              .Then(tp => tp.Element("found").Show());
         }));
 
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        // elementCoerceAs requires an array-typed property (List<T>) on the model.
-        // CareLevel is string, so elementCoerceAs is null and omitted from JSON.
-        // Asserting the properties this variant does produce.
-        AssertPropertiesPresent(json, "entries[0].reaction.branches[0].guard",
-            "kind", "source", "coerceAs", "op", "operand");
+        AssertPropertiesExactly(json, "entries[0].reaction.branches[0].guard",
+            "kind", "source", "coerceAs", "op", "operand", "elementCoerceAs");
     }
 
     [Test]

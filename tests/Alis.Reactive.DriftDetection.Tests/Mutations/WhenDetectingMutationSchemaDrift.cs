@@ -12,6 +12,8 @@ public class WhenDetectingMutationSchemaDrift : DriftTestBase
     {
         // SetPropMutation: kind, prop, coerce (optional)
         // SetText produces set-prop with prop="textContent", no coerce
+        AssertDefinitionPropertiesExactly("SetPropMutation", "kind", "prop", "coerce");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
             p.Element("welcome").SetText("Hello!")));
@@ -20,7 +22,7 @@ public class WhenDetectingMutationSchemaDrift : DriftTestBase
         AssertSchemaValid(json);
 
         // Minimal: kind + prop. 'coerce' requires a typed component (tested below).
-        AssertPropertiesPresent(json, "entries[0].reaction.commands[0].mutation",
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0].mutation",
             "kind", "prop");
     }
 
@@ -29,6 +31,8 @@ public class WhenDetectingMutationSchemaDrift : DriftTestBase
     {
         // SetPropMutation: kind, prop, coerce
         // FusionNumericTextBox.SetValue produces set-prop with coerce="number"
+        AssertDefinitionPropertiesExactly("SetPropMutation", "kind", "prop", "coerce");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
         {
@@ -47,6 +51,8 @@ public class WhenDetectingMutationSchemaDrift : DriftTestBase
     {
         // CallMutation minimal: kind, method
         // FocusIn produces call with just method="focus" (no chain, no args)
+        AssertDefinitionPropertiesExactly("CallMutation", "kind", "method", "chain", "args");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
         {
@@ -58,7 +64,7 @@ public class WhenDetectingMutationSchemaDrift : DriftTestBase
         AssertSchemaValid(json);
 
         // Minimal: kind + method. chain and args are optional.
-        AssertPropertiesPresent(json, "entries[0].reaction.commands[0].mutation",
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0].mutation",
             "kind", "method");
     }
 
@@ -67,6 +73,8 @@ public class WhenDetectingMutationSchemaDrift : DriftTestBase
     {
         // CallMutation: kind, method, chain, args
         // AddClass produces method="add", chain="classList", args=[LiteralArg]
+        AssertDefinitionPropertiesExactly("CallMutation", "kind", "method", "chain", "args");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
             p.Element("panel").AddClass("active")));

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Alis.Reactive.DriftDetection.Tests.Infrastructure;
+using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.Native.Components;
 using Alis.Reactive.Native.Extensions;
 
@@ -7,22 +9,26 @@ namespace Alis.Reactive.DriftDetection.Tests.Commands;
 [TestFixture]
 public class WhenDetectingCommandSchemaDrift : DriftTestBase
 {
+    private sealed class FilterResultsResponse
+    {
+        public List<string> Items { get; set; } = [];
+    }
+
     [Test]
     public void dispatch_conforms_to_schema()
     {
         // DispatchCommand: kind, event, payload
-        // Payload exercises the optional property.
+        // Minimal variant: no payload.
         AssertDefinitionPropertiesExactly("DispatchCommand", "kind", "event", "payload");
 
         var plan = CreatePlan();
-        On(plan, t => t.DomReady(p =>
-            p.Dispatch("resident-admitted", new { facilityId = "FAC-001" })));
+        On(plan, t => t.DomReady(p => p.Dispatch("resident-admitted")));
 
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        AssertPropertiesPresent(json, "entries[0].reaction.commands[0]",
-            "kind", "event", "payload");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0]",
+            "kind", "event");
     }
 
     [Test]
@@ -37,7 +43,7 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        AssertPropertiesPresent(json, "entries[0].reaction.commands[0]",
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0]",
             "kind", "event", "payload");
     }
 
@@ -55,7 +61,7 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        AssertPropertiesPresent(json, "entries[0].reaction.commands[0]",
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0]",
             "kind", "target", "mutation", "value");
     }
 
@@ -88,13 +94,13 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
         // No single MutateElementCommand carries all 6 properties simultaneously
         // (source and value are mutually exclusive). Verify each across commands.
         // cmd[0] = Component SetValue: vendor, value
-        AssertPropertiesPresent(json, "entries[0].reaction.commands[0]",
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0]",
             "kind", "target", "mutation", "value", "vendor");
         // cmd[1] = SetText from event source
-        AssertPropertiesPresent(json, "entries[0].reaction.commands[1]",
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[1]",
             "kind", "target", "mutation", "source");
         // cmd[2] = SetText with literal value
-        AssertPropertiesPresent(json, "entries[0].reaction.commands[2]",
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[2]",
             "kind", "target", "mutation", "value");
     }
 
@@ -114,14 +120,24 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
     }
 
     [Test]
-    public void mutate_event_with_all_properties_conforms()
+    public void mutate_event_with_publicly_reachable_properties_conforms()
     {
-        // BLOCKED: MutateEventCommand can only be produced through Fusion event arg extensions
-        // (FusionAutoComplete.PreventDefault, FusionAutoComplete.UpdateData) which require
-        // Syncfusion infrastructure not available in TestHtmlHelper.
-        Assert.Inconclusive(
-            "MutateEventCommand requires Fusion component event args (PreventDefault/UpdateData) " +
-            "which need Syncfusion infrastructure not available in drift detection tests.");
+        // MutateEventCommand: kind, mutation, value, source
+        // Public Fusion filtering extensions currently exercise the value variant.
+        AssertDefinitionPropertiesExactly("MutateEventCommand",
+            "kind", "mutation", "value", "source");
+
+        var plan = CreatePlan();
+        On(plan, t => t.CustomEvent("filtering", p =>
+        {
+            var args = new FusionAutoCompleteFilteringArgs();
+            args.PreventDefault(p);
+        }));
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0]",
+            "kind", "mutation", "value");
     }
 
     [Test]
@@ -137,7 +153,7 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        AssertPropertiesPresent(json, "entries[0].reaction.commands[0]",
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0]",
             "kind", "formId");
     }
 
@@ -157,7 +173,7 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        AssertPropertiesPresent(json,
+        AssertPropertiesExactly(json,
             "entries[0].reaction.request.onSuccess[0].commands[0]",
             "kind", "target");
     }
@@ -180,10 +196,23 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
     [Test]
     public void source_arg_conforms()
     {
-        // BLOCKED: SourceArg is produced by FusionAutoComplete.UpdateData and similar
-        // Fusion-only code paths requiring Syncfusion infrastructure.
-        Assert.Inconclusive(
-            "SourceArg requires Fusion component extensions (UpdateData) " +
-            "which need Syncfusion infrastructure not available in drift detection tests.");
+        AssertDefinitionPropertiesExactly("SourceArg", "kind", "source", "coerce");
+
+        var plan = CreatePlan();
+        On(plan, t => t.CustomEvent("filtering", p =>
+        {
+            var args = new FusionAutoCompleteFilteringArgs();
+            p.Get("/api/filter")
+             .Response(r => r.OnSuccess<FilterResultsResponse>((json, s) =>
+             {
+                 args.UpdateData(s, json, x => x.Items);
+             }));
+        }));
+
+        var json = plan.Render();
+        AssertSchemaValid(json);
+        AssertPropertiesExactly(json,
+            "entries[0].reaction.request.onSuccess[0].commands[0].mutation.args[0]",
+            "kind", "source");
     }
 }

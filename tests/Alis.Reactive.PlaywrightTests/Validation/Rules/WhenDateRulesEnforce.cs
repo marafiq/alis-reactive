@@ -27,7 +27,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
         await Expect(ErrorFor("DischargeDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
@@ -44,7 +44,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         // Submit first to trigger validation
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
         // Set date before 2020 using text input instead of calendar navigation.
@@ -53,7 +53,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await DatePicker("AdmissionDate").FillAndBlur("06/15/2019");
 
         // Trigger blur/change re-validation by clicking elsewhere
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("2020", new() { Timeout = 2000 });
 
@@ -67,14 +67,14 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         // Submit first
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
         // Set valid date
         await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
 
         // Re-validate
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         // Admission should pass (but discharge will still fail)
         await Expect(ErrorFor("AdmissionDate")).ToBeHiddenAsync(new() { Timeout = 2000 });
@@ -95,7 +95,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         // Set discharge BEFORE admission (March 10, 2025)
         await DatePicker("DischargeDate").SelectDate(2025, 3, 10);
 
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("DischargeDate")).ToContainTextAsync("after admission", new() { Timeout = 2000 });
 
@@ -112,7 +112,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
         await DatePicker("DischargeDate").SelectDate(2025, 3, 15);
 
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("DischargeDate")).ToContainTextAsync("after admission", new() { Timeout = 2000 });
 
@@ -129,7 +129,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
         await DatePicker("DischargeDate").SelectDate(2025, 3, 20);
 
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(Result).ToContainTextAsync("valid", new() { Timeout = 5000 });
 
@@ -147,7 +147,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await DatePicker("AdmissionDate").SelectDate(2025, 1, 10);
         await DatePicker("DischargeDate").SelectDate(2025, 2, 15);
 
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(Result).ToContainTextAsync("valid", new() { Timeout = 5000 });
 

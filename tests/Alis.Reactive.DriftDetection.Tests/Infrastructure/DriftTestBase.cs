@@ -87,15 +87,7 @@ public abstract class DriftTestBase
         string jsonPath,
         params string[] expectedProperties)
     {
-        using var doc = JsonDocument.Parse(planJson);
-        var element = NavigateToPath(doc.RootElement, jsonPath);
-        var jsonProps = new HashSet<string>();
-
-        if (element.ValueKind == JsonValueKind.Object)
-        {
-            foreach (var prop in element.EnumerateObject())
-                jsonProps.Add(prop.Name);
-        }
+        var jsonProps = GetPropertyNamesAtPath(planJson, jsonPath);
 
         var missing = expectedProperties.Where(p => !jsonProps.Contains(p)).ToList();
 
@@ -103,6 +95,20 @@ public abstract class DriftTestBase
             $"Expected properties not present in JSON at '{jsonPath}': " +
             $"[{string.Join(", ", missing)}]. " +
             $"Actual properties: [{string.Join(", ", jsonProps)}].");
+    }
+
+    protected static void AssertPropertiesExactly(
+        string planJson,
+        string jsonPath,
+        params string[] expectedProperties)
+    {
+        var actual = GetPropertyNamesAtPath(planJson, jsonPath).OrderBy(x => x).ToList();
+        var expected = expectedProperties.OrderBy(x => x).ToList();
+
+        Assert.That(actual, Is.EqualTo(expected),
+            $"JSON properties drifted at '{jsonPath}'. " +
+            $"Expected: [{string.Join(", ", expected)}]. " +
+            $"Actual: [{string.Join(", ", actual)}].");
     }
 
     // ── Helpers ──
@@ -137,6 +143,21 @@ public abstract class DriftTestBase
             }
         }
         return current;
+    }
+
+    private static HashSet<string> GetPropertyNamesAtPath(string planJson, string jsonPath)
+    {
+        using var doc = JsonDocument.Parse(planJson);
+        var element = NavigateToPath(doc.RootElement, jsonPath);
+        var jsonProps = new HashSet<string>();
+
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var prop in element.EnumerateObject())
+                jsonProps.Add(prop.Name);
+        }
+
+        return jsonProps;
     }
 
     private static string FormatSchemaErrors(EvaluationResults result)

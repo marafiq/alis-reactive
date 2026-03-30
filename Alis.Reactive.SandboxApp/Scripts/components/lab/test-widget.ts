@@ -18,7 +18,7 @@ export class TestWidget {
   private _value: string;
   private _items: unknown[];
   private _focused: boolean;
-  private _listeners: Record<string, (...args: unknown[]) => void[]>;
+  private _listeners: Record<string, Array<(...args: unknown[]) => void>>;
 
   constructor(el: HTMLElement) {
     this._el = el;
