@@ -32,7 +32,7 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "Each ResponseBuilder chain should have at most one .Chained() call. Multiple calls silently overwrite — only the last one takes effect.",
-            helpLinkUri: "");
+            helpLinkUri: null);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);

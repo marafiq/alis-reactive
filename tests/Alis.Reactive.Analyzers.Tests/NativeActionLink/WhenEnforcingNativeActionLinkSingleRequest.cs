@@ -341,4 +341,30 @@ public class GeneratedView
 
         await CreateTest(source, "Service.cs").RunAsync();
     }
+
+    [Test]
+    public async Task Two_top_level_requests_reports_ALIS002()
+    {
+        const string source = @"
+using Alis.Reactive.Native.Components;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+public class PageModel { }
+
+public class GeneratedView
+{
+    public IHtmlHelper<PageModel> Html { get; set; } = default!;
+
+    public void Execute()
+    {
+        Html.NativeActionLink(""Save"", ""/orders/save"", {|#0:p =>
+        {
+            p.Post(""/orders/save"");
+            p.Post(""/orders/notify"");
+        }|});
+    }
+}";
+
+        await CreateTest(source, "NativeActionLink.g.cs", ExpectALIS002(0)).RunAsync();
+    }
 }

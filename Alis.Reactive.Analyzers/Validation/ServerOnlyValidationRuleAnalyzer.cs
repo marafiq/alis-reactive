@@ -30,7 +30,7 @@ namespace Alis.Reactive.Analyzers.Validation
                          "It will only run during server-side validation. If you need client-side validation, use " +
                          "supported rules (NotEmpty, MinLength, MaxLength, EmailAddress, Matches, InclusiveBetween, " +
                          "GreaterThan, LessThan, Equal, NotEqual, CreditCard).",
-            helpLinkUri: "");
+            helpLinkUri: null);
 
         private static readonly ImmutableHashSet<string> ServerOnlyMethods =
             ImmutableHashSet.Create(StringComparer.Ordinal,

@@ -22,7 +22,7 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             description: "When a PipelineBuilder lambda contains two or more top-level HTTP request statements " +
                          "(Get/Post/Put/Delete), only the last one survives at runtime. " +
                          "Use Parallel(...) for concurrent requests or separate triggers for independent requests.",
-            helpLinkUri: "");
+            helpLinkUri: null);
 
         private static readonly ImmutableHashSet<string> HttpMethodNames =
             ImmutableHashSet.Create("Get", "Post", "Put", "Delete");

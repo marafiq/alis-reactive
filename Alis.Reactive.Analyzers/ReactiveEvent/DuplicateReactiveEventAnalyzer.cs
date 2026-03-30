@@ -34,7 +34,7 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "Each component event should have exactly one .Reactive() call per builder chain. Multiple calls for the same event create redundant plan entries.",
-            helpLinkUri: "");
+            helpLinkUri: null);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);

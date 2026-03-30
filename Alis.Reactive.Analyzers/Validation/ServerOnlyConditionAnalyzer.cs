@@ -34,7 +34,7 @@ namespace Alis.Reactive.Analyzers.Validation
             description: "FluentValidation's .When()/.Unless() conditions contain arbitrary C# predicates that cannot be " +
                          "serialized for client-side execution. Use ReactiveValidator.WhenField() instead \u2014 it constrains " +
                          "conditions to simple field comparisons (truthy, falsy, eq, neq) that the client runtime can evaluate.",
-            helpLinkUri: "");
+            helpLinkUri: null);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
