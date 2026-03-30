@@ -11,6 +11,8 @@ public class WhenDetectingGatherSchemaDrift : DriftTestBase
     public void include_all_conforms()
     {
         // AllGather: kind
+        AssertDefinitionPropertiesExactly("AllGather", "kind");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("submit", p =>
             p.Post("/api/residents", g => g.IncludeAll())));
@@ -25,6 +27,8 @@ public class WhenDetectingGatherSchemaDrift : DriftTestBase
     public void static_gather_conforms()
     {
         // StaticGather: kind, param, value
+        AssertDefinitionPropertiesExactly("StaticGather", "kind", "param", "value");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("submit", p =>
             p.Post("/api/residents", g => g.Static("facilityId", "FAC-001"))));
@@ -39,6 +43,8 @@ public class WhenDetectingGatherSchemaDrift : DriftTestBase
     public void from_event_gather_conforms()
     {
         // EventGather: kind, param, path
+        AssertDefinitionPropertiesExactly("EventGather", "kind", "param", "path");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("save", (args, p) =>
             p.Post("/api/residents", g =>
@@ -56,6 +62,9 @@ public class WhenDetectingGatherSchemaDrift : DriftTestBase
         // ComponentGather: kind, componentId, vendor, name, readExpr
         // Requires a component registered in the plan via InputField.
         // Native Include extension produces a ComponentGather.
+        AssertDefinitionPropertiesExactly("ComponentGather",
+            "kind", "componentId", "vendor", "name", "readExpr");
+
         var plan = CreatePlan();
 
         Html.InputField(plan, m => m.Name)

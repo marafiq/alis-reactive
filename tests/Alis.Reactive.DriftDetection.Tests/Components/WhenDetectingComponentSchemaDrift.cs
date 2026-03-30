@@ -12,6 +12,9 @@ public class WhenDetectingComponentSchemaDrift : DriftTestBase
     {
         // ComponentEntry: id, vendor, readExpr, componentType, coerceAs
         // NativeTextBox registered via InputField adds to plan.components
+        AssertDefinitionPropertiesExactly("ComponentEntry",
+            "id", "vendor", "readExpr", "componentType", "coerceAs");
+
         var plan = CreatePlan();
 
         Html.InputField(plan, m => m.Name)
@@ -38,6 +41,9 @@ public class WhenDetectingComponentSchemaDrift : DriftTestBase
     {
         // ComponentSource used inside a ValueGuard's source field
         // When(compValue).Eq(...) produces a guard with source: ComponentSource
+        AssertDefinitionPropertiesExactly("ComponentSource",
+            "kind", "componentId", "vendor", "readExpr");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
         {

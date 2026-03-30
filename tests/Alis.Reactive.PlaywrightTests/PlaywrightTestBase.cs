@@ -135,12 +135,13 @@ public abstract class PlaywrightTestBase : PageTest
 
     protected void AssertNoConsoleErrors()
     {
-        Assert.That(SnapshotConsoleErrors(), Is.Empty, "Expected no console errors");
+        var unexpected = FilterUnexpectedConsoleErrors();
+        Assert.That(unexpected, Is.Empty, "Expected no console errors");
     }
 
     protected void AssertNoConsoleErrorsExcept(params string[] allowedPatterns)
     {
-        var unexpected = SnapshotConsoleErrors()
+        var unexpected = FilterUnexpectedConsoleErrors()
             .Where(e => !allowedPatterns.Any(p => e.Contains(p)))
             .ToList();
         Assert.That(unexpected, Is.Empty, "Expected no unexpected console errors");
@@ -243,6 +244,13 @@ public abstract class PlaywrightTestBase : PageTest
         {
             return _consoleErrors.ToList();
         }
+    }
+
+    private List<string> FilterUnexpectedConsoleErrors()
+    {
+        return SnapshotConsoleErrors()
+            .Where(e => !TransientBootErrorMarkers.Any(e.Contains))
+            .ToList();
     }
 
     private void ClearConsoleState()

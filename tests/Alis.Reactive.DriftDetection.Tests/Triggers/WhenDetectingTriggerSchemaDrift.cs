@@ -10,6 +10,8 @@ public class WhenDetectingTriggerSchemaDrift : DriftTestBase
     [Test]
     public void dom_ready_trigger_conforms_to_schema()
     {
+        AssertDefinitionPropertiesExactly("DomReadyTrigger", "kind");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p => p.Dispatch("init")));
 
@@ -21,6 +23,8 @@ public class WhenDetectingTriggerSchemaDrift : DriftTestBase
     [Test]
     public void custom_event_trigger_conforms_to_schema()
     {
+        AssertDefinitionPropertiesExactly("CustomEventTrigger", "kind", "event");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("resident-saved", p => p.Dispatch("ack")));
 
@@ -32,6 +36,8 @@ public class WhenDetectingTriggerSchemaDrift : DriftTestBase
     [Test]
     public void typed_custom_event_conforms_to_schema()
     {
+        AssertDefinitionPropertiesExactly("CustomEventTrigger", "kind", "event");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("resident-updated", (args, p) =>
             p.Element("name-echo").SetText(args, x => x.Name!)));
@@ -44,6 +50,8 @@ public class WhenDetectingTriggerSchemaDrift : DriftTestBase
     [Test]
     public void server_push_with_all_properties_conforms()
     {
+        AssertDefinitionPropertiesExactly("ServerPushTrigger", "kind", "url", "eventType");
+
         var plan = CreatePlan();
         On(plan, t => t.ServerPush("/api/notifications/stream", "admission", p =>
             p.Dispatch("new-admission")));
@@ -56,6 +64,8 @@ public class WhenDetectingTriggerSchemaDrift : DriftTestBase
     [Test]
     public void signalr_trigger_conforms_to_schema()
     {
+        AssertDefinitionPropertiesExactly("SignalRTrigger", "kind", "hubUrl", "methodName");
+
         var plan = CreatePlan();
         On(plan, t => t.SignalR("/hubs/residents", "ReceiveUpdate", p =>
             p.Dispatch("resident-updated")));
@@ -68,6 +78,9 @@ public class WhenDetectingTriggerSchemaDrift : DriftTestBase
     [Test]
     public void component_event_with_all_properties_conforms()
     {
+        AssertDefinitionPropertiesExactly("ComponentEventTrigger",
+            "kind", "componentId", "jsEvent", "vendor", "bindingPath", "readExpr");
+
         var plan = CreatePlan();
 
         // InputField + NativeTextBox + Reactive produces a ComponentEventTrigger.
@@ -86,6 +99,9 @@ public class WhenDetectingTriggerSchemaDrift : DriftTestBase
     [Test]
     public void multiple_triggers_all_conform()
     {
+        AssertDefinitionPropertiesExactly("DomReadyTrigger", "kind");
+        AssertDefinitionPropertiesExactly("CustomEventTrigger", "kind", "event");
+
         var plan = CreatePlan();
         On(plan, t => t
             .DomReady(p => p.Dispatch("boot"))

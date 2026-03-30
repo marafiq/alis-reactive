@@ -85,6 +85,8 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
     public void all_guard_conforms()
     {
         // AllGuard: kind, guards
+        AssertDefinitionPropertiesExactly("AllGuard", "kind", "guards");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("check", (args, p) =>
         {
@@ -103,6 +105,8 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
     public void any_guard_conforms()
     {
         // AnyGuard: kind, guards
+        AssertDefinitionPropertiesExactly("AnyGuard", "kind", "guards");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("check", (args, p) =>
         {
@@ -121,6 +125,8 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
     public void not_guard_conforms()
     {
         // InvertGuard: kind, inner
+        AssertDefinitionPropertiesExactly("InvertGuard", "kind", "inner");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("check", (args, p) =>
         {
@@ -138,6 +144,8 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
     public void confirm_guard_conforms()
     {
         // ConfirmGuard: kind, message
+        AssertDefinitionPropertiesExactly("ConfirmGuard", "kind", "message");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("delete-resident", p =>
         {
@@ -155,6 +163,8 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
     public void branched_conditional_conforms()
     {
         // Full When/Then/ElseIf/Else chain producing multiple Branch objects
+        AssertDefinitionPropertiesExactly("Branch", "guard", "reaction");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("assess", (args, p) =>
         {

@@ -9,6 +9,8 @@ public class WhenDetectingReactionSchemaDrift : DriftTestBase
     public void sequential_reaction_conforms()
     {
         // SequentialReaction: kind, commands
+        AssertDefinitionPropertiesExactly("SequentialReaction", "kind", "commands");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
         {
@@ -25,6 +27,8 @@ public class WhenDetectingReactionSchemaDrift : DriftTestBase
     public void conditional_with_pre_commands_conforms()
     {
         // ConditionalReaction: kind, commands (pre-branch), branches
+        AssertDefinitionPropertiesExactly("ConditionalReaction", "kind", "commands", "branches");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("assess", (args, p) =>
         {
@@ -46,6 +50,8 @@ public class WhenDetectingReactionSchemaDrift : DriftTestBase
     public void http_with_pre_fetch_conforms()
     {
         // HttpReaction: kind, preFetch, request
+        AssertDefinitionPropertiesExactly("HttpReaction", "kind", "preFetch", "request");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("save-resident", p =>
         {
@@ -65,6 +71,9 @@ public class WhenDetectingReactionSchemaDrift : DriftTestBase
     public void parallel_with_all_properties_conforms()
     {
         // ParallelHttpReaction: kind, preFetch, requests, onAllSettled
+        AssertDefinitionPropertiesExactly("ParallelHttpReaction",
+            "kind", "preFetch", "requests", "onAllSettled");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
         {
@@ -91,6 +100,8 @@ public class WhenDetectingReactionSchemaDrift : DriftTestBase
     {
         // Branch: guard (present on When/ElseIf), reaction
         // Else branch has guard: null (omitted by JsonIgnoreCondition.WhenWritingNull)
+        AssertDefinitionPropertiesExactly("Branch", "guard", "reaction");
+
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("classify", (args, p) =>
         {

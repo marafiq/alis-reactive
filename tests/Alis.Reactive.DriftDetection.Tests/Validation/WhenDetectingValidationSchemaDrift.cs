@@ -32,6 +32,8 @@ public class WhenDetectingValidationSchemaDrift : DriftTestBase
     public void validation_descriptor_conforms()
     {
         // ValidationDescriptor: formId, planId, fields (all required)
+        AssertDefinitionPropertiesExactly("ValidationDescriptor", "formId", "planId", "fields");
+
         var plan = CreatePlan();
 
         // Register component so validation field enrichment works
@@ -79,6 +81,9 @@ public class WhenDetectingValidationSchemaDrift : DriftTestBase
     {
         // ValidationField: fieldName, rules, fieldId, vendor, readExpr, coerceAs
         // Enrichment fills fieldId, vendor, readExpr, coerceAs from ComponentsMap
+        AssertDefinitionPropertiesExactly("ValidationField",
+            "fieldName", "rules", "fieldId", "vendor", "readExpr", "coerceAs");
+
         var plan = CreatePlan();
         RegisterNameComponent(plan);
 
@@ -124,6 +129,9 @@ public class WhenDetectingValidationSchemaDrift : DriftTestBase
         // ValidationRule: rule, message, constraint, field, coerceAs, when
         // The TestValidator has conditional rules (WhenField) which produce 'when'
         // and numeric rules which produce 'constraint' and 'coerceAs'
+        AssertDefinitionPropertiesExactly("ValidationRule",
+            "rule", "message", "constraint", "field", "coerceAs", "when");
+
         var plan = CreatePlan();
         RegisterNameComponent(plan);
 
@@ -173,6 +181,8 @@ public class WhenDetectingValidationSchemaDrift : DriftTestBase
         // ValidationCondition: field, op, value
         // WhenField(x => x.IsVeteran, ...) produces op="truthy" (no value)
         // WhenField<string>(x => x.CareLevel, "Memory Care", ...) produces op="eq" + value="Memory Care"
+        AssertDefinitionPropertiesExactly("ValidationCondition", "field", "op", "value");
+
         var plan = CreatePlan();
         RegisterNameComponent(plan);
 
