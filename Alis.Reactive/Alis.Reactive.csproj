@@ -15,6 +15,14 @@
         <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
+    <!-- Ship JS/CSS as NuGet content files with configurable output path -->
+    <ItemGroup>
+        <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="buildTransitive\assets\js\" />
+        <None Include="assets\css\design-system.css" Pack="true" PackagePath="buildTransitive\assets\css\" />
+        <None Include="build\Alis.Reactive.targets" Pack="true" PackagePath="buildTransitive\" />
+        <None Include="build\Alis.Reactive.targets" Pack="true" PackagePath="build\" />
+    </ItemGroup>
+
     <ItemGroup>
         <InternalsVisibleTo Include="Alis.Reactive.Fusion" />
         <InternalsVisibleTo Include="Alis.Reactive.Native" />
