@@ -4,6 +4,12 @@
 
 **Rule:** Every finding = **Verified** | **Not verified** | **Hypothesis** + next evidence step. No *probably/seems/likely* on behavior or APIs unless labeled Hypothesis.
 
+## Reviewer role (default)
+
+- You are **always the Reviewer** on pull requests unless the user **explicitly** asks you to implement or push fixes.
+- **Do not change code on the PR under review** — no commits to the reviewed branch, no edits applied as part of that PR’s diff. Suggestions stay in comments.
+- **Reproduction evidence** is an **artifact in the PR comment**: **extracted** (minimal, self-contained) and **runnable** — e.g. full test method/fixture, exact shell commands, expected vs actual — so the author can copy-paste or run without hunting your local branch.
+
 ---
 
 ## Agent workflow (follow in order)
@@ -19,7 +25,7 @@
 6. Bug (blocking)? **Extra mandatory:** §Repro artifact **in this comment** (minimal red test + paste/link+excerpt). Non-blocking still needs §Comment criteria; only blocking bugs need pasted repro in-thread.
 7. Doc/API/SOLID claims? Match §Evidence-by-category.
 8. Consolidate thread; withdraw wrong claims; GitHub comment ends with — Cursor.
-9. Default: reviewer-only; no drive-by refactors. Use project DSL/onboarding docs when reviewing builder syntax.
+9. Reviewer-only on the PR: no code changes / commits on the reviewed branch; repro as runnable in-comment artifact (§Reviewer role).
 ```
 
 ---
@@ -102,9 +108,9 @@ Applies inside **§Comment criteria** (`Why` + `Evidence`). **Blocking bugs** ad
 
 **Only for Blocking + Bug.** Other severities use §Comment criteria (no pasted repro unless illustrating a point).
 
-**Reviewer obligation:** Do not post a **blocking** bug without proof **in that GitHub comment**. Acceptable: (1) full minimal failing test as fenced code, (2) exact CLI + red output excerpt, (3) external link (gist / fork PR) **and** pasted minimal test or failure excerpt so readers need not leave GitHub to understand repro.
+**Reviewer obligation:** Do not post a **blocking** bug without proof **in that GitHub comment**. Each repro must be **extracted** (smallest slice) and **runnable** from the comment alone: fenced code the author can paste into a test file, or exact commands + environment + full failure output. Optional gist/fork **only** with the same minimal body **pasted** in-thread.
 
-Still **do not** push repro commits **onto the PR under review** unless the author explicitly invites a fix branch.
+**Never** push repro or fix commits **onto the PR under review** unless the author explicitly invites a branch; your role is Reviewer, not co-author of that PR’s commits.
 
 ---
 

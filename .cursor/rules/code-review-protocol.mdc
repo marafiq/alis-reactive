@@ -1,5 +1,5 @@
 ---
-description: Evidence-first PR/code review for this repo — Comment criteria on every finding; blocking bugs need repro in-thread; sign GitHub — Cursor.
+description: Reviewer default on PRs — no commits on reviewed PR; evidence + runnable repro in comment; sign — Cursor.
 alwaysApply: true
 ---
 
@@ -11,6 +11,12 @@ This rule defines **how** reviews run here. Extended reference: `docs/process/co
 
 Code review, PR / diff review, merge readiness, drafting or posting **GitHub** review feedback.
 
+## Reviewer role (default — repo owner)
+
+- **Always Reviewer** on PRs unless the user **explicitly** asks you to implement or push fixes to a branch.
+- **Do not change code on the PR under review** — no commits to that branch, no edits that land in that PR. Feedback stays in **comments** only.
+- **Repro = in-comment artifact:** **extracted** (minimal) and **runnable** from the comment (paste-ready test, exact CLI + output, self-contained steps). Not a dependency on your unpublished local state.
+
 ## Workflow
 
 1. **Scope** — What's in/out; base + head SHA; **list every file you opened** (not diff-only).
@@ -18,9 +24,9 @@ Code review, PR / diff review, merge readiness, drafting or posting **GitHub** r
 3. **Layer map** — Owns C# vs schema vs TS vs browser; wrong layer → stop, trace full pipeline before LGTM.
 4. **Primitives** — If wire/command/trigger shape changes: doc §Primitive checklist or explicit deferrals.
 5. **Every finding** (Blocking, Gap, **Polish**) — Full **Comment criteria**; no evidence-free nits.
-6. **Blocking bug** — Minimal red test + repro **in the same GitHub comment** (paste test, CLI output, or link + excerpt). No repro commits on the **reviewed** PR unless author invites.
+6. **Blocking bug** — Minimal red test + **runnable** repro **in the same GitHub comment** (extracted test body, or exact commands + full failure output; link + pasted excerpt if gist). No commits on the **reviewed** PR unless author explicitly invites.
 7. **GitHub** — End agent comments with `— Cursor`.
-8. **Role** — Reviewer-only unless user asks to implement.
+8. **Role** — Same as §Reviewer role above; implement only when user clearly opts in.
 
 ## Comment criteria (per finding)
 
@@ -36,7 +42,7 @@ Severity:     Blocking | Gap | Polish
 Evidence:     <same as Why, or Not verified + next step>
 ```
 
-**Blocking + Bug:** repro **in that comment** (mandatory). Else: **Issue / Why / Files read / Self-check** still mandatory.
+**Blocking + Bug:** repro **in that comment** (mandatory), **runnable** from paste/commands. Else: **Issue / Why / Files read / Self-check** still mandatory.
 
 ## Language
 
