@@ -35,8 +35,9 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Gathers all registered components. Expanded at render time into explicit
-        /// ComponentGather items from the plan's component registry.
+        /// Gathers the current value of every input component created via
+        /// <c>Html.InputField(plan, ...)</c> in this plan. Each component's value is sent
+        /// using the model property name as the key.
         /// </summary>
         public GatherBuilder<TModel> IncludeAll()
         {
@@ -47,6 +48,8 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Adds a static key/value pair to the request.
         /// </summary>
+        /// <param name="param">The key name used in the request payload.</param>
+        /// <param name="value">The constant value to include.</param>
         public GatherBuilder<TModel> Static(string param, object value)
         {
             Items.Add(new StaticGather(param, value));
