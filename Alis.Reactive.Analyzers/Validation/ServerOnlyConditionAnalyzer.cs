@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -32,7 +33,8 @@ namespace Alis.Reactive.Analyzers.Validation
             isEnabledByDefault: true,
             description: "FluentValidation's .When()/.Unless() conditions contain arbitrary C# predicates that cannot be " +
                          "serialized for client-side execution. Use ReactiveValidator.WhenField() instead \u2014 it constrains " +
-                         "conditions to simple field comparisons (truthy, falsy, eq, neq) that the client runtime can evaluate.");
+                         "conditions to simple field comparisons (truthy, falsy, eq, neq) that the client runtime can evaluate.",
+            helpLinkUri: "");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
@@ -128,7 +130,9 @@ namespace Alis.Reactive.Analyzers.Validation
             foreach (var baseType in classDecl.BaseList.Types)
             {
                 var typeName = baseType.Type.ToString();
-                if (typeName.Contains("ReactiveValidator"))
+                // Check for ReactiveValidator<...> pattern — base type starts with "ReactiveValidator<"
+                // or equals "ReactiveValidator" (raw, non-generic, unlikely but safe)
+                if (typeName.StartsWith("ReactiveValidator<", StringComparison.Ordinal) || typeName == "ReactiveValidator")
                     return true;
             }
 

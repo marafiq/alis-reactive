@@ -29,7 +29,8 @@ namespace Alis.Reactive.Analyzers.Validation
             description: "This FluentValidation rule type cannot be serialized to JSON for client-side execution. " +
                          "It will only run during server-side validation. If you need client-side validation, use " +
                          "supported rules (NotEmpty, MinLength, MaxLength, EmailAddress, Matches, InclusiveBetween, " +
-                         "GreaterThan, LessThan, Equal, NotEqual, CreditCard).");
+                         "GreaterThan, LessThan, Equal, NotEqual, CreditCard).",
+            helpLinkUri: "");
 
         private static readonly ImmutableHashSet<string> ServerOnlyMethods =
             ImmutableHashSet.Create(StringComparer.Ordinal,
@@ -94,7 +95,9 @@ namespace Alis.Reactive.Analyzers.Validation
             foreach (var baseType in classDecl.BaseList.Types)
             {
                 var typeName = baseType.Type.ToString();
-                if (typeName.Contains("ReactiveValidator"))
+                // Check for ReactiveValidator<...> pattern — base type starts with "ReactiveValidator<"
+                // or equals "ReactiveValidator" (raw, non-generic, unlikely but safe)
+                if (typeName.StartsWith("ReactiveValidator<", StringComparison.Ordinal) || typeName == "ReactiveValidator")
                     return true;
             }
 

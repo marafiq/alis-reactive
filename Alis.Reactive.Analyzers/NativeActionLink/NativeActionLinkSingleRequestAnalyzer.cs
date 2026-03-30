@@ -19,7 +19,8 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "NativeActionLink is limited to one existing HTTP request chain serialized through data-reactive-* attributes.");
+            description: "NativeActionLink is limited to one existing HTTP request chain serialized through data-reactive-* attributes.",
+            helpLinkUri: "");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);

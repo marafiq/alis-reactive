@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -32,7 +33,8 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "Each component event should have exactly one .Reactive() call per builder chain. Multiple calls for the same event create redundant plan entries.");
+            description: "Each component event should have exactly one .Reactive() call per builder chain. Multiple calls for the same event create redundant plan entries.",
+            helpLinkUri: "");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
@@ -118,9 +120,9 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
             var path = tree.FilePath;
             if (string.IsNullOrEmpty(path)) return false;
 
-            return path.EndsWith(".cshtml", System.StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", System.StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".g.cs", System.StringComparison.OrdinalIgnoreCase);
+            return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
+                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase)
+                || path.EndsWith(".g.cs", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

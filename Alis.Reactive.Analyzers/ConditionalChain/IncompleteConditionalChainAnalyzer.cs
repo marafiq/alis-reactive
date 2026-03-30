@@ -20,7 +20,8 @@ namespace Alis.Reactive.Analyzers.ConditionalChain
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "A conditional or guard chain was started but never completed with .Then(). " +
-                         "The condition will not be included in the plan.");
+                         "The condition will not be included in the plan.",
+            helpLinkUri: "");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
