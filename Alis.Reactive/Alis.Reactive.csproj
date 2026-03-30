@@ -6,6 +6,9 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IsPackable>true</IsPackable>
+        <PackageDescription>Core reactive framework for building plan-driven browser UIs with C# fluent builders and JSON-serialized reactive plans.</PackageDescription>
+        <PackageTags>reactive;blazor;aspnetcore;fluent-api;plan-driven</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

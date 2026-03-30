@@ -5,6 +5,9 @@
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
+        <IsPackable>true</IsPackable>
+        <PackageDescription>FluentValidation integration for Alis.Reactive — server-side rules that automatically extract to client-side validation.</PackageDescription>
+        <PackageTags>reactive;aspnetcore;fluentvalidation;validation</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

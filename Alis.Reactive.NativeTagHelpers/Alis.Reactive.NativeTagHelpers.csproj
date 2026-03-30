@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Alis.Reactive.NativeTagHelpers</RootNamespace>
     <AssemblyName>Alis.Reactive.NativeTagHelpers</AssemblyName>
+    <IsPackable>true</IsPackable>
+    <PackageDescription>ASP.NET Core Tag Helpers for Alis.Reactive native components — declarative HTML authoring with reactive plan integration.</PackageDescription>
+    <PackageTags>reactive;aspnetcore;taghelpers;native-components</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

@@ -5,6 +5,9 @@
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IsPackable>true</IsPackable>
+        <PackageDescription>Native HTML components for Alis.Reactive — textboxes, checkboxes, dropdowns, and more with zero vendor dependencies.</PackageDescription>
+        <PackageTags>reactive;aspnetcore;native-components;html</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
