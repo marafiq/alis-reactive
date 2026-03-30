@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <VersionPrefix>0.0.$(AlisReactivePatch)</VersionPrefix>
     <AlisReactivePatch Condition="'$(AlisReactivePatch)' == ''">0</AlisReactivePatch>
+    <VersionPrefix>0.0.$(AlisReactivePatch)</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
     <Authors>Alis Solutions</Authors>
     <Company>Alis Solutions</Company>
