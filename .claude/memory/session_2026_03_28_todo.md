@@ -1,6 +1,6 @@
 ---
 name: session_2026_03_28_todo
-description: Persistent todo list — updated 2026-03-28 evening session. 6 done, 1 partial, 5 open.
+description: Persistent todo list — updated 2026-03-28 late session. 8 done, 1 partial, 3 open.
 type: project
 ---
 
@@ -41,42 +41,54 @@ type: project
 
 **Task 6. docs/ folder cleanup**
 - 78 → 24 active files (14 deleted, 40 archived to docs/archive/, -6,600 lines)
-- Archive preserves historical plans, reviews, and specs
+
+## Completed — Session 2026-03-28 (late)
+
+**Task 7. docs-site drift** — branch `fix/docs-site-drift` in worktree agent-a66dcc24
+- 10 files changed, 17 lines fixed
+- Test counts updated: C# 510→605, TS 944→1126, Playwright 483→742, Total→2400+
+- `NativeHiddenField()` → `HiddenFieldFor()` factory method fixed (3 files)
+- Runtime size "2kb" → "88KB minified", SF count 15→18
+- Agent incorrectly removed Fusion prefix from 4 files — reverted in follow-up commit
+- IReactivePlan still exists (memory was stale — "deleted" was wrong)
+- Build verified: 38 pages, zero errors
+
+**Task 8+9. TS runtime quality** — branch `fix/ts-runtime-quality` in worktree agent-a8d61b9e
+- SonarQube complexity: conditions.ts 24→~6, commands.ts 17→~4, rule-engine.ts 26→~5
+- All 3 used handler lookup maps (opHandlers, commandHandlers, ruleHandlers)
+- Vendor leaks: trigger.ts + live-clear.ts now call component.ts exports
+  - New: `buildComponentEventDetail()`, `wireLiveValidationEvents()` in component.ts
+- 1126/1126 vitest pass, zero new typecheck errors
 
 ## Partially Done
 
-**Task 4. Review all skills** — 4 of 8 reviewed
-- [x] onboard-fusion-component: 12 fixes (6 review + 6 A/B). FusionComponent base, ComponentRegistration, sandbox paths, references/ extracted. Score: ~9/10
-- [x] validation-rules: 10 fixes (6 review + 4 A/B). DateTime.Today warning, nullable gt, case sensitivity, verification steps. Score: ~9/10
-- [x] bdd-testing: 13 fixes (8 review + 5 A/B). ComponentScope, 13 components, SelectDate guidance, popup surfaces, journey granularity. Score: ~9/10
-- [x] solid-ts-audit: 11 fixes (7 review + 4 A/B). Module map, dispatcher exception, sync/async coupling, non-null assertion. Score: ~9/10
-- [ ] reactive-dsl — NOT REVIEWED
-- [ ] http-pipeline — NOT REVIEWED
-- [ ] conditions-dsl — NOT REVIEWED
-- [ ] modern-csharp — NOT REVIEWED (1,272 lines, needs condensing)
+**Task 4. Review all skills** — 6 of 8 reviewed + fixes applied
+- [x] onboard-fusion-component: 12 fixes. Score: ~9/10
+- [x] validation-rules: 10 fixes. Score: ~9/10
+- [x] bdd-testing: 13 fixes. Score: ~9/10
+- [x] solid-ts-audit: 11 fixes. Score: ~9/10
+- [x] reactive-dsl: 7 fixes (ServerPush/SignalR, TPayload constraint, fake namespace, FusionColorPicker, cross-model Component). Score: ~8.5/10
+- [x] http-pipeline: 1 fix (AsJson()). Score: ~9.5/10
+- [ ] conditions-dsl — reviewed, 2 minor findings, no changes needed. Score: ~9.5/10
+- [ ] modern-csharp — NOT reviewed in depth. 1,272 lines, promotes C# 12+ but repo uses C# 8.0. Needs complete rewrite.
 
-Common remaining gap: Rule 10 (A/B test log not persisted as references/ file)
+Remaining gaps:
+- A/B testing not completed (agent blocked on permissions, sub-agents not dispatched)
+- Top-10 audits not run
+- A/B logs not created (for any of the 8 skills)
+- modern-csharp needs dedicated condensing session
 
 ## Open — Future Sessions
 
-**Task 7. docs-site drift** — needs own session + plan
-- 5 pages reference deleted IReactivePlan
-- 3 pages wrong API name
-- Test counts 30-54% stale
-- Scope: content accuracy + code examples + sandbox verification
-
-**Task 8. SonarQube CRITICALs** — code change (Layer 3)
-- 3 complexity hotspots: conditions.ts 24, commands.ts 17, rule-engine.ts 26
-- Plan: extraction refactors to get under complexity 15
-
-**Task 9. Vendor isolation leaks** — code change (Layer 3)
-- trigger.ts:45, live-clear.ts:44 still have vendor string checks
-- Plan: move vendor logic into component.ts exports
-
-**Task 10. Schema drift detection tool** — code change (Layer 1→2)
+**Task 10. Schema drift detection tool** — agent dispatched, awaiting results
 - Automated C# descriptor → schema validation
-- No approach decided yet
+- Branch: feature/drift-detection in worktree agent-acea39de
 
-**Task 11. TS-to-schema validation** — code change (Layer 2→3)
+**Task 11. TS-to-schema validation** — same agent as Task 10
 - Automated schema → TS type conformance
-- No approach decided yet
+
+**modern-csharp skill rewrite** — dedicated session needed
+- 1,272 lines → target ~250 lines
+- Remove Span/Memory, async streaming, generic patterns
+- Add framework-specific patterns: sealed descriptors, internal constructors, C# 8.0 constraint
+- Align with CLAUDE.md "C# 8.0 enforced in library projects"
