@@ -2,6 +2,8 @@
 
 **Binding rule (agents):** [`.cursor/rules/code-review-protocol.mdc`](../rules/code-review-protocol.mdc) — includes **Reviewer role** (default), runnable repro-in-comment, sign `— Cursor`.
 
+**`@` paths:** Use only files under **`.cursor/`** (e.g. this file and the `.mdc`). Paths like `.worktrees/...` are local `git worktree` directories and are not a second copy of the protocol in the repo.
+
 This file adds **harness**, **primitive checklist**, **repo gates**, and **evidence tables** only. Do not duplicate §Reviewer role or §Repro here; keep them in the `.mdc`.
 
 ---
