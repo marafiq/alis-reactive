@@ -10,14 +10,18 @@ public class WhenDetectingMutationSchemaDrift : DriftTestBase
     [Test]
     public void set_prop_conforms()
     {
-        // SetPropMutation: kind, prop
-        // SetText produces set-prop with prop="textContent"
+        // SetPropMutation: kind, prop, coerce (optional)
+        // SetText produces set-prop with prop="textContent", no coerce
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
             p.Element("welcome").SetText("Hello!")));
 
         var json = plan.Render();
         AssertSchemaValid(json);
+
+        // Minimal: kind + prop. 'coerce' requires a typed component (tested below).
+        AssertPropertiesPresent(json, "entries[0].reaction.commands[0].mutation",
+            "kind", "prop");
     }
 
     [Test]
@@ -52,6 +56,10 @@ public class WhenDetectingMutationSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
+
+        // Minimal: kind + method. chain and args are optional.
+        AssertPropertiesPresent(json, "entries[0].reaction.commands[0].mutation",
+            "kind", "method");
     }
 
     [Test]

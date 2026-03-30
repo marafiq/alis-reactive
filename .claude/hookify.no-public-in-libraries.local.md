@@ -6,7 +6,7 @@ action: block
 conditions:
   - field: file_path
     operator: regex_match
-    pattern: (Alis\.Reactive/|Alis\.Reactive\.Native/|Alis\.Reactive\.Fusion/|Alis\.Reactive\.FluentValidator/).*\.cs$
+    pattern: (?:^|/)(?:Alis\.Reactive|Alis\.Reactive\.Native|Alis\.Reactive\.Fusion)/(?!.*tests/).*\.cs$
   - field: new_text
     operator: regex_match
     pattern: \bpublic\s+(static\s+)?(sealed\s+|abstract\s+|partial\s+|override\s+|virtual\s+|new\s+|async\s+)*(class|interface|struct|enum|record|void|string|bool|int|long|decimal|double|float|object|Task|IEnumerable|IReadOnlyList|IReadOnlyDictionary|Action|Func)\b
@@ -14,7 +14,7 @@ conditions:
 
 **BLOCKED: `public` declaration in library project.**
 
-Library projects (Alis.Reactive, Native, Fusion, FluentValidator) default to `internal`.
+The 3 library projects (Alis.Reactive, Alis.Reactive.Native, Alis.Reactive.Fusion) default to `internal`.
 Every `internal` member was made internal deliberately to protect the API surface.
 
 Changing `internal` to `public` is the #1 source of cascading breaks in this repo (M16, M17 in forensic index — 6+ commit cascades, 170+ affected files).

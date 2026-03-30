@@ -10,31 +10,28 @@ namespace Alis.Reactive.DriftDetection.Tests.Validation;
 [TestFixture]
 public class WhenDetectingValidationSchemaDrift : DriftTestBase
 {
+    private static bool _extractorRegistered;
+
     [OneTimeSetUp]
     public void RegisterExtractor()
     {
         // Register the FluentValidation adapter so Validate<T>() extracts rules at Render()
-        try
-        {
-            ReactivePlanConfig.UseValidationExtractor(
-                new FluentValidationAdapter(type =>
-                {
-                    if (type == typeof(TestValidator))
-                        return new TestValidator();
-                    return null;
-                }));
-        }
-        catch (InvalidOperationException)
-        {
-            // Already registered (parallel test execution)
-        }
+        if (_extractorRegistered) return;
+
+        ReactivePlanConfig.UseValidationExtractor(
+            new FluentValidationAdapter(type =>
+            {
+                if (type == typeof(TestValidator))
+                    return new TestValidator();
+                return null;
+            }));
+        _extractorRegistered = true;
     }
 
     [Test]
     public void validation_descriptor_conforms()
     {
-        // ValidationDescriptor: formId, planId, fields
-        // planId is set at Render() time from plan.PlanId
+        // ValidationDescriptor: formId, planId, fields (all required)
         var plan = CreatePlan();
 
         // Register component so validation field enrichment works
@@ -46,6 +43,8 @@ public class WhenDetectingValidationSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
+        AssertAllPropertiesPresent(json, "ValidationDescriptor",
+            "entries[0].reaction.request.validation");
     }
 
     [Test]
@@ -110,11 +109,13 @@ public class WhenDetectingValidationSchemaDrift : DriftTestBase
                 foundEnrichedField = true;
                 Assert.That(field.GetProperty("vendor").GetString(), Is.Not.Null);
                 Assert.That(field.GetProperty("readExpr").GetString(), Is.Not.Null);
+                Assert.That(field.GetProperty("coerceAs").GetString(), Is.Not.Null,
+                    "coerceAs should be enriched from ComponentRegistration");
             }
         }
 
         Assert.That(foundEnrichedField, Is.True,
-            "Name field should be enriched with fieldId, vendor, readExpr from ComponentsMap");
+            "Name field should be enriched with fieldId, vendor, readExpr, coerceAs from ComponentsMap");
     }
 
     [Test]
@@ -132,14 +133,46 @@ public class WhenDetectingValidationSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
+
+        // ValidationRule has optional properties that appear on different rules:
+        // - 'constraint' + 'coerceAs': on numeric rules (GreaterThan)
+        // - 'when': on conditional rules (WhenField)
+        // - 'field': on cross-property rules (not in current TestValidator)
+        // Verify at least one rule has constraint+coerceAs, and one has 'when'.
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        var fields = doc.RootElement
+            .GetProperty("entries")[0]
+            .GetProperty("reaction")
+            .GetProperty("request")
+            .GetProperty("validation")
+            .GetProperty("fields");
+
+        bool foundConstraint = false;
+        bool foundWhen = false;
+        for (int i = 0; i < fields.GetArrayLength(); i++)
+        {
+            var rules = fields[i].GetProperty("rules");
+            for (int j = 0; j < rules.GetArrayLength(); j++)
+            {
+                if (rules[j].TryGetProperty("constraint", out _))
+                    foundConstraint = true;
+                if (rules[j].TryGetProperty("when", out _))
+                    foundWhen = true;
+            }
+        }
+
+        Assert.That(foundConstraint, Is.True,
+            "At least one validation rule should have 'constraint' (from GreaterThan)");
+        Assert.That(foundWhen, Is.True,
+            "At least one validation rule should have 'when' condition (from WhenField)");
     }
 
     [Test]
     public void validation_condition_with_value_conforms()
     {
         // ValidationCondition: field, op, value
-        // WhenField(x => x.IsVeteran, ...) produces a condition with op="truthy"
-        // WhenField<TProp>(x => x.CareLevel, "Memory Care", ...) would produce op="eq" + value
+        // WhenField(x => x.IsVeteran, ...) produces op="truthy" (no value)
+        // WhenField<string>(x => x.CareLevel, "Memory Care", ...) produces op="eq" + value="Memory Care"
         var plan = CreatePlan();
         RegisterNameComponent(plan);
 
@@ -150,7 +183,7 @@ public class WhenDetectingValidationSchemaDrift : DriftTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        // Verify at least one rule has a 'when' condition
+        // Verify conditions: one "truthy" (IsVeteran) and one "eq" with value (CareLevel)
         using var doc = System.Text.Json.JsonDocument.Parse(json);
         var fields = doc.RootElement
             .GetProperty("entries")[0]
@@ -159,35 +192,36 @@ public class WhenDetectingValidationSchemaDrift : DriftTestBase
             .GetProperty("validation")
             .GetProperty("fields");
 
-        bool foundConditionalRule = false;
+        bool foundTruthy = false;
+        bool foundEqWithValue = false;
         for (int i = 0; i < fields.GetArrayLength(); i++)
         {
             var rules = fields[i].GetProperty("rules");
             for (int j = 0; j < rules.GetArrayLength(); j++)
             {
-                if (rules[j].TryGetProperty("when", out _))
-                    foundConditionalRule = true;
+                if (rules[j].TryGetProperty("when", out var when))
+                {
+                    var op = when.GetProperty("op").GetString();
+                    if (op == "truthy")
+                        foundTruthy = true;
+                    if (op == "eq" && when.TryGetProperty("value", out var val)
+                                   && val.GetString() == "Memory Care")
+                        foundEqWithValue = true;
+                }
             }
         }
 
-        Assert.That(foundConditionalRule, Is.True,
-            "At least one validation rule should have a 'when' condition from WhenField()");
+        Assert.That(foundTruthy, Is.True,
+            "WhenField(x => x.IsVeteran, ...) should produce op='truthy'");
+        Assert.That(foundEqWithValue, Is.True,
+            "WhenField<string>(x => x.CareLevel, \"Memory Care\", ...) should produce op='eq' with value");
     }
 
-    /// <summary>
     /// Registers a NativeTextBox component for the Name field so validation enrichment works.
     /// Uses InputField + NativeTextBox which adds to ComponentsMap before HTML render.
-    /// </summary>
     private static void RegisterNameComponent(ReactivePlan<ResidentModel> plan)
     {
-        try
-        {
-            Html.InputField(plan, m => m.Name)
-                .NativeTextBox(b => b.Placeholder("Resident name"));
-        }
-        catch (NotImplementedException)
-        {
-            // TestHtmlHelper.TextBoxFor — component already registered in ComponentsMap
-        }
+        Html.InputField(plan, m => m.Name)
+            .NativeTextBox(b => b.Placeholder("Resident name"));
     }
 }

@@ -60,6 +60,37 @@ public abstract class DriftTestBase
             "populate the missing optional properties in the DSL call.");
     }
 
+    // ── Assertion 3: JSON has specific named properties at path ──
+
+    /// <summary>
+    /// Asserts that specific named properties are present in the JSON element at the given path.
+    /// Use instead of AssertAllPropertiesPresent when a definition has mutually exclusive
+    /// optional properties (e.g., ValueGuard operand vs rightSource) or when some properties
+    /// are not reachable via the DSL.
+    /// </summary>
+    protected static void AssertPropertiesPresent(
+        string planJson,
+        string jsonPath,
+        params string[] expectedProperties)
+    {
+        using var doc = JsonDocument.Parse(planJson);
+        var element = NavigateToPath(doc.RootElement, jsonPath);
+        var jsonProps = new HashSet<string>();
+
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var prop in element.EnumerateObject())
+                jsonProps.Add(prop.Name);
+        }
+
+        var missing = expectedProperties.Where(p => !jsonProps.Contains(p)).ToList();
+
+        Assert.That(missing, Is.Empty,
+            $"Expected properties not present in JSON at '{jsonPath}': " +
+            $"[{string.Join(", ", missing)}]. " +
+            $"Actual properties: [{string.Join(", ", jsonProps)}].");
+    }
+
     // ── Helpers ──
 
     protected static ReactivePlan<ResidentModel> CreatePlan()

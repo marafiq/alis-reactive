@@ -5,7 +5,7 @@ event: file
 conditions:
   - field: file_path
     operator: regex_match
-    pattern: Alis\.Reactive(\.Native|\.Fusion)?/.*\.cs$
+    pattern: (?:^|/)Alis\.Reactive(\.Native|\.Fusion)?/(?!.*tests/).*\.cs$
   - field: new_text
     operator: regex_match
     pattern: (public|internal|protected)\s+(class|interface|struct|enum|sealed|static|void|string|bool|int|IHtmlContent|ReactivePlan|InputBoundField)

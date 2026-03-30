@@ -21,6 +21,12 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
+
+        // AssertAllPropertiesPresent not used: ValueGuard has mutually exclusive
+        // optional properties (operand vs rightSource vs elementCoerceAs).
+        // This variant exercises: kind, source, coerceAs, op, operand.
+        AssertPropertiesPresent(json, "entries[0].reaction.branches[0].guard",
+            "kind", "source", "coerceAs", "op", "operand");
     }
 
     [Test]
@@ -42,12 +48,19 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
+
+        // This variant exercises: kind, source, coerceAs, op, rightSource.
+        AssertPropertiesPresent(json, "entries[0].reaction.branches[0].guard",
+            "kind", "source", "coerceAs", "op", "rightSource");
     }
 
     [Test]
     public void value_guard_with_element_coerce_conforms()
     {
-        // ValueGuard with elementCoerceAs: used by ArrayContains operator
+        // ValueGuard with elementCoerceAs: requires array-typed model property.
+        // ResidentModel.CareLevel is string (not array), so elementCoerceAs is null.
+        // ArrayContains still exercises the op correctly; elementCoerceAs would need
+        // a List<T> property on the model to produce a non-null value.
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent<ResidentModel>("check", (args, p) =>
         {
@@ -57,6 +70,12 @@ public class WhenDetectingConditionSchemaDrift : DriftTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
+
+        // elementCoerceAs requires an array-typed property (List<T>) on the model.
+        // CareLevel is string, so elementCoerceAs is null and omitted from JSON.
+        // Asserting the properties this variant does produce.
+        AssertPropertiesPresent(json, "entries[0].reaction.branches[0].guard",
+            "kind", "source", "coerceAs", "op", "operand");
     }
 
     [Test]

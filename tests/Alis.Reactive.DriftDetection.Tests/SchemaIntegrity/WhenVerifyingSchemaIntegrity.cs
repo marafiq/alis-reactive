@@ -5,7 +5,7 @@ namespace Alis.Reactive.DriftDetection.Tests.SchemaIntegrity;
 /// <summary>
 /// Verifies the schema itself is structured to catch drift.
 /// additionalProperties: false on every object definition is what makes
-/// the C# → Schema direction work — without it, extra properties pass silently.
+/// the C# -> Schema direction work -- without it, extra properties pass silently.
 /// </summary>
 [TestFixture]
 public class WhenVerifyingSchemaIntegrity : DriftTestBase
@@ -35,7 +35,7 @@ public class WhenVerifyingSchemaIntegrity : DriftTestBase
         Assert.That(violations, Is.Empty,
             $"Schema object definitions missing additionalProperties: false: " +
             $"[{string.Join(", ", violations)}]. Without this constraint, " +
-            "new C# properties pass schema validation silently — drift detection breaks.");
+            "new C# properties pass schema validation silently -- drift detection breaks.");
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class WhenVerifyingSchemaIntegrity : DriftTestBase
         });
 
         Assert.That(result.IsValid, Is.False,
-            "Schema should reject unknown property 'extraProp' — " +
+            "Schema should reject unknown property 'extraProp' -- " +
             "drift detection mechanism is broken if this passes.");
     }
 
@@ -87,20 +87,43 @@ public class WhenVerifyingSchemaIntegrity : DriftTestBase
     [Test]
     public void all_union_definitions_have_variants()
     {
-        var unionDefs = new[]
+        var expectedUnions = new Dictionary<string, string[]>
         {
-            ("Trigger", 5), ("Reaction", 4), ("Command", 5), ("Guard", 5),
-            ("BindSource", 2), ("Mutation", 2), ("MethodArg", 2), ("GatherItem", 4)
+            ["Trigger"] = new[]
+            {
+                "DomReadyTrigger", "CustomEventTrigger", "ComponentEventTrigger",
+                "ServerPushTrigger", "SignalRTrigger"
+            },
+            ["Reaction"] = new[]
+            {
+                "SequentialReaction", "ConditionalReaction",
+                "HttpReaction", "ParallelHttpReaction"
+            },
+            ["Command"] = new[]
+            {
+                "DispatchCommand", "MutateElementCommand", "MutateEventCommand",
+                "ValidationErrorsCommand", "IntoCommand"
+            },
+            ["Guard"] = new[]
+            {
+                "ValueGuard", "AllGuard", "AnyGuard", "InvertGuard", "ConfirmGuard"
+            },
+            ["BindSource"] = new[] { "EventSource", "ComponentSource" },
+            ["Mutation"] = new[] { "SetPropMutation", "CallMutation" },
+            ["MethodArg"] = new[] { "LiteralArg", "SourceArg" },
+            ["GatherItem"] = new[]
+            {
+                "ComponentGather", "StaticGather", "AllGather", "EventGather"
+            }
         };
 
-        foreach (var (defName, expectedCount) in unionDefs)
+        foreach (var (defName, expectedVariants) in expectedUnions)
         {
             var def = Analyzer.GetDefinition(defName);
             Assert.That(def.IsUnionDef, Is.True,
                 $"Schema $defs/{defName} should be a oneOf union.");
-            Assert.That(def.UnionVariants!.Count, Is.EqualTo(expectedCount),
-                $"Schema $defs/{defName} has {def.UnionVariants.Count} variants, " +
-                $"expected {expectedCount}. A variant was added or removed.");
+            Assert.That(def.UnionVariants, Is.EquivalentTo(expectedVariants),
+                $"Schema $defs/{defName} variants don't match expected.");
         }
     }
 }

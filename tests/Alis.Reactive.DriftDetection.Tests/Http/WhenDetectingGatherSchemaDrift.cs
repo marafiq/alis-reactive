@@ -58,15 +58,8 @@ public class WhenDetectingGatherSchemaDrift : DriftTestBase
         // Native Include extension produces a ComponentGather.
         var plan = CreatePlan();
 
-        try
-        {
-            Html.InputField(plan, m => m.Name)
-                .NativeTextBox(b => b.Placeholder("Name"));
-        }
-        catch (NotImplementedException)
-        {
-            // TestHtmlHelper.TextBoxFor — component already registered in plan
-        }
+        Html.InputField(plan, m => m.Name)
+            .NativeTextBox(b => b.Placeholder("Name"));
 
         On(plan, t => t.CustomEvent("submit", p =>
             p.Post("/api/residents", g => g.Include(m => m.Name))));

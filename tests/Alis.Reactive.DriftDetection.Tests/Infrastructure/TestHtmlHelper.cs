@@ -99,7 +99,8 @@ public sealed class TestHtmlHelper<TModel> : IHtmlHelper<TModel>
     public IHtmlContent PasswordFor<TResult>(Expression<Func<TModel, TResult>> expression, object htmlAttributes) => throw new NotImplementedException();
     public IHtmlContent RadioButtonFor<TResult>(Expression<Func<TModel, TResult>> expression, object value, object htmlAttributes) => throw new NotImplementedException();
     public IHtmlContent TextAreaFor<TResult>(Expression<Func<TModel, TResult>> expression, int rows, int columns, object htmlAttributes) => throw new NotImplementedException();
-    public IHtmlContent TextBoxFor<TResult>(Expression<Func<TModel, TResult>> expression, string format, object htmlAttributes) => throw new NotImplementedException();
+    public IHtmlContent TextBoxFor<TResult>(Expression<Func<TModel, TResult>> expression, string format, object htmlAttributes)
+        => new HtmlString($"<input name=\"{NameFor(expression)}\" />");
     public IHtmlContent ValidationMessageFor<TResult>(Expression<Func<TModel, TResult>> expression, string message, object htmlAttributes, string tag) => throw new NotImplementedException();
     public string ValueFor<TResult>(Expression<Func<TModel, TResult>> expression, string format) => throw new NotImplementedException();
 

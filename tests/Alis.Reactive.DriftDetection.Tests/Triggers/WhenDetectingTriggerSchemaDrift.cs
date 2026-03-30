@@ -71,22 +71,12 @@ public class WhenDetectingTriggerSchemaDrift : DriftTestBase
         var plan = CreatePlan();
 
         // InputField + NativeTextBox + Reactive produces a ComponentEventTrigger.
-        // The Reactive() call adds entries to the plan before Render() writes HTML,
-        // so even if the HTML write fails the plan state is correct.
-        try
-        {
-            Html.InputField(plan, m => m.Name)
-                .NativeTextBox(b => b
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("name-echo").SetText(args, x => x.Value!);
-                    }));
-        }
-        catch (NotImplementedException)
-        {
-            // TestHtmlHelper.TextBoxFor is not implemented — but Reactive() already
-            // added the ComponentEventTrigger entry to the plan.
-        }
+        Html.InputField(plan, m => m.Name)
+            .NativeTextBox(b => b
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.Element("name-echo").SetText(args, x => x.Value!);
+                }));
 
         var json = plan.Render();
         AssertSchemaValid(json);

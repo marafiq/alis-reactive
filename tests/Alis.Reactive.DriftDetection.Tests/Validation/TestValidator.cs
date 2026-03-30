@@ -22,6 +22,12 @@ public class TestValidator : ReactiveValidator<ResidentModel>
             RuleFor(x => x.VeteranId).NotEmpty().WithMessage("Veteran ID is required");
         });
 
+        // Conditional rule with value: PhysicianName required when CareLevel == "Memory Care"
+        WhenField<string>(x => x.CareLevel, "Memory Care", () =>
+        {
+            RuleFor(x => x.PhysicianName).NotEmpty().WithMessage("Physician required for Memory Care");
+        });
+
         // Cross-property comparison: MonthlyRate must be > 0
         RuleFor(x => x.MonthlyRate)
             .GreaterThan(0m).WithMessage("Rate must be positive");
