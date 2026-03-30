@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Authors>Alis Solutions</Authors>
+    <Company>Alis Solutions</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/marafiq/alis-reactive</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/marafiq/alis-reactive</PackageProjectUrl>
+    <Copyright>Copyright (c) Alis Solutions 2026</Copyright>
+  </PropertyGroup>
+</Project>

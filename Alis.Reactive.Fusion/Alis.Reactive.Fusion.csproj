@@ -5,6 +5,9 @@
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IsPackable>true</IsPackable>
+        <PackageDescription>Syncfusion EJ2 component integration for Alis.Reactive — rich UI components through the reactive plan DSL.</PackageDescription>
+        <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

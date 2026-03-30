@@ -1,0 +1,111 @@
+name: Publish NuGet packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Alis.Reactive/**'
+      - 'Alis.Reactive.Native/**'
+      - 'Alis.Reactive.Fusion/**'
+      - 'Alis.Reactive.FluentValidator/**'
+      - 'Alis.Reactive.Analyzers/**'
+      - 'Alis.Reactive.NativeTagHelpers/**'
+      - 'Directory.Build.props'
+      - '.github/workflows/nuget-publish.yml'
+  workflow_dispatch:
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build JS + CSS bundles
+        run: npm run build:all
+
+      - name: Build all C# projects
+        run: dotnet build --configuration Release
+
+      - name: Run unit tests
+        run: |
+          dotnet test tests/Alis.Reactive.UnitTests --configuration Release --no-build
+          dotnet test tests/Alis.Reactive.Native.UnitTests --configuration Release --no-build
+          dotnet test tests/Alis.Reactive.Fusion.UnitTests --configuration Release --no-build
+          dotnet test tests/Alis.Reactive.FluentValidator.UnitTests --configuration Release --no-build
+          dotnet test tests/Alis.Reactive.Analyzers.Tests --configuration Release --no-build
+          dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests --configuration Release --no-build
+          dotnet test tests/Alis.Reactive.DesignSystem.Tests --configuration Release --no-build
+
+  pack-and-publish:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build JS + CSS bundles
+        run: npm run build:all
+
+      - name: Pack NuGet packages
+        run: |
+          dotnet pack Alis.Reactive/Alis.Reactive.csproj --configuration Release --output ./nupkgs
+          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj --configuration Release --output ./nupkgs
+          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj --configuration Release --output ./nupkgs
+          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj --configuration Release --output ./nupkgs
+          dotnet pack Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj --configuration Release --output ./nupkgs
+          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj --configuration Release --output ./nupkgs
+
+      - name: Upload NuGet artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./nupkgs/*.nupkg
+          retention-days: 30
+
+      - name: Publish to GitHub Packages
+        run: |
+          dotnet nuget push ./nupkgs/*.nupkg \
+            --source "https://nuget.pkg.github.com/marafiq/index.json" \
+            --api-key ${{ secrets.GITHUB_TOKEN }} \
+            --skip-duplicate
+
+      - name: Publish to NuGet.org
+        if: ${{ vars.PUBLISH_TO_NUGET == 'true' }}
+        run: |
+          dotnet nuget push ./nupkgs/*.nupkg \
+            --source "https://api.nuget.org/v3/index.json" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --skip-duplicate
