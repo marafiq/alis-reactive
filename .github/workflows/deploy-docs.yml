@@ -97,7 +97,8 @@ jobs:
             --no-build \
             --logger "html;LogFileName=playwright-report.html" \
             --logger "trx;LogFileName=playwright-results.trx" \
-            --results-directory TestResults
+            --results-directory TestResults \
+            -- NUnit.NumberOfTestWorkers=1
         continue-on-error: true
 
       - name: Retry failed tests (attempt 2)
