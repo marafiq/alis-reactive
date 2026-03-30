@@ -1,6 +1,8 @@
 # Code review protocol (compact)
 
-**Law:** [CLAUDE.md](../../CLAUDE.md) wins over this sheet.  
+**Cursor:** This process is enforced for agents via [`.cursor/rules/code-review-protocol.mdc`](../../.cursor/rules/code-review-protocol.mdc) (`alwaysApply: true`). Humans: same bar.
+
+**Law:** [CLAUDE.md](../../CLAUDE.md) wins over this sheet. See **Rule 13** in CLAUDE.md.  
 **Rule:** Every finding = **Verified** | **Not verified** | **Hypothesis** + next evidence step. No *probably/seems/likely* on behavior or APIs unless labeled Hypothesis.
 
 ---

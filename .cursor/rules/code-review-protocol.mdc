@@ -1,0 +1,45 @@
+---
+description: Evidence-first PR/code review — Comment criteria on every finding; blocking bugs need repro in-thread; sign GitHub posts — Cursor. Use for any review, PR feedback, LGTM, CR, or merge-readiness.
+alwaysApply: true
+---
+
+# Code review protocol (Cursor rule)
+
+**Law:** [CLAUDE.md](../../CLAUDE.md) wins on conflict.
+
+**Expanded tables / harness / gates:** `docs/process/code-review-protocol.md` — read it for full PRs; this rule is the non-negotiable core.
+
+## When this applies
+
+Any **code review**, **PR review**, **diff review**, **merge readiness**, or **GitHub** review comment (draft or post).
+
+## Workflow (order)
+
+1. Scope + base/head SHA + **files you OPENED** (not diff-only).
+2. Trust or run checks per layer (see doc): `npm run typecheck`, `npm run lint`, `npm test`, `dotnet build`, plus relevant `dotnet test` projects.
+3. Map change → owning layer; unexpected layer → stop and trace C# → schema → TS → browser.
+4. New/changed plan primitive → doc §Primitive checklist or explicit deferrals.
+5. **Every finding** (Blocking, Gap, **Polish**): full **Comment criteria** below — no nits without cites.
+6. **Blocking bug** → **also** paste repro in **same** GitHub comment (minimal test or CLI failure or link + excerpt). No repro commits on reviewed PR unless author asks.
+7. GitHub comments end with: `— Cursor`.
+8. Default **reviewer-only** unless user asks to implement.
+
+## Comment criteria (required per finding)
+
+```
+Issue:        <what is wrong or unclear>
+Why:          <path:line | symbol | diff | test — no vibes>
+Change:       <what should change>
+Benefit:      <correctness | clarity | risk | maintainability>
+Files read:   <every file opened for this comment>
+Self-check:   <re-read cited lines after writing — yes/adjusted>
+Category:     Bug | Doc | API | Design | Process
+Severity:     Blocking | Gap | Polish
+Evidence:     <same as Why, or Not verified + next step>
+```
+
+**Blocking + Bug:** repro proof **in that comment** (mandatory). Other severities: no pasted repro unless illustrating; **Issue / Why / Files read / Self-check** still mandatory.
+
+## Language
+
+Use **Verified** | **Not verified** | **Hypothesis** only for contracts/behavior. No *probably / seems / likely* unless labeled Hypothesis with a verify step.
