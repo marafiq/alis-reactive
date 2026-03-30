@@ -15,7 +15,7 @@
         <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
-    <!-- Ship JS/CSS as NuGet content files with configurable output path -->
+    <!-- Ship JS/CSS as NuGet content files with a configurable output path -->
     <ItemGroup>
         <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="buildTransitive\assets\js\" />
         <None Include="assets\css\design-system.css" Pack="true" PackagePath="buildTransitive\assets\css\" />
