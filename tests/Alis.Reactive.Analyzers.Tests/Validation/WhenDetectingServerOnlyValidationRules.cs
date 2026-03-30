@@ -114,6 +114,41 @@ public class MyValidator : AbstractValidator<MyModel>
         await CreateTest(source).RunAsync();
     }
 
+    [Test]
+    public async Task SetValidator_in_ReactiveValidator_does_not_report()
+    {
+        // SetValidator is handled by FluentValidationAdapter (recurses into nested validator).
+        // It is not server-only — the adapter extracts nested rules.
+        const string source = @"
+using FluentValidation;
+using Alis.Reactive.FluentValidator;
+
+public class Address
+{
+    public string Street { get; set; } = """";
+}
+
+public class AddressValidator : AbstractValidator<Address>
+{
+    public AddressValidator() { RuleFor(x => x.Street).NotEmpty(); }
+}
+
+public class MyModel
+{
+    public Address Address { get; set; } = new Address();
+}
+
+public class MyValidator : ReactiveValidator<MyModel>
+{
+    public MyValidator()
+    {
+        RuleFor(x => x.Address).SetValidator(new AddressValidator());
+    }
+}
+";
+        await CreateTest(source).RunAsync();
+    }
+
     // ── Flagged cases ─────────────────────────────────────────
 
     [Test]
@@ -242,32 +277,23 @@ public class MyValidator : ReactiveValidator<MyModel>
     }
 
     [Test]
-    public async Task SetValidator_in_ReactiveValidator_reports_ALIS005()
+    public async Task Server_only_method_after_extractable_chain_reports_ALIS005()
     {
         const string source = @"
+using System;
 using FluentValidation;
 using Alis.Reactive.FluentValidator;
 
-public class Address
-{
-    public string Street { get; set; } = """";
-}
-
-public class AddressValidator : AbstractValidator<Address>
-{
-    public AddressValidator() { RuleFor(x => x.Street).NotEmpty(); }
-}
-
 public class MyModel
 {
-    public Address Address { get; set; } = new Address();
+    public string Name { get; set; } = """";
 }
 
 public class MyValidator : ReactiveValidator<MyModel>
 {
     public MyValidator()
     {
-        RuleFor(x => x.Address).{|#0:SetValidator|}(new AddressValidator());
+        RuleFor(x => x.Name).NotEmpty().{|#0:Must|}(x => x.StartsWith(""A""));
     }
 }
 ";

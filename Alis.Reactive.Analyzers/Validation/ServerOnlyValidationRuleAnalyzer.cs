@@ -12,7 +12,7 @@ namespace Alis.Reactive.Analyzers.Validation
     /// inside a <c>ReactiveValidator&lt;T&gt;</c>. These rules cannot be extracted for
     /// client-side validation and will silently drop during extraction.
     ///
-    /// Detected methods: IsInEnum, Must, MustAsync, Custom, CustomAsync, SetValidator.
+    /// Detected methods: IsInEnum, Must, MustAsync, Custom, CustomAsync.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ServerOnlyValidationRuleAnalyzer : DiagnosticAnalyzer
@@ -37,8 +37,7 @@ namespace Alis.Reactive.Analyzers.Validation
                 "Must",
                 "MustAsync",
                 "Custom",
-                "CustomAsync",
-                "SetValidator"
+                "CustomAsync"
             );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
