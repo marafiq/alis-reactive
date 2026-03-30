@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System;
 
-namespace Alis.Reactive.Analyzers
+namespace Alis.Reactive.Analyzers.ConditionalChain
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class IncompleteConditionalChainAnalyzer : DiagnosticAnalyzer
@@ -20,7 +20,8 @@ namespace Alis.Reactive.Analyzers
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "A conditional or guard chain was started but never completed with .Then(). " +
-                         "The condition will not be included in the plan.");
+                         "The condition will not be included in the plan.",
+            helpLinkUri: null);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
@@ -30,10 +31,27 @@ namespace Alis.Reactive.Analyzers
             context.ConfigureGeneratedCodeAnalysis(
                 GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(AnalyzeExpressionStatement, SyntaxKind.ExpressionStatement);
+
+            context.RegisterCompilationStartAction(compilationCtx =>
+            {
+                var guardBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
+                    "Alis.Reactive.Builders.Conditions.GuardBuilder`1");
+                var conditionSourceBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
+                    "Alis.Reactive.Builders.Conditions.ConditionSourceBuilder`2");
+
+                if (guardBuilderType == null && conditionSourceBuilderType == null)
+                    return;
+
+                compilationCtx.RegisterSyntaxNodeAction(
+                    nodeCtx => AnalyzeExpressionStatement(nodeCtx, guardBuilderType, conditionSourceBuilderType),
+                    SyntaxKind.ExpressionStatement);
+            });
         }
 
-        private static void AnalyzeExpressionStatement(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeExpressionStatement(
+            SyntaxNodeAnalysisContext context,
+            INamedTypeSymbol? guardBuilderType,
+            INamedTypeSymbol? conditionSourceBuilderType)
         {
             var statement = (ExpressionStatementSyntax)context.Node;
             if (!IsRazorGeneratedFile(statement.SyntaxTree))
@@ -44,8 +62,7 @@ namespace Alis.Reactive.Analyzers
 
             if (type == null) return;
 
-            // Check if the return type is GuardBuilder<> or ConditionSourceBuilder<,>
-            if (!IsDanglingBuilderType(type)) return;
+            if (!IsDanglingBuilderType(type, guardBuilderType, conditionSourceBuilderType)) return;
 
             context.ReportDiagnostic(Diagnostic.Create(Rule, statement.Expression.GetLocation()));
         }
@@ -56,20 +73,23 @@ namespace Alis.Reactive.Analyzers
             if (string.IsNullOrEmpty(path)) return false;
 
             return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".g.cs", StringComparison.OrdinalIgnoreCase);
+                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
 
-        private static bool IsDanglingBuilderType(ITypeSymbol type)
+        private static bool IsDanglingBuilderType(
+            ITypeSymbol type,
+            INamedTypeSymbol? guardBuilderType,
+            INamedTypeSymbol? conditionSourceBuilderType)
         {
             if (type is not INamedTypeSymbol named) return false;
             if (!named.IsGenericType) return false;
 
             var original = named.ConstructedFrom;
-            var fullName = original.ToDisplayString();
 
-            return fullName == "Alis.Reactive.Builders.Conditions.GuardBuilder<TModel>"
-                || fullName == "Alis.Reactive.Builders.Conditions.ConditionSourceBuilder<TModel, TProp>";
+            return (guardBuilderType != null
+                    && SymbolEqualityComparer.Default.Equals(original, guardBuilderType))
+                || (conditionSourceBuilderType != null
+                    && SymbolEqualityComparer.Default.Equals(original, conditionSourceBuilderType));
         }
     }
 }

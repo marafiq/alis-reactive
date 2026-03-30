@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -6,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Alis.Reactive.Analyzers
+namespace Alis.Reactive.Analyzers.ReactiveEvent
 {
     /// <summary>
     /// Error when .Reactive() is called multiple times for the same event on the same builder chain.
@@ -32,7 +33,8 @@ namespace Alis.Reactive.Analyzers
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "Each component event should have exactly one .Reactive() call per builder chain. Multiple calls for the same event create redundant plan entries.");
+            description: "Each component event should have exactly one .Reactive() call per builder chain. Multiple calls for the same event create redundant plan entries.",
+            helpLinkUri: null);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
@@ -118,9 +120,8 @@ namespace Alis.Reactive.Analyzers
             var path = tree.FilePath;
             if (string.IsNullOrEmpty(path)) return false;
 
-            return path.EndsWith(".cshtml", System.StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", System.StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".g.cs", System.StringComparison.OrdinalIgnoreCase);
+            return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
+                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

@@ -1,10 +1,10 @@
-using Alis.Reactive.Analyzers;
+using Alis.Reactive.Analyzers.NativeActionLink;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 
-namespace Alis.Reactive.Analyzers.Tests;
+namespace Alis.Reactive.Analyzers.Tests.NativeActionLink;
 
 [TestFixture]
 public class WhenEnforcingNativeActionLinkSingleRequest
@@ -107,7 +107,7 @@ namespace Alis.Reactive.Native.Components
 }";
 
     private static CSharpAnalyzerTest<NativeActionLinkSingleRequestAnalyzer, DefaultVerifier> CreateTest(
-        string source, params DiagnosticResult[] expected)
+        string source, string fileName = "NativeActionLink.cshtml.g.cs", params DiagnosticResult[] expected)
     {
         var test = new CSharpAnalyzerTest<NativeActionLinkSingleRequestAnalyzer, DefaultVerifier>
         {
@@ -116,7 +116,7 @@ namespace Alis.Reactive.Native.Components
         };
 
         test.TestState.Sources.Add(("TypeStubs.cs", TypeStubs));
-        test.TestState.Sources.Add(("NativeActionLink.g.cs", source));
+        test.TestState.Sources.Add((fileName, source));
         test.ExpectedDiagnostics.AddRange(expected);
         return test;
     }
@@ -178,7 +178,7 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 
     [Test]
@@ -204,7 +204,7 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 
     [Test]
@@ -230,7 +230,7 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 
     [Test]
@@ -283,7 +283,7 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 
     [Test]
@@ -310,6 +310,61 @@ public class GeneratedView
     }
 }";
 
-        await CreateTest(source, ExpectALIS002(0)).RunAsync();
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
+    }
+
+    [Test]
+    public async Task Parallel_in_plain_cs_file_does_not_report()
+    {
+        const string source = @"
+using Alis.Reactive.Native.Components;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+public class PageModel { }
+
+public class GeneratedView
+{
+    public IHtmlHelper<PageModel> Html { get; set; } = default!;
+
+    public void Execute()
+    {
+        Html.NativeActionLink(""Delete"", ""/orders/delete/42"", p =>
+        {
+            p.Parallel(
+                a => a.Post(""/a""),
+                b => b.Post(""/b""))
+             .OnAllSettled(x => x.Element(""done"").Show());
+            p.Post(""/orders/delete/42"");
+        });
+    }
+}";
+
+        await CreateTest(source, "Service.cs").RunAsync();
+    }
+
+    [Test]
+    public async Task Two_top_level_requests_reports_ALIS002()
+    {
+        const string source = @"
+using Alis.Reactive.Native.Components;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+public class PageModel { }
+
+public class GeneratedView
+{
+    public IHtmlHelper<PageModel> Html { get; set; } = default!;
+
+    public void Execute()
+    {
+        Html.NativeActionLink(""Save"", ""/orders/save"", {|#0:p =>
+        {
+            p.Post(""/orders/save"");
+            p.Post(""/orders/notify"");
+        }|});
+    }
+}";
+
+        await CreateTest(source, "NativeActionLink.cshtml.g.cs", ExpectALIS002(0)).RunAsync();
     }
 }

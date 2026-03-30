@@ -68,7 +68,8 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "Reactive callbacks build descriptors at render time \u2014 they do not execute at runtime. " +
-                         "Use p.When(...).Then(...).Else(...) for conditions.");
+                         "Use p.When(...).Then(...).Else(...) for conditions.",
+            helpLinkUri: null);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
@@ -200,8 +201,7 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             if (string.IsNullOrEmpty(path)) return false;
 
             return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".g.cs", StringComparison.OrdinalIgnoreCase);
+                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

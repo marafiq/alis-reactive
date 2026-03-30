@@ -2,9 +2,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
-using Alis.Reactive.Analyzers;
+using Alis.Reactive.Analyzers.ConditionalChain;
 
-namespace Alis.Reactive.Analyzers.Tests;
+namespace Alis.Reactive.Analyzers.Tests.ConditionalChain;
 
 [TestFixture]
 public class WhenDetectingIncompleteConditionalChains
@@ -188,7 +188,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "ReactiveConditions.g.cs", ExpectALIS001(0)).RunAsync();
+        await CreateTest(source, "ReactiveConditions.cshtml.g.cs", ExpectALIS001(0)).RunAsync();
     }
 
     [Test]
@@ -206,6 +206,73 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "ReactiveConditions.g.cs", ExpectALIS001(0)).RunAsync();
+        await CreateTest(source, "ReactiveConditions.cshtml.g.cs", ExpectALIS001(0)).RunAsync();
+    }
+
+    [Test]
+    public async Task Multiple_dangling_chains_report_multiple_diagnostics()
+    {
+        const string source = @"
+using Alis.Reactive.Builders;
+using Alis.Reactive.Builders.Conditions;
+
+public class Payload { public string Value { get; set; } = """"; }
+
+public class GeneratedView
+{
+    public void Execute()
+    {
+        var p = new PipelineBuilder<GeneratedView>();
+        var args = new Payload();
+        {|#0:p.When(args, x => x.Value).Eq(""active"")|};
+        {|#1:p.When(args, x => x.Value).Eq(""pending"")|};
+    }
+}
+";
+        await CreateTest(source, "ReactiveConditions.cshtml.g.cs", ExpectALIS001(0), ExpectALIS001(1)).RunAsync();
+    }
+
+    [Test]
+    public async Task Dangling_chain_in_cshtml_file_reports_ALIS001()
+    {
+        const string source = @"
+using Alis.Reactive.Builders;
+using Alis.Reactive.Builders.Conditions;
+
+public class Payload { public string Value { get; set; } = """"; }
+
+public class GeneratedView
+{
+    public void Execute()
+    {
+        var p = new PipelineBuilder<GeneratedView>();
+        var args = new Payload();
+        {|#0:p.When(args, x => x.Value).Eq(""active"")|};
+    }
+}
+";
+        await CreateTest(source, "ReactiveConditions.cshtml", ExpectALIS001(0)).RunAsync();
+    }
+
+    [Test]
+    public async Task Deeply_chained_guard_without_Then_reports_ALIS001()
+    {
+        const string source = @"
+using Alis.Reactive.Builders;
+using Alis.Reactive.Builders.Conditions;
+
+public class Payload { public string Value { get; set; } = """"; }
+
+public class GeneratedView
+{
+    public void Execute()
+    {
+        var p = new PipelineBuilder<GeneratedView>();
+        var args = new Payload();
+        {|#0:p.When(args, x => x.Value).Eq(""active"").And()|};
+    }
+}
+";
+        await CreateTest(source, "ReactiveConditions.cshtml.g.cs", ExpectALIS001(0)).RunAsync();
     }
 }

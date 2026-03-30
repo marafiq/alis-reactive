@@ -160,7 +160,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -185,7 +185,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -209,7 +209,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -235,7 +235,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -259,7 +259,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -283,7 +283,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -309,7 +309,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0), ExpectALIS004(1)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0), ExpectALIS004(1)).RunAsync();
     }
 
     [Test]
@@ -333,7 +333,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -358,7 +358,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -383,7 +383,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -410,7 +410,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     // ── Flagged: Expression types ─────────────────────────────────
@@ -437,7 +437,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -463,7 +463,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     // ── Flagged: Scenarios ────────────────────────────────────────
@@ -490,7 +490,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0), ExpectALIS004(1)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0), ExpectALIS004(1)).RunAsync();
     }
 
     [Test]
@@ -516,7 +516,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -542,7 +542,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -565,7 +565,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     // ── Allowed: DSL usage ────────────────────────────────────────
@@ -593,7 +593,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     [Test]
@@ -621,7 +621,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     [Test]
@@ -649,7 +649,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     [Test]
@@ -679,7 +679,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     [Test]
@@ -702,7 +702,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     [Test]
@@ -724,7 +724,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     [Test]
@@ -751,7 +751,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     // ── Scope: Nested lambdas ─────────────────────────────────────
@@ -780,7 +780,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     [Test]
@@ -807,7 +807,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs").RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs").RunAsync();
     }
 
     [Test]
@@ -837,7 +837,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -864,7 +864,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     // ── Scope: File type ──────────────────────────────────────────
@@ -919,7 +919,7 @@ public class GeneratedView
 }
 ";
         // Only 1 diagnostic — the if statement. The ternary inside is NOT double-reported.
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -945,7 +945,7 @@ public class GeneratedView
 }
 ";
         // Only 1 diagnostic — the switch statement. The nested switch expression is NOT double-reported.
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     // ── Review fixes: additional statement types ──────────────────
@@ -972,7 +972,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -998,7 +998,7 @@ public class GeneratedView
 }
 ";
         // LocalFunctionStatement is flagged; the Helper() call is an ExpressionStatement (allowed)
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     // ── Review fixes: additional scope tests ──────────────────────
@@ -1028,7 +1028,7 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 
     [Test]
@@ -1059,6 +1059,6 @@ public class GeneratedView
     }
 }
 ";
-        await CreateTest(source, "View.g.cs", ExpectALIS004(0)).RunAsync();
+        await CreateTest(source, "View.cshtml.g.cs", ExpectALIS004(0)).RunAsync();
     }
 }
