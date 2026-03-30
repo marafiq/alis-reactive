@@ -1,30 +1,28 @@
 ---
-description: Evidence-first PR/code review — Comment criteria on every finding; blocking bugs need repro in-thread; sign GitHub posts — Cursor. Use for any review, PR feedback, LGTM, CR, or merge-readiness.
+description: Evidence-first PR/code review for this repo — Comment criteria on every finding; blocking bugs need repro in-thread; sign GitHub — Cursor.
 alwaysApply: true
 ---
 
-# Code review protocol (Cursor rule)
+# Code review (Cursor — source of truth)
 
-**Law:** [CLAUDE.md](../../CLAUDE.md) wins on conflict.
+This rule defines **how** reviews run here. Extended reference: `docs/process/code-review-protocol.md` (tables, harness detail, repo gates).
 
-**Expanded tables / harness / gates:** `docs/process/code-review-protocol.md` — read it for full PRs; this rule is the non-negotiable core.
+## Scope
 
-## When this applies
+Code review, PR / diff review, merge readiness, drafting or posting **GitHub** review feedback.
 
-Any **code review**, **PR review**, **diff review**, **merge readiness**, or **GitHub** review comment (draft or post).
+## Workflow
 
-## Workflow (order)
+1. **Scope** — What's in/out; base + head SHA; **list every file you opened** (not diff-only).
+2. **Automation** — Trust CI or run: `npm run typecheck`, `npm run lint`, `npm test`, `dotnet build`, plus layer `dotnet test` projects from the doc harness table.
+3. **Layer map** — Owns C# vs schema vs TS vs browser; wrong layer → stop, trace full pipeline before LGTM.
+4. **Primitives** — If wire/command/trigger shape changes: doc §Primitive checklist or explicit deferrals.
+5. **Every finding** (Blocking, Gap, **Polish**) — Full **Comment criteria**; no evidence-free nits.
+6. **Blocking bug** — Minimal red test + repro **in the same GitHub comment** (paste test, CLI output, or link + excerpt). No repro commits on the **reviewed** PR unless author invites.
+7. **GitHub** — End agent comments with `— Cursor`.
+8. **Role** — Reviewer-only unless user asks to implement.
 
-1. Scope + base/head SHA + **files you OPENED** (not diff-only).
-2. Trust or run checks per layer (see doc): `npm run typecheck`, `npm run lint`, `npm test`, `dotnet build`, plus relevant `dotnet test` projects.
-3. Map change → owning layer; unexpected layer → stop and trace C# → schema → TS → browser.
-4. New/changed plan primitive → doc §Primitive checklist or explicit deferrals.
-5. **Every finding** (Blocking, Gap, **Polish**): full **Comment criteria** below — no nits without cites.
-6. **Blocking bug** → **also** paste repro in **same** GitHub comment (minimal test or CLI failure or link + excerpt). No repro commits on reviewed PR unless author asks.
-7. GitHub comments end with: `— Cursor`.
-8. Default **reviewer-only** unless user asks to implement.
-
-## Comment criteria (required per finding)
+## Comment criteria (per finding)
 
 ```
 Issue:        <what is wrong or unclear>
@@ -38,8 +36,8 @@ Severity:     Blocking | Gap | Polish
 Evidence:     <same as Why, or Not verified + next step>
 ```
 
-**Blocking + Bug:** repro proof **in that comment** (mandatory). Other severities: no pasted repro unless illustrating; **Issue / Why / Files read / Self-check** still mandatory.
+**Blocking + Bug:** repro **in that comment** (mandatory). Else: **Issue / Why / Files read / Self-check** still mandatory.
 
 ## Language
 
-Use **Verified** | **Not verified** | **Hypothesis** only for contracts/behavior. No *probably / seems / likely* unless labeled Hypothesis with a verify step.
+**Verified** | **Not verified** | **Hypothesis** for behavior/contracts. No *probably / seems / likely* without Hypothesis + verify step.

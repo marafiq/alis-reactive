@@ -1,8 +1,7 @@
 # Code review protocol (compact)
 
-**Cursor:** This process is enforced for agents via [`.cursor/rules/code-review-protocol.mdc`](../../.cursor/rules/code-review-protocol.mdc) (`alwaysApply: true`). Humans: same bar.
+**Canonical for agents:** [`.cursor/rules/code-review-protocol.mdc`](../../.cursor/rules/code-review-protocol.mdc) (`alwaysApply: true`). This file is the **expanded** reference (harness, gates, tables).
 
-**Law:** [CLAUDE.md](../../CLAUDE.md) wins over this sheet. See **Rule 13** in CLAUDE.md.  
 **Rule:** Every finding = **Verified** | **Not verified** | **Hypothesis** + next evidence step. No *probably/seems/likely* on behavior or APIs unless labeled Hypothesis.
 
 ---
@@ -15,12 +14,12 @@
    + layer tests from harness table below.
 2. Map change → owning layer. Unexpected layer? Stop; trace C# → schema → TS → browser before LGTM.
 3. If new/changed plan primitive: complete §Primitive checklist or list explicit deferrals.
-4. Scan §CLAUDE gates if diff touches views, runtime, vendors, IDs, API visibility, slices.
+4. Scan §Repo gates if diff touches views, runtime, vendors, IDs, API visibility, slices.
 5. For **every** finding (Blocking, Gap, **or** Polish): emit §Comment criteria — all fields filled; no empty Evidence / “nit” without cites.
 6. Bug (blocking)? **Extra mandatory:** §Repro artifact **in this comment** (minimal red test + paste/link+excerpt). Non-blocking still needs §Comment criteria; only blocking bugs need pasted repro in-thread.
 7. Doc/API/SOLID claims? Match §Evidence-by-category.
 8. Consolidate thread; withdraw wrong claims; GitHub comment ends with — Cursor.
-9. Default: reviewer-only; no drive-by refactors. Load matching .claude/skills/ for DSL reviews.
+9. Default: reviewer-only; no drive-by refactors. Use project DSL/onboarding docs when reviewing builder syntax.
 ```
 
 ---
@@ -54,7 +53,7 @@ Evidence:     <same as Why, or Not verified + next step>
 | TS runtime | `npm test`, `npm run typecheck`, `npm run lint`; tests under `Alis.Reactive.SandboxApp/Scripts/__tests__/` ([vitest.config.ts](../../vitest.config.ts)) |
 | JS/CSS bundles | `npm run build:all` then `dotnet build` |
 | Native / Fusion / FV | `dotnet test tests/Alis.Reactive.Native.UnitTests` (+ Fusion, FluentValidator) as touched |
-| Browser | `dotnet test tests/Alis.Reactive.PlaywrightTests` + `TestResults/` per CLAUDE.md |
+| Browser | `dotnet test tests/Alis.Reactive.PlaywrightTests` + `TestResults/` (TRX/HTML per repo scripts) |
 
 ---
 
@@ -72,17 +71,17 @@ Evidence:     <same as Why, or Not verified + next step>
 
 ---
 
-## CLAUDE gates (flag if violated)
+## Repo gates (flag if violated)
 
 | Gate | Check |
 |------|--------|
 | Plan = contract | No manual JS / `addEventListener` in `.cshtml` / `window.alis` / inline script; boot = esbuild entry ([root.ts](../../Alis.Reactive.SandboxApp/Scripts/root.ts) on this layout). |
-| Vendor | Vendor logic in **one** canonical module per CLAUDE; `rg` before accusing; no sprawl. |
+| Vendor | Vendor logic in **one** canonical module; `rg` to find boundary before accusing; no sprawl. |
 | IDs | Plan-driven IDs; no new DOM-wide scans / `querySelectorAll` for discovery. |
-| Fail fast | No silent fallbacks for missing registration/vendor (Rule 10) without waiver. |
+| Fail fast | No silent fallbacks for missing registration/vendor without explicit waiver + rationale. |
 | Slices | No new shared **behavioral** base classes across vertical slices. |
-| C# | Libraries = **C# 8.0**; apps/tests may be newer. |
-| Public API | High risk; respect `.claude/hookify.protect-api-surface.local.md` **if present**. |
+| C# | Libraries = **C# 8.0** (per csproj); apps/tests may use newer language version. |
+| Public API | Treat visibility/surface changes as high risk; honor any repo hook or policy that blocks API edits **if present**. |
 
 ---
 
