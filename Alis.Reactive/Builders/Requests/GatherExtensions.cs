@@ -41,9 +41,12 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Gathers the value of a component identified by string ref.
-        /// Used for non-model-bound components (grids, string-id controls).
+        /// Escape hatch: gathers a component value by raw element ID instead of model expression.
+        /// Use for non-model-bound components (grids, string-id controls) that cannot use
+        /// the expression-based <see cref="Include{TComponent,TModel}(GatherBuilder{TModel}, System.Linq.Expressions.Expression{System.Func{TModel, object}})"/> overload.
         /// </summary>
+        /// <param name="refId">The element ID of the component on the page.</param>
+        /// <param name="name">The key name in the request payload.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             string refId,

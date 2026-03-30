@@ -57,11 +57,11 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Gathers a value from the event payload at runtime.
-        /// The expression resolves to a dot-path into ctx.evt (e.g., args.Text → "evt.text").
-        /// The param is the query parameter / body field name.
-        /// Usage: g.FromEvent(args, x => x.Text, "MedicationType")
+        /// Gathers a value from the event that triggered this pipeline.
         /// </summary>
+        /// <param name="args">The event args instance (used for type inference, not evaluated).</param>
+        /// <param name="path">Expression selecting the payload property to gather (e.g., <c>x =&gt; x.Text</c>).</param>
+        /// <param name="param">The key name in the request payload.</param>
         public GatherBuilder<TModel> FromEvent<TArgs, TProp>(
             TArgs args,
             Expression<Func<TArgs, TProp>> path,
