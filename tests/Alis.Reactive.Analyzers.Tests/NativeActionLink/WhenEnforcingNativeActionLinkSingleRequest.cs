@@ -1,10 +1,10 @@
-using Alis.Reactive.Analyzers;
+using Alis.Reactive.Analyzers.NativeActionLink;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 
-namespace Alis.Reactive.Analyzers.Tests;
+namespace Alis.Reactive.Analyzers.Tests.NativeActionLink;
 
 [TestFixture]
 public class WhenEnforcingNativeActionLinkSingleRequest

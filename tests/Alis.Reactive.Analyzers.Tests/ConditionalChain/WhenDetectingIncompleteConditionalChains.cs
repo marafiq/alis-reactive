@@ -2,9 +2,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
-using Alis.Reactive.Analyzers;
+using Alis.Reactive.Analyzers.ConditionalChain;
 
-namespace Alis.Reactive.Analyzers.Tests;
+namespace Alis.Reactive.Analyzers.Tests.ConditionalChain;
 
 [TestFixture]
 public class WhenDetectingIncompleteConditionalChains

@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System;
 
-namespace Alis.Reactive.Analyzers
+namespace Alis.Reactive.Analyzers.ConditionalChain
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class IncompleteConditionalChainAnalyzer : DiagnosticAnalyzer

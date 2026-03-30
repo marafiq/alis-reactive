@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Alis.Reactive.Analyzers
+namespace Alis.Reactive.Analyzers.NativeActionLink
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class NativeActionLinkSingleRequestAnalyzer : DiagnosticAnalyzer

@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Alis.Reactive.Analyzers
+namespace Alis.Reactive.Analyzers.ReactiveEvent
 {
     /// <summary>
     /// Error when .Reactive() is called multiple times for the same event on the same builder chain.
