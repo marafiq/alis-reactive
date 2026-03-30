@@ -40,6 +40,7 @@
   <Folder Name="/.claude/skills/modern-csharp/">
     <File Path=".claude/skills/modern-csharp/SKILL.md" />
   </Folder>
+  <Folder Name="/.claude/skills/" />
   <Folder Name="/.claude/skills/bdd-testing/">
     <File Path=".claude/skills/bdd-testing/SKILL.md" />
   </Folder>
@@ -102,6 +103,7 @@
     <Project Path="tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.Native.UnitTests/Alis.Reactive.Native.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj" />
+    <Project Path="tests/Alis.Reactive.DriftDetection.Tests/Alis.Reactive.DriftDetection.Tests.csproj" />
     <Project Path="tests/Alis.Reactive.FluentValidator.UnitTests/Alis.Reactive.FluentValidator.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.DesignSystem.Tests/Alis.Reactive.DesignSystem.Tests.csproj" />
     <Project Path="tests/Alis.Reactive.NativeTagHelpers.Tests/Alis.Reactive.NativeTagHelpers.Tests.csproj" />
