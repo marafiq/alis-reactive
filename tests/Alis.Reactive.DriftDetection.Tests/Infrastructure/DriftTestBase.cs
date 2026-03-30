@@ -60,6 +60,20 @@ public abstract class DriftTestBase
             "populate the missing optional properties in the DSL call.");
     }
 
+    protected static void AssertDefinitionPropertiesExactly(
+        string defName,
+        params string[] expectedProperties)
+    {
+        var schemaDef = Analyzer.GetDefinition(defName);
+        var actual = schemaDef.AllProperties.OrderBy(x => x).ToList();
+        var expected = expectedProperties.OrderBy(x => x).ToList();
+
+        Assert.That(actual, Is.EqualTo(expected),
+            $"Schema $defs/{defName} properties drifted. " +
+            $"Expected: [{string.Join(", ", expected)}]. " +
+            $"Actual: [{string.Join(", ", actual)}].");
+    }
+
     // ── Assertion 3: JSON has specific named properties at path ──
 
     /// <summary>

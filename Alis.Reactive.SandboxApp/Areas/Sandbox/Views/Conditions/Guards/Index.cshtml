@@ -176,13 +176,12 @@
             .Else(else_ => else_.Element("confirm-result").SetText("Cancelled"))
     ));
 
-    // ── Section 24: Per-action When guard ──
-    Html.On(plan, t => t.CustomEvent<ScorePayload>("check-per-action", (args, p) =>
+    // ── Section 24: Single-command condition via When/Then ──
+    Html.On(plan, t => t.CustomEvent<ScorePayload>("check-single-command-condition", (args, p) =>
     {
-        p.Element("per-action-result").SetText("Always runs");
-        var el = p.Element("per-action-bonus");
-        el.SetText("Bonus!");
-        el.When(args, x => x.Score, csb => csb.Gte(90));
+        p.Element("single-command-condition-result").SetText("Always runs");
+        p.When(args, x => x.Score).Gte(90)
+            .Then(then => then.Element("single-command-condition-bonus").SetText("Bonus!"));
     }));
 
     // ── Section 25: Direct And syntax (same JSON as lambda And) ──
@@ -474,17 +473,17 @@
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="confirm-result">&mdash;</span></div>
     </native-card-body></native-card>
 
-    <!-- Section 24: Per-action When guard -->
+    <!-- Section 24: Single-command condition via When/Then -->
     <native-card><native-card-body>
-        <native-heading level="H2" class="mb-2">Per-Action When — Command-Level Guard</native-heading>
-        <p class="text-xs text-text-secondary mb-3">First command always runs &bull; second guarded by Score &ge; 90</p>
+        <native-heading level="H2" class="mb-2">Single-Command Condition — When/Then</native-heading>
+        <p class="text-xs text-text-secondary mb-3">Unconditional command runs first &bull; guarded command executes when Score &ge; 90</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-peraction-high" onclick="document.dispatchEvent(new CustomEvent('check-per-action',{detail:{score:95,status:''}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">95</button>
-            <button id="btn-peraction-low" onclick="document.dispatchEvent(new CustomEvent('check-per-action',{detail:{score:50,status:''}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">50</button>
+            <button id="btn-single-command-condition-high" onclick="document.dispatchEvent(new CustomEvent('check-single-command-condition',{detail:{score:95,status:''}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">95</button>
+            <button id="btn-single-command-condition-low" onclick="document.dispatchEvent(new CustomEvent('check-single-command-condition',{detail:{score:50,status:''}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">50</button>
         </div>
         <div class="grid grid-cols-2 gap-4 text-xs font-mono">
-            <div class="flex justify-between"><span class="text-text-secondary">Always</span><span id="per-action-result">&mdash;</span></div>
-            <div class="flex justify-between"><span class="text-text-secondary">Bonus</span><span id="per-action-bonus">&mdash;</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Always</span><span id="single-command-condition-result">&mdash;</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Bonus</span><span id="single-command-condition-bonus">&mdash;</span></div>
         </div>
     </native-card-body></native-card>
 

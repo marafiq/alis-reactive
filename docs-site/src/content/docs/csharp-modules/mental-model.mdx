@@ -329,7 +329,7 @@ pipeline.Confirm("message")                          § ask user before proceedi
 └── .Then(then => { ... }) / .Else(otherwise => { ... })
 
 Conditions also integrate with:
-├── Element("id").{Mutation}().When(...)              per-command guard on element mutations
+├── Element("id").{Mutation}()                        unconditional commands before/after a branch
 └── .And(inner => inner.Confirm("..."))              confirm inside guard composition
 ```
 

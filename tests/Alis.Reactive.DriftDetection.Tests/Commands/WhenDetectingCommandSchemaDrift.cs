@@ -10,9 +10,10 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
     [Test]
     public void dispatch_conforms_to_schema()
     {
-        // DispatchCommand: kind, event, payload, when
-        // Payload exercises the optional property. 'when' is schema-defined
-        // but not exposed by the DSL for Dispatch — cannot be populated.
+        // DispatchCommand: kind, event, payload
+        // Payload exercises the optional property.
+        AssertDefinitionPropertiesExactly("DispatchCommand", "kind", "event", "payload");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
             p.Dispatch("resident-admitted", new { facilityId = "FAC-001" })));
@@ -20,7 +21,6 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        // AssertAllPropertiesPresent not used: 'when' not reachable via DSL.
         AssertPropertiesPresent(json, "entries[0].reaction.commands[0]",
             "kind", "event", "payload");
     }
@@ -29,7 +29,8 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
     public void dispatch_with_payload_conforms()
     {
         // DispatchCommand: kind, event, payload
-        // 'when' is schema-defined but not exposed by DSL for Dispatch
+        AssertDefinitionPropertiesExactly("DispatchCommand", "kind", "event", "payload");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
             p.Dispatch("notify", new { level = "Memory Care", residentId = 42 })));
@@ -43,8 +44,11 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
     [Test]
     public void element_set_prop_conforms()
     {
-        // MutateElementCommand: kind, target, mutation, value, source, vendor, when
+        // MutateElementCommand: kind, target, mutation, value, source, vendor
         // Minimal: exercises kind, target, mutation, value
+        AssertDefinitionPropertiesExactly("MutateElementCommand",
+            "kind", "target", "mutation", "value", "source", "vendor");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
             p.Element("welcome").SetText("Hello, resident!")));
@@ -58,8 +62,11 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
     [Test]
     public void element_with_all_properties_conforms()
     {
-        // MutateElementCommand has: kind, target, mutation, value, source, vendor, when
+        // MutateElementCommand has: kind, target, mutation, value, source, vendor
         // Exercised across multiple commands to cover all properties.
+        AssertDefinitionPropertiesExactly("MutateElementCommand",
+            "kind", "target", "mutation", "value", "source", "vendor");
+
         var plan = CreatePlan();
 
         On(plan, t => t.CustomEvent<ResidentModel>("update", (args, p) =>
@@ -71,24 +78,22 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
             // source: SetText from event source
             p.Element("name-echo").SetText(args, x => x.Name!);
 
-            // when: ElementBuilder.When attaches guard to the LAST command (cmd[1])
-            p.Element("status")
-             .When(args, x => x.Name!, g => g.NotEmpty())
-             .SetText("updated");
+            // value: literal SetText
+            p.Element("status").SetText("updated");
         }));
 
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        // No single MutateElementCommand carries all 7 properties simultaneously
+        // No single MutateElementCommand carries all 6 properties simultaneously
         // (source and value are mutually exclusive). Verify each across commands.
         // cmd[0] = Component SetValue: vendor, value
         AssertPropertiesPresent(json, "entries[0].reaction.commands[0]",
             "kind", "target", "mutation", "value", "vendor");
-        // cmd[1] = SetText from event + When guard attached: source, when
+        // cmd[1] = SetText from event source
         AssertPropertiesPresent(json, "entries[0].reaction.commands[1]",
-            "kind", "target", "mutation", "source", "when");
-        // cmd[2] = SetText with literal value (guard was on previous command)
+            "kind", "target", "mutation", "source");
+        // cmd[2] = SetText with literal value
         AssertPropertiesPresent(json, "entries[0].reaction.commands[2]",
             "kind", "target", "mutation", "value");
     }
@@ -122,8 +127,9 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
     [Test]
     public void validation_errors_conforms()
     {
-        // ValidationErrorsCommand: kind, formId, when
-        // 'when' per-command guard is not exposed by DSL for ValidationErrors
+        // ValidationErrorsCommand: kind, formId
+        AssertDefinitionPropertiesExactly("ValidationErrorsCommand", "kind", "formId");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
             p.ValidationErrors("resident-form")));
@@ -131,7 +137,6 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        // AssertAllPropertiesPresent not used: 'when' not reachable via DSL.
         AssertPropertiesPresent(json, "entries[0].reaction.commands[0]",
             "kind", "formId");
     }
@@ -139,8 +144,9 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
     [Test]
     public void into_conforms()
     {
-        // IntoCommand: kind, target, when
-        // 'when' per-command guard is not exposed by DSL for Into
+        // IntoCommand: kind, target
+        AssertDefinitionPropertiesExactly("IntoCommand", "kind", "target");
+
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
         {
@@ -151,7 +157,6 @@ public class WhenDetectingCommandSchemaDrift : DriftTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        // AssertAllPropertiesPresent not used: 'when' not reachable via DSL.
         AssertPropertiesPresent(json,
             "entries[0].reaction.request.onSuccess[0].commands[0]",
             "kind", "target");

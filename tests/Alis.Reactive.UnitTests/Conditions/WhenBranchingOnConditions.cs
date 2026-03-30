@@ -424,18 +424,17 @@ public class WhenBranchingOnConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ── Per-action When guard ──
+    // ── Single-command condition via When/Then ──
 
     [Test]
-    public Task Per_action_when_guard()
+    public Task Single_command_condition_via_when_then()
     {
         var plan = CreatePlan();
-        Trigger(plan).CustomEvent<ScorePayload>("per-action-check", (args, p) =>
+        Trigger(plan).CustomEvent<ScorePayload>("single-command-condition-check", (args, p) =>
         {
-            p.Element("result").SetText("Always runs");
-            var el = p.Element("bonus");
-            el.SetText("Bonus!");
-            el.When(args, x => x.Score, csb => csb.Gte(90));
+            p.Element("single-command-condition-result").SetText("Always runs");
+            p.When(args, x => x.Score).Gte(90)
+                .Then(then => then.Element("single-command-condition-bonus").SetText("Bonus!"));
         });
         var json = plan.Render();
         AssertSchemaValid(json);

@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Alis.Reactive.Descriptors.Guards;
 using Alis.Reactive.Descriptors.Mutations;
 using Alis.Reactive.Descriptors.Sources;
 
@@ -31,20 +30,13 @@ namespace Alis.Reactive.Descriptors.Commands
             Mutation mutation,
             object? value = null,
             BindSource? source = null,
-            string? vendor = null,
-            Guard? when = null)
-            : base(when)
+            string? vendor = null)
         {
             Target = target;
             Mutation = mutation;
             Value = value;
             Source = source;
             Vendor = vendor;
-        }
-
-        protected override Command CloneWithGuard(Guard guard)
-        {
-            return new MutateElementCommand(Target, Mutation, Value, Source, Vendor, guard);
         }
     }
 }

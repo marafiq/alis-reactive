@@ -15,7 +15,20 @@
             <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
         </div>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Interactive demo of all 20 condition operators, AND/OR/NOT composition, Confirm dialog, and per-action When guards — click buttons to see guards evaluate
+            Interactive demo of all 20 condition operators, AND/OR/NOT composition, Confirm dialog, and single-command conditions via When/Then — click buttons to see guards evaluate
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="SupportedSyntax" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+        <div class="flex items-start justify-between">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                Supported Syntax
+            </h3>
+            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+        </div>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Dedicated vertical slice for the only supported DSL: trigger and reactive pipelines mix shared commands around When/Then/Else and verify the full browser path
         </p>
     </a>
 

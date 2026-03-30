@@ -1,7 +1,6 @@
 import type { BindSource } from "./sources";
 import type { Vendor, EventPayload } from "./context";
 import type { CoercionType } from "../core/coerce";
-import type { Guard } from "./guards";
 
 export type Command = DispatchCommand | MutateElementCommand | MutateEventCommand | ValidationErrorsCommand | IntoCommand;
 
@@ -9,7 +8,6 @@ export interface DispatchCommand {
   kind: "dispatch";
   event: string;
   payload?: EventPayload;
-  when?: Guard;
 }
 
 // ── Mutation (discriminated by kind) ──
@@ -49,13 +47,11 @@ export interface MutateElementCommand {
   value?: string | string[];
   source?: BindSource;
   vendor?: Vendor;
-  when?: Guard;
 }
 
 export interface ValidationErrorsCommand {
   kind: "validation-errors";
   formId: string;
-  when?: Guard;
 }
 
 export interface MutateEventCommand {
@@ -63,11 +59,9 @@ export interface MutateEventCommand {
   mutation: Mutation;
   value?: string | string[];
   source?: BindSource;
-  when?: Guard;
 }
 
 export interface IntoCommand {
   kind: "into";
   target: string;
-  when?: Guard;
 }
