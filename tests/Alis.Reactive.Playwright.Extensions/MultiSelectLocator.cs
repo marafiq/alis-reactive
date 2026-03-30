@@ -91,9 +91,7 @@ public sealed class MultiSelectLocator
     {
         foreach (var text in itemTexts)
         {
-            // Click wrapper to open/re-open popup
-            await Wrapper.ClickAsync();
-            await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
+            await Open();
             await Popup.Locator(".e-list-item").GetByText(text, new() { Exact = true }).ClickAsync();
             // Wait for popup to close after selection
             await Popup.WaitForAsync(new() { State = WaitForSelectorState.Hidden, Timeout = 5000 });
