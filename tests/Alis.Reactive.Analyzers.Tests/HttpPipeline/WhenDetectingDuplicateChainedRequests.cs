@@ -16,13 +16,15 @@ namespace Alis.Reactive.Builders.Requests
 {
     public class ResponseBuilder<TModel> where TModel : class
     {
-        public ResponseBuilder<TModel> OnSuccess(Action<ResponseBuilder<TModel>> configure) => this;
-        public ResponseBuilder<TModel> OnError(Action<ResponseBuilder<TModel>> configure) => this;
-        public ResponseBuilder<TModel> Chained(Action<PipelineBuilder<TModel>> configure) => this;
+        public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> configure) => this;
+        public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> configure) => this;
+        public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> configure) => this;
     }
 
     public class HttpRequestBuilder<TModel> where TModel : class
     {
+        public HttpRequestBuilder<TModel> Post(string url) => this;
+        public HttpRequestBuilder<TModel> Get(string url) => this;
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> configure) => this;
     }
 }
@@ -108,7 +110,7 @@ public class GeneratedView
         p.Post(""/api/start"")
          .Response(r => r
              .OnSuccess(s => {})
-             .OnError(e => {}));
+             .OnError(400, e => {}));
     }
 }
 ";
@@ -220,5 +222,31 @@ public class GeneratedView
 }
 ";
         await CreateTest(source, expected: ExpectALIS007(0)).RunAsync();
+    }
+
+    [Test]
+    public async Task Three_Chained_reports_on_second_and_third()
+    {
+        const string source = @"
+using System;
+using Alis.Reactive.Builders;
+using Alis.Reactive.Builders.Requests;
+
+public class MyModel { }
+
+public class GeneratedView
+{
+    public void Execute()
+    {
+        var p = new PipelineBuilder<MyModel>();
+        p.Post(""/api/start"")
+         .Response(r => r
+             .Chained(c => c.Post(""/api/step-1""))
+             .{|#0:Chained|}(c => c.Post(""/api/step-2""))
+             .{|#1:Chained|}(c => c.Post(""/api/step-3"")));
+    }
+}
+";
+        await CreateTest(source, expected: new[] { ExpectALIS007(0), ExpectALIS007(1) }).RunAsync();
     }
 }

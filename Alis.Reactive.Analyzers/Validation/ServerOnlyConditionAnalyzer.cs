@@ -65,7 +65,7 @@ namespace Alis.Reactive.Analyzers.Validation
                 return;
 
             context.ReportDiagnostic(
-                Diagnostic.Create(Rule, invocation.GetLocation(), methodName));
+                Diagnostic.Create(Rule, memberAccess.Name.GetLocation(), methodName));
         }
 
         /// <summary>

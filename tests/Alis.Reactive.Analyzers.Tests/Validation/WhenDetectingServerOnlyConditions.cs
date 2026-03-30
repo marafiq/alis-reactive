@@ -153,7 +153,7 @@ public class MyValidator : ReactiveValidator<MyModel>
 {
     public MyValidator()
     {
-        {|#0:RuleFor(x => x.Name).NotEmpty().When(x => x.IsActive)|};
+        RuleFor(x => x.Name).NotEmpty().{|#0:When|}(x => x.IsActive);
     }
 }
 ";
@@ -178,7 +178,7 @@ public class MyValidator : ReactiveValidator<MyModel>
 {
     public MyValidator()
     {
-        {|#0:RuleFor(x => x.Name).NotEmpty().Unless(x => x.IsAdmin)|};
+        RuleFor(x => x.Name).NotEmpty().{|#0:Unless|}(x => x.IsAdmin);
     }
 }
 ";
@@ -203,7 +203,7 @@ public class MyValidator : ReactiveValidator<MyModel>
 {
     public MyValidator()
     {
-        {|#0:RuleFor(x => x.Name).NotEmpty().MaximumLength(100).When(x => x.IsActive)|};
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(100).{|#0:When|}(x => x.IsActive);
     }
 }
 ";
@@ -228,7 +228,7 @@ public class MyValidator : ReactiveValidator<MyModel>
 {
     public MyValidator()
     {
-        {|#0:RuleForEach(x => x.Tags).NotEmpty().When(x => x.RequireTags)|};
+        RuleForEach(x => x.Tags).NotEmpty().{|#0:When|}(x => x.RequireTags);
     }
 }
 ";
@@ -255,8 +255,8 @@ public class MyValidator : ReactiveValidator<MyModel>
 {
     public MyValidator()
     {
-        {|#0:RuleFor(x => x.Name).NotEmpty().When(x => x.IsActive)|};
-        {|#1:RuleFor(x => x.Email).NotEmpty().When(x => x.RequireEmail)|};
+        RuleFor(x => x.Name).NotEmpty().{|#0:When|}(x => x.IsActive);
+        RuleFor(x => x.Email).NotEmpty().{|#1:When|}(x => x.RequireEmail);
     }
 }
 ";

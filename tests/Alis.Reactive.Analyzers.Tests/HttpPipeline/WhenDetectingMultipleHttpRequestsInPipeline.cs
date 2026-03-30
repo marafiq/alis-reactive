@@ -42,7 +42,7 @@ namespace Alis.Reactive.Builders
 
     public class ParallelBuilder<TModel> where TModel : class
     {
-        public PipelineBuilder<TModel> Done() => new PipelineBuilder<TModel>();
+        public ParallelBuilder<TModel> OnAllSettled(Action<PipelineBuilder<TModel>> configure) => this;
     }
 
     public class HttpRequestBuilder<TModel> where TModel : class
