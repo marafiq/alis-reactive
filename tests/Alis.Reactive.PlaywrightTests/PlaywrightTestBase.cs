@@ -1,3 +1,4 @@
+using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
 namespace Alis.Reactive.PlaywrightTests;
@@ -6,7 +7,7 @@ public abstract class PlaywrightTestBase : PageTest
 {
     protected string BaseUrl => WebServerFixture.BaseUrl;
     private const string ReactiveBootedExpression = "() => document.documentElement.dataset.alisBooted === 'true'";
-    private static readonly string[] TransientBootErrorMarkers =
+    private static readonly string[] TransientBootRecoveryMarkers =
     [
         "ERR_NETWORK_CHANGED",
         "net::ERR_NETWORK_CHANGED",
@@ -14,6 +15,12 @@ public abstract class PlaywrightTestBase : PageTest
         "ReferenceError: ej is not defined",
         "ReferenceError: ejs is not defined",
         "Cannot read properties of undefined (reading 'popups')"
+    ];
+    private static readonly string[] IgnoredConsoleErrorMarkers =
+    [
+        "ERR_NETWORK_CHANGED",
+        "net::ERR_NETWORK_CHANGED",
+        "ERR_NETWORK_IO_SUSPENDED"
     ];
 
     protected readonly List<string> _consoleMessages = new();
@@ -155,29 +162,14 @@ public abstract class PlaywrightTestBase : PageTest
             return;
         }
 
-        var effectiveTimeoutMs = containing == "booted"
-            ? Math.Max(timeoutMs, 60000)
-            : timeoutMs;
-        var deadline = DateTime.UtcNow.AddMilliseconds(effectiveTimeoutMs);
-        var retriedBoot = false;
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
         while (true)
         {
             if (ConsoleContains(containing))
                 return;
 
             if (DateTime.UtcNow >= deadline)
-            {
-                if (!retriedBoot && containing == "booted" && HasTransientBootFailure())
-                {
-                    retriedBoot = true;
-                    ClearConsoleState();
-                    await Page.ReloadAsync();
-                    deadline = DateTime.UtcNow.AddMilliseconds(effectiveTimeoutMs);
-                    continue;
-                }
-
                 break;
-            }
 
             await Task.Delay(100);
         }
@@ -205,8 +197,10 @@ public abstract class PlaywrightTestBase : PageTest
         {
             await locator.ClickAsync(new() { Timeout = timeoutMs });
         }
-        catch (TimeoutException)
+        catch (TimeoutException ex)
         {
+            TestContext.Out.WriteLine(
+                $"ClickWhenStable retrying after timeout for locator '{locator}': {ex.Message}");
             await locator.ScrollIntoViewIfNeededAsync();
             await Page.WaitForTimeoutAsync(250);
             await locator.ClickAsync(new() { Timeout = timeoutMs });
@@ -217,8 +211,8 @@ public abstract class PlaywrightTestBase : PageTest
     {
         lock (_consoleLock)
         {
-            return _consoleMessages.Any(m => TransientBootErrorMarkers.Any(m.Contains))
-                   || _consoleErrors.Any(m => TransientBootErrorMarkers.Any(m.Contains));
+            return _consoleMessages.Any(m => TransientBootRecoveryMarkers.Any(m.Contains))
+                   || _consoleErrors.Any(m => TransientBootRecoveryMarkers.Any(m.Contains));
         }
     }
 
@@ -249,7 +243,7 @@ public abstract class PlaywrightTestBase : PageTest
     private List<string> FilterUnexpectedConsoleErrors()
     {
         return SnapshotConsoleErrors()
-            .Where(e => !TransientBootErrorMarkers.Any(e.Contains))
+            .Where(e => !IgnoredConsoleErrorMarkers.Any(e.Contains))
             .ToList();
     }
 
@@ -267,6 +261,7 @@ public abstract class PlaywrightTestBase : PageTest
         if (!HasTransientBootFailure())
             return false;
 
+        WriteConsoleMessages("=== Browser Console Output Before Boot Retry ===", SnapshotConsoleMessages());
         ClearConsoleState();
         await Page.ReloadAsync(new()
         {
@@ -282,12 +277,23 @@ public abstract class PlaywrightTestBase : PageTest
         {
             await Page.WaitForFunctionAsync(ReactiveBootedExpression, null, new() { Timeout = timeoutMs });
         }
-        catch (PlaywrightException)
+        catch (TimeoutException)
         {
             if (!await TryRecoverFromTransientBootFailure())
                 throw;
 
             await Page.WaitForFunctionAsync(ReactiveBootedExpression, null, new() { Timeout = timeoutMs });
         }
+    }
+
+    private static void WriteConsoleMessages(string header, IReadOnlyCollection<string> messages)
+    {
+        if (messages.Count == 0)
+            return;
+
+        TestContext.Out.WriteLine(header);
+        foreach (var message in messages)
+            TestContext.Out.WriteLine(message);
+        TestContext.Out.WriteLine("=== End Console Output ===");
     }
 }

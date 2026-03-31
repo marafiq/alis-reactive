@@ -148,4 +148,20 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
         await AssertReactivePathAsync("Routine follow-up", null);
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task reactive_ladder_recomputes_without_leaving_a_stale_badge_visible()
+    {
+        await NavigateAndBoot();
+
+        await RiskScore.FillAndBlur("95");
+        await AssertReactivePathAsync("Urgent follow-up", "Urgent");
+
+        await RiskScore.FillAndBlur("40");
+        await AssertReactivePathAsync("Routine follow-up", null);
+
+        await RiskScore.FillAndBlur("95");
+        await AssertReactivePathAsync("Urgent follow-up", "Urgent");
+        AssertNoConsoleErrors();
+    }
 }

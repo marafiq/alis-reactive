@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Alis.Reactive.Native.Extensions;
 using Json.Schema;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -31,6 +32,17 @@ public abstract class DriftTestBase
             OutputFormat = OutputFormat.List
         });
         Assert.That(result.IsValid, Is.True, () => FormatSchemaErrors(result));
+    }
+
+    protected static void AssertSchemaInvalid(string planJson, string because)
+    {
+        using var doc = JsonDocument.Parse(planJson);
+        var result = Schema.Evaluate(doc.RootElement, new EvaluationOptions
+        {
+            OutputFormat = OutputFormat.List
+        });
+        Assert.That(result.IsValid, Is.False,
+            $"Expected schema validation to fail because {because}, but it succeeded.");
     }
 
     // ── Assertion 2: JSON exercises ALL properties of a definition (no gaps) ──
@@ -121,6 +133,18 @@ public abstract class DriftTestBase
         Action<Builders.TriggerBuilder<ResidentModel>> trigger)
         => Html.On(plan, trigger);
 
+    protected static string AddUnknownProperty(
+        string planJson,
+        string objectPath,
+        string propertyName,
+        JsonNode value)
+    {
+        var root = JsonNode.Parse(planJson)!.AsObject();
+        var target = NavigateToNode(root, objectPath).AsObject();
+        target[propertyName] = value;
+        return root.ToJsonString();
+    }
+
     private static JsonElement NavigateToPath(JsonElement root, string path)
     {
         var current = root;
@@ -142,6 +166,31 @@ public abstract class DriftTestBase
                 current = current.GetProperty(segment);
             }
         }
+        return current;
+    }
+
+    private static JsonNode NavigateToNode(JsonNode root, string path)
+    {
+        JsonNode current = root;
+        foreach (var segment in path.Split('.'))
+        {
+            if (segment.Contains('['))
+            {
+                var bracketIdx = segment.IndexOf('[');
+                var prop = segment[..bracketIdx];
+                var indexStr = segment[(bracketIdx + 1)..^1];
+                var index = int.Parse(indexStr);
+
+                if (prop.Length > 0)
+                    current = current[prop]!;
+                current = current[index]!;
+            }
+            else
+            {
+                current = current[segment]!;
+            }
+        }
+
         return current;
     }
 

@@ -10,6 +10,7 @@ public class WhenBootingAndListeningForResidentEvents : DriftTestBase
     [Test]
     public void resident_boot_reactions_cover_dom_ready_dispatch_and_sequential_shape()
     {
+        AssertDefinitionPropertiesExactly("Entry", "trigger", "reaction");
         AssertDefinitionPropertiesExactly("DomReadyTrigger", "kind");
         AssertDefinitionPropertiesExactly("SequentialReaction", "kind", "commands");
         AssertDefinitionPropertiesExactly("DispatchCommand", "kind", "event", "payload");
@@ -24,6 +25,7 @@ public class WhenBootingAndListeningForResidentEvents : DriftTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
 
+        AssertPropertiesExactly(json, "entries[0]", "trigger", "reaction");
         AssertPropertiesExactly(json, "entries[0].trigger", "kind");
         AssertPropertiesExactly(json, "entries[0].reaction", "kind", "commands");
         AssertPropertiesExactly(json, "entries[0].reaction.commands[1]", "kind", "event");

@@ -12,8 +12,10 @@ public static class LocatorInteractionExtensions
         {
             await locator.ClickAsync(new() { Timeout = timeoutMs });
         }
-        catch (TimeoutException)
+        catch (TimeoutException ex)
         {
+            Console.WriteLine(
+                $"ClickWhenStableAsync retrying after timeout for locator '{locator}': {ex.Message}");
             await locator.ScrollIntoViewIfNeededAsync();
             await page.WaitForTimeoutAsync(250);
             await locator.ClickAsync(new() { Timeout = timeoutMs });
