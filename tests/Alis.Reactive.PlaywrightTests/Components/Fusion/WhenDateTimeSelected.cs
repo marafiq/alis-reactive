@@ -28,8 +28,7 @@ public class WhenDateTimeSelected : PlaywrightTestBase
 
     private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await NavigateToAndWaitForTextSignal(Path, "#value-echo");
     }
 
     // ── Page loads ──

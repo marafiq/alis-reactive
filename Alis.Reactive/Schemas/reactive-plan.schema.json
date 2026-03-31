@@ -146,8 +146,7 @@
       "properties": {
         "kind": { "const": "dispatch" },
         "event": { "type": "string" },
-        "payload": { "type": "object" },
-        "when": { "$ref": "#/$defs/Guard" }
+        "payload": { "type": "object" }
       }
     },
 
@@ -368,8 +367,7 @@
         "mutation": { "$ref": "#/$defs/Mutation" },
         "value": { "description": "Static value for mutations — string for scalars, array for multi-select" },
         "source": { "$ref": "#/$defs/BindSource" },
-        "vendor": { "$ref": "#/$defs/Vendor" },
-        "when": { "$ref": "#/$defs/Guard" }
+        "vendor": { "$ref": "#/$defs/Vendor" }
       }
     },
 
@@ -514,8 +512,7 @@
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "validation-errors" },
-        "formId": { "type": "string", "minLength": 1 },
-        "when": { "$ref": "#/$defs/Guard" }
+        "formId": { "type": "string", "minLength": 1 }
       }
     },
     "MutateEventCommand": {
@@ -526,8 +523,7 @@
         "kind": { "const": "mutate-event" },
         "mutation": { "$ref": "#/$defs/Mutation", "description": "set-prop or call on the event args object (ctx.evt). Same mutation algebra as mutate-element." },
         "value": { "description": "Static value for set-prop mutations" },
-        "source": { "$ref": "#/$defs/BindSource" },
-        "when": { "$ref": "#/$defs/Guard" }
+        "source": { "$ref": "#/$defs/BindSource" }
       }
     },
     "IntoCommand": {
@@ -536,8 +532,7 @@
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "into" },
-        "target": { "type": "string", "minLength": 1 },
-        "when": { "$ref": "#/$defs/Guard" }
+        "target": { "type": "string", "minLength": 1 }
       }
     },
 

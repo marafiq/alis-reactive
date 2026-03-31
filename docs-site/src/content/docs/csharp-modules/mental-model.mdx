@@ -328,8 +328,10 @@ pipeline.When(comp.Value()).Gt(0m)                   test component value agains
 pipeline.Confirm("message")                          § ask user before proceeding
 └── .Then(then => { ... }) / .Else(otherwise => { ... })
 
-Conditions also integrate with:
-├── Element("id").{Mutation}().When(...)              per-command guard on element mutations
+Unconditional commands mix freely around branches:
+├── pipeline.Element("id").SetText("Always runs")    § before the branch
+├── pipeline.When(...).Then(...).Else(...)            § the branch
+├── pipeline.Element("id").SetText("Also runs")      § after the branch
 └── .And(inner => inner.Confirm("..."))              confirm inside guard composition
 ```
 

@@ -1,6 +1,6 @@
 using Alis.Reactive.Playwright.Extensions;
 
-namespace Alis.Reactive.PlaywrightTests.Conditions.WithComponents;
+namespace Alis.Reactive.PlaywrightTests.Conditions.CareLevelCascade;
 
 /// <summary>
 /// Exercises condition → component mutation patterns end-to-end:
@@ -35,20 +35,9 @@ public class WhenCareLevelCascades : PlaywrightTestBase
         await WaitForTraceMessage("booted", 10000);
     }
 
-    /// <summary>
-    /// Select a care level via SF DDL's native API, then wait for the cascade.
-    /// Uses the ej2 instance value property which triggers the SF change event
-    /// the same way a user selection does. More robust than keyboard ArrowDown
-    /// which doesn't wrap for re-selections in SF DDL.
-    /// </summary>
     private async Task SelectCareLevelAndWait(string text)
     {
-        await Page.EvaluateAsync($@"(() => {{
-            const el = document.getElementById('{CareLevelId}');
-            const ej2 = el.ej2_instances[0];
-            ej2.value = '{text}';
-            ej2.dataBind();
-        }})()");
+        await CareLevel.Select(text);
 
         // Wait for the cascade to confirm the change event fired
         await Expect(Page.Locator("#s1-current-level"))

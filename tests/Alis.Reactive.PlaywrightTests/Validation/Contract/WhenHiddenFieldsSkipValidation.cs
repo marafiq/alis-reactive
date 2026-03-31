@@ -38,7 +38,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         // IsVeteran unchecked → veteran-section hidden
         await Expect(Page.Locator("#veteran-section")).ToBeHiddenAsync();
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         // VeteranId rule has truthy condition on IsVeteran → condition false → rule skipped
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
@@ -56,7 +56,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await Input("IsVeteran").CheckAsync();
         await Expect(Page.Locator("#veteran-section")).ToBeVisibleAsync();
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         // VeteranId rule fires → required error inline
         await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
@@ -74,23 +74,23 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await FillAllRequired();
 
         // 1. Unchecked → hidden → no error
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
 
         // 2. Check → shown → required error
         await Input("IsVeteran").CheckAsync();
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // 3. Fill → no error
         await Input("VeteranId").FillAsync("V12345");
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
 
         // 4. Uncheck → hidden → no error
         await Input("IsVeteran").UncheckAsync();
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
 
         AssertNoConsoleErrors();
@@ -109,7 +109,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         // Independent → physician hidden, memory hidden → no errors for either
         await Expect(Page.Locator("#physician-section")).ToBeHiddenAsync();
         await Expect(Page.Locator("#memory-section")).ToBeHiddenAsync();
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("PhysicianName")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
 
@@ -127,7 +127,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
 
         await Expect(Page.Locator("#physician-section")).ToBeVisibleAsync();
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
@@ -147,7 +147,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         // Memory section should be shown
         await Expect(Page.Locator("#memory-section")).ToBeVisibleAsync();
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("MemoryAssessmentScore")).ToContainTextAsync("required");
         await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
         await Expect(SummaryDiv).ToBeHiddenAsync();
@@ -167,7 +167,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         // HasEmergencyContact unchecked by default
         // emergency-section hidden, no-contact-section visible
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         // Reason required (falsy condition met, field visible)
         await Expect(ErrorFor("ReasonForNoContact")).ToContainTextAsync("required");
@@ -191,7 +191,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await Expect(Page.Locator("#emergency-section")).ToBeVisibleAsync();
         await Expect(Page.Locator("#no-contact-section")).ToBeHiddenAsync();
 
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("EmergencyName")).ToContainTextAsync("required");
         await Expect(ErrorFor("EmergencyPhone")).ToContainTextAsync("required");
@@ -211,21 +211,21 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await FillAllRequired();
 
         // 1. Unchecked → Reason required
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // 2. Check → Name required, Reason not required
         await Input("HasEmergencyContact").CheckAsync();
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("EmergencyName")).ToBeVisibleAsync();
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // 3. Uncheck → flips back
         await Input("HasEmergencyContact").UncheckAsync();
-        await SubmitBtn.ClickAsync();
+        await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();

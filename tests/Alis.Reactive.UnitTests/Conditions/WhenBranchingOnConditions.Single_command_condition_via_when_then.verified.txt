@@ -4,29 +4,24 @@
     {
       trigger: {
         kind: custom-event,
-        event: per-action-check
+        event: single-command-condition-check
       },
       reaction: {
-        kind: sequential,
+        kind: conditional,
         commands: [
           {
             kind: mutate-element,
-            target: result,
+            target: single-command-condition-result,
             mutation: {
               kind: set-prop,
               prop: textContent
             },
             value: Always runs
-          },
+          }
+        ],
+        branches: [
           {
-            kind: mutate-element,
-            target: bonus,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: Bonus!,
-            when: {
+            guard: {
               kind: value,
               source: {
                 kind: event,
@@ -35,6 +30,20 @@
               coerceAs: number,
               op: gte,
               operand: 90
+            },
+            reaction: {
+              kind: sequential,
+              commands: [
+                {
+                  kind: mutate-element,
+                  target: single-command-condition-bonus,
+                  mutation: {
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: Bonus!
+                }
+              ]
             }
           }
         ]

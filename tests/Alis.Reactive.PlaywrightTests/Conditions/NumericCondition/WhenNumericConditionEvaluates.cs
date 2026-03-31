@@ -1,6 +1,6 @@
 using Alis.Reactive.Playwright.Extensions;
 
-namespace Alis.Reactive.PlaywrightTests.Conditions.WithComponents;
+namespace Alis.Reactive.PlaywrightTests.Conditions.NumericCondition;
 
 /// <summary>
 /// Exercises conditions with FusionNumericTextBox components end-to-end in the browser:

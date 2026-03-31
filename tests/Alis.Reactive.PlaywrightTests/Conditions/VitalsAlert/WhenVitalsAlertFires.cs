@@ -1,6 +1,6 @@
 using Alis.Reactive.Playwright.Extensions;
 
-namespace Alis.Reactive.PlaywrightTests.Conditions.WithComponents;
+namespace Alis.Reactive.PlaywrightTests.Conditions.VitalsAlert;
 
 /// <summary>
 /// Exercises realistic condition → HTTP patterns with FusionNumericTextBox:

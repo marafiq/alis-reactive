@@ -4,6 +4,8 @@
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ResolvePlan<Step2ClinicalModel>();
+    var alertHypertensionUrl = Url.Action("AlertHypertension", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.AlertHypertension.");
 }
 
 <native-card><native-card-body>
@@ -27,7 +29,7 @@
                         .Then(then =>
                         {
                             then.Element("hypertension-spinner").Show();
-                            then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertHypertension",
+                            then.Post(alertHypertensionUrl,
                                 g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.SystolicBP)
                                       .Include<NativeHiddenField, Step2ClinicalModel>(m => m.ResidentName))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>

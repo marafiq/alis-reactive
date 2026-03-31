@@ -18,7 +18,10 @@ namespace Alis.Reactive.Validation
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object? Value { get; }
 
-        public ValidationCondition(string field, string op, object? value = null)
+        /// <summary>
+        /// NEVER make public. Constructed exclusively by framework builders.
+        /// </summary>
+        internal ValidationCondition(string field, string op, object? value = null)
         {
             Field = field;
             Op = op;

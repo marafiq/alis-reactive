@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessment;
 
 public class ScreeningAlertResponse
 {
@@ -29,10 +29,15 @@ public class SubmitScreeningResponse
 
 public class PhysicianSearchResponse
 {
-    public List<PhysicianItem> Physicians { get; set; } = new();
+    public List<AssessmentPhysicianItem> Physicians { get; set; } = new();
 }
 
-// PhysicianItem reused from AutoCompleteModel (same namespace) — has Text, Value, Specialty
+public class AssessmentPhysicianItem
+{
+    public string Value { get; set; } = "";
+    public string Text { get; set; } = "";
+    public string Specialty { get; set; } = "";
+}
 
 public class SaveStepResponse
 {

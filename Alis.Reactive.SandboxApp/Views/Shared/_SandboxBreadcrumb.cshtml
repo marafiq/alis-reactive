@@ -7,6 +7,11 @@
     /Sandbox/{Concern}/{Slice}      → ← Sandbox  /  ← {Concern}
 *@
 @{
+    if (ViewData["HideSandboxBreadcrumb"] as bool? == true)
+    {
+        return;
+    }
+
     var path = Context.Request.Path.Value ?? "";
     var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
 

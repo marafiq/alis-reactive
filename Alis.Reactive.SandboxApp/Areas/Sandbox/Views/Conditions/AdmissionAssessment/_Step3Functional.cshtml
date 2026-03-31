@@ -6,6 +6,10 @@
     var plan = Html.ReactivePlan<Step3FunctionalModel>();
     var fallOptions = (string[])ViewBag.FallOptions;
     var mobilityAids = (string[])ViewBag.MobilityAids;
+    var requestRoomSetupUrl = Url.Action("RequestRoomSetup", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.RequestRoomSetup.");
+    var saveStep3Url = Url.Action("SaveStep3", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.SaveStep3.");
 }
 
 <!-- ASSERT: select "1-2 falls" or "3+ falls" → fall-details visible
@@ -93,7 +97,7 @@
                         .Then(then =>
                         {
                             then.Element("room-spinner").Show();
-                            then.Post("/Sandbox/Conditions/AdmissionAssessment/RequestRoomSetup",
+                            then.Post(requestRoomSetupUrl,
                                 g => g.Include<FusionDropDownList, Step3FunctionalModel>(m => m.MobilityAid)
                                       .Include<NativeHiddenField, Step3FunctionalModel>(m => m.ResidentName))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>
@@ -178,7 +182,7 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveStep3",
+                p.Post(saveStep3Url,
                     g => g.IncludeAll())
                  .Validate<Step3Validator>("step3-form")
                  .Response(r => r

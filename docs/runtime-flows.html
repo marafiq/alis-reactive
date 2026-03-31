@@ -515,7 +515,7 @@ sequenceDiagram
 <section id="commands">
 <h2>5. commands.ts &mdash; executeCommand() All 4 Kinds</h2>
 <p class="path">Scripts/execution/commands.ts</p>
-<p>Executes a single command. Supports per-action <code>When</code> guards. Four command kinds:
+<p>Executes a single command. Branch-level conditions are evaluated in <code>execute.ts</code>, not here. Four command kinds:
 <code>dispatch</code>, <code>mutate-element</code>, <code>validation-errors</code>, <code>into</code>.</p>
 
 <div class="mermaid">
@@ -529,20 +529,6 @@ sequenceDiagram
     participant DOM
 
     Caller->>commands: executeCommand(cmd, ctx)
-
-    alt cmd.when is set (per-action guard)
-        alt isConfirmGuard(cmd.when) == true
-            commands->>commands: log.warn("ConfirmGuard on per-action When not supported")
-            commands-->>Caller: return (skip command)
-        else
-            commands->>conditions: evaluateGuard(cmd.when, ctx)
-            conditions-->>commands: boolean
-            alt guard is false
-                commands->>commands: log.trace("per-action-when-skipped", {kind})
-                commands-->>Caller: return (skip command)
-            end
-        end
-    end
 
     alt cmd.kind == "dispatch"
         commands->>commands: log.trace("dispatch", {event, payload})

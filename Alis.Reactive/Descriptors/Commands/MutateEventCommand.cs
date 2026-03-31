@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Alis.Reactive.Descriptors.Guards;
 using Alis.Reactive.Descriptors.Mutations;
 using Alis.Reactive.Descriptors.Sources;
 
@@ -31,17 +30,11 @@ namespace Alis.Reactive.Descriptors.Commands
         /// NEVER make public. Constructed exclusively by framework builders. Public constructors
         /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
         /// </summary>
-        internal MutateEventCommand(Mutation mutation, object? value = null, BindSource? source = null, Guard? when = null)
-            : base(when)
+        internal MutateEventCommand(Mutation mutation, object? value = null, BindSource? source = null)
         {
             Mutation = mutation;
             Value = value;
             Source = source;
-        }
-
-        protected override Command CloneWithGuard(Guard guard)
-        {
-            return new MutateEventCommand(Mutation, Value, Source, guard);
         }
     }
 }

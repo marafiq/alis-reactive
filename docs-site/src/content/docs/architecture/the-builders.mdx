@@ -86,7 +86,7 @@ Once a mode is set, mixing modes throws at build time — you can't call `When()
 
 ## ElementBuilder — DOM element mutations
 
-`pipeline.Element("id")` creates an `ElementBuilder`. Every method on it adds a `MutateElementCommand` to the pipeline's command list, then returns either the pipeline (for terminal calls like `SetText("x")`) or the builder itself (for chaining like `SetText(source).When(...)`).
+`pipeline.Element("id")` creates an `ElementBuilder`. Every method on it adds a `MutateElementCommand` to the pipeline's command list, then returns either the pipeline (for terminal calls like `SetText("x")`) or the builder itself for additional element mutations. For conditional execution, use `pipeline.When(...).Then(t => t.Element("id").Show())`.
 
 The builder is internal — devs can't construct it directly. It exists only as the return of `pipeline.Element()`.
 

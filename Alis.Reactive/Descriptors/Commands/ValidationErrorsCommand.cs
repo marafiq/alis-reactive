@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Alis.Reactive.Descriptors.Guards;
 
 namespace Alis.Reactive.Descriptors.Commands
 {
@@ -14,15 +13,9 @@ namespace Alis.Reactive.Descriptors.Commands
         /// NEVER make public. Constructed exclusively by framework builders. Public constructors
         /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
         /// </summary>
-        internal ValidationErrorsCommand(string formId, Guard? when = null)
-            : base(when)
+        internal ValidationErrorsCommand(string formId)
         {
             FormId = formId;
-        }
-
-        protected override Command CloneWithGuard(Guard guard)
-        {
-            return new ValidationErrorsCommand(FormId, guard);
         }
     }
 }

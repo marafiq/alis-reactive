@@ -14,7 +14,7 @@ public class DescriptorPayload
 /// <summary>
 /// BDD tests covering descriptor paths not hit by higher-level tests:
 /// TypedSource.ElementCoercionType, ValueGuard constructors,
-/// ElementBuilder source overloads, per-action When guards, SourceArg.
+/// ElementBuilder source overloads, dispatch descriptors, SourceArg.
 /// </summary>
 [TestFixture]
 public class WhenBuildingDescriptors : PlanTestBase
@@ -155,7 +155,7 @@ public class WhenBuildingDescriptors : PlanTestBase
     }
 
     // ═══════════════════════════════════════════════════════════
-    // Per-action When guard on ElementBuilder
+    // Dispatch descriptors
     // ═══════════════════════════════════════════════════════════
 
     [Test]

@@ -4,6 +4,8 @@
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ReactivePlan<Step2ClinicalModel>();
+    var saveStep2Url = Url.Action("SaveStep2", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.SaveStep2.");
 }
 
 <!-- ASSERT: Step 2 validation scopes to step2-form only — never leaks to Step 1 or Step 3
@@ -54,7 +56,7 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveStep2",
+                p.Post(saveStep2Url,
                     g => g.IncludeAll())
                  .Validate<Step2Validator>("step2-form")
                  .Response(r => r

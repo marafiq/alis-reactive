@@ -2,7 +2,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
 {
     // ── View model ──
 
-    public class HttpMixingModel { }
+    public class HttpMixingModel
+    {
+        public string ReactiveResidentName { get; set; } = "";
+        public string ReactiveFollowUpName { get; set; } = "";
+        public string ReactiveErrorCategory { get; set; } = "";
+    }
 
     // ── Event payload (typed args for When/Then/Else + HTTP pipeline) ──
 

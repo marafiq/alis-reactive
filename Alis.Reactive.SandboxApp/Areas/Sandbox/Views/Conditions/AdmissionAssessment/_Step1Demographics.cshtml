@@ -6,6 +6,10 @@
     var plan = Html.ReactivePlan<Step1DemographicsModel>();
     var diagnoses = (string[])ViewBag.Diagnoses;
     var serviceBranches = (string[])ViewBag.ServiceBranches;
+    var searchPhysiciansUrl = Url.Action("SearchPhysicians", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.SearchPhysicians.");
+    var saveStep1Url = Url.Action("SaveStep1", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.SaveStep1.");
 }
 
 <!-- ASSERT: enter age 85 → risk badge shows "High Risk"
@@ -91,7 +95,7 @@
                 .Reactive(plan, evt => evt.Filtering, (args, p) =>
                 {
                     args.PreventDefault(p);
-                    p.Get("/Sandbox/Conditions/AdmissionAssessment/SearchPhysicians")
+                    p.Get(searchPhysiciansUrl)
                      .Gather(g => g.FromEvent(args, x => x.Text, "q"))
                      .Response(r => r.OnSuccess<PhysicianSearchResponse>((json, s) =>
                      {
@@ -144,7 +148,7 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Conditions/AdmissionAssessment/SaveStep1",
+                p.Post(saveStep1Url,
                     g => g.IncludeAll())
                  .Validate<Step1Validator>("step1-form")
                  .Response(r => r

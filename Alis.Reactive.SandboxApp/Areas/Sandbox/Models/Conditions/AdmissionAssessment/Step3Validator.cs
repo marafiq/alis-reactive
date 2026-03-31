@@ -1,7 +1,7 @@
 using FluentValidation;
 using Alis.Reactive.FluentValidator;
 
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessment;
 
 public class Step3Validator : ReactiveValidator<Step3FunctionalModel>
 {

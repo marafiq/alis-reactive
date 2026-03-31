@@ -174,11 +174,9 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
         // Category dropdown has NO .Reactive() — selecting must not affect any echo
         await Page.Locator($"#{S}__Category").SelectOptionAsync(new SelectOptionValue { Value = "A" });
 
-        // Brief wait to allow any accidental event propagation
-        await Page.WaitForTimeoutAsync(500);
-
-        await Expect(statusEcho).ToHaveTextAsync("\u2014");
-        await Expect(amountEcho).ToHaveTextAsync("\u2014");
+        // A non-reactive control must remain inert even after the browser event settles.
+        await Expect(statusEcho).ToHaveTextAsync("\u2014", new() { Timeout = 1000 });
+        await Expect(amountEcho).ToHaveTextAsync("\u2014", new() { Timeout = 1000 });
 
         AssertNoConsoleErrors();
     }

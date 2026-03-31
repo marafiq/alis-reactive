@@ -1,4 +1,4 @@
-namespace Alis.Reactive.PlaywrightTests.Conditions;
+namespace Alis.Reactive.PlaywrightTests.Conditions.Guards;
 
 [TestFixture]
 public class WhenGuardsControlExecution : PlaywrightTestBase
@@ -410,24 +410,24 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Per-action When guard ──
+    // ── Single-command condition via When/Then ──
 
     [Test]
-    public async Task per_action_when_guard()
+    public async Task single_command_condition_via_when_then()
     {
         await NavigateAndBoot();
-        var always = Page.Locator("#per-action-result");
-        var bonus = Page.Locator("#per-action-bonus");
+        var always = Page.Locator("#single-command-condition-result");
+        var bonus = Page.Locator("#single-command-condition-bonus");
 
         // score=95 → guard passes → both set
-        await Page.Locator("#btn-peraction-high").ClickAsync();
+        await Page.Locator("#btn-single-command-condition-high").ClickAsync();
         await Expect(always).ToHaveTextAsync("Always runs");
         await Expect(bonus).ToHaveTextAsync("Bonus!");
 
-        // score=50 → guard fails → "Always runs" still set, bonus stays from previous or resets
-        await Page.Locator("#btn-peraction-low").ClickAsync();
+        // score=50 → guard fails → first command still runs, branch skips the guarded command
+        await Page.Locator("#btn-single-command-condition-low").ClickAsync();
         await Expect(always).ToHaveTextAsync("Always runs");
-        // Bonus stays "Bonus!" from previous click — per-action just skips the command,
+        // Bonus stays "Bonus!" from previous click — the branch skips the guarded command,
         // it doesn't reset. But if first time click is low, bonus stays as —.
         // For a clean test, we test in isolation by reloading:
 
@@ -669,15 +669,15 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     // ── Per-action When guard — low score on fresh page (skip path) ──
 
     [Test]
-    public async Task per_action_when_guard_skips_guarded_command_on_fresh_page()
+    public async Task single_command_condition_skips_guarded_branch_on_fresh_page()
     {
         // Fresh navigation — bonus starts as "—" (em dash default)
         await NavigateAndBoot();
-        var always = Page.Locator("#per-action-result");
-        var bonus = Page.Locator("#per-action-bonus");
+        var always = Page.Locator("#single-command-condition-result");
+        var bonus = Page.Locator("#single-command-condition-bonus");
 
-        // score=50 → guard fails → first command fires, second is SKIPPED
-        await Page.Locator("#btn-peraction-low").ClickAsync();
+        // score=50 → guard fails → first command fires, guarded branch is skipped
+        await Page.Locator("#btn-single-command-condition-low").ClickAsync();
         await Expect(always).ToHaveTextAsync("Always runs");
         // Bonus was never set — remains at default em dash
         await Expect(bonus).ToHaveTextAsync("\u2014");
@@ -694,8 +694,7 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await NavigateAndBoot();
         var result = Page.Locator("#direct-and-result");
 
-        await Page.EvaluateAsync(
-            "document.dispatchEvent(new CustomEvent('check-direct-and',{detail:{score:70,status:'active'}}))");
+        await Page.Locator("#btn-direct-and-score-low").ClickAsync();
         await Expect(result).ToHaveTextAsync("Fail");
 
         AssertNoConsoleErrors();
@@ -735,8 +734,7 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         var result = Page.Locator("#null-leaf-result");
 
         // address key entirely missing → walk.ts returns undefined → else
-        await Page.EvaluateAsync(
-            "document.dispatchEvent(new CustomEvent('check-null-leaf',{detail:{id:99}}))");
+        await Page.Locator("#btn-null-leaf-missing").ClickAsync();
         await Expect(result).ToHaveTextAsync("Not Seattle");
 
         // Confirm recovery: city=Seattle still matches after missing-key dispatch

@@ -1,4 +1,4 @@
-namespace Alis.Reactive.PlaywrightTests.Conditions;
+namespace Alis.Reactive.PlaywrightTests.Conditions.HttpMixing;
 
 /// <summary>
 /// Browser-level verification that conditions compose freely with HTTP blocks.
@@ -6,7 +6,7 @@ namespace Alis.Reactive.PlaywrightTests.Conditions;
 /// WhenMixingCommandsAndConditions, and WhenUsingConditionsInsideResponseHandlers.
 /// </summary>
 [TestFixture]
-public class WhenConditionFiresAfterHttp : PlaywrightTestBase
+public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
 {
     private async Task NavigateAndBoot()
     {
