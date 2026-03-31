@@ -8,33 +8,40 @@
       },
       reaction: {
         kind: conditional,
+        commands: [
+          {
+            kind: mutate-element,
+            target: before,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: step1
+          }
+        ],
         branches: [
           {
             guard: {
               kind: value,
               source: {
                 kind: event,
-                path: evt.active
+                path: evt.name
               },
-              coerceAs: boolean,
-              op: truthy
+              coerceAs: string,
+              op: eq,
+              operand: a
             },
             reaction: {
               kind: sequential,
               commands: [
                 {
                   kind: mutate-element,
-                  target: badge,
+                  target: r1,
                   mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
+                    kind: set-prop,
+                    prop: textContent
+                  },
+                  value: cond1
                 }
               ]
             }
@@ -51,8 +58,13 @@
         kind: sequential,
         commands: [
           {
-            kind: dispatch,
-            event: audit-log
+            kind: mutate-element,
+            target: between,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: step3
           }
         ]
       }
@@ -70,25 +82,46 @@
               kind: value,
               source: {
                 kind: event,
-                path: evt.value
+                path: evt.count
               },
-              coerceAs: string,
-              op: not-empty
+              coerceAs: number,
+              op: gt,
+              operand: 0
             },
             reaction: {
               kind: sequential,
               commands: [
                 {
                   kind: mutate-element,
-                  target: status,
+                  target: r2,
                   mutation: {
                     kind: set-prop,
                     prop: textContent
                   },
-                  value: has value
+                  value: cond2
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: after,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: step5
           }
         ]
       }

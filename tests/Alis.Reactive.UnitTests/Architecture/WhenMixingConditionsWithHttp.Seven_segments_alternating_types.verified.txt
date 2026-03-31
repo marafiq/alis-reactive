@@ -7,7 +7,7 @@
         event: test
       },
       reaction: {
-        kind: sequential,
+        kind: conditional,
         commands: [
           {
             kind: mutate-element,
@@ -21,26 +21,8 @@
           {
             kind: dispatch,
             event: event-1
-          },
-          {
-            kind: mutate-element,
-            target: s3,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: three
           }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: conditional,
+        ],
         branches: [
           {
             guard: {
@@ -71,6 +53,26 @@
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: s3,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: three
           }
         ]
       }
@@ -216,7 +218,7 @@
         event: test
       },
       reaction: {
-        kind: sequential,
+        kind: conditional,
         commands: [
           {
             kind: mutate-element,
@@ -227,16 +229,7 @@
             },
             value: complete
           }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: conditional,
+        ],
         branches: [
           {
             guard: {

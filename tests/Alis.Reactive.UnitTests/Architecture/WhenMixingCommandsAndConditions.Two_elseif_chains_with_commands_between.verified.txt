@@ -7,35 +7,6 @@
         event: test
       },
       reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: divider,
-            mutation: {
-              kind: call,
-              method: removeAttribute,
-              args: [
-                {
-                  kind: literal,
-                  value: hidden
-                }
-              ]
-            }
-          },
-          {
-            kind: dispatch,
-            event: tier-evaluated
-          }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
         kind: conditional,
         branches: [
           {
@@ -105,6 +76,35 @@
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: divider,
+            mutation: {
+              kind: call,
+              method: removeAttribute,
+              args: [
+                {
+                  kind: literal,
+                  value: hidden
+                }
+              ]
+            }
+          },
+          {
+            kind: dispatch,
+            event: tier-evaluated
           }
         ]
       }

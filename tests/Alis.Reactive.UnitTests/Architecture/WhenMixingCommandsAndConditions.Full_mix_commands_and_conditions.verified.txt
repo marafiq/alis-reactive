@@ -7,7 +7,7 @@
         event: test
       },
       reaction: {
-        kind: sequential,
+        kind: conditional,
         commands: [
           {
             kind: mutate-element,
@@ -18,16 +18,7 @@
             },
             value: before
           }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: conditional,
+        ],
         branches: [
           {
             guard: {
@@ -70,26 +61,6 @@
                 }
               ]
             }
-          }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: footer,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: after
           }
         ]
       }
@@ -143,6 +114,26 @@
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: footer,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: after
           }
         ]
       }

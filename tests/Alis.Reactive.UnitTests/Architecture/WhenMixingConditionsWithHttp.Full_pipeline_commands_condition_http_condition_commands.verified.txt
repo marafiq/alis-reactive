@@ -7,7 +7,7 @@
         event: test
       },
       reaction: {
-        kind: sequential,
+        kind: conditional,
         commands: [
           {
             kind: mutate-element,
@@ -17,26 +17,8 @@
               prop: textContent
             },
             value: start
-          },
-          {
-            kind: mutate-element,
-            target: loading,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: please wait
           }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: conditional,
+        ],
         branches: [
           {
             guard: {
@@ -77,6 +59,26 @@
         event: test
       },
       reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: loading,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: please wait
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
         kind: http,
         request: {
           verb: POST,
@@ -105,7 +107,7 @@
         event: test
       },
       reaction: {
-        kind: sequential,
+        kind: conditional,
         commands: [
           {
             kind: mutate-element,
@@ -116,16 +118,7 @@
             },
             value: done
           }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: conditional,
+        ],
         branches: [
           {
             guard: {

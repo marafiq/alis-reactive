@@ -65,6 +65,11 @@ namespace Alis.Reactive.Builders
             if (ConditionalBranches != null && ConditionalBranches.Count > 0)
                 FlushSegment();
 
+            // Snapshot how many commands exist before this condition starts.
+            // FlushSegment uses this to split pre-condition from between-condition commands.
+            if (_preConditionCommandCount < 0)
+                _preConditionCommandCount = Commands.Count;
+
             SetMode(PipelineMode.Conditional);
 
             var source = new EventArgSource<TPayload, TProp>(path);
@@ -96,6 +101,9 @@ namespace Alis.Reactive.Builders
             if (ConditionalBranches != null && ConditionalBranches.Count > 0)
                 FlushSegment();
 
+            if (_preConditionCommandCount < 0)
+                _preConditionCommandCount = Commands.Count;
+
             SetMode(PipelineMode.Conditional);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
@@ -125,6 +133,9 @@ namespace Alis.Reactive.Builders
         {
             if (ConditionalBranches != null && ConditionalBranches.Count > 0)
                 FlushSegment();
+
+            if (_preConditionCommandCount < 0)
+                _preConditionCommandCount = Commands.Count;
 
             SetMode(PipelineMode.Conditional);
 

@@ -76,26 +76,6 @@
         event: test
       },
       reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: footer,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: complete
-          }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
         kind: conditional,
         branches: [
           {
@@ -153,6 +133,26 @@
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: footer,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: complete
           }
         ]
       }

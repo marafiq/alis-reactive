@@ -34,6 +34,13 @@ namespace Alis.Reactive.Builders
         private PipelineMode _mode = PipelineMode.Sequential;
 
         /// <summary>
+        /// Snapshot of Commands.Count when the first When() in a segment is called.
+        /// Used by FlushSegment to split pre-condition commands from between-condition
+        /// commands so declaration order is preserved across multiple When blocks.
+        /// </summary>
+        private int _preConditionCommandCount = -1;
+
+        /// <summary>
         /// Completed reaction segments. When a new When() is called after a previous
         /// When().Then().Else() block, the current segment (commands + branches) is
         /// flushed here so both conditionals produce independent reactions.
@@ -211,6 +218,7 @@ namespace Alis.Reactive.Builders
                     _httpBuilder.BuildRequestDescriptor()));
                 Commands.Clear();
                 _httpBuilder = null;
+                _preConditionCommandCount = -1;
             }
             else if (_mode == PipelineMode.Parallel && _parallelBuilder != null)
             {
@@ -218,22 +226,44 @@ namespace Alis.Reactive.Builders
                     Commands.Count > 0 ? new List<Command>(Commands) : null));
                 Commands.Clear();
                 _parallelBuilder = null;
+                _preConditionCommandCount = -1;
+            }
+
+            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
+            {
+                // Split commands at the condition boundary: commands added before
+                // When() become the ConditionalReaction's pre-commands (matching
+                // BuildSingleReaction), commands added after Then/Else become a
+                // separate SequentialReaction that runs between conditions.
+                var splitAt = _preConditionCommandCount >= 0
+                    ? _preConditionCommandCount
+                    : Commands.Count;
+
+                List<Command>? preCommands = splitAt > 0
+                    ? new List<Command>(Commands.GetRange(0, splitAt))
+                    : null;
+
+                List<Command>? postCommands = splitAt < Commands.Count
+                    ? new List<Command>(Commands.GetRange(splitAt, Commands.Count - splitAt))
+                    : null;
+
+                _segments.Add(new ConditionalReaction(preCommands, ConditionalBranches.ToArray()));
+
+                if (postCommands != null && postCommands.Count > 0)
+                    _segments.Add(new SequentialReaction(postCommands));
+
+                Commands.Clear();
+                ConditionalBranches = null;
+                _preConditionCommandCount = -1;
             }
             else
             {
-                // Sequential/Conditional: flush commands as a standalone reaction
+                // Pure sequential: no condition block to attach to
                 if (Commands.Count > 0)
                 {
                     _segments.Add(new SequentialReaction(new List<Command>(Commands)));
                     Commands.Clear();
                 }
-            }
-
-            // Flush current conditional block
-            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
-            {
-                _segments.Add(new ConditionalReaction(null, ConditionalBranches.ToArray()));
-                ConditionalBranches = null;
             }
 
             _mode = PipelineMode.Sequential;

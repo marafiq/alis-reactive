@@ -45,22 +45,13 @@
         event: test
       },
       reaction: {
-        kind: sequential,
+        kind: conditional,
         commands: [
           {
             kind: dispatch,
             event: step-4
           }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: conditional,
+        ],
         branches: [
           {
             guard: {

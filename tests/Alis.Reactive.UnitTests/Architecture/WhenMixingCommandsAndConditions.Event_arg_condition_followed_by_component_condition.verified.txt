@@ -7,7 +7,7 @@
         event: test
       },
       reaction: {
-        kind: sequential,
+        kind: conditional,
         commands: [
           {
             kind: mutate-element,
@@ -21,16 +21,7 @@
               path: evt.value
             }
           }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: conditional,
+        ],
         branches: [
           {
             guard: {

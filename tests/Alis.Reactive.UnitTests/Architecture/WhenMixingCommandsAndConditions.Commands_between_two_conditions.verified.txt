@@ -7,26 +7,6 @@
         event: test
       },
       reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: mid,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: between
-          }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
         kind: conditional,
         branches: [
           {
@@ -54,6 +34,26 @@
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      trigger: {
+        kind: custom-event,
+        event: test
+      },
+      reaction: {
+        kind: sequential,
+        commands: [
+          {
+            kind: mutate-element,
+            target: mid,
+            mutation: {
+              kind: set-prop,
+              prop: textContent
+            },
+            value: between
           }
         ]
       }
