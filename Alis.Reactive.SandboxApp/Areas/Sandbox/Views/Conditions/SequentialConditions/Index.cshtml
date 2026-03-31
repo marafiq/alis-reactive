@@ -1,0 +1,58 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SequentialConditions.SequentialConditionsModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Sequential Conditions";
+    var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SequentialConditions.SequentialConditionsModel>();
+
+    var levels = new[] { "low", "medium", "high" }
+        .Select(c => new SelectListItem(c, c)).ToList();
+}
+
+<div class="space-y-6 p-6">
+    <h1 class="text-2xl font-bold">Sequential Conditions — Command Ordering</h1>
+    <p class="text-sm text-gray-500">
+        Two independent When/Then blocks in one pipeline with commands before, between, and after.
+        Tests whether commands execute in declaration order relative to condition blocks.
+    </p>
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Level"))
+        .NativeDropDown(b => b
+            .Items(levels)
+            .Placeholder("-- Select --")
+            .CssClass("rounded border px-3 py-1.5 text-sm")
+            .Reactive(plan, evt => evt.Changed, (args, p) =>
+            {
+                // Step 1: command BEFORE first condition — should always run first
+                p.Element("step1").SetText("1-before");
+
+                // Step 2: first condition
+                p.When(args, a => a.Value).Eq("high")
+                    .Then(t => t.Element("cond1-result").SetText("cond1-high"))
+                    .Else(e => e.Element("cond1-result").SetText("cond1-not-high"));
+
+                // Step 3: command BETWEEN conditions — should run AFTER cond1, BEFORE cond2
+                p.Element("step3").SetText("3-between");
+
+                // Step 4: second condition
+                p.When(args, a => a.Value).Eq("low")
+                    .Then(t => t.Element("cond2-result").SetText("cond2-low"))
+                    .Else(e => e.Element("cond2-result").SetText("cond2-not-low"));
+
+                // Step 5: command AFTER second condition — should always run last
+                p.Element("step5").SetText("5-after");
+            })); }
+
+    <div id="execution-log" class="font-mono text-sm mt-4 space-y-1">
+        <p>Step 1 (before cond1): <span id="step1" class="text-gray-400">&mdash;</span></p>
+        <p>Condition 1 result: <span id="cond1-result" class="text-gray-400">&mdash;</span></p>
+        <p>Step 3 (between cond1 and cond2): <span id="step3" class="text-gray-400">&mdash;</span></p>
+        <p>Condition 2 result: <span id="cond2-result" class="text-gray-400">&mdash;</span></p>
+        <p>Step 5 (after cond2): <span id="step5" class="text-gray-400">&mdash;</span></p>
+    </div>
+
+    <pre class="bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-auto max-h-96 rounded mt-4"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+</div>
+
+@Html.RenderPlan(plan)
