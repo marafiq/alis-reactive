@@ -1,112 +1,154 @@
 @{
     ViewData["Title"] = "Conditions";
+    ViewData["HideSandboxBreadcrumb"] = true;
 }
 
-<h1 class="text-2xl font-bold text-text-primary mb-2">Conditions</h1>
-<p class="text-text-secondary mb-8">Guard evaluation and branching</p>
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Conditions</native-heading>
+        <native-text color="Secondary">
+            Guard evaluation, condition-driven routing, and browser-visible workflow slices.
+        </native-text>
+    </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <a asp-area="Sandbox" asp-controller="Conditions" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
-        <div class="flex items-start justify-between">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
-                Guards
-            </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+    <section>
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-1 h-6 rounded-full bg-[#7A2E3B]"></span>
+            <native-heading level="H2">Syntax &amp; Routing</native-heading>
         </div>
-        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Interactive demo of all 20 condition operators, AND/OR/NOT composition, Confirm dialog, and single-command conditions via When/Then — click buttons to see guards evaluate
-        </p>
-    </a>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a asp-area="Sandbox" asp-controller="Guards" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Guards
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Interactive operator showcase for all guard types, compound logic, and Confirm without any custom JavaScript.
+                </p>
+            </a>
 
-    <a asp-area="Sandbox" asp-controller="SupportedSyntax" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
-        <div class="flex items-start justify-between">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
-                Supported Syntax
-            </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
-        </div>
-        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Dedicated vertical slice for the only supported DSL: trigger and reactive pipelines mix shared commands around When/Then/Else and verify the full browser path
-        </p>
-    </a>
+            <a asp-area="Sandbox" asp-controller="SupportedSyntax" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Supported Syntax
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Vertical slice for the supported branch-level DSL: shared commands around <code>When(...).Then(...).ElseIf(...).Else(...)</code>.
+                </p>
+            </a>
 
-    <a asp-area="Sandbox" asp-controller="HttpMixing" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
-        <div class="flex items-start justify-between">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
-                HTTP Mixing
-            </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
-        </div>
-        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Conditions interleaved with HTTP requests across trigger and real component reactive flows: guards after POST, guards between chained requests, branching on success/error responses
-        </p>
-    </a>
+            <a asp-area="Sandbox" asp-controller="EscalationRouting" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Escalation Routing
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Dedicated slice for dispatching routed events from inside condition branches and proving stale state clears across reevaluation.
+                </p>
+            </a>
 
-    <a asp-area="Sandbox" asp-controller="NumericCondition" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
-        <div class="flex items-start justify-between">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
-                Numeric Conditions
-            </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <a asp-area="Sandbox" asp-controller="HttpMixing" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        HTTP Mixing
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Conditions interleaved with HTTP across one page and two fixtures: trigger flows and real component reactive flows.
+                </p>
+            </a>
         </div>
-        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Type a number and watch conditions react: simple Gt threshold, ElseIf severity ladder, AND compound guards, cross-component source-vs-source comparisons
-        </p>
-    </a>
+    </section>
 
-    <a asp-area="Sandbox" asp-controller="VitalsAlert" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
-        <div class="flex items-start justify-between">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
-                Vitals Alert
-            </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+    <section>
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-1 h-6 rounded-full bg-[#D4A053]"></span>
+            <native-heading level="H2">Component Reactions</native-heading>
         </div>
-        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Enter vitals and see condition-gated HTTP fire: systolic > 140 posts a hypertension alert, severity tiers escalate, DOM updates wrap the request lifecycle
-        </p>
-    </a>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a asp-area="Sandbox" asp-controller="NumericCondition" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Numeric Conditions
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Numeric thresholds, severity ladders, AND compounds, and source-vs-source conditions driven by real components.
+                </p>
+            </a>
 
-    <a asp-area="Sandbox" asp-controller="CareLevelCascade" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
-        <div class="flex items-start justify-between">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
-                Care Level Cascade
-            </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
-        </div>
-        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Select a care level and watch components react: dropdown cascades set values, cross-component switch toggles, In() operator matches multiple values
-        </p>
-    </a>
+            <a asp-area="Sandbox" asp-controller="VitalsAlert" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Vitals Alert
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Condition-gated HTTP from component reads, including before/after command sandwich paths and tiered severity branches.
+                </p>
+            </a>
 
-    <a asp-area="Sandbox" asp-controller="AdmissionAssessment" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
-        <div class="flex items-start justify-between">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
-                Admission Assessment
-            </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <a asp-area="Sandbox" asp-controller="CareLevelCascade" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Care Level Cascade
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Cross-component value reactions driven by care-level selection, component updates, and membership-based branching.
+                </p>
+            </a>
         </div>
-        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Single-page flagship: 33 fields across 6 partials, 17 reactive conditions showing/hiding sections, 12 HTTP endpoints, full validation — fill out a resident admission form
-        </p>
-    </a>
+    </section>
 
-    <a asp-area="Sandbox" asp-controller="AdmissionWizard" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
-        <div class="flex items-start justify-between">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
-                Admission Wizard
-            </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+    <section>
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-1 h-6 rounded-full bg-[#2563EB]"></span>
+            <native-heading level="H2">Workflow Slices</native-heading>
         </div>
-        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            4-step server-side wizard: navigate forward/back with draft persistence, each step validates before advancing, final submit validates all steps together
-        </p>
-    </a>
-</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a asp-area="Sandbox" asp-controller="AdmissionAssessment" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Admission Assessment
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    One-page assessment with four form scopes, nested partial plans, condition-driven sections, HTTP alerts, and server-side draft coupling.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="AdmissionWizard" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                        Admission Wizard
+                    </h3>
+                    <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+                </div>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Server-loaded step workflow with partial replacement, draft persistence, per-step validation, and final server-side cross-step submission.
+                </p>
+            </a>
+        </div>
+    </section>
+</native-vstack>

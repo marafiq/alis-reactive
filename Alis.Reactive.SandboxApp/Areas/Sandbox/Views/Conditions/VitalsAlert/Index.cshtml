@@ -6,6 +6,12 @@
     ViewData["Title"] = "Vitals Alert";
 
     var plan = Html.ReactivePlan<VitalsAlertModel>();
+    var alertUrl = Url.Action("Alert", "VitalsAlert", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve VitalsAlert.Alert.");
+    var criticalUrl = Url.Action("Critical", "VitalsAlert", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve VitalsAlert.Critical.");
+    var warningUrl = Url.Action("Warning", "VitalsAlert", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve VitalsAlert.Warning.");
 
     // ── Section 1: Simple condition → HTTP in Then, Element in Else ──
     // Commands BEFORE and AFTER the condition always execute.
@@ -53,7 +59,7 @@
                         p.When(comp.Value()).Gt(140m)
                             .Then(then =>
                             {
-                                then.Post("/Sandbox/Conditions/VitalsAlert/Alert",
+                                then.Post(alertUrl,
                                         g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
                                     .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                     {
@@ -97,7 +103,7 @@
                     p.When(comp.Value()).Gte(180m)
                         .Then(then =>
                         {
-                            then.Post("/Sandbox/Conditions/VitalsAlert/Critical",
+                            then.Post(criticalUrl,
                                     g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
@@ -108,7 +114,7 @@
                         .ElseIf(comp.Value()).Gte(140m)
                         .Then(then =>
                         {
-                            then.Post("/Sandbox/Conditions/VitalsAlert/Warning",
+                            then.Post(warningUrl,
                                     g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {
@@ -152,7 +158,7 @@
                     p.When(comp.Value()).Gt(140m)
                         .Then(then =>
                         {
-                            then.Post("/Sandbox/Conditions/VitalsAlert/Alert",
+                            then.Post(alertUrl,
                                     g => g.Include<FusionNumericTextBox, VitalsAlertModel>(m => m.HeartRate))
                                 .Response(r => r.OnSuccess<AlertResponse>((json, s) =>
                                 {

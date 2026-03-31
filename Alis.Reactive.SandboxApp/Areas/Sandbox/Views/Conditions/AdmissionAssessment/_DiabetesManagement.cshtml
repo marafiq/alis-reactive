@@ -4,6 +4,8 @@
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ResolvePlan<Step2ClinicalModel>();
+    var alertUncontrolledUrl = Url.Action("AlertUncontrolled", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.AlertUncontrolled.");
 }
 
 <native-card><native-card-body>
@@ -32,7 +34,7 @@
                         .Then(then =>
                         {
                             then.Element("uncontrolled-spinner").Show();
-                            then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertUncontrolled",
+                            then.Post(alertUncontrolledUrl,
                                 g => g.Include<FusionNumericTextBox, Step2ClinicalModel>(m => m.A1cLevel)
                                       .Include<FusionDropDownList, Step2ClinicalModel>(m => m.DiabetesType))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>

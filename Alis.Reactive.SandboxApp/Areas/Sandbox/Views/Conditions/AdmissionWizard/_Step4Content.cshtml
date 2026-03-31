@@ -4,6 +4,10 @@
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ReactivePlan<Step4ReviewModel>();
+    var loadStepUrl = Url.Action("LoadStep", "AdmissionWizard", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionWizard.LoadStep.");
+    var submitUrl = Url.Action("Submit", "AdmissionWizard", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionWizard.Submit.");
 }
 
 <native-card><native-card-body id="screening-form">
@@ -62,7 +66,7 @@
             .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Conditions/AdmissionWizard/LoadStep",
+                p.Post(loadStepUrl,
                     g => g.Include<NativeHiddenField, Step4ReviewModel>(m => m.ScreeningId)
                           .Static("step", 3))
                  .Response(r => r.OnSuccess(s => s.Into("step-container")));
@@ -71,7 +75,7 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Conditions/AdmissionWizard/Submit",
+                p.Post(submitUrl,
                     g => g.IncludeAll())
                  .Validate<Step4Validator>("screening-form")
                  .Response(r => r

@@ -1,19 +1,13 @@
-@model SupportedSyntaxModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax.SupportedSyntaxModel
 @using Alis.Reactive
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax
 @{
     ViewData["Title"] = "Supported Condition Syntax";
 
     var plan = Html.ReactivePlan<SupportedSyntaxModel>();
-
-    var careTracks = new List<SupportedSyntaxCareTrackOption>
-    {
-        new() { Value = "assisted", Text = "Assisted Living" },
-        new() { Value = "memory", Text = "Memory Care" },
-        new() { Value = "respite", Text = "Respite" }
-    };
 
     Html.On(plan, t => t.CustomEvent<SupportedSyntaxTriggerPayload>("supported-trigger-review", (args, p) =>
     {
@@ -26,9 +20,16 @@
                 then.Element("trigger-badge").SetText("Priority");
                 then.Element("trigger-badge").Show();
             })
+            .ElseIf(args, x => x.Score).Gte(70)
+            .Then(then =>
+            {
+                then.Element("trigger-result").SetText("Standard review");
+                then.Element("trigger-badge").SetText("Standard");
+                then.Element("trigger-badge").Show();
+            })
             .Else(else_ =>
             {
-                else_.Element("trigger-result").SetText("Standard review");
+                else_.Element("trigger-result").SetText("Deferred review");
                 else_.Element("trigger-badge").Hide();
             });
         p.Element("trigger-summary").SetText("Workflow complete");
@@ -43,77 +44,6 @@
     {
         p.Element("reactive-audit").SetText("Audit logged");
     }));
-
-    Html.On(plan, t => t.CustomEvent<SupportedSyntaxEscalationPayload>("supported-trigger-escalation", (args, p) =>
-    {
-        p.Element("escalation-precheck").SetText("Escalation reviewed");
-        p.Dispatch("supported-trigger-escalation-audited");
-        p.When(args, x => x.Score).Gte(95)
-            .And(args, x => x.RequiresIsolation).Truthy()
-            .Then(then =>
-            {
-                then.Element("escalation-result").SetText("Isolation review");
-                then.Element("escalation-badge").SetText("Isolation");
-                then.Element("escalation-badge").Show();
-            })
-            .ElseIf(args, x => x.Score).Gte(70)
-            .Or(args, x => x.ManualOverride).Truthy()
-            .Then(then =>
-            {
-                then.Element("escalation-result").SetText("Expedited review");
-                then.Element("escalation-badge").SetText("Expedited");
-                then.Element("escalation-badge").Show();
-            })
-            .Else(else_ =>
-            {
-                else_.Element("escalation-result").SetText("Routine review");
-                else_.Element("escalation-badge").Hide();
-            });
-        p.Element("escalation-summary").SetText("Escalation complete");
-    }));
-
-    Html.On(plan, t => t.CustomEvent("supported-trigger-escalation-audited", p =>
-    {
-        p.Element("escalation-audit").SetText("Escalation audit logged");
-    }));
-
-    Html.On(plan, t => t.CustomEvent("supported-composite-audited", p =>
-    {
-        p.Element("composite-audit").SetText("Escalation audit logged");
-    }));
-
-    Html.On(plan, t => t.CustomEvent("supported-composite-refresh", p =>
-    {
-        var assessment = p.Component<FusionNumericTextBox>(m => m.AssessmentScore);
-        var supervisorOverride = p.Component<FusionSwitch>(m => m.SupervisorOverride);
-        var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
-
-        p.Element("composite-precheck").SetText("Escalation evaluated");
-        p.Dispatch("supported-composite-audited");
-        p.When(assessment.Value()).Gte(85m)
-            .And(cs => cs.When(supervisorOverride.Value()).Truthy()
-                         .Or(careTrack.Value()).Eq("memory"))
-            .Then(then =>
-            {
-                then.Element("composite-result").SetText("Escalate now");
-                then.Element("composite-badge").SetText("Escalate");
-                then.Element("composite-badge").Show();
-            })
-            .ElseIf(assessment.Value()).Gte(60m)
-            .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
-            .Then(then =>
-            {
-                then.Element("composite-result").SetText("Monitor closely");
-                then.Element("composite-badge").SetText("Monitor");
-                then.Element("composite-badge").Show();
-            })
-            .Else(else_ =>
-            {
-                else_.Element("composite-result").SetText("Routine follow-up");
-                else_.Element("composite-badge").Hide();
-            });
-        p.Element("composite-summary").SetText("Escalation decision complete");
-    }));
 }
 
 <native-vstack gap="Lg">
@@ -122,9 +52,7 @@
         <native-text color="Secondary">
             One dedicated vertical slice for the supported condition DSL:
             <code class="bg-slate-100 px-1 rounded">When(...).Then(...).ElseIf(...).Else(...)</code>
-            plus guard composition with <code class="bg-slate-100 px-1 rounded">And</code>,
-            <code class="bg-slate-100 px-1 rounded">Or</code>, and
-            <code class="bg-slate-100 px-1 rounded">Not</code>.
+            with shared commands before and after the branch in both trigger and component-reactive pipelines.
         </native-text>
     </div>
 
@@ -133,8 +61,8 @@
             <native-heading level="H2">1. Trigger Pipeline</native-heading>
             <p class="text-sm text-text-secondary mb-4">
                 Click a review button to dispatch a typed custom event. The trigger pipeline always
-                updates shared status, dispatches an audit event, evaluates the condition, and marks
-                the workflow complete.
+                updates shared status, dispatches an audit event, evaluates a three-branch ladder,
+                and marks the workflow complete.
             </p>
 
             <div class="flex gap-2 mb-4">
@@ -147,6 +75,13 @@
 
                 @(Html.NativeButton("btn-trigger-standard", "Standard Review")
                     .CssClass("px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Dispatch("supported-trigger-review", new { score = 75 });
+                    }))
+
+                @(Html.NativeButton("btn-trigger-deferred", "Deferred Review")
+                    .CssClass("px-3 py-1.5 rounded bg-stone-500 text-white text-xs font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Dispatch("supported-trigger-review", new { score = 40 });
@@ -183,8 +118,8 @@
             <native-heading level="H2">2. Reactive Pipeline</native-heading>
             <p class="text-sm text-text-secondary mb-4">
                 Change the risk score to run the full <code>.Reactive()</code> path. The pipeline always
-                updates shared status, dispatches an audit event, branches on the score, and records
-                completion.
+                updates shared status, dispatches an audit event, runs the same three-branch ladder,
+                and records completion.
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -200,6 +135,13 @@
                                 {
                                     then.Element("reactive-result").SetText("Urgent follow-up");
                                     then.Element("reactive-badge").SetText("Urgent");
+                                    then.Element("reactive-badge").Show();
+                                })
+                                .ElseIf(args, x => x.Value).Gte(60m)
+                                .Then(then =>
+                                {
+                                    then.Element("reactive-result").SetText("Standard follow-up");
+                                    then.Element("reactive-badge").SetText("Standard");
                                     then.Element("reactive-badge").Show();
                                 })
                                 .Else(else_ =>
@@ -238,125 +180,7 @@
 
     <native-card>
         <native-card-body>
-            <native-heading level="H2">3. Trigger Ladder and Guard Composition</native-heading>
-            <p class="text-sm text-text-secondary mb-4">
-                These buttons exercise the richer trigger-side DSL: a first branch with
-                <code>And</code>, an <code>ElseIf</code> branch with <code>Or</code>, and a final
-                <code>Else</code> fallback. Shared commands still run before and after the branch.
-            </p>
-
-            <div class="flex flex-wrap gap-2 mb-4">
-                @(Html.NativeButton("btn-escalation-isolation", "Isolation Review")
-                    .CssClass("px-3 py-1.5 rounded bg-rose-700 text-white text-xs font-medium")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Dispatch("supported-trigger-escalation", new { score = 97, requiresIsolation = true, manualOverride = false });
-                    }))
-
-                @(Html.NativeButton("btn-escalation-override", "Manual Override Review")
-                    .CssClass("px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Dispatch("supported-trigger-escalation", new { score = 55, requiresIsolation = false, manualOverride = true });
-                    }))
-
-                @(Html.NativeButton("btn-escalation-routine", "Routine Review")
-                    .CssClass("px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Dispatch("supported-trigger-escalation", new { score = 30, requiresIsolation = false, manualOverride = false });
-                    }))
-            </div>
-
-            <div class="space-y-2 text-xs font-mono">
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Shared precheck</span>
-                    <span id="escalation-precheck">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Audit</span>
-                    <span id="escalation-audit">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Result</span>
-                    <span id="escalation-result">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Badge</span>
-                    <span id="escalation-badge" hidden>&mdash;</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Summary</span>
-                    <span id="escalation-summary">&mdash;</span>
-                </div>
-            </div>
-        </native-card-body>
-    </native-card>
-
-    <native-card>
-        <native-card-body>
-            <native-heading level="H2">4. Component Sources with And / Or / Not</native-heading>
-            <p class="text-sm text-text-secondary mb-4">
-                This section reads only component values. Each field change dispatches a refresh event,
-                then a shared pipeline composes <code>And</code>, nested <code>Or</code>, and
-                <code>Not</code> across component sources before choosing a branch.
-            </p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                @{ Html.InputField(plan, m => m.AssessmentScore, o => o.Label("Assessment Score"))
-                    .FusionNumericTextBox(b => b
-                        .Min(0).Max(100).Step(1)
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Dispatch("supported-composite-refresh");
-                        })); }
-
-                @{ Html.InputField(plan, m => m.SupervisorOverride, o => o.Label("Supervisor Override"))
-                    .FusionSwitch(b => b
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Dispatch("supported-composite-refresh");
-                        })); }
-
-                @{ Html.InputField(plan, m => m.CareTrack, o => o.Label("Care Track"))
-                    .FusionDropDownList(b => b
-                        .DataSource(careTracks)
-                        .Fields<SupportedSyntaxCareTrackOption>(t => t.Text, v => v.Value)
-                        .Placeholder("Select care track")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Dispatch("supported-composite-refresh");
-                        })); }
-            </div>
-
-            <div class="space-y-2 text-xs font-mono">
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Shared precheck</span>
-                    <span id="composite-precheck">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Audit</span>
-                    <span id="composite-audit">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Result</span>
-                    <span id="composite-result">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Badge</span>
-                    <span id="composite-badge" hidden>&mdash;</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-text-secondary">Summary</span>
-                    <span id="composite-summary">&mdash;</span>
-                </div>
-            </div>
-        </native-card-body>
-    </native-card>
-
-    <native-card>
-        <native-card-body>
-            <native-heading level="H2">Plan JSON</native-heading>
+            <native-heading level="H2">3. Plan JSON</native-heading>
             <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
         </native-card-body>
     </native-card>

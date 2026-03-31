@@ -4,6 +4,8 @@
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ReactivePlan<Step4ReviewModel>();
+    var submitUrl = Url.Action("Submit", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.Submit.");
 }
 
 <!-- ASSERT: empty EmergencyContact → contact-warning visible
@@ -95,7 +97,7 @@
             {
                 p.Element("submit-spinner").Show();
                 p.Element("submit-text").Hide();
-                p.Post("/Sandbox/Conditions/AdmissionAssessment/Submit",
+                p.Post(submitUrl,
                     g => g.IncludeAll())
                  .Validate<Step4Validator>("screening-form")
                  .Response(r => r

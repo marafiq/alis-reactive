@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
@@ -12,10 +12,7 @@ public class SupportedSyntaxController : Controller
     {
         return View("~/Areas/Sandbox/Views/Conditions/SupportedSyntax/Index.cshtml", new SupportedSyntaxModel
         {
-            RiskScore = 0,
-            AssessmentScore = 0,
-            SupervisorOverride = false,
-            CareTrack = ""
+            RiskScore = 0
         });
     }
 }

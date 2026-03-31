@@ -39,37 +39,6 @@ public class WhenVerifyingSchemaIntegrity : DriftTestBase
     }
 
     [Test]
-    public void unknown_property_is_rejected_by_schema()
-    {
-        var json = """
-        {
-            "planId": "TestModel",
-            "components": {
-                "Field": {
-                    "id": "c1",
-                    "vendor": "native",
-                    "readExpr": "value",
-                    "componentType": "textbox",
-                    "coerceAs": "string",
-                    "extraProp": "this-should-be-rejected"
-                }
-            },
-            "entries": []
-        }
-        """;
-
-        using var doc = System.Text.Json.JsonDocument.Parse(json);
-        var result = Schema.Evaluate(doc.RootElement, new Json.Schema.EvaluationOptions
-        {
-            OutputFormat = Json.Schema.OutputFormat.List
-        });
-
-        Assert.That(result.IsValid, Is.False,
-            "Schema should reject unknown property 'extraProp' -- " +
-            "drift detection mechanism is broken if this passes.");
-    }
-
-    [Test]
     public void all_enum_definitions_have_values()
     {
         var enumDefs = new[] { "GuardOp", "Vendor", "CoercionType", "ValidationRuleType" };

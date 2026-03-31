@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax;
 
 /// <summary>
 /// Dedicated vertical slice for the supported condition syntax.
@@ -8,9 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 public class SupportedSyntaxModel
 {
     public decimal RiskScore { get; set; }
-    public decimal AssessmentScore { get; set; }
-    public bool SupervisorOverride { get; set; }
-    public string CareTrack { get; set; } = "";
 }
 
 /// <summary>
@@ -19,23 +16,4 @@ public class SupportedSyntaxModel
 public class SupportedSyntaxTriggerPayload
 {
     public int Score { get; set; }
-}
-
-/// <summary>
-/// Typed payload for the richer trigger-side condition demo.
-/// </summary>
-public class SupportedSyntaxEscalationPayload
-{
-    public int Score { get; set; }
-    public bool RequiresIsolation { get; set; }
-    public bool ManualOverride { get; set; }
-}
-
-/// <summary>
-/// DropDownList options for the component-source condition demo.
-/// </summary>
-public class SupportedSyntaxCareTrackOption
-{
-    public string Value { get; set; } = "";
-    public string Text { get; set; } = "";
 }

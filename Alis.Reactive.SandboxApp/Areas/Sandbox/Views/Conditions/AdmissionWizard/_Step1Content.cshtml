@@ -6,6 +6,12 @@
     var plan = Html.ReactivePlan<Step1DemographicsModel>();
     var diagnoses = (string[])ViewBag.Diagnoses;
     var serviceBranches = (string[])ViewBag.ServiceBranches;
+    var searchPhysiciansUrl = Url.Action("SearchPhysicians", "AdmissionWizard", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionWizard.SearchPhysicians.");
+    var saveStep1Url = Url.Action("SaveStep1", "AdmissionWizard", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionWizard.SaveStep1.");
+    var loadStepUrl = Url.Action("LoadStep", "AdmissionWizard", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionWizard.LoadStep.");
 }
 
 <native-card><native-card-body id="step1-form">
@@ -39,7 +45,7 @@
                 .Reactive(plan, evt => evt.Filtering, (args, p) =>
                 {
                     args.PreventDefault(p);
-                    p.Get("/Sandbox/Conditions/AdmissionWizard/SearchPhysicians")
+                    p.Get(searchPhysiciansUrl)
                      .Gather(g => g.FromEvent(args, x => x.Text, "q"))
                      .Response(r => r.OnSuccess<PhysicianSearchResponse>((json, s) => { args.UpdateData(s, json, j => j.Physicians); }));
                 })); }
@@ -74,7 +80,7 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Conditions/AdmissionWizard/SaveStep1",
+                p.Post(saveStep1Url,
                     g => g.IncludeAll())
                  .Validate<Step1Validator>("step1-form")
                  .Response(r => r
@@ -85,7 +91,7 @@
                     })
                     .OnError(400, e => e.ValidationErrors("step1-form"))
                     .Chained(c => c
-                        .Post("/Sandbox/Conditions/AdmissionWizard/LoadStep")
+                        .Post(loadStepUrl)
                         .Gather(g => g
                             .Include<NativeHiddenField, Step1DemographicsModel>(m => m.ScreeningId)
                             .Static("step", 2))

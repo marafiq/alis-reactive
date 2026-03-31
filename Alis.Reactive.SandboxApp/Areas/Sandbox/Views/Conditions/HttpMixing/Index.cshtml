@@ -7,13 +7,21 @@
     ViewData["Title"] = "Conditions + HTTP Mixing";
 
     var plan = Html.ReactivePlan<HttpMixingModel>();
+    var saveUrl = Url.Action("Save", "HttpMixing", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve HttpMixing.Save.");
+    var auditUrl = Url.Action("Audit", "HttpMixing", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve HttpMixing.Audit.");
+    var classifyUrl = Url.Action("Classify", "HttpMixing", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve HttpMixing.Classify.");
+    var failValidationUrl = Url.Action("FailValidation", "HttpMixing", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve HttpMixing.FailValidation.");
 
     // ── Shared event listeners (Sections 1–8 use custom events dispatched from buttons) ──
 
     // Section 1: Condition AFTER HTTP — the core fix
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s1-save-then-check", (args, p) =>
     {
-        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Alice"))
+        p.Post(saveUrl, g => g.Static("name", "Alice"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s1-status").SetText(json, x => x.ReceivedName);
@@ -29,7 +37,7 @@
         p.When(args, x => x.Active).Truthy()
             .Then(then => then.Element("s2-active-status").SetText("active"))
             .Else(else_ => else_.Element("s2-active-status").SetText("inactive"));
-        p.Post("/Sandbox/Conditions/HttpMixing/Audit", g => g.Static("action", "login"))
+        p.Post(auditUrl, g => g.Static("action", "login"))
          .Response(r => r.OnSuccess<HttpMixingAuditResponse>((json, s) =>
          {
              s.Element("s2-audit-result").SetText(json, x => x.Result);
@@ -46,7 +54,7 @@
         p.When(args, x => x.Active).Truthy()
             .Then(then => then.Element("s3-pre-badge").Show());
         p.Element("s3-loading").SetText("please wait");
-        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Bob"))
+        p.Post(saveUrl, g => g.Static("name", "Bob"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s3-http-result").SetText(json, x => x.ReceivedName);
@@ -61,7 +69,7 @@
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s4-condition-inside-success", (args, p) =>
     {
         p.Element("s4-pre").SetText("loading");
-        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Carol"))
+        p.Post(saveUrl, g => g.Static("name", "Carol"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s4-status").SetText("saved");
@@ -76,7 +84,7 @@
     // Section 5: ElseIf chain inside OnSuccess + outer condition
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s5-elseif-inside-success", (args, p) =>
     {
-        p.Post("/Sandbox/Conditions/HttpMixing/Classify", g => g
+        p.Post(classifyUrl, g => g
             .FromEvent(args, x => x.Count, "count"))
          .Response(r => r.OnSuccess<HttpMixingClassifyResponse>((json, s) =>
          {
@@ -97,7 +105,7 @@
     // Section 6: Multiple conditions after HTTP
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s6-multi-conditions-after-http", (args, p) =>
     {
-        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Dave"))
+        p.Post(saveUrl, g => g.Static("name", "Dave"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s6-saved").SetText(json, x => x.ReceivedName);
@@ -113,7 +121,7 @@
     // Section 7: Condition inside OnError handler
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s7-condition-in-error", (args, p) =>
     {
-        p.Post("/Sandbox/Conditions/HttpMixing/FailValidation")
+        p.Post(failValidationUrl)
          .Response(r => r
              .OnSuccess(s => s.Element("s7-status").SetText("should not happen"))
              .OnError(400, e =>
@@ -127,7 +135,7 @@
     // Section 8: And guard inside OnSuccess
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s8-and-guard-inside-success", (args, p) =>
     {
-        p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g.Static("name", "Eve"))
+        p.Post(saveUrl, g => g.Static("name", "Eve"))
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s8-saved").SetText(json, x => x.ReceivedName);
@@ -378,7 +386,7 @@
                         .Reactive(plan, evt => evt.Changed, (args, p) =>
                         {
                             p.Element("s9-pre").SetText("saving");
-                            p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g
+                            p.Post(saveUrl, g => g
                                 .FromEvent(args, x => x.Value!, "name"))
                              .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
                              {
@@ -415,7 +423,7 @@
                         .Reactive(plan, evt => evt.Changed, (args, p) =>
                         {
                             p.Element("s10-pre").SetText("loading");
-                            p.Post("/Sandbox/Conditions/HttpMixing/Save", g => g
+                            p.Post(saveUrl, g => g
                                 .FromEvent(args, x => x.Value!, "name"))
                              .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
                              {
@@ -452,7 +460,7 @@
                         .Reactive(plan, evt => evt.Changed, (args, p) =>
                         {
                             p.Element("s11-pre").SetText("validating");
-                            p.Post("/Sandbox/Conditions/HttpMixing/FailValidation")
+                            p.Post(failValidationUrl)
                              .Response(r => r
                                  .OnSuccess(s => s.Element("s11-status").SetText("should not happen"))
                                  .OnError(400, e =>

@@ -4,6 +4,8 @@
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ResolvePlan<Step1DemographicsModel>();
+    var verifyVeteranUrl = Url.Action("VerifyVeteran", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.VerifyVeteran.");
 }
 
 <native-card><native-card-body>
@@ -29,7 +31,7 @@
             {
                 p.Element("va-spinner").Show();
                 p.Element("verify-va-btn-text").Hide();
-                p.Post("/Sandbox/Conditions/AdmissionAssessment/VerifyVeteran",
+                p.Post(verifyVeteranUrl,
                     g => g.Include<NativeTextBox, Step1DemographicsModel>(m => m.VaId)
                           .Include<FusionDropDownList, Step1DemographicsModel>(m => m.ServiceBranch))
                  .Response(r => r.OnSuccess<VerifyVaResponse>((json, s) =>
@@ -50,5 +52,4 @@
         <div id="va-result" hidden class="mt-2 rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-700"></div>
     </div>
 </native-card-body></native-card>
-
 
