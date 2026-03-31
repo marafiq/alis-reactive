@@ -27,9 +27,12 @@
                   target: auth-status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: authorized
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: authorized
+                    }
+                  }
                 }
               ]
             }
@@ -55,9 +58,12 @@
                   target: create-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: created
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: created
+                    }
+                  }
                 }
               ]
             }
@@ -73,9 +79,12 @@
                     target: refresh-result,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: refreshed
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: refreshed
+                      }
+                    }
                   }
                 ]
               }

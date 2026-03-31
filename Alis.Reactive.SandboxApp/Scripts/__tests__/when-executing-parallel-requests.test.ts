@@ -49,14 +49,14 @@ describe("parallel http reactions", () => {
       requests: [
         {
           verb: "GET", url: "/api/residents",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loaded" } } }] }],
         },
         {
           verb: "GET", url: "/api/facilities",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "facilities", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "facilities", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loaded" } } }] }],
         },
       ],
-      onAllSettled: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "all done" }],
+      onAllSettled: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "all done" } } }],
     };
 
     await executeParallelHttpReaction(reaction);
@@ -77,11 +77,11 @@ describe("parallel http reactions", () => {
       requests: [
         {
           verb: "GET", url: "/api/residents",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "residents", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loaded" } } }] }],
         },
         {
           verb: "GET", url: "/api/facilities",
-          onError: [{ commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "failed" }] }],
+          onError: [{ commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "failed" } } }] }],
         },
       ],
     };

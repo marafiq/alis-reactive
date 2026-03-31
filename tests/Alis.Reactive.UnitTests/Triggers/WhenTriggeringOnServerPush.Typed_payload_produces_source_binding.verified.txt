@@ -15,11 +15,14 @@
             target: name,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.id
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.id
+                }
+              }
             }
           }
         ]

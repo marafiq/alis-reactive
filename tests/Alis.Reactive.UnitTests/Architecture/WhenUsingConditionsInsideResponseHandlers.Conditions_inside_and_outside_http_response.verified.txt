@@ -35,9 +35,12 @@
                           target: inner-tier,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: premium
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: premium
+                            }
+                          }
                         }
                       ]
                     }
@@ -51,9 +54,12 @@
                           target: inner-tier,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: standard
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: standard
+                            }
+                          }
                         }
                       ]
                     }

@@ -28,9 +28,12 @@
                   target: r1,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: match-a
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: match-a
+                    }
+                  }
                 }
               ]
             }
@@ -65,9 +68,12 @@
                   target: r2,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: high
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: high
+                    }
+                  }
                 }
               ]
             }
@@ -101,9 +107,12 @@
                   target: r3,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: active
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: active
+                    }
+                  }
                 }
               ]
             }

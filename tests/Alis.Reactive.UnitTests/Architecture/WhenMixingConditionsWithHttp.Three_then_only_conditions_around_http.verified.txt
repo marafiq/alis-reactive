@@ -60,9 +60,12 @@
                   target: process-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: processed
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: processed
+                    }
+                  }
                 }
               ]
             }

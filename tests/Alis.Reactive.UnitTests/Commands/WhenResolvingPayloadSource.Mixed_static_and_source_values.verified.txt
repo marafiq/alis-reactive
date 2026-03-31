@@ -14,20 +14,26 @@
             target: label,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: Name:
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: Name:
+              }
+            }
           },
           {
             kind: mutate-element,
             target: value,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.stringValue
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.stringValue
+                }
+              }
             }
           },
           {

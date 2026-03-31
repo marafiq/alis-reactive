@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { boot, resetBootStateForTests } from "../lifecycle/boot";
 import type { Reaction, Command } from "../types";
+import { dispatchPayload, literalValue } from "./test-value-helpers";
 
 /**
  * BDD: When reactions execute through the unified async path
@@ -16,11 +17,17 @@ import type { Reaction, Command } from "../types";
  */
 
 function setText(target: string, value: string): Command {
-  return { kind: "mutate-element", target, mutation: { kind: "set-prop", prop: "textContent" }, value };
+  return {
+    kind: "mutate-element",
+    target,
+    mutation: { kind: "set-prop", prop: "textContent", value: literalValue(value) },
+  };
 }
 
 function dispatch(event: string, payload?: Record<string, unknown>): Command {
-  return { kind: "dispatch", event, payload };
+  return payload == null
+    ? { kind: "dispatch", event }
+    : { kind: "dispatch", event, payload: dispatchPayload(payload) };
 }
 
 function mockResponse(status: number, body: unknown) {

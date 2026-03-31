@@ -1,4 +1,5 @@
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Values;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -10,7 +11,7 @@ namespace Alis.Reactive.Fusion.AppLevel
             this ComponentRef<FusionConfirm, TModel> self, string message)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("content"), value: message)
+            return self.Emit(new SetPropMutation("content", CommandValue.FromLiteral(message)))
                        .Emit(new CallMutation("dataBind"));
         }
 

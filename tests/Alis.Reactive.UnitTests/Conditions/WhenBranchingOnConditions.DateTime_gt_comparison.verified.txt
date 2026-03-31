@@ -28,9 +28,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: On Time
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: On Time
+                    }
+                  }
                 }
               ]
             }
@@ -44,9 +47,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Overdue
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Overdue
+                    }
+                  }
                 }
               ]
             }

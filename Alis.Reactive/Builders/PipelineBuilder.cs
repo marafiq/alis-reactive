@@ -69,7 +69,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
-            Commands.Add(new DispatchCommand(eventName, payload));
+            Commands.Add(new DispatchCommand(eventName, DispatchPayload.FromObject(payload)));
             return this;
         }
 

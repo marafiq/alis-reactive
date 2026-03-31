@@ -95,11 +95,14 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  source: {
-                    kind: event,
-                    path: responseBody.id
+                    prop: textContent,
+                    value: {
+                      kind: source,
+                      source: {
+                        kind: event,
+                        path: responseBody.id
+                      }
+                    }
                   }
                 }
               ]

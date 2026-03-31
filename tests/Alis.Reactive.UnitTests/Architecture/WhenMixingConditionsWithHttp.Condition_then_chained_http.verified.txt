@@ -27,9 +27,12 @@
                   target: pre-check,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: has value
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: has value
+                    }
+                  }
                 }
               ]
             }
@@ -43,9 +46,12 @@
                   target: pre-check,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: empty
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: empty
+                    }
+                  }
                 }
               ]
             }
@@ -71,9 +77,12 @@
                   target: lookup-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: found
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: found
+                    }
+                  }
                 }
               ]
             }
@@ -89,9 +98,12 @@
                     target: enrich-result,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: enriched
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: enriched
+                      }
+                    }
                   }
                 ]
               }

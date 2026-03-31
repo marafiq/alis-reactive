@@ -14,9 +14,12 @@
             target: single-command-condition-result,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: Always runs
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: Always runs
+              }
+            }
           }
         ],
         branches: [
@@ -39,9 +42,12 @@
                   target: single-command-condition-bonus,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Bonus!
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Bonus!
+                    }
+                  }
                 }
               ]
             }

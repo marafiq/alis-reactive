@@ -26,7 +26,7 @@ describe("trigger wiring end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "dom-ready" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "booted" },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "booted" } } },
       ]},
     }]});
     expect(document.getElementById("r1")!.textContent).toBe("booted");
@@ -38,7 +38,7 @@ describe("trigger wiring end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "my-event" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "received" },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "received" } } },
       ]},
     }]});
     expect(document.getElementById("r1")!.textContent).toBe("—");
@@ -50,7 +50,7 @@ describe("trigger wiring end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "event-a" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "a" },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "a" } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("event-b"));
@@ -61,7 +61,7 @@ describe("trigger wiring end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "data" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.msg" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.msg" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("data", { detail: { msg: "hello" } }));
@@ -73,7 +73,7 @@ describe("trigger wiring end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "tick" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.n" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.n" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("tick", { detail: { n: "1" } }));
@@ -92,7 +92,7 @@ describe("trigger wiring end-to-end", () => {
       entries: [{
         trigger: { kind: "component-event", componentId: "Name", jsEvent: "change", vendor: "native", readExpr: "value" },
         reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.value" } },
+          { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.value" } } } },
         ]},
       }],
     });
@@ -107,7 +107,7 @@ describe("trigger wiring end-to-end", () => {
       entries: [{
         trigger: { kind: "component-event", componentId: "Country", jsEvent: "change", vendor: "native", readExpr: "value" },
         reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.value" } },
+          { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.value" } } } },
         ]},
       }],
     });
@@ -121,10 +121,10 @@ describe("trigger wiring end-to-end", () => {
   it("dom-ready and custom-event coexist in same plan", () => {
     boot({ planId: "t", components: {}, entries: [
       { trigger: { kind: "dom-ready" }, reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "ready" },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "ready" } } },
       ]}},
       { trigger: { kind: "custom-event", event: "action" }, reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "acted" },
+        { kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "acted" } } },
       ]}},
     ]});
     expect(document.getElementById("r1")!.textContent).toBe("ready");
@@ -138,15 +138,15 @@ describe("trigger wiring end-to-end", () => {
       components: { "Name": { id: "Name", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
       entries: [
         { trigger: { kind: "dom-ready" }, reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "booted" },
+          { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "booted" } } },
         ]}},
         { trigger: { kind: "component-event", componentId: "Name", jsEvent: "change", vendor: "native", readExpr: "value" },
           reaction: { kind: "sequential", commands: [
-            { kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.value" } },
+            { kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.value" } } } },
           ]},
         },
         { trigger: { kind: "custom-event", event: "save" }, reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "r3", mutation: { kind: "set-prop", prop: "textContent" }, value: "saved" },
+          { kind: "mutate-element", target: "r3", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "saved" } } },
         ]}},
       ],
     });

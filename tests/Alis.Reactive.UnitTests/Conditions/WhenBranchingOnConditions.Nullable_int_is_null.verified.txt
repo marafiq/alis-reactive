@@ -27,9 +27,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: No Score
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: No Score
+                    }
+                  }
                 }
               ]
             }
@@ -43,9 +46,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Has Score
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Has Score
+                    }
+                  }
                 }
               ]
             }

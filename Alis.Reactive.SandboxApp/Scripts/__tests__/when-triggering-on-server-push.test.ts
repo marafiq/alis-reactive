@@ -62,7 +62,7 @@ const seq = (event: string): Reaction => ({
 /** Reaction with a mutate-element command — provides a target for retry indicator anchoring. */
 const mutating = (target: string): Reaction => ({
   kind: "sequential",
-  commands: [{ kind: "mutate-element", target, mutation: { kind: "set-prop", prop: "textContent" } }],
+  commands: [{ kind: "mutate-element", target, mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loading" } } }],
 });
 
 let wireServerPush: typeof import("../execution/server-push").wireServerPush;

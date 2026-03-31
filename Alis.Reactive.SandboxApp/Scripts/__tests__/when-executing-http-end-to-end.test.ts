@@ -45,7 +45,7 @@ describe("HTTP verbs", () => {
   it("GET sends method GET with no body", async () => {
     setupDom("r");
     (globalThis as any).fetch = mockFetch(200, {});
-    await execRequest({ verb: "GET", url: "/api/test", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "ok" }] }] });
+    await execRequest({ verb: "GET", url: "/api/test", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "ok" } } }] }] });
     expect(fetch).toHaveBeenCalledWith("/api/test", expect.objectContaining({ method: "GET" }));
     expect(document.getElementById("r")!.textContent).toBe("ok");
   });
@@ -53,21 +53,21 @@ describe("HTTP verbs", () => {
   it("POST sends method POST with JSON body", async () => {
     setupDom("r");
     (globalThis as any).fetch = mockFetch(200, {});
-    await execRequest({ verb: "POST", url: "/api/save", gather: [{ kind: "static", param: "x", value: 1 }], onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "saved" }] }] });
+    await execRequest({ verb: "POST", url: "/api/save", gather: [{ kind: "static", param: "x", value: 1 }], onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "saved" } } }] }] });
     expect(fetch).toHaveBeenCalledWith("/api/save", expect.objectContaining({ method: "POST", body: '{"x":1}' }));
   });
 
   it("PUT sends method PUT", async () => {
     setupDom("r");
     (globalThis as any).fetch = mockFetch(200, {});
-    await execRequest({ verb: "PUT", url: "/api/update", gather: [{ kind: "static", param: "name", value: "new" }], onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "updated" }] }] });
+    await execRequest({ verb: "PUT", url: "/api/update", gather: [{ kind: "static", param: "name", value: "new" }], onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "updated" } } }] }] });
     expect(fetch).toHaveBeenCalledWith("/api/update", expect.objectContaining({ method: "PUT" }));
   });
 
   it("DELETE sends method DELETE", async () => {
     setupDom("r");
     (globalThis as any).fetch = mockFetch(200, {});
-    await execRequest({ verb: "DELETE", url: "/api/remove/42", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "deleted" }] }] });
+    await execRequest({ verb: "DELETE", url: "/api/remove/42", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "deleted" } } }] }] });
     expect(fetch).toHaveBeenCalledWith("/api/remove/42", expect.objectContaining({ method: "DELETE" }));
   });
 });
@@ -80,14 +80,14 @@ describe("response routing", () => {
   it("200 routes to success handler", async () => {
     setupDom("r");
     (globalThis as any).fetch = mockFetch(200, { msg: "ok" });
-    await execRequest({ verb: "GET", url: "/api/test", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "success" }] }] });
+    await execRequest({ verb: "GET", url: "/api/test", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "success" } } }] }] });
     expect(document.getElementById("r")!.textContent).toBe("success");
   });
 
   it("400 routes to matching error handler", async () => {
     setupDom("r");
     (globalThis as any).fetch = mockFetch(400, {});
-    await execRequest({ verb: "POST", url: "/api/save", onError: [{ statusCode: 400, commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "bad request" }] }] });
+    await execRequest({ verb: "POST", url: "/api/save", onError: [{ statusCode: 400, commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "bad request" } } }] }] });
     expect(document.getElementById("r")!.textContent).toBe("bad request");
   });
 
@@ -97,8 +97,8 @@ describe("response routing", () => {
     await execRequest({
       verb: "POST", url: "/api/save",
       onError: [
-        { statusCode: 400, commands: [{ kind: "mutate-element", target: "r400", mutation: { kind: "set-prop", prop: "textContent" }, value: "400" }] },
-        { statusCode: 422, commands: [{ kind: "mutate-element", target: "r422", mutation: { kind: "set-prop", prop: "textContent" }, value: "422" }] },
+        { statusCode: 400, commands: [{ kind: "mutate-element", target: "r400", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "400" } } }] },
+        { statusCode: 422, commands: [{ kind: "mutate-element", target: "r422", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "422" } } }] },
       ],
     });
     expect(document.getElementById("r400")!.textContent).toBe("—");
@@ -111,8 +111,8 @@ describe("response routing", () => {
     await execRequest({
       verb: "GET", url: "/api/fail",
       onError: [
-        { statusCode: 400, commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "400" }] },
-        { commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "catch-all" }] },
+        { statusCode: 400, commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "400" } } }] },
+        { commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "catch-all" } } }] },
       ],
     });
     expect(document.getElementById("r")!.textContent).toBe("catch-all");
@@ -134,8 +134,8 @@ describe("typed response body", () => {
       verb: "GET", url: "/api/data",
       onSuccess: [{
         commands: [
-          { kind: "mutate-element", target: "rname", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" },
-          { kind: "mutate-element", target: "rcount", mutation: { kind: "set-prop", prop: "textContent" }, value: "3" },
+          { kind: "mutate-element", target: "rname", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loaded" } } },
+          { kind: "mutate-element", target: "rcount", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "3" } } },
         ],
       }],
     });
@@ -150,7 +150,7 @@ describe("typed response body", () => {
       verb: "GET", url: "/api/data",
       onSuccess: [{
         commands: [
-          { kind: "mutate-element", target: "rname", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.name" } },
+          { kind: "mutate-element", target: "rname", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "responseBody.name" } } } },
         ],
       }],
     });
@@ -165,7 +165,7 @@ describe("typed response body", () => {
       verb: "GET", url: "/api/resident",
       onSuccess: [{
         commands: [
-          { kind: "mutate-element", target: "city", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.address.city" } },
+          { kind: "mutate-element", target: "city", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "responseBody.address.city" } } } },
         ],
       }],
     });
@@ -185,8 +185,8 @@ describe("whileLoading", () => {
 
     const promise = execRequest({
       verb: "GET", url: "/api/slow",
-      whileLoading: [{ kind: "mutate-element", target: "spinner", mutation: { kind: "set-prop", prop: "textContent" }, value: "loading" }],
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "status", mutation: { kind: "set-prop", prop: "textContent" }, value: "done" }] }],
+      whileLoading: [{ kind: "mutate-element", target: "spinner", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loading" } } }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "status", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "done" } } }] }],
     });
 
     // While loading
@@ -212,7 +212,7 @@ describe("formData content type", () => {
       verb: "POST", url: "/api/upload",
       contentType: "form-data",
       gather: [{ kind: "static", param: "name", value: "test" }],
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "uploaded" }] }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "uploaded" } } }] }],
     });
     const call = (fetch as any).mock.calls[0];
     expect(call[1].body).toBeInstanceOf(FormData);
@@ -233,10 +233,10 @@ describe("chained requests", () => {
 
     await execRequest({
       verb: "POST", url: "/api/save",
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent" }, value: "saved" }] }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "saved" } } }] }],
       chained: {
         verb: "GET", url: "/api/refresh",
-        onSuccess: [{ commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent" }, value: "refreshed" }] }],
+        onSuccess: [{ commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "refreshed" } } }] }],
       },
     });
 
@@ -251,10 +251,10 @@ describe("chained requests", () => {
 
     await execRequest({
       verb: "POST", url: "/api/save",
-      onError: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent" }, value: "failed" }] }],
+      onError: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "failed" } } }] }],
       chained: {
         verb: "GET", url: "/api/refresh",
-        onSuccess: [{ commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent" }, value: "refreshed" }] }],
+        onSuccess: [{ commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "refreshed" } } }] }],
       },
     });
 
@@ -275,7 +275,7 @@ describe("gather in GET requests", () => {
     await execRequest({
       verb: "GET", url: "/api/search",
       gather: [{ kind: "static", param: "q", value: "hello" }, { kind: "static", param: "page", value: 1 }],
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "found" }] }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "found" } } }] }],
     });
     expect(fetch).toHaveBeenCalledWith("/api/search?q=hello&page=1", expect.anything());
   });
@@ -322,7 +322,7 @@ describe("full boot-to-http integration", () => {
           request: {
             verb: "GET", url: "/api/resident",
             onSuccess: [{ commands: [
-              { kind: "mutate-element", target: "name", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.name" } },
+              { kind: "mutate-element", target: "name", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "responseBody.name" } } } },
             ]}],
           },
         },
@@ -352,7 +352,7 @@ describe("full boot-to-http integration", () => {
           request: {
             verb: "POST", url: "/api/save",
             gather: [{ kind: "component", componentId: "NameField", vendor: "native", name: "Name", readExpr: "value" }],
-            onSuccess: [{ commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "saved" }] }],
+            onSuccess: [{ commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "saved" } } }] }],
           },
         },
       }],
@@ -387,7 +387,7 @@ describe("full boot-to-http integration", () => {
             verb: "GET", url: "/api/data",
             onSuccess: [{ commands: [
               { kind: "mutate-element", target: "spinner", mutation: { kind: "call", method: "setAttribute", args: [{ kind: "literal", value: "hidden" }, { kind: "literal", value: "" }] } },
-              { kind: "mutate-element", target: "data", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" },
+              { kind: "mutate-element", target: "data", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loaded" } } },
             ]}],
           },
         },

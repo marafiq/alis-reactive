@@ -18,9 +18,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: deleted
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: deleted
+                    }
+                  }
                 }
               ]
             }

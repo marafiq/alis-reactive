@@ -67,9 +67,12 @@
                   target: notice,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Contact admin for access
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Contact admin for access
+                    }
+                  }
                 },
                 {
                   kind: dispatch,

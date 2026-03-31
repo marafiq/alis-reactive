@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
 using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -23,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionDropDownList, TModel> SetValue<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self, string? value)
             where TModel : class
-            => self.Emit(new SetPropMutation("value"), value: value);
+            => self.Emit(new SetPropMutation("value", CommandValue.FromLiteral(value)));
 
         /// <summary>Sets the displayed text without changing the underlying value.</summary>
         /// <param name="text">The text to display.</param>
@@ -31,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionDropDownList, TModel> SetText<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self, string text)
             where TModel : class
-            => self.Emit(new SetPropMutation("text"), value: text);
+            => self.Emit(new SetPropMutation("text", CommandValue.FromLiteral(text)));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -45,7 +46,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+            return self.Emit(new SetPropMutation("dataSource", CommandValue.FromSource(new EventSource(sourcePath))));
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
@@ -61,7 +62,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+            return self.Emit(new SetPropMutation("dataSource", CommandValue.FromSource(new EventSource(sourcePath))));
         }
 
         /// <summary>Flushes pending property changes to the component in the browser.</summary>

@@ -31,14 +31,14 @@ describe("multiple entries on the same trigger", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "first" }],
+            commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "first" } } }],
           },
         },
         {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "second" }],
+            commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "second" } } }],
           },
         },
       ],
@@ -57,7 +57,7 @@ describe("multiple entries on the same trigger", () => {
           trigger: { kind: "custom-event", event: "my-event" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "entry-1" }],
+            commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "entry-1" } } }],
           },
         },
         {
@@ -67,10 +67,10 @@ describe("multiple entries on the same trigger", () => {
             branches: [
               {
                 guard: { kind: "value", source: { kind: "event", path: "evt.name" }, coerceAs: "string", op: "eq", operand: "hello" },
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "matched" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "matched" } } }] },
               },
               {
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "else" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "else" } } }] },
               },
             ],
           },
@@ -94,7 +94,7 @@ describe("multiple entries on the same trigger", () => {
           trigger: { kind: "custom-event", event: "test" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "echo", mutation: { kind: "set-prop", prop: "textContent" }, value: "before" }],
+            commands: [{ kind: "mutate-element", target: "echo", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "before" } } }],
           },
         },
         {
@@ -104,10 +104,10 @@ describe("multiple entries on the same trigger", () => {
             branches: [
               {
                 guard: { kind: "value", source: { kind: "event", path: "evt.active" }, coerceAs: "boolean", op: "truthy" },
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "active" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "active" } } }] },
               },
               {
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "inactive" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "inactive" } } }] },
               },
             ],
           },
@@ -119,10 +119,10 @@ describe("multiple entries on the same trigger", () => {
             branches: [
               {
                 guard: { kind: "value", source: { kind: "event", path: "evt.score" }, coerceAs: "number", op: "gt", operand: 80 },
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "high" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "high" } } }] },
               },
               {
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "low" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "low" } } }] },
               },
             ],
           },
@@ -131,7 +131,7 @@ describe("multiple entries on the same trigger", () => {
           trigger: { kind: "custom-event", event: "test" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "footer", mutation: { kind: "set-prop", prop: "textContent" }, value: "after" }],
+            commands: [{ kind: "mutate-element", target: "footer", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "after" } } }],
           },
         },
       ],
@@ -159,10 +159,10 @@ describe("multiple entries on the same trigger", () => {
             branches: [
               {
                 guard: { kind: "value", source: { kind: "event", path: "evt.color" }, coerceAs: "string", op: "eq", operand: "red" },
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "is red" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "is red" } } }] },
               },
               {
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "not red" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "not red" } } }] },
               },
             ],
           },
@@ -174,10 +174,10 @@ describe("multiple entries on the same trigger", () => {
             branches: [
               {
                 guard: { kind: "value", source: { kind: "event", path: "evt.size" }, coerceAs: "number", op: "gt", operand: 10 },
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "big" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "big" } } }] },
               },
               {
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "small" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "small" } } }] },
               },
             ],
           },
@@ -205,10 +205,10 @@ describe("multiple entries on the same trigger", () => {
             branches: [
               {
                 guard: { kind: "value", source: { kind: "event", path: "evt.color" }, coerceAs: "string", op: "eq", operand: "red" },
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "is red" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "is red" } } }] },
               },
               {
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "not red" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "not red" } } }] },
               },
             ],
           },
@@ -220,10 +220,10 @@ describe("multiple entries on the same trigger", () => {
             branches: [
               {
                 guard: { kind: "value", source: { kind: "event", path: "evt.size" }, coerceAs: "number", op: "gt", operand: 100 },
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "huge" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "huge" } } }] },
               },
               {
-                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "normal" }] },
+                reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "normal" } } }] },
               },
             ],
           },
@@ -248,7 +248,7 @@ describe("multiple entries on the same trigger", () => {
           trigger: { kind: "custom-event", event: "after-boot" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "received" }],
+            commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "received" } } }],
           },
         },
         {
@@ -256,7 +256,7 @@ describe("multiple entries on the same trigger", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "booted" },
+              { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "booted" } } },
               { kind: "dispatch", event: "after-boot" },
             ],
           },
@@ -277,15 +277,15 @@ describe("multiple entries on the same trigger", () => {
       entries: [
         {
           trigger: { kind: "dom-ready" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "1" }] },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "1" } } }] },
         },
         {
           trigger: { kind: "dom-ready" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "2" }] },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "2" } } }] },
         },
         {
           trigger: { kind: "dom-ready" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r3", mutation: { kind: "set-prop", prop: "textContent" }, value: "3" }] },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r3", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "3" } } }] },
         },
       ],
     };

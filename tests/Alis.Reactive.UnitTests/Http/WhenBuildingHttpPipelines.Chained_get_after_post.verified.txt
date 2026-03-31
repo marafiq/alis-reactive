@@ -25,9 +25,12 @@
                   target: save-status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: saved
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: saved
+                    }
+                  }
                 }
               ]
             }
@@ -43,9 +46,12 @@
                     target: list,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: refreshed
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: refreshed
+                      }
+                    }
                   }
                 ]
               }

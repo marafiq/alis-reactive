@@ -14,9 +14,12 @@
             target: header,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: evaluating
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: evaluating
+              }
+            }
           },
           {
             kind: dispatch,
@@ -52,9 +55,12 @@
                   target: count-tier,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: high
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: high
+                    }
+                  }
                 }
               ]
             }
@@ -78,9 +84,12 @@
                   target: count-tier,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: medium
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: medium
+                    }
+                  }
                 }
               ]
             }
@@ -94,9 +103,12 @@
                   target: count-tier,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: low
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: low
+                    }
+                  }
                 }
               ]
             }
@@ -117,9 +129,12 @@
             target: mid,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: between
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: between
+              }
+            }
           }
         ]
       }
@@ -203,9 +218,12 @@
             target: footer,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: complete
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: complete
+              }
+            }
           }
         ]
       }
@@ -237,9 +255,12 @@
                   target: priority,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: URGENT
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: URGENT
+                    }
+                  }
                 },
                 {
                   kind: mutate-element,
@@ -278,9 +299,12 @@
                   target: priority,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: normal
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: normal
+                    }
+                  }
                 }
               ]
             }
@@ -294,9 +318,12 @@
                   target: priority,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: low
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: low
+                    }
+                  }
                 }
               ]
             }

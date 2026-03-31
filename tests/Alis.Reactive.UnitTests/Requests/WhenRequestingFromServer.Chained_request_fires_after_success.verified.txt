@@ -18,9 +18,12 @@
                   target: residents,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: loaded
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: loaded
+                    }
+                  }
                 }
               ]
             }
@@ -36,9 +39,12 @@
                     target: facilities,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: loaded
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: loaded
+                      }
+                    }
                   }
                 ]
               }

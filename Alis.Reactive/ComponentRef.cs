@@ -1,7 +1,6 @@
 using Alis.Reactive.Builders;
 using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive
 {
@@ -34,13 +33,10 @@ namespace Alis.Reactive
         /// Called by vendor extension methods — not by DSL users directly.
         /// Vendor is resolved from the cached TComponent instance.
         /// </summary>
-        internal ComponentRef<TComponent, TModel> Emit(
-            Mutation mutation,
-            object? value = null,
-            BindSource? source = null)
+        internal ComponentRef<TComponent, TModel> Emit(Mutation mutation)
         {
             Emitter.AddCommand(new MutateElementCommand(
-                TargetId, mutation, value, source, vendor: _instance.Vendor));
+                TargetId, mutation, vendor: _instance.Vendor));
             return this;
         }
 

@@ -33,7 +33,7 @@ public class WhenVerifyingSchemaIntegrity : DriftTestBase
         "HttpReaction",
         "IntoCommand",
         "InvertGuard",
-        "LiteralArg",
+        "LiteralValue",
         "MutateElementCommand",
         "MutateEventCommand",
         "ParallelHttpReaction",
@@ -42,7 +42,7 @@ public class WhenVerifyingSchemaIntegrity : DriftTestBase
         "ServerPushTrigger",
         "SetPropMutation",
         "SignalRTrigger",
-        "SourceArg",
+        "SourceValue",
         "StaticGather",
         "StatusHandler",
         "ValidationCondition",
@@ -57,7 +57,7 @@ public class WhenVerifyingSchemaIntegrity : DriftTestBase
     private static readonly HashSet<string> NonObjectDefs = new()
     {
         "Trigger", "Reaction", "Command", "Guard", "BindSource",
-        "Mutation", "MethodArg", "GatherItem", "BindExpr",
+        "Mutation", "CommandValue", "GatherItem", "BindExpr",
         "GuardOp", "Vendor", "CoercionType", "ValidationRuleType"
     };
 
@@ -152,7 +152,7 @@ public class WhenVerifyingSchemaIntegrity : DriftTestBase
             },
             ["BindSource"] = new[] { "EventSource", "ComponentSource" },
             ["Mutation"] = new[] { "SetPropMutation", "CallMutation" },
-            ["MethodArg"] = new[] { "LiteralArg", "SourceArg" },
+            ["CommandValue"] = new[] { "LiteralValue", "SourceValue" },
             ["GatherItem"] = new[]
             {
                 "ComponentGather", "StaticGather", "AllGather", "EventGather"

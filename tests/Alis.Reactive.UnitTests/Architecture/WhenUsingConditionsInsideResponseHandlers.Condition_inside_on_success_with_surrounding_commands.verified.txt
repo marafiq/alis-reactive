@@ -14,18 +14,24 @@
             target: status,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: loading
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: loading
+              }
+            }
           },
           {
             kind: mutate-element,
             target: footer,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: done
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: done
+              }
+            }
           }
         ],
         request: {
@@ -41,18 +47,24 @@
                     target: status,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: saved
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: saved
+                      }
+                    }
                   },
                   {
                     kind: mutate-element,
                     target: timestamp,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: now
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: now
+                      }
+                    }
                   }
                 ],
                 branches: [

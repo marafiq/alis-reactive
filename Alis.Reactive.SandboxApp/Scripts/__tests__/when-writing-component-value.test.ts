@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../lifecycle/boot";
 import { TestWidget } from "../components/lab/test-widget";
+import { literalValue } from "./test-value-helpers";
 
 describe("when writing component value", () => {
   afterEach(() => { document.body.innerHTML = ""; });
@@ -15,7 +16,7 @@ describe("when writing component value", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "native-write",
-          mutation: { kind: "set-prop", prop: "value" }, value: "written",
+          mutation: { kind: "set-prop", prop: "value", value: { kind: "literal", value: "written" } },
         }] },
       }] });
 
@@ -35,7 +36,7 @@ describe("when writing component value", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "fusion-write",
-          mutation: { kind: "set-prop", prop: "value" }, vendor: "fusion", value: "written",
+          mutation: { kind: "set-prop", prop: "value", value: literalValue("written") }, vendor: "fusion",
         }] },
       }] });
 

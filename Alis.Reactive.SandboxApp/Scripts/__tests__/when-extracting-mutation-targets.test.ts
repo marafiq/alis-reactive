@@ -8,8 +8,8 @@ describe("when extracting mutation targets from reactions", () => {
       kind: "sequential",
       commands: [
         { kind: "dispatch", event: "test" },
-        { kind: "mutate-element", target: "notif-count", mutation: { kind: "set-prop", prop: "textContent" } },
-        { kind: "mutate-element", target: "notif-message", mutation: { kind: "set-prop", prop: "textContent" } },
+        { kind: "mutate-element", target: "notif-count", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "count" } } },
+        { kind: "mutate-element", target: "notif-message", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "message" } } },
       ],
     };
     expect(firstMutationTarget(reaction)).toBe("notif-count");
@@ -19,7 +19,7 @@ describe("when extracting mutation targets from reactions", () => {
     const reaction: Reaction = {
       kind: "conditional",
       commands: [
-        { kind: "mutate-element", target: "status", mutation: { kind: "set-prop", prop: "textContent" } },
+        { kind: "mutate-element", target: "status", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "ready" } } },
       ],
       branches: [],
     };

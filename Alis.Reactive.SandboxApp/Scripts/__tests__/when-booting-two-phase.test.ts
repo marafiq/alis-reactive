@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { JSDOM } from "jsdom";
 import type { Plan } from "../types";
 
+import { dispatchPayload } from "./test-value-helpers";
 let boot: typeof import("../lifecycle/boot").boot;
 
 beforeEach(async () => {
@@ -33,7 +34,7 @@ describe("two-phase boot", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent" }, value: "dom-ready fired" },
+              { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "dom-ready fired" } } },
               { kind: "dispatch", event: "init" },
             ],
           },
@@ -43,7 +44,7 @@ describe("two-phase boot", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent" }, value: "init received" },
+              { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "init received" } } },
             ],
           },
         },
@@ -63,21 +64,21 @@ describe("two-phase boot", () => {
         {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [
-            { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent" }, value: "1" },
+            { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "1" } } },
             { kind: "dispatch", event: "hop-a" },
           ]},
         },
         {
           trigger: { kind: "custom-event", event: "hop-a" },
           reaction: { kind: "sequential", commands: [
-            { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent" }, value: "2" },
+            { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "2" } } },
             { kind: "dispatch", event: "hop-b" },
           ]},
         },
         {
           trigger: { kind: "custom-event", event: "hop-b" },
           reaction: { kind: "sequential", commands: [
-            { kind: "mutate-element", target: "step3", mutation: { kind: "set-prop", prop: "textContent" }, value: "3" },
+            { kind: "mutate-element", target: "step3", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "3" } } },
           ]},
         },
       ],
@@ -99,7 +100,7 @@ describe("two-phase boot", () => {
         {
           trigger: { kind: "custom-event", event: "late-event" },
           reaction: { kind: "sequential", commands: [
-            { kind: "mutate-element", target: "chain-result", mutation: { kind: "set-prop", prop: "textContent" }, value: "caught" },
+            { kind: "mutate-element", target: "chain-result", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "caught" } } },
           ]},
         },
         {
@@ -123,14 +124,14 @@ describe("two-phase boot", () => {
         {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [
-            { kind: "dispatch", event: "data-ready", payload: { name: "Margaret", age: 82 } },
+            { kind: "dispatch", event: "data-ready", payload: dispatchPayload({ name: "Margaret", age: 82 }) },
           ]},
         },
         {
           trigger: { kind: "custom-event", event: "data-ready" },
           reaction: { kind: "sequential", commands: [
-            { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.name" } },
-            { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.age" } },
+            { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.name" } } } },
+            { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.age" } } } },
           ]},
         },
       ],
@@ -147,13 +148,13 @@ describe("two-phase boot", () => {
       components: {},
       entries: [
         { trigger: { kind: "custom-event", event: "event-a" }, reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent" }, value: "a" },
+          { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "a" } } },
         ]}},
         { trigger: { kind: "custom-event", event: "event-b" }, reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent" }, value: "b" },
+          { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "b" } } },
         ]}},
         { trigger: { kind: "custom-event", event: "event-c" }, reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "step3", mutation: { kind: "set-prop", prop: "textContent" }, value: "c" },
+          { kind: "mutate-element", target: "step3", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "c" } } },
         ]}},
       ],
     };
@@ -180,13 +181,13 @@ describe("two-phase boot", () => {
           reaction: {
             kind: "conditional",
             commands: [
-              { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent" }, value: "pre-command ran" },
+              { kind: "mutate-element", target: "step1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "pre-command ran" } } },
             ],
             branches: [
               {
                 guard: { kind: "value", source: { kind: "event", path: "evt.ok" }, coerceAs: "boolean", op: "truthy" },
                 reaction: { kind: "sequential", commands: [
-                  { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent" }, value: "branch taken" },
+                  { kind: "mutate-element", target: "step2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "branch taken" } } },
                 ]},
               },
             ],

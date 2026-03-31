@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../lifecycle/boot";
 import { TestWidget } from "../components/lab/test-widget";
 
+import { dispatchPayload } from "./test-value-helpers";
 describe("when using unified call mutations", () => {
   afterEach(() => { document.body.innerHTML = ""; });
 
@@ -51,7 +52,7 @@ describe("when using unified call mutations", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "dispatch", event: "load-data",
-          payload: { data: { items: ["a", "b"] } },
+          payload: dispatchPayload({ data: { items: ["a", "b"] } }),
         }] },
       },
       {
@@ -91,7 +92,7 @@ describe("when using unified call mutations", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "dispatch", event: "set-prop",
-          payload: { form: { label: "hello" } },
+          payload: dispatchPayload({ form: { label: "hello" } }),
         }] },
       },
       {
@@ -120,7 +121,7 @@ describe("when using unified call mutations", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "dispatch", event: "add-item",
-          payload: { data: { item: "new", position: 1 } },
+          payload: dispatchPayload({ data: { item: "new", position: 1 } }),
         }] },
       },
       {
@@ -149,7 +150,7 @@ describe("when using unified call mutations", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "dispatch", event: "insert",
-          payload: { config: { idx: "2" } },
+          payload: dispatchPayload({ config: { idx: "2" } }),
         }] },
       },
       {
@@ -203,7 +204,7 @@ describe("when using unified call mutations", () => {
       trigger: { kind: "dom-ready" },
       reaction: { kind: "sequential", commands: [{
         kind: "mutate-element", target: "el",
-        mutation: { kind: "set-prop", prop: "textContent" }, value: "from-command",
+        mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "from-command" } },
       }] },
     }] });
 
@@ -218,15 +219,14 @@ describe("when using unified call mutations", () => {
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [{
           kind: "dispatch", event: "msg",
-          payload: { msg: "resolved" },
+          payload: dispatchPayload({ msg: "resolved" }),
         }] },
       },
       {
         trigger: { kind: "custom-event", event: "msg" },
         reaction: { kind: "sequential", commands: [{
           kind: "mutate-element", target: "el",
-          mutation: { kind: "set-prop", prop: "textContent" },
-          source: { kind: "event", path: "evt.msg" },
+          mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.msg" } } },
         }] },
       },
     ] });

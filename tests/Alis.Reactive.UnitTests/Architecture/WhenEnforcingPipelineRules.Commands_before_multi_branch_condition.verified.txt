@@ -14,9 +14,12 @@
             target: status,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: Processing...
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: Processing...
+              }
+            }
           },
           {
             kind: dispatch,
@@ -43,9 +46,12 @@
                   target: tier,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Gold
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Gold
+                    }
+                  }
                 }
               ]
             }
@@ -69,9 +75,12 @@
                   target: tier,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Silver
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Silver
+                    }
+                  }
                 }
               ]
             }
@@ -85,9 +94,12 @@
                   target: tier,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Bronze
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Bronze
+                    }
+                  }
                 }
               ]
             }

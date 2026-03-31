@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { JSDOM } from "jsdom";
 import type { HttpReaction, ParallelHttpReaction } from "../types";
+import { literalValue } from "./test-value-helpers";
 
 /**
  * BDD: When pre-fetch commands or validation throw at the pipeline level
@@ -44,8 +45,7 @@ function setText(target: string, value: string) {
   return {
     kind: "mutate-element" as const,
     target,
-    mutation: { kind: "set-prop" as const, prop: "textContent" },
-    value,
+    mutation: { kind: "set-prop" as const, prop: "textContent", value: literalValue(value) },
   };
 }
 

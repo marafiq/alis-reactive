@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
 using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -14,7 +15,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static ComponentRef<TestWidgetSyncFusion, TModel> SetValue<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self, string value)
-            where TModel : class => self.Emit(new SetPropMutation("value"), value: value);
+            where TModel : class => self.Emit(new SetPropMutation("value", CommandValue.FromLiteral(value)));
 
         // ── Property Write (event payload) ──
 
@@ -24,7 +25,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
+            return self.Emit(new SetPropMutation("value", CommandValue.FromSource(new EventSource(sourcePath))));
         }
 
         // ── Property Write (response body) ──
@@ -36,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
+            return self.Emit(new SetPropMutation("value", CommandValue.FromSource(new EventSource(sourcePath))));
         }
 
         // ── Property Write (component read) ──
@@ -44,7 +45,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<TestWidgetSyncFusion, TModel> SetValue<TModel, TProp>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self, TypedSource<TProp> source)
             where TModel : class
-            => self.Emit(new SetPropMutation("value"), source: source.ToBindSource());
+            => self.Emit(new SetPropMutation("value", CommandValue.FromSource(source.ToBindSource())));
 
         // ── Property Read ──
 
@@ -70,7 +71,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new CallMutation("setItems", args: new MethodArg[] { new SourceArg(new EventSource(sourcePath)) }));
+            return self.Emit(new CallMutation("setItems", args: new[] { CommandValue.FromSource(new EventSource(sourcePath)) }));
         }
 
         // ── Method + arg (response body) ──
@@ -82,7 +83,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new CallMutation("setItems", args: new MethodArg[] { new SourceArg(new EventSource(sourcePath)) }));
+            return self.Emit(new CallMutation("setItems", args: new[] { CommandValue.FromSource(new EventSource(sourcePath)) }));
         }
     }
 }

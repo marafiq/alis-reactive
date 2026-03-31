@@ -31,9 +31,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Not admin
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Not admin
+                    }
+                  }
                 }
               ]
             }
@@ -47,9 +50,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Is admin
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Is admin
+                    }
+                  }
                 }
               ]
             }

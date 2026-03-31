@@ -19,9 +19,12 @@
                   target: perms,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: loaded
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: loaded
+                    }
+                  }
                 }
               ]
             }

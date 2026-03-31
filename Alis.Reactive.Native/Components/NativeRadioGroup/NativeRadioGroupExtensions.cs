@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
 using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -29,7 +30,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeRadioGroup, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.Emit(new SetPropMutation("value", CommandValue.FromLiteral(value)));
         }
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
+            return self.Emit(new SetPropMutation("value", CommandValue.FromSource(new EventSource(sourcePath))));
         }
 
         /// <summary>

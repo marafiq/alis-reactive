@@ -29,9 +29,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: positive
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: positive
+                    }
+                  }
                 }
               ]
             }
@@ -45,9 +48,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: zero or negative
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: zero or negative
+                    }
+                  }
                 }
               ]
             }

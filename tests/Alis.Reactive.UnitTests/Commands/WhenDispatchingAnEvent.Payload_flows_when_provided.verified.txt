@@ -12,7 +12,10 @@
             kind: dispatch,
             event: saved,
             payload: {
-              id: abc
+              id: {
+                kind: literal,
+                value: abc
+              }
             }
           }
         ]

@@ -16,9 +16,9 @@ public class WhenMutatingResidentUiState : DriftTestBase
     public void resident_panels_can_call_methods_with_literal_arguments()
     {
         AssertDefinitionPropertiesExactly("MutateElementCommand",
-            "kind", "target", "mutation", "value", "source", "vendor");
+            "kind", "target", "mutation", "vendor");
         AssertDefinitionPropertiesExactly("CallMutation", "kind", "method", "chain", "args");
-        AssertDefinitionPropertiesExactly("LiteralArg", "kind", "value");
+        AssertDefinitionPropertiesExactly("LiteralValue", "kind", "value", "coerce");
 
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
@@ -38,8 +38,8 @@ public class WhenMutatingResidentUiState : DriftTestBase
     public void resident_ui_text_updates_cover_literal_event_and_component_sources()
     {
         AssertDefinitionPropertiesExactly("MutateElementCommand",
-            "kind", "target", "mutation", "value", "source", "vendor");
-        AssertDefinitionPropertiesExactly("SetPropMutation", "kind", "prop", "coerce");
+            "kind", "target", "mutation", "vendor");
+        AssertDefinitionPropertiesExactly("SetPropMutation", "kind", "prop", "value");
         AssertDefinitionPropertiesExactly("EventSource", "kind", "path");
         AssertDefinitionPropertiesExactly("ComponentSource",
             "kind", "componentId", "vendor", "readExpr");
@@ -58,14 +58,19 @@ public class WhenMutatingResidentUiState : DriftTestBase
         AssertSchemaValid(json);
 
         AssertPropertiesExactly(json, "entries[0].reaction.commands[0]",
-            "kind", "target", "mutation", "value");
-        AssertPropertiesExactly(json, "entries[0].reaction.commands[0].mutation", "kind", "prop");
+            "kind", "target", "mutation");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0].mutation", "kind", "prop", "value");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0].mutation.value", "kind", "value");
         AssertPropertiesExactly(json, "entries[0].reaction.commands[1]",
-            "kind", "target", "mutation", "source");
-        AssertPropertiesExactly(json, "entries[0].reaction.commands[1].source", "kind", "path");
+            "kind", "target", "mutation");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[1].mutation", "kind", "prop", "value");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[1].mutation.value", "kind", "source");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[1].mutation.value.source", "kind", "path");
         AssertPropertiesExactly(json, "entries[0].reaction.commands[2]",
-            "kind", "target", "mutation", "source");
-        AssertPropertiesExactly(json, "entries[0].reaction.commands[2].source",
+            "kind", "target", "mutation");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[2].mutation", "kind", "prop", "value");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[2].mutation.value", "kind", "source");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[2].mutation.value.source",
             "kind", "componentId", "vendor", "readExpr");
     }
 
@@ -73,8 +78,8 @@ public class WhenMutatingResidentUiState : DriftTestBase
     public void resident_components_can_accept_typed_values_with_vendor_and_coercion()
     {
         AssertDefinitionPropertiesExactly("MutateElementCommand",
-            "kind", "target", "mutation", "value", "source", "vendor");
-        AssertDefinitionPropertiesExactly("SetPropMutation", "kind", "prop", "coerce");
+            "kind", "target", "mutation", "vendor");
+        AssertDefinitionPropertiesExactly("SetPropMutation", "kind", "prop", "value");
 
         var plan = CreatePlan();
         On(plan, t => t.DomReady(p =>
@@ -87,16 +92,18 @@ public class WhenMutatingResidentUiState : DriftTestBase
         AssertSchemaValid(json);
 
         AssertPropertiesExactly(json, "entries[0].reaction.commands[0]",
-            "kind", "target", "mutation", "value", "vendor");
+            "kind", "target", "mutation", "vendor");
         AssertPropertiesExactly(json, "entries[0].reaction.commands[0].mutation",
-            "kind", "prop", "coerce");
+            "kind", "prop", "value");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0].mutation.value",
+            "kind", "value", "coerce");
     }
 
     [Test]
     public void resident_filtering_helpers_can_prevent_default_via_public_event_value_mutation()
     {
         AssertDefinitionPropertiesExactly("MutateEventCommand",
-            "kind", "mutation", "value", "source");
+            "kind", "mutation");
 
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("filtering", p =>
@@ -109,15 +116,19 @@ public class WhenMutatingResidentUiState : DriftTestBase
         AssertSchemaValid(json);
 
         AssertPropertiesExactly(json, "entries[0].reaction.commands[0]",
-            "kind", "mutation", "value");
+            "kind", "mutation");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0].mutation",
+            "kind", "prop", "value");
+        AssertPropertiesExactly(json, "entries[0].reaction.commands[0].mutation.value",
+            "kind", "value");
     }
 
     [Test]
     public void resident_filtering_helpers_cover_only_publicly_reachable_source_arg_shape()
     {
         AssertDefinitionPropertiesExactly("MutateEventCommand",
-            "kind", "mutation", "value", "source");
-        AssertDefinitionPropertiesExactly("SourceArg", "kind", "source", "coerce");
+            "kind", "mutation");
+        AssertDefinitionPropertiesExactly("SourceValue", "kind", "source", "coerce");
 
         var plan = CreatePlan();
         On(plan, t => t.CustomEvent("filtering", p =>
@@ -133,8 +144,8 @@ public class WhenMutatingResidentUiState : DriftTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
 
-        // The fluent DSL currently reaches SourceArg through CallMutation args here.
-        // It does not emit command-level MutateEventCommand.source or SourceArg.coerce.
+        // The fluent DSL reaches source-backed event mutation through CallMutation args here.
+        // It does not emit any separate command-level source lane.
         AssertPropertiesExactly(json,
             "entries[0].reaction.request.onSuccess[0].commands[0]",
             "kind", "mutation");

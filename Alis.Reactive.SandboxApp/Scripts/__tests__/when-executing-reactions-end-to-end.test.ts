@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { JSDOM } from "jsdom";
+import { dispatchPayload } from "./test-value-helpers";
 
 
 let boot: typeof import("../lifecycle/boot").boot;
@@ -32,9 +33,9 @@ describe("reaction execution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "dom-ready" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent" }, value: "1" },
-        { kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent" }, value: "2" },
-        { kind: "mutate-element", target: "c", mutation: { kind: "set-prop", prop: "textContent" }, value: "3" },
+        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "1" } } },
+        { kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "2" } } },
+        { kind: "mutate-element", target: "c", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "3" } } },
       ]},
     }]});
     expect(document.getElementById("a")!.textContent).toBe("1");
@@ -47,10 +48,10 @@ describe("reaction execution end-to-end", () => {
   it("dispatch fires custom event caught by another entry", () => {
     boot({ planId: "t", components: {}, entries: [
       { trigger: { kind: "custom-event", event: "step2" }, reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent" }, value: "step2-done" },
+        { kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "step2-done" } } },
       ]}},
       { trigger: { kind: "dom-ready" }, reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent" }, value: "step1-done" },
+        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "step1-done" } } },
         { kind: "dispatch", event: "step2" },
       ]}},
     ]});
@@ -61,10 +62,10 @@ describe("reaction execution end-to-end", () => {
   it("dispatch with payload passes data to listener", () => {
     boot({ planId: "t", components: {}, entries: [
       { trigger: { kind: "custom-event", event: "data-ready" }, reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.name" } },
+        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.name" } } } },
       ]}},
       { trigger: { kind: "dom-ready" }, reaction: { kind: "sequential", commands: [
-        { kind: "dispatch", event: "data-ready", payload: { name: "Eleanor" } },
+        { kind: "dispatch", event: "data-ready", payload: dispatchPayload({ name: "Eleanor" }) },
       ]}},
     ]});
     expect(document.getElementById("a")!.textContent).toBe("Eleanor");
@@ -128,7 +129,7 @@ describe("reaction execution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "dom-ready" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "innerHTML" }, value: "<b>bold</b>" },
+        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "innerHTML", value: { kind: "literal", value: "<b>bold</b>" } } },
       ]},
     }]});
     expect(document.getElementById("a")!.innerHTML).toBe("<b>bold</b>");
@@ -140,7 +141,7 @@ describe("reaction execution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.address.city" } },
+        { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.address.city" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { address: { city: "Portland" } } }));
@@ -153,7 +154,7 @@ describe("reaction execution end-to-end", () => {
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "component", componentId: "NameField", vendor: "native", readExpr: "value" } },
+          { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "component", componentId: "NameField", vendor: "native", readExpr: "value" } } } },
         ]},
       }],
     });
@@ -167,7 +168,7 @@ describe("reaction execution end-to-end", () => {
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "component", componentId: "ActiveField", vendor: "native", readExpr: "checked" } },
+          { kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "component", componentId: "ActiveField", vendor: "native", readExpr: "checked" } } } },
         ]},
       }],
     });
@@ -180,7 +181,7 @@ describe("reaction execution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "dom-ready" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "NameField", mutation: { kind: "set-prop", prop: "value" }, value: "Eleanor", vendor: "native" },
+        { kind: "mutate-element", target: "NameField", mutation: { kind: "set-prop", prop: "value", value: { kind: "literal", value: "Eleanor" } }, vendor: "native" },
       ]},
     }]});
     expect((document.getElementById("NameField") as HTMLInputElement).value).toBe("Eleanor");
@@ -193,7 +194,7 @@ describe("reaction execution end-to-end", () => {
     await expect(executeReaction({
       kind: "sequential",
       commands: [
-        { kind: "mutate-element", target: "nonexistent", mutation: { kind: "set-prop", prop: "textContent" }, value: "x" },
+        { kind: "mutate-element", target: "nonexistent", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "x" } } },
       ],
     })).rejects.toThrow();
   });

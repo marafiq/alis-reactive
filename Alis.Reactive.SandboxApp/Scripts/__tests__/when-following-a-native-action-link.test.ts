@@ -30,8 +30,7 @@ describe("when following a native action link", () => {
             commands: [{
               kind: "mutate-element",
               target: "result",
-              mutation: { kind: "set-prop", prop: "textContent" },
-              value: "Deleted row 42",
+              mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "Deleted row 42" } },
             }],
           }],
         },
@@ -77,8 +76,7 @@ describe("when following a native action link", () => {
                 commands: [{
                   kind: "mutate-element",
                   target: "result",
-                  mutation: { kind: "set-prop", prop: "textContent" },
-                  value: "Deleted row 42",
+                  mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "Deleted row 42" } },
                 }],
               }],
             },

@@ -14,18 +14,24 @@
             target: a,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: one
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: one
+              }
+            }
           },
           {
             kind: mutate-element,
             target: b,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: two
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: two
+              }
+            }
           }
         ]
       }

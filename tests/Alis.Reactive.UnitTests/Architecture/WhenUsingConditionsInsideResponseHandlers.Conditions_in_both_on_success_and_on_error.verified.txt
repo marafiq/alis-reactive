@@ -35,9 +35,12 @@
                           target: transfer-detail,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: items transferred
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: items transferred
+                            }
+                          }
                         }
                       ]
                     }
@@ -51,9 +54,12 @@
                           target: transfer-detail,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: nothing to transfer
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: nothing to transfer
+                            }
+                          }
                         }
                       ]
                     }
@@ -87,9 +93,12 @@
                           target: conflict-msg,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: resource locked
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: resource locked
+                            }
+                          }
                         }
                       ]
                     }
@@ -103,9 +112,12 @@
                           target: conflict-msg,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: conflict detected
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: conflict detected
+                            }
+                          }
                         }
                       ]
                     }

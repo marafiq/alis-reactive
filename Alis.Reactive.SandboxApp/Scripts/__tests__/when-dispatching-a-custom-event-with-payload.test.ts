@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { boot } from "../lifecycle/boot";
 
+import { dispatchPayload } from "./test-value-helpers";
 describe("when dispatching a custom event with payload", () => {
   it("delivers payload containing all supported primitive types", () => {
     let detail: unknown = null;
@@ -29,7 +30,7 @@ describe("when dispatching a custom event with payload", () => {
           commands: [{
             kind: "dispatch",
             event: "typed-payload",
-            payload,
+            payload: dispatchPayload(payload),
           }],
         },
       }],
@@ -54,7 +55,7 @@ describe("when dispatching a custom event with payload", () => {
           commands: [{
             kind: "dispatch",
             event: "int-precision",
-            payload: { value: 2147483647 },
+            payload: dispatchPayload({ value: 2147483647 }),
           }],
         },
       }],
@@ -79,7 +80,7 @@ describe("when dispatching a custom event with payload", () => {
           commands: [{
             kind: "dispatch",
             event: "bool-payload",
-            payload: { active: true, deleted: false },
+            payload: dispatchPayload({ active: true, deleted: false }),
           }],
         },
       }],
@@ -106,7 +107,7 @@ describe("when dispatching a custom event with payload", () => {
             commands: [{
               kind: "dispatch",
               event: "chain-start-typed",
-              payload: { step: 1 },
+              payload: dispatchPayload({ step: 1 }),
             }],
           },
         },
@@ -117,7 +118,7 @@ describe("when dispatching a custom event with payload", () => {
             commands: [{
               kind: "dispatch",
               event: "chain-end-typed",
-              payload: { step: 2, origin: "chain" },
+              payload: dispatchPayload({ step: 2, origin: "chain" }),
             }],
           },
         },

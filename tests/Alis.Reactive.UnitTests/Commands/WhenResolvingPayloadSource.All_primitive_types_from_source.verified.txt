@@ -14,11 +14,14 @@
             target: int-value,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.intValue
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.intValue
+                }
+              }
             }
           },
           {
@@ -26,11 +29,14 @@
             target: long-value,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.longValue
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.longValue
+                }
+              }
             }
           },
           {
@@ -38,11 +44,14 @@
             target: double-value,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.doubleValue
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.doubleValue
+                }
+              }
             }
           },
           {
@@ -50,11 +59,14 @@
             target: string-value,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.stringValue
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.stringValue
+                }
+              }
             }
           },
           {
@@ -62,11 +74,14 @@
             target: bool-value,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.boolValue
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.boolValue
+                }
+              }
             }
           }
         ]

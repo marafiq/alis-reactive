@@ -30,9 +30,12 @@
                   target: r,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: inactive
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: inactive
+                    }
+                  }
                 }
               ]
             }

@@ -19,9 +19,12 @@
                   target: validate-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: valid
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: valid
+                    }
+                  }
                 }
               ]
             }
@@ -37,9 +40,12 @@
                     target: save-result,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: saved
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: saved
+                      }
+                    }
                   }
                 ]
               }

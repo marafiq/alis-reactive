@@ -27,9 +27,12 @@
                   target: greeting,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Welcome
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Welcome
+                    }
+                  }
                 }
               ]
             }

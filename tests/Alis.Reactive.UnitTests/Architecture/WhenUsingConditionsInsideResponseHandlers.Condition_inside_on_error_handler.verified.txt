@@ -19,9 +19,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: ok
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: ok
+                    }
+                  }
                 }
               ]
             }
@@ -51,9 +54,12 @@
                           target: error-msg,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: missing required fields
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: missing required fields
+                            }
+                          }
                         }
                       ]
                     }
@@ -67,9 +73,12 @@
                           target: error-msg,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: validation error
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: validation error
+                            }
+                          }
                         }
                       ]
                     }

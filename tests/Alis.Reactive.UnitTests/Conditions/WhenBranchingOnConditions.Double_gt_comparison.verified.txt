@@ -28,9 +28,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Fever
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Fever
+                    }
+                  }
                 }
               ]
             }
@@ -44,9 +47,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Normal
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Normal
+                    }
+                  }
                 }
               ]
             }

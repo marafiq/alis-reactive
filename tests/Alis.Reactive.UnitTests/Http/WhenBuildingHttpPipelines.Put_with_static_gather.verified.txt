@@ -30,9 +30,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: updated
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: updated
+                    }
+                  }
                 }
               ]
             }

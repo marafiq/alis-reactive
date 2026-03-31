@@ -14,9 +14,12 @@
             target: echo,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: before
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: before
+              }
+            }
           }
         ],
         branches: [
@@ -39,9 +42,12 @@
                   target: r1,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: yes
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: yes
+                    }
+                  }
                 }
               ]
             }
@@ -55,9 +61,12 @@
                   target: r1,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: no
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: no
+                    }
+                  }
                 }
               ]
             }

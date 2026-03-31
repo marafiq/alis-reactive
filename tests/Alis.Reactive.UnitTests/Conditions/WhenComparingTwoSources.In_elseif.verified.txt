@@ -34,9 +34,12 @@
                   target: s,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Under
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Under
+                    }
+                  }
                 }
               ]
             }
@@ -67,9 +70,12 @@
                   target: s,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Exact
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Exact
+                    }
+                  }
                 }
               ]
             }
@@ -83,9 +89,12 @@
                   target: s,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Over
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Over
+                    }
+                  }
                 }
               ]
             }

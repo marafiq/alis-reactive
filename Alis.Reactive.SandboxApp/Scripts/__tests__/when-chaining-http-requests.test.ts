@@ -47,10 +47,10 @@ describe("chained HTTP requests", () => {
 
     await execRequest({
       verb: "POST", url: "/api/save",
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent" }, value: "saved" }] }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "saved" } } }] }],
       chained: {
         verb: "GET", url: "/api/list",
-        onSuccess: [{ commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent" }, value: "refreshed" }] }],
+        onSuccess: [{ commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "refreshed" } } }] }],
       },
     });
 
@@ -65,10 +65,10 @@ describe("chained HTTP requests", () => {
 
     await execRequest({
       verb: "POST", url: "/api/save",
-      onError: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent" }, value: "failed" }] }],
+      onError: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "failed" } } }] }],
       chained: {
         verb: "GET", url: "/api/list",
-        onSuccess: [{ commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent" }, value: "should not appear" }] }],
+        onSuccess: [{ commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "should not appear" } } }] }],
       },
     });
 
@@ -87,11 +87,11 @@ describe("chained HTTP requests", () => {
     await execRequest({
       verb: "POST", url: "/api/save",
       gather: [{ kind: "static", param: "name", value: "Margaret" }],
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "saved" }] }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "saved" } } }] }],
       chained: {
         verb: "GET", url: "/api/search",
         gather: [{ kind: "static", param: "q", value: "Thompson" }],
-        onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent" }, value: "found" }] }],
+        onSuccess: [{ commands: [{ kind: "mutate-element", target: "r", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "found" } } }] }],
       },
     });
 
@@ -109,12 +109,12 @@ describe("chained HTTP requests", () => {
 
     await execRequest({
       verb: "POST", url: "/api/save",
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "name", mutation: { kind: "set-prop", prop: "textContent" }, value: "saving..." }] }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "name", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "saving..." } } }] }],
       chained: {
         verb: "GET", url: "/api/detail",
         onSuccess: [{ commands: [
-          { kind: "mutate-element", target: "name", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.name" } },
-          { kind: "mutate-element", target: "count", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.count" } },
+          { kind: "mutate-element", target: "name", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "responseBody.name" } } } },
+          { kind: "mutate-element", target: "count", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "responseBody.count" } } } },
         ]}],
       },
     });
@@ -132,10 +132,10 @@ describe("chained HTTP requests", () => {
 
     await execRequest({
       verb: "POST", url: "/api/save",
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent" }, value: "saved" }] }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "first", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "saved" } } }] }],
       chained: {
         verb: "GET", url: "/api/missing",
-        onError: [{ statusCode: 404, commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent" }, value: "not found" }] }],
+        onError: [{ statusCode: 404, commands: [{ kind: "mutate-element", target: "second", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "not found" } } }] }],
       },
     });
 
@@ -153,13 +153,13 @@ describe("chained HTTP requests", () => {
 
     await execRequest({
       verb: "POST", url: "/api/step1",
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent" }, value: "1" }] }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "1" } } }] }],
       chained: {
         verb: "POST", url: "/api/step2",
-        onSuccess: [{ commands: [{ kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent" }, value: "2" }] }],
+        onSuccess: [{ commands: [{ kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "2" } } }] }],
         chained: {
           verb: "POST", url: "/api/step3",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "c", mutation: { kind: "set-prop", prop: "textContent" }, value: "3" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "c", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "3" } } }] }],
         },
       },
     });
@@ -179,13 +179,13 @@ describe("chained HTTP requests", () => {
 
     await execRequest({
       verb: "POST", url: "/api/step1",
-      onSuccess: [{ commands: [{ kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent" }, value: "1" }] }],
+      onSuccess: [{ commands: [{ kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "1" } } }] }],
       chained: {
         verb: "POST", url: "/api/step2",
-        onError: [{ commands: [{ kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent" }, value: "failed at 2" }] }],
+        onError: [{ commands: [{ kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "failed at 2" } } }] }],
         chained: {
           verb: "POST", url: "/api/step3",
-          onSuccess: [{ commands: [{ kind: "mutate-element", target: "c", mutation: { kind: "set-prop", prop: "textContent" }, value: "3" }] }],
+          onSuccess: [{ commands: [{ kind: "mutate-element", target: "c", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "3" } } }] }],
         },
       },
     });
@@ -211,11 +211,11 @@ describe("chained HTTP requests", () => {
           kind: "http",
           request: {
             verb: "POST", url: "/api/init",
-            onSuccess: [{ commands: [{ kind: "mutate-element", target: "status", mutation: { kind: "set-prop", prop: "textContent" }, value: "initialized" }] }],
+            onSuccess: [{ commands: [{ kind: "mutate-element", target: "status", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "initialized" } } }] }],
             chained: {
               verb: "GET", url: "/api/data",
               onSuccess: [{ commands: [
-                { kind: "mutate-element", target: "data", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.result" } },
+                { kind: "mutate-element", target: "data", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "responseBody.result" } } } },
               ]}],
             },
           },
@@ -245,8 +245,8 @@ describe("parallel HTTP requests", () => {
         reaction: {
           kind: "parallel-http",
           requests: [
-            { verb: "GET", url: "/api/residents", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "residents loaded" }] }] },
-            { verb: "GET", url: "/api/facilities", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "facilities loaded" }] }] },
+            { verb: "GET", url: "/api/residents", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "residents loaded" } } }] }] },
+            { verb: "GET", url: "/api/facilities", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "facilities loaded" } } }] }] },
           ],
         },
       }],
@@ -272,8 +272,8 @@ describe("parallel HTTP requests", () => {
         reaction: {
           kind: "parallel-http",
           requests: [
-            { verb: "GET", url: "/api/ok", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "ok" }] }] },
-            { verb: "GET", url: "/api/fail", onError: [{ commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "error" }] }] },
+            { verb: "GET", url: "/api/ok", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "ok" } } }] }] },
+            { verb: "GET", url: "/api/fail", onError: [{ commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "error" } } }] }] },
           ],
         },
       }],
@@ -298,10 +298,10 @@ describe("parallel HTTP requests", () => {
         reaction: {
           kind: "parallel-http",
           requests: [
-            { verb: "GET", url: "/api/a", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "a done" }] }] },
-            { verb: "GET", url: "/api/b", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "b done" }] }] },
+            { verb: "GET", url: "/api/a", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "a done" } } }] }] },
+            { verb: "GET", url: "/api/b", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "b done" } } }] }] },
           ],
-          onAllSettled: [{ kind: "mutate-element", target: "done", mutation: { kind: "set-prop", prop: "textContent" }, value: "all settled" }],
+          onAllSettled: [{ kind: "mutate-element", target: "done", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "all settled" } } }],
         },
       }],
     });
@@ -330,8 +330,8 @@ describe("parallel HTTP requests", () => {
             { kind: "mutate-element", target: "spinner", mutation: { kind: "call", method: "removeAttribute", args: [{ kind: "literal", value: "hidden" }] } },
           ],
           requests: [
-            { verb: "GET", url: "/api/a", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "a" }] }] },
-            { verb: "GET", url: "/api/b", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, value: "b" }] }] },
+            { verb: "GET", url: "/api/a", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "a" } } }] }] },
+            { verb: "GET", url: "/api/b", onSuccess: [{ commands: [{ kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "b" } } }] }] },
           ],
           onAllSettled: [
             { kind: "mutate-element", target: "spinner", mutation: { kind: "call", method: "setAttribute", args: [{ kind: "literal", value: "hidden" }, { kind: "literal", value: "" }] } },
@@ -361,10 +361,10 @@ describe("parallel HTTP requests", () => {
           kind: "parallel-http",
           requests: [
             { verb: "GET", url: "/api/resident/1", onSuccess: [{ commands: [
-              { kind: "mutate-element", target: "name1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.name" } },
+              { kind: "mutate-element", target: "name1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "responseBody.name" } } } },
             ]}] },
             { verb: "GET", url: "/api/resident/2", onSuccess: [{ commands: [
-              { kind: "mutate-element", target: "name2", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "responseBody.name" } },
+              { kind: "mutate-element", target: "name2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "responseBody.name" } } } },
             ]}] },
           ],
         },
@@ -391,9 +391,9 @@ describe("parallel HTTP requests", () => {
         reaction: {
           kind: "parallel-http",
           requests: [
-            { verb: "GET", url: "/api/a", onSuccess: [{ commands: [{ kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent" }, value: "a" }] }] },
-            { verb: "GET", url: "/api/b", onSuccess: [{ commands: [{ kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent" }, value: "b" }] }] },
-            { verb: "GET", url: "/api/c", onSuccess: [{ commands: [{ kind: "mutate-element", target: "c", mutation: { kind: "set-prop", prop: "textContent" }, value: "c" }] }] },
+            { verb: "GET", url: "/api/a", onSuccess: [{ commands: [{ kind: "mutate-element", target: "a", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "a" } } }] }] },
+            { verb: "GET", url: "/api/b", onSuccess: [{ commands: [{ kind: "mutate-element", target: "b", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "b" } } }] }] },
+            { verb: "GET", url: "/api/c", onSuccess: [{ commands: [{ kind: "mutate-element", target: "c", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "c" } } }] }] },
           ],
         },
       }],

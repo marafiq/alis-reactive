@@ -42,9 +42,12 @@
                   target: r,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: active high scorer
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: active high scorer
+                    }
+                  }
                 }
               ]
             }

@@ -39,7 +39,7 @@ describe("http request execution", () => {
       verb: "GET",
       url: "/api/test",
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" }],
+        commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loaded" } } }],
       }],
     };
 
@@ -57,7 +57,7 @@ describe("http request execution", () => {
       url: "/api/save",
       onError: [{
         statusCode: 400,
-        commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "bad request" }],
+        commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "bad request" } } }],
       }],
     };
 
@@ -123,13 +123,13 @@ describe("http request execution", () => {
       verb: "GET",
       url: "/api/residents",
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "residents", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" }],
+        commands: [{ kind: "mutate-element", target: "residents", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loaded" } } }],
       }],
       chained: {
         verb: "GET",
         url: "/api/facilities",
         onSuccess: [{
-          commands: [{ kind: "mutate-element", target: "facilities", mutation: { kind: "set-prop", prop: "textContent" }, value: "loaded" }],
+          commands: [{ kind: "mutate-element", target: "facilities", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "loaded" } } }],
         }],
       },
     };
@@ -153,7 +153,7 @@ describe("http request execution", () => {
         { kind: "static", param: "name", value: "test" },
       ],
       onSuccess: [{
-        commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent" }, value: "ok" }],
+        commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "ok" } } }],
       }],
     };
 
@@ -172,8 +172,8 @@ describe("http request execution", () => {
       verb: "GET",
       url: "/api/test",
       onError: [
-        { statusCode: 400, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "400" }] },
-        { commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent" }, value: "catch-all" }] },
+        { statusCode: 400, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "400" } } }] },
+        { commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "catch-all" } } }] },
       ],
     };
 

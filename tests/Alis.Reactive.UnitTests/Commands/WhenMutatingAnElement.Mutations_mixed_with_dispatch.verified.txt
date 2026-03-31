@@ -32,9 +32,12 @@
             target: step-2,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: next
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: next
+              }
+            }
           }
         ]
       }

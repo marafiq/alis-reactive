@@ -19,9 +19,12 @@
                     target: r1,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: loaded
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: loaded
+                      }
+                    }
                   }
                 ]
               }
@@ -38,9 +41,12 @@
                     target: r2,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: loaded
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: loaded
+                      }
+                    }
                   }
                 ]
               }

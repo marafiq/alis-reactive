@@ -14,11 +14,14 @@
             target: active,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.boolValue
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.boolValue
+                }
+              }
             }
           }
         ]

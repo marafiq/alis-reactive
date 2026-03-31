@@ -31,9 +31,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Allowed
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Allowed
+                    }
+                  }
                 }
               ]
             }
@@ -47,9 +50,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Blocked
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Blocked
+                    }
+                  }
                 }
               ]
             }

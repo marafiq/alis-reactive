@@ -47,9 +47,12 @@
                   target: error,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Unauthorized
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Unauthorized
+                    }
+                  }
                 }
               ]
             }

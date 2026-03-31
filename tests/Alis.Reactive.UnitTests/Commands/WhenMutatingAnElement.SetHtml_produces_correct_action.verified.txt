@@ -13,9 +13,12 @@
             target: container,
             mutation: {
               kind: set-prop,
-              prop: innerHTML
-            },
-            value: <strong>done</strong>
+              prop: innerHTML,
+              value: {
+                kind: literal,
+                value: <strong>done</strong>
+              }
+            }
           }
         ]
       }

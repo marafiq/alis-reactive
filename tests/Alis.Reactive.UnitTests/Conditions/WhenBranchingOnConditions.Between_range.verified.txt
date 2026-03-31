@@ -31,9 +31,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Working Age
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Working Age
+                    }
+                  }
                 }
               ]
             }
@@ -47,9 +50,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Outside Range
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Outside Range
+                    }
+                  }
                 }
               ]
             }

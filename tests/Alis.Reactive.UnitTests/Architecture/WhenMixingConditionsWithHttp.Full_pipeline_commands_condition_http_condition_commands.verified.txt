@@ -14,18 +14,24 @@
             target: header,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: start
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: start
+              }
+            }
           },
           {
             kind: mutate-element,
             target: loading,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: please wait
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: please wait
+              }
+            }
           }
         ]
       }
@@ -89,9 +95,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: ok
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: ok
+                    }
+                  }
                 }
               ]
             }
@@ -112,9 +121,12 @@
             target: footer,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: done
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: done
+              }
+            }
           }
         ]
       }

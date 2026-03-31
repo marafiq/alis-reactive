@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
 using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -14,7 +15,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeHiddenField, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.Emit(new SetPropMutation("value", CommandValue.FromLiteral(value)));
         }
 
         // ── Property Write (component source — cross-plan value binding) ──
@@ -23,7 +24,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeHiddenField, TModel> self, TypedComponentSource<string> source)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), source: source.ToBindSource());
+            return self.Emit(new SetPropMutation("value", CommandValue.FromSource(source.ToBindSource())));
         }
 
         // ── Property Write (response body) ──
@@ -35,7 +36,7 @@ namespace Alis.Reactive.Native.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
+            return self.Emit(new SetPropMutation("value", CommandValue.FromSource(new EventSource(sourcePath))));
         }
 
         public static TypedComponentSource<string> Value<TModel>(

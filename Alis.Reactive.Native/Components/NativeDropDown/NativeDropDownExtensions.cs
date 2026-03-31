@@ -1,5 +1,6 @@
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -26,7 +27,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeDropDown, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.Emit(new SetPropMutation("value", CommandValue.FromLiteral(value)));
         }
 
         /// <summary>

@@ -43,9 +43,12 @@
             target: panel,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: done
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: done
+              }
+            }
           }
         ]
       }

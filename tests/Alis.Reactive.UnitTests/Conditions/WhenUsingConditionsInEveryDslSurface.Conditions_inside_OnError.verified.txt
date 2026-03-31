@@ -36,9 +36,12 @@
                           target: error,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: Admin: check server logs
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: Admin: check server logs
+                            }
+                          }
                         }
                       ]
                     }
@@ -52,9 +55,12 @@
                           target: error,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: Please try again
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: Please try again
+                            }
+                          }
                         }
                       ]
                     }

@@ -19,9 +19,12 @@
                   target: data,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: fetched
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: fetched
+                    }
+                  }
                 }
               ]
             }
@@ -103,9 +106,12 @@
                   target: processed,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: done
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: done
+                    }
+                  }
                 }
               ]
             }

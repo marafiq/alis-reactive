@@ -22,9 +22,12 @@
                   target: confirmed,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: yes
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: yes
+                    }
+                  }
                 }
               ]
             }
@@ -50,9 +53,12 @@
                   target: delete-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: deleted
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: deleted
+                    }
+                  }
                 }
               ]
             }

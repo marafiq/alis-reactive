@@ -1,5 +1,6 @@
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -21,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionRichTextEditor, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.Emit(new SetPropMutation("value", CommandValue.FromLiteral(value)));
         }
 
         /// <summary>Moves focus into the rich text editor.</summary>

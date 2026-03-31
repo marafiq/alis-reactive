@@ -27,9 +27,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: active
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: active
+                    }
+                  }
                 },
                 {
                   kind: dispatch,
@@ -47,9 +50,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: inactive
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: inactive
+                    }
+                  }
                 },
                 {
                   kind: dispatch,

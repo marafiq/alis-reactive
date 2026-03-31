@@ -56,9 +56,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: enabled
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: enabled
+                    }
+                  }
                 }
               ]
             }
@@ -105,9 +108,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: disabled
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: disabled
+                    }
+                  }
                 }
               ]
             }

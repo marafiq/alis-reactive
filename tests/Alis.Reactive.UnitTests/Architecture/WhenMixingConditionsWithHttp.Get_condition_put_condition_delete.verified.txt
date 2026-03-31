@@ -19,9 +19,12 @@
                   target: resource,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: loaded
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: loaded
+                    }
+                  }
                 }
               ]
             }
@@ -95,9 +98,12 @@
                   target: update-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: updated
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: updated
+                    }
+                  }
                 }
               ]
             }
@@ -165,9 +171,12 @@
                   target: delete-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: removed
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: removed
+                    }
+                  }
                 }
               ]
             }

@@ -6,5 +6,6 @@ afterEach(() => {
   resetNativeActionLinksForTests();
   resetBootStateForTests();
   vi.restoreAllMocks();
+  vi.resetModules();
   document.body.innerHTML = "";
 });

@@ -1,5 +1,6 @@
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -20,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, string? value)
             where TModel : class
-            => self.Emit(new SetPropMutation("value"), value: value);
+            => self.Emit(new SetPropMutation("value", CommandValue.FromLiteral(value)));
 
         /// <summary>Toggles the ColorPicker popup open/closed.</summary>
         /// <returns>The component reference for method chaining.</returns>
@@ -35,8 +36,8 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> Disable<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, bool disabled = true)
             where TModel : class
-            => self.Emit(new SetPropMutation("disabled", coerce: "boolean"),
-                value: disabled ? "true" : "false");
+            => self.Emit(new SetPropMutation("disabled",
+                CommandValue.FromLiteral(disabled ? "true" : "false", coerce: "boolean")));
 
         /// <summary>Reads the current color value for use in conditions or gather.</summary>
         /// <remarks>

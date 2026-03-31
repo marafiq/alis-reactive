@@ -26,11 +26,14 @@
                   target: id,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  source: {
-                    kind: event,
-                    path: responseBody.id
+                    prop: textContent,
+                    value: {
+                      kind: source,
+                      source: {
+                        kind: event,
+                        path: responseBody.id
+                      }
+                    }
                   }
                 },
                 {
@@ -38,9 +41,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: success
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: success
+                    }
+                  }
                 }
               ]
             }
@@ -54,9 +60,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: invalid
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: invalid
+                    }
+                  }
                 },
                 {
                   kind: validation-errors,

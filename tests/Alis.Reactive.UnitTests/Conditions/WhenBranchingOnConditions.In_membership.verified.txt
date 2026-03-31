@@ -32,9 +32,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: In Group
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: In Group
+                    }
+                  }
                 }
               ]
             }
@@ -48,9 +51,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Not In Group
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Not In Group
+                    }
+                  }
                 }
               ]
             }

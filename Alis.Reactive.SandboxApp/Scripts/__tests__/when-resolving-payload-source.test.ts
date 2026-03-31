@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { boot } from "../lifecycle/boot";
+import { dispatchPayload } from "./test-value-helpers";
 
 describe("when resolving payload source in mutate-element", () => {
   it("resolves flat string property from event detail", () => {
@@ -13,14 +14,14 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "src-test-1", payload: { stringValue: "hello" } }],
+            commands: [{ kind: "dispatch", event: "src-test-1", payload: dispatchPayload({ stringValue: "hello" }) }],
           },
         },
         {
           trigger: { kind: "custom-event", event: "src-test-1" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "name", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.stringValue" } }],
+            commands: [{ kind: "mutate-element", target: "name", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.stringValue" } } } }],
           },
         },
       ],
@@ -40,14 +41,14 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "src-test-2", payload: { intValue: 42 } }],
+            commands: [{ kind: "dispatch", event: "src-test-2", payload: dispatchPayload({ intValue: 42 }) }],
           },
         },
         {
           trigger: { kind: "custom-event", event: "src-test-2" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "count", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.intValue" } }],
+            commands: [{ kind: "mutate-element", target: "count", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.intValue" } } } }],
           },
         },
       ],
@@ -67,14 +68,14 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "src-test-3", payload: { boolValue: true } }],
+            commands: [{ kind: "dispatch", event: "src-test-3", payload: dispatchPayload({ boolValue: true }) }],
           },
         },
         {
           trigger: { kind: "custom-event", event: "src-test-3" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "active", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.boolValue" } }],
+            commands: [{ kind: "mutate-element", target: "active", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.boolValue" } } } }],
           },
         },
       ],
@@ -94,18 +95,14 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{
-              kind: "dispatch",
-              event: "src-test-4",
-              payload: { address: { city: "Seattle", zip: "98101" } },
-            }],
+            commands: [{ kind: "dispatch", event: "src-test-4", payload: dispatchPayload({ address: { city: "Seattle", zip: "98101" } }) }],
           },
         },
         {
           trigger: { kind: "custom-event", event: "src-test-4" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "city", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.address.city" } }],
+            commands: [{ kind: "mutate-element", target: "city", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.address.city" } } } }],
           },
         },
       ],
@@ -125,11 +122,7 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{
-              kind: "dispatch",
-              event: "src-test-5",
-              payload: { address: { street: "123 Main St", city: "Seattle", zip: "98101" } },
-            }],
+            commands: [{ kind: "dispatch", event: "src-test-5", payload: dispatchPayload({ address: { street: "123 Main St", city: "Seattle", zip: "98101" } }) }],
           },
         },
         {
@@ -137,9 +130,9 @@ describe("when resolving payload source in mutate-element", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "street", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.address.street" } },
-              { kind: "mutate-element", target: "city2", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.address.city" } },
-              { kind: "mutate-element", target: "zip", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.address.zip" } },
+              { kind: "mutate-element", target: "street", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.address.street" } } } },
+              { kind: "mutate-element", target: "city2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.address.city" } } } },
+              { kind: "mutate-element", target: "zip", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.address.zip" } } } },
             ],
           },
         },
@@ -168,17 +161,13 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{
-              kind: "dispatch",
-              event: "src-test-6",
-              payload: {
+            commands: [{ kind: "dispatch", event: "src-test-6", payload: dispatchPayload({
                 intValue: 42,
                 longValue: 9007199254740991,
                 doubleValue: 3.14159,
                 stringValue: "hello world",
                 boolValue: true,
-              },
-            }],
+              }) }],
           },
         },
         {
@@ -186,11 +175,11 @@ describe("when resolving payload source in mutate-element", () => {
           reaction: {
             kind: "sequential",
             commands: [
-              { kind: "mutate-element", target: "t-int", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.intValue" } },
-              { kind: "mutate-element", target: "t-long", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.longValue" } },
-              { kind: "mutate-element", target: "t-double", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.doubleValue" } },
-              { kind: "mutate-element", target: "t-string", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.stringValue" } },
-              { kind: "mutate-element", target: "t-bool", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.boolValue" } },
+              { kind: "mutate-element", target: "t-int", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.intValue" } } } },
+              { kind: "mutate-element", target: "t-long", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.longValue" } } } },
+              { kind: "mutate-element", target: "t-double", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.doubleValue" } } } },
+              { kind: "mutate-element", target: "t-string", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.stringValue" } } } },
+              { kind: "mutate-element", target: "t-bool", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.boolValue" } } } },
             ],
           },
         },
@@ -215,7 +204,7 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "static-test", mutation: { kind: "set-prop", prop: "textContent" }, value: "static" }],
+            commands: [{ kind: "mutate-element", target: "static-test", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "static" } } }],
           },
         },
       ],
@@ -235,14 +224,14 @@ describe("when resolving payload source in mutate-element", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "dispatch", event: "src-test-7", payload: { name: "test" } }],
+            commands: [{ kind: "dispatch", event: "src-test-7", payload: dispatchPayload({ name: "test" }) }],
           },
         },
         {
           trigger: { kind: "custom-event", event: "src-test-7" },
           reaction: {
             kind: "sequential",
-            commands: [{ kind: "mutate-element", target: "missing", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.nonexistent.deep" } }],
+            commands: [{ kind: "mutate-element", target: "missing", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.nonexistent.deep" } } } }],
           },
         },
       ],

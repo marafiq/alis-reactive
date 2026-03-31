@@ -27,9 +27,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: active
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: active
+                    }
+                  }
                 }
               ]
             }
@@ -43,9 +46,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: inactive
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: inactive
+                    }
+                  }
                 }
               ]
             }
@@ -72,9 +78,12 @@
                     target: audit,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: logged
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: logged
+                      }
+                    }
                   }
                 ]
               }
@@ -91,9 +100,12 @@
                     target: notify,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: sent
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: sent
+                      }
+                    }
                   }
                 ]
               }

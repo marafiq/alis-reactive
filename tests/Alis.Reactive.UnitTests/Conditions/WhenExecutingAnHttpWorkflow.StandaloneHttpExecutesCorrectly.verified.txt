@@ -18,9 +18,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Ready
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Ready
+                    }
+                  }
                 }
               ]
             }

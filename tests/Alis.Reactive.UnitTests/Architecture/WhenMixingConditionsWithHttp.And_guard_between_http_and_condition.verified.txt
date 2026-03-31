@@ -19,9 +19,12 @@
                   target: auth-status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: authenticated
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: authenticated
+                    }
+                  }
                 }
               ]
             }
@@ -93,9 +96,12 @@
                   target: full-access,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: all checks passed
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: all checks passed
+                    }
+                  }
                 }
               ]
             }

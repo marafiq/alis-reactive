@@ -48,9 +48,12 @@
                           target: status,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: Cancelled
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: Cancelled
+                            }
+                          }
                         }
                       ]
                     }

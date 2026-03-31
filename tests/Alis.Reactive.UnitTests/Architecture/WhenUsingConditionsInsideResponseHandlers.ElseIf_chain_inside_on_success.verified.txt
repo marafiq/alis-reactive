@@ -35,9 +35,12 @@
                           target: tier,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: gold
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: gold
+                            }
+                          }
                         }
                       ]
                     }
@@ -61,9 +64,12 @@
                           target: tier,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: silver
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: silver
+                            }
+                          }
                         }
                       ]
                     }
@@ -87,9 +93,12 @@
                           target: tier,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: bronze
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: bronze
+                            }
+                          }
                         }
                       ]
                     }
@@ -103,9 +112,12 @@
                           target: tier,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: none
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: none
+                            }
+                          }
                         }
                       ]
                     }

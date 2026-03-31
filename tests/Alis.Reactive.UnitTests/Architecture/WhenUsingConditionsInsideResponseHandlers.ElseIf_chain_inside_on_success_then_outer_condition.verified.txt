@@ -35,9 +35,12 @@
                           target: class,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: enterprise
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: enterprise
+                            }
+                          }
                         }
                       ]
                     }
@@ -61,9 +64,12 @@
                           target: class,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: business
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: business
+                            }
+                          }
                         }
                       ]
                     }
@@ -87,9 +93,12 @@
                           target: class,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: team
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: team
+                            }
+                          }
                         }
                       ]
                     }
@@ -103,9 +112,12 @@
                           target: class,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: individual
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: individual
+                            }
+                          }
                         }
                       ]
                     }

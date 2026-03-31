@@ -84,9 +84,12 @@
                   target: warning,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: account disabled
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: account disabled
+                    }
+                  }
                 }
               ]
             }

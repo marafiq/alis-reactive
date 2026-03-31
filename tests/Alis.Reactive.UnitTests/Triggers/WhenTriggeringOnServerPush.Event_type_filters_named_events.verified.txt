@@ -15,9 +15,12 @@
             target: msg,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: received
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: received
+              }
+            }
           }
         ]
       }

@@ -1,9 +1,14 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../lifecycle/boot";
 import type { Command } from "../types";
+import { dispatchPayload, literalValue } from "./test-value-helpers";
 
 function setText(target: string, value: string): Command {
-  return { kind: "mutate-element", target, mutation: { kind: "set-prop", prop: "textContent" }, value };
+  return {
+    kind: "mutate-element",
+    target,
+    mutation: { kind: "set-prop", prop: "textContent", value: literalValue(value) },
+  };
 }
 
 function show(target: string): Command {
@@ -15,7 +20,9 @@ function hide(target: string): Command {
 }
 
 function _dispatch(event: string, payload?: Record<string, unknown>): Command {
-  return { kind: "dispatch", event, payload };
+  return payload == null
+    ? { kind: "dispatch", event }
+    : { kind: "dispatch", event, payload: dispatchPayload(payload) };
 }
 
 describe("when executing an http workflow", () => {

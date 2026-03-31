@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../lifecycle/boot";
 import { TestWidget } from "../components/lab/test-widget";
 
+import { dispatchPayload, sourceValue } from "./test-value-helpers";
 /**
  * Proves that source walk (dot-path resolution from event payload)
  * flows correctly into EVERY mutation kind: set-prop, set-prop+coerce,
@@ -36,15 +37,14 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "fill",
-            payload: { form: { username: "walked-user" } },
+            payload: dispatchPayload({ form: { username: "walked-user" } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "fill" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "target",
-            mutation: { kind: "set-prop", prop: "value" },
-            source: { kind: "event", path: "evt.form.username" },
+            mutation: { kind: "set-prop", prop: "value", value: { kind: "source", source: { kind: "event", path: "evt.form.username" } } },
           }] },
         },
       ] });
@@ -60,15 +60,14 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "deep",
-            payload: { a: { b: { c: "<em>deep</em>" } } },
+            payload: dispatchPayload({ a: { b: { c: "<em>deep</em>" } } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "deep" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "deep",
-            mutation: { kind: "set-prop", prop: "innerHTML" },
-            source: { kind: "event", path: "evt.a.b.c" },
+            mutation: { kind: "set-prop", prop: "innerHTML", value: { kind: "source", source: { kind: "event", path: "evt.a.b.c" } } },
           }] },
         },
       ] });
@@ -84,15 +83,14 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "set-fw",
-            payload: { result: { newValue: "from-source" } },
+            payload: dispatchPayload({ result: { newValue: "from-source" } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "set-fw" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fw",
-            mutation: { kind: "set-prop", prop: "value" }, vendor: "fusion",
-            source: { kind: "event", path: "evt.result.newValue" },
+            mutation: { kind: "set-prop", prop: "value", value: sourceValue({ kind: "event", path: "evt.result.newValue" }) }, vendor: "fusion",
           }] },
         },
       ] });
@@ -112,15 +110,14 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "set-num",
-            payload: { data: { amount: "99" } },
+            payload: dispatchPayload({ data: { amount: "99" } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "set-num" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "num",
-            mutation: { kind: "set-prop", prop: "value", coerce: "number" }, vendor: "fusion",
-            source: { kind: "event", path: "evt.data.amount" },
+            mutation: { kind: "set-prop", prop: "value", value: sourceValue({ kind: "event", path: "evt.data.amount" }, "number") }, vendor: "fusion",
           }] },
         },
       ] });
@@ -143,15 +140,14 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "toggle",
-            payload: { state: { checked: "false" } },
+            payload: dispatchPayload({ state: { checked: "false" } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "toggle" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "cb",
-            mutation: { kind: "set-prop", prop: "checked", coerce: "boolean" },
-            source: { kind: "event", path: "evt.state.checked" },
+            mutation: { kind: "set-prop", prop: "checked", value: { kind: "source", source: { kind: "event", path: "evt.state.checked" }, coerce: "boolean" } },
           }] },
         },
       ] });
@@ -172,7 +168,7 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "style",
-            payload: { css: { className: "highlight" } },
+            payload: dispatchPayload({ css: { className: "highlight" } }),
           }] },
         },
         {
@@ -196,14 +192,14 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "load-items",
-            payload: { response: { data: { list: ["x", "y", "z"] } } },
+            payload: dispatchPayload({ response: { data: { list: ["x", "y", "z"] } } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "load-items" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "items-target",
-            mutation: { kind: "call", method: "setItems", args: [{ kind: "source", source: { kind: "event", path: "evt.response.data.list" } }] }, vendor: "fusion",
+            mutation: { kind: "call", method: "setItems", args: [sourceValue({ kind: "event", path: "evt.response.data.list" })] }, vendor: "fusion",
           }] },
         },
       ] });
@@ -280,8 +276,7 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "echo",
-            mutation: { kind: "set-prop", prop: "textContent" },
-            source: { kind: "component", componentId: "src-input", vendor: "native", readExpr: "value" },
+            mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "component", componentId: "src-input", vendor: "native", readExpr: "value" } } },
           }] },
         }],
       });
@@ -306,8 +301,7 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "dest-input",
-            mutation: { kind: "set-prop", prop: "value" },
-            source: { kind: "component", componentId: "src-widget", vendor: "fusion", readExpr: "value" },
+            mutation: { kind: "set-prop", prop: "value", value: { kind: "source", source: { kind: "component", componentId: "src-widget", vendor: "fusion", readExpr: "value" } } },
           }] },
         }],
       });
@@ -330,8 +324,7 @@ describe("when walking source into each mutation kind", () => {
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "cross-dest",
-            mutation: { kind: "set-prop", prop: "value" }, vendor: "fusion",
-            source: { kind: "component", componentId: "cross-src", vendor: "fusion", readExpr: "value" },
+            mutation: { kind: "set-prop", prop: "value", value: sourceValue({ kind: "component", componentId: "cross-src", vendor: "fusion", readExpr: "value" }) }, vendor: "fusion",
           }] },
         }],
       });

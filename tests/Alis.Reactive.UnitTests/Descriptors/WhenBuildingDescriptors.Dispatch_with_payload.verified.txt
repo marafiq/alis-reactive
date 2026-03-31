@@ -12,8 +12,14 @@
             kind: dispatch,
             event: data-ready,
             payload: {
-              count: 5,
-              message: loaded
+              count: {
+                kind: literal,
+                value: 5
+              },
+              message: {
+                kind: literal,
+                value: loaded
+              }
             }
           }
         ]

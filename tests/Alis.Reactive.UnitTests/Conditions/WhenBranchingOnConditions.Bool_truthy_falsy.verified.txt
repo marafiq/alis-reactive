@@ -27,9 +27,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Online
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Online
+                    }
+                  }
                 }
               ]
             }
@@ -43,9 +46,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Offline
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Offline
+                    }
+                  }
                 }
               ]
             }

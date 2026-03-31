@@ -27,9 +27,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Empty
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Empty
+                    }
+                  }
                 }
               ]
             }
@@ -43,9 +46,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Has value
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Has value
+                    }
+                  }
                 }
               ]
             }

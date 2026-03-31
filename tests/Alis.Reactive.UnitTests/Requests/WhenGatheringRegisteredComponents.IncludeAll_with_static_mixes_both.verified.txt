@@ -37,9 +37,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: saved
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: saved
+                    }
+                  }
                 }
               ]
             }

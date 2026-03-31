@@ -40,9 +40,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Deleted
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Deleted
+                    }
+                  }
                 },
                 {
                   kind: dispatch,
@@ -60,9 +63,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Cancelled
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Cancelled
+                    }
+                  }
                 }
               ]
             }

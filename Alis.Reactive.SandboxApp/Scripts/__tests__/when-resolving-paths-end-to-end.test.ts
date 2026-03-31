@@ -28,7 +28,7 @@ describe("path resolution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.name" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.name" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { name: "Eleanor" } }));
@@ -39,7 +39,7 @@ describe("path resolution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.age" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.age" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { age: 82 } }));
@@ -50,7 +50,7 @@ describe("path resolution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.active" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.active" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { active: true } }));
@@ -63,7 +63,7 @@ describe("path resolution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.address.city" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.address.city" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { address: { city: "Portland" } } }));
@@ -74,7 +74,7 @@ describe("path resolution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.resident.address.zip" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.resident.address.zip" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { resident: { address: { zip: "97201" } } } }));
@@ -87,7 +87,7 @@ describe("path resolution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.nonexistent" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.nonexistent" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: {} }));
@@ -98,7 +98,7 @@ describe("path resolution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.address.city" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.address.city" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { address: null } }));
@@ -111,9 +111,9 @@ describe("path resolution end-to-end", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "sequential", commands: [
-        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.first" } },
-        { kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.last" } },
-        { kind: "mutate-element", target: "r3", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "event", path: "evt.age" } },
+        { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.first" } } } },
+        { kind: "mutate-element", target: "r2", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.last" } } } },
+        { kind: "mutate-element", target: "r3", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.age" } } } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { first: "Margaret", last: "Thompson", age: 82 } }));
@@ -130,7 +130,7 @@ describe("path resolution end-to-end", () => {
       entries: [{
         trigger: { kind: "dom-ready" },
         reaction: { kind: "sequential", commands: [
-          { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, source: { kind: "component", componentId: "Name", vendor: "native", readExpr: "value" } },
+          { kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "component", componentId: "Name", vendor: "native", readExpr: "value" } } } },
         ]},
       }],
     });
@@ -144,7 +144,7 @@ describe("path resolution end-to-end", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.address.city" }, coerceAs: "string", op: "eq", operand: "Portland" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "PDX" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "PDX" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { address: { city: "Portland" } } }));
@@ -159,8 +159,8 @@ describe("path resolution end-to-end", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.score" }, coerceAs: "number", op: "gt", operand: 50 },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "high" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "low" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "high" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "low" } } }] } },
       ]},
     }]});
     // Score is a string "75" — coercion should convert to number
@@ -174,8 +174,8 @@ describe("path resolution end-to-end", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.active" }, coerceAs: "boolean", op: "truthy" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "active" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "inactive" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "active" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "inactive" } } }] } },
       ]},
     }]});
     // String "false" should coerce to false in boolean context
@@ -189,7 +189,7 @@ describe("path resolution end-to-end", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.tag" }, coerceAs: "array", op: "not-empty" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "has tags" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "has tags" } } }] } },
       ]},
     }]});
     // Single string should be wrapped into ["hello"] by array coercion
@@ -203,7 +203,7 @@ describe("path resolution end-to-end", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.items" }, coerceAs: "array", op: "is-empty" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "empty" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "empty" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { items: null } }));

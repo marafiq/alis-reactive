@@ -19,9 +19,12 @@
                   target: check-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: checked
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: checked
+                    }
+                  }
                 }
               ]
             }

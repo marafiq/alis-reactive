@@ -64,8 +64,7 @@ function mutateOnEvent(listenFor: string, targetId: string, text: string): Entry
       commands: [{
         kind: "mutate-element",
         target: targetId,
-        mutation: { kind: "set-prop", prop: "textContent" },
-        value: text,
+        mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: text } },
       }],
     },
   };
@@ -79,8 +78,7 @@ function domReadyMutate(targetId: string, text: string): Entry {
       commands: [{
         kind: "mutate-element",
         target: targetId,
-        mutation: { kind: "set-prop", prop: "textContent" },
-        value: text,
+        mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: text } },
       }],
     },
   };

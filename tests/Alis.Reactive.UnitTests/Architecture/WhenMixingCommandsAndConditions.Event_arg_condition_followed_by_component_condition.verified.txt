@@ -14,11 +14,14 @@
             target: echo,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.value
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.value
+                }
+              }
             }
           }
         ]
@@ -118,9 +121,12 @@
                   target: badge,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: many
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: many
+                    }
+                  }
                 }
               ]
             }
@@ -134,9 +140,12 @@
                   target: badge,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: few
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: few
+                    }
+                  }
                 }
               ]
             }

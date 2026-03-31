@@ -28,9 +28,12 @@
                   target: tier,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: gold
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: gold
+                    }
+                  }
                 }
               ]
             }
@@ -54,9 +57,12 @@
                   target: tier,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: silver
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: silver
+                    }
+                  }
                 }
               ]
             }
@@ -70,9 +76,12 @@
                   target: tier,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: bronze
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: bronze
+                    }
+                  }
                 }
               ]
             }

@@ -24,9 +24,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: uploaded
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: uploaded
+                    }
+                  }
                 }
               ]
             }

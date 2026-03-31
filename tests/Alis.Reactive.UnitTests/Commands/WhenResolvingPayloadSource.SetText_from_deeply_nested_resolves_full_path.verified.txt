@@ -14,11 +14,14 @@
             target: street,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.address.street
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.address.street
+                }
+              }
             }
           },
           {
@@ -26,11 +29,14 @@
             target: city,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.address.city
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.address.city
+                }
+              }
             }
           },
           {
@@ -38,11 +44,14 @@
             target: zip,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.address.zip
+              prop: textContent,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.address.zip
+                }
+              }
             }
           }
         ]

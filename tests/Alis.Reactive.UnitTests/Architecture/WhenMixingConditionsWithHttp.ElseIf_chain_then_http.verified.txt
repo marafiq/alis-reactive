@@ -28,9 +28,12 @@
                   target: role,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Administrator
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Administrator
+                    }
+                  }
                 }
               ]
             }
@@ -54,9 +57,12 @@
                   target: role,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Standard User
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Standard User
+                    }
+                  }
                 }
               ]
             }
@@ -70,9 +76,12 @@
                   target: role,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Guest
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Guest
+                    }
+                  }
                 }
               ]
             }
@@ -98,9 +107,12 @@
                   target: log-status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: logged
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: logged
+                    }
+                  }
                 }
               ]
             }

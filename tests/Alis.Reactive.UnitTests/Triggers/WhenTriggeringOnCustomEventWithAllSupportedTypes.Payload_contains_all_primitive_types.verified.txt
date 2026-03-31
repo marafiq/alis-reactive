@@ -13,14 +13,38 @@
             kind: dispatch,
             event: synced,
             payload: {
-              intValue: 42,
-              longValue: 9007199254740991,
-              doubleValue: 3.14159,
-              floatValue: 2.718,
-              dateTimeValue: DateTimeOffset_1,
-              stringValue: hello,
-              dateValue: DateTimeOffset_2,
-              boolValue: true
+              intValue: {
+                kind: literal,
+                value: 42
+              },
+              longValue: {
+                kind: literal,
+                value: 9007199254740991
+              },
+              doubleValue: {
+                kind: literal,
+                value: 3.14159
+              },
+              floatValue: {
+                kind: literal,
+                value: 2.718
+              },
+              dateTimeValue: {
+                kind: literal,
+                value: DateTimeOffset_1
+              },
+              stringValue: {
+                kind: literal,
+                value: hello
+              },
+              dateValue: {
+                kind: literal,
+                value: DateTimeOffset_2
+              },
+              boolValue: {
+                kind: literal,
+                value: true
+              }
             }
           }
         ]

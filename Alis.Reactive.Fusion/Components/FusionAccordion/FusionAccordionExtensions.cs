@@ -1,4 +1,5 @@
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -23,10 +24,10 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> ExpandItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, bool isExpand, int index)
             where TModel : class
-            => self.Emit(new CallMutation("expandItem", args: new MethodArg[]
+            => self.Emit(new CallMutation("expandItem", args: new CommandValue[]
             {
-                new LiteralArg(isExpand),
-                new LiteralArg(index)
+                CommandValue.FromLiteral(isExpand),
+                CommandValue.FromLiteral(index)
             }));
 
         /// <summary>
@@ -36,10 +37,10 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> EnableItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, int index, bool isEnable = true)
             where TModel : class
-            => self.Emit(new CallMutation("enableItem", args: new MethodArg[]
+            => self.Emit(new CallMutation("enableItem", args: new CommandValue[]
             {
-                new LiteralArg(index),
-                new LiteralArg(isEnable)
+                CommandValue.FromLiteral(index),
+                CommandValue.FromLiteral(isEnable)
             }));
     }
 }

@@ -1,6 +1,7 @@
 using System.Globalization;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -22,8 +23,8 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value", coerce: "number"),
-                value: value.ToString(CultureInfo.InvariantCulture));
+            return self.Emit(new SetPropMutation("value",
+                CommandValue.FromLiteral(value.ToString(CultureInfo.InvariantCulture), coerce: "number")));
         }
 
         /// <summary>Sets the minimum allowed value.</summary>
@@ -33,8 +34,8 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal min)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("min", coerce: "number"),
-                value: min.ToString(CultureInfo.InvariantCulture));
+            return self.Emit(new SetPropMutation("min",
+                CommandValue.FromLiteral(min.ToString(CultureInfo.InvariantCulture), coerce: "number")));
         }
 
         /// <summary>Moves focus into the numeric input.</summary>

@@ -43,9 +43,12 @@
                   target: r,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: has access
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: has access
+                    }
+                  }
                 }
               ]
             }

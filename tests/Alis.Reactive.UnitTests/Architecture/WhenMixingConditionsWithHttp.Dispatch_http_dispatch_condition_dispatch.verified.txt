@@ -29,9 +29,12 @@
                   target: action-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: acted
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: acted
+                    }
+                  }
                 }
               ]
             }

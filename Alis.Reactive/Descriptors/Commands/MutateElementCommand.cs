@@ -1,23 +1,24 @@
 using System.Text.Json.Serialization;
 using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive.Descriptors.Commands
 {
+    /// <summary>
+    /// Applies a mutation to a DOM element or component root resolved in the browser.
+    /// </summary>
     public sealed class MutateElementCommand : Command
     {
+        /// <summary>Gets the discriminator written to plan JSON.</summary>
         [JsonPropertyOrder(-1)]
         public string Kind => "mutate-element";
 
+        /// <summary>Gets the DOM element identifier targeted by the mutation.</summary>
         public string Target { get; }
+
+        /// <summary>Gets the mutation applied after the target root is resolved.</summary>
         public Mutation Mutation { get; }
 
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public object? Value { get; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public BindSource? Source { get; }
-
+        /// <summary>Gets the optional vendor hint used to resolve the component root.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Vendor { get; }
 
@@ -28,14 +29,10 @@ namespace Alis.Reactive.Descriptors.Commands
         internal MutateElementCommand(
             string target,
             Mutation mutation,
-            object? value = null,
-            BindSource? source = null,
             string? vendor = null)
         {
             Target = target;
             Mutation = mutation;
-            Value = value;
-            Source = source;
             Vendor = vendor;
         }
     }

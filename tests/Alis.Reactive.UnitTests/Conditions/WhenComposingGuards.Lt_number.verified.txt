@@ -28,9 +28,12 @@
                   target: r,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: low
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: low
+                    }
+                  }
                 }
               ]
             }

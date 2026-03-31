@@ -34,9 +34,12 @@
                           target: step1-status,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: active user
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: active user
+                            }
+                          }
                         }
                       ]
                     }
@@ -50,9 +53,12 @@
                           target: step1-status,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: inactive user
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: inactive user
+                            }
+                          }
                         }
                       ]
                     }
@@ -88,9 +94,12 @@
                             target: step2-count,
                             mutation: {
                               kind: set-prop,
-                              prop: textContent
-                            },
-                            value: has items
+                              prop: textContent,
+                              value: {
+                                kind: literal,
+                                value: has items
+                              }
+                            }
                           }
                         ]
                       }
@@ -104,9 +113,12 @@
                             target: step2-count,
                             mutation: {
                               kind: set-prop,
-                              prop: textContent
-                            },
-                            value: empty
+                              prop: textContent,
+                              value: {
+                                kind: literal,
+                                value: empty
+                              }
+                            }
                           }
                         ]
                       }

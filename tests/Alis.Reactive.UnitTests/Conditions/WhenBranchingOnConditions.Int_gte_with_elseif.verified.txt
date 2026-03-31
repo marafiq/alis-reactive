@@ -28,9 +28,12 @@
                   target: grade,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: A
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: A
+                    }
+                  }
                 }
               ]
             }
@@ -54,9 +57,12 @@
                   target: grade,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: B
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: B
+                    }
+                  }
                 }
               ]
             }
@@ -70,9 +76,12 @@
                   target: grade,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: F
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: F
+                    }
+                  }
                 }
               ]
             }

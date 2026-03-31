@@ -178,8 +178,7 @@ describe("when merging plans", () => {
           commands: [{
             kind: "mutate-element",
             target: "status-a",
-            mutation: { kind: "set-prop", prop: "textContent" },
-            value: "A",
+            mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "A" } },
           }],
         },
       }],
@@ -203,8 +202,7 @@ describe("when merging plans", () => {
           commands: [{
             kind: "mutate-element",
             target: "status-b",
-            mutation: { kind: "set-prop", prop: "textContent" },
-            value: "B",
+            mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "B" } },
           }],
         },
       }],

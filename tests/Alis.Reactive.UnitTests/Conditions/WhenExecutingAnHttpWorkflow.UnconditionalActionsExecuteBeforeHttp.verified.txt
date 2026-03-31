@@ -27,9 +27,12 @@
             target: status,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: Loading...
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: Loading...
+              }
+            }
           }
         ],
         request: {
@@ -61,9 +64,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Loaded
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Loaded
+                    }
+                  }
                 }
               ]
             }

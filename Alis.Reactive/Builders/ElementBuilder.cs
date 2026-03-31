@@ -4,6 +4,7 @@ using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Mutations;
 using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Builders
 {
@@ -38,7 +39,9 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> AddClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("add", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new CallMutation("add", chain: "classList", args: new[] { CommandValue.FromLiteral(className) })));
             return _pipeline;
         }
 
@@ -49,7 +52,9 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> RemoveClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("remove", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new CallMutation("remove", chain: "classList", args: new[] { CommandValue.FromLiteral(className) })));
             return _pipeline;
         }
 
@@ -60,7 +65,9 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> ToggleClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("toggle", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new CallMutation("toggle", chain: "classList", args: new[] { CommandValue.FromLiteral(className) })));
             return _pipeline;
         }
 
@@ -71,7 +78,9 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetText(string text)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("textContent"), text));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new SetPropMutation("textContent", CommandValue.FromLiteral(text))));
             return _pipeline;
         }
 
@@ -89,7 +98,9 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object?>> path)
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("textContent"), source: new EventSource(sourcePath)));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new SetPropMutation("textContent", CommandValue.FromSource(new EventSource(sourcePath)))));
             return _pipeline;
         }
 
@@ -104,7 +115,9 @@ namespace Alis.Reactive.Builders
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("textContent"), source: new EventSource(sourcePath)));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new SetPropMutation("textContent", CommandValue.FromSource(new EventSource(sourcePath)))));
             return _pipeline;
         }
 
@@ -125,7 +138,8 @@ namespace Alis.Reactive.Builders
         public ElementBuilder<TModel> SetText(BindSource source)
         {
             _pipeline.Commands.Add(new MutateElementCommand(
-                _elementId, new SetPropMutation("textContent"), source: source));
+                _elementId,
+                new SetPropMutation("textContent", CommandValue.FromSource(source))));
             return this;
         }
 
@@ -145,7 +159,8 @@ namespace Alis.Reactive.Builders
         public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
         {
             _pipeline.Commands.Add(new MutateElementCommand(
-                _elementId, new SetPropMutation("textContent"), source: source.ToBindSource()));
+                _elementId,
+                new SetPropMutation("textContent", CommandValue.FromSource(source.ToBindSource()))));
             return this;
         }
 
@@ -156,7 +171,9 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetHtml(string html)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("innerHTML"), html));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new SetPropMutation("innerHTML", CommandValue.FromLiteral(html))));
             return _pipeline;
         }
 
@@ -170,7 +187,9 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object?>> path)
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("innerHTML"), source: new EventSource(sourcePath)));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new SetPropMutation("innerHTML", CommandValue.FromSource(new EventSource(sourcePath)))));
             return _pipeline;
         }
 
@@ -187,7 +206,8 @@ namespace Alis.Reactive.Builders
         public ElementBuilder<TModel> SetHtml(BindSource source)
         {
             _pipeline.Commands.Add(new MutateElementCommand(
-                _elementId, new SetPropMutation("innerHTML"), source: source));
+                _elementId,
+                new SetPropMutation("innerHTML", CommandValue.FromSource(source))));
             return this;
         }
 
@@ -207,7 +227,8 @@ namespace Alis.Reactive.Builders
         public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
         {
             _pipeline.Commands.Add(new MutateElementCommand(
-                _elementId, new SetPropMutation("innerHTML"), source: source.ToBindSource()));
+                _elementId,
+                new SetPropMutation("innerHTML", CommandValue.FromSource(source.ToBindSource()))));
             return this;
         }
 
@@ -217,7 +238,9 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Show()
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("removeAttribute", args: new MethodArg[] { new LiteralArg("hidden") })));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new CallMutation("removeAttribute", args: new[] { CommandValue.FromLiteral("hidden") })));
             return _pipeline;
         }
 
@@ -227,7 +250,9 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Hide()
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("setAttribute", args: new MethodArg[] { new LiteralArg("hidden"), new LiteralArg("") })));
+            _pipeline.Commands.Add(new MutateElementCommand(
+                _elementId,
+                new CallMutation("setAttribute", args: new[] { CommandValue.FromLiteral("hidden"), CommandValue.FromLiteral("") })));
             return _pipeline;
         }
     }

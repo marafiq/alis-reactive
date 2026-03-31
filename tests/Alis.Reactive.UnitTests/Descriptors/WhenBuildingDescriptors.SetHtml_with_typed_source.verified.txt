@@ -14,11 +14,14 @@
             target: container,
             mutation: {
               kind: set-prop,
-              prop: innerHTML
-            },
-            source: {
-              kind: event,
-              path: evt.value
+              prop: innerHTML,
+              value: {
+                kind: source,
+                source: {
+                  kind: event,
+                  path: evt.value
+                }
+              }
             }
           }
         ]

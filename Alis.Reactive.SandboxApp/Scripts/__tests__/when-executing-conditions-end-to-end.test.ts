@@ -35,8 +35,8 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.status" }, coerceAs: "string", op: "eq", operand: "active" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "yes" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "no" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "yes" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "no" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { status: "active" } }));
@@ -49,8 +49,8 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.status" }, coerceAs: "string", op: "eq", operand: "active" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "yes" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "no" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "yes" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "no" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { status: "blocked" } }));
@@ -63,7 +63,7 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.role" }, coerceAs: "string", op: "neq", operand: "guest" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "authorized" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "authorized" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { role: "admin" } }));
@@ -76,8 +76,8 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.score" }, coerceAs: "number", op: "gt", operand: 80 },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "high" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "low" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "high" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "low" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { score: 95 } }));
@@ -94,8 +94,8 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.temp" }, coerceAs: "number", op: "between", operand: [60, 80] },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "comfortable" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "extreme" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "comfortable" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "extreme" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { temp: 72 } }));
@@ -110,8 +110,8 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.active" }, coerceAs: "boolean", op: "truthy" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "active" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "inactive" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "active" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "inactive" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { active: true } }));
@@ -124,7 +124,7 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.name" }, coerceAs: "string", op: "falsy" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "missing" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "missing" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { name: "" } }));
@@ -137,7 +137,7 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.address" }, coerceAs: "raw", op: "is-null" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "no address" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "no address" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { address: null } }));
@@ -150,7 +150,7 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.name" }, coerceAs: "string", op: "not-empty" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "has name" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "has name" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { name: "Margaret" } }));
@@ -163,7 +163,7 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.items" }, coerceAs: "raw", op: "is-empty" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "empty" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "empty" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { items: [] } }));
@@ -178,8 +178,8 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.status" }, coerceAs: "string", op: "in", operand: ["active", "pending"] },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "valid" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "invalid" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "valid" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "invalid" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { status: "pending" } }));
@@ -192,7 +192,7 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.role" }, coerceAs: "string", op: "not-in", operand: ["banned", "suspended"] },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "allowed" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "allowed" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { role: "member" } }));
@@ -207,7 +207,7 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.name" }, coerceAs: "string", op: "contains", operand: "son" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "matched" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "matched" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { name: "Thompson" } }));
@@ -220,7 +220,7 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.name" }, coerceAs: "string", op: "starts-with", operand: "Dr." },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "doctor" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "doctor" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { name: "Dr. Smith" } }));
@@ -233,8 +233,8 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.code" }, coerceAs: "string", op: "min-length", operand: 5 },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "long enough" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "too short" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "long enough" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "too short" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { code: "ABC" } }));
@@ -256,8 +256,8 @@ describe("conditions end-to-end via boot", () => {
           { kind: "value", source: { kind: "event", path: "evt.active" }, coerceAs: "boolean", op: "truthy" },
           { kind: "value", source: { kind: "event", path: "evt.score" }, coerceAs: "number", op: "gt", operand: 50 },
         ]},
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "both" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "nope" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "both" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "nope" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { active: true, score: 80 } }));
@@ -277,8 +277,8 @@ describe("conditions end-to-end via boot", () => {
           { kind: "value", source: { kind: "event", path: "evt.role" }, coerceAs: "string", op: "eq", operand: "admin" },
           { kind: "value", source: { kind: "event", path: "evt.role" }, coerceAs: "string", op: "eq", operand: "superadmin" },
         ]},
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "access" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "denied" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "access" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "denied" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { role: "superadmin" } }));
@@ -295,7 +295,7 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "not", inner: { kind: "value", source: { kind: "event", path: "evt.blocked" }, coerceAs: "boolean", op: "truthy" } },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "allowed" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "allowed" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { blocked: false } }));
@@ -310,12 +310,12 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.score" }, coerceAs: "number", op: "gte", operand: 90 },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "grade", mutation: { kind: "set-prop", prop: "textContent" }, value: "A" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "grade", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "A" } } }] } },
         { guard: { kind: "value", source: { kind: "event", path: "evt.score" }, coerceAs: "number", op: "gte", operand: 80 },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "grade", mutation: { kind: "set-prop", prop: "textContent" }, value: "B" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "grade", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "B" } } }] } },
         { guard: { kind: "value", source: { kind: "event", path: "evt.score" }, coerceAs: "number", op: "gte", operand: 70 },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "grade", mutation: { kind: "set-prop", prop: "textContent" }, value: "C" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "grade", mutation: { kind: "set-prop", prop: "textContent" }, value: "F" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "grade", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "C" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "grade", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "F" } } }] } },
       ]},
     }]});
 
@@ -342,10 +342,10 @@ describe("conditions end-to-end via boot", () => {
     boot({ planId: "t", components: {}, entries: [{
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional",
-        commands: [{ kind: "mutate-element", target: "echo", mutation: { kind: "set-prop", prop: "textContent" }, value: "pre" }],
+        commands: [{ kind: "mutate-element", target: "echo", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "pre" } } }],
         branches: [
           { guard: { kind: "value", source: { kind: "event", path: "evt.ok" }, coerceAs: "boolean", op: "truthy" },
-            reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "branch" }] } },
+            reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "branch" } } }] } },
         ],
       },
     }]});
@@ -363,8 +363,8 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.tags" }, coerceAs: "array", op: "array-contains", operand: "urgent", elementCoerceAs: "string" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "has urgent" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "no urgent" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "has urgent" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "no urgent" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { tags: ["normal", "urgent", "review"] } }));
@@ -384,8 +384,8 @@ describe("conditions end-to-end via boot", () => {
       trigger: { kind: "custom-event", event: "test" },
       reaction: { kind: "conditional", branches: [
         { guard: { kind: "value", source: { kind: "event", path: "evt.date" }, coerceAs: "date", op: "gt", operand: "2024-06-01" },
-          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "after" }] } },
-        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent" }, value: "before" }] } },
+          reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "after" } } }] } },
+        { reaction: { kind: "sequential", commands: [{ kind: "mutate-element", target: "r1", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "before" } } }] } },
       ]},
     }]});
     document.dispatchEvent(new CustomEvent("test", { detail: { date: "2024-07-15" } }));

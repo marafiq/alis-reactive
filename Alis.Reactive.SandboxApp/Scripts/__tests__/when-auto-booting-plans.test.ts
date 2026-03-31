@@ -22,8 +22,7 @@ describe("when auto booting plans", () => {
               commands: [{
                 kind: "mutate-element",
                 target: "status",
-                mutation: { kind: "set-prop", prop: "textContent" },
-                value: "root",
+                mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "root" } },
               }],
             },
           }],
@@ -42,8 +41,7 @@ describe("when auto booting plans", () => {
               commands: [{
                 kind: "mutate-element",
                 target: "status",
-                mutation: { kind: "set-prop", prop: "textContent" },
-                value: "partial",
+                mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "partial" } },
               }],
             },
           }],

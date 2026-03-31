@@ -33,8 +33,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo",
-              mutation: { kind: "set-prop", prop: "textContent" },
-              value: "changed!",
+              mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "changed!" } },
             }],
           },
         }],
@@ -67,8 +66,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-idle",
-              mutation: { kind: "set-prop", prop: "textContent" },
-              value: "fired",
+              mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "fired" } },
             }],
           },
         }],
@@ -108,8 +106,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-nested",
-              mutation: { kind: "set-prop", prop: "textContent" },
-              value: "nested works",
+              mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "nested works" } },
             }],
           },
         }],
@@ -162,8 +159,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-fusion",
-              mutation: { kind: "set-prop", prop: "textContent" },
-              value: "fusion changed",
+              mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "fusion changed" } },
             }],
           },
         }],
@@ -197,8 +193,7 @@ describe("when triggering on component event", () => {
             commands: [{
               kind: "mutate-element",
               target: "echo-args",
-              mutation: { kind: "set-prop", prop: "textContent" },
-              source: { kind: "event", path: "evt.value" },
+              mutation: { kind: "set-prop", prop: "textContent", value: { kind: "source", source: { kind: "event", path: "evt.value" } } },
             }],
           },
         }],

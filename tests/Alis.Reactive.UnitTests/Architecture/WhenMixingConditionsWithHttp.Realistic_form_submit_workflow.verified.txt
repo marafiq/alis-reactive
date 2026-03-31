@@ -67,9 +67,12 @@
                   target: name-error,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Name is required
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Name is required
+                    }
+                  }
                 },
                 {
                   kind: mutate-element,
@@ -143,9 +146,12 @@
                     target: status,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: saved successfully
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: saved successfully
+                      }
+                    }
                   }
                 ],
                 branches: [
@@ -168,9 +174,12 @@
                           target: capacity,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: at capacity
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: at capacity
+                            }
+                          }
                         }
                       ]
                     }
@@ -194,9 +203,12 @@
                           target: capacity,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: filling up
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: filling up
+                            }
+                          }
                         }
                       ]
                     }
@@ -210,9 +222,12 @@
                           target: capacity,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: available
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: available
+                            }
+                          }
                         }
                       ]
                     }
@@ -232,9 +247,12 @@
                     target: status,
                     mutation: {
                       kind: set-prop,
-                      prop: textContent
-                    },
-                    value: validation failed
+                      prop: textContent,
+                      value: {
+                        kind: literal,
+                        value: validation failed
+                      }
+                    }
                   }
                 ],
                 branches: [
@@ -280,9 +298,12 @@
                   target: status,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: server error
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: server error
+                    }
+                  }
                 }
               ]
             }

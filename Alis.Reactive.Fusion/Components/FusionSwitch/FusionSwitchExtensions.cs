@@ -1,5 +1,6 @@
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -21,7 +22,8 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionSwitch, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("checked", coerce: "boolean"), value: isChecked ? "true" : "false");
+            return self.Emit(new SetPropMutation("checked",
+                CommandValue.FromLiteral(isChecked ? "true" : "false", coerce: "boolean")));
         }
 
         /// <summary>Reads the current checked state for use in conditions or gather.</summary>

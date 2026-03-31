@@ -31,9 +31,12 @@
                   target: r,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: passing
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: passing
+                    }
+                  }
                 }
               ]
             }

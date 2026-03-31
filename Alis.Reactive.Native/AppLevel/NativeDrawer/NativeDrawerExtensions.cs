@@ -1,5 +1,6 @@
 using Alis.Reactive;
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Values;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -26,7 +27,7 @@ namespace Alis.Reactive.Native.AppLevel
             // Remove all size classes, then add the requested one
             foreach (var cls in SizeClasses)
                 self = self.Emit(new CallMutation("remove", "classList",
-                    new[] { new LiteralArg(cls) }));
+                    new[] { CommandValue.FromLiteral(cls) }));
 
             var sizeClass = size switch
             {
@@ -36,7 +37,7 @@ namespace Alis.Reactive.Native.AppLevel
                 _ => "alis-drawer--md"
             };
             return self.Emit(new CallMutation("add", "classList",
-                new[] { new LiteralArg(sizeClass) }));
+                new[] { CommandValue.FromLiteral(sizeClass) }));
         }
 
         /// <summary>
@@ -49,9 +50,9 @@ namespace Alis.Reactive.Native.AppLevel
             where TModel : class
         {
             return self.Emit(new CallMutation("add", "classList",
-                           new[] { new LiteralArg("alis-drawer--visible") }))
+                           new[] { CommandValue.FromLiteral("alis-drawer--visible") }))
                        .Emit(new CallMutation("removeAttribute",
-                           args: new MethodArg[] { new LiteralArg("aria-hidden") }));
+                           args: new[] { CommandValue.FromLiteral("aria-hidden") }));
         }
 
         /// <summary>
@@ -64,7 +65,7 @@ namespace Alis.Reactive.Native.AppLevel
             where TModel : class
         {
             return self.Emit(new CallMutation("remove", "classList",
-                       new[] { new LiteralArg("alis-drawer--visible") }));
+                       new[] { CommandValue.FromLiteral("alis-drawer--visible") }));
         }
 
         /// <summary>

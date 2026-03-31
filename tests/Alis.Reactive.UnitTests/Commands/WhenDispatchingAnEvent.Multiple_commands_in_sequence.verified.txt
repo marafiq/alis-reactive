@@ -16,7 +16,10 @@
             kind: dispatch,
             event: second,
             payload: {
-              id: x
+              id: {
+                kind: literal,
+                value: x
+              }
             }
           }
         ]

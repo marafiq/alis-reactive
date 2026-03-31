@@ -32,9 +32,12 @@
                         target: result,
                         mutation: {
                           kind: set-prop,
-                          prop: textContent
-                        },
-                        value: Processed
+                          prop: textContent,
+                          value: {
+                            kind: literal,
+                            value: Processed
+                          }
+                        }
                       }
                     ]
                   }
@@ -51,9 +54,12 @@
                   target: error,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Account inactive
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: Account inactive
+                    }
+                  }
                 },
                 {
                   kind: mutate-element,

@@ -18,11 +18,14 @@
                   target: message,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  source: {
-                    kind: event,
-                    path: responseBody.message
+                    prop: textContent,
+                    value: {
+                      kind: source,
+                      source: {
+                        kind: event,
+                        path: responseBody.message
+                      }
+                    }
                   }
                 },
                 {
@@ -30,11 +33,14 @@
                   target: count,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  source: {
-                    kind: event,
-                    path: responseBody.count
+                    prop: textContent,
+                    value: {
+                      kind: source,
+                      source: {
+                        kind: event,
+                        path: responseBody.count
+                      }
+                    }
                   }
                 }
               ]

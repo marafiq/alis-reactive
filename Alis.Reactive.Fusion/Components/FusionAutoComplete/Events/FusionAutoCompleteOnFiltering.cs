@@ -4,6 +4,7 @@ using Alis.Reactive.Builders;
 using Alis.Reactive.Descriptors.Commands;
 using Alis.Reactive.Descriptors.Mutations;
 using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -56,7 +57,7 @@ namespace Alis.Reactive.Fusion.Components
             ICommandEmitter pipeline)
         {
             pipeline.AddCommand(new MutateEventCommand(
-                new SetPropMutation("preventDefaultAction"), value: true));
+                new SetPropMutation("preventDefaultAction", CommandValue.FromLiteral(true))));
         }
 
         /// <summary>
@@ -81,10 +82,7 @@ namespace Alis.Reactive.Fusion.Components
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
             pipeline.AddCommand(new MutateEventCommand(
-                new CallMutation("updateData", args: new MethodArg[]
-                {
-                    new SourceArg(new EventSource(sourcePath))
-                })));
+                new CallMutation("updateData", args: new[] { CommandValue.FromSource(new EventSource(sourcePath)) })));
         }
     }
 }

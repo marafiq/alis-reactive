@@ -25,9 +25,12 @@
                   target: result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: ok
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: ok
+                    }
+                  }
                 }
               ]
             }
@@ -41,9 +44,12 @@
                   target: error,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: bad request
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: bad request
+                    }
+                  }
                 }
               ]
             },
@@ -55,9 +61,12 @@
                   target: error,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: server error
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: server error
+                    }
+                  }
                 }
               ]
             }

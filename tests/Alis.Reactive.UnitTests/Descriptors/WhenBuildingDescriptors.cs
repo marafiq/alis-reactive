@@ -14,7 +14,7 @@ public class DescriptorPayload
 /// <summary>
 /// BDD tests covering descriptor paths not hit by higher-level tests:
 /// TypedSource.ElementCoercionType, ValueGuard constructors,
-/// ElementBuilder source overloads, dispatch descriptors, SourceArg.
+/// ElementBuilder source overloads, dispatch descriptors, CommandValue.
 /// </summary>
 [TestFixture]
 public class WhenBuildingDescriptors : PlanTestBase

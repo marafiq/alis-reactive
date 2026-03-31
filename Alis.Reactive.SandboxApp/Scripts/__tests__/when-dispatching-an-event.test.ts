@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { boot } from "../lifecycle/boot";
 
 
+import { dispatchPayload } from "./test-value-helpers";
 describe("when dispatching an event", () => {
   it("fires CustomEvent on document", () => {
     let received = false;
@@ -38,7 +39,7 @@ describe("when dispatching an event", () => {
           commands: [{
             kind: "dispatch",
             event: "evt-b",
-            payload: { id: "abc", count: 42 },
+            payload: dispatchPayload({ id: "abc", count: 42 }),
           }],
         },
       }],

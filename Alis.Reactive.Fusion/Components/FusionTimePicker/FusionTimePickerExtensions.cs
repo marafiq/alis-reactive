@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.Descriptors.Values;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -23,8 +24,8 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionTimePicker, TModel> self, DateTime value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"),
-                value: value.ToString("HH:mm", CultureInfo.InvariantCulture));
+            return self.Emit(new SetPropMutation("value",
+                CommandValue.FromLiteral(value.ToString("HH:mm", CultureInfo.InvariantCulture))));
         }
 
         /// <summary>Moves focus into the time picker.</summary>

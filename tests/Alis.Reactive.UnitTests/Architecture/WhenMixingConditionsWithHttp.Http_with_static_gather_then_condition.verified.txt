@@ -31,9 +31,12 @@
                   target: submit-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: submitted
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: submitted
+                    }
+                  }
                 }
               ]
             }
@@ -68,9 +71,12 @@
                   target: urgency,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: URGENT
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: URGENT
+                    }
+                  }
                 },
                 {
                   kind: mutate-element,
@@ -99,9 +105,12 @@
                   target: urgency,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: normal
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: normal
+                    }
+                  }
                 }
               ]
             }

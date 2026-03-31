@@ -146,7 +146,11 @@
       "properties": {
         "kind": { "const": "dispatch" },
         "event": { "type": "string" },
-        "payload": { "type": "object" }
+        "payload": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/CommandValue" },
+          "description": "Object-shaped custom-event detail. Each field resolves through the shared command value contract."
+        }
       }
     },
 
@@ -313,30 +317,31 @@
     },
     "SetPropMutation": {
       "type": "object",
-      "required": ["kind", "prop"],
+      "required": ["kind", "prop", "value"],
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "set-prop" },
         "prop": { "type": "string", "minLength": 1, "description": "Property name to set: root[prop] = val" },
-        "coerce": { "$ref": "#/$defs/CoercionType" }
+        "value": { "$ref": "#/$defs/CommandValue", "description": "Literal or source-backed value assigned to the target property." }
       }
     },
-    "MethodArg": {
+    "CommandValue": {
       "oneOf": [
-        { "$ref": "#/$defs/LiteralArg" },
-        { "$ref": "#/$defs/SourceArg" }
+        { "$ref": "#/$defs/LiteralValue" },
+        { "$ref": "#/$defs/SourceValue" }
       ]
     },
-    "LiteralArg": {
+    "LiteralValue": {
       "type": "object",
       "required": ["kind", "value"],
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "literal" },
-        "value": { "description": "Literal argument value" }
+        "value": { "description": "Literal value carried directly in the plan." },
+        "coerce": { "$ref": "#/$defs/CoercionType" }
       }
     },
-    "SourceArg": {
+    "SourceValue": {
       "type": "object",
       "required": ["kind", "source"],
       "additionalProperties": false,
@@ -354,7 +359,7 @@
         "kind": { "const": "call" },
         "method": { "type": "string", "minLength": 1, "description": "Method to call: root[method](...args)" },
         "chain": { "type": "string", "minLength": 1 },
-        "args": { "type": "array", "items": { "$ref": "#/$defs/MethodArg" }, "description": "Per-arg resolution: each arg is literal or source-walked" }
+        "args": { "type": "array", "items": { "$ref": "#/$defs/CommandValue" }, "description": "Per-arg resolution: each arg is literal or source-backed." }
       }
     },
     "MutateElementCommand": {
@@ -365,8 +370,6 @@
         "kind": { "const": "mutate-element" },
         "target": { "type": "string", "minLength": 1 },
         "mutation": { "$ref": "#/$defs/Mutation" },
-        "value": { "description": "Static value for mutations — string for scalars, array for multi-select" },
-        "source": { "$ref": "#/$defs/BindSource" },
         "vendor": { "$ref": "#/$defs/Vendor" }
       }
     },
@@ -521,9 +524,7 @@
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "mutate-event" },
-        "mutation": { "$ref": "#/$defs/Mutation", "description": "set-prop or call on the event args object (ctx.evt). Same mutation algebra as mutate-element." },
-        "value": { "description": "Static value for set-prop mutations" },
-        "source": { "$ref": "#/$defs/BindSource" }
+        "mutation": { "$ref": "#/$defs/Mutation", "description": "set-prop or call on the event args object (ctx.evt). Same mutation algebra as mutate-element." }
       }
     },
     "IntoCommand": {

@@ -1,11 +1,10 @@
 import type { Command, MutateEventCommand, ExecContext } from "../types";
-import { mutateElement, resolveArg } from "./element";
+import { mutateElement } from "./element";
 import { showServerErrors } from "../validation";
 import { injectHtml } from "./inject";
-import { resolveSource } from "../resolution/resolver";
-import { coerceOrThrow } from "../core/coerce";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
+import { resolveCommandValue, resolveDispatchPayload } from "./values";
 
 const log = scope("command");
 
@@ -14,14 +13,13 @@ function executeMutateEvent(cmd: MutateEventCommand, ctx: ExecContext): void {
   const m = cmd.mutation;
   switch (m.kind) {
     case "set-prop": {
-      const val = cmd.source ? resolveSource(cmd.source, ctx) : cmd.value;
-      const coerced = m.coerce ? coerceOrThrow(val, m.coerce) : val;
-      log.trace("mutate-event", { prop: m.prop, val: coerced });
-      (ctx.evt as any)[m.prop] = coerced;
+      const value = resolveCommandValue(m.value, ctx);
+      log.trace("mutate-event", { prop: m.prop, val: value });
+      (ctx.evt as any)[m.prop] = value;
       break;
     }
     case "call": {
-      const resolved = (m.args ?? []).map(a => resolveArg(a, ctx));
+      const resolved = (m.args ?? []).map(a => resolveCommandValue(a, ctx));
       log.trace("mutate-event", { method: m.method, args: resolved });
       (ctx.evt as any)[m.method](...resolved);
       break;
@@ -33,10 +31,12 @@ function executeMutateEvent(cmd: MutateEventCommand, ctx: ExecContext): void {
 /** Execute a single command. */
 export function executeCommand(cmd: Command, ctx?: ExecContext): void {
   switch (cmd.kind) {
-    case "dispatch":
-      log.trace("dispatch", { event: cmd.event, payload: cmd.payload });
-      document.dispatchEvent(new CustomEvent(cmd.event, { detail: cmd.payload ?? {} }));
+    case "dispatch": {
+      const detail = resolveDispatchPayload(cmd.payload, ctx);
+      log.trace("dispatch", { event: cmd.event, payload: detail });
+      document.dispatchEvent(new CustomEvent(cmd.event, { detail }));
       break;
+    }
 
     case "mutate-element":
       log.trace("mutate-element", { target: cmd.target, mutation: cmd.mutation.kind });

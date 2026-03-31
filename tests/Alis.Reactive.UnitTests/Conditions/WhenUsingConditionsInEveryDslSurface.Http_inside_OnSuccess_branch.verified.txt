@@ -53,9 +53,12 @@
                           target: error,
                           mutation: {
                             kind: set-prop,
-                            prop: textContent
-                          },
-                          value: Inactive
+                            prop: textContent,
+                            value: {
+                              kind: literal,
+                              value: Inactive
+                            }
+                          }
                         }
                       ]
                     }

@@ -14,9 +14,12 @@
             target: s1,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: one
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: one
+              }
+            }
           },
           {
             kind: dispatch,
@@ -27,9 +30,12 @@
             target: s3,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: three
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: three
+              }
+            }
           }
         ]
       }
@@ -93,9 +99,12 @@
                   target: s4-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: four
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: four
+                    }
+                  }
                 }
               ]
             }
@@ -130,9 +139,12 @@
                   target: s5,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: high
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: high
+                    }
+                  }
                 }
               ]
             }
@@ -156,9 +168,12 @@
                   target: s5,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: low
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: low
+                    }
+                  }
                 }
               ]
             }
@@ -172,9 +187,12 @@
                   target: s5,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: zero
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: zero
+                    }
+                  }
                 }
               ]
             }
@@ -200,9 +218,12 @@
                   target: s6-result,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: six
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: six
+                    }
+                  }
                 }
               ]
             }
@@ -223,9 +244,12 @@
             target: s8-final,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: complete
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: complete
+              }
+            }
           }
         ]
       }

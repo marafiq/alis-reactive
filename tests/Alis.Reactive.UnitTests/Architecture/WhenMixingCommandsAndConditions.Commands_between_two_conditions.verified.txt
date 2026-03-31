@@ -14,9 +14,12 @@
             target: mid,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: between
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: between
+              }
+            }
           }
         ]
       }
@@ -48,9 +51,12 @@
                   target: r1,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: first
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: first
+                    }
+                  }
                 }
               ]
             }
@@ -85,9 +91,12 @@
                   target: r2,
                   mutation: {
                     kind: set-prop,
-                    prop: textContent
-                  },
-                  value: second
+                    prop: textContent,
+                    value: {
+                      kind: literal,
+                      value: second
+                    }
+                  }
                 }
               ]
             }

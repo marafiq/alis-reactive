@@ -14,9 +14,12 @@
             target: status,
             mutation: {
               kind: set-prop,
-              prop: textContent
-            },
-            value: Processing...
+              prop: textContent,
+              value: {
+                kind: literal,
+                value: Processing...
+              }
+            }
           },
           {
             kind: dispatch,

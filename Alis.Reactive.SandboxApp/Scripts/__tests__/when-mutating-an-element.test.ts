@@ -62,7 +62,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "panel", mutation: { kind: "set-prop", prop: "textContent" }, value: "done" }],
+          commands: [{ kind: "mutate-element", target: "panel", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "done" } } }],
         },
       }],
     });
@@ -78,7 +78,7 @@ describe("mutate-element command", () => {
         trigger: { kind: "dom-ready" },
         reaction: {
           kind: "sequential",
-          commands: [{ kind: "mutate-element", target: "panel", mutation: { kind: "set-prop", prop: "innerHTML" }, value: "<strong>ok</strong>" }],
+          commands: [{ kind: "mutate-element", target: "panel", mutation: { kind: "set-prop", prop: "innerHTML", value: { kind: "literal", value: "<strong>ok</strong>" } } }],
         },
       }],
     });
@@ -149,7 +149,7 @@ describe("mutate-element command", () => {
           commands: [
             { kind: "mutate-element", target: "status", mutation: { kind: "call", method: "add", chain: "classList", args: [{ kind: "literal", value: "complete" }] } },
             { kind: "dispatch", event: "step-done" },
-            { kind: "mutate-element", target: "panel", mutation: { kind: "set-prop", prop: "textContent" }, value: "next" },
+            { kind: "mutate-element", target: "panel", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "next" } } },
           ],
         },
       }],

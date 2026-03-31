@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { boot } from "../lifecycle/boot";
 import { TestWidget } from "../components/lab/test-widget";
 
+import { dispatchPayload, sourceValue } from "./test-value-helpers";
 describe("when calling component method with args (source walk → val)", () => {
   afterEach(() => { document.body.innerHTML = ""; });
 
@@ -23,14 +24,14 @@ describe("when calling component method with args (source walk → val)", () => 
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "load-data",
-            payload: { data: { items: ["a", "b", "c"] } },
+            payload: dispatchPayload({ data: { items: ["a", "b", "c"] } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "load-data" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fusion-args",
-            mutation: { kind: "call", method: "setItems", args: [{ kind: "source", source: { kind: "event", path: "evt.data.items" } }] }, vendor: "fusion",
+            mutation: { kind: "call", method: "setItems", args: [sourceValue({ kind: "event", path: "evt.data.items" })] }, vendor: "fusion",
           }] },
         },
       ] });
@@ -46,15 +47,14 @@ describe("when calling component method with args (source walk → val)", () => 
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "set-val",
-            payload: { result: { detail: { newValue: "walked-value" } } },
+            payload: dispatchPayload({ result: { detail: { newValue: "walked-value" } } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "set-val" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "fusion-set",
-            mutation: { kind: "set-prop", prop: "value" }, vendor: "fusion",
-            source: { kind: "event", path: "evt.result.detail.newValue" },
+            mutation: { kind: "set-prop", prop: "value", value: sourceValue({ kind: "event", path: "evt.result.detail.newValue" }) }, vendor: "fusion",
           }] },
         },
       ] });
@@ -74,15 +74,14 @@ describe("when calling component method with args (source walk → val)", () => 
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "set-attr",
-            payload: { attr: { val: "active" } },
+            payload: dispatchPayload({ attr: { val: "active" } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "set-attr" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "native-args",
-            mutation: { kind: "set-prop", prop: "value" },
-            source: { kind: "event", path: "evt.attr.val" },
+            mutation: { kind: "set-prop", prop: "value", value: { kind: "source", source: { kind: "event", path: "evt.attr.val" } } },
           }] },
         },
       ] });
@@ -100,15 +99,14 @@ describe("when calling component method with args (source walk → val)", () => 
           trigger: { kind: "dom-ready" },
           reaction: { kind: "sequential", commands: [{
             kind: "dispatch", event: "fill",
-            payload: { form: { username: "walked-user" } },
+            payload: dispatchPayload({ form: { username: "walked-user" } }),
           }] },
         },
         {
           trigger: { kind: "custom-event", event: "fill" },
           reaction: { kind: "sequential", commands: [{
             kind: "mutate-element", target: "native-set",
-            mutation: { kind: "set-prop", prop: "value" },
-            source: { kind: "event", path: "evt.form.username" },
+            mutation: { kind: "set-prop", prop: "value", value: { kind: "source", source: { kind: "event", path: "evt.form.username" } } },
           }] },
         },
       ] });

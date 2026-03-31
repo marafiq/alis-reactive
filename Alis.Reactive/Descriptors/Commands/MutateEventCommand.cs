@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive.Descriptors.Commands
 {
@@ -15,26 +14,20 @@ namespace Alis.Reactive.Descriptors.Commands
     /// </summary>
     public sealed class MutateEventCommand : Command
     {
+        /// <summary>Gets the discriminator written to plan JSON.</summary>
         [JsonPropertyOrder(-1)]
         public string Kind => "mutate-event";
 
+        /// <summary>Gets the mutation applied to the triggering event object.</summary>
         public Mutation Mutation { get; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public object? Value { get; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public BindSource? Source { get; }
 
         /// <summary>
         /// NEVER make public. Constructed exclusively by framework builders. Public constructors
         /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
         /// </summary>
-        internal MutateEventCommand(Mutation mutation, object? value = null, BindSource? source = null)
+        internal MutateEventCommand(Mutation mutation)
         {
             Mutation = mutation;
-            Value = value;
-            Source = source;
         }
     }
 }
