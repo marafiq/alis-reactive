@@ -91,7 +91,7 @@ public class WhenDrawerOpensAndCloses : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#btn-open-lg").ClickAsync();
+        await ClickWhenStable(Page.Locator("#btn-open-lg"));
 
         await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 5000 });
         await Expect(DrawerTitle).ToHaveTextAsync("Add Resident", new() { Timeout = 5000 });
@@ -182,10 +182,10 @@ public class WhenDrawerOpensAndCloses : PlaywrightTestBase
         await Page.GetByText("Assisted Living", new() { Exact = true }).ClickAsync();
 
         // Submit — server has a 5s delay, then returns success
-        await Page.Locator("#drawer-submit-btn").ClickAsync();
+        await ClickWhenStable(Page.Locator("#drawer-submit-btn"));
 
-        // Drawer closes on success (plan calls NativeDrawer.Close after toast)
-        await Expect(Drawer).Not.ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 15000 });
+        // Drawer is fully closed only after the close transition finishes.
+        await Expect(Drawer).ToHaveAttributeAsync("aria-hidden", "true", new() { Timeout = 30000 });
 
         AssertNoConsoleErrors();
     }

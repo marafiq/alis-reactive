@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Alis.Reactive.Native.Extensions;
 using Json.Schema;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -33,6 +34,17 @@ public abstract class DriftTestBase
         Assert.That(result.IsValid, Is.True, () => FormatSchemaErrors(result));
     }
 
+    protected static void AssertSchemaInvalid(string planJson, string because)
+    {
+        using var doc = JsonDocument.Parse(planJson);
+        var result = Schema.Evaluate(doc.RootElement, new EvaluationOptions
+        {
+            OutputFormat = OutputFormat.List
+        });
+        Assert.That(result.IsValid, Is.False,
+            $"Expected schema validation to fail because {because}, but it succeeded.");
+    }
+
     // ── Assertion 2: JSON exercises ALL properties of a definition (no gaps) ──
 
     protected static void AssertAllPropertiesPresent(
@@ -60,6 +72,20 @@ public abstract class DriftTestBase
             "populate the missing optional properties in the DSL call.");
     }
 
+    protected static void AssertDefinitionPropertiesExactly(
+        string defName,
+        params string[] expectedProperties)
+    {
+        var schemaDef = Analyzer.GetDefinition(defName);
+        var actual = schemaDef.AllProperties.OrderBy(x => x).ToList();
+        var expected = expectedProperties.OrderBy(x => x).ToList();
+
+        Assert.That(actual, Is.EqualTo(expected),
+            $"Schema $defs/{defName} properties drifted. " +
+            $"Expected: [{string.Join(", ", expected)}]. " +
+            $"Actual: [{string.Join(", ", actual)}].");
+    }
+
     // ── Assertion 3: JSON has specific named properties at path ──
 
     /// <summary>
@@ -73,15 +99,7 @@ public abstract class DriftTestBase
         string jsonPath,
         params string[] expectedProperties)
     {
-        using var doc = JsonDocument.Parse(planJson);
-        var element = NavigateToPath(doc.RootElement, jsonPath);
-        var jsonProps = new HashSet<string>();
-
-        if (element.ValueKind == JsonValueKind.Object)
-        {
-            foreach (var prop in element.EnumerateObject())
-                jsonProps.Add(prop.Name);
-        }
+        var jsonProps = GetPropertyNamesAtPath(planJson, jsonPath);
 
         var missing = expectedProperties.Where(p => !jsonProps.Contains(p)).ToList();
 
@@ -89,6 +107,20 @@ public abstract class DriftTestBase
             $"Expected properties not present in JSON at '{jsonPath}': " +
             $"[{string.Join(", ", missing)}]. " +
             $"Actual properties: [{string.Join(", ", jsonProps)}].");
+    }
+
+    protected static void AssertPropertiesExactly(
+        string planJson,
+        string jsonPath,
+        params string[] expectedProperties)
+    {
+        var actual = GetPropertyNamesAtPath(planJson, jsonPath).OrderBy(x => x).ToList();
+        var expected = expectedProperties.OrderBy(x => x).ToList();
+
+        Assert.That(actual, Is.EqualTo(expected),
+            $"JSON properties drifted at '{jsonPath}'. " +
+            $"Expected: [{string.Join(", ", expected)}]. " +
+            $"Actual: [{string.Join(", ", actual)}].");
     }
 
     // ── Helpers ──
@@ -100,6 +132,18 @@ public abstract class DriftTestBase
         ReactivePlan<ResidentModel> plan,
         Action<Builders.TriggerBuilder<ResidentModel>> trigger)
         => Html.On(plan, trigger);
+
+    protected static string AddUnknownProperty(
+        string planJson,
+        string objectPath,
+        string propertyName,
+        JsonNode value)
+    {
+        var root = JsonNode.Parse(planJson)!.AsObject();
+        var target = NavigateToNode(root, objectPath).AsObject();
+        target[propertyName] = value;
+        return root.ToJsonString();
+    }
 
     private static JsonElement NavigateToPath(JsonElement root, string path)
     {
@@ -123,6 +167,46 @@ public abstract class DriftTestBase
             }
         }
         return current;
+    }
+
+    private static JsonNode NavigateToNode(JsonNode root, string path)
+    {
+        JsonNode current = root;
+        foreach (var segment in path.Split('.'))
+        {
+            if (segment.Contains('['))
+            {
+                var bracketIdx = segment.IndexOf('[');
+                var prop = segment[..bracketIdx];
+                var indexStr = segment[(bracketIdx + 1)..^1];
+                var index = int.Parse(indexStr);
+
+                if (prop.Length > 0)
+                    current = current[prop]!;
+                current = current[index]!;
+            }
+            else
+            {
+                current = current[segment]!;
+            }
+        }
+
+        return current;
+    }
+
+    private static HashSet<string> GetPropertyNamesAtPath(string planJson, string jsonPath)
+    {
+        using var doc = JsonDocument.Parse(planJson);
+        var element = NavigateToPath(doc.RootElement, jsonPath);
+        var jsonProps = new HashSet<string>();
+
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var prop in element.EnumerateObject())
+                jsonProps.Add(prop.Name);
+        }
+
+        return jsonProps;
     }
 
     private static string FormatSchemaErrors(EvaluationResults result)

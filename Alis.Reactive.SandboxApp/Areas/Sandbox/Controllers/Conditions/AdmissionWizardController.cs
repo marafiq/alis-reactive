@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionWizard;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
@@ -217,7 +217,7 @@ public class AdmissionWizardController : Controller
     public async Task<IActionResult> SearchPhysicians([FromQuery] string? q)
     {
         await Task.Delay(300);
-        var all = new List<PhysicianItem>
+        var all = new List<WizardPhysicianItem>
         {
             new() { Text = "Dr. Sarah Chen", Value = "Dr. Sarah Chen", Specialty = "Geriatrics" },
             new() { Text = "Dr. James Wilson", Value = "Dr. James Wilson", Specialty = "Cardiology" },
@@ -233,36 +233,30 @@ public class AdmissionWizardController : Controller
     }
 
     [HttpPost("AlertElopement")]
-    public async Task<IActionResult> AlertElopement([FromBody] AdmissionAssessmentController.AlertElopementRequest? r)
+    public async Task<IActionResult> AlertElopement([FromBody] AlertElopementRequest? r)
     { await Task.Delay(400); return Ok(new ScreeningAlertResponse { Message = $"Elopement risk flagged for {r?.ResidentName}", Urgency = "high" }); }
 
     [HttpPost("AlertHypertension")]
-    public async Task<IActionResult> AlertHypertension([FromBody] AdmissionAssessmentController.AlertHypertensionRequest? r)
+    public async Task<IActionResult> AlertHypertension([FromBody] AlertHypertensionRequest? r)
     { await Task.Delay(400); return Ok(new ScreeningAlertResponse { Message = $"Hypertension: {r?.SystolicBP}mmHg", Urgency = "moderate" }); }
 
     [HttpPost("AlertUncontrolled")]
-    public async Task<IActionResult> AlertUncontrolled([FromBody] AdmissionAssessmentController.AlertUncontrolledRequest? r)
+    public async Task<IActionResult> AlertUncontrolled([FromBody] AlertUncontrolledRequest? r)
     { await Task.Delay(400); return Ok(new ScreeningAlertResponse { Message = $"Uncontrolled diabetes: A1C {r?.A1cLevel}", Urgency = "high" }); }
 
     [HttpPost("AlertNeuro")]
-    public async Task<IActionResult> AlertNeuro([FromBody] AdmissionAssessmentController.AlertNeuroRequest? r)
+    public async Task<IActionResult> AlertNeuro([FromBody] AlertNeuroRequest? r)
     { await Task.Delay(400); return Ok(new ScreeningAlertResponse { Message = $"Neuro consult for {r?.ResidentName}", Urgency = "immediate" }); }
 
     [HttpPost("AlertPain")]
-    public async Task<IActionResult> AlertPain([FromBody] AdmissionAssessmentController.AlertPainRequest? r)
+    public async Task<IActionResult> AlertPain([FromBody] AlertPainRequest? r)
     { await Task.Delay(400); return Ok(new ScreeningAlertResponse { Message = $"Pain alert: level {r?.PainLevel}", Urgency = "immediate" }); }
 
     [HttpPost("RequestRoomSetup")]
-    public async Task<IActionResult> RequestRoomSetup([FromBody] AdmissionAssessmentController.RequestRoomSetupRequest? r)
+    public async Task<IActionResult> RequestRoomSetup([FromBody] RequestRoomSetupRequest? r)
     { await Task.Delay(500); return Ok(new ScreeningAlertResponse { Message = $"Room setup for {r?.ResidentName}", Urgency = "routine" }); }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
-
-    public class LoadStepRequest
-    {
-        public string ScreeningId { get; set; } = "";
-        public int Step { get; set; }
-    }
 
     private bool TryValidate<T>(FluentValidation.IValidator<T> validator, T model, out IActionResult error)
     {

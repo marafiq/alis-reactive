@@ -84,7 +84,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Open the country dropdown — icon click opens popup in Playwright
-        await Page.Locator($"#{CountryId}").Locator("..").Locator(".e-ddl-icon").ClickAsync();
+        await Page.Locator($"#{CountryId}").Locator("..").Locator(".e-ddl-icon").ClickWhenStableAsync(Page);
         var popup = Page.Locator($"#{CountryPopupId}");
         await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
 
@@ -176,7 +176,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveTextAsync("SEA", new() { Timeout = 5000 });
 
         // Click Save — gathers both Country and City
-        await Page.Locator("#save-btn").ClickAsync();
+        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
 
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
@@ -227,7 +227,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveTextAsync("SEA", new() { Timeout = 5000 });
 
         // Step 3: Save — gathers both Country and City, verify server echoes both
-        await Page.Locator("#save-btn").ClickAsync();
+        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
 
@@ -268,13 +268,12 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveValueAsync("", new() { Timeout = 5000 });
 
         // Verify UK cities are available — open popup and confirm 2 items loaded
-        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickAsync();
-        await Page.WaitForTimeoutAsync(300);
+        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickWhenStableAsync(Page);
         var cityPopup = Page.Locator($"#{CityPopupId}");
         await Expect(cityPopup).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(cityPopup.Locator(".e-list-item")).ToHaveCountAsync(2, new() { Timeout = 5000 });
         await Page.Keyboard.PressAsync("Escape");
-        await Page.WaitForTimeoutAsync(300); // allow DDL to fully close before reopening
+        await Expect(cityPopup).ToBeHiddenAsync(new() { Timeout = 5000 });
 
         await SelectCity("London");
         await Expect(Page.Locator("#selected-city"))
@@ -296,8 +295,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         // City dropdown should have no data source items — it starts empty.
         // Open the popup and verify no list items are rendered.
-        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickAsync();
-        await Page.WaitForTimeoutAsync(300);
+        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickWhenStableAsync(Page);
         var cityPopup = Page.Locator($"#{CityPopupId}");
         await Expect(cityPopup).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(cityPopup.Locator(".e-list-item")).ToHaveCountAsync(0, new() { Timeout = 3000 });
@@ -415,7 +413,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
 
         // Click Save without selecting a city
-        await Page.Locator("#save-btn").ClickAsync();
+        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
 
         // Server responds with the message — city is empty
         await Expect(Page.Locator("#save-result"))
@@ -448,7 +446,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await Expect(Page.Locator("#selected-city"))
             .ToHaveTextAsync("MAN", new() { Timeout = 5000 });
 
-        await Page.Locator("#save-btn").ClickAsync();
+        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
 
@@ -483,7 +481,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveTextAsync("VAN", new() { Timeout = 5000 });
 
         // Step 3: Save — verify both values echo
-        await Page.Locator("#save-btn").ClickAsync();
+        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
 

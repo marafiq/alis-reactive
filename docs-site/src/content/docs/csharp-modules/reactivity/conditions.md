@@ -321,23 +321,20 @@ pipeline.When(args, x => x.HasUnsavedChanges).Truthy()
     .Then(then => then.Dispatch("navigate-away"));
 ```
 
-## Can I guard a single command instead of wrapping it in When/Then?
+## How do I model a single guarded command?
 
-Yes. Per-command guards are available on element targets after source-bound methods:
+Use the regular branch DSL. Put unconditional work before the condition, then keep the guarded command inside `Then(...)`:
 
 ```csharp
-Html.On(plan, t => t.CustomEvent<ScorePayload>("check-per-action", (args, pipeline) =>
+Html.On(plan, t => t.CustomEvent<ScorePayload>("check-single-command-condition", (args, pipeline) =>
 {
-    pipeline.Element("per-action-result").SetText("Always runs");
-    var el = pipeline.Element("per-action-bonus");
-    el.SetText("Bonus!");
-    el.When(args, x => x.Score, csb => csb.Gte(90));
+    pipeline.Element("single-command-condition-result").SetText("Always runs");
+    pipeline.When(args, x => x.Score).Gte(90)
+        .Then(then => then.Element("single-command-condition-bonus").SetText("Bonus!"));
 }));
 ```
 
-The first command always executes. The second command (`SetText("Bonus!")`) is skipped at runtime if `Score < 90`. The rest of the pipeline continues either way.
-
-The per-command `When` takes the same event args and expression as the pipeline-level `When`, plus a lambda that picks an operator:
+The unconditional command always executes. The guarded command runs only when `Score >= 90`. This keeps all condition logic in the same `When(...).Then(...)` model as the rest of the framework.
 
 ## Can I write multiple independent conditions in one pipeline?
 

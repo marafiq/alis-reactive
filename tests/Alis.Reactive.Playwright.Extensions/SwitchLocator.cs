@@ -42,5 +42,5 @@ public sealed class SwitchLocator
     // ─── Gestures — What the User Does ───
 
     /// <summary>Click the wrapper to toggle the switch.</summary>
-    public async Task Toggle() => await Wrapper.ClickAsync();
+    public async Task Toggle() => await Wrapper.ClickWhenStableAsync(_page);
 }

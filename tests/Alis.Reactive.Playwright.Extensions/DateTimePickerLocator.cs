@@ -66,7 +66,7 @@ public sealed class DateTimePickerLocator
     /// <summary>Click and fill the input with a date-time value.</summary>
     public async Task Fill(string dateTimeText)
     {
-        await Input.ClickAsync();
+        await Input.ClickWhenStableAsync(_page);
         await Input.PressAsync("Meta+a");
         await Input.PressSequentiallyAsync(dateTimeText, new() { Delay = 30 });
     }
@@ -74,13 +74,13 @@ public sealed class DateTimePickerLocator
     /// <summary>Click, select all, and delete.</summary>
     public async Task Clear()
     {
-        await Input.ClickAsync();
+        await Input.ClickWhenStableAsync(_page);
         await Input.PressAsync("Meta+a");
         await Input.PressAsync("Backspace");
     }
 
     /// <summary>Click the input to focus it.</summary>
-    public async Task Focus() => await Input.ClickAsync();
+    public async Task Focus() => await Input.ClickWhenStableAsync(_page);
 
     /// <summary>Press Tab to leave the field.</summary>
     public async Task Blur() => await Input.PressAsync("Tab");
@@ -96,12 +96,12 @@ public sealed class DateTimePickerLocator
     /// This sets the date portion of ej2.value reliably.</summary>
     public async Task SelectDate(int year, int month, int day)
     {
-        await CalendarIcon.ClickAsync();
+        await CalendarIcon.ClickWhenStableAsync(_page);
         await CalendarPopup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
         await NavigateToMonth(CalendarPopup, year, month);
 
         var dayCell = CalendarPopup.Locator($"td.e-cell:not(.e-other-month) span.e-day:text-is(\"{day}\")");
-        await dayCell.ClickAsync();
+        await dayCell.ClickWhenStableAsync(_page);
     }
 
     /// <summary>Open the time popup and click the matching time item.
@@ -109,11 +109,11 @@ public sealed class DateTimePickerLocator
     /// Time items use 30-minute intervals (e.g., "8:00 AM", "8:30 AM").</summary>
     public async Task SelectTime(string timeText)
     {
-        await ClockIcon.ClickAsync();
+        await ClockIcon.ClickWhenStableAsync(_page);
         await TimeListPopup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
 
         var item = TimeListPopup.Locator($".e-list-item[data-value='{timeText}']");
-        await item.ClickAsync();
+        await item.ClickWhenStableAsync(_page);
     }
 
     /// <summary>Select both date and time via their popups.
@@ -133,10 +133,11 @@ public sealed class DateTimePickerLocator
     private async Task NavigateToMonth(ILocator popup, int targetYear, int targetMonth)
     {
         var target = new DateTime(targetYear, targetMonth, 1);
+        var title = popup.Locator(".e-title");
 
         for (var i = 0; i < 24; i++) // max 2 years of navigation
         {
-            var titleText = await popup.Locator(".e-title").TextContentAsync() ?? "";
+            var titleText = await title.TextContentAsync() ?? "";
 
             if (DateTime.TryParseExact(titleText.Trim(), "MMMM yyyy",
                     CultureInfo.InvariantCulture, DateTimeStyles.None, out var current))
@@ -146,12 +147,27 @@ public sealed class DateTimePickerLocator
                     return;
 
                 if (target < currentMonth)
-                    await popup.Locator(".e-prev").ClickAsync();
+                    await popup.Locator(".e-prev").ClickWhenStableAsync(_page);
                 else
-                    await popup.Locator(".e-next").ClickAsync();
+                    await popup.Locator(".e-next").ClickWhenStableAsync(_page);
 
-                await _page.WaitForTimeoutAsync(100); // allow calendar animation
+                await WaitForTitleChange(title, titleText.Trim());
             }
         }
+    }
+
+    private static async Task WaitForTitleChange(ILocator title, string previousText, int timeoutMs = 5000)
+    {
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+        while (DateTime.UtcNow < deadline)
+        {
+            var currentText = (await title.TextContentAsync())?.Trim();
+            if (!string.Equals(currentText, previousText, StringComparison.Ordinal))
+                return;
+
+            await Task.Delay(50);
+        }
+
+        throw new TimeoutException($"Calendar title did not change from '{previousText}' within {timeoutMs}ms.");
     }
 }

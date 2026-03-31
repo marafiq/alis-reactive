@@ -1,6 +1,5 @@
 import type { Command, MutateEventCommand, ExecContext } from "../types";
 import { mutateElement, resolveArg } from "./element";
-import { evaluateGuard, isConfirmGuard } from "../conditions/conditions";
 import { showServerErrors } from "../validation";
 import { injectHtml } from "./inject";
 import { resolveSource } from "../resolution/resolver";
@@ -31,19 +30,8 @@ function executeMutateEvent(cmd: MutateEventCommand, ctx: ExecContext): void {
   }
 }
 
-/** Execute a single command with per-action When guard support. */
+/** Execute a single command. */
 export function executeCommand(cmd: Command, ctx?: ExecContext): void {
-  if (cmd.when) {
-    if (isConfirmGuard(cmd.when)) {
-      log.warn("ConfirmGuard on per-action When is not supported. Use branch-level Confirm.");
-      return;
-    }
-    if (!evaluateGuard(cmd.when, ctx)) {
-      log.trace("per-action-when-skipped", { kind: cmd.kind });
-      return;
-    }
-  }
-
   switch (cmd.kind) {
     case "dispatch":
       log.trace("dispatch", { event: cmd.event, payload: cmd.payload });

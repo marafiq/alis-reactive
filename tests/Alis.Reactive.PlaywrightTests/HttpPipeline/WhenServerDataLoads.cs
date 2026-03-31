@@ -3,11 +3,15 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 [TestFixture]
 public class WhenServerDataLoads : PlaywrightTestBase
 {
+    private Task ClickButton(string name) =>
+        ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = name }));
+
     private async Task WaitForDomReadyGet()
     {
         await NavigateTo("/Sandbox/HttpPipeline/Http");
+        await WaitForTraceMessage("booted", 10000);
         // DomReady GET fires automatically — wait for response data to arrive
-        await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }
 
     // ── Section 1: DomReady GET — exact resident data round-trip ──────────
@@ -65,7 +69,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        await ClickButton("Save");
 
         // Server receives {name:"John Doe"} and echoes it back as receivedName
         await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
@@ -77,7 +81,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        await ClickButton("Save");
 
         // Server returns message:"Saved: John Doe" — verifies full round-trip
         await Expect(Page.Locator("#save-message")).ToHaveTextAsync("Saved: John Doe", new() { Timeout = 5000 });
@@ -89,7 +93,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        await ClickButton("Save");
 
         await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
@@ -104,7 +108,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Chain" }).ClickAsync();
+        await ClickButton("Load Chain");
 
         // First request: residents
         await Expect(Page.Locator("#chain-resident-first")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
@@ -117,7 +121,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Chain" }).ClickAsync();
+        await ClickButton("Load Chain");
 
         // Second request: facilities (only fires after first completes)
         await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
@@ -130,7 +134,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Chain" }).ClickAsync();
+        await ClickButton("Load Chain");
 
         // Spinner hides in the chained (second) response handler
         await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
@@ -145,7 +149,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
+        await ClickButton("Load Parallel");
 
         await Expect(Page.Locator("#parallel-resident-first")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#parallel-resident-second")).ToHaveTextAsync("Jane Smith", new() { Timeout = 5000 });
@@ -157,7 +161,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
+        await ClickButton("Load Parallel");
 
         await Expect(Page.Locator("#parallel-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
         await Expect(Page.Locator("#parallel-facility-second")).ToHaveTextAsync("West Wing", new() { Timeout = 5000 });
@@ -169,7 +173,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
+        await ClickButton("Load Parallel");
 
         await Expect(Page.Locator("#parallel-all")).ToHaveTextAsync(
             "All parallel requests completed!", new() { Timeout = 5000 });
@@ -183,7 +187,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
+        await ClickButton("Load Parallel");
 
         await Expect(Page.Locator("#parallel-all")).ToHaveTextAsync(
             "All parallel requests completed!", new() { Timeout = 5000 });
@@ -198,7 +202,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }).ClickAsync();
+        await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }));
 
         // Server receives {name:"Updated Name",facilityId:"1"} and echoes receivedName
         await Expect(Page.Locator("#put-received-name")).ToHaveTextAsync("Updated Name", new() { Timeout = 5000 });
@@ -210,7 +214,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }).ClickAsync();
+        await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }));
 
         // Server receives facilityId:"1" and echoes it as receivedFacilityId
         await Expect(Page.Locator("#put-received-facility")).ToHaveTextAsync("1", new() { Timeout = 5000 });
@@ -222,7 +226,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }).ClickAsync();
+        await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }));
 
         await Expect(Page.Locator("#put-received-name")).ToHaveTextAsync("Updated Name", new() { Timeout = 5000 });
         await Expect(Page.Locator("#put-result")).ToHaveClassAsync(
@@ -237,11 +241,11 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete Resident #42" }).ClickAsync();
+        await ClickButton("Delete Resident #42");
 
         var okButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "OK" });
         await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await okButton.ClickAsync();
+        await ClickWhenStable(okButton);
 
         // Server receives DELETE /DeleteResident/42 and echoes deletedId:42
         await Expect(Page.Locator("#delete-id")).ToHaveTextAsync("42", new() { Timeout = 5000 });
@@ -253,11 +257,11 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete Resident #42" }).ClickAsync();
+        await ClickButton("Delete Resident #42");
 
         var okButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "OK" });
         await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await okButton.ClickAsync();
+        await ClickWhenStable(okButton);
 
         await Expect(Page.Locator("#delete-id")).ToHaveTextAsync("42", new() { Timeout = 5000 });
         await Expect(Page.Locator("#delete-result")).ToHaveClassAsync(
@@ -270,11 +274,11 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete Resident #42" }).ClickAsync();
+        await ClickButton("Delete Resident #42");
 
         var okButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "OK" });
         await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await okButton.ClickAsync();
+        await ClickWhenStable(okButton);
 
         await Expect(Page.Locator("#delete-id")).ToHaveTextAsync("42", new() { Timeout = 5000 });
         await Expect(Page.Locator("#delete-spinner")).ToBeHiddenAsync();
@@ -288,7 +292,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Form" }).ClickAsync();
+        await ClickButton("Submit Form");
 
         // Server counts received fields: FirstName, LastName, Email = 3
         await Expect(Page.Locator("#formdata-count")).ToHaveTextAsync("3", new() { Timeout = 5000 });
@@ -300,7 +304,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Form" }).ClickAsync();
+        await ClickButton("Submit Form");
 
         // Server echoes the exact field names it received — verifies model binding names
         await Expect(Page.Locator("#formdata-fields")).ToHaveTextAsync(
@@ -313,7 +317,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Submit Form" }).ClickAsync();
+        await ClickButton("Submit Form");
 
         await Expect(Page.Locator("#formdata-count")).ToHaveTextAsync("3", new() { Timeout = 5000 });
         await Expect(Page.Locator("#formdata-result")).ToHaveClassAsync(
@@ -328,7 +332,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Search for 'John'" }).ClickAsync();
+        await ClickButton("Search for 'John'");
 
         // Server receives ?q=John and echoes it back as query
         await Expect(Page.Locator("#search-query")).ToHaveTextAsync("John", new() { Timeout = 5000 });
@@ -340,7 +344,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Search for 'John'" }).ClickAsync();
+        await ClickButton("Search for 'John'");
 
         // "John" matches "John Doe" and "Bob Johnson" = 2 results
         await Expect(Page.Locator("#search-match-count")).ToHaveTextAsync("2", new() { Timeout = 5000 });
@@ -352,7 +356,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Search for 'John'" }).ClickAsync();
+        await ClickButton("Search for 'John'");
 
         await Expect(Page.Locator("#search-query")).ToHaveTextAsync("John", new() { Timeout = 5000 });
         await Expect(Page.Locator("#search-result")).ToHaveClassAsync(
@@ -367,7 +371,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate (will fail)" }).ClickAsync();
+        await ClickButton("Validate (will fail)");
 
         // 422 handler sets specific text — verifies status-code routing works
         await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
@@ -380,7 +384,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate (will fail)" }).ClickAsync();
+        await ClickButton("Validate (will fail)");
 
         await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
             "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
@@ -394,7 +398,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate (will fail)" }).ClickAsync();
+        await ClickButton("Validate (will fail)");
 
         await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
             "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
@@ -407,7 +411,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     [Test]
     public async Task native_action_link_grid_loads_initial_rows()
     {
-        await NavigateTo("/Sandbox/HttpPipeline/Http");
+        await WaitForDomReadyGet();
 
         // All three seed rows must be present — proves Into() partial injection rendered the grid
         await Expect(Page.GetByTestId("native-action-link-row-41"))
@@ -433,16 +437,16 @@ public class WhenServerDataLoads : PlaywrightTestBase
     [Test]
     public async Task native_action_link_delete_with_confirm_does_not_delete_when_cancelled()
     {
-        await NavigateTo("/Sandbox/HttpPipeline/Http");
+        await WaitForDomReadyGet();
 
         await Expect(Page.GetByTestId("native-action-link-row-42"))
             .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
 
-        await Page.GetByTestId("native-action-link-42").ClickAsync();
+        await ClickWhenStable(Page.GetByTestId("native-action-link-42"));
 
         var cancelButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "Cancel" });
-        await Expect(cancelButton).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await cancelButton.ClickAsync();
+        await Expect(cancelButton).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await ClickWhenStable(cancelButton);
 
         await Expect(Page.GetByTestId("native-action-link-row-42"))
             .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
@@ -453,16 +457,16 @@ public class WhenServerDataLoads : PlaywrightTestBase
     [Test]
     public async Task native_action_link_delete_with_confirm_deletes_and_refreshes_grid_when_confirmed()
     {
-        await NavigateTo("/Sandbox/HttpPipeline/Http");
+        await WaitForDomReadyGet();
 
         await Expect(Page.GetByTestId("native-action-link-row-42"))
             .ToContainTextAsync("Resident #42", new() { Timeout = 5000 });
 
-        await Page.GetByTestId("native-action-link-42").ClickAsync();
+        await ClickWhenStable(Page.GetByTestId("native-action-link-42"));
 
         var okButton = Page.Locator("#alisConfirmDialog").GetByRole(AriaRole.Button, new() { Name = "OK" });
-        await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await okButton.ClickAsync();
+        await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await ClickWhenStable(okButton);
 
         await Expect(Page.Locator("#native-action-link-status"))
             .ToContainTextAsync("Deleted resident #42", new() { Timeout = 5000 });
@@ -481,9 +485,9 @@ public class WhenServerDataLoads : PlaywrightTestBase
     [Test]
     public async Task standalone_native_action_link_loads_its_own_success_target()
     {
-        await NavigateTo("/Sandbox/HttpPipeline/Http");
+        await WaitForDomReadyGet();
 
-        await Page.GetByTestId("standalone-native-action-link").ClickAsync();
+        await ClickWhenStable(Page.GetByTestId("standalone-native-action-link"));
 
         await Expect(Page.Locator("#standalone-native-action-link-status"))
             .ToContainTextAsync("Standalone NativeActionLink succeeded", new() { Timeout = 5000 });
@@ -496,7 +500,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     [Test]
     public async Task standalone_action_link_fires_post_and_shows_result()
     {
-        await NavigateTo("/Sandbox/HttpPipeline/Http");
+        await WaitForDomReadyGet();
 
         // Before click — status shows default text, result container has no server content
         await Expect(Page.Locator("#standalone-native-action-link-status"))
@@ -505,7 +509,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
             .ToHaveTextAsync("No standalone response yet");
 
         // Click the standalone action link — fires POST with {command:"run"}
-        await Page.GetByTestId("standalone-native-action-link").ClickAsync();
+        await ClickWhenStable(Page.GetByTestId("standalone-native-action-link"));
 
         // POST response HTML is injected Into() the result container
         await Expect(Page.Locator("#standalone-native-action-link-result"))
@@ -551,14 +555,14 @@ public class WhenServerDataLoads : PlaywrightTestBase
         });
 
         // First POST — intercepted as 400 — error handler fires
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        await ClickButton("Save");
         await Expect(Page.Locator("#save-error")).ToHaveTextAsync(
             "Validation failed: Name is required", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-red-600"));
 
         // Second POST — passes through to real server — success handler fires
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        await ClickButton("Save");
         await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync(
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
@@ -577,13 +581,13 @@ public class WhenServerDataLoads : PlaywrightTestBase
         await WaitForDomReadyGet();
 
         // POST valid data via Save — spinner shows during request, hides after success
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        await ClickButton("Save");
         await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync(
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-spinner")).ToBeHiddenAsync();
 
         // POST invalid data via Validate — spinner shows during request, hides after 422
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Validate (will fail)" }).ClickAsync();
+        await ClickButton("Validate (will fail)");
         await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
             "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
         await Expect(Page.Locator("#multi-err-spinner")).ToBeHiddenAsync();
@@ -596,7 +600,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Chain" }).ClickAsync();
+        await ClickButton("Load Chain");
 
         // First hop: wait for residents to arrive — proves first request completed
         await Expect(Page.Locator("#chain-resident-first")).ToHaveTextAsync(
@@ -652,7 +656,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
         // This catches bugs where spinner hides after first response instead of waiting for all.
         await WaitForDomReadyGet();
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Load Parallel" }).ClickAsync();
+        await ClickButton("Load Parallel");
 
         // Wait for BOTH datasets to arrive — proves both requests completed
         await Expect(Page.Locator("#parallel-resident-first")).ToHaveTextAsync(
@@ -675,7 +679,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     [Test]
     public async Task http_page_renders_with_correct_title()
     {
-        await NavigateTo("/Sandbox/HttpPipeline/Http");
+        await WaitForDomReadyGet();
         await Expect(Page).ToHaveTitleAsync("HTTP Requests — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
     }

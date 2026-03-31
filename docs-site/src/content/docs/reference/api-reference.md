@@ -64,6 +64,11 @@ ToResponsePath<T>(expression)
 Marker for app-level components that have a well-known element ID.
             Enables the parameterless overload: p.Component<FusionConfirm>()
 
+```csharp
+// Properties
+DefaultId { get; }  // Gets the well-known element ID for this app-level component.
+```
+
 ### IComponent
 
 Base interface for all reactive components (Fusion SF, Native DOM).
@@ -166,7 +171,6 @@ SetText<T>(source, path)
 SetText<T>(source)
 Show()
 ToggleClass(className)
-When<T>(payload, path, guard)
 ```
 
 ### ICommandEmitter
@@ -357,9 +361,9 @@ Collects values from form components, event payloads, and static data to build t
 
 ```csharp
 AddItem()
-FromEvent<T>()
+FromEvent<T>(args, path, param)
 IncludeAll()
-Static()
+Static(param, value)
 ```
 
 ### GatherExtensions
@@ -370,7 +374,7 @@ Vendor-agnostic gather extensions for any `IComponent` + `IInputComponent`.
 
 ```csharp
 Include<T>()
-Include<T>()
+Include<T>(refId, name)
 ```
 
 ### HttpRequestBuilder<T>

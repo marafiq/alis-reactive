@@ -1,10 +1,20 @@
-@model ConditionsShowcaseModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.Guards.ConditionsShowcaseModel
 @using Alis.Reactive
+@using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.Extensions
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.Guards
 @{
-    ViewData["Title"] = "Conditions";
+    ViewData["Title"] = "Guards";
 
     var plan = Html.ReactivePlan<ConditionsShowcaseModel>();
+
+    IHtmlContent DispatchButton<TPayload>(string id, string text, string eventName, TPayload payload, string cssClass)
+    {
+        return Html.NativeButton(id, text)
+            .CssClass(cssClass)
+            .Reactive(plan, evt => evt.Click, (_, p) => p.Dispatch(eventName, payload));
+    }
 
     // ── Section 1: int — ElseIf grade ladder ──
     Html.On(plan, t => t.CustomEvent<ScorePayload>("set-score", (args, p) =>
@@ -176,13 +186,12 @@
             .Else(else_ => else_.Element("confirm-result").SetText("Cancelled"))
     ));
 
-    // ── Section 24: Per-action When guard ──
-    Html.On(plan, t => t.CustomEvent<ScorePayload>("check-per-action", (args, p) =>
+    // ── Section 24: Single-command condition via When/Then ──
+    Html.On(plan, t => t.CustomEvent<ScorePayload>("check-single-command-condition", (args, p) =>
     {
-        p.Element("per-action-result").SetText("Always runs");
-        var el = p.Element("per-action-bonus");
-        el.SetText("Bonus!");
-        el.When(args, x => x.Score, csb => csb.Gte(90));
+        p.Element("single-command-condition-result").SetText("Always runs");
+        p.When(args, x => x.Score).Gte(90)
+            .Then(then => then.Element("single-command-condition-bonus").SetText("Bonus!"));
     }));
 
     // ── Section 25: Direct And syntax (same JSON as lambda And) ──
@@ -206,7 +215,7 @@
 
 <native-vstack gap="Md">
     <div>
-        <native-heading level="H1">Conditions — All Types</native-heading>
+        <native-heading level="H1">Guards</native-heading>
         <native-text color="Secondary" size="Sm">
             Every primitive type through the typed guard chain. Operand type matches the C# property type at compile time.
         </native-text>
@@ -217,9 +226,9 @@
         <native-heading level="H2" class="mb-2">int — ElseIf Grade Ladder</native-heading>
         <p class="text-xs text-text-secondary mb-3">Score &ge; 90 &rarr; A &bull; &ge; 80 &rarr; B &bull; else &rarr; F</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-score-95" onclick="document.dispatchEvent(new CustomEvent('set-score',{detail:{score:95}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">95</button>
-            <button id="btn-score-85" onclick="document.dispatchEvent(new CustomEvent('set-score',{detail:{score:85}}))" class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">85</button>
-            <button id="btn-score-40" onclick="document.dispatchEvent(new CustomEvent('set-score',{detail:{score:40}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">40</button>
+            @DispatchButton("btn-score-95", "95", "set-score", new ScorePayload { Score = 95 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-score-85", "85", "set-score", new ScorePayload { Score = 85 }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
+            @DispatchButton("btn-score-40", "40", "set-score", new ScorePayload { Score = 40 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="grid grid-cols-2 gap-4 text-xs font-mono">
             <div class="flex justify-between"><span class="text-text-secondary">Score</span><span id="score-display">&mdash;</span></div>
@@ -232,8 +241,8 @@
         <native-heading level="H2" class="mb-2">long — Balance Threshold</native-heading>
         <p class="text-xs text-text-secondary mb-3">Balance &gt; 1,000,000 &rarr; "High Value" &bull; else &rarr; "Standard"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-long-high" onclick="document.dispatchEvent(new CustomEvent('check-long',{detail:{balance:5000000}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">5,000,000</button>
-            <button id="btn-long-low" onclick="document.dispatchEvent(new CustomEvent('check-long',{detail:{balance:500}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">500</button>
+            @DispatchButton("btn-long-high", "5,000,000", "check-long", new LongPayload { Balance = 5_000_000L }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-long-low", "500", "check-long", new LongPayload { Balance = 500L }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="long-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -243,8 +252,8 @@
         <native-heading level="H2" class="mb-2">double — Temperature Check</native-heading>
         <p class="text-xs text-text-secondary mb-3">Temp &gt; 98.6 &rarr; "Fever" &bull; else &rarr; "Normal"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-double-high" onclick="document.dispatchEvent(new CustomEvent('check-double',{detail:{temperature:101.3}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">101.3</button>
-            <button id="btn-double-low" onclick="document.dispatchEvent(new CustomEvent('check-double',{detail:{temperature:97.2}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">97.2</button>
+            @DispatchButton("btn-double-high", "101.3", "check-double", new DoublePayload { Temperature = 101.3 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
+            @DispatchButton("btn-double-low", "97.2", "check-double", new DoublePayload { Temperature = 97.2 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="double-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -254,8 +263,8 @@
         <native-heading level="H2" class="mb-2">bool — Truthy / Falsy</native-heading>
         <p class="text-xs text-text-secondary mb-3">IsActive truthy &rarr; "Online" &bull; else &rarr; "Offline"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-bool-true" onclick="document.dispatchEvent(new CustomEvent('check-bool',{detail:{isActive:true}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">true</button>
-            <button id="btn-bool-false" onclick="document.dispatchEvent(new CustomEvent('check-bool',{detail:{isActive:false}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">false</button>
+            @DispatchButton("btn-bool-true", "true", "check-bool", new BoolPayload { IsActive = true }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-bool-false", "false", "check-bool", new BoolPayload { IsActive = false }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="bool-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -265,8 +274,8 @@
         <native-heading level="H2" class="mb-2">string — Equality</native-heading>
         <p class="text-xs text-text-secondary mb-3">Name == "Alice" &rarr; "Welcome Alice!" &bull; else &rarr; "Hello Stranger"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-string-match" onclick="document.dispatchEvent(new CustomEvent('check-string',{detail:{role:'Alice'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">Alice</button>
-            <button id="btn-string-miss" onclick="document.dispatchEvent(new CustomEvent('check-string',{detail:{role:'Bob'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">Bob</button>
+            @DispatchButton("btn-string-match", "Alice", "check-string", new RolePayload { Role = "Alice" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-string-miss", "Bob", "check-string", new RolePayload { Role = "Bob" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="string-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -276,8 +285,8 @@
         <native-heading level="H2" class="mb-2">DateTime — Deadline Comparison</native-heading>
         <p class="text-xs text-text-secondary mb-3">Deadline &gt; 2026-06-01 &rarr; "On Time" &bull; else &rarr; "Overdue"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-date-future" onclick="document.dispatchEvent(new CustomEvent('check-date',{detail:{deadline:'2026-07-15T00:00:00'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">2026-07-15</button>
-            <button id="btn-date-past" onclick="document.dispatchEvent(new CustomEvent('check-date',{detail:{deadline:'2026-01-15T00:00:00'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">2026-01-15</button>
+            @DispatchButton("btn-date-future", "2026-07-15", "check-date", new DatePayload { Deadline = new DateTime(2026, 7, 15) }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-date-past", "2026-01-15", "check-date", new DatePayload { Deadline = new DateTime(2026, 1, 15) }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="date-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -287,8 +296,8 @@
         <native-heading level="H2" class="mb-2">int? — Nullable IsNull</native-heading>
         <p class="text-xs text-text-secondary mb-3">NullableScore is null &rarr; "No Score" &bull; else &rarr; "Has Score"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-nullable-null" onclick="document.dispatchEvent(new CustomEvent('check-nullable',{detail:{nullableScore:null}}))" class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">null</button>
-            <button id="btn-nullable-value" onclick="document.dispatchEvent(new CustomEvent('check-nullable',{detail:{nullableScore:42}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">42</button>
+            @DispatchButton("btn-nullable-null", "null", "check-nullable", new NullablePayload { NullableScore = null }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
+            @DispatchButton("btn-nullable-value", "42", "check-nullable", new NullablePayload { NullableScore = 42 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="nullable-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -298,8 +307,8 @@
         <native-heading level="H2" class="mb-2">AND — Mixed Types (int + string)</native-heading>
         <p class="text-xs text-text-secondary mb-3">Score &ge; 90 <strong>AND</strong> Status == "active"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-and-pass" onclick="document.dispatchEvent(new CustomEvent('check-and',{detail:{score:95,status:'active'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">95 + active</button>
-            <button id="btn-and-fail" onclick="document.dispatchEvent(new CustomEvent('check-and',{detail:{score:95,status:'inactive'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">95 + inactive</button>
+            @DispatchButton("btn-and-pass", "95 + active", "check-and", new ScorePayload { Score = 95, Status = "active" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-and-fail", "95 + inactive", "check-and", new ScorePayload { Score = 95, Status = "inactive" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="and-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -309,9 +318,9 @@
         <native-heading level="H2" class="mb-2">OR — String Alternatives</native-heading>
         <p class="text-xs text-text-secondary mb-3">Role == "admin" <strong>OR</strong> "superuser"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-or-admin" onclick="document.dispatchEvent(new CustomEvent('check-or',{detail:{role:'admin'}}))" class="px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium">admin</button>
-            <button id="btn-or-super" onclick="document.dispatchEvent(new CustomEvent('check-or',{detail:{role:'superuser'}}))" class="px-3 py-1.5 rounded bg-violet-600 text-white text-xs font-medium">superuser</button>
-            <button id="btn-or-viewer" onclick="document.dispatchEvent(new CustomEvent('check-or',{detail:{role:'viewer'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">viewer</button>
+            @DispatchButton("btn-or-admin", "admin", "check-or", new RolePayload { Role = "admin" }, "px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium")
+            @DispatchButton("btn-or-super", "superuser", "check-or", new RolePayload { Role = "superuser" }, "px-3 py-1.5 rounded bg-violet-600 text-white text-xs font-medium")
+            @DispatchButton("btn-or-viewer", "viewer", "check-or", new RolePayload { Role = "viewer" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="or-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -321,8 +330,8 @@
         <native-heading level="H2" class="mb-2">Nested Payload — Deep Dot-Path Guard</native-heading>
         <p class="text-xs text-text-secondary mb-3">Address.City == "Seattle" &rarr; "Found Seattle" &bull; else &rarr; "Other City"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-nested-seattle" onclick="document.dispatchEvent(new CustomEvent('check-nested',{detail:{address:{city:'Seattle',zip:'98101'},id:1}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">Seattle</button>
-            <button id="btn-nested-portland" onclick="document.dispatchEvent(new CustomEvent('check-nested',{detail:{address:{city:'Portland',zip:'97201'},id:2}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">Portland</button>
+            @DispatchButton("btn-nested-seattle", "Seattle", "check-nested", new NestedPayload { Address = new AddressInfo { City = "Seattle", Zip = "98101" }, Id = 1 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-nested-portland", "Portland", "check-nested", new NestedPayload { Address = new AddressInfo { City = "Portland", Zip = "97201" }, Id = 2 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="nested-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -332,9 +341,9 @@
         <native-heading level="H2" class="mb-2">Null Nested Object — IsNull Guard</native-heading>
         <p class="text-xs text-text-secondary mb-3">Address is null &rarr; "No Address" &bull; else &rarr; "Has Address"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-nested-null" onclick="document.dispatchEvent(new CustomEvent('check-nested-null',{detail:{address:null,id:1}}))" class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">null address</button>
-            <button id="btn-nested-present" onclick="document.dispatchEvent(new CustomEvent('check-nested-null',{detail:{address:{city:'NYC'},id:2}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">has address</button>
-            <button id="btn-nested-missing" onclick="document.dispatchEvent(new CustomEvent('check-nested-null',{detail:{id:3}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">missing key</button>
+            @DispatchButton("btn-nested-null", "null address", "check-nested-null", new NestedPayload { Address = null, Id = 1 }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
+            @DispatchButton("btn-nested-present", "has address", "check-nested-null", new NestedPayload { Address = new AddressInfo { City = "NYC" }, Id = 2 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-nested-missing", "missing key", "check-nested-null", new NestedPayload { Id = 3 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="nested-null-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -344,9 +353,9 @@
         <native-heading level="H2" class="mb-2">Mixed AND — Flat + Nested in Compound</native-heading>
         <p class="text-xs text-text-secondary mb-3">Id &ge; 1 <strong>AND</strong> Address.City not-null &rarr; "Valid" &bull; else &rarr; "Invalid"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-nested-and-pass" onclick="document.dispatchEvent(new CustomEvent('check-nested-and',{detail:{id:5,address:{city:'NYC'}}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">id=5 + city</button>
-            <button id="btn-nested-and-null" onclick="document.dispatchEvent(new CustomEvent('check-nested-and',{detail:{id:5,address:null}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">id=5 + null addr</button>
-            <button id="btn-nested-and-missing" onclick="document.dispatchEvent(new CustomEvent('check-nested-and',{detail:{id:5}}))" class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">id=5 + missing</button>
+            @DispatchButton("btn-nested-and-pass", "id=5 + city", "check-nested-and", new NestedPayload { Id = 5, Address = new AddressInfo { City = "NYC" } }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-nested-and-null", "id=5 + null addr", "check-nested-and", new NestedPayload { Id = 5, Address = null }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
+            @DispatchButton("btn-nested-and-missing", "id=5 + missing", "check-nested-and", new NestedPayload { Id = 5 }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="nested-and-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -356,9 +365,10 @@
         <native-heading level="H2" class="mb-2">Null Leaf — Comparison Doesn't Crash</native-heading>
         <p class="text-xs text-text-secondary mb-3">Address.City == "Seattle" when city is null &rarr; else branch (no crash)</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-null-leaf-null" onclick="document.dispatchEvent(new CustomEvent('check-null-leaf',{detail:{address:{city:null},id:1}}))" class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">city=null</button>
-            <button id="btn-null-leaf-match" onclick="document.dispatchEvent(new CustomEvent('check-null-leaf',{detail:{address:{city:'Seattle'},id:2}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">city=Seattle</button>
-            <button id="btn-null-leaf-obj-null" onclick="document.dispatchEvent(new CustomEvent('check-null-leaf',{detail:{address:null,id:3}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">address=null</button>
+            @DispatchButton("btn-null-leaf-null", "city=null", "check-null-leaf", new NestedPayload { Address = new AddressInfo { City = null }, Id = 1 }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
+            @DispatchButton("btn-null-leaf-match", "city=Seattle", "check-null-leaf", new NestedPayload { Address = new AddressInfo { City = "Seattle" }, Id = 2 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-null-leaf-obj-null", "address=null", "check-null-leaf", new NestedPayload { Address = null, Id = 3 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
+            @DispatchButton("btn-null-leaf-missing", "address missing", "check-null-leaf", new NestedPayload { Id = 99 }, "px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="null-leaf-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -368,8 +378,8 @@
         <native-heading level="H2" class="mb-2">In — Membership</native-heading>
         <p class="text-xs text-text-secondary mb-3">Category in ["A","B","C"] &rarr; "In Group" &bull; else &rarr; "Not In Group"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-in-match" onclick="document.dispatchEvent(new CustomEvent('check-in',{detail:{category:'B',priority:1}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">B</button>
-            <button id="btn-in-miss" onclick="document.dispatchEvent(new CustomEvent('check-in',{detail:{category:'Z',priority:1}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">Z</button>
+            @DispatchButton("btn-in-match", "B", "check-in", new MembershipPayload { Category = "B", Priority = 1 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-in-miss", "Z", "check-in", new MembershipPayload { Category = "Z", Priority = 1 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="in-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -379,8 +389,8 @@
         <native-heading level="H2" class="mb-2">NotIn — Exclusion</native-heading>
         <p class="text-xs text-text-secondary mb-3">Category not-in ["X","Y"] &rarr; "Allowed" &bull; else &rarr; "Blocked"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-notin-pass" onclick="document.dispatchEvent(new CustomEvent('check-notin',{detail:{category:'A',priority:1}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">A</button>
-            <button id="btn-notin-fail" onclick="document.dispatchEvent(new CustomEvent('check-notin',{detail:{category:'X',priority:1}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">X</button>
+            @DispatchButton("btn-notin-pass", "A", "check-notin", new MembershipPayload { Category = "A", Priority = 1 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-notin-fail", "X", "check-notin", new MembershipPayload { Category = "X", Priority = 1 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="notin-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -390,9 +400,9 @@
         <native-heading level="H2" class="mb-2">Between — Range Check</native-heading>
         <p class="text-xs text-text-secondary mb-3">Age between [18, 65] &rarr; "Working Age" &bull; else &rarr; "Outside Range"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-between-in" onclick="document.dispatchEvent(new CustomEvent('check-between',{detail:{age:30}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">30</button>
-            <button id="btn-between-low" onclick="document.dispatchEvent(new CustomEvent('check-between',{detail:{age:10}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">10</button>
-            <button id="btn-between-high" onclick="document.dispatchEvent(new CustomEvent('check-between',{detail:{age:80}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">80</button>
+            @DispatchButton("btn-between-in", "30", "check-between", new RangePayload { Age = 30 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-between-low", "10", "check-between", new RangePayload { Age = 10 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
+            @DispatchButton("btn-between-high", "80", "check-between", new RangePayload { Age = 80 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="between-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -402,8 +412,8 @@
         <native-heading level="H2" class="mb-2">Contains — Text Search</native-heading>
         <p class="text-xs text-text-secondary mb-3">Name contains "admin" &rarr; "Has admin" &bull; else &rarr; "No admin"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-contains-yes" onclick="document.dispatchEvent(new CustomEvent('check-contains',{detail:{name:'superadmin',email:''}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">superadmin</button>
-            <button id="btn-contains-no" onclick="document.dispatchEvent(new CustomEvent('check-contains',{detail:{name:'viewer',email:''}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">viewer</button>
+            @DispatchButton("btn-contains-yes", "superadmin", "check-contains", new TextPayload { Name = "superadmin", Email = "" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-contains-no", "viewer", "check-contains", new TextPayload { Name = "viewer", Email = "" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="contains-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -411,10 +421,10 @@
     <!-- Section 18: StartsWith text -->
     <native-card><native-card-body>
         <native-heading level="H2" class="mb-2">StartsWith — Text Prefix</native-heading>
-        <p class="text-xs text-text-secondary mb-3">Email starts-with "admin@@" &rarr; "Admin email" &bull; else &rarr; "Other email"</p>
+        <p class="text-xs text-text-secondary mb-3">Email starts-with "admin&#64;" &rarr; "Admin email" &bull; else &rarr; "Other email"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-startswith-yes" onclick="document.dispatchEvent(new CustomEvent('check-startswith',{detail:{name:'',email:'admin@@corp.com'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">admin@@corp.com</button>
-            <button id="btn-startswith-no" onclick="document.dispatchEvent(new CustomEvent('check-startswith',{detail:{name:'',email:'user@@corp.com'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">user@@corp.com</button>
+            @DispatchButton("btn-startswith-yes", "admin@corp.com", "check-startswith", new TextPayload { Name = "", Email = "admin@corp.com" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-startswith-no", "user@corp.com", "check-startswith", new TextPayload { Name = "", Email = "user@corp.com" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="startswith-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -422,10 +432,10 @@
     <!-- Section 19: Matches regex -->
     <native-card><native-card-body>
         <native-heading level="H2" class="mb-2">Matches — Regex Pattern</native-heading>
-        <p class="text-xs text-text-secondary mb-3">Email matches ^[a-z]+@@[a-z]+\.[a-z]+$ &rarr; "Valid" &bull; else &rarr; "Invalid"</p>
+        <p class="text-xs text-text-secondary mb-3">Email matches ^[a-z]+&#64;[a-z]+\.[a-z]+$ &rarr; "Valid" &bull; else &rarr; "Invalid"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-matches-yes" onclick="document.dispatchEvent(new CustomEvent('check-matches',{detail:{name:'',email:'test@@corp.com'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">test@@corp.com</button>
-            <button id="btn-matches-no" onclick="document.dispatchEvent(new CustomEvent('check-matches',{detail:{name:'',email:'BAD@@123.com'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">BAD@@123.com</button>
+            @DispatchButton("btn-matches-yes", "test@corp.com", "check-matches", new TextPayload { Name = "", Email = "test@corp.com" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-matches-no", "BAD@123.com", "check-matches", new TextPayload { Name = "", Email = "BAD@123.com" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="matches-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -435,8 +445,8 @@
         <native-heading level="H2" class="mb-2">MinLength — Text Length Check</native-heading>
         <p class="text-xs text-text-secondary mb-3">Name min-length 3 &rarr; "Long enough" &bull; else &rarr; "Too short"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-minlength-yes" onclick="document.dispatchEvent(new CustomEvent('check-minlength',{detail:{name:'Alice',email:''}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">Alice</button>
-            <button id="btn-minlength-no" onclick="document.dispatchEvent(new CustomEvent('check-minlength',{detail:{name:'Al',email:''}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">Al</button>
+            @DispatchButton("btn-minlength-yes", "Alice", "check-minlength", new TextPayload { Name = "Alice", Email = "" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-minlength-no", "Al", "check-minlength", new TextPayload { Name = "Al", Email = "" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="minlength-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -446,9 +456,9 @@
         <native-heading level="H2" class="mb-2">IsEmpty — Presence Check</native-heading>
         <p class="text-xs text-text-secondary mb-3">Name is-empty &rarr; "Empty" &bull; else &rarr; "Has value"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-isempty-empty" onclick="document.dispatchEvent(new CustomEvent('check-isempty',{detail:{name:'',email:''}}))" class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">""</button>
-            <button id="btn-isempty-null" onclick="document.dispatchEvent(new CustomEvent('check-isempty',{detail:{name:null,email:''}}))" class="px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium">null</button>
-            <button id="btn-isempty-value" onclick="document.dispatchEvent(new CustomEvent('check-isempty',{detail:{name:'Alice',email:''}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">Alice</button>
+            @DispatchButton("btn-isempty-empty", "\"\"", "check-isempty", new TextPayload { Name = "", Email = "" }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
+            @DispatchButton("btn-isempty-null", "null", "check-isempty", new TextPayload { Name = null!, Email = "" }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
+            @DispatchButton("btn-isempty-value", "Alice", "check-isempty", new TextPayload { Name = "Alice", Email = "" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="isempty-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -458,8 +468,8 @@
         <native-heading level="H2" class="mb-2">NOT — Invert Guard</native-heading>
         <p class="text-xs text-text-secondary mb-3">NOT(Role == "admin") &rarr; "Not admin" &bull; else &rarr; "Is admin"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-not-user" onclick="document.dispatchEvent(new CustomEvent('check-not',{detail:{role:'user'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">user</button>
-            <button id="btn-not-admin" onclick="document.dispatchEvent(new CustomEvent('check-not',{detail:{role:'admin'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">admin</button>
+            @DispatchButton("btn-not-user", "user", "check-not", new RolePayload { Role = "user" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-not-admin", "admin", "check-not", new RolePayload { Role = "admin" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="not-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -469,22 +479,22 @@
         <native-heading level="H2" class="mb-2">Confirm — Async Halt Dialog</native-heading>
         <p class="text-xs text-text-secondary mb-3">Shows confirm dialog &rarr; OK = "Confirmed" &bull; Cancel = "Cancelled"</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-confirm" onclick="document.dispatchEvent(new CustomEvent('check-confirm',{detail:{score:1,status:''}}))" class="px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium">Trigger Confirm</button>
+            @DispatchButton("btn-confirm", "Trigger Confirm", "check-confirm", new ScorePayload { Score = 1, Status = "" }, "px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="confirm-result">&mdash;</span></div>
     </native-card-body></native-card>
 
-    <!-- Section 24: Per-action When guard -->
+    <!-- Section 24: Single-command condition via When/Then -->
     <native-card><native-card-body>
-        <native-heading level="H2" class="mb-2">Per-Action When — Command-Level Guard</native-heading>
-        <p class="text-xs text-text-secondary mb-3">First command always runs &bull; second guarded by Score &ge; 90</p>
+        <native-heading level="H2" class="mb-2">Single-Command Condition — When/Then</native-heading>
+        <p class="text-xs text-text-secondary mb-3">Unconditional command runs first &bull; guarded command executes when Score &ge; 90</p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-peraction-high" onclick="document.dispatchEvent(new CustomEvent('check-per-action',{detail:{score:95,status:''}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">95</button>
-            <button id="btn-peraction-low" onclick="document.dispatchEvent(new CustomEvent('check-per-action',{detail:{score:50,status:''}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">50</button>
+            @DispatchButton("btn-single-command-condition-high", "95", "check-single-command-condition", new ScorePayload { Score = 95, Status = "" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-single-command-condition-low", "50", "check-single-command-condition", new ScorePayload { Score = 50, Status = "" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="grid grid-cols-2 gap-4 text-xs font-mono">
-            <div class="flex justify-between"><span class="text-text-secondary">Always</span><span id="per-action-result">&mdash;</span></div>
-            <div class="flex justify-between"><span class="text-text-secondary">Bonus</span><span id="per-action-bonus">&mdash;</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Always</span><span id="single-command-condition-result">&mdash;</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Bonus</span><span id="single-command-condition-bonus">&mdash;</span></div>
         </div>
     </native-card-body></native-card>
 
@@ -493,8 +503,9 @@
         <native-heading level="H2" class="mb-2">Direct And — Simplified Syntax</native-heading>
         <p class="text-xs text-text-secondary mb-3">Score &ge; 90 <strong>.And(args, x =&gt; x.Status).Eq("active")</strong></p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-direct-and-pass" onclick="document.dispatchEvent(new CustomEvent('check-direct-and',{detail:{score:95,status:'active'}}))" class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium">95 + active</button>
-            <button id="btn-direct-and-fail" onclick="document.dispatchEvent(new CustomEvent('check-direct-and',{detail:{score:95,status:'inactive'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">95 + inactive</button>
+            @DispatchButton("btn-direct-and-pass", "95 + active", "check-direct-and", new ScorePayload { Score = 95, Status = "active" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-direct-and-fail", "95 + inactive", "check-direct-and", new ScorePayload { Score = 95, Status = "inactive" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
+            @DispatchButton("btn-direct-and-score-low", "70 + active", "check-direct-and", new ScorePayload { Score = 70, Status = "active" }, "px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="direct-and-result">&mdash;</span></div>
     </native-card-body></native-card>
@@ -504,9 +515,9 @@
         <native-heading level="H2" class="mb-2">Direct Or — Simplified Syntax</native-heading>
         <p class="text-xs text-text-secondary mb-3">Role == "admin" <strong>.Or(args, x =&gt; x.Role).Eq("superuser")</strong></p>
         <div class="flex gap-2 mb-4">
-            <button id="btn-direct-or-admin" onclick="document.dispatchEvent(new CustomEvent('check-direct-or',{detail:{role:'admin'}}))" class="px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium">admin</button>
-            <button id="btn-direct-or-super" onclick="document.dispatchEvent(new CustomEvent('check-direct-or',{detail:{role:'superuser'}}))" class="px-3 py-1.5 rounded bg-violet-600 text-white text-xs font-medium">superuser</button>
-            <button id="btn-direct-or-viewer" onclick="document.dispatchEvent(new CustomEvent('check-direct-or',{detail:{role:'viewer'}}))" class="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium">viewer</button>
+            @DispatchButton("btn-direct-or-admin", "admin", "check-direct-or", new RolePayload { Role = "admin" }, "px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium")
+            @DispatchButton("btn-direct-or-super", "superuser", "check-direct-or", new RolePayload { Role = "superuser" }, "px-3 py-1.5 rounded bg-violet-600 text-white text-xs font-medium")
+            @DispatchButton("btn-direct-or-viewer", "viewer", "check-direct-or", new RolePayload { Role = "viewer" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </div>
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="direct-or-result">&mdash;</span></div>
     </native-card-body></native-card>

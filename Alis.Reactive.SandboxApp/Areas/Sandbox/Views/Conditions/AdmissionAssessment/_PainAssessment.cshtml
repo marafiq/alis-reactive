@@ -4,6 +4,8 @@
 @using Alis.Reactive.Fusion.Components
 @{
     var plan = Html.ResolvePlan<Step3FunctionalModel>();
+    var alertPainUrl = Url.Action("AlertPain", "AdmissionAssessment", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.AlertPain.");
 }
 
 <native-card><native-card-body>
@@ -27,7 +29,7 @@
                         {
                             then.Element("pain-spinner").Show();
                             then.Element("location-required").Show();
-                            then.Post("/Sandbox/Conditions/AdmissionAssessment/AlertPain",
+                            then.Post(alertPainUrl,
                                 g => g.Include<FusionNumericTextBox, Step3FunctionalModel>(m => m.PainLevel)
                                       .Include<NativeTextBox, Step3FunctionalModel>(m => m.PainLocation))
                              .Response(r => r.OnSuccess<ScreeningAlertResponse>((json, s) =>

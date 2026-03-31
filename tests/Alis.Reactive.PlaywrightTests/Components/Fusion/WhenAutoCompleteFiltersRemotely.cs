@@ -17,8 +17,7 @@ public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
 
     private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await NavigateToAndWaitForTextSignal(Path, "#value-echo");
 
         _scope = new ComponentScope(Page,
             "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_AutoCompleteModel__");

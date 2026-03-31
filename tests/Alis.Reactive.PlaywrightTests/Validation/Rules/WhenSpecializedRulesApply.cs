@@ -26,7 +26,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("CardNumber").FillAsync("1234567890123");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("CardNumber")).ToContainTextAsync("not valid", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -40,7 +40,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         // First trigger error
         await Input("CardNumber").FillAsync("1234567890123");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("CardNumber")).ToContainTextAsync("not valid", new() { Timeout = 2000 });
 
         // Fix with valid Visa test number, blur to live-clear
@@ -61,7 +61,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         // Score at exact boundary (0) — exclusive range rejects boundaries
         await Input("Score").FillAsync("0");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("Score")).ToContainTextAsync("exclusive", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -74,7 +74,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("Score").FillAsync("100");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("Score")).ToContainTextAsync("exclusive", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -88,7 +88,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         // Trigger error first
         await Input("Score").FillAsync("0");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("Score")).ToContainTextAsync("exclusive", new() { Timeout = 2000 });
 
         // Fix
@@ -108,7 +108,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("MonthlyRate").FillAsync("0");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("MonthlyRate")).ToContainTextAsync("greater than zero", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -121,7 +121,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         // Leave empty — gt implies required
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("MonthlyRate")).ToContainTextAsync("greater than zero", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -134,7 +134,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("MonthlyRate").FillAsync("0");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("MonthlyRate")).ToContainTextAsync("greater than zero", new() { Timeout = 2000 });
 
         await Input("MonthlyRate").FillAsync("4250");
@@ -153,7 +153,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("MaxDeposit").FillAsync("1000000");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("MaxDeposit")).ToContainTextAsync("less than", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -166,7 +166,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("MaxDeposit").FillAsync("1000000");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("MaxDeposit")).ToContainTextAsync("less than", new() { Timeout = 2000 });
 
         await Input("MaxDeposit").FillAsync("999999");
@@ -185,7 +185,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("Status").FillAsync("deleted");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("Status")).ToContainTextAsync("must not be", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -198,7 +198,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("Status").FillAsync("deleted");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("Status")).ToContainTextAsync("must not be", new() { Timeout = 2000 });
 
         await Input("Status").FillAsync("active");
@@ -218,7 +218,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await Input("Email").FillAsync("nurse@facility.com");
         await Input("AlternateEmail").FillAsync("nurse@facility.com");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("AlternateEmail")).ToContainTextAsync("differ", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -232,7 +232,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await Input("Email").FillAsync("nurse@facility.com");
         await Input("AlternateEmail").FillAsync("nurse@facility.com");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("AlternateEmail")).ToContainTextAsync("differ", new() { Timeout = 2000 });
 
         await Input("AlternateEmail").FillAsync("backup@facility.com");
@@ -251,7 +251,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("Website").FillAsync("not-a-url");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("Website")).ToContainTextAsync("valid URL", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -264,7 +264,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("Website").FillAsync("not-a-url");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("Website")).ToContainTextAsync("valid URL", new() { Timeout = 2000 });
 
         await Input("Website").FillAsync("https://sunnyacres.com");
@@ -283,7 +283,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("Nickname").FillAsync("Maggie");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("Nickname")).ToContainTextAsync("must be empty", new() { Timeout = 2000 });
         AssertNoConsoleErrors();
@@ -296,7 +296,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await Input("Nickname").FillAsync("Maggie");
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("Nickname")).ToContainTextAsync("must be empty", new() { Timeout = 2000 });
 
         await Input("Nickname").FillAsync("");
@@ -324,7 +324,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("Website").FillAsync("https://sunnyacres.com");
         // Nickname left empty (as required by empty rule)
 
-        await ValidateBtn.ClickAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(Result).ToContainTextAsync("passed", new() { Timeout = 5000 });
         AssertNoConsoleErrors();

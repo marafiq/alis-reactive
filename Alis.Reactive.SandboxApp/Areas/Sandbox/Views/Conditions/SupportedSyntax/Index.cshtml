@@ -1,0 +1,189 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax.SupportedSyntaxModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax
+@{
+    ViewData["Title"] = "Supported Condition Syntax";
+
+    var plan = Html.ReactivePlan<SupportedSyntaxModel>();
+
+    Html.On(plan, t => t.CustomEvent<SupportedSyntaxTriggerPayload>("supported-trigger-review", (args, p) =>
+    {
+        p.Element("trigger-precheck").SetText("Review started");
+        p.Dispatch("supported-trigger-audited");
+        p.When(args, x => x.Score).Gte(90)
+            .Then(then =>
+            {
+                then.Element("trigger-result").SetText("Priority review");
+                then.Element("trigger-badge").SetText("Priority");
+                then.Element("trigger-badge").Show();
+            })
+            .ElseIf(args, x => x.Score).Gte(70)
+            .Then(then =>
+            {
+                then.Element("trigger-result").SetText("Standard review");
+                then.Element("trigger-badge").SetText("Standard");
+                then.Element("trigger-badge").Show();
+            })
+            .Else(else_ =>
+            {
+                else_.Element("trigger-result").SetText("Deferred review");
+                else_.Element("trigger-badge").Hide();
+            });
+        p.Element("trigger-summary").SetText("Workflow complete");
+    }));
+
+    Html.On(plan, t => t.CustomEvent("supported-trigger-audited", p =>
+    {
+        p.Element("trigger-audit").SetText("Audit logged");
+    }));
+
+    Html.On(plan, t => t.CustomEvent("supported-reactive-audited", p =>
+    {
+        p.Element("reactive-audit").SetText("Audit logged");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Supported Condition Syntax</native-heading>
+        <native-text color="Secondary">
+            One dedicated vertical slice for the supported condition DSL:
+            <code class="bg-slate-100 px-1 rounded">When(...).Then(...).ElseIf(...).Else(...)</code>
+            with shared commands before and after the branch in both trigger and component-reactive pipelines.
+        </native-text>
+    </div>
+
+    <native-card>
+        <native-card-body>
+            <native-heading level="H2">1. Trigger Pipeline</native-heading>
+            <p class="text-sm text-text-secondary mb-4">
+                Click a review button to dispatch a typed custom event. The trigger pipeline always
+                updates shared status, dispatches an audit event, evaluates a three-branch ladder,
+                and marks the workflow complete.
+            </p>
+
+            <div class="flex gap-2 mb-4">
+                @(Html.NativeButton("btn-trigger-priority", "Priority Review")
+                    .CssClass("px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Dispatch("supported-trigger-review", new { score = 95 });
+                    }))
+
+                @(Html.NativeButton("btn-trigger-standard", "Standard Review")
+                    .CssClass("px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Dispatch("supported-trigger-review", new { score = 75 });
+                    }))
+
+                @(Html.NativeButton("btn-trigger-deferred", "Deferred Review")
+                    .CssClass("px-3 py-1.5 rounded bg-stone-500 text-white text-xs font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Dispatch("supported-trigger-review", new { score = 40 });
+                    }))
+            </div>
+
+            <div class="space-y-2 text-xs font-mono">
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Shared precheck</span>
+                    <span id="trigger-precheck">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Audit</span>
+                    <span id="trigger-audit">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Result</span>
+                    <span id="trigger-result">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Badge</span>
+                    <span id="trigger-badge" hidden>&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Summary</span>
+                    <span id="trigger-summary">&mdash;</span>
+                </div>
+            </div>
+        </native-card-body>
+    </native-card>
+
+    <native-card>
+        <native-card-body>
+            <native-heading level="H2">2. Reactive Pipeline</native-heading>
+            <p class="text-sm text-text-secondary mb-4">
+                Change the risk score to run the full <code>.Reactive()</code> path. The pipeline always
+                updates shared status, dispatches an audit event, runs the same three-branch ladder,
+                and records completion.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                @{ Html.InputField(plan, m => m.RiskScore, o => o.Label("Risk Score"))
+                    .FusionNumericTextBox(b => b
+                        .Min(0).Max(100).Step(1)
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            p.Element("reactive-precheck").SetText("Risk evaluated");
+                            p.Dispatch("supported-reactive-audited");
+                            p.When(args, x => x.Value).Gte(90m)
+                                .Then(then =>
+                                {
+                                    then.Element("reactive-result").SetText("Urgent follow-up");
+                                    then.Element("reactive-badge").SetText("Urgent");
+                                    then.Element("reactive-badge").Show();
+                                })
+                                .ElseIf(args, x => x.Value).Gte(60m)
+                                .Then(then =>
+                                {
+                                    then.Element("reactive-result").SetText("Standard follow-up");
+                                    then.Element("reactive-badge").SetText("Standard");
+                                    then.Element("reactive-badge").Show();
+                                })
+                                .Else(else_ =>
+                                {
+                                    else_.Element("reactive-result").SetText("Routine follow-up");
+                                    else_.Element("reactive-badge").Hide();
+                                });
+                            p.Element("reactive-summary").SetText("Assessment complete");
+                        })); }
+            </div>
+
+            <div class="space-y-2 text-xs font-mono">
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Shared precheck</span>
+                    <span id="reactive-precheck">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Audit</span>
+                    <span id="reactive-audit">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Result</span>
+                    <span id="reactive-result">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Badge</span>
+                    <span id="reactive-badge" hidden>&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Summary</span>
+                    <span id="reactive-summary">&mdash;</span>
+                </div>
+            </div>
+        </native-card-body>
+    </native-card>
+
+    <native-card>
+        <native-card-body>
+            <native-heading level="H2">3. Plan JSON</native-heading>
+            <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+        </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

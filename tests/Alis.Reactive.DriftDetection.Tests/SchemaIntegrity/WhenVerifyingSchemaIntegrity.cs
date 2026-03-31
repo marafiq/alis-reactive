@@ -1,4 +1,5 @@
 using Alis.Reactive.DriftDetection.Tests.Infrastructure;
+using System.Text.Json.Nodes;
 
 namespace Alis.Reactive.DriftDetection.Tests.SchemaIntegrity;
 
@@ -10,6 +11,48 @@ namespace Alis.Reactive.DriftDetection.Tests.SchemaIntegrity;
 [TestFixture]
 public class WhenVerifyingSchemaIntegrity : DriftTestBase
 {
+    private static readonly HashSet<string> ObjectDefinitionsCoveredByExactAssertions =
+    [
+        "AllGather",
+        "AllGuard",
+        "AnyGuard",
+        "Branch",
+        "CallMutation",
+        "ComponentEntry",
+        "ComponentEventTrigger",
+        "ComponentGather",
+        "ComponentSource",
+        "ConditionalReaction",
+        "ConfirmGuard",
+        "CustomEventTrigger",
+        "DispatchCommand",
+        "DomReadyTrigger",
+        "Entry",
+        "EventGather",
+        "EventSource",
+        "HttpReaction",
+        "IntoCommand",
+        "InvertGuard",
+        "LiteralArg",
+        "MutateElementCommand",
+        "MutateEventCommand",
+        "ParallelHttpReaction",
+        "RequestDescriptor",
+        "SequentialReaction",
+        "ServerPushTrigger",
+        "SetPropMutation",
+        "SignalRTrigger",
+        "SourceArg",
+        "StaticGather",
+        "StatusHandler",
+        "ValidationCondition",
+        "ValidationDescriptor",
+        "ValidationErrorsCommand",
+        "ValidationField",
+        "ValidationRule",
+        "ValueGuard"
+    ];
+
     // Unions, enums, and non-object types that don't have additionalProperties
     private static readonly HashSet<string> NonObjectDefs = new()
     {
@@ -39,34 +82,33 @@ public class WhenVerifyingSchemaIntegrity : DriftTestBase
     }
 
     [Test]
-    public void unknown_property_is_rejected_by_schema()
+    public void schema_evaluation_rejects_unknown_properties_on_rendered_public_dsl_json()
     {
-        var json = """
-        {
-            "planId": "TestModel",
-            "components": {
-                "Field": {
-                    "id": "c1",
-                    "vendor": "native",
-                    "readExpr": "value",
-                    "componentType": "textbox",
-                    "coerceAs": "string",
-                    "extraProp": "this-should-be-rejected"
-                }
-            },
-            "entries": []
-        }
-        """;
+        var plan = CreatePlan();
+        On(plan, t => t.DomReady(p => p.Dispatch("booted")));
 
-        using var doc = System.Text.Json.JsonDocument.Parse(json);
-        var result = Schema.Evaluate(doc.RootElement, new Json.Schema.EvaluationOptions
-        {
-            OutputFormat = Json.Schema.OutputFormat.List
-        });
+        var json = plan.Render();
+        AssertSchemaValid(json);
 
-        Assert.That(result.IsValid, Is.False,
-            "Schema should reject unknown property 'extraProp' -- " +
-            "drift detection mechanism is broken if this passes.");
+        var mutated = AddUnknownProperty(
+            json,
+            "entries[0].reaction.commands[0]",
+            "unexpected",
+            JsonValue.Create("drifted")!);
+
+        AssertSchemaInvalid(mutated, "additionalProperties: false should reject unknown command fields");
+    }
+
+    [Test]
+    public void all_object_definitions_have_a_matching_exact_definition_coverage_entry()
+    {
+        var objectDefs = Analyzer.AllDefinitions
+            .Where(x => x.Value.IsObjectDef)
+            .Select(x => x.Key)
+            .ToHashSet();
+
+        Assert.That(ObjectDefinitionsCoveredByExactAssertions, Is.EquivalentTo(objectDefs),
+            "Every schema object definition should be represented in the exact-definition coverage set.");
     }
 
     [Test]

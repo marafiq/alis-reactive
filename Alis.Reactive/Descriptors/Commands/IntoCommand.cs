@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Alis.Reactive.Descriptors.Guards;
 
 namespace Alis.Reactive.Descriptors.Commands
 {
@@ -18,15 +17,9 @@ namespace Alis.Reactive.Descriptors.Commands
         /// NEVER make public. Constructed exclusively by framework builders. Public constructors
         /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
         /// </summary>
-        internal IntoCommand(string target, Guard? when = null)
-            : base(when)
+        internal IntoCommand(string target)
         {
             Target = target;
-        }
-
-        protected override Command CloneWithGuard(Guard guard)
-        {
-            return new IntoCommand(Target, guard);
         }
     }
 }

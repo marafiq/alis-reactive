@@ -3,13 +3,15 @@
 @{
     ViewData["Title"] = "Admission Wizard";
     var screeningId = (string?)ViewBag.ScreeningId ?? "";
+    var loadStepUrl = Url.Action("LoadStep", "AdmissionWizard", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionWizard.LoadStep.");
 
     // Shell plan — only used for DomReady to load Step 1
     var plan = Html.ReactivePlan<Step1DemographicsModel>();
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Post("/Sandbox/Conditions/AdmissionWizard/LoadStep",
+        p.Post(loadStepUrl,
             g => g.Static("screeningId", screeningId)
                   .Static("step", 1))
          .Response(r => r.OnSuccess(s => s.Into("step-container")));

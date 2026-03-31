@@ -39,34 +39,20 @@ public sealed class DropDownListLocator
     public async Task Focus() => await Input.ClickAsync();
 
     /// <summary>
-    /// Open the popup via the dropdown icon, navigate with ArrowDown to the item, press Enter.
-    /// SF DDL responds to keyboard navigation natively — ArrowDown highlights items,
-    /// Enter confirms the selection and fires the change event.
+    /// Open the popup and click the exact list item text.
+    /// This keeps the interaction purely user-driven without depending on keyboard
+    /// focus state from a prior open popup.
     /// </summary>
     public async Task Select(string text)
     {
-        // Clear stale focus from any prior DDL — prevents keyboard events going to wrong popup
         await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
 
-        await DropdownIcon.ClickAsync();
+        await DropdownIcon.ClickWhenStableAsync(_page);
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
 
-        // Navigate with ArrowDown until the highlighted item matches the target text
-        var items = Popup.Locator(".e-list-item");
-        var count = await items.CountAsync();
-        for (var i = 0; i < count; i++)
-        {
-            await _page.Keyboard.PressAsync("ArrowDown");
-            var active = Popup.Locator(".e-list-item.e-active, .e-list-item.e-item-focus");
-            var activeText = await active.TextContentAsync();
-            if (activeText?.Trim() == text)
-            {
-                await _page.Keyboard.PressAsync("Enter");
-                return;
-            }
-        }
-
-        // Fallback: if exact match not found, just press Enter on whatever is highlighted
-        await _page.Keyboard.PressAsync("Enter");
+        var option = Popup.GetByText(text, new() { Exact = true });
+        await option.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
+        await option.ClickWhenStableAsync(_page);
+        await Popup.WaitForAsync(new() { State = WaitForSelectorState.Hidden, Timeout = 5000 });
     }
 }

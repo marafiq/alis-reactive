@@ -1,0 +1,284 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.EscalationRouting.EscalationRoutingModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.EscalationRouting
+@{
+    ViewData["Title"] = "Escalation Routing";
+
+    var plan = Html.ReactivePlan<EscalationRoutingModel>();
+    var careTracks = new List<EscalationRoutingCareTrackOption>
+    {
+        new() { Value = "assisted", Text = "Assisted Living" },
+        new() { Value = "memory", Text = "Memory Care" },
+        new() { Value = "respite", Text = "Respite" }
+    };
+
+    Html.On(plan, t => t.CustomEvent<EscalationRoutingTriggerPayload>("escalation-trigger-route", (args, p) =>
+    {
+        p.Element("trigger-precheck").SetText("Escalation reviewed");
+        p.When(args, x => x.Score).Gte(95)
+            .And(args, x => x.RequiresIsolation).Truthy()
+            .Then(then =>
+            {
+                then.Dispatch("route-isolation");
+            })
+            .ElseIf(args, x => x.Score).Gte(70)
+            .Or(args, x => x.ManualOverride).Truthy()
+            .Then(then =>
+            {
+                then.Dispatch("route-expedited");
+            })
+            .Else(else_ =>
+            {
+                else_.Dispatch("route-routine");
+            });
+        p.Element("trigger-summary").SetText("Escalation complete");
+    }));
+
+    Html.On(plan, t => t.CustomEvent("route-isolation", p =>
+    {
+        p.Element("trigger-audit").SetText("Isolation route dispatched");
+        p.Element("trigger-result").SetText("Isolation review");
+        p.Element("trigger-badge").SetText("Isolation");
+        p.Element("trigger-badge").Show();
+    }));
+
+    Html.On(plan, t => t.CustomEvent("route-expedited", p =>
+    {
+        p.Element("trigger-audit").SetText("Expedited route dispatched");
+        p.Element("trigger-result").SetText("Expedited review");
+        p.Element("trigger-badge").SetText("Expedited");
+        p.Element("trigger-badge").Show();
+    }));
+
+    Html.On(plan, t => t.CustomEvent("route-routine", p =>
+    {
+        p.Element("trigger-audit").SetText("Routine route dispatched");
+        p.Element("trigger-result").SetText("Routine review");
+        p.Element("trigger-badge").Hide();
+    }));
+
+    Html.On(plan, t => t.CustomEvent("component-route-isolation", p =>
+    {
+        p.Element("component-audit").SetText("Isolation route dispatched");
+        p.Element("component-result").SetText("Escalate now");
+        p.Element("component-badge").SetText("Escalate");
+        p.Element("component-badge").Show();
+    }));
+
+    Html.On(plan, t => t.CustomEvent("component-route-monitor", p =>
+    {
+        p.Element("component-audit").SetText("Monitor route dispatched");
+        p.Element("component-result").SetText("Monitor closely");
+        p.Element("component-badge").SetText("Monitor");
+        p.Element("component-badge").Show();
+    }));
+
+    Html.On(plan, t => t.CustomEvent("component-route-routine", p =>
+    {
+        p.Element("component-audit").SetText("Routine route dispatched");
+        p.Element("component-result").SetText("Routine follow-up");
+        p.Element("component-badge").Hide();
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Escalation Routing</native-heading>
+        <native-text color="Secondary">
+            Branch-contained <code>Dispatch()</code> routes trigger and component workflows into distinct listeners.
+            Each reevaluation must clear stale state and leave only the winning route visible.
+        </native-text>
+    </div>
+
+    <native-card>
+        <native-card-body>
+            <native-heading level="H2">1. Trigger Routing</native-heading>
+            <p class="text-sm text-text-secondary mb-4">
+                Each button enters the same branch chain. The winning branch dispatches a different event, and only the routed listener updates the visible result.
+            </p>
+
+            <div class="flex flex-wrap gap-2 mb-4">
+                @(Html.NativeButton("btn-escalation-isolation", "Isolation Review")
+                    .CssClass("px-3 py-1.5 rounded bg-rose-700 text-white text-xs font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Dispatch("escalation-trigger-route", new EscalationRoutingTriggerPayload
+                        {
+                            Score = 97,
+                            RequiresIsolation = true,
+                            ManualOverride = false
+                        });
+                    }))
+
+                @(Html.NativeButton("btn-escalation-override", "Manual Override Review")
+                    .CssClass("px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Dispatch("escalation-trigger-route", new EscalationRoutingTriggerPayload
+                        {
+                            Score = 55,
+                            RequiresIsolation = false,
+                            ManualOverride = true
+                        });
+                    }))
+
+                @(Html.NativeButton("btn-escalation-routine", "Routine Review")
+                    .CssClass("px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Dispatch("escalation-trigger-route", new EscalationRoutingTriggerPayload
+                        {
+                            Score = 30,
+                            RequiresIsolation = false,
+                            ManualOverride = false
+                        });
+                    }))
+            </div>
+
+            <div class="space-y-2 text-xs font-mono">
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Shared precheck</span>
+                    <span id="trigger-precheck">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Audit</span>
+                    <span id="trigger-audit">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Result</span>
+                    <span id="trigger-result">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Badge</span>
+                    <span id="trigger-badge" hidden>&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Summary</span>
+                    <span id="trigger-summary">&mdash;</span>
+                </div>
+            </div>
+        </native-card-body>
+    </native-card>
+
+    <native-card>
+        <native-card-body>
+            <native-heading level="H2">2. Component Routing</native-heading>
+            <p class="text-sm text-text-secondary mb-4">
+                Changing any input re-runs the same branch chain from component sources. The routed event determines the visible outcome.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                @{ Html.InputField(plan, m => m.AssessmentScore, o => o.Label("Assessment Score"))
+                    .FusionNumericTextBox(b => b
+                        .Min(0).Max(100).Step(1)
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            var assessment = p.Component<FusionNumericTextBox>(m => m.AssessmentScore);
+                            var supervisorOverride = p.Component<FusionSwitch>(m => m.SupervisorOverride);
+                            var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
+
+                            p.Element("component-precheck").SetText("Escalation evaluated");
+                            p.When(assessment.Value()).Gte(85m)
+                                .And(cs => cs.When(supervisorOverride.Value()).Truthy()
+                                    .Or(careTrack.Value()).Eq("memory"))
+                                .Then(then =>
+                                {
+                                    then.Dispatch("component-route-isolation");
+                                })
+                                .ElseIf(assessment.Value()).Gte(60m)
+                                .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
+                                .Then(then =>
+                                {
+                                    then.Dispatch("component-route-monitor");
+                                })
+                                .Else(else_ =>
+                                {
+                                    else_.Dispatch("component-route-routine");
+                                });
+                            p.Element("component-summary").SetText("Escalation decision complete");
+                        })); }
+
+                @{ Html.InputField(plan, m => m.SupervisorOverride, o => o.Label("Supervisor Override"))
+                    .FusionSwitch(b => b
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            p.Dispatch("refresh-component-routing");
+                        })); }
+
+                @{ Html.InputField(plan, m => m.CareTrack, o => o.Label("Care Track"))
+                    .FusionDropDownList(b => b
+                        .DataSource(careTracks)
+                        .Fields<EscalationRoutingCareTrackOption>(t => t.Text, v => v.Value)
+                        .Placeholder("Select care track")
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            p.Dispatch("refresh-component-routing");
+                        })); }
+            </div>
+
+            @{
+                Html.On(plan, t => t.CustomEvent("refresh-component-routing", p =>
+                {
+                    var assessment = p.Component<FusionNumericTextBox>(m => m.AssessmentScore);
+                    var supervisorOverride = p.Component<FusionSwitch>(m => m.SupervisorOverride);
+                    var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
+
+                    p.Element("component-precheck").SetText("Escalation evaluated");
+                    p.When(assessment.Value()).Gte(85m)
+                        .And(cs => cs.When(supervisorOverride.Value()).Truthy()
+                            .Or(careTrack.Value()).Eq("memory"))
+                        .Then(then =>
+                        {
+                            then.Dispatch("component-route-isolation");
+                        })
+                        .ElseIf(assessment.Value()).Gte(60m)
+                        .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
+                        .Then(then =>
+                        {
+                            then.Dispatch("component-route-monitor");
+                        })
+                        .Else(else_ =>
+                        {
+                            else_.Dispatch("component-route-routine");
+                        });
+                    p.Element("component-summary").SetText("Escalation decision complete");
+                }));
+            }
+
+            <div class="space-y-2 text-xs font-mono">
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Shared precheck</span>
+                    <span id="component-precheck">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Audit</span>
+                    <span id="component-audit">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Result</span>
+                    <span id="component-result">&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Badge</span>
+                    <span id="component-badge" hidden>&mdash;</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-text-secondary">Summary</span>
+                    <span id="component-summary">&mdash;</span>
+                </div>
+            </div>
+        </native-card-body>
+    </native-card>
+
+    <native-card>
+        <native-card-body>
+            <native-heading level="H2">Plan JSON</native-heading>
+            <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+        </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

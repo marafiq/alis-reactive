@@ -6,6 +6,10 @@
     var plan = Html.ReactivePlan<Step3FunctionalModel>();
     var fallOptions = (string[])ViewBag.FallOptions;
     var mobilityAids = (string[])ViewBag.MobilityAids;
+    var loadStepUrl = Url.Action("LoadStep", "AdmissionWizard", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionWizard.LoadStep.");
+    var saveStep3Url = Url.Action("SaveStep3", "AdmissionWizard", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve AdmissionWizard.SaveStep3.");
 }
 
 <native-card><native-card-body id="step3-form">
@@ -103,7 +107,7 @@
             .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Conditions/AdmissionWizard/LoadStep",
+                p.Post(loadStepUrl,
                     g => g.Include<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId)
                           .Static("step", 2))
                  .Response(r => r.OnSuccess(s => s.Into("step-container")));
@@ -112,7 +116,7 @@
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post("/Sandbox/Conditions/AdmissionWizard/SaveStep3",
+                p.Post(saveStep3Url,
                     g => g.IncludeAll())
                  .Validate<Step3Validator>("step3-form")
                  .Response(r => r
@@ -123,7 +127,7 @@
                     })
                     .OnError(400, e => e.ValidationErrors("step3-form"))
                     .Chained(c => c
-                        .Post("/Sandbox/Conditions/AdmissionWizard/LoadStep")
+                        .Post(loadStepUrl)
                         .Gather(g => g
                             .Include<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId)
                             .Static("step", 4))

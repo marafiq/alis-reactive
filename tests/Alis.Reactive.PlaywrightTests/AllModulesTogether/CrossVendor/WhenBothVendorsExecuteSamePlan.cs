@@ -281,10 +281,7 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Click validate with both fields empty — validation must block the POST
-        await Page.Locator("#validate-btn").ClickAsync();
-
-        // Wait a moment for any async validation to complete
-        await Page.WaitForTimeoutAsync(500);
+        await ClickWhenStable(Page.Locator("#validate-btn"));
 
         // The success message "Both fields passed!" must NOT appear —
         // proving the POST was blocked by client-side validation.

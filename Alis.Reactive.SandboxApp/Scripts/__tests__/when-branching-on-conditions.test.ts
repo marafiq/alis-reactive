@@ -12,6 +12,7 @@ let boot: (plan: Plan) => void;
 
 beforeEach(async () => {
   const dom = new JSDOM(`<!DOCTYPE html><html><body>
+    <span id="always">unchanged</span>
     <span id="result">original</span>
   </body></html>`);
 
@@ -332,7 +333,7 @@ describe("when branching on conditions", () => {
     expect(document.getElementById("result")!.textContent).toBe("Working Age");
   });
 
-  it("evaluates per-action when guard — skips command when false", () => {
+  it("evaluates single-command condition via branch DSL — skips guarded branch when false", async () => {
     boot({
       planId: "Test.Model",
       components: {},
@@ -341,13 +342,35 @@ describe("when branching on conditions", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
+            commands: [{ kind: "dispatch", event: "single-command-check", payload: { active: false } }],
+          },
+        },
+        {
+          trigger: { kind: "custom-event", event: "single-command-check" },
+          reaction: {
+            kind: "conditional",
             commands: [
               {
                 kind: "mutate-element",
-                target: "result",
+                target: "always",
                 mutation: { kind: "set-prop", prop: "textContent" },
-                value: "blocked",
-                when: { kind: "value", source: es("ctx.active"), coerceAs: "boolean", op: "truthy" },
+                value: "Always runs",
+              },
+            ],
+            branches: [
+              {
+                guard: { kind: "value", source: es("evt.active"), coerceAs: "boolean", op: "truthy" },
+                reaction: {
+                  kind: "sequential",
+                  commands: [
+                    {
+                      kind: "mutate-element",
+                      target: "result",
+                      mutation: { kind: "set-prop", prop: "textContent" },
+                      value: "allowed",
+                    },
+                  ],
+                },
               },
             ],
           },
@@ -355,11 +378,12 @@ describe("when branching on conditions", () => {
       ],
     });
 
-    // No ctx.active — when guard false — textContent unchanged
+    await flushMicrotasks();
+    expect(document.getElementById("always")!.textContent).toBe("Always runs");
     expect(document.getElementById("result")!.textContent).toBe("original");
   });
 
-  it("evaluates per-action when guard — executes command when true", () => {
+  it("evaluates single-command condition via branch DSL — executes guarded branch when true", async () => {
     boot({
       planId: "Test.Model",
       components: {},
@@ -368,13 +392,35 @@ describe("when branching on conditions", () => {
           trigger: { kind: "dom-ready" },
           reaction: {
             kind: "sequential",
+            commands: [{ kind: "dispatch", event: "single-command-check", payload: { active: true } }],
+          },
+        },
+        {
+          trigger: { kind: "custom-event", event: "single-command-check" },
+          reaction: {
+            kind: "conditional",
             commands: [
               {
                 kind: "mutate-element",
-                target: "result",
+                target: "always",
                 mutation: { kind: "set-prop", prop: "textContent" },
-                value: "allowed",
-                when: null,
+                value: "Always runs",
+              },
+            ],
+            branches: [
+              {
+                guard: { kind: "value", source: es("evt.active"), coerceAs: "boolean", op: "truthy" },
+                reaction: {
+                  kind: "sequential",
+                  commands: [
+                    {
+                      kind: "mutate-element",
+                      target: "result",
+                      mutation: { kind: "set-prop", prop: "textContent" },
+                      value: "allowed",
+                    },
+                  ],
+                },
               },
             ],
           },
@@ -382,6 +428,8 @@ describe("when branching on conditions", () => {
       ],
     });
 
+    await flushMicrotasks();
+    expect(document.getElementById("always")!.textContent).toBe("Always runs");
     expect(document.getElementById("result")!.textContent).toBe("allowed");
   });
 });

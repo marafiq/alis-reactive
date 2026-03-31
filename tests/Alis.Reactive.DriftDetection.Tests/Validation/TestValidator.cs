@@ -15,6 +15,9 @@ public class TestValidator : ReactiveValidator<ResidentModel>
         RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
         RuleFor(x => x.Email).EmailAddress().WithMessage("Valid email required");
         RuleFor(x => x.CareLevel).NotEmpty().WithMessage("Care level is required");
+        RuleFor(x => x.PhysicianName)
+            .Equal(x => x.Name!)
+            .WithMessage("Physician must match resident name");
 
         // Conditional rule: VeteranId required when IsVeteran is truthy
         WhenField(x => x.IsVeteran, () =>
@@ -23,7 +26,7 @@ public class TestValidator : ReactiveValidator<ResidentModel>
         });
 
         // Conditional rule with value: PhysicianName required when CareLevel == "Memory Care"
-        WhenField<string>(x => x.CareLevel, "Memory Care", () =>
+        WhenField<string>(x => x.CareLevel!, "Memory Care", () =>
         {
             RuleFor(x => x.PhysicianName).NotEmpty().WithMessage("Physician required for Memory Care");
         });
