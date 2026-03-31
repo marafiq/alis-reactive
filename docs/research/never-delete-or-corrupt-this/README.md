@@ -11,3 +11,7 @@ issue #86 session.
   distills the agreed architectural model
 - [2026-03-31-task-level-plan.md](./2026-03-31-task-level-plan.md)
   turns that understanding into ordered next work
+- Continuation for the later planning pass:
+  [2026-03-31-session-transcript-continuation-02.md](./2026-03-31-session-transcript-continuation-02.md),
+  [2026-03-31-architecture-understanding-continuation-02.md](./2026-03-31-architecture-understanding-continuation-02.md),
+  and [2026-03-31-release-stack-plan-v2.md](./2026-03-31-release-stack-plan-v2.md)
