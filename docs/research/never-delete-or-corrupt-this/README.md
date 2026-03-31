@@ -15,3 +15,8 @@ issue #86 session.
   [2026-03-31-session-transcript-continuation-02.md](./2026-03-31-session-transcript-continuation-02.md),
   [2026-03-31-architecture-understanding-continuation-02.md](./2026-03-31-architecture-understanding-continuation-02.md),
   and [2026-03-31-release-stack-plan-v2.md](./2026-03-31-release-stack-plan-v2.md)
+- Continuation for the executable end-state schema proof:
+  [2026-03-31-session-transcript-continuation-03.md](./2026-03-31-session-transcript-continuation-03.md),
+  [2026-03-31-end-state-schema-proof.md](./2026-03-31-end-state-schema-proof.md),
+  [2026-03-31-end-state-schema-proof-matrix.md](./2026-03-31-end-state-schema-proof-matrix.md),
+  and [2026-03-31-end-state-reactive-plan.schema.json](./2026-03-31-end-state-reactive-plan.schema.json)

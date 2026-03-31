@@ -1,0 +1,622 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://alis.dev/schemas/reactive-plan.end-state.schema.json",
+  "title": "Reactive Plan End-State Schema Proof",
+  "type": "object",
+  "required": ["planId", "components", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "planId": { "type": "string", "minLength": 1 },
+    "components": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/ComponentEntry" }
+    },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Entry" }
+    }
+  },
+  "$defs": {
+    "Vendor": {
+      "type": "string",
+      "enum": ["native", "fusion"]
+    },
+    "ValueShape": {
+      "type": "string",
+      "enum": ["string", "number", "boolean", "date", "array", "raw"]
+    },
+    "ComponentValueDescriptor": {
+      "type": "object",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "shape": { "$ref": "#/$defs/ValueShape" },
+        "elementShape": { "$ref": "#/$defs/ValueShape" }
+      }
+    },
+    "ComponentEntry": {
+      "type": "object",
+      "required": ["id", "vendor", "componentType", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "vendor": { "$ref": "#/$defs/Vendor" },
+        "componentType": { "type": "string", "minLength": 1 },
+        "value": { "$ref": "#/$defs/ComponentValueDescriptor" }
+      }
+    },
+    "Entry": {
+      "type": "object",
+      "required": ["trigger", "reaction"],
+      "additionalProperties": false,
+      "properties": {
+        "trigger": { "$ref": "#/$defs/Trigger" },
+        "reaction": { "$ref": "#/$defs/Reaction" }
+      }
+    },
+    "Trigger": {
+      "oneOf": [
+        { "$ref": "#/$defs/DomReadyTrigger" },
+        { "$ref": "#/$defs/CustomEventTrigger" },
+        { "$ref": "#/$defs/ComponentEventTrigger" },
+        { "$ref": "#/$defs/ServerPushTrigger" },
+        { "$ref": "#/$defs/SignalRTrigger" }
+      ]
+    },
+    "DomReadyTrigger": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "dom-ready" }
+      }
+    },
+    "CustomEventTrigger": {
+      "type": "object",
+      "required": ["kind", "event"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "custom-event" },
+        "event": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ComponentEventTrigger": {
+      "type": "object",
+      "required": ["kind", "target", "payload"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "component-event" },
+        "target": { "$ref": "#/$defs/ComponentEventTarget" },
+        "payload": { "$ref": "#/$defs/ComponentEventPayload" }
+      }
+    },
+    "ComponentEventTarget": {
+      "type": "object",
+      "required": ["componentId", "vendor", "jsEvent"],
+      "additionalProperties": false,
+      "properties": {
+        "componentId": { "type": "string", "minLength": 1 },
+        "vendor": { "$ref": "#/$defs/Vendor" },
+        "jsEvent": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ComponentEventPayload": {
+      "oneOf": [
+        { "$ref": "#/$defs/NoTriggerPayload" },
+        { "$ref": "#/$defs/CallbackTriggerPayload" },
+        { "$ref": "#/$defs/ObjectTriggerPayload" }
+      ]
+    },
+    "NoTriggerPayload": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
+    "CallbackTriggerPayload": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "callback" }
+      }
+    },
+    "ObjectTriggerPayload": {
+      "type": "object",
+      "required": ["kind", "fields"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "object" },
+        "fields": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/TriggerProjectionValue" }
+        }
+      }
+    },
+    "TriggerProjectionValue": {
+      "oneOf": [
+        { "$ref": "#/$defs/LiteralValue" },
+        { "$ref": "#/$defs/ComponentReadValue" }
+      ]
+    },
+    "ComponentReadValue": {
+      "type": "object",
+      "required": ["kind", "access"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "read" },
+        "access": { "$ref": "#/$defs/ComponentAccess" }
+      }
+    },
+    "ServerPushTrigger": {
+      "type": "object",
+      "required": ["kind", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "server-push" },
+        "url": { "type": "string", "minLength": 1 },
+        "eventType": { "type": "string", "minLength": 1 }
+      }
+    },
+    "SignalRTrigger": {
+      "type": "object",
+      "required": ["kind", "hubUrl", "methodName"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "signalr" },
+        "hubUrl": { "type": "string", "minLength": 1 },
+        "methodName": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Reaction": {
+      "oneOf": [
+        { "$ref": "#/$defs/SequentialReaction" },
+        { "$ref": "#/$defs/ConditionalReaction" },
+        { "$ref": "#/$defs/HttpReaction" },
+        { "$ref": "#/$defs/ParallelHttpReaction" }
+      ]
+    },
+    "SequentialReaction": {
+      "type": "object",
+      "required": ["kind", "commands"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "sequential" },
+        "commands": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        }
+      }
+    },
+    "ConditionalReaction": {
+      "type": "object",
+      "required": ["kind", "branches"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "conditional" },
+        "commands": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        },
+        "branches": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Branch" }
+        }
+      }
+    },
+    "Branch": {
+      "type": "object",
+      "required": ["guard", "reaction"],
+      "additionalProperties": false,
+      "properties": {
+        "guard": {
+          "oneOf": [
+            { "$ref": "#/$defs/Guard" },
+            { "type": "null" }
+          ]
+        },
+        "reaction": { "$ref": "#/$defs/Reaction" }
+      }
+    },
+    "HttpReaction": {
+      "type": "object",
+      "required": ["kind", "request"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "http" },
+        "preFetch": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        },
+        "request": { "$ref": "#/$defs/RequestDescriptor" }
+      }
+    },
+    "ParallelHttpReaction": {
+      "type": "object",
+      "required": ["kind", "requests"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "parallel-http" },
+        "preFetch": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        },
+        "requests": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RequestDescriptor" }
+        },
+        "onAllSettled": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        }
+      }
+    },
+    "Guard": {
+      "oneOf": [
+        { "$ref": "#/$defs/ValueGuard" },
+        { "$ref": "#/$defs/AllGuard" },
+        { "$ref": "#/$defs/AnyGuard" },
+        { "$ref": "#/$defs/InvertGuard" },
+        { "$ref": "#/$defs/ConfirmGuard" }
+      ]
+    },
+    "GuardOp": {
+      "type": "string",
+      "enum": [
+        "eq", "neq",
+        "gt", "gte", "lt", "lte",
+        "truthy", "falsy",
+        "is-null", "not-null",
+        "is-empty", "not-empty",
+        "in", "not-in", "between",
+        "array-contains",
+        "contains", "starts-with", "ends-with", "matches", "min-length"
+      ]
+    },
+    "ValueGuard": {
+      "type": "object",
+      "required": ["kind", "left", "op"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "value" },
+        "left": { "$ref": "#/$defs/ValueAccess" },
+        "op": { "$ref": "#/$defs/GuardOp" },
+        "right": { "$ref": "#/$defs/PlanValue" }
+      }
+    },
+    "AllGuard": {
+      "type": "object",
+      "required": ["kind", "guards"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "all" },
+        "guards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Guard" }
+        }
+      }
+    },
+    "AnyGuard": {
+      "type": "object",
+      "required": ["kind", "guards"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "any" },
+        "guards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Guard" }
+        }
+      }
+    },
+    "InvertGuard": {
+      "type": "object",
+      "required": ["kind", "inner"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "not" },
+        "inner": { "$ref": "#/$defs/Guard" }
+      }
+    },
+    "ConfirmGuard": {
+      "type": "object",
+      "required": ["kind", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "confirm" },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Command": {
+      "oneOf": [
+        { "$ref": "#/$defs/DispatchCommand" },
+        { "$ref": "#/$defs/MutateElementCommand" },
+        { "$ref": "#/$defs/MutatePayloadCommand" },
+        { "$ref": "#/$defs/ValidationErrorsCommand" },
+        { "$ref": "#/$defs/IntoCommand" }
+      ]
+    },
+    "DispatchCommand": {
+      "type": "object",
+      "required": ["kind", "event"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "dispatch" },
+        "event": { "type": "string", "minLength": 1 },
+        "payload": { "$ref": "#/$defs/ObjectValue" }
+      }
+    },
+    "MutateElementCommand": {
+      "type": "object",
+      "required": ["kind", "target", "mutation"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "mutate-element" },
+        "target": { "type": "string", "minLength": 1 },
+        "mutation": { "$ref": "#/$defs/Mutation" },
+        "vendor": { "$ref": "#/$defs/Vendor" }
+      }
+    },
+    "MutatePayloadCommand": {
+      "type": "object",
+      "required": ["kind", "mutation"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "mutate-payload" },
+        "mutation": { "$ref": "#/$defs/Mutation" }
+      }
+    },
+    "ValidationErrorsCommand": {
+      "type": "object",
+      "required": ["kind", "formId"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "validation-errors" },
+        "formId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "IntoCommand": {
+      "type": "object",
+      "required": ["kind", "target"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "into" },
+        "target": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Mutation": {
+      "oneOf": [
+        { "$ref": "#/$defs/SetPropMutation" },
+        { "$ref": "#/$defs/CallMutation" }
+      ]
+    },
+    "SetPropMutation": {
+      "type": "object",
+      "required": ["kind", "prop", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "set-prop" },
+        "prop": { "type": "string", "minLength": 1 },
+        "value": { "$ref": "#/$defs/PlanValue" }
+      }
+    },
+    "CallMutation": {
+      "type": "object",
+      "required": ["kind", "method"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "call" },
+        "method": { "type": "string", "minLength": 1 },
+        "chain": { "type": "string", "minLength": 1 },
+        "args": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PlanValue" }
+        }
+      }
+    },
+    "PlanValue": {
+      "oneOf": [
+        { "$ref": "#/$defs/LiteralValue" },
+        { "$ref": "#/$defs/ReadValue" },
+        { "$ref": "#/$defs/ObjectValue" },
+        { "$ref": "#/$defs/ArrayValue" }
+      ]
+    },
+    "LiteralValue": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "literal" },
+        "value": {},
+        "shape": { "$ref": "#/$defs/ValueShape" }
+      }
+    },
+    "ReadValue": {
+      "type": "object",
+      "required": ["kind", "access"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "read" },
+        "access": { "$ref": "#/$defs/ValueAccess" }
+      }
+    },
+    "ObjectValue": {
+      "type": "object",
+      "required": ["kind", "fields"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "object" },
+        "fields": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/PlanValue" }
+        }
+      }
+    },
+    "ArrayValue": {
+      "type": "object",
+      "required": ["kind", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "array" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PlanValue" }
+        }
+      }
+    },
+    "ValueAccess": {
+      "type": "object",
+      "required": ["source", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "$ref": "#/$defs/ValueSource" },
+        "path": { "type": "string", "minLength": 1 },
+        "shape": { "$ref": "#/$defs/ValueShape" },
+        "elementShape": { "$ref": "#/$defs/ValueShape" }
+      }
+    },
+    "ComponentAccess": {
+      "type": "object",
+      "required": ["source", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "$ref": "#/$defs/ComponentValueSource" },
+        "path": { "type": "string", "minLength": 1 },
+        "shape": { "$ref": "#/$defs/ValueShape" },
+        "elementShape": { "$ref": "#/$defs/ValueShape" }
+      }
+    },
+    "ValueSource": {
+      "oneOf": [
+        { "$ref": "#/$defs/ComponentValueSource" },
+        { "$ref": "#/$defs/PayloadValueSource" }
+      ]
+    },
+    "ComponentValueSource": {
+      "type": "object",
+      "required": ["kind", "componentId", "vendor"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "component" },
+        "componentId": { "type": "string", "minLength": 1 },
+        "vendor": { "$ref": "#/$defs/Vendor" }
+      }
+    },
+    "PayloadValueSource": {
+      "type": "object",
+      "required": ["kind", "scope"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "payload" },
+        "scope": {
+          "type": "string",
+          "enum": ["trigger", "response"]
+        }
+      }
+    },
+    "RequestDescriptor": {
+      "type": "object",
+      "required": ["verb", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "verb": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "DELETE"]
+        },
+        "url": { "type": "string", "minLength": 1 },
+        "gather": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GatherItem" }
+        },
+        "contentType": {
+          "type": "string",
+          "enum": ["form-data"]
+        },
+        "whileLoading": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Command" }
+        },
+        "onSuccess": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StatusHandler" }
+        },
+        "onError": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StatusHandler" }
+        },
+        "chained": { "$ref": "#/$defs/RequestDescriptor" },
+        "validation": { "$ref": "#/$defs/ValidationDescriptor" }
+      }
+    },
+    "GatherItem": {
+      "oneOf": [
+        { "$ref": "#/$defs/AllGather" },
+        { "$ref": "#/$defs/GatherField" }
+      ]
+    },
+    "AllGather": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "all" }
+      }
+    },
+    "GatherField": {
+      "type": "object",
+      "required": ["kind", "name", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "field" },
+        "name": { "type": "string", "minLength": 1 },
+        "value": { "$ref": "#/$defs/PlanValue" }
+      }
+    },
+    "StatusHandler": {
+      "type": "object",
+      "required": ["reaction"],
+      "additionalProperties": false,
+      "properties": {
+        "statusCode": { "type": "integer" },
+        "reaction": { "$ref": "#/$defs/Reaction" }
+      }
+    },
+    "ValidationDescriptor": {
+      "type": "object",
+      "required": ["formId", "fields"],
+      "additionalProperties": false,
+      "properties": {
+        "formId": { "type": "string", "minLength": 1 },
+        "fields": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValidationField" }
+        }
+      }
+    },
+    "ValidationField": {
+      "type": "object",
+      "required": ["modelPath", "rules"],
+      "additionalProperties": false,
+      "properties": {
+        "modelPath": { "type": "string", "minLength": 1 },
+        "rules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValidationRule" }
+        }
+      }
+    },
+    "ValidationRule": {
+      "type": "object",
+      "required": ["rule", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "constraint": {}
+      }
+    }
+  }
+}
