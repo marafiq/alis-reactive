@@ -13,6 +13,10 @@ Produce a code-backed, architecturally correct issue #86 package that:
 3. proposes the smallest strengthening change without system rot
 4. sets up refactoring and tests in a way that preserves the few-command model
 
+This folder itself is part of the work product. As understanding improves from
+further code reading, the saved transcript and understanding docs should be
+edited in-place rather than abandoned.
+
 ## Non-Negotiable Constraints
 
 - No fallbacks.
@@ -32,6 +36,7 @@ Create the final current-state package before proposing any design change.
 
 ### Deliverables
 
+- a preserved visible-thread reference plus the distilled understanding docs
 - A capability matrix organized around the shared model:
   - root resolution
   - member access
@@ -49,9 +54,15 @@ Create the final current-state package before proposing any design change.
 ### Required current-state questions
 
 - Which roots can be resolved today?
+- Which source kinds exist today, and which value producers piggyback on those
+  kinds instead of introducing new ones?
 - Which member-access paths are supported today?
 - Where does shaping/coercion live today?
+- What is the exact difference between registration-time `coerceAs` and
+  command-time `coerce` today?
 - Which command consumers accept source-driven values today?
+- Where do trigger paths currently shape event payloads differently by vendor or
+  trigger type?
 - Which flows are public-DSL reachable vs descriptor/runtime-only?
 - Where does continuity stop?
 
@@ -91,6 +102,10 @@ A small table showing how command consumers currently accept values:
 This table should make the duplication visible without yet locking the final
 refactor naming.
 
+That table should also call out the current TS type mismatch between mutation
+values, method args, and dispatch payloads, because that is another symptom of
+the same duplication.
+
 ## Phase 3: Define The Refactor Target At The Concept Level
 
 Before writing code, define the target in architectural terms.
@@ -120,6 +135,9 @@ helper language.
 - Do not make dispatch a special case.
 - Do not create compatibility lanes that survive the refactor.
 - Prefer descriptors that encapsulate meaning cleanly and serialize clearly.
+- Preserve the fact that component events and custom events are one flow model
+  with different scope/root attachment, while still accounting for current
+  payload-shaping differences in the trigger layer.
 
 ## Phase 4: Red-First BDD Specification
 
@@ -158,6 +176,14 @@ New spec files for pure seams:
 - value shaping/coercion
 - command value consumption
 
+These should explicitly cover:
+
+- primitive leaves
+- object leaves
+- array leaves
+- response-body paths that reuse the event-path lane
+- native vs fusion trigger payload shaping where relevant
+
 These should stay as pure and deterministic as possible.
 
 #### 4. TS execution tests
@@ -190,6 +216,10 @@ Only after phases 1 through 4 are written down should the issue be rewritten.
    - no storage subsystem
    - no fallback lanes
    - no dispatch-only mini-model
+
+The prior issue rewrite done earlier in this branch should be treated only as an
+intermediate draft. The rewritten issue should be regenerated from this saved
+architecture baseline, not incrementally edited from older assumptions.
 
 ### Tone
 

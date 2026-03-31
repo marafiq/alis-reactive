@@ -80,6 +80,22 @@ important, but it is not the architecture. The architecture is root resolution
 plus member access. The current runtime happens to realize member access through
 path walking.
 
+## Current Source Model, Precisely
+
+Today the serialized source model is still very small:
+
+- `event` source
+- `component` source
+
+There is not a third serialized `responseBody` source kind today. Typed
+response-body access is lowered into the existing event-path lane using paths
+like `responseBody.name` or `responseBody.address.city`, then resolved against
+`ExecContext` by the same path-walking mechanics.
+
+That matters because it shows the framework already prefers reusing shared
+mechanics over inventing new source families when the same model can carry the
+capability.
+
 ## What A Read Produces
 
 A read yields a raw JS value.
@@ -119,6 +135,34 @@ This is why typed conditions work even though the runtime starts from plain JS
 values. It is also why shaping belongs in the plan/descriptor model and not as
 ad hoc runtime intelligence.
 
+There are two related shaping seams in the current architecture:
+
+- registration-time `coerceAs`
+  - carried on component registrations
+  - used to enrich validation fields
+  - used by gather/read-side flows
+- command-time `coerce`
+  - carried on mutations and source-backed method args
+  - used when a command consumes a raw value
+
+Those are conceptually related, but they are not yet one cleanly unified
+descriptor contract.
+
+## Typed DSL Story, Precisely
+
+The typed C# DSL is already layered on top of this raw-value runtime model.
+
+`TypedSource<TProp>` preserves the C# property type through:
+
+- conditions
+- source-vs-source comparisons
+- source-backed writes
+- source-backed display helpers
+
+It also exposes coercion metadata inferred from `TProp`, which is part of why
+the current typed DSL can stay strongly typed while the runtime still works with
+plain JS values.
+
 ## Event Scope: Logical Unity, Physical Difference
 
 Component events and custom events are not different capability families.
@@ -138,6 +182,19 @@ So the right architecture is:
 
 That means the system should not fork into a separate logical model for custom
 events versus component events.
+
+One nuance from the current code should be preserved accurately:
+
+- custom events currently pass `CustomEvent.detail` through as the event payload
+- fusion-style component events currently pass the component callback payload
+  through directly
+- native component events currently synthesize a payload object shaped like
+  `{ [readExpr]: currentValue, event: domEvent }`
+
+So the architecture should view them as one event/value-flow model with
+different roots and scope, but the saved current-state understanding must still
+acknowledge that the current trigger layer has different payload-shaping rules
+per trigger/vendor path.
 
 ## What The Runtime Should Look Like
 
@@ -179,6 +236,15 @@ Inside mutation execution, the effect verbs are even smaller:
 That is a strong architectural sign. The system should continue to revolve
 around a few stable commands, not around many wrapper-specific APIs.
 
+The execution context is also already small and important:
+
+- `evt`
+- `responseBody`
+- `validationDesc`
+- `components`
+
+That is another sign that the architecture wants to stay compact.
+
 ## What Is Actually Duplicated Today
 
 The problem is not root resolution.
@@ -195,6 +261,16 @@ Today, the same concept is represented through multiple descriptor shapes:
 - mutate-event uses `Value` plus `Source`
 - call args use `MethodArg` (`LiteralArg` / `SourceArg`)
 - dispatch uses raw object payload
+
+There is even a type-level mismatch visible in the TS types today:
+
+- mutation commands still type `value` as `string | string[]`
+- method args already allow broader `unknown`
+- dispatch payload is a record of `unknown`
+
+So the duplication problem is not only naming. It is also that the consumers do
+not share one explicit contract for "value obtained, optionally shaped, then
+consumed by a command."
 
 That means one underlying idea, “how does this command obtain and shape a
 value?”, is currently split across multiple representations.

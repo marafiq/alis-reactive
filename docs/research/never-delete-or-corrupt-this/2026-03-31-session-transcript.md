@@ -1,11 +1,14 @@
 # Issue #86 Session Transcript
 
-> Purpose: preserve the substantive user/assistant exchange from this session so
-> the architectural nuance is not lost.
+> Purpose: preserve a curated substantive transcript from this session so the
+> architectural nuance is not lost.
 >
 > Scope: visible user/assistant chat content only. Tool output, hidden system
 > instructions, and short progress-only commentary are omitted. Empty assistant
 > turns are also omitted.
+>
+> For the closest saved thread-reference version, see
+> `2026-03-31-visible-thread-reference.md` in this same folder.
 
 ## User
 

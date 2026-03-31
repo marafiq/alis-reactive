@@ -37,6 +37,8 @@ fallback lanes, or dispatch-specific hacks.
 - A read yields a raw JS value that may be a primitive, object, or array.
 - `coerce` is the shaping step that turns the raw runtime value into the value
   the typed DSL expects.
+- Source is the truth. New capabilities should plug into the shared source/value
+  model rather than inventing storage or ad hoc handoff paths.
 - The stable architectural concepts should be:
   - root resolution
   - member access
@@ -174,6 +176,14 @@ So the correct model is:
 4. shape/coerce it
 5. consume it
 
+There are two related shaping seams today:
+
+- registration-time `coerceAs`
+- command-time `coerce`
+
+They are conceptually aligned, but not yet expressed through one unified
+descriptor contract.
+
 ### 5. Component events and custom events share the same mechanics
 
 The meaningful difference is scope attachment, not logical capability.
@@ -191,6 +201,13 @@ Architecturally:
 - component event = local event root
 - custom event = document event root
 - payload access and flow semantics should remain the same
+
+Current-state nuance: the trigger layer still shapes payloads differently in a
+few places.
+
+- custom events pass `detail`
+- fusion-style component events pass their callback payload directly
+- native component events synthesize `{ [readExpr]: currentValue, event: e }`
 
 ### 6. The framework already revolves around a few commands
 
@@ -225,6 +242,12 @@ Current consumer shapes:
 That means the same underlying concept, "how does this command obtain a value?",
 is expressed through multiple unrelated descriptor contracts. This is what makes
 the architecture feel more complicated than the runtime model actually is.
+
+There is also a TS type-level symptom of the same issue:
+
+- mutation command `value` is still typed narrowly
+- method args already accept broader `unknown`
+- dispatch payload is a broad record
 
 ## What Must Stay Stable During Refactoring
 
