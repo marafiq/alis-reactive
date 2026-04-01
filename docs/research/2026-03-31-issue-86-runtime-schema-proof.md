@@ -586,6 +586,10 @@ Current `IncludeAll` already does this mechanically in
 3. read `readExpr`
 4. emit under model binding path
 
+In the current contract, `plan.components` is effectively the registered
+participant set. The hidden end-state schema makes that participation explicit
+through optional `binding` instead of leaving it implicit in the current map.
+
 End-state logic becomes smaller:
 
 ```ts
