@@ -6,9 +6,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock executeReaction to capture calls without side effects
-vi.mock("../execution/execute", () => ({
-  executeReaction: vi.fn(() => Promise.resolve()),
-}));
+vi.mock("../execution/execute", () => {
+  const executeReaction = vi.fn(() => Promise.resolve());
+  return {
+    executeReaction,
+    executeReactionSequence: vi.fn((reactions: Reaction[], ctx: unknown) =>
+      Promise.all(reactions.map(reaction => executeReaction(reaction, ctx)))),
+  };
+});
 
 // Minimal EventSource mock
 class MockEventSource {

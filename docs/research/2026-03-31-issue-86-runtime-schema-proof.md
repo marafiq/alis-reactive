@@ -195,6 +195,20 @@ already shows the same payload pattern:
 That means SSE, SignalR, CustomEvent `detail`, and Fusion callback args all fit
 the same trigger payload family.
 
+They also now have direct ordered-runtime proof, not just structural proof:
+
+- [when-proving-server-push-pipeline-semantics.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-server-push-pipeline-semantics.test.ts)
+  proves one SSE trigger occurrence can run:
+  - conditional seed step
+  - request unit
+  - later conditional step
+  - nested `onSuccess` conditional
+  - component reads/writes/calls
+  in declaration order
+- [when-proving-signalr-pipeline-semantics.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-signalr-pipeline-semantics.test.ts)
+  proves the same thing for SignalR, including non-input fusion component
+  participation in gather and later component reads
+
 ## Focused Runtime Proofs Added In This Pass
 
 Two deterministic proof suites were added to pin the runtime algebra down
@@ -231,6 +245,36 @@ The important architectural boundary exposed by those proofs is:
 - the effect side is `set` or `call`
 - the same dotted-path walking semantics apply across trigger, response,
   component, and binding reads
+- same-trigger lowered segments must execute as one ordered reaction chain,
+  otherwise conditional guards yield and break declaration order
+
+## Direct Runtime Ordering Proof Added On April 1, 2026
+
+The runtime now has direct proof that same-trigger mixed pipelines preserve
+declaration order even when conditions are involved.
+
+Supporting code:
+
+- [boot.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/lifecycle/boot.ts)
+  groups entries by trigger signature and wires one ordered chain per trigger
+- [trigger.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/trigger.ts)
+  executes the grouped reaction chain for one trigger occurrence
+- [execute.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/execute.ts)
+  keeps sequential steps synchronous while awaiting true async stages
+- [server-push.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/server-push.ts)
+  and [signalr.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/signalr.ts)
+  now pass one ordered chain into execution instead of independent listeners per
+  lowered segment
+
+Fresh execution evidence:
+
+- focused trigger/order sweep: **29 tests passed**
+- broader TS runtime sweep after the ordering change: **1,149 tests passed**
+- one stale suite still fails to parse:
+  [when-proving-end-state-schema.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-end-state-schema.test.ts)
+  via
+  [end-state-plan-fixtures.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/architecture-proof/end-state-plan-fixtures.ts);
+  that harness remains non-authoritative for issue #86
 
 ## End-State Object Model That Matches The Runtime
 
@@ -511,6 +555,43 @@ It needs ordered steps:
   }
 }
 ```
+
+### C1. SSE and SignalR use the same pipeline contract
+
+This is not just architectural taste. It is already true in the current DSL.
+
+In C#:
+
+- `TriggerBuilder.DomReady(...)` creates `PipelineBuilder<TModel>`
+- `TriggerBuilder.CustomEvent(...)` creates `PipelineBuilder<TModel>`
+- `TriggerBuilder.ServerPush(...)` creates `PipelineBuilder<TModel>`
+- `TriggerBuilder.SignalR(...)` creates `PipelineBuilder<TModel>`
+- all four pass through the same `AddEntryWithContexts(...)`
+- `AddEntryWithContexts(...)` calls `pb.BuildReactions()`
+
+Proof:
+
+- [TriggerBuilder.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/Builders/TriggerBuilder.cs)
+- [WhenTriggeringOnServerPush.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Triggers/WhenTriggeringOnServerPush.cs)
+- [WhenTriggeringOnSignalR.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Triggers/WhenTriggeringOnSignalR.cs)
+
+In TS:
+
+- `wireServerPush(...)` parses SSE JSON and calls `executeReaction(reaction, { evt, components })`
+- `wireSignalR(...)` accepts one object payload and calls `executeReaction(reaction, { evt, components })`
+
+Proof:
+
+- [server-push.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/server-push.ts)
+- [signalr.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/signalr.ts)
+- [when-triggering-on-server-push.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-triggering-on-server-push.test.ts)
+- [when-triggering-on-signalr.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-triggering-on-signalr.test.ts)
+
+So the schema truth is:
+
+- trigger kind changes attachment
+- payload source changes
+- pipeline semantics do not
 
 ### D. Validation proof
 

@@ -1,6 +1,6 @@
 import * as signalR from "@microsoft/signalr";
 import type { SignalRTrigger, Reaction, ComponentEntry } from "../types";
-import { executeReaction } from "./execute";
+import { executeReactionSequence } from "./execute";
 import { showRetryIndicators, removeRetryIndicators, firstMutationTarget } from "./retry-indicator";
 import { scope } from "../core/trace";
 
@@ -123,16 +123,19 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
 
 export function wireSignalR(
   trigger: SignalRTrigger,
-  reaction: Reaction,
+  reactionOrReactions: Reaction | readonly Reaction[],
   components?: Record<string, ComponentEntry>,
   signal?: AbortSignal
 ): void {
+  const reactions = Array.isArray(reactionOrReactions) ? reactionOrReactions : [reactionOrReactions];
   const managed = getOrCreate(trigger.hubUrl, signal);
   const { connection, targetIds } = managed;
 
-  // Track the first target element for retry indicator placement
-  const target = firstMutationTarget(reaction);
-  if (target) targetIds.add(target);
+  // Track all top-level mutation targets in the ordered chain for retry indicator placement.
+  for (const reaction of reactions) {
+    const target = firstMutationTarget(reaction);
+    if (target) targetIds.add(target);
+  }
 
   // Handlers registered via .on() persist across automatic reconnects —
   // no re-registration needed (per Microsoft docs).
@@ -147,7 +150,7 @@ export function wireSignalR(
 
     const evt = args[0] as Record<string, unknown>;
     log.debug("method", { hubUrl: trigger.hubUrl, method: trigger.methodName });
-    executeReaction(reaction, { evt, components }).catch(err =>
+    executeReactionSequence(reactions, { evt, components }).catch(err =>
       log.error("reaction failed", { error: String(err) }));
   });
 

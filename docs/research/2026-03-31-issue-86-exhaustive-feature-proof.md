@@ -30,8 +30,8 @@ The rows below therefore distinguish:
 ## Fresh Proof Runs
 
 The following commands were executed in this worktree on **March 31, 2026**,
-with the TS sweep rerun on **April 1, 2026** after the array/object walking
-proof additions.
+with targeted and broader TS reruns on **April 1, 2026** after the array/object
+walking and same-trigger ordering proofs were added.
 
 ```bash
 npm test -- \
@@ -53,6 +53,9 @@ npm test -- \
   Alis.Reactive.SandboxApp/Scripts/__tests__/when-consuming-command-values.test.ts \
   Alis.Reactive.SandboxApp/Scripts/__tests__/when-triggering-on-server-push.test.ts \
   Alis.Reactive.SandboxApp/Scripts/__tests__/when-triggering-on-signalr.test.ts \
+  Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-server-push-pipeline-semantics.test.ts \
+  Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-signalr-pipeline-semantics.test.ts \
+  Alis.Reactive.SandboxApp/Scripts/__tests__/when-executing-multiple-entries-same-trigger.test.ts \
   Alis.Reactive.SandboxApp/Scripts/__tests__/when-executing-reactions-end-to-end.test.ts \
   Alis.Reactive.SandboxApp/Scripts/__tests__/when-http-handlers-contain-nested-reactions.test.ts \
   Alis.Reactive.SandboxApp/Scripts/__tests__/when-using-conditions-in-response-handlers.test.ts \
@@ -80,6 +83,8 @@ dotnet test tests/Alis.Reactive.Analyzers.Tests/Alis.Reactive.Analyzers.Tests.cs
 Fresh results:
 
 - TS runtime sweep: **22 files, 368 tests passed**
+- focused trigger/order sweep after same-trigger chaining fix: **5 files, 29 tests passed**
+- broader active TS runtime sweep after ordering fix: **78 files, 1,149 tests passed**
 - core reactive C# sweep: **80 tests passed**
 - FluentValidation extraction sweep: **23 tests passed**
 - native descriptor sweep: **16 tests passed**
@@ -87,7 +92,14 @@ Fresh results:
 - native action-link serializer sweep: **9 tests passed**
 - native action-link analyzer sweep: **9 tests passed**
 
-Total fresh passing tests used in this proof packet: **521**
+One stale suite still fails to parse and remains explicitly non-authoritative
+for issue #86:
+
+- [when-proving-end-state-schema.test.ts](../../Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-end-state-schema.test.ts)
+  via
+  [end-state-plan-fixtures.ts](../../Alis.Reactive.SandboxApp/Scripts/architecture-proof/end-state-plan-fixtures.ts)
+
+Total fresh passing tests used in this proof packet: **1,331**
 
 ## Cross-Cutting Runtime Truths Proven By Code
 
@@ -191,6 +203,44 @@ Proof:
 
 This forces `Pipeline` to preserve ordered steps instead of collapsing to one
 structural stage.
+
+### 5b. Trigger kind does not change pipeline semantics
+
+`DomReady`, `CustomEvent`, `ServerPush`, and `SignalR` all feed the same
+`PipelineBuilder<TModel>` path in C#.
+
+Proof:
+
+- [TriggerBuilder.cs](../../Alis.Reactive/Builders/TriggerBuilder.cs)
+  - `DomReady(Action<PipelineBuilder<TModel>>)`
+  - `CustomEvent(..., Action<PipelineBuilder<TModel>>)`
+  - `ServerPush(..., Action<PipelineBuilder<TModel>>)`
+  - `SignalR(..., Action<PipelineBuilder<TModel>>)`
+  - all of them call `AddEntryWithContexts(...)`
+  - `AddEntryWithContexts(...)` calls `pb.BuildReactions()`
+- [WhenTriggeringOnServerPush.cs](../../tests/Alis.Reactive.UnitTests/Triggers/WhenTriggeringOnServerPush.cs)
+- [WhenTriggeringOnSignalR.cs](../../tests/Alis.Reactive.UnitTests/Triggers/WhenTriggeringOnSignalR.cs)
+- [server-push.ts](../../Alis.Reactive.SandboxApp/Scripts/execution/server-push.ts)
+- [signalr.ts](../../Alis.Reactive.SandboxApp/Scripts/execution/signalr.ts)
+
+So:
+
+- trigger kind chooses attachment surface and carried payload root
+- pipeline semantics after attachment stay universal
+- SSE and SignalR are not second-class behavioral lanes
+
+Fresh direct runtime proof now exists too:
+
+- [when-proving-server-push-pipeline-semantics.test.ts](../../Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-server-push-pipeline-semantics.test.ts)
+- [when-proving-signalr-pipeline-semantics.test.ts](../../Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-signalr-pipeline-semantics.test.ts)
+
+Those two tests prove more than attachment:
+
+- condition -> request -> condition ordering is preserved for one trigger
+  occurrence
+- nested `onSuccess` conditions still work in the same chain
+- component reads/writes/calls still use the same schema/runtime semantics
+  inside SSE and SignalR pipelines
 
 ### 6. Validation is rules plus a join to live components
 

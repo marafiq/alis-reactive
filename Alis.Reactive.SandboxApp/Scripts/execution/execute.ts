@@ -47,3 +47,16 @@ export async function executeReaction(reaction: Reaction, ctx?: ExecContext): Pr
       assertNever(reaction, "reaction kind");
   }
 }
+
+/** Execute a plan-ordered reaction chain for one trigger occurrence. */
+export async function executeReactionSequence(
+  reactions: readonly Reaction[],
+  ctx?: ExecContext
+): Promise<void> {
+  for (const reaction of reactions) {
+    const pending = executeReaction(reaction, ctx);
+    if (reaction.kind !== "sequential") {
+      await pending;
+    }
+  }
+}

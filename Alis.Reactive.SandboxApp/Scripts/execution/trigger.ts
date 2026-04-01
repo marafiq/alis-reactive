@@ -2,7 +2,7 @@ import type { Trigger, Reaction, ComponentEntry } from "../types";
 import { resolveRoot } from "../resolution/component";
 import { walk } from "../core/walk";
 import { scope } from "../core/trace";
-import { executeReaction } from "./execute";
+import { executeReactionSequence } from "./execute";
 import { assertNever } from "../core/assert-never";
 import { wireServerPush } from "./server-push";
 import { wireSignalR } from "./signalr";
@@ -15,14 +15,26 @@ export function wireTrigger(
   components?: Record<string, ComponentEntry>,
   signal?: AbortSignal
 ): void {
+  wireTriggerSequence(trigger, [reaction], components, signal);
+}
+
+export function wireTriggerSequence(
+  trigger: Trigger,
+  reactions: readonly Reaction[],
+  components?: Record<string, ComponentEntry>,
+  signal?: AbortSignal
+): void {
   const opts = signal ? { signal } : undefined;
 
   switch (trigger.kind) {
     case "dom-ready":
       if (document.readyState === "complete" || document.readyState === "interactive") {
-        executeReaction(reaction, { components }).catch(err => log.error("reaction failed", { error: String(err) }));
+        executeReactionSequence(reactions, { components }).catch(err =>
+          log.error("reaction failed", { error: String(err) }));
       } else {
-        document.addEventListener("DOMContentLoaded", () => executeReaction(reaction, { components }).catch(err => log.error("reaction failed", { error: String(err) })), opts);
+        document.addEventListener("DOMContentLoaded", () =>
+          executeReactionSequence(reactions, { components }).catch(err =>
+            log.error("reaction failed", { error: String(err) })), opts);
       }
       break;
 
@@ -30,7 +42,8 @@ export function wireTrigger(
       log.debug("custom-event: listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e) => {
         const detail = (e as CustomEvent).detail;
-        executeReaction(reaction, { evt: detail ?? {}, components }).catch(err => log.error("reaction failed", { error: String(err) }));
+        executeReactionSequence(reactions, { evt: detail ?? {}, components }).catch(err =>
+          log.error("reaction failed", { error: String(err) }));
       }, opts);
       break;
 
@@ -47,17 +60,18 @@ export function wireTrigger(
         } else {
           detail = e ?? {};
         }
-        executeReaction(reaction, { evt: detail, components }).catch(err => log.error("reaction failed", { error: String(err) }));
+        executeReactionSequence(reactions, { evt: detail, components }).catch(err =>
+          log.error("reaction failed", { error: String(err) }));
       }, opts);
       break;
     }
 
     case "server-push":
-      wireServerPush(trigger, reaction, components, signal);
+      wireServerPush(trigger, reactions, components, signal);
       break;
 
     case "signalr":
-      wireSignalR(trigger, reaction, components, signal);
+      wireSignalR(trigger, reactions, components, signal);
       break;
 
     default:

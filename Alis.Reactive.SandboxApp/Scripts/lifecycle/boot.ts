@@ -6,7 +6,7 @@
 import type { Plan, Entry, ComponentEntry } from "../types";
 import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
-import { wireTrigger } from "../execution/trigger";
+import { wireTriggerSequence } from "../execution/trigger";
 import { enrichEntries } from "./enrichment";
 import { wireLiveValidation, unwireFields } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
@@ -40,16 +40,51 @@ export function boot(plan: Plan): void {
  * This ensures custom-event listeners exist before dom-ready dispatches into them.
  */
 function wireEntries(entries: Entry[], components: Record<string, ComponentEntry>, signal?: AbortSignal): void {
-  const deferred: Entry[] = [];
-  for (const entry of entries) {
-    if (entry.trigger.kind === "dom-ready") {
-      deferred.push(entry);
+  const deferred: Array<{ trigger: Entry["trigger"]; reactions: Entry["reaction"][] }> = [];
+  for (const group of groupEntriesByTrigger(entries)) {
+    if (group.trigger.kind === "dom-ready") {
+      deferred.push(group);
     } else {
-      wireTrigger(entry.trigger, entry.reaction, components, signal);
+      wireTriggerSequence(group.trigger, group.reactions, components, signal);
     }
   }
-  for (const entry of deferred) {
-    wireTrigger(entry.trigger, entry.reaction, components, signal);
+  for (const group of deferred) {
+    wireTriggerSequence(group.trigger, group.reactions, components, signal);
+  }
+}
+
+function groupEntriesByTrigger(
+  entries: Entry[]
+): Array<{ trigger: Entry["trigger"]; reactions: Entry["reaction"][] }> {
+  const groups = new Map<string, { trigger: Entry["trigger"]; reactions: Entry["reaction"][] }>();
+  const ordered: Array<{ trigger: Entry["trigger"]; reactions: Entry["reaction"][] }> = [];
+
+  for (const entry of entries) {
+    const key = triggerKey(entry.trigger);
+    let group = groups.get(key);
+    if (!group) {
+      group = { trigger: entry.trigger, reactions: [] };
+      groups.set(key, group);
+      ordered.push(group);
+    }
+    group.reactions.push(entry.reaction);
+  }
+
+  return ordered;
+}
+
+function triggerKey(trigger: Entry["trigger"]): string {
+  switch (trigger.kind) {
+    case "dom-ready":
+      return "dom-ready";
+    case "custom-event":
+      return `custom-event:${trigger.event}`;
+    case "component-event":
+      return `component-event:${trigger.componentId}:${trigger.vendor}:${trigger.jsEvent}:${trigger.readExpr ?? ""}`;
+    case "server-push":
+      return `server-push:${trigger.url}:${trigger.eventType ?? ""}`;
+    case "signalr":
+      return `signalr:${trigger.hubUrl}:${trigger.methodName}`;
   }
 }
 

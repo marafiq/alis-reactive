@@ -1,5 +1,5 @@
 import type { ServerPushTrigger, Reaction, ComponentEntry } from "../types";
-import { executeReaction } from "./execute";
+import { executeReactionSequence } from "./execute";
 import { showRetryIndicators, removeRetryIndicators, firstMutationTarget } from "./retry-indicator";
 import { scope } from "../core/trace";
 
@@ -7,7 +7,7 @@ const log = scope("server-push");
 
 interface WiredEntry {
   readonly trigger: ServerPushTrigger;
-  readonly reaction: Reaction;
+  readonly reactions: readonly Reaction[];
   readonly components?: Record<string, ComponentEntry>;
 }
 
@@ -29,7 +29,7 @@ function retrySSE(url: string, entries: readonly WiredEntry[]): void {
   // Signal is intentionally omitted — the original abort context is no longer
   // meaningful for a fresh connection after manual retry.
   for (const entry of entries) {
-    wireServerPush(entry.trigger, entry.reaction, entry.components);
+    wireServerPush(entry.trigger, entry.reactions, entry.components);
   }
 }
 
@@ -80,25 +80,28 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
 
 export function wireServerPush(
   trigger: ServerPushTrigger,
-  reaction: Reaction,
+  reactionOrReactions: Reaction | readonly Reaction[],
   components?: Record<string, ComponentEntry>,
   signal?: AbortSignal
 ): void {
+  const reactions = Array.isArray(reactionOrReactions) ? reactionOrReactions : [reactionOrReactions];
   const managed = getOrCreate(trigger.url, signal);
 
-  // Track the first target element for retry indicator placement
-  const target = firstMutationTarget(reaction);
-  if (target) managed.targetIds.add(target);
+  // Track all top-level mutation targets in the ordered chain for retry indicator placement.
+  for (const reaction of reactions) {
+    const target = firstMutationTarget(reaction);
+    if (target) managed.targetIds.add(target);
+  }
 
   // Store wiring info for retry re-registration (signal omitted — see retrySSE)
-  managed.wired.push({ trigger, reaction, components });
+  managed.wired.push({ trigger, reactions, components });
 
   const handler = (e: MessageEvent) => {
     // Framework only supports JSON payloads — non-JSON is a server-side bug.
     // Throw immediately so the developer fixes their SSE endpoint.
     const evt: Record<string, unknown> = JSON.parse(e.data);
     log.debug("message", { url: trigger.url, eventType: trigger.eventType });
-    executeReaction(reaction, { evt, components }).catch(err =>
+    executeReactionSequence(reactions, { evt, components }).catch(err =>
       log.error("reaction failed", { error: String(err) }));
   };
 

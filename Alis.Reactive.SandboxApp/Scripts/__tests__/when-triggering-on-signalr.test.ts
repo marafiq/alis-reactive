@@ -38,9 +38,14 @@ vi.mock("@microsoft/signalr", () => ({
   LogLevel: { Warning: 4, Information: 2 },
 }));
 
-vi.mock("../execution/execute", () => ({
-  executeReaction: vi.fn(() => Promise.resolve()),
-}));
+vi.mock("../execution/execute", () => {
+  const executeReaction = vi.fn(() => Promise.resolve());
+  return {
+    executeReaction,
+    executeReactionSequence: vi.fn((reactions: Reaction[], ctx: unknown) =>
+      Promise.all(reactions.map(reaction => executeReaction(reaction, ctx)))),
+  };
+});
 
 const seq = (event: string): Reaction => ({
   kind: "sequential",
