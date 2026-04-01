@@ -132,6 +132,22 @@ The real request stages are:
 
 The end-state schema should keep those names and boundaries.
 
+There is one more request invariant the final schema should preserve:
+
+- a request unit gathers once into a resolved transport snapshot
+- after that, the unit executes against that frozen payload
+- later source mutations do not rewrite the in-flight request
+- this is intentional because a future retry story can replay the same request
+  snapshot instead of recollecting
+
+Direct runtime proof:
+
+- [http.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/http.ts)
+  already documents and implements `Gather -> freeze`
+- [when-executing-http-end-to-end.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-executing-http-end-to-end.test.ts)
+  now proves both JSON-body and GET-query snapshots stay fixed even when the
+  source component changes during the fetch
+
 ### 6. Validation is a pure ruleset plus a join to live components
 
 Current validation flow:

@@ -201,6 +201,74 @@ describe("whileLoading", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════
+// Request snapshot semantics — gather once, then execute against frozen payload
+// ═══════════════════════════════════════════════════════════════
+
+describe("request snapshot semantics", () => {
+  it("POST request body stays fixed after gather even if sources change during fetch", async () => {
+    const input = document.createElement("input");
+    input.id = "resident-name";
+    input.value = "Amina";
+    document.body.appendChild(input);
+
+    let capturedBody = "";
+    (globalThis as any).fetch = vi.fn(async (_url: string, init?: RequestInit) => {
+      capturedBody = String(init?.body ?? "");
+      input.value = "Bea";
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => "application/json" },
+        json: () => Promise.resolve({}),
+        text: () => Promise.resolve("{}"),
+      };
+    });
+
+    await execRequest({
+      verb: "POST",
+      url: "/api/save",
+      gather: [
+        { kind: "component", componentId: "resident-name", vendor: "native", name: "Name", readExpr: "value" },
+      ],
+    });
+
+    expect(capturedBody).toBe('{"Name":"Amina"}');
+    expect(input.value).toBe("Bea");
+  });
+
+  it("GET query string stays fixed after gather even if sources change during fetch", async () => {
+    const input = document.createElement("input");
+    input.id = "resident-city";
+    input.value = "Albany";
+    document.body.appendChild(input);
+
+    let capturedUrl = "";
+    (globalThis as any).fetch = vi.fn(async (url: string) => {
+      capturedUrl = url;
+      input.value = "Boston";
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => "application/json" },
+        json: () => Promise.resolve({}),
+        text: () => Promise.resolve("{}"),
+      };
+    });
+
+    await execRequest({
+      verb: "GET",
+      url: "/api/search",
+      gather: [
+        { kind: "component", componentId: "resident-city", vendor: "native", name: "City", readExpr: "value" },
+      ],
+    });
+
+    expect(capturedUrl).toBe("/api/search?City=Albany");
+    expect(input.value).toBe("Boston");
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
 // FormData — contentType form-data uses FormData
 // ═══════════════════════════════════════════════════════════════
 

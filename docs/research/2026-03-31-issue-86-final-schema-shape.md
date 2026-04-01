@@ -10,6 +10,9 @@
 - `Request` stays a first-class DSL unit and keeps the public stage names:
   `gather`, `as`, `whileLoading`, `validate`, `response.onSuccess`,
   `response.onError`, `response.chained`.
+- Each request unit is immutable after `gather` resolves: later source changes
+  do not rewrite the in-flight payload, which keeps future retry support
+  open without recollection.
 - Pipeline order is first-class: conditions, requests, parallel blocks, and
   commands keep declaration order instead of being flattened into one stage.
 - One value-flow law governs the whole runtime: resolve root, access from root,
