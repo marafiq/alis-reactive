@@ -10,6 +10,8 @@
 - `Request` stays a first-class DSL unit and keeps the public stage names:
   `gather`, `as`, `whileLoading`, `validate`, `response.onSuccess`,
   `response.onError`, `response.chained`.
+- Pipeline order is first-class: conditions, requests, parallel blocks, and
+  commands keep declaration order instead of being flattened into one stage.
 - One value-flow law governs the whole runtime: resolve root, access from root,
   shape if needed, consume.
 - A component opts into `binding` only when its vertical slice can declare a
@@ -36,7 +38,8 @@
 - `Reaction`: one trigger-attached behavior.
 - `Trigger`: wake-up source plus explicit trigger payload contract.
 - `TriggerPayload`: the carried payload root for a trigger.
-- `Pipeline`: pre-commands plus one optional structural stage.
+- `Pipeline`: ordered executable steps.
+- `PipelineStep`: one ordered command, condition, request, or parallel block.
 - `When`: guarded branching stage.
 - `Request`: full HTTP unit.
 - `Response`: success/error/chained stages owned by a request.
@@ -136,9 +139,10 @@ type PayloadValue =
   | { kind: "object"; fields: Record<string, PayloadValue> }
   | { kind: "array"; items: PayloadValue[] };
 
+type PipelineStep = Command | When | Request | Parallel;
+
 type Pipeline = {
-  commands?: Command[];
-  stage?: When | Request | Parallel;
+  steps: PipelineStep[];
 };
 
 type When = {
@@ -188,7 +192,7 @@ type Request = {
   url: string;
   gather?: GatherItem[];
   as?: "json" | "formData"; // GET implies query-string sink
-  whileLoading?: Command[];
+  whileLoading?: Command[]; // current public DSL keeps this commands-only
   validate?: Validation;
   response?: Response;
 };
@@ -207,7 +211,7 @@ type ErrorHandler = {
 type Parallel = {
   kind: "parallel";
   requests: Request[];
-  onAllSettled?: Command[];
+  onAllSettled?: Command[]; // current public DSL keeps this commands-only
 };
 
 type GatherItem =
@@ -355,68 +359,70 @@ type ValidationOp = GuardOp;
         }
       },
       "pipeline": {
-        "stage": {
-          "kind": "request",
-          "method": "POST",
-          "url": "/orders/save",
-          "gather": [
-            { "kind": "includeAll" }
-          ],
-          "validate": {
-            "formId": "order-form",
-            "targets": [
-              {
-                "componentId": "MyApp_Models_OrderModel__Address_City",
-                "rules": [
-                  {
-                    "rule": "required",
-                    "message": "City is required"
-                  }
-                ]
-              }
-            ]
-          },
-          "response": {
-            "onSuccess": [
-              {
-                "commands": [
-                  {
-                    "kind": "apply",
-                    "target": {
-                      "kind": "component",
-                      "target": { "id": "alisFusionToast", "vendor": "fusion" }
-                    },
-                    "mutation": {
-                      "kind": "set",
-                      "path": "content",
-                      "value": {
-                        "kind": "access",
-                        "root": { "kind": "response" },
-                        "access": {
-                          "steps": [
-                            { "kind": "member", "path": "resident.name" }
-                          ],
-                          "shape": "string"
+        "steps": [
+          {
+            "kind": "request",
+            "method": "POST",
+            "url": "/orders/save",
+            "gather": [
+              { "kind": "includeAll" }
+            ],
+            "validate": {
+              "formId": "order-form",
+              "targets": [
+                {
+                  "componentId": "MyApp_Models_OrderModel__Address_City",
+                  "rules": [
+                    {
+                      "rule": "required",
+                      "message": "City is required"
+                    }
+                  ]
+                }
+              ]
+            },
+            "response": {
+              "onSuccess": [
+                {
+                  "steps": [
+                    {
+                      "kind": "apply",
+                      "target": {
+                        "kind": "component",
+                        "target": { "id": "alisFusionToast", "vendor": "fusion" }
+                      },
+                      "mutation": {
+                        "kind": "set",
+                        "path": "content",
+                        "value": {
+                          "kind": "access",
+                          "root": { "kind": "response" },
+                          "access": {
+                            "steps": [
+                              { "kind": "member", "path": "resident.name" }
+                            ],
+                            "shape": "string"
+                          }
                         }
                       }
-                    }
-                  },
-                  {
-                    "kind": "apply",
-                    "target": {
-                      "kind": "component",
-                      "target": { "id": "alisFusionToast", "vendor": "fusion" }
                     },
-                    "mutation": {
-                      "kind": "call",
-                      "path": "show"
+                    {
+                      "kind": "apply",
+                      "target": {
+                        "kind": "component",
+                        "target": { "id": "alisFusionToast", "vendor": "fusion" }
+                      },
+                      "mutation": {
+                        "kind": "call",
+                        "path": "show"
+                      }
                     }
-                  }
-                ]
-              }
-            ]
+                  ]
+                }
+              ]
+            }
           }
-        }
+        ]
       }
     }
   ]
@@ -564,6 +570,8 @@ binding value.
   the DSL produced them is not a runtime-schema concern.
 - `bindingValue(componentId)` gives request/validation/includeAll one canonical
   participation lane.
+- ordered `pipeline.steps[]` keeps `When -> Request -> When -> Parallel`
+  sequences honest instead of flattening them into one stage.
 - generic `access(root, access)` gives triggers, responses, components,
   elements, and document one shared read language.
 - compositional `access.steps[]` means future slice onboarding can add
@@ -583,3 +591,38 @@ binding value.
 
 Native action-link remains a constrained projection over the same `When` +
 `Request` core, not a second top-level plan family.
+
+## Stage Mix Rules
+
+This is the stage-mix contract the schema now claims.
+
+- outer `pipeline.steps[]`
+  - supports ordered mixing of `Command`, `When`, `Request`, and `Parallel`
+  - example: `Command -> When -> Request -> When -> Parallel -> Command`
+- `When.branches[].pipeline`
+  - full nested `Pipeline`
+  - preserves order inside each branch
+- `Request.whileLoading`
+  - commands only
+  - this matches the current public DSL and builder enforcement
+- `Request.response.onSuccess[]`
+  - full nested `Pipeline`
+  - can mix commands, conditions, requests, and parallel blocks in order
+- `Request.response.onError[]`
+  - full nested `Pipeline`
+  - same capability as `onSuccess`, with required status matching
+- `Request.response.chained`
+  - exactly one `Request`
+  - stays a request-owned continuation stage, not a generic pipeline slot
+- `Parallel.requests[]`
+  - each branch is a full `Request`
+- `Parallel.onAllSettled`
+  - commands only
+  - this matches the current public DSL and builder enforcement
+
+So the honest architecture is:
+
+- one ordered outer pipeline language
+- full nested pipelines in response handlers and conditional branches
+- request-owned transport stages stay request-owned
+- a few deliberately commands-only slots stay commands-only

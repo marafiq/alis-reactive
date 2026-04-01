@@ -175,6 +175,23 @@ Proof:
 - [ParallelBuilder.cs](../../Alis.Reactive/Builders/Requests/ParallelBuilder.cs)
 - [http.ts](../../Alis.Reactive.SandboxApp/Scripts/execution/http.ts)
 
+### 5a. Outer pipeline order is real
+
+The public DSL and builders already prove mixed outer ordering like:
+
+- `When -> Request -> When`
+- `Request -> When -> Request`
+- `When -> Parallel -> When`
+
+Proof:
+
+- [PipelineBuilder.cs](../../Alis.Reactive/Builders/PipelineBuilder.cs)
+- [WhenMixingConditionsWithHttp.cs](../../tests/Alis.Reactive.UnitTests/Architecture/WhenMixingConditionsWithHttp.cs)
+- [WhenUsingConditionsInsideResponseHandlers.cs](../../tests/Alis.Reactive.UnitTests/Architecture/WhenUsingConditionsInsideResponseHandlers.cs)
+
+This forces `Pipeline` to preserve ordered steps instead of collapsing to one
+structural stage.
+
 ### 6. Validation is rules plus a join to live components
 
 Proof:

@@ -247,7 +247,8 @@ This is the smallest working model that fits the proven seams.
 - `Reaction`: one `.Reactive(...)` unit.
 - `Trigger`: event attachment plus explicit trigger payload contract.
 - `TriggerPayload`: carried trigger payload root.
-- `Pipeline`: commands plus one optional structural stage.
+- `Pipeline`: ordered executable steps.
+- `PipelineStep`: one ordered command, condition, request, or parallel block.
 - `When`: guarded branching stage.
 - `Request`: HTTP unit with its own DSL stages.
 - `Response`: success/error/chained stages owned by a request.
@@ -340,9 +341,10 @@ type PayloadValue =
   | { kind: "object"; fields: Record<string, PayloadValue> }
   | { kind: "array"; items: PayloadValue[] }
 
+type PipelineStep = Command | When | Request | Parallel
+
 type Pipeline = {
-  commands?: Command[]
-  stage?: When | Request | Parallel
+  steps: PipelineStep[]
 }
 
 type When = {
@@ -357,7 +359,7 @@ type Request = {
   url: string
   gather?: GatherItem[]
   as?: "json" | "formData"
-  whileLoading?: Command[]
+  whileLoading?: Command[] // current DSL keeps this commands-only
   validate?: Validation
   response?: Response
 }
@@ -371,7 +373,7 @@ type Response = {
 type Parallel = {
   kind: "parallel"
   requests: Request[]
-  onAllSettled?: Command[]
+  onAllSettled?: Command[] // current DSL keeps this commands-only
 }
 
 type GatherItem =
@@ -479,7 +481,38 @@ The runtime gets dumber:
 - no binding-path keyed registration object leaking consumer semantics
 - one canonical field-value contract
 
-### C. Validation proof
+### C. Ordered pipeline proof
+
+`PipelineBuilder` and the architecture tests already prove that outer pipeline
+order is real:
+
+- commands execute in declaration order
+- `When`, `Request`, and `Parallel` can be interleaved
+- conditions can appear before HTTP, after HTTP, and around chained/parallel
+  requests
+
+Proof:
+
+- [PipelineBuilder.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/Builders/PipelineBuilder.cs)
+- [WhenMixingConditionsWithHttp.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Architecture/WhenMixingConditionsWithHttp.cs)
+- [WhenUsingConditionsInsideResponseHandlers.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Architecture/WhenUsingConditionsInsideResponseHandlers.cs)
+
+So the schema cannot collapse a pipeline into `commands + one stage`.
+It needs ordered steps:
+
+```json
+{
+  "pipeline": {
+    "steps": [
+      { "kind": "when", "...": "..." },
+      { "kind": "request", "...": "..." },
+      { "kind": "when", "...": "..." }
+    ]
+  }
+}
+```
+
+### D. Validation proof
 
 Current validation needs enrichment because the extracted rules know field
 identity, but the runtime needs a canonical component join and semantic value
@@ -527,7 +560,7 @@ Proof for deterministic id generation:
 - [IdGenerator.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/IdGenerator.cs)
 - [ExpressionPathHelper.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/ExpressionPathHelper.cs)
 
-### D. Component event proof
+### E. Component event proof
 
 Current component events are already self-sufficient at wire time because they
 carry:
@@ -580,7 +613,7 @@ Runtime execution becomes:
 
 The runtime no longer invents `{ event, value }` structure on its own.
 
-### E. Response payload proof
+### F. Response payload proof
 
 `response` is already a carried root in
 [http.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/http.ts).
@@ -615,7 +648,7 @@ This is the same value language as:
 - dispatch payloads
 - mutation args
 
-### F. Request unit proof
+### G. Request unit proof
 
 This is the request shape that matches the public DSL and the runtime:
 
@@ -640,7 +673,7 @@ This is the request shape that matches the public DSL and the runtime:
   "response": {
     "onSuccess": [
       {
-        "commands": [
+        "steps": [
           { "kind": "dispatch", "event": "orderSaved" }
         ]
       }
@@ -649,7 +682,7 @@ This is the request shape that matches the public DSL and the runtime:
       {
         "status": 400,
         "pipeline": {
-          "commands": [
+          "steps": [
             { "kind": "validationErrors", "formId": "order-form" }
           ]
         }
@@ -722,7 +755,36 @@ This is the design move that closes the first real pressure point:
 - terminal method-return read still works
 - invoke, then keep walking deeper into the returned object now also works
 
-### 2. Canonical binding value
+### 2. Ordered pipeline execution
+
+```ts
+function executePipeline(plan: Plan, ctx: ExecContext, pipeline: Pipeline): void {
+  for (const step of pipeline.steps) {
+    switch (step.kind) {
+      case "apply":
+      case "dispatch":
+      case "validationErrors":
+      case "into":
+        executeCommand(plan, ctx, step)
+        break
+      case "when":
+        executeWhen(plan, ctx, step)
+        break
+      case "request":
+        executeRequest(plan, ctx, step)
+        break
+      case "parallel":
+        executeParallel(plan, ctx, step)
+        break
+    }
+  }
+}
+```
+
+This is the runtime shape that keeps declaration order honest without making the
+runtime smarter.
+
+### 3. Canonical binding value
 
 ```ts
 function readBindingValue(plan: Plan, componentId: string): unknown {
@@ -741,7 +803,7 @@ function readBindingValue(plan: Plan, componentId: string): unknown {
 on the resolved component root, but it cannot depend on `trigger` or `response`
 context.
 
-### 3. Generic read
+### 4. Generic read
 
 ```ts
 function readValue(plan: Plan, ctx: ExecContext, value: Value): unknown {
@@ -762,7 +824,7 @@ function readValue(plan: Plan, ctx: ExecContext, value: Value): unknown {
 }
 ```
 
-### 4. Explicit trigger payload build
+### 5. Explicit trigger payload build
 
 ```ts
 function buildTriggerPayload(plan: Plan, host: unknown, target: ComponentRef | null, payload: TriggerPayload): unknown {
@@ -783,7 +845,7 @@ This is simpler than today because:
 - no validation enrichment DTO copying
 - no separate model for request gather vs command args vs response reads
 
-### 5. Explicit component ref proof
+### 6. Explicit component ref proof
 
 Because `ComponentRef<TComponent, TModel>` already lowers both string-id and
 app-level component refs, the same value language can read from non-input
@@ -884,6 +946,8 @@ flowchart LR
 - Explicit component refs are a second usage form beside binding participation,
   not a special case of it.
 - `Request` stays a first-class DSL-shaped unit.
+- Ordered `pipeline.steps[]` preserves real declaration order for mixed
+  condition/request/parallel flows.
 - Validation targets canonical component identity and reuses the component
   registry through `binding`.
 - `IncludeAll` and validation both read through the same canonical binding
@@ -907,8 +971,31 @@ What is already proven here is enough to stop designing from stitched DTOs:
 
 - the runtime seams are known
 - the request unit boundary is known
+- the ordered outer-pipeline boundary is known
 - the component registry plus optional binding seam is known
 - the trigger payload problem is known
 - the first real read-algebra pressure point has a clean schema answer
 - the end-state schema can now be designed from these truths instead of from the
   current leaked wire format
+
+## Stage Mix Matrix
+
+This is the concrete mix-and-match result forced by the real builders and tests.
+
+| Stage surface | What it can contain | Order preserved? | Proof |
+|---|---|---|---|
+| outer `Pipeline` | `Command`, `When`, `Request`, `Parallel` | yes | [PipelineBuilder.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/Builders/PipelineBuilder.cs), [WhenMixingConditionsWithHttp.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Architecture/WhenMixingConditionsWithHttp.cs) |
+| `When.branches[].pipeline` | full nested `Pipeline` | yes | [WhenEnforcingPipelineRules.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Architecture/WhenEnforcingPipelineRules.cs) |
+| `Request.whileLoading` | `Command[]` only | yes | [HttpRequestBuilder.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/Builders/Requests/HttpRequestBuilder.cs) |
+| `Request.response.onSuccess[]` | full nested `Pipeline` | yes | [ResponseBuilder.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/Builders/Requests/ResponseBuilder.cs), [WhenUsingConditionsInsideResponseHandlers.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Architecture/WhenUsingConditionsInsideResponseHandlers.cs), [when-http-handlers-contain-nested-reactions.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-http-handlers-contain-nested-reactions.test.ts) |
+| `Request.response.onError[]` | full nested `Pipeline` | yes | [ResponseBuilder.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/Builders/Requests/ResponseBuilder.cs), [WhenUsingConditionsInsideResponseHandlers.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Architecture/WhenUsingConditionsInsideResponseHandlers.cs), [when-http-handlers-contain-nested-reactions.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-http-handlers-contain-nested-reactions.test.ts) |
+| `Request.response.chained` | one `Request` | request order only | [ResponseBuilder.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/Builders/Requests/ResponseBuilder.cs), [WhenRequestingFromServer.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Requests/WhenRequestingFromServer.cs) |
+| `Parallel.requests[]` | `Request[]` | branch order is declarative, execution is concurrent | [ParallelBuilder.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/Builders/Requests/ParallelBuilder.cs) |
+| `Parallel.onAllSettled` | `Command[]` only | yes | [ParallelBuilder.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/Builders/Requests/ParallelBuilder.cs) |
+
+So the stage-pressure answer is:
+
+- yes, stages mix
+- yes, order matters
+- no, not every slot is equally permissive
+- the constrained slots are explicit and builder-proven

@@ -27,6 +27,8 @@ Review break cases only within these supported surfaces:
   - `response.onSuccess`
   - `response.onError`
   - `response.chained`
+- ordered outer pipelines, where commands, conditions, requests, and parallel
+  blocks keep declaration order
 - `Parallel` with `onAllSettled`
 - component, element, document, trigger, and response roots
 - value reads as compositional access steps:
@@ -49,6 +51,12 @@ Review break cases only within these supported surfaces:
   - request gather
   - `includeAll`
   - validation
+
+Be careful about current sub-boundaries:
+
+- `response.onSuccess` and `response.onError` are full nested pipelines
+- `whileLoading` is commands-only in the current public DSL
+- `Parallel.onAllSettled` is commands-only in the current public DSL
 
 The current schema does **not** claim to support:
 
@@ -74,6 +82,8 @@ of these places:
 
 - a non-input component that still participates in `binding` cleanly
 - a request chain that gathers from nested response data into another request
+- a mixed outer pipeline where declaration order is lost, for example
+  `When -> Request -> When`
 - a validation rule or condition that cannot be expressed without copied runtime
   enrichment
 - a trigger payload that still requires runtime invention
