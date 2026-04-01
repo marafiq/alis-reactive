@@ -18,6 +18,20 @@ mechanics:
 4. shape it if needed
 5. consume it
 
+## Scope Boundary
+
+This document now distinguishes two different claim levels:
+
+- **current-runtime proof**: directly exercised by the current emitted plan
+  contract, current TS runtime, and current public DSL
+- **final-schema requirement**: the end-state hidden contract that cleanly
+  matches those seams, even if the current runtime still emits/executes the
+  older vocabulary
+
+When this document says the final schema "must" do something, that is an
+architectural conclusion derived from the current seams. It is not the same as
+claiming the hidden end-state schema/runtime have already been implemented.
+
 ## Code-Backed Runtime Truths
 
 ### 1. Binding participation and `.Reactive(...)` triggers are already different
@@ -254,7 +268,9 @@ They also now have direct ordered-runtime proof, not just structural proof:
   in declaration order
 - [when-proving-signalr-pipeline-semantics.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-signalr-pipeline-semantics.test.ts)
   proves the same thing for SignalR, including non-input fusion component
-  participation in gather and later component reads
+- [when-managing-pooled-realtime-partials.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-managing-pooled-realtime-partials.test.ts)
+  proves shared EventSource and HubConnection teardown is subscriber-scoped
+  across merged partials
 
 ## Focused Runtime Proofs Added In This Pass
 
@@ -301,7 +317,8 @@ Focused re-run on **April 1, 2026** after the array-walking additions:
 
 The important architectural boundary exposed by those proofs is:
 
-- binding participation is one registry-backed facet on components
+- binding participation is one registry-backed facet on components, with current
+  proof coverage centered on readable bound surfaces
 - explicit component refs are a separate usage form
 - both still lower into the same resolved-root algebra
 - the effect side is `set` or `call`
@@ -309,6 +326,8 @@ The important architectural boundary exposed by those proofs is:
   component, and binding reads
 - same-trigger lowered segments must execute as one ordered reaction chain,
   otherwise conditional guards yield and break declaration order
+- the end-state schema should emit those same-trigger segments already grouped,
+  so runtime execution does not need to rediscover that chain shape
 
 ## Direct Runtime Ordering Proof Added On April 1, 2026
 
@@ -331,6 +350,14 @@ Supporting code:
 Fresh execution evidence:
 
 - focused trigger/order sweep: **29 tests passed**
+- focused chained/realtime rerun after response-context and pooled-subscriber fixes:
+  **37 tests passed**
+- focused realtime end-to-end rerun after the same fixes: **2 tests passed**
+- focused HTTP / merge / enrichment rerun after the same fixes:
+  **153 tests passed**
+- authoritative schema-center runtime sweep across triggers, requests,
+  validation, merge lifecycle, and proof surfaces: **21 files, 409 tests
+  passed**
 - broader TS runtime sweep after the ordering change: **1,149 tests passed**
 - one stale suite still fails to parse:
   [when-proving-end-state-schema.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-end-state-schema.test.ts)
@@ -352,18 +379,19 @@ This is the smallest working model that fits the proven seams.
 - `ComponentRef`: explicit runtime root identity for a component surface.
 - `Reaction`: one `.Reactive(...)` unit.
 - `Trigger`: event attachment plus explicit trigger payload contract.
-- `TriggerPayload`: carried trigger payload root.
+- `TriggerPayload`: carried trigger payload root, built from the same value /
+  access algebra using payload-scoped roots.
 - `Pipeline`: ordered executable steps.
 - `PipelineStep`: one ordered command, condition, request, or parallel block.
 - `When`: guarded branching stage.
 - `Request`: HTTP unit with its own DSL stages.
 - `Response`: success/error/chained stages owned by a request.
 - `Parallel`: concurrent request unit with `onAllSettled`.
-- `Value`: one consumed value in guards, commands, gather, dispatch, and payloads.
+- `Value`: one shared value/access algebra, parameterized by which roots are
+  legal in that scope.
+- `BindingAccess`: the self-sufficient canonical value contract for a binding.
 - `AccessStep`: one composable member or invoke step.
 - `Access`: generic read access over a resolved root.
-- `PayloadAccessStep`: one composable member or invoke step while building
-  trigger payload.
 - `Validation`: request-time validation plan.
 - `ValidationTarget`: rules for one canonical component id.
 
@@ -381,25 +409,19 @@ type Shape =
   | "object"
   | { kind: "array"; of: Shape }
 
-type AccessStep =
-  | { kind: "member"; path: string }
-  | { kind: "invoke"; method: string; args?: Value[] }
+type BindingLiteral = { kind: "literal"; value: unknown }
 
-type Access = {
-  steps: AccessStep[]
+type AccessStep<TValue> =
+  | { kind: "member"; path: string }
+  | { kind: "invoke"; method: string; args?: TValue[] }
+
+type Access<TValue> = {
+  steps: AccessStep<TValue>[]
   rawShape?: Shape
   shape?: Shape
 }
 
-type PayloadAccessStep =
-  | { kind: "member"; path: string }
-  | { kind: "invoke"; method: string; args?: PayloadValue[] }
-
-type PayloadAccess = {
-  steps: PayloadAccessStep[]
-  rawShape?: Shape
-  shape?: Shape
-}
+type BindingAccess = Access<BindingLiteral> // self-sufficient canonical semantic value
 
 type ComponentRef = {
   id: string
@@ -408,7 +430,7 @@ type ComponentRef = {
 
 type Binding = {
   path: string
-  access: Access // self-sufficient canonical semantic value
+  access: BindingAccess // self-sufficient canonical semantic value
 }
 
 type Component = {
@@ -439,13 +461,6 @@ type TriggerPayload =
   | { kind: "none" }
   | { kind: "host" }
   | { kind: "build"; value: PayloadValue }
-
-type PayloadValue =
-  | { kind: "literal"; value: unknown }
-  | { kind: "bindingValue"; componentId: string }
-  | { kind: "access"; root: "host" | "target"; access: PayloadAccess }
-  | { kind: "object"; fields: Record<string, PayloadValue> }
-  | { kind: "array"; items: PayloadValue[] }
 
 type PipelineStep = Command | When | Request | Parallel
 
@@ -483,22 +498,29 @@ type Parallel = {
 }
 
 type GatherItem =
-  | { kind: "field"; name: string; value: Value }
+  | { kind: "field"; name: string; value: RuntimeValue }
   | { kind: "includeAll" }
 
-type RootRef =
+type RuntimeRoot =
   | { kind: "trigger" }
   | { kind: "response" }
   | { kind: "component"; target: ComponentRef }
   | { kind: "element"; id: string }
   | { kind: "document" }
 
-type Value =
+type PayloadRoot =
+  | { kind: "payloadHost" }
+  | { kind: "payloadTarget" }
+
+type Value<TRoot> =
   | { kind: "literal"; value: unknown }
   | { kind: "bindingValue"; componentId: string }
-  | { kind: "access"; root: RootRef; access: Access }
-  | { kind: "object"; fields: Record<string, Value> }
-  | { kind: "array"; items: Value[] }
+  | { kind: "access"; root: TRoot; access: Access<Value<TRoot>> }
+  | { kind: "object"; fields: Record<string, Value<TRoot>> }
+  | { kind: "array"; items: Value<TRoot>[] }
+
+type RuntimeValue = Value<RuntimeRoot>
+type PayloadValue = Value<PayloadRoot>
 
 type Validation = {
   formId: string
@@ -509,6 +531,11 @@ type ValidationTarget = {
   componentId: string
   rules: ValidationRule[]
 }
+
+type ValidationValue = Extract<
+  RuntimeValue,
+  { kind: "bindingValue" } | { kind: "literal" }
+>
 ```
 
 ## Why These Objects Fit The Real Runtime
@@ -646,6 +673,7 @@ Proof:
 
 - [server-push.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/server-push.ts)
 - [signalr.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/signalr.ts)
+- [when-managing-pooled-realtime-partials.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-managing-pooled-realtime-partials.test.ts)
 - [when-triggering-on-server-push.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-triggering-on-server-push.test.ts)
 - [when-triggering-on-signalr.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-triggering-on-signalr.test.ts)
 
@@ -977,14 +1005,17 @@ function buildTriggerPayload(plan: Plan, host: unknown, target: ComponentRef | n
     case "host":
       return host ?? {}
     case "build":
-      return readPayloadValue(plan, host, target, payload.value)
+      return readValue(plan, {
+        payloadHost: host ?? {},
+        payloadTarget: target ?? undefined,
+      }, payload.value)
   }
 }
 ```
 
 This is simpler than today because:
 
-- no runtime-invented native event payload
+- the final schema no longer needs runtime-invented native event payloads
 - no validation enrichment DTO copying
 - no separate model for request gather vs command args vs response reads
 
@@ -1062,24 +1093,24 @@ flowchart LR
   D --> F["IncludeAll emits binding.path=value"]
 ```
 
-### 2. Component event with typed payload
+### 2. Component event with explicit typed payload
 
 ```mermaid
 flowchart LR
   A["componentEvent(target, event, payload)"] --> B["wire listener"]
   B --> C["event fires"]
-  C --> D["build trigger payload explicitly"]
+  C --> D["final schema builds trigger payload explicitly"]
   D --> E["execute reaction with trigger root"]
 ```
 
-### 3. Request success to chained request
+### 3. Request success to chained request continuity
 
 ```mermaid
 flowchart LR
   A["request.gather"] --> B["fetch"]
   B --> C["response root"]
   C --> D["response.onSuccess"]
-  C --> E["response.chained.gather from response"]
+  C --> E["runtime continuity keeps response readable for chained gather"]
 ```
 
 ## What This Proof Locks
@@ -1095,11 +1126,13 @@ flowchart LR
   registry through `binding`.
 - `IncludeAll` and validation both read through the same canonical binding
   value contract.
-- Trigger payload structure must be explicit in the schema, not invented in TS.
-- Access is now compositional, so invoke-then-walk is an extension of the same
-  read language instead of a schema redesign.
-- `response`, `trigger`, and resolved component roots all participate in the
-  same access model after root resolution.
+- The final schema must make trigger payload structure explicit instead of
+  letting TS invent native/fusion-specific shapes.
+- Compositional access is the locked end-state answer for invoke-then-walk, but
+  that specific `invoke -> member` execution remains a design requirement until
+  the hidden end-state runtime executes the compositional access model directly.
+- `response`, `trigger`, and resolved component roots all fit one shared access
+  algebra in the end-state schema after root resolution.
 
 ## What This Proof Deliberately Does Not Pretend To Solve Yet
 

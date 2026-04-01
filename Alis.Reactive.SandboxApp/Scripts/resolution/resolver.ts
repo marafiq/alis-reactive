@@ -25,13 +25,29 @@ export function resolveSource(source: BindSource, ctx?: ExecContext): unknown {
 
 /**
  * Event path resolution — walks dot-notation path against execution context.
- * Uses walk() from walk.ts (shared primitive).
+ * Only the public runtime roots are visible here: evt and responseBody.
  */
 export function resolveEventPath(path: string, ctx?: ExecContext): unknown {
-  if (!ctx) return undefined;
-  const result = walk(ctx, path);
+  const scoped = resolveScopedContextPath(path, ctx);
+  if (!scoped) return undefined;
+
+  const result = scoped.path ? walk(scoped.root, scoped.path) : scoped.root;
   log.trace("resolve", { path, value: result });
   return result;
+}
+
+function resolveScopedContextPath(
+  path: string,
+  ctx?: ExecContext
+): { root: unknown; path: string } | undefined {
+  if (!ctx) return undefined;
+  if (path === "evt") return { root: ctx.evt, path: "" };
+  if (path === "responseBody") return { root: ctx.responseBody, path: "" };
+  if (path.startsWith("evt.")) return { root: ctx.evt, path: path.slice(4) };
+  if (path.startsWith("responseBody.")) {
+    return { root: ctx.responseBody, path: path.slice("responseBody.".length) };
+  }
+  return undefined;
 }
 
 /**

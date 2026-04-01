@@ -155,6 +155,42 @@ describe("multi-status error routing", () => {
 
     expect(document.getElementById("error")!.textContent).toBe("unknown error");
   });
+
+  it("runs all handlers that match the same status in declaration order", async () => {
+    (globalThis as any).fetch = mockFetch(422, {});
+
+    const req: RequestDescriptor = {
+      verb: "POST",
+      url: "/api/validate",
+      onError: [
+        { statusCode: 422, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "first" } } }] },
+        { statusCode: 422, commands: [{ kind: "mutate-element", target: "error", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "second" } } }] },
+      ],
+    };
+
+    await execRequest(req);
+
+    expect(document.getElementById("error")!.textContent).toBe("second");
+  });
+});
+
+describe("multiple success handlers", () => {
+  it("runs all success handlers in declaration order", async () => {
+    (globalThis as any).fetch = mockFetch(200, { ok: true });
+
+    const req: RequestDescriptor = {
+      verb: "POST",
+      url: "/api/save",
+      onSuccess: [
+        { commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "first" } } }] },
+        { commands: [{ kind: "mutate-element", target: "result", mutation: { kind: "set-prop", prop: "textContent", value: { kind: "literal", value: "second" } } }] },
+      ],
+    };
+
+    await execRequest(req);
+
+    expect(document.getElementById("result")!.textContent).toBe("second");
+  });
 });
 
 describe("GET with gather items as URL params", () => {

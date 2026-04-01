@@ -88,6 +88,90 @@ These files remain non-authoritative:
 Those should be replaced or retired once the hidden end-state contract is
 implemented for real.
 
+### 5. Component-event payloads are still legacy-shaped in the current runtime
+
+The final schema design now requires trigger payloads to be explicit. The
+current runtime still does not execute that end-state contract directly:
+
+- native component events still invent legacy payload objects in
+  [trigger.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/trigger.ts)
+- fusion component events still forward callback payloads through the current
+  plan shape
+
+So:
+
+- this is not a schema-fit gap
+- this is still an implementation gap before the hidden end-state contract is
+  real
+
+### 6. Binding participation proof is narrower than the schema's extension surface
+
+The schema intentionally leaves room for any component slice to opt into
+canonical semantic participation through `binding`.
+
+What is actually proven today is narrower:
+
+- current readable participation is centered on registered/readable bound
+  components
+- the current public C# gather surface still hard-requires `IInputComponent`
+  semantics even for the raw-id escape hatch
+- non-input component command semantics are proven
+- non-input component binding participation remains an extension surface, not a
+  current-runtime fact
+
+### 7. Response-based chained gather is runtime-proven but not DSL-proven
+
+The runtime now preserves success context into chained requests, so response
+scope is readable for chained gather in:
+
+- [http.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/http.ts)
+- [when-chaining-http-requests.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-chaining-http-requests.test.ts)
+
+But the current public C# DSL does not yet directly prove response-based
+`chained.gather` lowering. Typed response reads are proven for `OnSuccess`, not
+for chained gather configuration itself.
+
+### 8. Duplicate binding identity is still a current-contract limitation
+
+The current emitted/runtime contract still keys registered components by binding
+path and rejects duplicates in:
+
+- [ReactivePlan.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive/ReactivePlan.cs)
+
+That means repeater/grid-like duplicate binding identity is still a real current
+implementation limitation. The recent merge/runtime fixes now preserve a
+surviving sibling registration when one partial with the same key is removed,
+but the emitted/current plan contract still cannot model simultaneous duplicate
+binding identities as first-class distinct components. The end-state schema
+direction separates component identity from optional binding participation more
+cleanly, but the hidden end-state contract is not implemented yet.
+
+### 9. `WhileLoading` is commands-only and not self-reverting by itself
+
+The current public DSL and runtime prove:
+
+- `WhileLoading(...)` is commands-only
+- the runtime executes those commands before fetch
+- success/error handlers explicitly undo state where needed
+
+So any documentation implying automatic self-revert behavior in the runtime
+would be inaccurate.
+
+### 10. JSON gather still applies sink-specific empty-string normalization
+
+The current runtime still treats empty string differently by transport sink:
+
+- JSON body gather normalizes `""` to `null`
+- GET query and `formData` keep `""` as string data
+
+Current seam:
+
+- [gather.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/gather.ts)
+
+That is a current-contract behavior leak, not an end-state schema concept. The
+hidden end-state runtime should either remove that leak or make the policy
+explicit at one deliberate seam.
+
 ## Closure Gaps
 
 These are the remaining gates before issue #86 can honestly be called done.

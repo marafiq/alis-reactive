@@ -10,8 +10,19 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Reaction } from "../types";
 
 // Track registered handlers per method name
-const handlers = new Map<string, (...args: unknown[]) => void>();
+const handlers = new Map<string, Array<(...args: unknown[]) => void>>();
 let startCalled = false;
+const connections: Array<{ stop: ReturnType<typeof vi.fn>; state: string }> = [];
+
+function handlerCount(method: string): number {
+  return (handlers.get(method) ?? []).length;
+}
+
+function emit(method: string, ...args: unknown[]) {
+  for (const handler of handlers.get(method) ?? []) {
+    handler(...args);
+  }
+}
 
 // Must declare vi.mock BEFORE any imports of the target module.
 // vi.mock is hoisted by vitest.
@@ -21,20 +32,35 @@ vi.mock("@microsoft/signalr", () => ({
     withAutomaticReconnect() { return this; }
     configureLogging() { return this; }
     build() {
-      return {
+      const connection = {
         on(method: string, handler: (...args: unknown[]) => void) {
-          handlers.set(method, handler);
+          if (!handlers.has(method)) handlers.set(method, []);
+          handlers.get(method)!.push(handler);
         },
-        start() { startCalled = true; return Promise.resolve(); },
-        stop() { return Promise.resolve(); },
+        off(method: string, handler: (...args: unknown[]) => void) {
+          const existing = handlers.get(method);
+          if (!existing) return;
+          handlers.set(method, existing.filter(current => current !== handler));
+        },
+        start() {
+          startCalled = true;
+          connection.state = "Connected";
+          return Promise.resolve();
+        },
+        stop: vi.fn(() => {
+          connection.state = "Disconnected";
+          return Promise.resolve();
+        }),
         onreconnecting() {},
         onreconnected() {},
         onclose() {},
         state: "Disconnected",
       };
+      connections.push(connection);
+      return connection;
     }
   },
-  HubConnectionState: { Disconnected: "Disconnected" },
+  HubConnectionState: { Connected: "Connected", Disconnected: "Disconnected" },
   LogLevel: { Warning: 4, Information: 2 },
 }));
 
@@ -57,6 +83,7 @@ let executeReaction: typeof import("../execution/execute").executeReaction;
 
 beforeEach(async () => {
   handlers.clear();
+  connections.length = 0;
   startCalled = false;
   vi.clearAllMocks();
 
@@ -84,8 +111,7 @@ describe("when triggering on signalr", () => {
       reaction
     );
 
-    const handler = handlers.get("Receive")!;
-    handler({ count: 5, message: "test" });
+    emit("Receive", { count: 5, message: "test" });
 
     expect(executeReaction).toHaveBeenCalledWith(
       reaction,
@@ -98,8 +124,7 @@ describe("when triggering on signalr", () => {
       { kind: "signalr", hubUrl: "/hubs/c", methodName: "Receive" },
       seq("out")
     );
-    const handler = handlers.get("Receive")!;
-    expect(() => handler("raw string")).toThrow("expected single object argument");
+    expect(() => emit("Receive", "raw string")).toThrow("expected single object argument");
   });
 
   it("throws on null payload", () => {
@@ -107,8 +132,7 @@ describe("when triggering on signalr", () => {
       { kind: "signalr", hubUrl: "/hubs/d", methodName: "Receive" },
       seq("out")
     );
-    const handler = handlers.get("Receive")!;
-    expect(() => handler(null)).toThrow("expected single object argument");
+    expect(() => emit("Receive", null)).toThrow("expected single object argument");
   });
 
   it("throws on multiple arguments", () => {
@@ -116,8 +140,7 @@ describe("when triggering on signalr", () => {
       { kind: "signalr", hubUrl: "/hubs/e", methodName: "Receive" },
       seq("out")
     );
-    const handler = handlers.get("Receive")!;
-    expect(() => handler("a", "b")).toThrow("got 2 args");
+    expect(() => emit("Receive", "a", "b")).toThrow("got 2 args");
   });
 
   it("starts the connection", () => {
@@ -126,5 +149,50 @@ describe("when triggering on signalr", () => {
       seq("out")
     );
     expect(startCalled).toBe(true);
+  });
+
+  it("aborting one shared subscriber does not tear down the surviving subscriber", () => {
+    const first = new AbortController();
+    const second = new AbortController();
+    const reactionA = seq("a");
+    const reactionB = seq("b");
+
+    wireSignalR(
+      { kind: "signalr", hubUrl: "/hubs/shared", methodName: "Receive" },
+      reactionA,
+      undefined,
+      first.signal
+    );
+    wireSignalR(
+      { kind: "signalr", hubUrl: "/hubs/shared", methodName: "Receive" },
+      reactionB,
+      undefined,
+      second.signal
+    );
+
+    expect(connections).toHaveLength(1);
+    const shared = connections[0];
+
+    first.abort();
+    expect(shared.stop).not.toHaveBeenCalled();
+    expect(handlerCount("Receive")).toBe(1);
+
+    emit("Receive", { ok: true });
+
+    expect(executeReaction).toHaveBeenCalledTimes(1);
+    expect(executeReaction).toHaveBeenCalledWith(
+      reactionB,
+      expect.objectContaining({ evt: { ok: true } })
+    );
+
+    second.abort();
+    expect(shared.stop).toHaveBeenCalledTimes(1);
+    expect(handlerCount("Receive")).toBe(0);
+
+    wireSignalR(
+      { kind: "signalr", hubUrl: "/hubs/shared", methodName: "Receive" },
+      seq("fresh")
+    );
+    expect(connections).toHaveLength(2);
   });
 });

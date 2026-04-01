@@ -108,6 +108,24 @@ describe("when resolving a BindExpr against execution context", () => {
       expect(resolveEventPath("evt", ctx)).toEqual(evt);
     });
 
+    it("resolves the responseBody root itself", () => {
+      const responseBody = { status: "ok" };
+      const ctx: ExecContext = { responseBody };
+      expect(resolveEventPath("responseBody", ctx)).toEqual(responseBody);
+    });
+
+    it("does not leak non-public execution roots", () => {
+      const ctx: ExecContext = {
+        evt: { name: "Alice" },
+        responseBody: { status: "ok" },
+        validationDesc: { formId: "resident-form", fields: [] },
+        components: { Name: { id: "name", vendor: "native", readExpr: "value", componentType: "textbox", coerceAs: "string" } },
+      };
+
+      expect(resolveEventPath("validationDesc.formId", ctx)).toBeUndefined();
+      expect(resolveEventPath("components.Name.id", ctx)).toBeUndefined();
+    });
+
     it("handles array values at leaf", () => {
       const ctx: ExecContext = { evt: { items: [1, 2, 3] } };
       expect(resolveEventPath("evt.items", ctx)).toEqual([1, 2, 3]);

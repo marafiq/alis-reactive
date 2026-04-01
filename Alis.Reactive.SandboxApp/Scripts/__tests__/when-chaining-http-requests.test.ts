@@ -123,6 +123,24 @@ describe("chained HTTP requests", () => {
     expect(document.getElementById("count")!.textContent).toBe("5");
   });
 
+  it("chained request gather can read from the prior success response body", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(mockResponse(200, { residentId: "r-42" }))
+      .mockResolvedValueOnce(mockResponse(200, { ok: true }));
+    (globalThis as any).fetch = fetchMock;
+
+    await execRequest({
+      verb: "POST", url: "/api/save",
+      chained: {
+        verb: "GET", url: "/api/detail",
+        gather: [{ kind: "event", param: "residentId", path: "responseBody.residentId" }],
+      },
+    });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/save", expect.anything());
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/detail?residentId=r-42", expect.anything());
+  });
+
   it("chained request error routes to its own error handler", async () => {
     setupDom("first", "second");
     const fetchMock = vi.fn()

@@ -13,20 +13,23 @@ export interface MergeHooks {
 export class PlanRegistry {
   private readonly plans = new Map<string, Plan>();
   private readonly rootPlanIds = new Set<string>();
+  private readonly rootComponents = new Map<string, Record<string, ComponentEntry>>();
   private readonly abortControllers = new Map<string, AbortController>();
   private readonly sourceEntries = new Map<string, Entry[]>();
   private readonly sourceComponentKeys = new Map<string, string[]>();
+  private readonly sourceComponents = new Map<string, Record<string, ComponentEntry>>();
 
   register(plan: Plan): void {
     this.plans.set(plan.planId, plan);
     this.rootPlanIds.add(plan.planId);
+    this.rootComponents.set(plan.planId, { ...plan.components });
   }
 
   add(incoming: Plan, hooks: MergeHooks): Plan {
     const sourceId = incoming.sourceId;
 
     if (sourceId) {
-      this.removeSource(incoming.planId, sourceId, hooks.unwireFields);
+      this.removeSource(incoming.planId, sourceId, hooks);
     }
 
     let target = this.plans.get(incoming.planId);
@@ -36,6 +39,13 @@ export class PlanRegistry {
     }
 
     Object.assign(target.components, incoming.components);
+    if (!sourceId) {
+      this.rootPlanIds.add(incoming.planId);
+      this.rootComponents.set(incoming.planId, {
+        ...(this.rootComponents.get(incoming.planId) ?? {}),
+        ...incoming.components,
+      });
+    }
 
     if (target.entries.length > 0) {
       hooks.enrichEntries(target.entries, target.components);
@@ -51,6 +61,7 @@ export class PlanRegistry {
       this.abortControllers.set(key, abort);
       this.sourceEntries.set(key, [...incoming.entries]);
       this.sourceComponentKeys.set(key, Object.keys(incoming.components));
+      this.sourceComponents.set(key, { ...incoming.components });
     }
 
     return target;
@@ -67,9 +78,11 @@ export class PlanRegistry {
     this.abortControllers.clear();
     this.sourceEntries.clear();
     this.sourceComponentKeys.clear();
+    this.sourceComponents.clear();
+    this.rootComponents.clear();
   }
 
-  private removeSource(planId: string, sourceId: string, unwireFields: UnwireFields): void {
+  private removeSource(planId: string, sourceId: string, hooks: MergeHooks): void {
     const key = sourceKey(planId, sourceId);
     const plan = this.plans.get(planId);
     if (!plan) {
@@ -89,14 +102,24 @@ export class PlanRegistry {
 
     const oldKeys = this.sourceComponentKeys.get(key);
     if (oldKeys) {
-      // Unwire live-clear for components being removed — their element IDs
-      // must be cleared from wiredFields so re-loaded partials get fresh wiring.
-      const fieldIds = oldKeys.map(key => plan.components[key]?.id).filter((id): id is string => !!id);
-      if (fieldIds.length > 0) unwireFields(fieldIds);
+      const oldComponents = this.sourceComponents.get(key) ?? {};
+      const rebuiltComponents = this.rebuildComponents(planId, key);
+      const fieldIds = Object.entries(oldComponents)
+        .filter(([componentKey, component]) => rebuiltComponents[componentKey]?.id !== component.id)
+        .map(([, component]) => component.id);
+      if (fieldIds.length > 0) hooks.unwireFields(fieldIds);
 
-      for (const key of oldKeys) delete plan.components[key];
+      const currentComponents = plan.components;
+      for (const componentKey of Object.keys(currentComponents)) {
+        delete currentComponents[componentKey];
+      }
+      Object.assign(currentComponents, rebuiltComponents);
+      if (plan.entries.length > 0) {
+        hooks.enrichEntries(plan.entries, currentComponents);
+      }
     }
 
+    this.sourceComponents.delete(key);
     this.clearTracking(key);
 
     if (!this.rootPlanIds.has(planId) && plan.entries.length === 0 && Object.keys(plan.components).length === 0) {
@@ -108,6 +131,21 @@ export class PlanRegistry {
     this.abortControllers.delete(key);
     this.sourceEntries.delete(key);
     this.sourceComponentKeys.delete(key);
+    this.sourceComponents.delete(key);
+  }
+
+  private rebuildComponents(planId: string, removingKey: string): Record<string, ComponentEntry> {
+    const rebuilt: Record<string, ComponentEntry> = {
+      ...(this.rootComponents.get(planId) ?? {}),
+    };
+
+    const prefix = `${planId}::`;
+    for (const [key, components] of this.sourceComponents.entries()) {
+      if (key === removingKey || !key.startsWith(prefix)) continue;
+      Object.assign(rebuilt, components);
+    }
+
+    return rebuilt;
   }
 }
 

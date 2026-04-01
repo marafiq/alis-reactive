@@ -217,20 +217,63 @@ describe("When a partial adds components that match unenriched validation fields
 });
 
 describe("When a partial adds a component with the same key as a root component", () => {
-  it("root component is preserved — partial does not shadow it", () => {
+  it("removing the partial restores the root component registration", () => {
     boot(rootPlan({
       components: { "Name": comp("name-root") },
     }));
 
-    // After partial merge, the root component should still be there
-    // (Object.assign puts partial's on top, but root plan's should conceptually remain)
     mergePlan(partialPlan("slot", {
       components: { "Name": comp("name-partial") },
     }));
 
+    expect(getBootedPlan("Resident.Model")!.components["Name"]?.id).toBe("name-partial");
+
+    mergePlan(partialPlan("slot", { components: {}, entries: [] }));
+
     const plan = getBootedPlan("Resident.Model")!;
-    // The component key exists (partial may overwrite, but re-removing partial restores root)
-    expect(plan.components["Name"]).toBeDefined();
+    expect(plan.components["Name"]?.id).toBe("name-root");
+  });
+});
+
+describe("When two partials contribute the same component key", () => {
+  it("removing one partial preserves the surviving partial's registration", () => {
+    boot(rootPlan());
+
+    mergePlan(partialPlan("slot-a", {
+      components: { "Name": comp("name-a") },
+    }));
+
+    mergePlan(partialPlan("slot-b", {
+      components: { "Name": comp("name-b") },
+    }));
+
+    expect(getBootedPlan("Resident.Model")!.components["Name"]?.id).toBe("name-b");
+
+    mergePlan(partialPlan("slot-a", { components: {}, entries: [] }));
+
+    const plan = getBootedPlan("Resident.Model")!;
+    expect(plan.components["Name"]?.id).toBe("name-b");
+  });
+});
+
+describe("When a root plan evolves after boot without a sourceId", () => {
+  it("later partial removal preserves the updated root component snapshot", () => {
+    boot(rootPlan());
+
+    mergePlan({
+      planId: "Resident.Model",
+      components: { "Root.City": comp("root-city") },
+      entries: [],
+    });
+
+    mergePlan(partialPlan("slot", {
+      components: { "Address.City": comp("partial-city") },
+    }));
+
+    mergePlan(partialPlan("slot", { components: {}, entries: [] }));
+
+    const plan = getBootedPlan("Resident.Model")!;
+    expect(plan.components["Root.City"]?.id).toBe("root-city");
   });
 });
 

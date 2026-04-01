@@ -15,6 +15,11 @@ vi.mock("@microsoft/signalr", () => ({
           if (!methodHandlers.has(method)) methodHandlers.set(method, []);
           methodHandlers.get(method)!.push(handler);
         },
+        off(method: string, handler: (...args: unknown[]) => void) {
+          const existing = methodHandlers.get(method);
+          if (!existing) return;
+          methodHandlers.set(method, existing.filter(current => current !== handler));
+        },
         start() { return Promise.resolve(); },
         stop() { return Promise.resolve(); },
         onreconnecting() {},

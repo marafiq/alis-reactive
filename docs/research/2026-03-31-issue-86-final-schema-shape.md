@@ -15,21 +15,28 @@
   open without recollection.
 - Pipeline order is first-class: conditions, requests, parallel blocks, and
   commands keep declaration order instead of being flattened into one stage.
+- `reactions[]` is the post-lowering execution surface. If the public DSL
+  declares multiple same-trigger segments, lowering groups them into one ordered
+  reaction before the hidden schema is emitted.
 - One value-flow law governs the whole runtime: resolve root, access from root,
   shape if needed, consume.
 - A component opts into `binding` only when its vertical slice can declare a
-  self-sufficient canonical semantic value.
+  self-sufficient canonical semantic value. Current proof coverage for this is
+  centered on readable bound components, not arbitrary non-input widgets.
 - Member paths are plain dotted JS paths and may walk arrays and nested objects,
   for example `items.0.meta.name`.
-- The same access semantics apply uniformly across `binding`, `trigger`,
-  `response`, and explicit `component` roots.
+- The same access algebra governs payload building, request/command values, and
+  explicit `component` / `response` / `trigger` reads; validation deliberately
+  uses a constrained subset for purity.
 - Generic read access is compositional: an ordered chain of `member` and
   `invoke` steps.
 - Generic effect access stays `set` and `call`.
 - Validation targets canonical `componentId` and resolves through the component
   registry instead of carrying copied runtime enrichment.
 - `includeAll` walks only components that opt into `binding`.
-- Trigger payload shape is explicit in the schema; runtime must not invent it.
+- The final schema makes trigger payload shape explicit; the current runtime
+  still carries legacy/native-invented payloads, which remains an implementation
+  gap until the hidden end-state contract is executed directly.
 
 ## Final Nouns
 
@@ -40,19 +47,19 @@
 - `ComponentRef`: explicit runtime root identity for a component surface.
 - `Reaction`: one trigger-attached behavior.
 - `Trigger`: wake-up source plus explicit trigger payload contract.
-- `TriggerPayload`: the carried payload root for a trigger.
+- `TriggerPayload`: the carried payload root for a trigger, built from the same
+  value/access algebra using payload-scoped roots.
 - `Pipeline`: ordered executable steps.
 - `PipelineStep`: one ordered command, condition, request, or parallel block.
 - `When`: guarded branching stage.
 - `Request`: full HTTP unit.
 - `Response`: success/error/chained stages owned by a request.
 - `Parallel`: concurrent request unit with `onAllSettled`.
-- `Value`: one consumed value in guards, commands, gather, and payloads.
+- `Value`: one shared value/access algebra, parameterized by which roots are
+  legal in that scope.
+- `BindingAccess`: the self-sufficient canonical value contract for a binding.
 - `AccessStep`: one composable read step over a root or intermediate value.
 - `Access`: generic read access over a resolved root.
-- `PayloadAccessStep`: one composable read step while building trigger payload.
-- `PayloadAccess`: generic read access over `host` or `target` while building
-  trigger payload.
 - `ReadRoot`: one readable runtime root surface.
 - `ApplyTarget`: one writable/callable runtime root surface.
 - `Command`: one imperative effect.
@@ -90,25 +97,19 @@ type Shape =
   | "object"
   | { kind: "array"; of: Shape };
 
-type AccessStep =
-  | { kind: "member"; path: string }
-  | { kind: "invoke"; method: string; args?: Value[] };
+type BindingLiteral = { kind: "literal"; value: unknown };
 
-type Access = {
-  steps: AccessStep[]; // empty = resolved root itself
+type AccessStep<TValue> =
+  | { kind: "member"; path: string }
+  | { kind: "invoke"; method: string; args?: TValue[] };
+
+type Access<TValue> = {
+  steps: AccessStep<TValue>[]; // empty = resolved root itself
   rawShape?: Shape;
   shape?: Shape;
 };
 
-type PayloadAccessStep =
-  | { kind: "member"; path: string }
-  | { kind: "invoke"; method: string; args?: PayloadValue[] };
-
-type PayloadAccess = {
-  steps: PayloadAccessStep[]; // empty = carried host/target root itself
-  rawShape?: Shape;
-  shape?: Shape;
-};
+type BindingAccess = Access<BindingLiteral>; // self-sufficient: no external roots
 
 type ComponentRef = {
   id: string;
@@ -117,7 +118,7 @@ type ComponentRef = {
 
 type Binding = {
   path: string;      // semantic field name/path, e.g. "Address.City"
-  access: Access;    // self-sufficient canonical semantic value for this component
+  access: BindingAccess; // self-sufficient canonical semantic value for this component
 };
 
 type Component = {
@@ -129,7 +130,7 @@ type Plan = {
   planId: string;
   sourceId?: string;
   components: Record<string, Component>; // key = componentId
-  reactions: Reaction[];
+  reactions: Reaction[]; // already grouped by trigger signature + declaration order
 };
 
 type Reaction = {
@@ -149,12 +150,26 @@ type TriggerPayload =
   | { kind: "host" }
   | { kind: "build"; value: PayloadValue };
 
-type PayloadValue =
+type RuntimeRoot =
+  | { kind: "trigger" }
+  | { kind: "response" }
+  | { kind: "component"; target: ComponentRef }
+  | { kind: "element"; id: string }
+  | { kind: "document" };
+
+type PayloadRoot =
+  | { kind: "payloadHost" }
+  | { kind: "payloadTarget" };
+
+type Value<TRoot> =
   | { kind: "literal"; value: unknown }
   | { kind: "bindingValue"; componentId: string }
-  | { kind: "access"; root: "host" | "target"; access: PayloadAccess }
-  | { kind: "object"; fields: Record<string, PayloadValue> }
-  | { kind: "array"; items: PayloadValue[] };
+  | { kind: "access"; root: TRoot; access: Access<Value<TRoot>> }
+  | { kind: "object"; fields: Record<string, Value<TRoot>> }
+  | { kind: "array"; items: Value<TRoot>[] };
+
+type RuntimeValue = Value<RuntimeRoot>;
+type PayloadValue = Value<PayloadRoot>;
 
 type PipelineStep = Command | When | Request | Parallel;
 
@@ -174,7 +189,7 @@ type WhenBranch = {
 };
 
 type Guard =
-  | { kind: "check"; left: Value; op: GuardOp; right?: Value }
+  | { kind: "check"; left: RuntimeValue; op: GuardOp; right?: RuntimeValue }
   | { kind: "all"; guards: Guard[] }
   | { kind: "any"; guards: Guard[] }
   | { kind: "not"; guard: Guard }
@@ -232,26 +247,12 @@ type Parallel = {
 };
 
 type GatherItem =
-  | { kind: "field"; name: string; value: Value }
+  | { kind: "field"; name: string; value: RuntimeValue }
   | { kind: "includeAll" };
-
-type Value =
-  | { kind: "literal"; value: unknown }
-  | { kind: "bindingValue"; componentId: string }
-  | { kind: "access"; root: ReadRoot; access: Access }
-  | { kind: "object"; fields: Record<string, Value> }
-  | { kind: "array"; items: Value[] };
-
-type ReadRoot =
-  | { kind: "trigger" }
-  | { kind: "response" }
-  | { kind: "component"; target: ComponentRef }
-  | { kind: "element"; id: string }
-  | { kind: "document" };
 
 type Command =
   | { kind: "apply"; target: ApplyTarget; mutation: Mutation }
-  | { kind: "dispatch"; event: string; payload?: Value }
+  | { kind: "dispatch"; event: string; payload?: RuntimeValue }
   | { kind: "validationErrors"; formId: string }
   | { kind: "into"; target: string };
 
@@ -262,8 +263,8 @@ type ApplyTarget =
   | { kind: "document" };
 
 type Mutation =
-  | { kind: "set"; path: string; value: Value }
-  | { kind: "call"; path: string; args?: Value[] };
+  | { kind: "set"; path: string; value: RuntimeValue }
+  | { kind: "call"; path: string; args?: RuntimeValue[] };
 
 type Validation = {
   formId: string;
@@ -308,9 +309,10 @@ type ValidationCondition =
   | { kind: "any"; conditions: ValidationCondition[] }
   | { kind: "not"; condition: ValidationCondition };
 
-type ValidationValue =
-  | { kind: "bindingValue"; componentId: string }
-  | { kind: "literal"; value: unknown };
+type ValidationValue = Extract<
+  RuntimeValue,
+  { kind: "bindingValue" } | { kind: "literal" }
+>;
 
 type ValidationOp = GuardOp;
 ```
@@ -504,7 +506,8 @@ Call a non-input component method:
 }
 ```
 
-Use a non-input component in request gather if it opts into binding:
+Illustrative end-state extension: a non-input component could participate in
+request gather if a future vertical slice declares a canonical binding:
 
 ```json
 {
@@ -562,6 +565,10 @@ Invoke a method, then keep walking inside what it returned:
 }
 ```
 
+This is part of the locked end-state design, but it is still a design
+requirement rather than a current executable-proof case because the current TS
+runtime still executes the older path model directly.
+
 `shape` describes the terminal semantic value after all steps run. It does not
 carry the path structure. So for an array of objects where the final leaf is a
 string, the access is:
@@ -575,9 +582,11 @@ If the final leaf itself is an array, the shape stays explicit:
 { "kind": "array", "of": "object" }
 ```
 
-That component is still not an HTML input, but it now participates in
-`includeAll`, validation, and request gather because it declared a canonical
-binding value.
+That component is still not an HTML input. The schema leaves room for future
+vertical slices to opt such a surface into `includeAll`, validation, and
+request gather by declaring a canonical binding value, but current proof
+coverage and the current public C# gather surface are still centered on
+readable bound/input components.
 
 ## Why This Is The Final Center
 
@@ -597,8 +606,8 @@ binding value.
   document one shared effect language.
 - non-input widgets like tabs, accordion, toast, confirm, and custom buttons do
   not need special schema treatment.
-- if a component can expose a semantic value shape, it can participate in
-  request/validation semantics too.
+- the schema leaves extension room for non-input binding participation later;
+  current proof coverage for binding participation is intentionally narrower.
 - the runtime stays dumb:
   - resolve root
   - execute `access.steps[]` in order

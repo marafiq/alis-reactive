@@ -9,7 +9,8 @@
 3. Component surface identity and binding participation are different concerns;
    one component registry may hold both, but they are not the same noun.
 4. Binding is optional and narrow: it exists only when a component can declare a
-   self-sufficient canonical semantic value.
+   self-sufficient canonical semantic value; current proof coverage for this is
+   centered on readable bound components.
 5. `Request` is a first-class unit and owns its own stages.
 6. Pipeline order is first-class; the schema must preserve declaration order
    instead of flattening behavior into a single structural stage.
@@ -54,7 +55,8 @@ That removes overlapping meaning and keeps each schema object narrow.
 - validation no longer carries copied lookup/enrichment data
 - request input semantics are not modeled differently from command and guard
   value semantics
-- trigger payload shape is not invented at runtime
+- the final schema carries trigger payload shape explicitly instead of leaving
+  it to runtime invention
 
 ### Better Testability
 

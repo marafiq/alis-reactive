@@ -34,6 +34,8 @@ function buildFetch(req: RequestDescriptor, gatherResult: GatherResult): Resolve
 
 /** Execute a single HTTP request with gather, whileLoading, response routing, and chaining. */
 export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Promise<void> {
+  let chainedCtx = ctx;
+
   try {
     // 1. WhileLoading
     if (req.whileLoading) {
@@ -41,7 +43,7 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     }
 
     // 2. Gather → freeze
-    const gatherResult = resolveGather(req.gather ?? [], req.verb, ctx?.components ?? {}, req.contentType, ctx?.evt);
+    const gatherResult = resolveGather(req.gather ?? [], req.verb, ctx?.components ?? {}, req.contentType, ctx);
     const resolved = buildFetch(req, gatherResult);
 
     log.debug("fetch", { verb: req.verb, url: resolved.url });
@@ -53,6 +55,7 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
     const body = await readResponseBody(response);
     if (response.ok) {
       const successCtx: ExecContext = body != null ? { ...ctx, responseBody: body } : ctx ?? {};
+      chainedCtx = successCtx;
       await routeHandlers(req.onSuccess, response.status, successCtx);
     } else {
       const errorCtx: ExecContext = {
@@ -72,7 +75,7 @@ export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Pr
 
   // 5. Chained — only after success
   if (req.chained) {
-    await execRequest(req.chained, ctx);
+    await execRequest(req.chained, chainedCtx);
   }
 }
 
@@ -87,17 +90,17 @@ async function readResponseBody(response: Response): Promise<unknown> {
 export async function routeHandlers(handlers: StatusHandler[] | undefined, status: number, ctx?: ExecContext): Promise<void> {
   if (!handlers || handlers.length === 0) return;
 
-  for (const h of handlers) {
-    if (h.statusCode != null && h.statusCode === status) {
-      await executeHandler(h, ctx);
-      return;
+  const matching = handlers.filter(handler => handler.statusCode != null && handler.statusCode === status);
+  if (matching.length > 0) {
+    for (const handler of matching) {
+      await executeHandler(handler, ctx);
     }
+    return;
   }
 
-  for (const h of handlers) {
-    if (h.statusCode == null) {
-      await executeHandler(h, ctx);
-      return;
+  for (const handler of handlers) {
+    if (handler.statusCode == null) {
+      await executeHandler(handler, ctx);
     }
   }
 }
@@ -109,4 +112,3 @@ async function executeHandler(h: StatusHandler, ctx?: ExecContext): Promise<void
     executeCommands(h.commands, ctx);
   }
 }
-

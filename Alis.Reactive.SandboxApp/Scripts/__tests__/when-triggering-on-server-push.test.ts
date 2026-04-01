@@ -40,6 +40,12 @@ class MockEventSource {
     this.listeners.get(type)!.push(handler);
   }
 
+  removeEventListener(type: string, handler: (e: any) => void) {
+    const handlers = this.listeners.get(type);
+    if (!handlers) return;
+    this.listeners.set(type, handlers.filter(current => current !== handler));
+  }
+
   close = vi.fn();
 
   emit(type: string, data: unknown) {
@@ -303,5 +309,45 @@ describe("when SSE connection closes permanently", () => {
 
     // No retry indicator — this was an intentional shutdown
     expect(document.querySelector("[data-alis-retry]")).toBeNull();
+  });
+
+  it("aborting one shared subscriber does not tear down the surviving subscriber", () => {
+    const first = new AbortController();
+    const second = new AbortController();
+    const reactionA = seq("a");
+    const reactionB = seq("b");
+
+    wireServerPush(
+      { kind: "server-push", url: "/api/shared-abort" },
+      reactionA,
+      undefined,
+      first.signal
+    );
+    wireServerPush(
+      { kind: "server-push", url: "/api/shared-abort" },
+      reactionB,
+      undefined,
+      second.signal
+    );
+
+    const es = MockEventSource.instances[0];
+    first.abort();
+
+    expect(es.close).not.toHaveBeenCalled();
+    expect(es.handlerCount("message")).toBe(1);
+
+    es.emit("message", { ok: true });
+
+    expect(executeReaction).toHaveBeenCalledTimes(1);
+    expect(executeReaction).toHaveBeenCalledWith(
+      reactionB,
+      expect.objectContaining({ evt: { ok: true } })
+    );
+
+    second.abort();
+    expect(es.close).toHaveBeenCalledTimes(1);
+
+    wireServerPush({ kind: "server-push", url: "/api/shared-abort" }, seq("fresh"));
+    expect(MockEventSource.instances).toHaveLength(2);
   });
 });

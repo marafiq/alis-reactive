@@ -9,12 +9,42 @@ const log = scope("signalr");
 interface ManagedConnection {
   readonly connection: signalR.HubConnection;
   startPromise: Promise<void>;
-  readonly targetIds: Set<string>;
+  readonly subscriptions: Set<Subscription>;
+  readonly dispatchers: Map<string, (...args: unknown[]) => void>;
   stopping: boolean;
+}
+
+interface Subscription {
+  readonly trigger: SignalRTrigger;
+  readonly reactions: readonly Reaction[];
+  readonly components?: Record<string, ComponentEntry>;
+  readonly targetIds: ReadonlySet<string>;
+  active: boolean;
 }
 
 // Connection pool — singleton HubConnection per hubUrl
 const hubs = new Map<string, ManagedConnection>();
+
+function activeSubscriptions(managed: ManagedConnection): Subscription[] {
+  return Array.from(managed.subscriptions).filter(subscription => subscription.active);
+}
+
+function collectTargetIds(managed: ManagedConnection): Set<string> {
+  const targetIds = new Set<string>();
+  for (const subscription of activeSubscriptions(managed)) {
+    for (const targetId of subscription.targetIds) targetIds.add(targetId);
+  }
+  return targetIds;
+}
+
+function showRetryForActiveSubscribers(hubUrl: string, managed: ManagedConnection): void {
+  const targetIds = collectTargetIds(managed);
+  if (targetIds.size === 0) {
+    removeRetryIndicators(hubUrl);
+    return;
+  }
+  showRetryIndicators(hubUrl, targetIds, () => retryConnection(hubUrl));
+}
 
 /**
  * Starts the connection with retry for initial connection failures.
@@ -42,7 +72,7 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
   // The connection is in Disconnected state; handlers persist for restart.
   log.error("start failed after all retries", { hubUrl, attempts: maxAttempts });
   const managed = hubs.get(hubUrl);
-  if (managed) showRetryIndicators(hubUrl, managed.targetIds, () => retryConnection(hubUrl));
+  if (managed) showRetryForActiveSubscribers(hubUrl, managed);
 }
 
 function retryConnection(hubUrl: string): void {
@@ -81,8 +111,6 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
     })
     .build();
 
-  const targetIds = new Set<string>();
-
   // Library handles reconnection natively — handlers persist across reconnects.
   connection.onreconnecting(err => {
     log.warn("reconnecting", { hubUrl, error: err ? String(err) : undefined });
@@ -102,23 +130,74 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
       hubs.delete(hubUrl);
     } else {
       log.warn("disconnected", { hubUrl, error: err ? String(err) : undefined });
-      showRetryIndicators(hubUrl, targetIds, () => retryConnection(hubUrl));
+      showRetryForActiveSubscribers(hubUrl, managed!);
     }
   });
 
   const startPromise = startWithRetry(connection, hubUrl);
 
-  managed = { connection, startPromise, targetIds, stopping: false };
+  managed = {
+    connection,
+    startPromise,
+      subscriptions: new Set<Subscription>(),
+      dispatchers: new Map<string, (...args: unknown[]) => void>(),
+      stopping: false,
+  };
   hubs.set(hubUrl, managed);
 
-  if (signal) {
-    signal.addEventListener("abort", () => {
-      managed!.stopping = true;
-      connection.stop();
-    });
+  return managed;
+}
+
+function ensureDispatcher(managed: ManagedConnection, trigger: SignalRTrigger): void {
+  if (managed.dispatchers.has(trigger.methodName)) return;
+
+  const dispatcher = (...args: unknown[]) => {
+    if (args.length !== 1 || typeof args[0] !== "object" || args[0] === null) {
+      throw new Error(
+        `[alis:signalr] ${trigger.hubUrl}/${trigger.methodName}: ` +
+        `expected single object argument, got ${args.length} args (first: ${typeof args[0]})`
+      );
+    }
+
+    const evt = args[0] as Record<string, unknown>;
+    log.debug("method", { hubUrl: trigger.hubUrl, method: trigger.methodName });
+
+    for (const subscription of activeSubscriptions(managed)) {
+      if (subscription.trigger.methodName !== trigger.methodName) continue;
+      executeReactionSequence(subscription.reactions, { evt, components: subscription.components }).catch(err =>
+        log.error("reaction failed", { error: String(err) }));
+    }
+  };
+
+  managed.connection.on(trigger.methodName, dispatcher);
+  managed.dispatchers.set(trigger.methodName, dispatcher);
+}
+
+function removeSubscription(hubUrl: string, subscription: Subscription): void {
+  const managed = hubs.get(hubUrl);
+  if (!managed || !managed.subscriptions.has(subscription)) return;
+
+  subscription.active = false;
+  managed.subscriptions.delete(subscription);
+  if (!activeSubscriptions(managed).some(active => active.trigger.methodName === subscription.trigger.methodName)) {
+    const dispatcher = managed.dispatchers.get(subscription.trigger.methodName);
+    if (dispatcher) {
+      managed.connection.off(subscription.trigger.methodName, dispatcher);
+      managed.dispatchers.delete(subscription.trigger.methodName);
+    }
   }
 
-  return managed;
+  if (managed.subscriptions.size === 0) {
+    managed.stopping = true;
+    hubs.delete(hubUrl);
+    void managed.connection.stop();
+    removeRetryIndicators(hubUrl);
+    return;
+  }
+
+  if (managed.connection.state === signalR.HubConnectionState.Disconnected && !managed.stopping) {
+    showRetryForActiveSubscribers(hubUrl, managed);
+  }
 }
 
 export function wireSignalR(
@@ -129,30 +208,27 @@ export function wireSignalR(
 ): void {
   const reactions = Array.isArray(reactionOrReactions) ? reactionOrReactions : [reactionOrReactions];
   const managed = getOrCreate(trigger.hubUrl, signal);
-  const { connection, targetIds } = managed;
 
-  // Track all top-level mutation targets in the ordered chain for retry indicator placement.
+  const targetIds = new Set<string>();
   for (const reaction of reactions) {
     const target = firstMutationTarget(reaction);
     if (target) targetIds.add(target);
   }
 
-  // Handlers registered via .on() persist across automatic reconnects —
-  // no re-registration needed (per Microsoft docs).
-  // Trust the library's JSON deserialization — don't reshape the payload.
-  connection.on(trigger.methodName, (...args: unknown[]) => {
-    if (args.length !== 1 || typeof args[0] !== "object" || args[0] === null) {
-      throw new Error(
-        `[alis:signalr] ${trigger.hubUrl}/${trigger.methodName}: ` +
-        `expected single object argument, got ${args.length} args (first: ${typeof args[0]})`
-      );
-    }
+  const subscription: Subscription = {
+    trigger,
+    reactions,
+    components,
+    targetIds,
+    active: true,
+  };
 
-    const evt = args[0] as Record<string, unknown>;
-    log.debug("method", { hubUrl: trigger.hubUrl, method: trigger.methodName });
-    executeReactionSequence(reactions, { evt, components }).catch(err =>
-      log.error("reaction failed", { error: String(err) }));
-  });
+  managed.subscriptions.add(subscription);
+  ensureDispatcher(managed, trigger);
 
   log.debug("listening", { hubUrl: trigger.hubUrl, method: trigger.methodName });
+
+  if (signal) {
+    signal.addEventListener("abort", () => removeSubscription(trigger.hubUrl, subscription), { once: true });
+  }
 }

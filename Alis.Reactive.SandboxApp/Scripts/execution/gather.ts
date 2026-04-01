@@ -1,6 +1,6 @@
-import type { GatherItem, ComponentEntry } from "../types";
+import type { GatherItem, ComponentEntry, ExecContext } from "../types";
 import { evalRead } from "../resolution/component";
-import { walk } from "../core/walk";
+import { resolveEventPath } from "../resolution/resolver";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
 import { toString } from "../core/coerce";
@@ -126,7 +126,7 @@ export function resolveGather(
   verb: string,
   components: Record<string, ComponentEntry>,
   contentType?: string,
-  evt?: Record<string, unknown>
+  ctx?: ExecContext
 ): GatherResult {
   const urlParams: string[] = [];
   const formData = contentType === "form-data" ? new FormData() : null;
@@ -144,8 +144,7 @@ export function resolveGather(
         break;
 
       case "event": {
-        const ctx = evt ? { evt } : {};
-        emitValue(g.param, walk(ctx, g.path), transport);
+        emitValue(g.param, resolveEventPath(g.path, ctx), transport);
         break;
       }
 
