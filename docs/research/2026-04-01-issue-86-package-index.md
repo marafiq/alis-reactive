@@ -17,6 +17,7 @@ This is the current package index for the issue #86 end-state schema work.
 ## Honesty Ledger
 
 - [gap ledger](./2026-04-01-issue-86-gap-ledger.md)
+- [next implementation steps](./2026-04-01-issue-86-next-implementation-steps.md)
 
 ## Proof Harnesses
 
