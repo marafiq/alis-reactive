@@ -59,7 +59,8 @@ npm test -- \
   Alis.Reactive.SandboxApp/Scripts/__tests__/when-executing-reactions-end-to-end.test.ts \
   Alis.Reactive.SandboxApp/Scripts/__tests__/when-http-handlers-contain-nested-reactions.test.ts \
   Alis.Reactive.SandboxApp/Scripts/__tests__/when-using-conditions-in-response-handlers.test.ts \
-  Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-response-and-component-algebra.test.ts
+  Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-response-and-component-algebra.test.ts \
+  Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-canonical-proof-surfaces.test.ts
 
 dotnet test tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj \
   --filter "FullyQualifiedName~WhenTriggeringOnDomReady|FullyQualifiedName~WhenTriggeringOnCustomEvent|FullyQualifiedName~WhenTriggeringOnServerPush|FullyQualifiedName~WhenTriggeringOnSignalR|FullyQualifiedName~WhenRequestingFromServer|FullyQualifiedName~WhenGatheringRegisteredComponents|FullyQualifiedName~WhenBuildingHttpPipelines|FullyQualifiedName~WhenConditionReadsComponent|FullyQualifiedName~WhenUsingConditionsInEveryDslSurface|FullyQualifiedName~WhenEnrichingValidationAtRenderTime|FullyQualifiedName~WhenRegisteringComponents|FullyQualifiedName~WhenGeneratingUniqueIds"
@@ -83,6 +84,8 @@ dotnet test tests/Alis.Reactive.Analyzers.Tests/Alis.Reactive.Analyzers.Tests.cs
 Fresh results:
 
 - TS runtime sweep: **22 files, 368 tests passed**
+- canonical proof-surface harness: **1 file, 4 tests passed**
+- focused proof-algebra sweep including the canonical harness: **5 files, 23 tests passed**
 - focused trigger/order sweep after same-trigger chaining fix: **5 files, 29 tests passed**
 - broader active TS runtime sweep after ordering fix: **78 files, 1,149 tests passed**
 - core reactive C# sweep: **80 tests passed**
@@ -148,6 +151,23 @@ Proof:
 
 This forces the schema to keep component surface identity and optional binding
 participation separate, without inventing a second top-level registry family.
+
+### 3a. A controlled native/fusion proof harness now exists
+
+The issue #86 work no longer depends only on scattered real widgets to prove the
+runtime algebra. There is now one controlled native surface and one controlled
+fusion surface with the same API:
+
+- [proof-surfaces.ts](../../Alis.Reactive.SandboxApp/Scripts/components/lab/proof-surfaces.ts)
+- [when-proving-canonical-proof-surfaces.test.ts](../../Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-canonical-proof-surfaces.test.ts)
+
+That harness proves the shared algebra can be exercised cleanly across both
+vendors for:
+
+- nested member walking
+- command-driven property writes
+- command-driven method calls with and without args
+- component-event-driven downstream reads and conditions
 
 ### 4. The runtime is root-first
 

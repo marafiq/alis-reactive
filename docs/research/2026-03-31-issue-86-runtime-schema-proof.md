@@ -267,11 +267,24 @@ instead of inferring it from scattered older tests:
   - explicit component-root property reads
   - array item object walking from component roots
   - explicit component-root method calls with and without args
+- [proof-surfaces.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/components/lab/proof-surfaces.ts)
+  plus
+  [when-proving-canonical-proof-surfaces.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-canonical-proof-surfaces.test.ts)
+  add a controlled native/fusion proof harness with the same API surface on both
+  vendors, proving:
+  - shared nested member reads
+  - shared command-driven property writes
+  - shared method calls with and without args
+  - shared component-event downstream semantics
+  - the same runtime algebra can be pressure-tested without relying on one-off
+    real widget quirks
 
 Focused re-run on **April 1, 2026** after the array-walking additions:
 
 - [when-proving-response-and-component-algebra.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-response-and-component-algebra.test.ts)
   passed **10 tests**
+- [when-proving-canonical-proof-surfaces.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-canonical-proof-surfaces.test.ts)
+  passed **4 tests**
 
 The important architectural boundary exposed by those proofs is:
 
