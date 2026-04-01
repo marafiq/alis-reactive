@@ -62,6 +62,20 @@
 - `ValidationRule`: one validation rule.
 - `ValidationCondition`: composable rule gate.
 
+## Proof Anchors
+
+The current design is now anchored by two deliberately separate proof layers:
+
+- runtime execution proof in
+  [proof-surfaces.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/components/lab/proof-surfaces.ts)
+  and
+  [when-proving-canonical-proof-surfaces.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-canonical-proof-surfaces.test.ts)
+  for a controlled native/fusion shared surface
+- C# lowering proof in
+  [WhenLoweringDslSurfacesToRuntimeAlgebra.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Architecture/WhenLoweringDslSurfacesToRuntimeAlgebra.cs)
+  for bound refs, explicit refs, app-level refs, gather participation, command
+  values, guards, and request-owned stage lowering
+
 ## Final Shape
 
 ```ts
