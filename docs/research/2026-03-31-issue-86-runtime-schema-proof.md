@@ -253,9 +253,10 @@ This is the smallest working model that fits the proven seams.
 - `Response`: success/error/chained stages owned by a request.
 - `Parallel`: concurrent request unit with `onAllSettled`.
 - `Value`: one consumed value in guards, commands, gather, dispatch, and payloads.
-- `MemberAccess`: root-relative property/path access plus semantic shaping.
-- `InvokeAccess`: method invocation that returns a value.
+- `AccessStep`: one composable member or invoke step.
 - `Access`: generic read access over a resolved root.
+- `PayloadAccessStep`: one composable member or invoke step while building
+  trigger payload.
 - `Validation`: request-time validation plan.
 - `ValidationTarget`: rules for one canonical component id.
 
@@ -273,39 +274,25 @@ type Shape =
   | "object"
   | { kind: "array"; of: Shape }
 
-type MemberAccess = {
-  kind: "member"
-  path?: string
+type AccessStep =
+  | { kind: "member"; path: string }
+  | { kind: "invoke"; method: string; args?: Value[] }
+
+type Access = {
+  steps: AccessStep[]
   rawShape?: Shape
   shape?: Shape
 }
 
-type InvokeAccess = {
-  kind: "invoke"
-  method: string
-  args?: Value[]
+type PayloadAccessStep =
+  | { kind: "member"; path: string }
+  | { kind: "invoke"; method: string; args?: PayloadValue[] }
+
+type PayloadAccess = {
+  steps: PayloadAccessStep[]
   rawShape?: Shape
   shape?: Shape
 }
-
-type Access = MemberAccess | InvokeAccess
-
-type PayloadMemberAccess = {
-  kind: "member"
-  path?: string
-  rawShape?: Shape
-  shape?: Shape
-}
-
-type PayloadInvokeAccess = {
-  kind: "invoke"
-  method: string
-  args?: PayloadValue[]
-  rawShape?: Shape
-  shape?: Shape
-}
-
-type PayloadAccess = PayloadMemberAccess | PayloadInvokeAccess
 
 type ComponentRef = {
   id: string
@@ -314,7 +301,7 @@ type ComponentRef = {
 
 type Binding = {
   path: string
-  access: Access
+  access: Access // self-sufficient canonical semantic value
 }
 
 type Component = {
@@ -377,7 +364,7 @@ type Request = {
 
 type Response = {
   onSuccess?: Pipeline[]
-  onError?: { status?: number; pipeline: Pipeline }[]
+  onError?: { status: number; pipeline: Pipeline }[]
   chained?: Request
 }
 
@@ -430,8 +417,9 @@ Example:
       "binding": {
         "path": "Address.City",
         "access": {
-          "kind": "member",
-          "path": "value",
+          "steps": [
+            { "kind": "member", "path": "value" }
+          ],
           "shape": "string"
         }
       }
@@ -472,12 +460,7 @@ function readBindingValue(plan: Plan, componentId: string): unknown {
   const el = document.getElementById(componentId)
   if (!el) throw new Error(`[alis] element not found: ${componentId}`)
   const root = resolveRoot(el, component.vendor)
-  const raw = component.binding.access.kind === "member" && component.binding.access.path
-    ? walk(root, component.binding.access.path)
-    : component.binding.access.kind === "member"
-      ? root
-      : root[component.binding.access.method](...(component.binding.access.args ?? []).map(readValue))
-  return shape(raw, component.binding.access.shape)
+  return executeAccess(root, component.binding.access)
 }
 
 function includeAll(plan: Plan): Record<string, unknown> {
@@ -614,7 +597,12 @@ Example:
   "value": {
     "kind": "access",
     "root": { "kind": "response" },
-    "access": { "kind": "member", "path": "data.customerId", "shape": "number" }
+    "access": {
+      "steps": [
+        { "kind": "member", "path": "data.customerId" }
+      ],
+      "shape": "number"
+    }
   }
 }
 ```
@@ -678,7 +666,12 @@ This is the request shape that matches the public DSL and the runtime:
           "value": {
             "kind": "access",
             "root": { "kind": "response" },
-            "access": { "kind": "member", "path": "data.id", "shape": "number" }
+            "access": {
+              "steps": [
+                { "kind": "member", "path": "data.id" }
+              ],
+              "shape": "number"
+            }
           }
         }
       ]
@@ -694,7 +687,42 @@ one shared value language and explicit payload contracts.
 
 The end-state runtime can be expressed as a few small mechanical helpers.
 
-### 1. Canonical binding value
+### 1. Compositional access execution
+
+```ts
+function executeAccess(
+  root: unknown,
+  access: Access,
+  readArg?: (value: Value) => unknown
+): unknown {
+  let current = root
+  for (const step of access.steps) {
+    if (step.kind === "member") {
+      current = walk(current, step.path)
+      continue
+    }
+
+    const args = (step.args ?? []).map(arg => {
+      if (!readArg) {
+        throw new Error("[alis] access-step args are not available in this context")
+      }
+      return readArg(arg)
+    })
+
+    current = (current as any)[step.method](...args)
+  }
+
+  return shape(current, access.shape)
+}
+```
+
+This is the design move that closes the first real pressure point:
+
+- member read still works
+- terminal method-return read still works
+- invoke, then keep walking deeper into the returned object now also works
+
+### 2. Canonical binding value
 
 ```ts
 function readBindingValue(plan: Plan, componentId: string): unknown {
@@ -705,22 +733,15 @@ function readBindingValue(plan: Plan, componentId: string): unknown {
   if (!el) throw new Error(`[alis] element not found: ${componentId}`)
 
   const root = resolveRoot(el, component.vendor)
-  switch (component.binding.access.kind) {
-    case "member": {
-      const raw = component.binding.access.path ? walk(root, component.binding.access.path) : root
-      return shape(raw, component.binding.access.shape)
-    }
-    case "invoke": {
-      // Binding-level invoke arguments, if any, follow the same value-evaluation
-      // path as request gather or command args.
-      const raw = (root as any)[component.binding.access.method]()
-      return shape(raw, component.binding.access.shape)
-    }
-  }
+  return executeAccess(root, component.binding.access)
 }
 ```
 
-### 2. Generic read
+`binding.access` stays self-sufficient. It can walk members and invoke methods
+on the resolved component root, but it cannot depend on `trigger` or `response`
+context.
+
+### 3. Generic read
 
 ```ts
 function readValue(plan: Plan, ctx: ExecContext, value: Value): unknown {
@@ -731,17 +752,7 @@ function readValue(plan: Plan, ctx: ExecContext, value: Value): unknown {
       return readBindingValue(plan, value.componentId)
     case "access": {
       const root = resolveRuntimeRoot(plan, ctx, value.root)
-      switch (value.access.kind) {
-        case "member": {
-          const raw = value.access.path ? walk(root, value.access.path) : root
-          return shape(raw, value.access.shape)
-        }
-        case "invoke": {
-          const args = (value.access.args ?? []).map(arg => readValue(plan, ctx, arg))
-          const raw = (root as any)[value.access.method](...args)
-          return shape(raw, value.access.shape)
-        }
-      }
+      return executeAccess(root, value.access, arg => readValue(plan, ctx, arg))
     }
     case "object":
       return Object.fromEntries(Object.entries(value.fields).map(([k, v]) => [k, readValue(plan, ctx, v)]))
@@ -751,7 +762,7 @@ function readValue(plan: Plan, ctx: ExecContext, value: Value): unknown {
 }
 ```
 
-### 3. Explicit trigger payload build
+### 4. Explicit trigger payload build
 
 ```ts
 function buildTriggerPayload(plan: Plan, host: unknown, target: ComponentRef | null, payload: TriggerPayload): unknown {
@@ -772,7 +783,7 @@ This is simpler than today because:
 - no validation enrichment DTO copying
 - no separate model for request gather vs command args vs response reads
 
-### 4. Explicit component ref proof
+### 5. Explicit component ref proof
 
 Because `ComponentRef<TComponent, TModel>` already lowers both string-id and
 app-level component refs, the same value language can read from non-input
@@ -788,9 +799,30 @@ Example end-state value:
     "target": { "id": "resident-tabs", "vendor": "fusion" }
   },
   "access": {
-    "kind": "invoke",
-    "method": "getSelectedItems",
+    "steps": [
+      { "kind": "invoke", "method": "getSelectedItems" }
+    ],
     "shape": { "kind": "array", "of": "raw" }
+  }
+}
+```
+
+And if a future vertical slice needs to walk deeper into that returned value,
+the schema is already open to it:
+
+```json
+{
+  "kind": "access",
+  "root": {
+    "kind": "component",
+    "target": { "id": "country-ddl", "vendor": "fusion" }
+  },
+  "access": {
+    "steps": [
+      { "kind": "invoke", "method": "getItems" },
+      { "kind": "member", "path": "3.disabled" }
+    ],
+    "shape": "boolean"
   }
 }
 ```
@@ -819,7 +851,7 @@ And the same resolved root can still be a mutation target:
 ```mermaid
 flowchart LR
   A["Component(id, vendor, binding.path, binding.access)"] --> B["resolveRoot(id, vendor)"]
-  B --> C["member or invoke binding.access"]
+  B --> C["run binding.access.steps in order"]
   C --> D["shape if needed"]
   D --> E["validation target"]
   D --> F["IncludeAll emits binding.path=value"]
@@ -857,6 +889,8 @@ flowchart LR
 - `IncludeAll` and validation both read through the same canonical binding
   value contract.
 - Trigger payload structure must be explicit in the schema, not invented in TS.
+- Access is now compositional, so invoke-then-walk is an extension of the same
+  read language instead of a schema redesign.
 - `response`, `trigger`, and resolved component roots all participate in the
   same access model after root resolution.
 
@@ -864,6 +898,7 @@ flowchart LR
 
 - The final naming lock for every noun.
 - The final complete rule matrix for every validation operator.
+- The final public C# DSL spelling for compositional access steps.
 - The exact shape-conversion map behind `shape(...)`.
 
 Those are next-step design decisions.
@@ -874,5 +909,6 @@ What is already proven here is enough to stop designing from stitched DTOs:
 - the request unit boundary is known
 - the component registry plus optional binding seam is known
 - the trigger payload problem is known
+- the first real read-algebra pressure point has a clean schema answer
 - the end-state schema can now be designed from these truths instead of from the
   current leaked wire format

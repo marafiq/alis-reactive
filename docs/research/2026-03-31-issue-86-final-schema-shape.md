@@ -12,11 +12,14 @@
   `response.onError`, `response.chained`.
 - One value-flow law governs the whole runtime: resolve root, access from root,
   shape if needed, consume.
+- A component opts into `binding` only when its vertical slice can declare a
+  self-sufficient canonical semantic value.
 - Member paths are plain dotted JS paths and may walk arrays and nested objects,
   for example `items.0.meta.name`.
 - The same access semantics apply uniformly across `binding`, `trigger`,
   `response`, and explicit `component` roots.
-- Generic read access supports both `member` and `invoke`.
+- Generic read access is compositional: an ordered chain of `member` and
+  `invoke` steps.
 - Generic effect access stays `set` and `call`.
 - Validation targets canonical `componentId` and resolves through the component
   registry instead of carrying copied runtime enrichment.
@@ -39,9 +42,11 @@
 - `Response`: success/error/chained stages owned by a request.
 - `Parallel`: concurrent request unit with `onAllSettled`.
 - `Value`: one consumed value in guards, commands, gather, and payloads.
-- `MemberAccess`: property/path access plus semantic shaping.
-- `InvokeAccess`: method invocation that returns a value.
+- `AccessStep`: one composable read step over a root or intermediate value.
 - `Access`: generic read access over a resolved root.
+- `PayloadAccessStep`: one composable read step while building trigger payload.
+- `PayloadAccess`: generic read access over `host` or `target` while building
+  trigger payload.
 - `ReadRoot`: one readable runtime root surface.
 - `ApplyTarget`: one writable/callable runtime root surface.
 - `Command`: one imperative effect.
@@ -65,39 +70,25 @@ type Shape =
   | "object"
   | { kind: "array"; of: Shape };
 
-type MemberAccess = {
-  kind: "member";
-  path?: string;
+type AccessStep =
+  | { kind: "member"; path: string }
+  | { kind: "invoke"; method: string; args?: Value[] };
+
+type Access = {
+  steps: AccessStep[]; // empty = resolved root itself
   rawShape?: Shape;
   shape?: Shape;
 };
 
-type InvokeAccess = {
-  kind: "invoke";
-  method: string;
-  args?: Value[];
+type PayloadAccessStep =
+  | { kind: "member"; path: string }
+  | { kind: "invoke"; method: string; args?: PayloadValue[] };
+
+type PayloadAccess = {
+  steps: PayloadAccessStep[]; // empty = carried host/target root itself
   rawShape?: Shape;
   shape?: Shape;
 };
-
-type Access = MemberAccess | InvokeAccess;
-
-type PayloadMemberAccess = {
-  kind: "member";
-  path?: string;
-  rawShape?: Shape;
-  shape?: Shape;
-};
-
-type PayloadInvokeAccess = {
-  kind: "invoke";
-  method: string;
-  args?: PayloadValue[];
-  rawShape?: Shape;
-  shape?: Shape;
-};
-
-type PayloadAccess = PayloadMemberAccess | PayloadInvokeAccess;
 
 type ComponentRef = {
   id: string;
@@ -106,7 +97,7 @@ type ComponentRef = {
 
 type Binding = {
   path: string;      // semantic field name/path, e.g. "Address.City"
-  access: Access;    // canonical semantic value for this component
+  access: Access;    // self-sufficient canonical semantic value for this component
 };
 
 type Component = {
@@ -209,7 +200,7 @@ type Response = {
 };
 
 type ErrorHandler = {
-  status?: number;
+  status: number;
   pipeline: Pipeline;
 };
 
@@ -314,8 +305,9 @@ type ValidationOp = GuardOp;
       "binding": {
         "path": "Address.City",
         "access": {
-          "kind": "member",
-          "path": "value",
+          "steps": [
+            { "kind": "member", "path": "value" }
+          ],
           "shape": "string"
         }
       }
@@ -325,8 +317,9 @@ type ValidationOp = GuardOp;
       "binding": {
         "path": "Age",
         "access": {
-          "kind": "member",
-          "path": "value",
+          "steps": [
+            { "kind": "member", "path": "value" }
+          ],
           "rawShape": "string",
           "shape": "number"
         }
@@ -400,8 +393,9 @@ type ValidationOp = GuardOp;
                         "kind": "access",
                         "root": { "kind": "response" },
                         "access": {
-                          "kind": "member",
-                          "path": "resident.name",
+                          "steps": [
+                            { "kind": "member", "path": "resident.name" }
+                          ],
                           "shape": "string"
                         }
                       }
@@ -444,8 +438,9 @@ Read from a non-input component property:
     "target": { "id": "resident-tabs", "vendor": "fusion" }
   },
   "access": {
-    "kind": "member",
-    "path": "selectedItem",
+    "steps": [
+      { "kind": "member", "path": "selectedItem" }
+    ],
     "shape": "number"
   }
 }
@@ -461,8 +456,9 @@ Read from a non-input component method:
     "target": { "id": "resident-tabs", "vendor": "fusion" }
   },
   "access": {
-    "kind": "invoke",
-    "method": "getSelectedItems",
+    "steps": [
+      { "kind": "invoke", "method": "getSelectedItems" }
+    ],
     "shape": { "kind": "array", "of": "raw" }
   }
 }
@@ -495,8 +491,9 @@ Use a non-input component in request gather if it opts into binding:
       "binding": {
         "path": "EditContext",
         "access": {
-          "kind": "invoke",
-          "method": "getPayload",
+          "steps": [
+            { "kind": "invoke", "method": "getPayload" }
+          ],
           "shape": "object"
         }
       }
@@ -515,18 +512,38 @@ Walk an array item object path from a response or component root:
     "target": { "id": "resident-grid", "vendor": "fusion" }
   },
   "access": {
-    "kind": "member",
-    "path": "items.1.meta.name",
+    "steps": [
+      { "kind": "member", "path": "items.1.meta.name" }
+    ],
     "shape": "string"
   }
 }
 ```
 
-`shape` describes the terminal semantic value after the walk. It does not carry
-the path structure. So for an array of objects where the final leaf is a
+Invoke a method, then keep walking inside what it returned:
+
+```json
+{
+  "kind": "access",
+  "root": {
+    "kind": "component",
+    "target": { "id": "country-ddl", "vendor": "fusion" }
+  },
+  "access": {
+    "steps": [
+      { "kind": "invoke", "method": "getItems" },
+      { "kind": "member", "path": "3.disabled" }
+    ],
+    "shape": "boolean"
+  }
+}
+```
+
+`shape` describes the terminal semantic value after all steps run. It does not
+carry the path structure. So for an array of objects where the final leaf is a
 string, the access is:
 
-- `path = "items.1.meta.name"`
+- `steps = [{ kind: "member", path: "items.1.meta.name" }]`
 - `shape = "string"`
 
 If the final leaf itself is an array, the shape stays explicit:
@@ -549,6 +566,8 @@ binding value.
   participation lane.
 - generic `access(root, access)` gives triggers, responses, components,
   elements, and document one shared read language.
+- compositional `access.steps[]` means future slice onboarding can add
+  method-return walking without redesigning the schema.
 - generic `apply(target, mutation)` gives triggers, components, elements, and
   document one shared effect language.
 - non-input widgets like tabs, accordion, toast, confirm, and custom buttons do
@@ -557,7 +576,7 @@ binding value.
   request/validation semantics too.
 - the runtime stays dumb:
   - resolve root
-  - execute `member` or `invoke`
+  - execute `access.steps[]` in order
   - shape if needed
   - consume
   - apply `set` / `call` only on explicit targets

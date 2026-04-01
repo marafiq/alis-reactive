@@ -29,9 +29,10 @@ Review break cases only within these supported surfaces:
   - `response.chained`
 - `Parallel` with `onAllSettled`
 - component, element, document, trigger, and response roots
-- value reads as:
+- value reads as compositional access steps:
   - member/path access
-  - method invocation returning a terminal value
+  - method invocation
+  - ordered step chains over the same root, for example `invoke` then `member`
 - the same member/path semantics apply on:
   - trigger payload roots
   - response roots
@@ -54,8 +55,8 @@ The current schema does **not** claim to support:
 - arbitrary JS reflection
 - dynamic property-name generation at runtime
 - arbitrary method chaining
-- “invoke method, then continue walking inside its return object” as a second
-  access stage unless the DSL is explicitly expanded to support that
+- making every component a `binding` participant without an explicit canonical
+  semantic value contract
 
 ## Challenge Format
 
@@ -76,10 +77,10 @@ of these places:
 - a validation rule or condition that cannot be expressed without copied runtime
   enrichment
 - a trigger payload that still requires runtime invention
-- a case where `member` access cannot express the supported path semantics
-  cleanly
-- a case where `invoke` is required but the DSL also needs to walk deeper into
-  the returned value
+- a case where compositional access still cannot express a curated DSL read
+  cleanly without adding reflection or fallback behavior
+- a case where `binding` participation cannot stay self-sufficient and still
+  express the supported semantic value
 - a partial lifecycle scenario where trigger wiring or `binding` lookup is not
   honest about wire-time vs lazy resolution
 
