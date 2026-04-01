@@ -140,6 +140,17 @@ There is one more request invariant the final schema should preserve:
 - this is intentional because a future retry story can replay the same request
   snapshot instead of recollecting
 
+There is now direct C# lowering proof for that unit boundary too:
+
+- [WhenLoweringDslSurfacesToRuntimeAlgebra.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Architecture/WhenLoweringDslSurfacesToRuntimeAlgebra.cs)
+  proves from the DSL side that:
+  - bound refs, explicit refs, and app-level refs all lower to the same
+    `mutate-element + mutation` envelope
+  - expression-based gather and explicit-ref gather lower through the same input
+    contract when a component declares canonical readable participation
+  - typed component sources lower the same way in guards and command values
+  - request-owned stages stay attached to the request object in emitted JSON
+
 Direct runtime proof:
 
 - [http.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/execution/http.ts)
@@ -284,6 +295,8 @@ Focused re-run on **April 1, 2026** after the array-walking additions:
 - [when-proving-response-and-component-algebra.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-response-and-component-algebra.test.ts)
   passed **10 tests**
 - [when-proving-canonical-proof-surfaces.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-proving-canonical-proof-surfaces.test.ts)
+  passed **4 tests**
+- [WhenLoweringDslSurfacesToRuntimeAlgebra.cs](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/tests/Alis.Reactive.UnitTests/Architecture/WhenLoweringDslSurfacesToRuntimeAlgebra.cs)
   passed **4 tests**
 
 The important architectural boundary exposed by those proofs is:

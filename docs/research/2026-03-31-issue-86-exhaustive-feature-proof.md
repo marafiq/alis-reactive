@@ -65,6 +65,9 @@ npm test -- \
 dotnet test tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj \
   --filter "FullyQualifiedName~WhenTriggeringOnDomReady|FullyQualifiedName~WhenTriggeringOnCustomEvent|FullyQualifiedName~WhenTriggeringOnServerPush|FullyQualifiedName~WhenTriggeringOnSignalR|FullyQualifiedName~WhenRequestingFromServer|FullyQualifiedName~WhenGatheringRegisteredComponents|FullyQualifiedName~WhenBuildingHttpPipelines|FullyQualifiedName~WhenConditionReadsComponent|FullyQualifiedName~WhenUsingConditionsInEveryDslSurface|FullyQualifiedName~WhenEnrichingValidationAtRenderTime|FullyQualifiedName~WhenRegisteringComponents|FullyQualifiedName~WhenGeneratingUniqueIds"
 
+dotnet test tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj \
+  --filter "FullyQualifiedName~WhenLoweringDslSurfacesToRuntimeAlgebra|FullyQualifiedName~WhenRequestingFromServer|FullyQualifiedName~WhenConditionReadsComponent|FullyQualifiedName~WhenComparingTwoSources"
+
 dotnet test tests/Alis.Reactive.FluentValidator.UnitTests/Alis.Reactive.FluentValidator.UnitTests.csproj \
   --filter "FullyQualifiedName~WhenExtractingAllRuleTypes|FullyQualifiedName~WhenExtractingConditionalRules|FullyQualifiedName~WhenExtractingEqualToRules|FullyQualifiedName~WhenExtractingNestedValidators|FullyQualifiedName~WhenExtractingDateOnlyRules|FullyQualifiedName~WhenExtractingComparisonRules|FullyQualifiedName~WhenExtractingLengthRules|FullyQualifiedName~WhenExtractingRangeRule"
 
@@ -89,6 +92,7 @@ Fresh results:
 - focused trigger/order sweep after same-trigger chaining fix: **5 files, 29 tests passed**
 - broader active TS runtime sweep after ordering fix: **78 files, 1,149 tests passed**
 - core reactive C# sweep: **80 tests passed**
+- focused C# lowering sweep: **32 tests passed**, including **4 new lowering-truth tests**
 - FluentValidation extraction sweep: **23 tests passed**
 - native descriptor sweep: **16 tests passed**
 - fusion descriptor sweep: **16 tests passed**
@@ -102,7 +106,7 @@ for issue #86:
   via
   [end-state-plan-fixtures.ts](../../Alis.Reactive.SandboxApp/Scripts/architecture-proof/end-state-plan-fixtures.ts)
 
-Total fresh passing tests used in this proof packet: **1,331**
+Total fresh passing tests used in this proof packet: **1,335**
 
 ## Cross-Cutting Runtime Truths Proven By Code
 
@@ -168,6 +172,22 @@ vendors for:
 - command-driven property writes
 - command-driven method calls with and without args
 - component-event-driven downstream reads and conditions
+
+### 3b. Isolated C# lowering proof now exists too
+
+There is now a serializer/lowering-specific proof file that does not depend on
+real browser execution:
+
+- [WhenLoweringDslSurfacesToRuntimeAlgebra.cs](../../tests/Alis.Reactive.UnitTests/Architecture/WhenLoweringDslSurfacesToRuntimeAlgebra.cs)
+
+It proves from the DSL side that:
+
+- bound refs, explicit refs, and app-level refs collapse into the same
+  `mutate-element + mutation` envelope
+- readable participation can be lowered from either an expression-bound ref or
+  an explicit ref when the component declares a canonical readable contract
+- the same component-source shape is reused in guards and command values
+- request-owned stages remain attached to the request unit in emitted JSON
 
 ### 4. The runtime is root-first
 
