@@ -13,7 +13,6 @@ export interface MergeHooks {
 export class PlanRegistry {
   private readonly plans = new Map<string, Plan>();
   private readonly rootPlanIds = new Set<string>();
-  private readonly sourceOwners = new Map<string, string>();
   private readonly abortControllers = new Map<string, AbortController>();
   private readonly sourceEntries = new Map<string, Entry[]>();
   private readonly sourceComponentKeys = new Map<string, string[]>();
@@ -25,10 +24,9 @@ export class PlanRegistry {
 
   add(incoming: Plan, hooks: MergeHooks): Plan {
     const sourceId = incoming.sourceId;
-    const previousPlanId = sourceId ? this.sourceOwners.get(sourceId) : undefined;
 
-    if (sourceId && previousPlanId) {
-      this.removeSource(previousPlanId, sourceId, hooks.unwireFields);
+    if (sourceId) {
+      this.removeSource(incoming.planId, sourceId, hooks.unwireFields);
     }
 
     let target = this.plans.get(incoming.planId);
@@ -49,10 +47,10 @@ export class PlanRegistry {
     target.entries.push(...incoming.entries);
 
     if (sourceId && abort) {
-      this.sourceOwners.set(sourceId, incoming.planId);
-      this.abortControllers.set(sourceId, abort);
-      this.sourceEntries.set(sourceId, [...incoming.entries]);
-      this.sourceComponentKeys.set(sourceId, Object.keys(incoming.components));
+      const key = sourceKey(incoming.planId, sourceId);
+      this.abortControllers.set(key, abort);
+      this.sourceEntries.set(key, [...incoming.entries]);
+      this.sourceComponentKeys.set(key, Object.keys(incoming.components));
     }
 
     return target;
@@ -65,7 +63,6 @@ export class PlanRegistry {
   reset(): void {
     this.plans.clear();
     this.rootPlanIds.clear();
-    this.sourceOwners.clear();
     for (const abort of this.abortControllers.values()) abort.abort();
     this.abortControllers.clear();
     this.sourceEntries.clear();
@@ -73,15 +70,16 @@ export class PlanRegistry {
   }
 
   private removeSource(planId: string, sourceId: string, unwireFields: UnwireFields): void {
+    const key = sourceKey(planId, sourceId);
     const plan = this.plans.get(planId);
     if (!plan) {
-      this.clearTracking(sourceId);
+      this.clearTracking(key);
       return;
     }
 
-    this.abortControllers.get(sourceId)?.abort();
+    this.abortControllers.get(key)?.abort();
 
-    const oldEntries = this.sourceEntries.get(sourceId);
+    const oldEntries = this.sourceEntries.get(key);
     if (oldEntries) {
       for (const entry of oldEntries) {
         const idx = plan.entries.indexOf(entry);
@@ -89,7 +87,7 @@ export class PlanRegistry {
       }
     }
 
-    const oldKeys = this.sourceComponentKeys.get(sourceId);
+    const oldKeys = this.sourceComponentKeys.get(key);
     if (oldKeys) {
       // Unwire live-clear for components being removed — their element IDs
       // must be cleared from wiredFields so re-loaded partials get fresh wiring.
@@ -99,19 +97,22 @@ export class PlanRegistry {
       for (const key of oldKeys) delete plan.components[key];
     }
 
-    this.clearTracking(sourceId);
+    this.clearTracking(key);
 
     if (!this.rootPlanIds.has(planId) && plan.entries.length === 0 && Object.keys(plan.components).length === 0) {
       this.plans.delete(planId);
     }
   }
 
-  private clearTracking(sourceId: string): void {
-    this.sourceOwners.delete(sourceId);
-    this.abortControllers.delete(sourceId);
-    this.sourceEntries.delete(sourceId);
-    this.sourceComponentKeys.delete(sourceId);
+  private clearTracking(key: string): void {
+    this.abortControllers.delete(key);
+    this.sourceEntries.delete(key);
+    this.sourceComponentKeys.delete(key);
   }
+}
+
+function sourceKey(planId: string, sourceId: string): string {
+  return `${planId}::${sourceId}`;
 }
 
 // ── Singleton + delegating exports (backward-compatible API) ──

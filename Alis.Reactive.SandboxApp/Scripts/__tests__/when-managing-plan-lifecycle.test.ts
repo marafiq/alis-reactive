@@ -957,6 +957,66 @@ describe("When two plans with different planIds are booted", () => {
     const facility = getBootedPlan("Facility.Model")!;
     expect(facility.components["FacilityName"]).toBeDefined();
   });
+
+  it("the same sourceId reused across different planIds does not collide", () => {
+    boot(rootPlan());
+    boot(unrelatedPlan());
+
+    mergePlan(partialPlan("shared-slot", {
+      components: { "Address.City": comp("resident-city") },
+    }));
+
+    mergePlan({
+      planId: "Facility.Model",
+      sourceId: "shared-slot",
+      components: { "Facility.City": comp("facility-city") },
+      entries: [],
+    });
+
+    const resident = getBootedPlan("Resident.Model")!;
+    const facility = getBootedPlan("Facility.Model")!;
+
+    expect(resident.components["Address.City"]?.id).toBe("resident-city");
+    expect(facility.components["Facility.City"]?.id).toBe("facility-city");
+  });
+
+  it("removing a shared sourceId from one plan does not remove the other plan's fragment", () => {
+    document.body.innerHTML = '<div id="resident-status"></div><div id="facility-status"></div>';
+
+    boot(rootPlan());
+    boot(unrelatedPlan());
+
+    mergePlan(partialPlan("shared-slot", {
+      components: { "Address.City": comp("resident-city") },
+      entries: [mutateOnEvent("resident-fragment-event", "resident-status", "resident-fragment")],
+    }));
+
+    mergePlan({
+      planId: "Facility.Model",
+      sourceId: "shared-slot",
+      components: { "Facility.City": comp("facility-city") },
+      entries: [mutateOnEvent("facility-fragment-event", "facility-status", "facility-fragment")],
+    });
+
+    mergePlan({
+      planId: "Facility.Model",
+      sourceId: "shared-slot",
+      components: {},
+      entries: [],
+    });
+
+    const resident = getBootedPlan("Resident.Model")!;
+    const facility = getBootedPlan("Facility.Model")!;
+
+    expect(resident.components["Address.City"]?.id).toBe("resident-city");
+    expect(facility.components["Facility.City"]).toBeUndefined();
+
+    document.dispatchEvent(new CustomEvent("resident-fragment-event"));
+    document.dispatchEvent(new CustomEvent("facility-fragment-event"));
+
+    expect(document.getElementById("resident-status")?.textContent).toBe("resident-fragment");
+    expect(document.getElementById("facility-status")?.textContent).toBe("");
+  });
 });
 
 // ── Lifecycle round-trip ────────────────────────────────

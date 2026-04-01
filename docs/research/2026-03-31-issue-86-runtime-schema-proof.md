@@ -180,6 +180,26 @@ That is the honest lifecycle split:
 
 The schema should express that directly instead of hiding it behind enrichment.
 
+### 8a. Fragment ownership must be scoped by plan
+
+Plan merge also has one isolation rule that the end-state schema/runtime cannot
+get wrong:
+
+- fragment ownership is `planId + sourceId`
+- not global `sourceId`
+
+Why this matters:
+
+- two unrelated plans can reuse the same fragment/source name
+- removing or reloading one must not tear down listeners/components from the
+  other
+
+Direct proof:
+
+- [merge-plan.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/lifecycle/merge-plan.ts)
+- [when-managing-plan-lifecycle.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-managing-plan-lifecycle.test.ts)
+- [when-merging-plans.test.ts](/Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/issue-86-capability-matrix/Alis.Reactive.SandboxApp/Scripts/__tests__/when-merging-plans.test.ts)
+
 ### 9. SSE and SignalR already behave like carried host roots
 
 Server push wiring in

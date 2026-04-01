@@ -162,7 +162,7 @@ describe("when merging plans", () => {
     expect(fireCount).toBe(1);
   });
 
-  it("removes source-owned listeners and components when the same sourceId moves to a different planId", () => {
+  it("keeps listeners and components isolated when the same sourceId is reused by a different planId", () => {
     document.body.innerHTML = '<div id="status-a"></div><div id="status-b"></div>';
 
     mergePlan({
@@ -211,9 +211,9 @@ describe("when merging plans", () => {
     document.dispatchEvent(new CustomEvent("fire-a"));
     document.dispatchEvent(new CustomEvent("fire-b"));
 
-    expect(document.getElementById("status-a")?.textContent).toBe("");
+    expect(document.getElementById("status-a")?.textContent).toBe("A");
     expect(document.getElementById("status-b")?.textContent).toBe("B");
-    expect(getBootedPlan("Plan.A")).toBeUndefined();
+    expect(getBootedPlan("Plan.A")?.components["Root.Name"]).toBeDefined();
     expect(getBootedPlan("Plan.B")?.components["Root.Email"]).toBeDefined();
   });
 
