@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wrapper builder for the FusionTab component.
-    /// Wraps SF-rendered IHtmlContent and exposes ElementId + Plan for .Reactive() chaining.
-    /// Non-input component — no InputField wrapper, no label, no validation slot.
+    /// Wraps the rendered Fusion Tab markup and carries the object identity needed for reactive workflows.
     /// </summary>
     public class FusionTabBuilder<TModel> : IHtmlContent where TModel : class
     {
@@ -20,12 +18,17 @@ namespace Alis.Reactive.Fusion.Components
             _inner = inner;
         }
 
-        /// <summary>The reactive plan — used by .Reactive() to add entries.</summary>
+        /// <summary>The reactive plan — used by .Reactive() to add workflows.</summary>
         internal ReactivePlan<TModel> Plan { get; }
 
         /// <summary>The element ID — used by .Reactive() to wire events.</summary>
         internal string ElementId { get; }
 
+        /// <summary>
+        /// Writes the rendered tab markup.
+        /// </summary>
+        /// <param name="writer">The writer that receives the markup.</param>
+        /// <param name="encoder">The encoder used for HTML output.</param>
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             _inner.WriteTo(writer, encoder);

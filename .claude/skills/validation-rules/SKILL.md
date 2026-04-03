@@ -62,7 +62,7 @@ RuleFor(x => x.Discharge).GreaterThan(x => x.Admission);                  // gt 
 
 > **WARNING: `DateTime.Today` / `DateTime.Now` freezes at construction time.** The constraint value is captured when the validator constructor runs. If the validator is registered as a singleton in DI, the date is frozen at app startup. Use fixed dates (e.g., `new DateTime(2020, 1, 1)`) for client-side rules. For dynamic date constraints (e.g., "must be after today"), use server-only `.When()` guards instead.
 
-### Cross-Property (field set automatically, peer auto-included in descriptor)
+### Cross-Property (field set automatically, peer auto-included in the validation contract)
 
 ```csharp
 RuleFor(x => x.ConfirmEmail).Equal(x => x.Email);            // equalTo — skips empty
@@ -75,7 +75,7 @@ RuleFor(x => x.Start).LessThanOrEqualTo(x => x.End);        // max cross-propert
 
 ### Server-Only (Not Extractable)
 
-These rules are silently dropped by the adapter and only enforced server-side:
+These rules are not extracted into client validation and remain server-only:
 
 | Rule | Why not extractable |
 |------|-------------------|
@@ -140,7 +140,7 @@ public class MyValidator : ReactiveValidator<MyModel>  // NOTE: ReactiveValidato
 | `RuleFor(x).Empty()` | `RuleFor(x).IsEmpty()` | FV's Empty has no interface |
 | `RuleFor(x).ExclusiveBetween(a,b)` | `RuleFor(x).IsExclusiveBetween(a,b)` | FV can't distinguish from inclusive |
 | `.When(x => x.Bool)` | `WhenField(x => x.Bool, () => {})` | `.When()` is server-only |
-| Manual `min` rule without `coerceAs` | Let adapter set it | Runtime throws without coerceAs |
+| Manual `min` rule without `coerceAs` | Let the extractor infer it | Runtime throws without coerceAs |
 | `p.Element("input-id")` for inputs | `Html.InputField(plan, m => m.Prop)` | Element() is for display, not input |
 
 ## Empty Behavior

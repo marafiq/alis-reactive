@@ -48,7 +48,7 @@ namespace Alis.Reactive.Validation
 
         /// <summary>
         /// NEVER make public. Constructed exclusively by framework builders. Public constructors
-        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// on framework-owned contract types allow devs to bypass the builder API and create invalid plan state.
         /// </summary>
         internal ValidationRule(string rule, string message, object? constraint = null,
             ValidationCondition? when = null, string? field = null, string? coerceAs = null)

@@ -14,8 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Register FluentValidation extraction for client-side validation
-ReactivePlanConfig.UseValidationExtractor(
-    new FluentValidationAdapter(type =>
+ReactivePlanConfig.UseFormValidationExtractor(
+    new FluentValidationRuleExtractor(type =>
         (FluentValidation.IValidator?)Activator.CreateInstance(type)));
 
 var app = builder.Build();

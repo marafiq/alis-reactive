@@ -1,66 +1,127 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: conditional,
-        commands: [
-          {
-            kind: mutate-element,
-            target: echo,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    element.echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
-            },
-            value: before
-          }
-        ],
-        branches: [
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.r1: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::echo: {
+      contract: element.echo,
+      elementId: echo
+    },
+    element::r1: {
+      contract: element.r1,
+      elementId: r1
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: test
+      },
+      run: {
+        kind: sequence,
+        steps: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.value
-              },
-              coerceAs: string,
-              op: eq,
-              operand: hello
+            kind: set,
+            target: {
+              object: element::echo,
+              member: text
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: r1,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: matched
-                }
-              ]
+            value: {
+              kind: literal,
+              value: before
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: r1,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+            kind: branch,
+            cases: [
+              {
+                when: {
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: value
+                      }
+                    ]
                   },
-                  value: nope
+                  op: eq,
+                  right: {
+                    kind: literal,
+                    value: hello
+                  },
+                  as: {
+                    kind: scalar,
+                    type: string
+                  }
+                },
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::r1,
+                    member: text
+                  },
+                  value: {
+                    kind: literal,
+                    value: matched
+                  }
                 }
-              ]
-            }
+              },
+              {
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::r1,
+                    member: text
+                  },
+                  value: {
+                    kind: literal,
+                    value: nope
+                  }
+                }
+              }
+            ]
           }
         ]
       }

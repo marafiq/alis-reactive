@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -56,7 +57,9 @@ namespace Alis.Reactive.Native.Extensions
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class
         {
-            return new ReactivePlan<TModel>(isPartial: true);
+            return new ReactivePlan<TModel>(
+                isPartial: true,
+                sourceId: CreatePartialSourceId(html));
         }
 
         /// <summary>
@@ -78,7 +81,7 @@ namespace Alis.Reactive.Native.Extensions
             var script = $"<script type=\"application/json\" data-reactive-plan data-trace=\"trace\">{json}</script>";
 
             // Validation errors display inline next to each field by default.
-            // The summary div is a fallback for errors that cannot be shown inline:
+            // The summary div is the summary-only location for errors that cannot be shown inline:
             // hidden fields, unenriched fields (partial not yet loaded), or server
             // errors with no matching error span. Only views emit it — partials
             // rely on the view's summary div only if the partials are not rendered yet.
@@ -88,6 +91,43 @@ namespace Alis.Reactive.Native.Extensions
             var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
             return new HtmlString(script +
                 $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
+        }
+
+        private static string CreatePartialSourceId<TModel>(IHtmlHelper<TModel> html)
+            where TModel : class
+        {
+            const string key = "__alis.reactive.partial-source-index";
+
+            var items = html.ViewContext.HttpContext.Items;
+            var next = items.TryGetValue(key, out var current) && current is int index
+                ? index + 1
+                : 1;
+
+            items[key] = next;
+
+            var viewPath = html.ViewContext.View.Path
+                ?? html.ViewContext.ExecutingFilePath
+                ?? typeof(TModel).FullName
+                ?? "partial";
+
+            return $"server-partial::{SanitizeSourceId(viewPath)}::{next}";
+        }
+
+        private static string SanitizeSourceId(string value)
+        {
+            var builder = new StringBuilder(value.Length);
+            foreach (var ch in value)
+            {
+                if (char.IsLetterOrDigit(ch))
+                {
+                    builder.Append(ch);
+                    continue;
+                }
+
+                builder.Append('_');
+            }
+
+            return builder.ToString().Trim('_');
         }
     }
 }

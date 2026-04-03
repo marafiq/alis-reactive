@@ -38,7 +38,7 @@ namespace Alis.Reactive.Native.Components
         private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
 
         // NEVER make public — devs create builders via the .NativeRadioGroup() factory,
-        // which also registers the component in the plan's ComponentsMap.
+        // which also registers the component in the plan's RegisteredComponents.
         internal NativeRadioGroupBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
         {
             _html = html;

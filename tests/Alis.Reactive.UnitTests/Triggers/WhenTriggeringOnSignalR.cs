@@ -26,7 +26,7 @@ public class WhenTriggeringOnSignalR : PlanTestBase
     }
 
     [Test]
-    public Task Multiple_methods_on_same_hub_produce_separate_entries()
+    public Task Multiple_methods_on_same_hub_produce_separate_workflows()
     {
         var plan = CreatePlan();
         Trigger(plan)
@@ -38,7 +38,7 @@ public class WhenTriggeringOnSignalR : PlanTestBase
     }
 
     [Test]
-    public Task Different_hubs_produce_entries_with_different_hub_urls()
+    public Task Different_hubs_produce_workflows_with_different_hub_urls()
     {
         var plan = CreatePlan();
         Trigger(plan)

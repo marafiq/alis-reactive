@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace Alis.Reactive.PlaywrightTests;
 
@@ -13,22 +14,26 @@ namespace Alis.Reactive.PlaywrightTests;
 public class WebServerFixture
 {
     private static Process? _server;
+    private static readonly object _serverOutputLock = new();
+    private static readonly Queue<string> _serverOutput = new();
+    private const int MaxServerOutputLines = 200;
     public static string BaseUrl { get; private set; } = "";
 
     [OneTimeSetUp]
     public async Task StartServer()
     {
         var port = GetAvailablePort();
-        BaseUrl = $"http://localhost:{port}";
+        BaseUrl = $"http://127.0.0.1:{port}";
 
         var projectDir = FindProjectDir();
+        ClearServerOutput();
 
         _server = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"run --project \"{projectDir}\" --no-launch-profile --urls {BaseUrl}",
+                Arguments = $"run --no-build --project \"{projectDir}\" --no-launch-profile --urls {BaseUrl}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -42,11 +47,18 @@ public class WebServerFixture
         };
 
         _server.Start();
+        _server.OutputDataReceived += (_, args) => RecordServerOutput("stdout", args.Data);
+        _server.ErrorDataReceived += (_, args) => RecordServerOutput("stderr", args.Data);
+        _server.BeginOutputReadLine();
+        _server.BeginErrorReadLine();
 
         // Wait for server to be ready (up to 30s)
         using var http = new HttpClient();
         for (var i = 0; i < 60; i++)
         {
+            if (_server.HasExited)
+                throw BuildServerStartupException("SandboxApp exited before becoming ready.");
+
             try
             {
                 var response = await http.GetAsync(BaseUrl);
@@ -60,7 +72,7 @@ public class WebServerFixture
             await Task.Delay(500);
         }
 
-        throw new Exception($"Server did not start within 30 seconds at {BaseUrl}");
+        throw BuildServerStartupException($"Server did not start within 30 seconds at {BaseUrl}.");
     }
 
     [OneTimeTearDown]
@@ -97,5 +109,50 @@ public class WebServerFixture
         // Fallback: relative from repo root
         var repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", ".."));
         return Path.Combine(repoRoot, "Alis.Reactive.SandboxApp");
+    }
+
+    private static void RecordServerOutput(string stream, string? line)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+            return;
+
+        lock (_serverOutputLock)
+        {
+            _serverOutput.Enqueue($"[{stream}] {line}");
+            while (_serverOutput.Count > MaxServerOutputLines)
+                _serverOutput.Dequeue();
+        }
+    }
+
+    private static void ClearServerOutput()
+    {
+        lock (_serverOutputLock)
+        {
+            _serverOutput.Clear();
+        }
+    }
+
+    private static Exception BuildServerStartupException(string message)
+    {
+        var output = SnapshotServerOutput();
+        if (output.Count == 0)
+            return new Exception(message);
+
+        var builder = new StringBuilder()
+            .AppendLine(message)
+            .AppendLine("Recent SandboxApp output:");
+
+        foreach (var line in output)
+            builder.AppendLine(line);
+
+        return new Exception(builder.ToString());
+    }
+
+    private static IReadOnlyCollection<string> SnapshotServerOutput()
+    {
+        lock (_serverOutputLock)
+        {
+            return _serverOutput.ToArray();
+        }
     }
 }

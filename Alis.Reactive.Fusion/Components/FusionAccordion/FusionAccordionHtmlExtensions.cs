@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
     /// Factory extension for creating FusionAccordionBuilder.
-    /// Non-input component — NO InputField wrapper, NO ComponentsMap registration.
+    /// Non-input component — NO InputField wrapper, NO RegisteredComponents registration.
     /// </summary>
     public static class FusionAccordionHtmlExtensions
     {
@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<AccordionBuilder> build)
             where TModel : class
         {
-            // NO ComponentsMap registration — this is NOT an input component
+            // NO RegisteredComponents registration — this is NOT an input component
 
             var builder = html.EJS().Accordion(elementId);
             build(builder);

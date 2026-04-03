@@ -71,7 +71,7 @@ The `"intake-form"` string is the form ID — it must match the `id` attribute o
 
 ## What rule types are available?
 
-16 rule types are extracted from FluentValidation. One additional type (`atLeastOne`) is supported by the runtime but must be added manually via `ValidationDescriptor`.
+16 rule types are extracted from FluentValidation. One additional type (`atLeastOne`) is supported by the runtime but must be added manually via `FormValidation`.
 
 ### Presence rules
 
@@ -153,7 +153,7 @@ RuleFor(x => x.Status).NotEqual("Discharged");
 |------|-----------|-------------|
 | (manual) | `atLeastOne` | Array must have at least one element |
 
-The `atLeastOne` rule is not extracted from FluentValidation — add it manually when constructing a `ValidationDescriptor`. Used for multi-select fields like `NativeCheckList` or `FusionMultiSelect`.
+The `atLeastOne` rule is not extracted from FluentValidation — add it manually when constructing a `FormValidation`. Used for multi-select fields like `NativeCheckList` or `FusionMultiSelect`.
 
 ## How do I add conditional rules?
 
@@ -241,7 +241,7 @@ If a field is hidden (e.g., inside a collapsed section), errors go to the **vali
 
 ### Unenriched fields with rules
 
-If a field has rules but was not registered in the plan's `ComponentsMap` (not rendered via `Html.InputField`), the first rule's error message appears in the summary. This is fail-closed — the validation blocks rather than silently skipping.
+If a field has rules but was not registered as a plan binding (not rendered via `Html.InputField`), the first rule's error message appears in the summary. This is fail-closed — the validation blocks rather than silently skipping.
 
 ### Missing form container
 

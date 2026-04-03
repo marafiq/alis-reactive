@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Resolvers;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Collects reactive behavior for a view: triggers, reactions, and component registrations.
-    /// Renders the collected behavior so it executes in the browser.
+    /// Collects reactive workflows and registered components for a view, then
+    /// renders the V2 execution plan for the browser runtime.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -38,14 +37,17 @@ namespace Alis.Reactive
             WriteIndented = true
         };
 
-        private readonly List<Entry> _entries = new List<Entry>();
-        private readonly Dictionary<string, ComponentRegistration> _componentsMap = new Dictionary<string, ComponentRegistration>();
+        private readonly PlanAuthoringContext _authoring;
 
         /// <summary>
         /// NEVER make public. Constructed exclusively by framework builders. Public constructors
-        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// on framework-owned contract types allow devs to bypass the builder API and create invalid plan state.
         /// </summary>
-        internal ReactivePlan(bool isPartial = false) { IsPartial = isPartial; }
+        internal ReactivePlan(bool isPartial = false, string? sourceId = null)
+        {
+            IsPartial = isPartial;
+            _authoring = new PlanAuthoringContext(PlanId, sourceId);
+        }
 
         /// <summary>
         /// Gets the unique plan identifier, derived from the model's full type name.
@@ -70,49 +72,52 @@ namespace Alis.Reactive
         /// </summary>
         /// <remarks>
         /// Populated when component builders (e.g. <c>Html.InputField(...).NativeTextBox()</c>)
-        /// register themselves. Used by validation and gather resolvers to map model
-        /// properties to their component IDs, vendors, and read expressions.
+        /// register themselves. Used when shaping bindings and request values so model
+        /// properties map to the correct component object and readable member path.
         /// </remarks>
-        internal IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
-
-        /// <summary>
-        /// Registers a trigger-reaction pair in the plan. Called by
-        /// <see cref="Builders.TriggerBuilder{TModel}"/>, not intended for direct use in views.
-        /// </summary>
-        internal void AddEntry(Entry entry)
-        {
-            _entries.Add(entry);
-        }
+        internal IReadOnlyDictionary<string, ComponentRegistration> RegisteredComponents => _authoring.Components;
+        internal PlanAuthoringContext Authoring => _authoring;
 
         /// <summary>
         /// Registers a component for a model property so validation and gather can find it.
         /// Called by component builders, not intended for direct use in views.
         /// </summary>
         /// <param name="bindingPath">The model property path (e.g. <c>"FacilityId"</c>, <c>"Address.City"</c>).</param>
-        /// <param name="entry">The component registration describing ID, vendor, and read expression.</param>
+        /// <param name="registration">The component registration describing ID, vendor, and value path.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when a different component is already registered for <paramref name="bindingPath"/>.
         /// Each model property maps to exactly one component.
         /// </exception>
-        internal void AddToComponentsMap(string bindingPath, ComponentRegistration entry)
+        internal void RegisterComponent(string bindingPath, ComponentRegistration registration)
         {
-            if (_componentsMap.TryGetValue(bindingPath, out var existing))
+            if (_authoring.Components.TryGetValue(bindingPath, out var existing))
             {
-                if (existing.ComponentId == entry.ComponentId
-                    && existing.Vendor == entry.Vendor
-                    && existing.ReadExpr == entry.ReadExpr
-                    && existing.ComponentType == entry.ComponentType
-                    && existing.CoerceAs == entry.CoerceAs)
+                if (existing.ComponentId == registration.ComponentId
+                    && existing.Vendor == registration.Vendor
+                    && existing.ValueMemberPath == registration.ValueMemberPath
+                    && existing.ComponentType == registration.ComponentType
+                    && existing.CoerceAs == registration.CoerceAs)
                     return;
 
                 throw new InvalidOperationException(
                     $"Duplicate component registration for binding path '{bindingPath}': " +
-                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ReadExpr}, {existing.ComponentType}, {existing.CoerceAs}] vs " +
-                    $"new [{entry.ComponentId}, {entry.Vendor}, {entry.ReadExpr}, {entry.ComponentType}, {entry.CoerceAs}]. " +
+                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ValueMemberPath}, {existing.ComponentType}, {existing.CoerceAs}] vs " +
+                    $"new [{registration.ComponentId}, {registration.Vendor}, {registration.ValueMemberPath}, {registration.ComponentType}, {registration.CoerceAs}]. " +
                     "Each binding path must map to exactly one component.");
             }
 
-            _componentsMap[bindingPath] = entry;
+            _authoring.RegisterComponent(bindingPath, registration);
+        }
+
+        internal void AddWorkflow(WorkflowScope scope, PlanAction action)
+        {
+            _authoring.AddWorkflow(scope, action);
+        }
+
+        internal void AddWorkflow(WorkflowScope scope, Builders.PipelineBuilder<TModel> pipeline)
+        {
+            foreach (var action in pipeline.BuildActions())
+                _authoring.AddWorkflow(scope, action);
         }
 
         /// <summary>
@@ -120,18 +125,13 @@ namespace Alis.Reactive
         /// </summary>
         /// <remarks>
         /// Called by <c>Html.RenderPlan(plan)</c>, not called directly in views.
-        /// Resolves validation rules and component enrichment before rendering.
+        /// Resolves validation rules before rendering the V2 plan document.
         /// </remarks>
         /// <returns>The rendered plan string consumed by the browser.</returns>
         public string Render()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(new
-            {
-                planId = PlanId,
-                components = SerializeComponentsMap(),
-                entries = _entries
-            }, CompactOptions);
+            return JsonSerializer.Serialize(_authoring.Document, CompactOptions);
         }
 
         /// <summary>
@@ -141,54 +141,14 @@ namespace Alis.Reactive
         public string RenderFormatted()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(new
-            {
-                planId = PlanId,
-                components = SerializeComponentsMap(),
-                entries = _entries
-            }, FormattedOptions);
+            return JsonSerializer.Serialize(_authoring.Document, FormattedOptions);
         }
 
-        // Flatten ComponentRegistration to anonymous objects for JSON serialization
-        private Dictionary<string, object> SerializeComponentsMap()
-        {
-            var result = new Dictionary<string, object>();
-            foreach (var kvp in _componentsMap)
-            {
-                result[kvp.Key] = new
-                {
-                    id = kvp.Value.ComponentId,
-                    vendor = kvp.Value.Vendor,
-                    readExpr = kvp.Value.ReadExpr,
-                    componentType = kvp.Value.ComponentType,
-                    coerceAs = kvp.Value.CoerceAs
-                };
-            }
-            return result;
-        }
-
-        // Resolve validation rules and component enrichment before serialization.
+        // Resolve validation rules before serialization.
         // Must run before every Render/RenderFormatted call.
         private void ResolveAll()
         {
-            var extractor = ReactivePlanConfig.Extractor;
-            if (extractor != null)
-            {
-                ValidationResolver.Resolve(_entries, extractor, _componentsMap);
-            }
-            else if (ValidationResolver.HasValidatorTypes(_entries))
-            {
-                throw new InvalidOperationException(
-                    "One or more requests use Validate<TValidator>() but no validation extractor is registered. " +
-                    "Call ReactivePlanConfig.UseValidationExtractor(...) at app startup.");
-            }
-            else if (_componentsMap.Count > 0)
-            {
-                ValidationResolver.EnrichFromComponents(_entries, _componentsMap);
-            }
-
-            // Stamp planId on all validation descriptors for summary div scoping
-            ValidationResolver.StampPlanId(_entries, PlanId);
+            _authoring.ResolveValidation(ReactivePlanConfig.FormValidationExtractor);
         }
     }
 }

@@ -43,8 +43,8 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
     }
 
     // ── Scenario 2: Gather reads from both vendors in same POST ──
-    // WHY: proves component.ts evalRead works for both vendor roots in a single gather.
-    // Same readExpr "value" resolves to el.value for native and ej2_instances[0].value for fusion.
+    // WHY: proves resolution/contracts.ts reads from both vendor roots in a single gather.
+    // Same valueMemberPath "value" resolves to el.value for native and ej2_instances[0].value for fusion.
 
     [Test]
     public async Task gather_reads_values_from_both_vendors_in_single_post()
@@ -60,12 +60,12 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
     }
 
     // ── Scenario 3: Component events wire on both vendors ──
-    // WHY: proves ComponentEventTrigger wiring works for both vendors.
+    // WHY: proves object-event workflow wiring works for both vendors.
     // Native wires DOM "change" on the element. Fusion wires "change" on the ej2 instance.
     // Both must resolve the correct value from the event and update the DOM.
 
     [Test]
-    public async Task native_change_event_fires_reaction_and_fusion_change_event_fires_reaction()
+    public async Task native_change_event_runs_workflow_and_fusion_change_event_runs_workflow()
     {
         await NavigateAndBoot();
 
@@ -133,7 +133,7 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
     }
 
     // ── Scenario 6: Cross-vendor gather integrity ──
-    // WHY: proves readExpr "value" resolves differently per vendor root.
+    // WHY: proves valueMemberPath "value" resolves differently per vendor root.
     // Native: el.value. Fusion: ej2_instances[0].value.
     // Each gather must read the correct vendor root independently.
 
@@ -254,7 +254,7 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
     }
 
     // ── Scenario 10: Void method call focuses fusion widget on dom-ready ──
-    // WHY: proves CallMutation with method:"focus" and no args resolves through resolveRoot
+    // WHY: proves a method action with member:"focus" and no args resolves through resolveRoot
     // and calls ej2_instances[0].focus(). The TestWidget sets _focused=true and calls
     // input.focus(). If resolveRoot or bracket notation is broken, the input won't be focused.
 
@@ -434,7 +434,7 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
 
     // ── Scenario 17: Page renders plan JSON for debugging ──
     // WHY: proves the plan JSON is serialized and visible on the page for developer inspection.
-    // The plan contains entries with triggers and reactions — if serialization is broken,
+    // The plan contains workflows with subscriptions and actions — if serialization is broken,
     // the #plan-json element would be empty or malformed.
 
     [Test]

@@ -1,28 +1,56 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/init,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::status,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: Ready
                 }
-              ]
+              }
             }
           ]
         }

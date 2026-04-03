@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionColorPicker"/> component.
+    /// Typed reactive events for the <see cref="FusionColorPicker"/> component.
     /// </summary>
     /// <remarks>
     /// Select an event via the <c>.Reactive()</c> lambda:
@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionColorPickerEvents() { }
 
         /// <summary>Fires when the color value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionColorPickerChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionColorPickerChangeArgs>(
+        public ReactiveEvent<FusionColorPickerChangeArgs> Changed =>
+            new ReactiveEvent<FusionColorPickerChangeArgs>(
                 "change", new FusionColorPickerChangeArgs());
     }
 }

@@ -50,10 +50,9 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("mutate-element"),
-            "Plan must contain mutate-element commands");
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
-            "Plan must contain fusion vendor");
+        AssertV2Plan(planJson);
+        AssertV2MemberAction(planJson);
+        AssertPlanResolver(planJson, "fusion-instance");
         AssertNoConsoleErrors();
     }
 
@@ -238,9 +237,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
-            "Plan must carry vendor 'fusion' for switch mutations — " +
-            "runtime uses this to choose resolveRoot strategy (ej2_instances)");
+        AssertPlanResolver(planJson, "fusion-instance");
         AssertNoConsoleErrors();
     }
 
@@ -250,9 +247,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"checked\""),
-            "Plan must carry readExpr 'checked' for FusionSwitch component sources — " +
-            "runtime walks this path to read the switch state");
+        AssertPlanValueMember(planJson, "checked");
         AssertNoConsoleErrors();
     }
 
@@ -262,9 +257,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"coerce\": \"boolean\""),
-            "Plan must carry coerce 'boolean' for SetChecked — " +
-            "without it, string 'false' is truthy and switch stays checked");
+        AssertPlanScalarType(planJson, "boolean");
         AssertNoConsoleErrors();
     }
 
@@ -274,9 +267,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"prop\": \"checked\""),
-            "Plan must carry prop 'checked' for SetChecked mutation — " +
-            "runtime uses bracket notation root[prop] = val");
+        AssertPlanPathProp(planJson, "checked");
         AssertNoConsoleErrors();
     }
 

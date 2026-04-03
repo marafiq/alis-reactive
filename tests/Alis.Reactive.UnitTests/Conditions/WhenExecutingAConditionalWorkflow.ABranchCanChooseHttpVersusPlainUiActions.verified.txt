@@ -1,72 +1,160 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.error: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.retry-btn: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    },
+    element::error: {
+      contract: element.error,
+      elementId: error
+    },
+    element::retry-btn: {
+      contract: element.retry-btn,
+      elementId: retry-btn
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: action-check
+      when: {
+        kind: document-event,
+        name: action-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.isActive
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: isActive
+                  }
+                ]
               },
-              coerceAs: boolean,
-              op: truthy
+              op: truthy,
+              as: {
+                kind: scalar,
+                type: boolean
+              }
             },
-            reaction: {
-              kind: http,
+            run: {
+              kind: request,
               request: {
-                verb: POST,
+                method: POST,
                 url: /api/process,
                 onSuccess: [
                   {
-                    commands: [
-                      {
-                        kind: mutate-element,
-                        target: result,
-                        mutation: {
-                          kind: set-prop,
-                          prop: textContent
-                        },
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::result,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
                         value: Processed
                       }
-                    ]
+                    }
                   }
                 ]
               }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
+            run: {
+              kind: sequence,
+              steps: [
                 {
-                  kind: mutate-element,
-                  target: error,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+                  kind: set,
+                  target: {
+                    object: element::error,
+                    member: text
                   },
-                  value: Account inactive
+                  value: {
+                    kind: literal,
+                    value: Account inactive
+                  }
                 },
                 {
-                  kind: mutate-element,
-                  target: retry-btn,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
+                  kind: set,
+                  target: {
+                    object: element::retry-btn,
+                    member: hidden
+                  },
+                  value: {
+                    kind: convert,
+                    value: {
+                      kind: literal,
+                      value: false
+                    },
+                    to: {
+                      kind: scalar,
+                      type: boolean
+                    }
                   }
                 }
               ]

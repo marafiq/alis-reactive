@@ -13,7 +13,7 @@
     }));
 
     // Section 4: Dispatch chain — transfer-btn dispatches "resident-transferred",
-    // a custom-event listener picks it up and updates transfer-status
+    // a document-event workflow picks it up and updates transfer-status
     Html.On(plan, t => t.CustomEvent("resident-transferred", p =>
     {
         p.Element("transfer-status").SetText("transfer confirmed");
@@ -83,8 +83,8 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Dispatch Chain (Click Dispatches Event to Listener)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Clicking "Transfer Resident" dispatches a <code>resident-transferred</code> custom event.
-            A separate listener picks it up and updates the status text.
+            Clicking "Transfer Resident" dispatches a named document event.
+            A separate workflow picks it up and updates the status text.
         </p>
         @(Html.NativeButton("btn-transfer", "Transfer Resident")
             .CssClass("rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors")

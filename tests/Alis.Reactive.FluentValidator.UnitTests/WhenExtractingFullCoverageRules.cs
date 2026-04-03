@@ -3,14 +3,14 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingFullCoverageRules
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     // ── required ─────────────────────────────────────────────
 
     [Test]
     public void Name_required_extracts_correctly()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "required");
         Assert.That(rule.Constraint, Is.Null);
         Assert.That(rule.Field, Is.Null);
@@ -22,7 +22,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Nickname_empty_extracts_correctly()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Nickname").Rules.First(r => r.Rule == "empty");
         Assert.That(rule.Constraint, Is.Null);
     }
@@ -32,7 +32,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Name_minLength_extracts_with_constraint()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "minLength");
         Assert.That(rule.Constraint, Is.EqualTo(3));
     }
@@ -40,7 +40,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Name_maxLength_extracts_with_constraint()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "maxLength");
         Assert.That(rule.Constraint, Is.EqualTo(100));
     }
@@ -50,7 +50,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Email_extracts_email_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Email").Rules.First(r => r.Rule == "email");
         Assert.That(rule.Constraint, Is.Null);
     }
@@ -60,7 +60,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Phone_extracts_regex_with_pattern()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Phone").Rules.First(r => r.Rule == "regex");
         Assert.That(rule.Constraint, Is.EqualTo(@"^\d{3}-\d{3}-\d{4}$"));
     }
@@ -70,7 +70,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void CreditCardNumber_extracts_creditCard_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "CreditCardNumber").Rules.First(r => r.Rule == "creditCard");
         Assert.That(rule.Constraint, Is.Null);
     }
@@ -80,7 +80,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Age_range_extracts_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Age").Rules.First(r => r.Rule == "range");
         var constraint = rule.Constraint as object[];
         Assert.That(constraint, Is.Not.Null);
@@ -94,7 +94,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Score_exclusiveRange_extracts_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Score").Rules.First(r => r.Rule == "exclusiveRange");
         var constraint = rule.Constraint as object[];
         Assert.That(constraint, Is.Not.Null);
@@ -108,7 +108,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Salary_min_extracts_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Salary").Rules.First(r => r.Rule == "min");
         Assert.That(rule.Constraint, Is.EqualTo(0m));
         Assert.That(rule.CoerceAs, Is.EqualTo("number"));
@@ -118,7 +118,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Salary_max_extracts_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Salary").Rules.First(r => r.Rule == "max");
         Assert.That(rule.Constraint, Is.EqualTo(500000m));
         Assert.That(rule.CoerceAs, Is.EqualTo("number"));
@@ -129,7 +129,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void MonthlyRate_gt_extracts_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Rule == "gt");
         Assert.That(rule.Constraint, Is.EqualTo(0m));
         Assert.That(rule.CoerceAs, Is.EqualTo("number"));
@@ -138,7 +138,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void MonthlyRate_lt_extracts_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Rule == "lt");
         Assert.That(rule.Constraint, Is.EqualTo(1000000m));
         Assert.That(rule.CoerceAs, Is.EqualTo("number"));
@@ -149,7 +149,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void ConfirmEmail_equalTo_extracts_with_field()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "ConfirmEmail").Rules.First(r => r.Rule == "equalTo");
         Assert.That(rule.Field, Is.EqualTo("Email"));
         Assert.That(rule.Constraint, Is.Null);
@@ -160,7 +160,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void AlternateEmail_notEqualTo_extracts_with_field()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "AlternateEmail").Rules.First(r => r.Rule == "notEqualTo");
         Assert.That(rule.Field, Is.EqualTo("Email"));
         Assert.That(rule.Constraint, Is.Null);
@@ -171,7 +171,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void Status_notEqual_extracts_with_constraint()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Status").Rules.First(r => r.Rule == "notEqual");
         Assert.That(rule.Constraint, Is.EqualTo("deleted"));
         Assert.That(rule.Field, Is.Null);
@@ -182,7 +182,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void AdmissionDate_min_extracts_with_date_coercion_and_ISO_format()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "AdmissionDate").Rules.First(r => r.Rule == "min");
         Assert.That(rule.Constraint, Is.EqualTo("2020-01-01"));
         Assert.That(rule.CoerceAs, Is.EqualTo("date"));
@@ -194,7 +194,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void DischargeDate_gt_extracts_with_field_and_date_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "DischargeDate").Rules.First(r => r.Rule == "gt");
         Assert.That(rule.Field, Is.EqualTo("AdmissionDate"));
         Assert.That(rule.Constraint, Is.Null);
@@ -206,7 +206,7 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void All_18_fields_are_extracted()
     {
-        var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var fieldNames = desc.Fields.Select(f => f.FieldName).ToList();
         Assert.That(fieldNames, Does.Contain("Name"));
         Assert.That(fieldNames, Does.Contain("Email"));
@@ -229,8 +229,8 @@ public class WhenExtractingFullCoverageRules
     [Test]
     public void All_rules_extract_identically_under_WhenField_condition()
     {
-        var unconditional = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
-        var conditional = _adapter.ExtractRules(typeof(FullCoverageConditionalValidator), "testForm")!;
+        var unconditional = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
+        var conditional = _ruleExtractor.ExtractRules(typeof(FullCoverageConditionalValidator), "testForm")!;
 
         // Same fields exist (plus IsEmployed condition source)
         var unconditionalFields = unconditional.Fields.Select(f => f.FieldName).OrderBy(x => x).ToList();

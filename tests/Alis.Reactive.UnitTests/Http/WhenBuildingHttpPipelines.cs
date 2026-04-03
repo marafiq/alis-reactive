@@ -31,7 +31,7 @@ public class WhenBuildingHttpPipelines : PlanTestBase
     // ═══════════════════════════════════════════════════════════
 
     [Test]
-    public Task Get_produces_http_reaction()
+    public Task Get_produces_http_request_action()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
@@ -67,7 +67,7 @@ public class WhenBuildingHttpPipelines : PlanTestBase
     }
 
     [Test]
-    public Task Delete_produces_http_reaction()
+    public Task Delete_produces_http_request_action()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
@@ -241,7 +241,7 @@ public class WhenBuildingHttpPipelines : PlanTestBase
                     .Response(cr => cr.OnSuccess(s => s.Element("list").SetText("refreshed"))))));
         var json = plan.Render();
         AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("chained"));
+        Assert.That(json, Does.Contain("\"next\""));
         return VerifyJson(json);
     }
 
@@ -260,7 +260,7 @@ public class WhenBuildingHttpPipelines : PlanTestBase
             ).OnAllSettled(s => s.Element("spinner").Hide()));
         var json = plan.Render();
         AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("parallel-http"));
+        Assert.That(json, Does.Contain("\"kind\":\"parallel\""));
         return VerifyJson(json);
     }
 
@@ -279,7 +279,7 @@ public class WhenBuildingHttpPipelines : PlanTestBase
         var json = plan.Render();
         AssertSchemaValid(json);
         Assert.That(json, Does.Contain("spinner"));
-        Assert.That(json, Does.Contain("parallel-http"));
+        Assert.That(json, Does.Contain("\"kind\":\"parallel\""));
         return VerifyJson(json);
     }
 
@@ -322,7 +322,7 @@ public class WhenBuildingHttpPipelines : PlanTestBase
              .Response(r => r.OnSuccess(s => s.Into("container"))));
         var json = plan.Render();
         AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("into"));
+        Assert.That(json, Does.Contain("\"kind\":\"inject\""));
         Assert.That(json, Does.Contain("container"));
         return VerifyJson(json);
     }
@@ -346,7 +346,7 @@ public class WhenBuildingHttpPipelines : PlanTestBase
         AssertSchemaValid(json);
         Assert.That(json, Does.Contain("message"));
         Assert.That(json, Does.Contain("count"));
-        Assert.That(json, Does.Contain("responseBody"));
+        Assert.That(json, Does.Contain("\"scope\":\"response\""));
         return VerifyJson(json);
     }
 

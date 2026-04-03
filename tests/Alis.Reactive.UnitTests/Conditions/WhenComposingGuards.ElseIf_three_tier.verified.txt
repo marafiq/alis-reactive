@@ -1,106 +1,155 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.grade: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::grade: {
+      contract: element.grade,
+      elementId: grade
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.score
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: score
+                  }
+                ]
               },
-              coerceAs: number,
               op: gte,
-              operand: 90
+              right: {
+                kind: literal,
+                value: 90
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: grade,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: A
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::grade,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: A
+              }
             }
           },
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.score
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: score
+                  }
+                ]
               },
-              coerceAs: number,
               op: gte,
-              operand: 80
+              right: {
+                kind: literal,
+                value: 80
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: grade,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: B
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::grade,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: B
+              }
             }
           },
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.score
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: score
+                  }
+                ]
               },
-              coerceAs: number,
               op: gte,
-              operand: 70
+              right: {
+                kind: literal,
+                value: 70
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: grade,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: C
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::grade,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: C
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: grade,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: F
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::grade,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: F
+              }
             }
           }
         ]

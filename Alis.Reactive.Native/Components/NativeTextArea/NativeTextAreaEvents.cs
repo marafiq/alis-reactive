@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Typed event descriptors for <see cref="NativeTextArea"/>.
+    /// Typed reactive events for <see cref="NativeTextArea"/>.
     /// </summary>
     /// <remarks>
     /// Used with the <c>.Reactive()</c> event selector lambda:
@@ -18,8 +18,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Fires when the user changes the textarea value and leaves the field.
         /// </summary>
-        public TypedEventDescriptor<NativeTextAreaChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeTextAreaChangeArgs>(
+        public ReactiveEvent<NativeTextAreaChangeArgs> Changed =>
+            new ReactiveEvent<NativeTextAreaChangeArgs>(
                 "change", new NativeTextAreaChangeArgs());
     }
 }

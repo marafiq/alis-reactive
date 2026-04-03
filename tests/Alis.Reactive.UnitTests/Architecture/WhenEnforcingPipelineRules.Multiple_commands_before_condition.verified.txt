@@ -1,103 +1,216 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.confirmation: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.spinner: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.express: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.standard: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::confirmation: {
+      contract: element.confirmation,
+      elementId: confirmation
+    },
+    element::spinner: {
+      contract: element.spinner,
+      elementId: spinner
+    },
+    element::express: {
+      contract: element.express,
+      elementId: express
+    },
+    element::standard: {
+      contract: element.standard,
+      elementId: standard
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: order-submitted
+      when: {
+        kind: document-event,
+        name: order-submitted
       },
-      reaction: {
-        kind: conditional,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: confirmation,
-            mutation: {
-              kind: call,
-              method: removeAttribute,
-              args: [
-                {
-                  kind: literal,
-                  value: hidden
-                }
-              ]
+            kind: set,
+            target: {
+              object: element::confirmation,
+              member: hidden
+            },
+            value: {
+              kind: convert,
+              value: {
+                kind: literal,
+                value: false
+              },
+              to: {
+                kind: scalar,
+                type: boolean
+              }
             }
           },
           {
             kind: dispatch,
-            event: audit-log
+            name: audit-log
           },
           {
-            kind: mutate-element,
-            target: spinner,
-            mutation: {
-              kind: call,
-              method: setAttribute,
-              args: [
-                {
-                  kind: literal,
-                  value: hidden
-                },
-                {
-                  kind: literal,
-                  value: 
-                }
-              ]
-            }
-          }
-        ],
-        branches: [
-          {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.total
-              },
-              coerceAs: number,
-              op: gte,
-              operand: 100
+            kind: set,
+            target: {
+              object: element::spinner,
+              member: hidden
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: express,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
-                }
-              ]
+            value: {
+              kind: convert,
+              value: {
+                kind: literal,
+                value: true
+              },
+              to: {
+                kind: scalar,
+                type: boolean
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: standard,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
+            kind: branch,
+            cases: [
+              {
+                when: {
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
                       {
-                        kind: literal,
-                        value: hidden
+                        prop: total
                       }
                     ]
+                  },
+                  op: gte,
+                  right: {
+                    kind: literal,
+                    value: 100
+                  },
+                  as: {
+                    kind: scalar,
+                    type: number
+                  }
+                },
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::express,
+                    member: hidden
+                  },
+                  value: {
+                    kind: convert,
+                    value: {
+                      kind: literal,
+                      value: false
+                    },
+                    to: {
+                      kind: scalar,
+                      type: boolean
+                    }
                   }
                 }
-              ]
-            }
+              },
+              {
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::standard,
+                    member: hidden
+                  },
+                  value: {
+                    kind: convert,
+                    value: {
+                      kind: literal,
+                      value: false
+                    },
+                    to: {
+                      kind: scalar,
+                      type: boolean
+                    }
+                  }
+                }
+              }
+            ]
           }
         ]
       }

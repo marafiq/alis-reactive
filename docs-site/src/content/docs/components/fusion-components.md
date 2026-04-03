@@ -17,9 +17,9 @@ A text input with server-side or client-side filtering and autocomplete suggesti
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed`, `Filtering` |
-| Typed Source | `TypedComponentSource<string>` |
+| Value Expression | `ComponentValueExpression<string>` |
 
 ### How do I render an autocomplete?
 
@@ -107,9 +107,9 @@ A numeric input with spin buttons, formatting, and min/max constraints.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed`, `Focus`, `Blur` |
-| Typed Source | `TypedComponentSource<decimal>` |
+| Value Expression | `ComponentValueExpression<decimal>` |
 
 ### How do I render a numeric input?
 
@@ -153,9 +153,9 @@ A date-only picker with calendar popup.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed` |
-| Typed Source | `TypedComponentSource<DateTime>` |
+| Value Expression | `ComponentValueExpression<DateTime>` |
 
 ### How do I render a date picker?
 
@@ -196,9 +196,9 @@ A combined date and time picker.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed` |
-| Typed Source | `TypedComponentSource<DateTime>` |
+| Value Expression | `ComponentValueExpression<DateTime>` |
 
 ### How do I render a datetime picker?
 
@@ -232,9 +232,9 @@ A time-only picker.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed` |
-| Typed Source | `TypedComponentSource<DateTime>` |
+| Value Expression | `ComponentValueExpression<DateTime>` |
 
 ### How do I render a time picker?
 
@@ -268,11 +268,11 @@ A picker for selecting a start and end date. Unique among components because the
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` — returns `[Date, Date]` from ej2 instance |
+| ValueMemberPath | `"value"` — returns `[Date, Date]` from ej2 instance |
 | Model type | `DateTime[]?` — array matches the Syncfusion value shape |
 | CoerceAs | `"array"` (inferred from `DateTime[]`) with element type `"date"` |
 | Events | `Changed` |
-| Typed Sources | `StartDate()` / `EndDate()` → `TypedComponentSource<DateTime>` (individual dates), `Value()` → `TypedComponentSource<DateTime[]>` (full array) |
+| Value Expressions | `StartDate()` / `EndDate()` → `ComponentValueExpression<DateTime>` (individual dates), `Value()` → `ComponentValueExpression<DateTime[]>` (full array) |
 
 ### How do I render a date range picker?
 
@@ -288,7 +288,7 @@ Html.InputField(plan, m => m.StayPeriod, o => o.Required().Label("Stay Period"))
 
 ### How do I read individual dates in conditions?
 
-`StartDate()` and `EndDate()` use hardcoded readExpr `"startDate"` / `"endDate"` — independent of the component's ReadExpr. They return individual `DateTime` values for typed condition comparison.
+`StartDate()` and `EndDate()` use hardcoded value member path `"startDate"` / `"endDate"` — independent of the component's ValueMemberPath. They return individual `DateTime` values for typed condition comparison.
 
 ```csharp
 var stay = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
@@ -310,11 +310,11 @@ p.When(stay.EndDate()).NotNull()
 
 ### Source extensions
 
-| Extension | Returns | ReadExpr | Use case |
+| Extension | Returns | ValueMemberPath | Use case |
 |-----------|---------|----------|----------|
-| `StartDate()` | `TypedComponentSource<DateTime>` | `"startDate"` | Individual date for conditions/mutations |
-| `EndDate()` | `TypedComponentSource<DateTime>` | `"endDate"` | Individual date for conditions/mutations |
-| `Value()` | `TypedComponentSource<DateTime[]>` | `"value"` | Full array for gather/validation |
+| `StartDate()` | `ComponentValueExpression<DateTime>` | `"startDate"` | Individual date for conditions/mutations |
+| `EndDate()` | `ComponentValueExpression<DateTime>` | `"endDate"` | Individual date for conditions/mutations |
+| `Value()` | `ComponentValueExpression<DateTime[]>` | `"value"` | Full array for gather/validation |
 
 No `SetValue()` is provided — the DateRangePicker is set by user interaction only.
 
@@ -326,9 +326,9 @@ A single-select dropdown with search and filtering.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed`, `Focus`, `Blur` |
-| Typed Source | `TypedComponentSource<string>` |
+| Value Expression | `ComponentValueExpression<string>` |
 
 ### How do I render a dropdown?
 
@@ -393,9 +393,9 @@ A multi-select dropdown. Selected values are a `string[]`.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed`, `Filtering` |
-| Typed Source | `TypedComponentSource<string[]>` |
+| Value Expression | `ComponentValueExpression<string[]>` |
 
 ### How do I render a multi-select?
 
@@ -446,9 +446,9 @@ A combo box that displays multiple columns in its dropdown -- useful for showing
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed` |
-| Typed Source | `TypedComponentSource<string>` |
+| Value Expression | `ComponentValueExpression<string>` |
 
 ### Mutation extensions
 
@@ -465,13 +465,13 @@ A combo box that displays multiple columns in its dropdown -- useful for showing
 
 ## FusionSwitch
 
-A toggle switch. Uses `ReadExpr => "checked"`, same concept as NativeCheckBox but rendered as a Syncfusion Switch control.
+A toggle switch. Uses `ValueMemberPath => "checked"`, same concept as NativeCheckBox but rendered as a Syncfusion Switch control.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"checked"` |
+| ValueMemberPath | `"checked"` |
 | Events | `Changed` |
-| Typed Source | `TypedComponentSource<bool>` |
+| Value Expression | `ComponentValueExpression<bool>` |
 
 ### How do I render a switch?
 
@@ -507,9 +507,9 @@ A masked text input that enforces a specific format (phone numbers, SSNs, zip co
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed` |
-| Typed Source | `TypedComponentSource<string>` |
+| Value Expression | `ComponentValueExpression<string>` |
 
 ### How do I render a masked input?
 
@@ -534,9 +534,9 @@ A WYSIWYG rich text editor.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMemberPath | `"value"` |
 | Events | `Changed` |
-| Typed Source | `TypedComponentSource<string>` |
+| Value Expression | `ComponentValueExpression<string>` |
 
 ### How do I render a rich text editor?
 
@@ -560,9 +560,9 @@ A file upload component in form mode (no auto-upload). Read-only -- the framewor
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"filesData"` |
+| ValueMemberPath | `"filesData"` |
 | Events | `Selected` (fires when files are chosen) |
-| Typed Source | `TypedComponentSource<string>` |
+| Value Expression | `ComponentValueExpression<string>` |
 
 ### How do I render a file upload?
 

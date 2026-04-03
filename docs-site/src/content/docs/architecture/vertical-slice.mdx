@@ -1,56 +1,56 @@
 ---
 title: The Vertical Slice
-description: How each component is structured as a self-contained unit — 7 files, zero cross-slice dependencies, zero runtime changes.
+description: How each component owns its own authoring metadata, events, actions, and HTML integration without leaking cross-slice behavior.
 sidebar:
   order: 6
 ---
 
-Every component in Reactive is a **vertical slice** — a self-contained set of files that owns everything about that component: its type metadata, events, mutations, builder, and view integration. No shared base classes for behavior. No cross-slice dependencies.
+Every component in Reactive is a **vertical slice**: one self-contained unit that owns its authoring metadata, events, actions, builder, and HTML integration. No cross-slice behavior sharing. No runtime branching per component.
 
 ## The 7-file pattern
 
-Each component follows the same structure. Here's NativeTextBox as a concrete example:
+Each component follows the same structure. Here's `NativeTextBox` as a concrete example:
 
 ```
 NativeTextBox/
-├── NativeTextBox.cs                  component class — Vendor + ReadExpr
+├── NativeTextBox.cs                  component class — Vendor + ValueMemberPath
 ├── NativeTextBoxEvents.cs            event registry — Changed, Focus, Blur
 ├── Events/
 │   └── NativeTextBoxOnChanged.cs     event args — { string? Value }
-├── NativeTextBoxExtensions.cs        mutation extensions — SetValue, FocusIn, Value
+├── NativeTextBoxExtensions.cs        action/value extensions — SetValue, FocusIn, Value
 ├── NativeTextBoxReactiveExtensions.cs .Reactive() wiring
 ├── NativeTextBoxBuilder.cs           renders HTML, config methods (Placeholder, Type, CssClass)
-└── NativeTextBoxHtmlExtensions.cs    Html.InputField().NativeTextBox() factory
+└── NativeTextBoxHtmlExtensions.cs    Html.InputField().NativeTextBox() factory + plan registration
 ```
 
 ```d2
 direction: right
 
-component: "Component Class\nsealed, IInputComponent\nVendor + ReadExpr" {
+component: "Component Class\nsealed, IInputComponent\nVendor + ValueMemberPath" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 16
 }
-events: "Events + Args\nTypedEventDescriptor\ntyped arg properties" {
+events: "Events + Args\nReactiveEvent<TArgs>\ntyped arg properties" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 16
 }
-extensions: "Extensions\nSetValue, FocusIn, Value\nuses Emit() on ComponentRef" {
+extensions: "Extensions\nSetValue, FocusIn, Value\nemit actions or value expressions" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 16
 }
-reactive: "Reactive Extensions\n.Reactive(plan, evt, args)\ncreates ComponentEventTrigger" {
+reactive: "Reactive Extensions\n.Reactive(plan, evt, args)\nregister workflow subscriptions" {
   shape: rectangle
   style.fill: "#fce8e6"
   style.stroke: "#ea4335"
   style.font-size: 16
 }
-builder: "Builder + Html Factory\nrenders HTML\nregisters in ComponentsMap" {
+builder: "Builder + Html Factory\nrenders HTML\nregisters component metadata" {
   shape: rectangle
   style.fill: "#f3e8fd"
   style.stroke: "#9334e6"
@@ -78,23 +78,23 @@ reactive -> builder: {
 
 ### 1. Component class — the phantom type
 
-A `sealed class` with a parameterless constructor. Implements `IInputComponent` (or `IAppLevelComponent`). Declares `Vendor` and `ReadExpr` as instance properties. Has zero state — it exists only as a type parameter to constrain extension methods.
+A `sealed class` with a parameterless constructor. Implements `IInputComponent` (or `IAppLevelComponent`). Declares `Vendor` and `ValueMemberPath`. Has zero runtime state; it exists to constrain extension methods and declare the slice's authoring metadata.
 
 ### 2. Events registry — what the component can fire
 
-A singleton class with `TypedEventDescriptor<TArgs>` properties. The `.Reactive()` lambda `evt => evt.Changed` resolves to this descriptor, which carries the JS event name and the typed args class.
+A singleton class with `ReactiveEvent<TArgs>` properties. The `.Reactive()` lambda `evt => evt.Changed` resolves to one of these typed events, which carries the browser event name and the event payload type.
 
 ### 3. Event args — typed payload properties
 
-A class with properties like `Value : string?`, `Checked : bool?`, `IsInteracted : bool`. The compiler enforces which properties exist on `args` inside the `.Reactive()` lambda. Filtering args may also have extension methods (`PreventDefault`, `UpdateData`).
+A class with properties like `Value : string?`, `Checked : bool?`, `IsInteracted : bool`. The compiler enforces which properties exist on `args` inside the `.Reactive()` lambda. Filtering args may also have extension methods such as `PreventDefault` and `UpdateData`.
 
-### 4. Mutation extensions — what you can do in the pipeline
+### 4. Action/value extensions — what you can do in the pipeline
 
-Static extension methods on `ComponentRef<TComponent, TModel>`. Each method creates a structured `Mutation` (SetPropMutation or CallMutation) and calls `ref.Emit()` to add it to the pipeline. `.Value()` returns a `TypedComponentSource<TProp>` for conditions.
+Static extension methods on `ComponentRef<TComponent, TModel>`. Action methods emit member-targeted plan actions. `.Value()` returns a `ComponentValueExpression<TProp>` for conditions, comparisons, and element updates.
 
 ### 5. Reactive extensions — wiring events to pipelines
 
-A static extension method on the builder that takes `plan`, an event selector, and a pipeline lambda. Creates a `ComponentEventTrigger` with the component's vendor, jsEvent, and bindingPath, then adds the entry to the plan.
+A static extension method on the builder that takes `plan`, an event selector, and a pipeline lambda. It registers a workflow subscription for the rendered component and lowers the event payload contract into the authored V2 plan.
 
 ### 6. Builder — renders HTML and accepts configuration
 
@@ -102,39 +102,39 @@ Implements `IHtmlContent`. Configuration methods (`Placeholder()`, `CssClass()`,
 
 ### 7. Html factory — the entry point
 
-Extension method on `InputBoundField<TModel, TProp>`. Creates the builder, registers the component in `plan.ComponentsMap`, and calls `setup.Render(builder)` to emit the HTML with label and validation slot.
+Extension method on `InputBoundField<TModel, TProp>`. Creates the builder, registers the component's metadata with the plan authoring layer, and calls `setup.Render(builder)` to emit the HTML with label and validation slot.
 
 ## Why vertical slices?
 
-**Isolation.** Each slice owns its behavior completely. Adding FusionTimePicker doesn't touch NativeTextBox. Changing NativeCheckBox's events doesn't affect FusionDropDownList.
+**Isolation.** Each slice owns its behavior completely. Adding `FusionTimePicker` doesn't touch `NativeTextBox`. Changing `NativeCheckBox` events doesn't affect `FusionDropDownList`.
 
-**Zero runtime changes.** The slice declares Vendor and ReadExpr. The runtime already knows how to resolve vendors and walk readExprs. The plan carries the metadata. No new switch cases, no new if branches.
+**Zero runtime changes.** The slice declares vendor, value member path, and events. Authoring lowers those declarations to V2 contracts, objects, bindings, and workflows. The runtime already knows how to execute that model.
 
-**Duplication is intentional.** Each slice has its own extensions file, its own reactive extensions, its own builder. The code looks similar across slices — that's by design. Shared abstractions would couple slices and make each one harder to understand in isolation.
+**Duplication is intentional.** Each slice has its own extensions file, its own reactive extensions, its own builder. The code looks similar across slices — that is by design. Shared abstractions would couple slices and make each one harder to understand in isolation.
 
 ```d2
 direction: right
 
-new_slice: "New component\nsealed class\nVendor + ReadExpr\n+ 6 more files" {
+new_slice: "New component\nsealed class\nVendor + ValueMemberPath\n+ 6 more files" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-plan: "Plan carries\nsame shape\nas every component" {
+plan: "Authoring lowers to\ncontracts + objects\nbindings + workflows" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
-runtime: "Runtime unchanged\nSame resolveRoot\nSame bracket notation" {
+runtime: "Runtime unchanged\nresolve object\nresolve member\nexecute" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 18
 }
 
-new_slice -> plan: metadata {
+new_slice -> plan: lower {
   style.stroke: "#4285f4"
 }
 plan -> runtime: executes {
@@ -142,4 +142,4 @@ plan -> runtime: executes {
 }
 ```
 
-**Previous:** [Descriptors & Plan](../descriptors-and-plan/)
+**Previous:** [Plan Model](../plan-model/)

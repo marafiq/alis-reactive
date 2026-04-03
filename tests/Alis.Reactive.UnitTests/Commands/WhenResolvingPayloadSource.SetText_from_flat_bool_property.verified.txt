@@ -1,27 +1,53 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: test-event
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: active,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    element.active: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.boolValue
             }
-          }
-        ]
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::active: {
+      contract: element.active,
+      elementId: active
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: test-event
+      },
+      run: {
+        kind: set,
+        target: {
+          object: element::active,
+          member: text
+        },
+        value: {
+          kind: context,
+          scope: event,
+          path: [
+            {
+              prop: boolValue
+            }
+          ]
+        }
       }
     }
   ]

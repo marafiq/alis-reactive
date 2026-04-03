@@ -346,7 +346,7 @@ public class WhenComposingGuards : PlanTestBase
         Trigger(plan).CustomEvent<GuardPayload>("test", (args, p) =>
             p.When(args, x => x.Status).Eq("has-allergies")
                 .Then(t => t.Element("r").SetText("allergic")));
-        // Note: ArrayContains requires a string[] typed source — tested in Native tests
+        // Note: ArrayContains requires a string[] typed value expression — tested in Native tests
         AssertSchemaValid(plan.Render());
         return VerifyJson(plan.Render());
     }

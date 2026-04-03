@@ -1,24 +1,48 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
+  contracts: {
+    native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Status: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Native_UnitTests_NativeTestModel__Status: {
+      contract: native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
+      elementId: Alis_Reactive_Native_UnitTests_NativeTestModel__Status
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
-            mutation: {
-              kind: set-prop,
-              prop: value
-            },
-            value: active,
-            vendor: native
-          }
-        ]
+      run: {
+        kind: set,
+        target: {
+          object: component::Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
+          member: value
+        },
+        value: {
+          kind: literal,
+          value: active
+        }
       }
     }
   ]

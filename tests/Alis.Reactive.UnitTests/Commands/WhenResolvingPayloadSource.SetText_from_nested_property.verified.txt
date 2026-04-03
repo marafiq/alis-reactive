@@ -1,27 +1,56 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: test-event
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: city,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    element.city: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.address.city
             }
-          }
-        ]
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::city: {
+      contract: element.city,
+      elementId: city
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: test-event
+      },
+      run: {
+        kind: set,
+        target: {
+          object: element::city,
+          member: text
+        },
+        value: {
+          kind: context,
+          scope: event,
+          path: [
+            {
+              prop: address
+            },
+            {
+              prop: city
+            }
+          ]
+        }
       }
     }
   ]

@@ -15,18 +15,18 @@ MODIFY: 58 files (tests, views, extensions, descriptors, runtime)
 ## Dependency Map
 
 ```
-TypedSource<TProp> (abstract)
-├── TypedComponentSource<TProp>
+ValueExpression<TProp> (abstract)
+├── ComponentValueExpression<TProp>
 │   ├── Used by: 11 component *Extensions.cs (.Value() returns this)
-│   ├── Used by: PipelineBuilder.When(TypedSource)     → DELETED (replaced by If)
-│   ├── Used by: ElementBuilder.SetText(TypedSource)   → replaced by SetText(ComponentRef)
+│   ├── Used by: PipelineBuilder.When(ValueExpression)     → DELETED (replaced by If)
+│   ├── Used by: ElementBuilder.SetText(ValueExpression)   → replaced by SetText(ComponentRef)
 │   └── Used by: ConditionSourceBuilder                → DELETED
-├── EventArgSource<TPayload, TProp>
+├── EventValueExpression<TPayload, TProp>
 │   ├── Used by: PipelineBuilder.When(payload, expr)   → DELETED (replaced by If)
 │   └── NOT used by ElementBuilder (has separate overload with expression)
 └── ConditionSourceBuilder, GuardBuilder, BranchBuilder, ConditionStart → ALL DELETED
 
-ComponentRef<TProp> (NEW — replaces TypedComponentSource)
+ComponentRef<TProp> (NEW — replaces ComponentValueExpression)
 ├── Has: ToBindSource() → ComponentSource  (for ElementBuilder.SetText)
 ├── Has: .Value → TProp                    (for expression tree conditions)
 ├── Created by: per-component .Value() extensions (same pattern, different return type)
@@ -95,10 +95,10 @@ TestWidgetSyncFusionExtensions.cs    → .Value() returns ComponentRef<string>
 ```
 
 **Also modify:** `ElementBuilder.cs`
-- Change `SetText<TProp>(TypedSource<TProp>)` → `SetText<TProp>(ComponentRef<TProp>)` (calls `.ToBindSource()`)
-- Change `SetHtml<TProp>(TypedSource<TProp>)` → `SetHtml<TProp>(ComponentRef<TProp>)` (calls `.ToBindSource()`)
+- Change `SetText<TProp>(ValueExpression<TProp>)` → `SetText<TProp>(ComponentRef<TProp>)` (calls `.ToBindSource()`)
+- Change `SetHtml<TProp>(ValueExpression<TProp>)` → `SetHtml<TProp>(ComponentRef<TProp>)` (calls `.ToBindSource()`)
 
-**Quality gate:** `dotnet build` — existing `.Value()` call sites don't change syntax, only return type. Tests that assert `Is.TypeOf<TypedComponentSource<decimal>>()` will fail — fixed in Step 6.
+**Quality gate:** `dotnet build` — existing `.Value()` call sites don't change syntax, only return type. Tests that assert `Is.TypeOf<ComponentValueExpression<decimal>>()` will fail — fixed in Step 6.
 
 ### Step 5: Update runtime for rightSource (3 files modified)
 
@@ -120,7 +120,7 @@ tests/Alis.Reactive.UnitTests/Conditions/
 └── WhenUsingConditionsInEveryDslSurface.cs   → rewrite OnSuccess/OnError conditions
 ```
 
-**Component tests that assert TypedComponentSource (6 files — update assertions):**
+**Component tests that assert ComponentValueExpression (6 files — update assertions):**
 ```
 tests/Alis.Reactive.Fusion.UnitTests/Components/
 ├── FusionNumericTextBox/WhenMutatingAFusionNumericTextBox.cs     → TypeOf<ComponentRef<decimal>>
@@ -186,7 +186,7 @@ Areas/Sandbox/Views/ValidationContract/AjaxPartial.cshtml
 
 **Modify:**
 - `Alis.Reactive.FluentValidator/ReactiveValidator.cs` — update condition references
-- `Alis.Reactive.FluentValidator/FluentValidationAdapter.cs` — update TypedComponentSource refs
+- `Alis.Reactive.FluentValidator/FluentValidationAdapter.cs` — update ComponentValueExpression refs
 - `Alis.Reactive.Analyzers/IncompleteConditionalChainAnalyzer.cs` — update for If/ElseIf/Else pattern
 
 **Quality gate:** FluentValidator tests (43) + Analyzer tests pass.
@@ -199,8 +199,8 @@ Alis.Reactive/Builders/Conditions/ConditionSourceBuilder.cs
 Alis.Reactive/Builders/Conditions/GuardBuilder.cs
 Alis.Reactive/Builders/Conditions/BranchBuilder.cs
 Alis.Reactive/Builders/Conditions/ConditionStart.cs
-Alis.Reactive/Builders/Conditions/TypedSource.cs
-Alis.Reactive/Builders/Conditions/TypedComponentSource.cs
+Alis.Reactive/Builders/Conditions/ValueExpression.cs
+Alis.Reactive/Builders/Conditions/ComponentValueExpression.cs
 Alis.Reactive/Builders/PipelineBuilder.Conditions.cs
 ```
 

@@ -1,113 +1,185 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.class: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.trial-badge: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::class: {
+      contract: element.class,
+      elementId: class
+    },
+    element::trial-badge: {
+      contract: element.trial-badge,
+      elementId: trial-badge
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/classify,
           onSuccess: [
             {
-              reaction: {
-                kind: conditional,
-                branches: [
+              run: {
+                kind: branch,
+                cases: [
                   {
-                    guard: {
-                      kind: value,
-                      source: {
-                        kind: event,
-                        path: evt.count
+                    when: {
+                      kind: compare,
+                      left: {
+                        kind: context,
+                        scope: event,
+                        path: [
+                          {
+                            prop: count
+                          }
+                        ]
                       },
-                      coerceAs: number,
                       op: gt,
-                      operand: 1000
+                      right: {
+                        kind: literal,
+                        value: 1000
+                      },
+                      as: {
+                        kind: scalar,
+                        type: number
+                      }
                     },
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: class,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: enterprise
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::class,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: enterprise
+                      }
                     }
                   },
                   {
-                    guard: {
-                      kind: value,
-                      source: {
-                        kind: event,
-                        path: evt.count
+                    when: {
+                      kind: compare,
+                      left: {
+                        kind: context,
+                        scope: event,
+                        path: [
+                          {
+                            prop: count
+                          }
+                        ]
                       },
-                      coerceAs: number,
                       op: gt,
-                      operand: 100
+                      right: {
+                        kind: literal,
+                        value: 100
+                      },
+                      as: {
+                        kind: scalar,
+                        type: number
+                      }
                     },
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: class,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: business
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::class,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: business
+                      }
                     }
                   },
                   {
-                    guard: {
-                      kind: value,
-                      source: {
-                        kind: event,
-                        path: evt.count
+                    when: {
+                      kind: compare,
+                      left: {
+                        kind: context,
+                        scope: event,
+                        path: [
+                          {
+                            prop: count
+                          }
+                        ]
                       },
-                      coerceAs: number,
                       op: gt,
-                      operand: 10
+                      right: {
+                        kind: literal,
+                        value: 10
+                      },
+                      as: {
+                        kind: scalar,
+                        type: number
+                      }
                     },
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: class,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: team
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::class,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: team
+                      }
                     }
                   },
                   {
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: class,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: individual
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::class,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: individual
+                      }
                     }
                   }
                 ]
@@ -118,66 +190,68 @@
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.active
-              },
-              coerceAs: boolean,
-              op: truthy
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: trial-badge,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: active
                   }
+                ]
+              },
+              op: truthy,
+              as: {
+                kind: scalar,
+                type: boolean
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::trial-badge,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: trial-badge,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::trial-badge,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

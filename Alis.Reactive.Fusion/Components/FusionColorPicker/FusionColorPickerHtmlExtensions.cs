@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.Descriptors;
+using Alis.Reactive;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
@@ -31,8 +31,8 @@ namespace Alis.Reactive.Fusion.Components
             Action<ColorPickerBuilder> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "colorpicker",
+            setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMemberPath, "colorpicker",
                 CoercionTypes.InferFromType(typeof(TProp))));
 
             // CRITICAL: Pass htmlAttributes as a parameter to ColorPickerFor(), NOT as a fluent

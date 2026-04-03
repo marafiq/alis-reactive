@@ -285,7 +285,7 @@ public sealed class FusionDropDownList : FusionComponent, IFusionInputComponent,
 
 **2. `FusionDropDownListExtensions.cs`** — For each onboarded property/method:
 - Per writable property: `Set{PascalName}()` with 4 overloads (static, event, response, component)
-- Per readable property: `{PascalName}()` returning `TypedComponentSource<T>`
+- Per readable property: `{PascalName}()` returning `ComponentValueExpression<T>`
 - Per void method: method returning `CallMutation`
 - Per method with args: method with `MethodArg[]`
 
@@ -551,7 +551,7 @@ clean projection. This decouples generation from storage.
 ### Task 7: Extensions template
 - `Templates/ExtensionsTemplate.cs`
 - For each onboarded writable property: `Set{Name}()` with 4 overloads (static, event, response, component)
-- For each onboarded readable property: `{Name}()` returning `TypedComponentSource<T>`
+- For each onboarded readable property: `{Name}()` returning `ComponentValueExpression<T>`
 - For each onboarded void method: `CallMutation` with no args
 - For each onboarded method with args: `CallMutation` with `MethodArg[]`
 - Matches exact pattern from `FusionDropDownListExtensions.cs`

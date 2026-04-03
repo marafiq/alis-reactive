@@ -1,50 +1,91 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.express: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::express: {
+      contract: element.express,
+      elementId: express
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: order-submitted
+      when: {
+        kind: document-event,
+        name: order-submitted
       },
-      reaction: {
-        kind: conditional,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
             kind: dispatch,
-            event: audit-log
-          }
-        ],
-        branches: [
+            name: audit-log
+          },
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.total
-              },
-              coerceAs: number,
-              op: gte,
-              operand: 100
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: express,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
+            kind: branch,
+            cases: [
+              {
+                when: {
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
                       {
-                        kind: literal,
-                        value: hidden
+                        prop: total
                       }
                     ]
+                  },
+                  op: gte,
+                  right: {
+                    kind: literal,
+                    value: 100
+                  },
+                  as: {
+                    kind: scalar,
+                    type: number
+                  }
+                },
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::express,
+                    member: hidden
+                  },
+                  value: {
+                    kind: convert,
+                    value: {
+                      kind: literal,
+                      value: false
+                    },
+                    to: {
+                      kind: scalar,
+                      type: boolean
+                    }
                   }
                 }
-              ]
-            }
+              }
+            ]
           }
         ]
       }

@@ -1,0 +1,60 @@
+﻿{
+  version: 2,
+  planId: Alis.Reactive.UnitTests.TestModel,
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: dom-ready
+      },
+      run: {
+        kind: request,
+        request: {
+          method: GET,
+          url: /api/residents,
+          onSuccess: [
+            {
+              run: {
+                kind: set,
+                target: {
+                  object: element::result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
+                  value: loaded
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

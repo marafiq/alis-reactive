@@ -12,6 +12,6 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeCheckList : NativeComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMemberPath => "value";
     }
 }

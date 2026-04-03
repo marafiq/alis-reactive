@@ -10,6 +10,6 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionTimePicker : FusionComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMemberPath => "value";
     }
 }

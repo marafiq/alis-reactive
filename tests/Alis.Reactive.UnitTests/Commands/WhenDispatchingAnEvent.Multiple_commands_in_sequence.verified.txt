@@ -1,22 +1,26 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
             kind: dispatch,
-            event: first
+            name: first
           },
           {
             kind: dispatch,
-            event: second,
-            payload: {
-              id: x
+            name: second,
+            detail: {
+              kind: literal,
+              value: {
+                id: x
+              }
             }
           }
         ]

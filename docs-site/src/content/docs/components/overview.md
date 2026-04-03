@@ -14,7 +14,7 @@ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Nam
     .NativeTextBox(b => b.Placeholder("Enter name"));
 ```
 
-That single call does three things: registers the component in the plan's `ComponentsMap`, renders the HTML with a label and validation slot, and makes the component available for `.Reactive()` event wiring, gather, and `When()` conditions.
+That single call does three things: registers the component with the plan authoring layer, renders the HTML with a label and validation slot, and makes the component available for `.Reactive()` event wiring, gather, and `When()` conditions.
 
 ## How do I interact with a component after it renders?
 
@@ -24,7 +24,7 @@ Through `p.Component<T>(m => m.Property)` inside any pipeline. This gives you a 
 // Write a value
 p.Component<NativeTextBox>(m => m.ResidentName).SetValue("Jane Doe");
 
-// Read a value (as a typed source for conditions or SetText)
+// Read a value (as a typed value expression for conditions or SetText)
 var comp = p.Component<NativeTextBox>(m => m.ResidentName);
 p.Element("echo").SetText(comp.Value());
 ```
@@ -33,7 +33,7 @@ p.Element("echo").SetText(comp.Value());
 
 Standard HTML elements. Vendor is `"native"` -- the runtime reads directly from the DOM element (`el.value`, `el.checked`).
 
-| Component | HTML Element | ReadExpr | Value Type | Key Methods |
+| Component | HTML Element | ValueMemberPath | Value Type | Key Methods |
 |-----------|-------------|----------|------------|-------------|
 | `NativeTextBox` | `<input type="text">` | `"value"` | `string` | `SetValue`, `FocusIn`, `Value()` |
 | `NativeCheckBox` | `<input type="checkbox">` | `"checked"` | `bool` | `SetChecked`, `FocusIn`, `Value()` |
@@ -50,7 +50,7 @@ All input components fire a `Changed` event. NativeButton fires `Click` instead.
 
 Syncfusion EJ2 components. Vendor is `"fusion"` -- the runtime reads via `el.ej2_instances[0]`.
 
-| Component | SF Control | ReadExpr | Value Type | Key Methods |
+| Component | SF Control | ValueMemberPath | Value Type | Key Methods |
 |-----------|-----------|----------|------------|-------------|
 | `FusionAutoComplete` | AutoComplete | `"value"` | `string` | `SetValue`, `SetText`, `SetDataSource`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Enable`, `Disable` |
 | `FusionNumericTextBox` | NumericTextBox | `"value"` | `decimal` | `SetValue`, `SetMin`, `FocusIn`, `FocusOut`, `Increment`, `Decrement` |
@@ -105,6 +105,6 @@ They must be rendered once in your layout:
 
 ## Where is the architecture behind all this?
 
-Every component -- native or Syncfusion -- follows the same pattern: a sealed C# class declares `Vendor` and `ReadExpr`, the plan carries that metadata as JSON, and the runtime executes via vendor-neutral bracket notation. Adding a new component requires zero runtime changes.
+Every component -- native or Syncfusion -- follows the same pattern: a sealed C# class declares `Vendor` and `ValueMemberPath`, authoring lowers that into V2 contracts, objects, and bindings, and the runtime executes through one vendor-neutral member-resolution path. Adding a new component requires zero runtime changes.
 
-For the full architecture -- `walk.ts`, `component.ts`, `resolver.ts`, the vertical slice shape, and `ComponentsMap` -- see [Component Model](../../architecture/component-model/).
+For the full architecture -- member resolution, runtime contracts, vertical slices, and plan composition -- see [Component Model](../../architecture/component-model/).

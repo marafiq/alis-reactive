@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionMultiSelect"/> component.
+    /// Typed reactive events for the <see cref="FusionMultiSelect"/> component.
     /// </summary>
     /// <remarks>
     /// Select an event via the <c>.Reactive()</c> lambda:
@@ -14,13 +14,13 @@ namespace Alis.Reactive.Fusion.Components
         private FusionMultiSelectEvents() { }
 
         /// <summary>Fires when the selected value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionMultiSelectChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionMultiSelectChangeArgs>(
+        public ReactiveEvent<FusionMultiSelectChangeArgs> Changed =>
+            new ReactiveEvent<FusionMultiSelectChangeArgs>(
                 "change", new FusionMultiSelectChangeArgs());
 
         /// <summary>Fires when the user types to filter (SF "filtering" event).</summary>
-        public TypedEventDescriptor<FusionMultiSelectFilteringArgs> Filtering =>
-            new TypedEventDescriptor<FusionMultiSelectFilteringArgs>(
+        public ReactiveEvent<FusionMultiSelectFilteringArgs> Filtering =>
+            new ReactiveEvent<FusionMultiSelectFilteringArgs>(
                 "filtering", new FusionMultiSelectFilteringArgs());
     }
 }

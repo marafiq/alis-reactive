@@ -8,15 +8,15 @@ namespace Alis.Reactive.UnitTests;
 public sealed class StubDropDown : IComponent, IInputComponent
 {
     public string Vendor => "fusion";
-    public string ReadExpr => "value";
+    public string ValueMemberPath => "value";
 }
 
 public static class StubDropDownExtensions
 {
     private static readonly StubDropDown _c = new();
-    public static TypedComponentSource<string> Value<TModel>(
+    public static ComponentValueExpression<string> Value<TModel>(
         this ComponentRef<StubDropDown, TModel> self) where TModel : class
-        => new TypedComponentSource<string>(self.TargetId, _c.Vendor, _c.ReadExpr);
+        => new ComponentValueExpression<string>(self.TargetId, _c.Vendor, _c.ValueMemberPath);
 }
 
 public class TwoSourceModel
@@ -178,7 +178,7 @@ public class WhenComparingTwoSources : PlanTestBase
 
     private Task TwoComponents(
         Func<ConditionSourceBuilder<TwoSourceModel, decimal>,
-             TypedComponentSource<decimal>,
+             ComponentValueExpression<decimal>,
              GuardBuilder<TwoSourceModel>> op)
     {
         var plan = new ReactivePlan<TwoSourceModel>();

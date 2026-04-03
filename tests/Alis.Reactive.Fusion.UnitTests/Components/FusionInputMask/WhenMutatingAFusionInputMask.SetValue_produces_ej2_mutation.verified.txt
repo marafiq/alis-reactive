@@ -1,24 +1,48 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__PhoneNumber: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__PhoneNumber: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__PhoneNumber,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__PhoneNumber
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__PhoneNumber,
-            mutation: {
-              kind: set-prop,
-              prop: value
-            },
-            value: (555) 123-4567,
-            vendor: fusion
-          }
-        ]
+      run: {
+        kind: set,
+        target: {
+          object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__PhoneNumber,
+          member: value
+        },
+        value: {
+          kind: literal,
+          value: (555) 123-4567
+        }
       }
     }
   ]

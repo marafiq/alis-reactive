@@ -1,5 +1,4 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -15,38 +14,41 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly FusionColorPicker Component = new FusionColorPicker();
 
         /// <summary>Sets the color value (hex string, e.g. "#ff0000").</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <param name="value">The hex color string to set, or <see langword="null"/> to clear.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionColorPicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, string? value)
             where TModel : class
-            => self.Emit(new SetPropMutation("value"), value: value);
+            => self.Set("value", value);
 
         /// <summary>Toggles the ColorPicker popup open/closed.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionColorPicker, TModel> Toggle<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("toggle"));
+            => self.Call("toggle");
 
         /// <summary>Sets the disabled state of the ColorPicker.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <param name="disabled"><see langword="true"/> to disable, <see langword="false"/> to enable.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionColorPicker, TModel> Disable<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, bool disabled = true)
             where TModel : class
-            => self.Emit(new SetPropMutation("disabled", coerce: "boolean"),
-                value: disabled ? "true" : "false");
+            => self.Set("disabled", disabled, coerceAs: "boolean");
 
         /// <summary>Reads the current color value for use in conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
         /// <c>p.When(p.Component&lt;FusionColorPicker&gt;(m =&gt; m.ThemeColor).Value()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the color picker's current hex value.</returns>
-        public static TypedComponentSource<string> Value<TModel>(
+        /// <param name="self">The component reference to operate on.</param>
+        /// <returns>A typed value expression representing the color picker's current hex value.</returns>
+        public static ComponentValueExpression<string> Value<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
     }
 }

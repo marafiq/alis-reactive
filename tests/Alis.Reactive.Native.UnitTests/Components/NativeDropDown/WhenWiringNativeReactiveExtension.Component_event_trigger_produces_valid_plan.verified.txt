@@ -1,28 +1,94 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
-    {
-      trigger: {
-        kind: component-event,
-        componentId: Status,
-        jsEvent: change,
-        vendor: native,
-        bindingPath: Status,
-        readExpr: value
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: echo,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: Status changed
+  contracts: {
+    native.component.Status: {
+      kind: component,
+      resolver: native-element,
+      events: {
+        change: {
+          channel: change,
+          eventObject: {
+            contract: event-object.native_component_Status.change
+          },
+          data: {
+            value: {
+              kind: member,
+              object: $eventObject,
+              member: value
+            }
           }
-        ]
+        }
+      }
+    },
+    event-object.native_component_Status.change: {
+      kind: event-object,
+      resolver: event-object,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: currentTarget
+            },
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    element.echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Status: {
+      contract: native.component.Status,
+      elementId: Status
+    },
+    element::echo: {
+      contract: element.echo,
+      elementId: echo
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: object-event,
+        object: component::Status,
+        event: change
+      },
+      run: {
+        kind: set,
+        target: {
+          object: element::echo,
+          member: text
+        },
+        value: {
+          kind: literal,
+          value: Status changed
+        }
       }
     }
   ]

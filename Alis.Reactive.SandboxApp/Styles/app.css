@@ -66,8 +66,8 @@
   --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
 
   /* Typography */
-  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --font-display: 'Avenir Next', 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
+  --font-mono: 'SFMono-Regular', 'Cascadia Mono', 'Fira Code', ui-monospace, monospace;
 }
 
 /* ── Layers ── */

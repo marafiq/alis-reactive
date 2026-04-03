@@ -3,12 +3,12 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingEqualToRules
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     [Test]
     public void Equal_to_other_field_extracts_equalTo_with_field()
     {
-        var desc = _adapter.ExtractRules(typeof(EqualToValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(EqualToValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var field = desc!.Fields.First(f => f.FieldName == "ConfirmEmail");
@@ -20,7 +20,7 @@ public class WhenExtractingEqualToRules
     [Test]
     public void Equal_to_with_custom_message_uses_custom_message()
     {
-        var desc = _adapter.ExtractRules(typeof(EqualToWithCustomMessageValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(EqualToWithCustomMessageValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var field = desc!.Fields.First(f => f.FieldName == "ConfirmEmail");

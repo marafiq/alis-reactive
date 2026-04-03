@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionInputMask"/> component.
+    /// Typed reactive events for the <see cref="FusionInputMask"/> component.
     /// </summary>
     /// <remarks>
     /// Select an event via the <c>.Reactive()</c> lambda:
@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionInputMaskEvents() { }
 
         /// <summary>Fires when the masked value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionInputMaskChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionInputMaskChangeArgs>(
+        public ReactiveEvent<FusionInputMaskChangeArgs> Changed =>
+            new ReactiveEvent<FusionInputMaskChangeArgs>(
                 "change", new FusionInputMaskChangeArgs());
     }
 }

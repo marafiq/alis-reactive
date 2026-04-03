@@ -195,11 +195,11 @@ namespace Alis.Reactive.Native.Components
             return self.Emit(new CallMutation("focus"));
         }
 
-        public static TypedComponentSource<string> Value<TModel>(
+        public static ComponentValueExpression<string> Value<TModel>(
             this ComponentRef<NativeDatePicker, TModel> self)
             where TModel : class
         {
-            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            return new ComponentValueExpression<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
         }
     }
 }

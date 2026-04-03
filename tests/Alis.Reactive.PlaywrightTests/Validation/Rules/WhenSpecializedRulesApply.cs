@@ -1,3 +1,4 @@
+using Alis.Reactive.Playwright.Extensions;
 using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
@@ -299,7 +300,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("Nickname")).ToContainTextAsync("must be empty", new() { Timeout = 2000 });
 
-        await Input("Nickname").FillAsync("");
+        await Input("Nickname").ClearWhenStableAsync(Page);
         await Input("Nickname").BlurAsync();
 
         await Expect(ErrorFor("Nickname")).ToBeHiddenAsync(new() { Timeout = 2000 });

@@ -40,7 +40,13 @@ export function init(): void {
     return;
   }
 
-  const dialog = new (window as any).ej.popups.Dialog({
+  const dialogCtor = (window as any).ej?.popups?.Dialog;
+  if (!dialogCtor) {
+    log.warn("confirm vendor not available", { id: ELEMENT_ID });
+    return;
+  }
+
+  const dialog = new dialogCtor({
     isModal: true,
     visible: false,
     width: "400px",

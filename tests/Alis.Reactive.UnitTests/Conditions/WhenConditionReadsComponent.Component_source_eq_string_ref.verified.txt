@@ -1,39 +1,91 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.AmountModel,
-  entries: [
+  contracts: {
+    fusion.component.my-numeric: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::my-numeric: {
+      contract: fusion.component.my-numeric,
+      elementId: my-numeric
+    },
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: component,
-                componentId: my-numeric,
-                vendor: fusion,
-                readExpr: value
+            when: {
+              kind: compare,
+              left: {
+                kind: member,
+                object: component::my-numeric,
+                member: value
               },
-              coerceAs: number,
               op: eq,
-              operand: 100
+              right: {
+                kind: literal,
+                value: 100
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: exact match
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::result,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: exact match
+              }
             }
           }
         ]

@@ -1,27 +1,53 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        classRemove: {
+          kind: method,
+          path: [
+            {
+              prop: classList
+            },
+            {
+              prop: remove
+            }
+          ],
+          args: [
+            {
+              kind: scalar,
+              type: string
+            }
+          ],
+          returns: void
+        }
+      }
+    }
+  },
+  objects: {
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: call,
+        target: {
+          object: element::status,
+          member: classRemove
+        },
+        args: [
           {
-            kind: mutate-element,
-            target: status,
-            mutation: {
-              kind: call,
-              method: remove,
-              chain: classList,
-              args: [
-                {
-                  kind: literal,
-                  value: hidden
-                }
-              ]
-            }
+            kind: literal,
+            value: hidden
           }
         ]
       }

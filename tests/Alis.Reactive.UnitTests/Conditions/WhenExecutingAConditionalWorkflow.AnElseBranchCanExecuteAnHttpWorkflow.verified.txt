@@ -1,57 +1,65 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: save-check
+      when: {
+        kind: document-event,
+        name: save-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.role
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: role
+                  }
+                ]
               },
-              coerceAs: string,
               op: eq,
-              operand: admin
+              right: {
+                kind: literal,
+                value: admin
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: http,
+            run: {
+              kind: request,
               request: {
-                verb: POST,
+                method: POST,
                 url: /api/admin/save,
                 onSuccess: [
                   {
-                    commands: [
-                      {
-                        kind: dispatch,
-                        event: admin-saved
-                      }
-                    ]
+                    run: {
+                      kind: dispatch,
+                      name: admin-saved
+                    }
                   }
                 ]
               }
             }
           },
           {
-            reaction: {
-              kind: http,
+            run: {
+              kind: request,
               request: {
-                verb: POST,
+                method: POST,
                 url: /api/user/save,
                 onSuccess: [
                   {
-                    commands: [
-                      {
-                        kind: dispatch,
-                        event: user-saved
-                      }
-                    ]
+                    run: {
+                      kind: dispatch,
+                      name: user-saved
+                    }
                   }
                 ]
               }

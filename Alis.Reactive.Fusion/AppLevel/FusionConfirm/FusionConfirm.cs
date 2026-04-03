@@ -1,17 +1,14 @@
 namespace Alis.Reactive.Fusion.AppLevel
 {
     /// <summary>
-    /// App-level confirm dialog backed by Syncfusion Dialog.
-    /// Singleton per page — one SF Dialog instance serves all ConfirmGuard evaluations.
-    ///
-    /// Implements IAppLevelComponent so it can be resolved without an explicit ID:
-    ///   p.Component&lt;FusionConfirm&gt;().Show()
+    /// Represents the page-level confirmation dialog component.
     /// </summary>
     public sealed class FusionConfirm : FusionComponent, IAppLevelComponent
     {
+        /// <summary>Gets the DOM element id used for the singleton confirm host.</summary>
         public const string ElementId = "alisConfirmDialog";
 
+        /// <summary>Gets the default component id used when resolving the app-level dialog.</summary>
         public string DefaultId => ElementId;
     }
 }
-

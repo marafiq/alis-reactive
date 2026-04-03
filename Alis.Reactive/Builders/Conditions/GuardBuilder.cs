@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Descriptors.Guards;
-using Alis.Reactive.Descriptors.Reactions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
@@ -44,11 +43,12 @@ namespace Alis.Reactive.Builders.Conditions
     public sealed class GuardBuilder<TModel> where TModel : class
     {
         /// <summary>
-        /// Gets the guard descriptor built by the operator chain.
+        /// Gets the guard expression built by the operator chain.
         /// </summary>
-        internal Guard Guard { get; }
+        internal PlanPredicate Guard { get; }
+        private readonly PlanAuthoringContext _authoring;
 
-        // Back-references — only one is set depending on the entry path.
+        // Back-references — only one is set depending on the calling path.
         private readonly PipelineBuilder<TModel>? _pipeline;
         private readonly BranchBuilder<TModel>? _branchBuilder;
 
@@ -56,9 +56,10 @@ namespace Alis.Reactive.Builders.Conditions
         /// NEVER make public. Constructed by <see cref="ConditionSourceBuilder{TModel, TProp}"/>
         /// operator methods when a pipeline context is available.
         /// </summary>
-        internal GuardBuilder(Guard guard, PipelineBuilder<TModel> pipeline)
+        internal GuardBuilder(PlanPredicate guard, PlanAuthoringContext authoring, PipelineBuilder<TModel> pipeline)
         {
             Guard = guard;
+            _authoring = authoring;
             _pipeline = pipeline;
         }
 
@@ -66,9 +67,10 @@ namespace Alis.Reactive.Builders.Conditions
         /// NEVER make public. Constructed by <see cref="ConditionSourceBuilder{TModel, TProp}"/>
         /// operator methods when continuing an <c>ElseIf</c> chain.
         /// </summary>
-        internal GuardBuilder(Guard guard, BranchBuilder<TModel> branchBuilder)
+        internal GuardBuilder(PlanPredicate guard, PlanAuthoringContext authoring, BranchBuilder<TModel> branchBuilder)
         {
             Guard = guard;
+            _authoring = authoring;
             _branchBuilder = branchBuilder;
         }
 
@@ -76,9 +78,10 @@ namespace Alis.Reactive.Builders.Conditions
         /// NEVER make public. Constructed by <see cref="ConditionSourceBuilder{TModel, TProp}"/>
         /// operator methods inside <c>And</c>/<c>Or</c> lambdas (no pipeline context).
         /// </summary>
-        internal GuardBuilder(Guard guard)
+        internal GuardBuilder(PlanPredicate guard, PlanAuthoringContext authoring)
         {
             Guard = guard;
+            _authoring = authoring;
         }
 
         // ── Direct And/Or (flat composition from event args) ──
@@ -95,9 +98,9 @@ namespace Alis.Reactive.Builders.Conditions
         public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
         {
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = new EventValueExpression<TPayload, TProp>(path);
             return new ConditionSourceBuilder<TModel, TProp>(
-                source, CompositionMode.All, Guard, _pipeline, _branchBuilder);
+                source, _authoring, CompositionMode.All, Guard, _pipeline, _branchBuilder);
         }
 
         /// <summary>
@@ -112,24 +115,24 @@ namespace Alis.Reactive.Builders.Conditions
         public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
         {
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = new EventValueExpression<TPayload, TProp>(path);
             return new ConditionSourceBuilder<TModel, TProp>(
-                source, CompositionMode.Any, Guard, _pipeline, _branchBuilder);
+                source, _authoring, CompositionMode.Any, Guard, _pipeline, _branchBuilder);
         }
 
-        // ── Direct And/Or with TypedSource (component value) ──
+        // ── Direct And/Or with typed value references (component value) ──
 
         /// <summary>
         /// Adds an AND condition from a component's current value. Both this guard and the
         /// new operator must pass for the branch to execute.
         /// </summary>
         /// <typeparam name="TProp">The component's value type.</typeparam>
-        /// <param name="source">A typed source from a component's <c>Value()</c> extension.</param>
+        /// <param name="value">A typed value reference from a component's <c>Value()</c> extension.</param>
         /// <returns>A <see cref="ConditionSourceBuilder{TModel, TProp}"/> for applying the next operator.</returns>
-        public ConditionSourceBuilder<TModel, TProp> And<TProp>(TypedSource<TProp> source)
+        public ConditionSourceBuilder<TModel, TProp> And<TProp>(ValueExpression<TProp> value)
         {
             return new ConditionSourceBuilder<TModel, TProp>(
-                source, CompositionMode.All, Guard, _pipeline, _branchBuilder);
+                value, _authoring, CompositionMode.All, Guard, _pipeline, _branchBuilder);
         }
 
         /// <summary>
@@ -137,12 +140,12 @@ namespace Alis.Reactive.Builders.Conditions
         /// new operator must pass for the branch to execute.
         /// </summary>
         /// <typeparam name="TProp">The component's value type.</typeparam>
-        /// <param name="source">A typed source from a component's <c>Value()</c> extension.</param>
+        /// <param name="value">A typed value reference from a component's <c>Value()</c> extension.</param>
         /// <returns>A <see cref="ConditionSourceBuilder{TModel, TProp}"/> for applying the next operator.</returns>
-        public ConditionSourceBuilder<TModel, TProp> Or<TProp>(TypedSource<TProp> source)
+        public ConditionSourceBuilder<TModel, TProp> Or<TProp>(ValueExpression<TProp> value)
         {
             return new ConditionSourceBuilder<TModel, TProp>(
-                source, CompositionMode.Any, Guard, _pipeline, _branchBuilder);
+                value, _authoring, CompositionMode.Any, Guard, _pipeline, _branchBuilder);
         }
 
         // ── Lambda And/Or (for complex nesting) ──
@@ -170,11 +173,11 @@ namespace Alis.Reactive.Builders.Conditions
         public GuardBuilder<TModel> And(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
         {
-            var innerResult = inner(new ConditionStart<TModel>());
-            var guards = new List<Guard>();
+            var innerResult = inner(new ConditionStart<TModel>(_authoring));
+            var guards = new List<PlanPredicate>();
             FlattenAllStatic(Guard, guards);
             FlattenAllStatic(innerResult.Guard, guards);
-            return WrapGuard(new AllGuard(guards));
+            return WrapGuard(new AllPredicate(guards));
         }
 
         /// <summary>
@@ -192,11 +195,11 @@ namespace Alis.Reactive.Builders.Conditions
         public GuardBuilder<TModel> Or(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
         {
-            var innerResult = inner(new ConditionStart<TModel>());
-            var guards = new List<Guard>();
+            var innerResult = inner(new ConditionStart<TModel>(_authoring));
+            var guards = new List<PlanPredicate>();
             FlattenAnyStatic(Guard, guards);
             FlattenAnyStatic(innerResult.Guard, guards);
-            return WrapGuard(new AnyGuard(guards));
+            return WrapGuard(new AnyPredicate(guards));
         }
 
         // ── Not ──
@@ -208,7 +211,7 @@ namespace Alis.Reactive.Builders.Conditions
         /// <returns>This builder with the inverted guard for further composition or <c>Then</c>.</returns>
         public GuardBuilder<TModel> Not()
         {
-            return WrapGuard(new InvertGuard(Guard));
+            return WrapGuard(new NotPredicate(Guard));
         }
 
         // ── Then ──
@@ -241,10 +244,12 @@ namespace Alis.Reactive.Builders.Conditions
         /// </exception>
         public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>();
+            var pb = new PipelineBuilder<TModel>(_authoring, _pipeline != null ? _pipeline.Scope : _branchBuilder!.Pipeline.Scope);
             pipeline(pb);
-            var reaction = pb.BuildReaction();
-            var branch = new Branch(Guard, reaction);
+            var branch = new BranchCase(pb.BuildAction())
+            {
+                When = Guard
+            };
 
             if (_branchBuilder != null)
             {
@@ -256,29 +261,29 @@ namespace Alis.Reactive.Builders.Conditions
                 throw new InvalidOperationException(
                     "Then() requires a pipeline context. Use PipelineBuilder.When() or BranchBuilder.ElseIf() to start a condition.");
 
-            var branches = new List<Branch> { branch };
+            var branches = new List<BranchCase> { branch };
             _pipeline.SetConditionalBranches(branches);
             return new BranchBuilder<TModel>(_pipeline, branches);
         }
 
-        internal GuardBuilder<TModel> WrapGuard(Guard combined)
+        internal GuardBuilder<TModel> WrapGuard(PlanPredicate combined)
         {
             if (_pipeline != null)
-                return new GuardBuilder<TModel>(combined, _pipeline);
+                return new GuardBuilder<TModel>(combined, _authoring, _pipeline);
             if (_branchBuilder != null)
-                return new GuardBuilder<TModel>(combined, _branchBuilder);
-            return new GuardBuilder<TModel>(combined);
+                return new GuardBuilder<TModel>(combined, _authoring, _branchBuilder);
+            return new GuardBuilder<TModel>(combined, _authoring);
         }
 
-        internal static void FlattenAllStatic(Guard guard, List<Guard> target)
+        internal static void FlattenAllStatic(PlanPredicate guard, List<PlanPredicate> target)
         {
-            if (guard is AllGuard all) target.AddRange(all.Guards);
+            if (guard is AllPredicate all) target.AddRange(all.Terms);
             else target.Add(guard);
         }
 
-        internal static void FlattenAnyStatic(Guard guard, List<Guard> target)
+        internal static void FlattenAnyStatic(PlanPredicate guard, List<PlanPredicate> target)
         {
-            if (guard is AnyGuard any) target.AddRange(any.Guards);
+            if (guard is AnyPredicate any) target.AddRange(any.Terms);
             else target.Add(guard);
         }
     }

@@ -1,51 +1,108 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.save-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.cleanup-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::save-result: {
+      contract: element.save-result,
+      elementId: save-result
+    },
+    element::cleanup-result: {
+      contract: element.cleanup-result,
+      elementId: cleanup-result
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: parallel-http,
-        requests: [
+      run: {
+        kind: parallel,
+        steps: [
           {
-            verb: POST,
-            url: /api/save,
-            onSuccess: [
-              {
-                commands: [
-                  {
-                    kind: mutate-element,
-                    target: save-result,
-                    mutation: {
-                      kind: set-prop,
-                      prop: textContent
+            kind: request,
+            request: {
+              method: POST,
+              url: /api/save,
+              onSuccess: [
+                {
+                  run: {
+                    kind: set,
+                    target: {
+                      object: element::save-result,
+                      member: text
                     },
-                    value: saved
+                    value: {
+                      kind: literal,
+                      value: saved
+                    }
                   }
-                ]
-              }
-            ]
+                }
+              ]
+            }
           },
           {
-            verb: DELETE,
-            url: /api/cleanup,
-            onSuccess: [
-              {
-                commands: [
-                  {
-                    kind: mutate-element,
-                    target: cleanup-result,
-                    mutation: {
-                      kind: set-prop,
-                      prop: textContent
+            kind: request,
+            request: {
+              method: DELETE,
+              url: /api/cleanup,
+              onSuccess: [
+                {
+                  run: {
+                    kind: set,
+                    target: {
+                      object: element::cleanup-result,
+                      member: text
                     },
-                    value: cleaned
+                    value: {
+                      kind: literal,
+                      value: cleaned
+                    }
                   }
-                ]
-              }
-            ]
+                }
+              ]
+            }
           }
         ]
       }

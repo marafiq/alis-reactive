@@ -1,125 +1,221 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: role-check
-      },
-      reaction: {
-        kind: conditional,
-        commands: [
-          {
-            kind: mutate-element,
-            target: loading,
-            mutation: {
-              kind: call,
-              method: setAttribute,
-              args: [
-                {
-                  kind: literal,
-                  value: hidden
-                },
-                {
-                  kind: literal,
-                  value: 
-                }
-              ]
+  contracts: {
+    element.loading: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
             }
-          }
-        ],
-        branches: [
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.admin-panel: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.delete-btn: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::loading: {
+      contract: element.loading,
+      elementId: loading
+    },
+    element::admin-panel: {
+      contract: element.admin-panel,
+      elementId: admin-panel
+    },
+    element::delete-btn: {
+      contract: element.delete-btn,
+      elementId: delete-btn
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: role-check
+      },
+      run: {
+        kind: sequence,
+        steps: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.role
-              },
-              coerceAs: string,
-              op: eq,
-              operand: admin
+            kind: set,
+            target: {
+              object: element::loading,
+              member: hidden
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: admin-panel,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
-                },
-                {
-                  kind: mutate-element,
-                  target: delete-btn,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
-                },
-                {
-                  kind: dispatch,
-                  event: admin-loaded
-                }
-              ]
+            value: {
+              kind: convert,
+              value: {
+                kind: literal,
+                value: true
+              },
+              to: {
+                kind: scalar,
+                type: boolean
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: admin-panel,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
+            kind: branch,
+            cases: [
+              {
+                when: {
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
                       {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
+                        prop: role
                       }
                     ]
+                  },
+                  op: eq,
+                  right: {
+                    kind: literal,
+                    value: admin
+                  },
+                  as: {
+                    kind: scalar,
+                    type: string
                   }
                 },
-                {
-                  kind: mutate-element,
-                  target: delete-btn,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
+                run: {
+                  kind: sequence,
+                  steps: [
+                    {
+                      kind: set,
+                      target: {
+                        object: element::admin-panel,
+                        member: hidden
                       },
-                      {
-                        kind: literal,
-                        value: 
+                      value: {
+                        kind: convert,
+                        value: {
+                          kind: literal,
+                          value: false
+                        },
+                        to: {
+                          kind: scalar,
+                          type: boolean
+                        }
                       }
-                    ]
-                  }
+                    },
+                    {
+                      kind: set,
+                      target: {
+                        object: element::delete-btn,
+                        member: hidden
+                      },
+                      value: {
+                        kind: convert,
+                        value: {
+                          kind: literal,
+                          value: false
+                        },
+                        to: {
+                          kind: scalar,
+                          type: boolean
+                        }
+                      }
+                    },
+                    {
+                      kind: dispatch,
+                      name: admin-loaded
+                    }
+                  ]
                 }
-              ]
-            }
+              },
+              {
+                run: {
+                  kind: sequence,
+                  steps: [
+                    {
+                      kind: set,
+                      target: {
+                        object: element::admin-panel,
+                        member: hidden
+                      },
+                      value: {
+                        kind: convert,
+                        value: {
+                          kind: literal,
+                          value: true
+                        },
+                        to: {
+                          kind: scalar,
+                          type: boolean
+                        }
+                      }
+                    },
+                    {
+                      kind: set,
+                      target: {
+                        object: element::delete-btn,
+                        member: hidden
+                      },
+                      value: {
+                        kind: convert,
+                        value: {
+                          kind: literal,
+                          value: true
+                        },
+                        to: {
+                          kind: scalar,
+                          type: boolean
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         ]
       }

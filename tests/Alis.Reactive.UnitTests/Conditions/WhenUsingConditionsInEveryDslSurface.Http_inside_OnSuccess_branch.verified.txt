@@ -1,63 +1,94 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.error: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::error: {
+      contract: element.error,
+      elementId: error
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: check
+      when: {
+        kind: document-event,
+        name: check
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/check,
           onSuccess: [
             {
-              reaction: {
-                kind: conditional,
-                branches: [
+              run: {
+                kind: branch,
+                cases: [
                   {
-                    guard: {
-                      kind: value,
-                      source: {
-                        kind: event,
-                        path: evt.isActive
+                    when: {
+                      kind: compare,
+                      left: {
+                        kind: context,
+                        scope: event,
+                        path: [
+                          {
+                            prop: isActive
+                          }
+                        ]
                       },
-                      coerceAs: boolean,
-                      op: truthy
+                      op: truthy,
+                      as: {
+                        kind: scalar,
+                        type: boolean
+                      }
                     },
-                    reaction: {
-                      kind: http,
+                    run: {
+                      kind: request,
                       request: {
-                        verb: POST,
+                        method: POST,
                         url: /api/activate,
                         onSuccess: [
                           {
-                            commands: [
-                              {
-                                kind: dispatch,
-                                event: activated
-                              }
-                            ]
+                            run: {
+                              kind: dispatch,
+                              name: activated
+                            }
                           }
                         ]
                       }
                     }
                   },
                   {
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: error,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: Inactive
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::error,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: Inactive
+                      }
                     }
                   }
                 ]

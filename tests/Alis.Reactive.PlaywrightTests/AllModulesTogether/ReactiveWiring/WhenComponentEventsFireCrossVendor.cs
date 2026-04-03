@@ -1,7 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.ReactiveWiring;
 
 /// <summary>
-/// Verifies that .Reactive() extensions wire component-event triggers end-to-end:
+/// Verifies that .Reactive() extensions wire object-event workflows end-to-end:
 /// C# DSL -> plan JSON -> TS runtime -> DOM mutation. Tests both vendor types
 /// (Fusion and Native), nested property ID patterns, cross-vendor reset,
 /// and that non-reactive controls stay inert.
@@ -14,7 +14,7 @@ namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.ReactiveWiring;
 ///   Category (native dropdown, NOT reactive) -- no .Reactive(), must NOT fire anything
 ///   City     (nested native dropdown, reactive)     -- echo "City changed"
 ///   PostalCode (nested fusion numeric, reactive)    -- echo "PostalCode changed"
-///   Reset All button -- dispatches "reset-all" custom event -> zeros Amount, clears Status, echoes "All fields reset"
+///   Reset All button -- dispatches "reset-all" document event -> zeros Amount, clears Status, echoes "All fields reset"
 /// </summary>
 [TestFixture]
 public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
@@ -34,7 +34,7 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
     /// Typing a value into the Fusion NumericTextBox and tabbing away triggers its
     /// .Reactive() pipeline, which sets the echo element text to "Amount changed".
     ///
-    /// WHY: proves Fusion vendor component-event trigger wires correctly end-to-end
+    /// WHY: proves Fusion vendor object-event workflow wiring works end-to-end
     /// </summary>
     [Test]
     public async Task fusion_numeric_change_updates_echo()
@@ -61,7 +61,7 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
     /// Selecting a value in the Native dropdown triggers its .Reactive() pipeline,
     /// which sets the echo element text to "Status changed".
     ///
-    /// WHY: proves Native vendor component-event trigger wires correctly end-to-end
+    /// WHY: proves Native vendor object-event workflow wiring works end-to-end
     /// </summary>
     [Test]
     public async Task native_dropdown_change_updates_echo()
@@ -113,15 +113,15 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario: Reset All button clears both vendors via custom event ──
+    // ── Scenario: Reset All button clears both vendors via document event ──
 
     /// <summary>
-    /// The "Reset All Fields" button dispatches a "reset-all" custom event. The plan
+    /// The "Reset All Fields" button dispatches a named document event. The plan
     /// wires this to a pipeline that zeros Fusion Amount, clears Native Status dropdown,
     /// and sets the echo to "All fields reset".
     ///
-    /// WHY: proves cross-vendor custom event pipeline mutates components from both vendors
-    /// in a single reaction
+    /// WHY: proves one document-event workflow mutates components from both vendors
+    /// in a single workflow
     /// </summary>
     [Test]
     public async Task reset_all_button_clears_both_vendors()
@@ -138,7 +138,7 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
         await numericInput.PressAsync("Tab");
         await Expect(Page.Locator("#amount-echo")).ToHaveTextAsync("Amount changed", new() { Timeout = 3000 });
 
-        // Reset All — single custom event resets both vendors
+        // Reset All — one document event resets both vendors
         await Page.Locator("button:has-text('Reset All Fields')").ClickAsync();
 
         // Echo confirms the reset-all pipeline executed
@@ -195,7 +195,7 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
     ///   4. Change Amount again → echo must update to "Amount changed" (proves Fusion re-fire too)
     ///
     /// WHY: proves reactive event listeners survive a cross-vendor reset dispatch,
-    /// catching regressions where a reset accidentally unwires component-event triggers
+    /// catching regressions where a reset accidentally unwires object-event workflows
     /// </summary>
     [Test]
     public async Task reset_then_interact_proves_components_still_reactive_after_reset()
@@ -366,7 +366,7 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
     /// change (still "Amount changed"), but the framework must not debounce or suppress
     /// repeated events from the same component.
     ///
-    /// WHY: proves Fusion component-event triggers fire on every value change, not just
+    /// WHY: proves Fusion object-event workflows fire on every value change, not just
     /// the first — catching regressions where event listeners are accidentally one-shot
     /// </summary>
     [Test]
@@ -402,7 +402,7 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
     /// Selecting "active", then selecting "inactive" in the Status dropdown must fire
     /// the reactive echo each time. The second selection must still trigger the pipeline.
     ///
-    /// WHY: proves Native component-event triggers fire on every selection change —
+    /// WHY: proves Native object-event workflows fire on every selection change —
     /// not just the first — catching regressions where event listeners detach after first fire
     /// </summary>
     [Test]

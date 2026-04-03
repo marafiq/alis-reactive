@@ -1,56 +1,89 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.spinner: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::spinner: {
+      contract: element.spinner,
+      elementId: spinner
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: http,
-        preFetch: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: spinner,
-            mutation: {
-              kind: call,
-              method: removeAttribute,
-              args: [
-                {
-                  kind: literal,
-                  value: hidden
-                }
-              ]
+            kind: set,
+            target: {
+              object: element::spinner,
+              member: hidden
+            },
+            value: {
+              kind: convert,
+              value: {
+                kind: literal,
+                value: false
+              },
+              to: {
+                kind: scalar,
+                type: boolean
+              }
             }
-          }
-        ],
-        request: {
-          verb: GET,
-          url: /api/test,
-          onSuccess: [
-            {
-              commands: [
+          },
+          {
+            kind: request,
+            request: {
+              method: GET,
+              url: /api/test,
+              onSuccess: [
                 {
-                  kind: mutate-element,
-                  target: spinner,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
+                  run: {
+                    kind: set,
+                    target: {
+                      object: element::spinner,
+                      member: hidden
+                    },
+                    value: {
+                      kind: convert,
+                      value: {
                         kind: literal,
-                        value: hidden
+                        value: true
                       },
-                      {
-                        kind: literal,
-                        value: 
+                      to: {
+                        kind: scalar,
+                        type: boolean
                       }
-                    ]
+                    }
                   }
                 }
               ]
             }
-          ]
-        }
+          }
+        ]
       }
     }
   ]

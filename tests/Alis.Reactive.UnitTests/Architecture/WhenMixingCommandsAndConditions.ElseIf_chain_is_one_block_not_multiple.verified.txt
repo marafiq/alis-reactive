@@ -1,80 +1,121 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.tier: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::tier: {
+      contract: element.tier,
+      elementId: tier
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.count
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: count
+                  }
+                ]
               },
-              coerceAs: number,
               op: gt,
-              operand: 100
+              right: {
+                kind: literal,
+                value: 100
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: tier,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: gold
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::tier,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: gold
+              }
             }
           },
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.count
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: count
+                  }
+                ]
               },
-              coerceAs: number,
               op: gt,
-              operand: 50
+              right: {
+                kind: literal,
+                value: 50
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: tier,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: silver
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::tier,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: silver
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: tier,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: bronze
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::tier,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: bronze
+              }
             }
           }
         ]

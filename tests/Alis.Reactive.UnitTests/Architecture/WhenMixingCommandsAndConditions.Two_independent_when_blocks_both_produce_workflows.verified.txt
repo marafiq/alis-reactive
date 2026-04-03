@@ -1,0 +1,172 @@
+﻿{
+  version: 2,
+  planId: Alis.Reactive.UnitTests.TestModel,
+  contracts: {
+    element.r1: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.r2: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::r1: {
+      contract: element.r1,
+      elementId: r1
+    },
+    element::r2: {
+      contract: element.r2,
+      elementId: r2
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: test
+      },
+      run: {
+        kind: branch,
+        cases: [
+          {
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: value
+                  }
+                ]
+              },
+              op: eq,
+              right: {
+                kind: literal,
+                value: hello
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::r1,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: yes
+              }
+            }
+          },
+          {
+            run: {
+              kind: set,
+              target: {
+                object: element::r1,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: no
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      when: {
+        kind: document-event,
+        name: test
+      },
+      run: {
+        kind: branch,
+        cases: [
+          {
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: count
+                  }
+                ]
+              },
+              op: gt,
+              right: {
+                kind: literal,
+                value: 5
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::r2,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: >5
+              }
+            }
+          },
+          {
+            run: {
+              kind: set,
+              target: {
+                object: element::r2,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: <=5
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,40 +1,72 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: dom-ready
-      },
-      reaction: {
-        kind: http,
-        request: {
-          verb: PUT,
-          url: /api/update,
-          gather: [
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
             {
-              kind: static,
-              param: id,
-              value: 42
-            },
-            {
-              kind: static,
-              param: name,
-              value: Jane
+              prop: textContent
             }
           ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: dom-ready
+      },
+      run: {
+        kind: request,
+        request: {
+          method: PUT,
+          url: /api/update,
+          input: {
+            transport: json,
+            value: {
+              kind: object,
+              fields: {
+                id: {
+                  kind: literal,
+                  value: 42
+                },
+                name: {
+                  kind: literal,
+                  value: Jane
+                }
+              }
+            }
+          },
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: updated
                 }
-              ]
+              }
             }
           ]
         }

@@ -1,37 +1,70 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.greeting: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::greeting: {
+      contract: element.greeting,
+      elementId: greeting
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: user-loaded
+      when: {
+        kind: document-event,
+        name: user-loaded
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.name
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: name
+                  }
+                ]
               },
-              coerceAs: string,
-              op: not-null
+              op: not-null,
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: greeting,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Welcome
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::greeting,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Welcome
+              }
             }
           }
         ]

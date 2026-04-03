@@ -1,28 +1,54 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.value: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::value: {
+      contract: element.value,
+      elementId: value
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: signalr,
         hubUrl: /hubs/data,
-        methodName: ReceiveData
+        method: ReceiveData
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: value,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            source: {
-              kind: event,
-              path: evt.id
+      run: {
+        kind: set,
+        target: {
+          object: element::value,
+          member: text
+        },
+        value: {
+          kind: context,
+          scope: event,
+          path: [
+            {
+              prop: id
             }
-          }
-        ]
+          ]
+        }
       }
     }
   ]

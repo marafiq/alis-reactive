@@ -2,11 +2,11 @@ namespace Alis.Reactive.Native.Components
 {
     /// <summary>
     /// Test widget for architecture verification — native vendor.
-    /// Phantom type — proves the same readExpr works for both vendors.
+    /// Phantom type — proves the same valueMemberPath works for both vendors.
     /// </summary>
     public sealed class TestWidgetNative : NativeComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMemberPath => "value";
     }
 }

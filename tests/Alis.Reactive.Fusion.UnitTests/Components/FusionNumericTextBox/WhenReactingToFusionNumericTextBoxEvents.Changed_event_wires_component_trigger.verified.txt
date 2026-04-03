@@ -1,26 +1,56 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: number
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: amount-changed
+      when: {
+        kind: document-event,
+        name: amount-changed
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            mutation: {
-              kind: set-prop,
-              prop: value,
-              coerce: number
-            },
-            value: 999,
-            vendor: fusion
+      run: {
+        kind: set,
+        target: {
+          object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+          member: value
+        },
+        value: {
+          kind: convert,
+          value: {
+            kind: literal,
+            value: 999
+          },
+          to: {
+            kind: scalar,
+            type: number
           }
-        ]
+        }
       }
     }
   ]

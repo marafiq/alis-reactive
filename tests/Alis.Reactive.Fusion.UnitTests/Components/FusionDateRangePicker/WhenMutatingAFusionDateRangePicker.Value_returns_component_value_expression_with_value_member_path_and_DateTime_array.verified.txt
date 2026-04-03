@@ -1,0 +1,74 @@
+﻿{
+  version: 2,
+  planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    element.range-echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: array,
+            item: {
+              kind: any
+            }
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod
+    },
+    element::range-echo: {
+      contract: element.range-echo,
+      elementId: range-echo
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: dom-ready
+      },
+      run: {
+        kind: set,
+        target: {
+          object: element::range-echo,
+          member: text
+        },
+        value: {
+          kind: member,
+          object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod,
+          member: value
+        }
+      }
+    }
+  ]
+}

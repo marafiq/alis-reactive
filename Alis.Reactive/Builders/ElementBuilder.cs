@@ -1,9 +1,6 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive.Builders
 {
@@ -38,7 +35,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> AddClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("add", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
+            _pipeline.CallElementMember(_elementId, "classList.add", className);
             return _pipeline;
         }
 
@@ -49,7 +46,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> RemoveClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("remove", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
+            _pipeline.CallElementMember(_elementId, "classList.remove", className);
             return _pipeline;
         }
 
@@ -60,7 +57,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> ToggleClass(string className)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("toggle", chain: "classList", args: new MethodArg[] { new LiteralArg(className) })));
+            _pipeline.CallElementMember(_elementId, "classList.toggle", className);
             return _pipeline;
         }
 
@@ -71,7 +68,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetText(string text)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("textContent"), text));
+            _pipeline.SetElementProperty(_elementId, "textContent", text);
             return _pipeline;
         }
 
@@ -79,17 +76,17 @@ namespace Alis.Reactive.Builders
         /// Sets the element text from an event payload property resolved in the browser.
         /// </summary>
         /// <remarks>
-        /// The <paramref name="source"/> instance is used only for compile-time type inference;
+        /// The <paramref name="payload"/> instance is used only for compile-time type inference;
         /// its property values are never read.
         /// </remarks>
         /// <typeparam name="TSource">The event payload type.</typeparam>
-        /// <param name="source">The payload instance providing compile-time type inference.</param>
+        /// <param name="payload">The payload instance providing compile-time type inference.</param>
         /// <param name="path">The property-access expression into the payload.</param>
         /// <returns>The pipeline builder for chaining additional commands.</returns>
-        public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object?>> path)
+        public PipelineBuilder<TModel> SetText<TSource>(TSource payload, Expression<Func<TSource, object?>> path)
         {
-            var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("textContent"), source: new EventSource(sourcePath)));
+            var valueMemberPath = ExpressionPathHelper.ToEventPath(path);
+            _pipeline.SetElementPropertyFromPath(_elementId, "textContent", valueMemberPath);
             return _pipeline;
         }
 
@@ -97,40 +94,19 @@ namespace Alis.Reactive.Builders
         /// Sets the element text from an HTTP response body property.
         /// </summary>
         /// <typeparam name="TResponse">The response body type.</typeparam>
-        /// <param name="source">The response body instance providing compile-time type inference.</param>
+        /// <param name="response">The response body instance providing compile-time type inference.</param>
         /// <param name="path">The property-access expression into the response body.</param>
         /// <returns>The pipeline builder for chaining additional commands.</returns>
-        public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
+        public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> response, Expression<Func<TResponse, object?>> path)
             where TResponse : class
         {
-            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("textContent"), source: new EventSource(sourcePath)));
+            var valueMemberPath = ExpressionPathHelper.ToResponsePath(path);
+            _pipeline.SetElementPropertyFromPath(_elementId, "textContent", valueMemberPath);
             return _pipeline;
         }
 
         /// <summary>
-        /// Sets the element text from a <see cref="BindSource"/> (event or component).
-        /// </summary>
-        /// <remarks>
-        /// Resolves the source value in the browser and assigns it to the element's text content.
-        /// Typically used with <see cref="ComponentSource"/> or <see cref="EventSource"/>:
-        /// <code>
-        /// p.Element("echo").SetText(new ComponentSource(id, vendor, readExpr));
-        /// </code>
-        /// Prefer the <see cref="SetText{TProp}(TypedSource{TProp})"/> overload when a
-        /// component's <c>Value()</c> method is available, as it preserves type safety.
-        /// </remarks>
-        /// <param name="source">The source binding to resolve in the browser.</param>
-        /// <returns>This element builder for chaining additional mutations.</returns>
-        public ElementBuilder<TModel> SetText(BindSource source)
-        {
-            _pipeline.Commands.Add(new MutateElementCommand(
-                _elementId, new SetPropMutation("textContent"), source: source));
-            return this;
-        }
-
-        /// <summary>
-        /// Sets the element text from a typed source (type-safe for conditions).
+        /// Sets the element text from a typed value reference (type-safe for conditions).
         /// </summary>
         /// <remarks>
         /// Use with a component's <c>Value()</c> method to display its current value:
@@ -139,13 +115,16 @@ namespace Alis.Reactive.Builders
         /// p.Element("name-echo").SetText(comp.Value());
         /// </code>
         /// </remarks>
-        /// <typeparam name="TProp">The source property type.</typeparam>
-        /// <param name="source">The typed source to resolve.</param>
+        /// <typeparam name="TProp">The value type.</typeparam>
+        /// <param name="value">The typed value reference to resolve.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>
-        public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
+        public ElementBuilder<TModel> SetText<TProp>(ValueExpression<TProp> value)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(
-                _elementId, new SetPropMutation("textContent"), source: source.ToBindSource()));
+            _pipeline.SetElementProperty(
+                _elementId,
+                "textContent",
+                value.ToValueExpr(_pipeline.Authoring),
+                value.CoercionType);
             return this;
         }
 
@@ -156,7 +135,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetHtml(string html)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("innerHTML"), html));
+            _pipeline.SetElementProperty(_elementId, "innerHTML", html);
             return _pipeline;
         }
 
@@ -164,35 +143,18 @@ namespace Alis.Reactive.Builders
         /// Sets the element HTML from an event payload property resolved in the browser.
         /// </summary>
         /// <typeparam name="TSource">The event payload type.</typeparam>
-        /// <param name="source">The payload instance providing compile-time type inference.</param>
+        /// <param name="payload">The payload instance providing compile-time type inference.</param>
         /// <param name="path">The property-access expression into the payload.</param>
         /// <returns>The pipeline builder for chaining additional commands.</returns>
-        public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object?>> path)
+        public PipelineBuilder<TModel> SetHtml<TSource>(TSource payload, Expression<Func<TSource, object?>> path)
         {
-            var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new SetPropMutation("innerHTML"), source: new EventSource(sourcePath)));
+            var valueMemberPath = ExpressionPathHelper.ToEventPath(path);
+            _pipeline.SetElementPropertyFromPath(_elementId, "innerHTML", valueMemberPath);
             return _pipeline;
         }
 
         /// <summary>
-        /// Sets the element HTML from a <see cref="BindSource"/> (event or component).
-        /// </summary>
-        /// <remarks>
-        /// Resolves the source value in the browser and assigns it to the element's inner HTML.
-        /// Prefer the <see cref="SetHtml{TProp}(TypedSource{TProp})"/> overload when a
-        /// component's <c>Value()</c> method is available, as it preserves type safety.
-        /// </remarks>
-        /// <param name="source">The source binding to resolve in the browser.</param>
-        /// <returns>This element builder for chaining additional mutations.</returns>
-        public ElementBuilder<TModel> SetHtml(BindSource source)
-        {
-            _pipeline.Commands.Add(new MutateElementCommand(
-                _elementId, new SetPropMutation("innerHTML"), source: source));
-            return this;
-        }
-
-        /// <summary>
-        /// Sets the element HTML from a typed source (type-safe for conditions).
+        /// Sets the element HTML from a typed value reference (type-safe for conditions).
         /// </summary>
         /// <remarks>
         /// Use with a component's <c>Value()</c> method to display its current value as HTML:
@@ -201,13 +163,16 @@ namespace Alis.Reactive.Builders
         /// p.Element("name-html").SetHtml(comp.Value());
         /// </code>
         /// </remarks>
-        /// <typeparam name="TProp">The source property type.</typeparam>
-        /// <param name="source">The typed source to resolve.</param>
+        /// <typeparam name="TProp">The value type.</typeparam>
+        /// <param name="value">The typed value reference to resolve.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>
-        public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
+        public ElementBuilder<TModel> SetHtml<TProp>(ValueExpression<TProp> value)
         {
-            _pipeline.Commands.Add(new MutateElementCommand(
-                _elementId, new SetPropMutation("innerHTML"), source: source.ToBindSource()));
+            _pipeline.SetElementProperty(
+                _elementId,
+                "innerHTML",
+                value.ToValueExpr(_pipeline.Authoring),
+                value.CoercionType);
             return this;
         }
 
@@ -217,7 +182,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Show()
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("removeAttribute", args: new MethodArg[] { new LiteralArg("hidden") })));
+            _pipeline.SetElementProperty(_elementId, "hidden", false, coerceAs: "boolean");
             return _pipeline;
         }
 
@@ -227,7 +192,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Hide()
         {
-            _pipeline.Commands.Add(new MutateElementCommand(_elementId, new CallMutation("setAttribute", args: new MethodArg[] { new LiteralArg("hidden"), new LiteralArg("") })));
+            _pipeline.SetElementProperty(_elementId, "hidden", true, coerceAs: "boolean");
             return _pipeline;
         }
     }

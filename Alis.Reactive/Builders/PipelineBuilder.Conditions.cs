@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Guards;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
 {
@@ -67,8 +67,8 @@ namespace Alis.Reactive.Builders
 
             SetMode(PipelineMode.Conditional);
 
-            var source = new EventArgSource<TPayload, TProp>(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+            var source = new EventValueExpression<TPayload, TProp>(path);
+            return new ConditionSourceBuilder<TModel, TProp>(source, _authoring, this);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Alis.Reactive.Builders
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Obtain a <see cref="TypedSource{TProp}"/> by calling a component's <c>Value()</c>
+        /// Obtain a <see cref="ValueExpression{TProp}"/> by calling a component's <c>Value()</c>
         /// extension. The property type flows through the operator chain for compile-time safety.
         /// </para>
         /// <code>
@@ -86,18 +86,18 @@ namespace Alis.Reactive.Builders
         ///  .Else(e =&gt; e.Element("country-selected").Hide());
         /// </code>
         /// </remarks>
-        /// <typeparam name="TProp">The component's value type, inferred from the <see cref="TypedSource{TProp}"/>.</typeparam>
-        /// <param name="source">A typed source from a component's <c>Value()</c> extension.</param>
+        /// <typeparam name="TProp">The component's value type, inferred from the <see cref="ValueExpression{TProp}"/>.</typeparam>
+        /// <param name="value">A typed value reference from a component's <c>Value()</c> extension.</param>
         /// <returns>
         /// A <see cref="ConditionSourceBuilder{TModel, TProp}"/> exposing typed operators.
         /// </returns>
-        public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
+        public ConditionSourceBuilder<TModel, TProp> When<TProp>(ValueExpression<TProp> value)
         {
             if (ConditionalBranches != null && ConditionalBranches.Count > 0)
                 FlushSegment();
 
             SetMode(PipelineMode.Conditional);
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+            return new ConditionSourceBuilder<TModel, TProp>(value, _authoring, this);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Alis.Reactive.Builders
 
             SetMode(PipelineMode.Conditional);
 
-            return new GuardBuilder<TModel>(new ConfirmGuard(message), this);
+            return new GuardBuilder<TModel>(new ConfirmPredicate(message), _authoring, this);
         }
     }
 }

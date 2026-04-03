@@ -36,7 +36,7 @@ public class WhenTriggeringOnServerPush : PlanTestBase
     }
 
     [Test]
-    public Task Multiple_triggers_on_same_url_produce_separate_entries()
+    public Task Multiple_triggers_on_same_url_produce_separate_workflows()
     {
         var plan = CreatePlan();
         Trigger(plan)

@@ -1,0 +1,28 @@
+﻿{
+  version: 2,
+  planId: Alis.Reactive.UnitTests.TestModel,
+  workflows: [
+    {
+      when: {
+        kind: server-push,
+        url: /api/stream,
+        eventType: event-a
+      },
+      run: {
+        kind: dispatch,
+        name: a
+      }
+    },
+    {
+      when: {
+        kind: server-push,
+        url: /api/stream,
+        eventType: event-b
+      },
+      run: {
+        kind: dispatch,
+        name: b
+      }
+    }
+  ]
+}

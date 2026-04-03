@@ -41,13 +41,13 @@ layer2 -> layer3: boot {
 
 ## Layer 1 — C# Fluent Builders
 
-The developer writes fluent C# in `.cshtml` views. Every call builds a descriptor — a data structure that captures what should happen. Nothing executes. The builders are the API surface: triggers, mutations, conditions, HTTP, components.
+The developer writes fluent C# in `.cshtml` views. Every call captures authoring intent in strongly typed builder objects. Nothing executes. The builders are the API surface: subscriptions, actions, conditions, HTTP, components.
 
 The compiler checks model bindings, event arg types, and response types at build time. Rename a property → compiler error.
 
 ## Layer 2 — JSON Plan
 
-`plan.Render()` serializes all descriptors to JSON. This JSON is the **contract** — the only thing that crosses from server to browser. The C# side never executes behavior. The JS side never invents behavior. Both agree on the plan's shape.
+`plan.Render()` serializes that authoring intent to JSON. This JSON is the **contract** — the only thing that crosses from server to browser. The C# side never executes behavior. The JS side never invents behavior. Both agree on the plan's shape.
 
 The plan is emitted as a `<script type="application/json">` element in the page. It is inert data until the runtime reads it.
 
@@ -175,10 +175,10 @@ Every feature follows the same three-layer pattern:
 
 | Feature | C# captures | Plan carries | Runtime executes |
 |---------|------------|-------------|-----------------|
-| Events | `.Reactive(evt => evt.Changed)` | trigger + reaction | wires listener, runs commands |
-| Mutations | `pipeline.Element("id").Show()` | target + mutation | bracket notation on DOM |
-| Components | `pipeline.Component<T>(m => m.Prop)` | vendor + readExpr | resolves root, reads/writes |
-| Conditions | `pipeline.When(...).Eq(val)` | guard + branches | evaluates, picks branch |
+| Events | `.Reactive(evt => evt.Changed)` | subscription + workflow | wires listener, runs action tree |
+| Actions | `pipeline.Element("id").Show()` | target + action | applies property writes or method calls |
+| Components | `pipeline.Component<T>(m => m.Prop)` | contract + object + binding | resolves root, reads/writes |
+| Conditions | `pipeline.When(...).Eq(val)` | predicate + branch action | evaluates, picks branch |
 | HTTP | `pipeline.Post(url).Gather(...)` | request + handlers | fetches, routes response |
 
 One idea, five features, zero JavaScript in your views.
@@ -193,6 +193,6 @@ One idea, five features, zero JavaScript in your views.
 
 ## Next
 
-- [Fluent Builders](../fluent-builders/) — how descriptors, builders, and the plan compose
+- [Fluent Builders](../fluent-builders/) — how fluent authoring lowers into the plan
 - [The JSON Plan Contract](../the-contract/) — what the serialized plan looks like
 - [Runtime](../runtime/) — how the runtime boots and executes commands

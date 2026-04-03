@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionSwitch"/> component.
+    /// Typed reactive events for the <see cref="FusionSwitch"/> component.
     /// </summary>
     /// <remarks>
     /// Select an event via the <c>.Reactive()</c> lambda:
@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionSwitchEvents() { }
 
         /// <summary>Fires when the switch state changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionSwitchChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionSwitchChangeArgs>(
+        public ReactiveEvent<FusionSwitchChangeArgs> Changed =>
+            new ReactiveEvent<FusionSwitchChangeArgs>(
                 "change", new FusionSwitchChangeArgs());
     }
 }

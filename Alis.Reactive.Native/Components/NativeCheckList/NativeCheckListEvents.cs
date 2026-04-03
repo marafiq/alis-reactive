@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Typed event descriptors for <see cref="NativeCheckList"/>.
+    /// Typed reactive events for <see cref="NativeCheckList"/>.
     /// </summary>
     /// <remarks>
     /// Used with the <c>.Reactive()</c> event selector lambda:
@@ -18,8 +18,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Fires when the user checks or unchecks any checkbox in the list.
         /// </summary>
-        public TypedEventDescriptor<NativeCheckListChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeCheckListChangeArgs>(
+        public ReactiveEvent<NativeCheckListChangeArgs> Changed =>
+            new ReactiveEvent<NativeCheckListChangeArgs>(
                 "change", new NativeCheckListChangeArgs());
     }
 }

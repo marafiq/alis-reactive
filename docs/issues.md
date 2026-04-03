@@ -25,10 +25,10 @@ p.Element("x").Show().AddClass("active")  // Fails — Show() exits element cont
 
 When `elementCoerceAs` is present but source resolves to scalar, `items` becomes `undefined`. Should throw early with diagnostic message.
 
-### 4. component.ts — error message missing componentId
-**File:** `Scripts/component.ts:16-27`
+### 4. resolution/contracts.ts — error message missing componentId
+**File:** `Scripts/resolution/contracts.ts`
 
-`unknown vendor` error doesn't include which component failed. Hard to trace in large forms.
+`unsupported contract resolver` doesn't include which component failed. Hard to trace in large forms.
 
 ### 5. Validation module needs refactor
 Observed during ComponentGather testing — validation behaves differently from what the interactive pattern was designed for. Needs stricter module boundaries. Separate design session required.

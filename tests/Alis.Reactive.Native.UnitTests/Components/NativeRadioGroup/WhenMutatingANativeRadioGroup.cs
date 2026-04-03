@@ -42,13 +42,13 @@ public class WhenMutatingANativeRadioGroup : NativeTestBase
     }
 
     [Test]
-    public void Value_returns_typed_component_source()
+    public void Value_returns_component_value_expression()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
             var source = p.Component<NativeRadioGroup>(m => m.MobilityLevel).Value();
-            Assert.That(source, Is.InstanceOf<Alis.Reactive.Builders.Conditions.TypedComponentSource<string>>());
+            Assert.That(source, Is.InstanceOf<Alis.Reactive.Builders.Conditions.ComponentValueExpression<string>>());
         });
     }
 

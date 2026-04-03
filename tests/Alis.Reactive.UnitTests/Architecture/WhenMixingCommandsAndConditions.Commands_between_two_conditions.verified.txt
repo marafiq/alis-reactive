@@ -1,95 +1,182 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: mid,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    element.r1: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
-            },
-            value: between
-          }
-        ]
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.mid: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.r2: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::r1: {
+      contract: element.r1,
+      elementId: r1
+    },
+    element::mid: {
+      contract: element.mid,
+      elementId: mid
+    },
+    element::r2: {
+      contract: element.r2,
+      elementId: r2
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: test
+      },
+      run: {
+        kind: set,
+        target: {
+          object: element::mid,
+          member: text
+        },
+        value: {
+          kind: literal,
+          value: between
+        }
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.value
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: value
+                  }
+                ]
               },
-              coerceAs: string,
               op: eq,
-              operand: a
+              right: {
+                kind: literal,
+                value: a
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: r1,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: first
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::r1,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: first
+              }
             }
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.count
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: count
+                  }
+                ]
               },
-              coerceAs: number,
               op: gt,
-              operand: 0
+              right: {
+                kind: literal,
+                value: 0
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: r2,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: second
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::r2,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: second
+              }
             }
           }
         ]

@@ -1,0 +1,28 @@
+﻿{
+  version: 2,
+  planId: Alis.Reactive.UnitTests.TestModel,
+  workflows: [
+    {
+      when: {
+        kind: signalr,
+        hubUrl: /hubs/notifications,
+        method: ReceiveAlert
+      },
+      run: {
+        kind: dispatch,
+        name: alert
+      }
+    },
+    {
+      when: {
+        kind: signalr,
+        hubUrl: /hubs/notifications,
+        method: ReceiveUpdate
+      },
+      run: {
+        kind: dispatch,
+        name: update
+      }
+    }
+  ]
+}

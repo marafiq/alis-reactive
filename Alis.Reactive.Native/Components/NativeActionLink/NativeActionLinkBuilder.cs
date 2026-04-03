@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.Native.Components
 {
+    /// <summary>
+    /// Builds a native anchor element whose click behavior is driven by a serialized reactive action.
+    /// </summary>
     public sealed class NativeActionLinkBuilder<TModel> : IHtmlContent
         where TModel : class
     {
@@ -24,12 +27,19 @@ namespace Alis.Reactive.Native.Components
             _payloadJson = payloadJson;
         }
 
+        /// <summary>Adds custom CSS classes to the anchor element.</summary>
+        /// <param name="css">The CSS classes to append.</param>
+        /// <returns>The current builder.</returns>
         public NativeActionLinkBuilder<TModel> CssClass(string css)
         {
             _cssClass = css;
             return this;
         }
 
+        /// <summary>Adds a non-reserved HTML attribute to the anchor element.</summary>
+        /// <param name="name">The attribute name.</param>
+        /// <param name="value">The attribute value.</param>
+        /// <returns>The current builder.</returns>
         public NativeActionLinkBuilder<TModel> Attr(string name, string value)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -48,6 +58,9 @@ namespace Alis.Reactive.Native.Components
             return this;
         }
 
+        /// <summary>Writes the anchor markup and serialized reactive payload.</summary>
+        /// <param name="writer">The writer that receives the markup.</param>
+        /// <param name="encoder">The encoder used for HTML attribute and content values.</param>
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             writer.Write("<a");

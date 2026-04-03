@@ -1,160 +1,119 @@
 # Alis.Reactive Framework
 
-C# fluent builders capture reactive browser intent as descriptors. `Html.RenderPlan(plan)`
-serializes to JSON validated against `reactive-plan.schema.json`. The JS runtime executes
-the plan — the only contract. C# never executes behavior, JS never invents it.
+Alis.Reactive is a clean-break V2 system.
 
-## Skills
+C# builders capture typed browser intent and render one JSON contract:
 
-| Skill | Status | Use for |
-|-------|--------|---------|
-| `reactive-dsl` | WIP | Plan, triggers, Element, Dispatch, Component, InputField, .Reactive() |
-| `http-pipeline` | OK | Get/Post, Gather, Response, Chained, Parallel, WhileLoading, Into |
-| `conditions-dsl` | OK | When/Then/ElseIf/Else, operators, guard composition, source types |
-| `validation-rules-alis-reactive` | WIP | FluentValidation rules, Validate, ValidationErrors, WhenField |
-| `onboard-fusion-component` | WIP | Adding SF components, 7-file vertical slice |
-| `dotnet-xml-docs` | OK | XML documentation on public types |
+- `version`
+- `contracts`
+- `objects`
+- `bindings`
+- `workflows`
 
-## Build & Run
+The browser runtime is a dumb executor for that contract. There is no legacy plan, no compatibility layer, and no second schema to reason about.
 
-```bash
-npm run build:all                # JS bundles + CSS
-dotnet build                     # All C# projects
-npm run build:api-docs           # API reference from XML docs
+## Quality Bar
 
-npm run watch                    # esbuild watch
-npm run watch:css                # Tailwind watch
-lsof -ti:5220 | xargs kill -9 2>/dev/null; dotnet run --project Alis.Reactive.SandboxApp
+- One active model only: V2.
+- No adapter, bridge, fallback, shim, or parallel implementation.
+- If a module makes the system harder to reason about than `main`, it is a bug.
+- Any old vocabulary that teaches the removed design is a bug.
+- Every class, helper, and test must satisfy SOLID and proper encapsulation.
+- Tests are behavior-first vertical slices, not internal implementation probes.
+- Runtime uses explicit object/member resolution only. No DOM scanning, no guessing.
 
-npm run typecheck                # TS type checking
-npm run lint                     # ESLint
-
-npm test                                                     # TS vitest
-dotnet test tests/Alis.Reactive.UnitTests                    # Core + schema
-dotnet test tests/Alis.Reactive.Native.UnitTests             # Native
-dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion
-dotnet test tests/Alis.Reactive.FluentValidator.UnitTests    # Validation
-dotnet test tests/Alis.Reactive.Analyzers.Tests              # Analyzers
-dotnet test tests/Alis.Reactive.DesignSystem.Tests           # Design system
-dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests       # Tag helpers
-dotnet test tests/Alis.Reactive.PlaywrightTests \
-  --logger "trx;LogFileName=playwright-results.trx" \
-  --results-directory TestResults
-./scripts/sonar-analyze.sh                                   # SonarQube (Docker)
-```
-
-After TS/CSS changes: `npm run build:all && dotnet build`, restart SandboxApp.
-All tests pass before every commit.
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| C# | .NET 10, **C# 8.0 enforced** in library projects. Apps/tests use latest. |
-| TS | TypeScript 5.8, esbuild ESM, Tailwind CSS v4 |
-| Components | Fusion (SF EJ2 32.x) + Native. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
-| Validation | FluentValidation 12.x |
-| Tests | NUnit 4.5 + Verify, Vitest 3.x + jsdom, Playwright 1.52 |
-
-## Process
-
-Pipeline: **C# → Schema → TS Types → TS Runtime → Browser → Docs**.
-Each layer has skills, thinking, and a test harness. A failing test drives every boundary crossing.
-
-Detailed flows in `.claude/rules/`: `process-pipeline.md`, `process-layers.md`, `process-task-types.md`
-
-### Prompt Clarity Gate
-Prompt must be clear and specific. If vague — stop, ask, push back, propose a checklist.
-
-### Plan — Identify Layers
-1. Which layers does this touch?
-2. Load applicable skills FIRST, before reading code.
-3. Survey code at each layer. Read, don't guess.
-4. Build a master task index (INVEST: Independent, Negotiable, Valuable, Estimable, Small, Testable).
-
-### Thoughtful Editing
-Before editing: understand the code path and blast radius. Design your strategy.
-Confirm right skills and processes are loaded and you are following the plan.
-If editing the same file multiple times, rethink your approach and design choices.
-
-### Wrong Plan Protocol
-If touching an unexpected layer, the plan or task is wrong. Stop, save learnings, return to planning.
-
-### Pre-flight
-- [ ] Loaded skills? Read source code at each layer touched?
-- [ ] Understood WHY the current code works the way it does?
-- [ ] Visibility (`internal`/`public`) chosen deliberately? API surface unchanged?
-- [ ] Input evidence: what proves this change is needed?
-
-### Post-flight
-- [ ] All tests pass? Verified in actual browser?
-- [ ] Each boundary crossing driven by a failing test?
-- [ ] Root cause fixed, not a patch? No code smells?
-- [ ] Output evidence: what proves this change is correct?
-- [ ] Coverage matrix: every item in scope mapped to a test or justified as untestable?
-
-## Rules
-
-### 1. Git Worktrees for Feature Work
+## Build & Verify
 
 ```bash
-git worktree add .worktrees/<feature-name> -b feature/<feature-name>
-cd .worktrees/<feature-name>
+npm run build:all
+dotnet build /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/schema-capability-design/Alis.Reactive.slnx -nologo -t:Rebuild
+npm run typecheck
+npm test
+
+dotnet test tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj -nologo
+dotnet test tests/Alis.Reactive.Native.UnitTests/Alis.Reactive.Native.UnitTests.csproj -nologo
+dotnet test tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj -nologo
+dotnet test tests/Alis.Reactive.FluentValidator.UnitTests/Alis.Reactive.FluentValidator.UnitTests.csproj -nologo
+dotnet test tests/Alis.Reactive.DriftDetection.Tests/Alis.Reactive.DriftDetection.Tests.csproj -nologo
+dotnet test tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj -nologo
 ```
 
-### 2. Plan Is the Only Contract
+For the full browser sweep with visible progress:
 
-No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
-No inline `<script>` blocks — `root.ts` handles discovery and boot automatically.
+```bash
+dotnet test tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj -nologo --logger "console;verbosity=detailed"
+```
 
-### 3. New or Changed Primitive — 10 Steps, All Layers
+## Mental Model
 
-1. C# descriptor — sealed class, `internal` constructor
-2. Polymorphic registration — `WriteOnlyPolymorphicConverter` switch
-3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
-4. JSON schema — failing `AssertSchemaValid()` test drives the update
-5. TS types — new interface in `Scripts/types/`, discriminated union
-6. Runtime handler — new switch case + `assertNever`
-7. C# unit test — `VerifyJson` snapshot + `AssertSchemaValid`
-8. TS unit test — runtime behavior via `boot()`
-9. Playwright test — browser behavior with sandbox view
-10. Sandbox view — demonstrate the primitive
+### C# authoring
 
+- `ReactivePlan<TModel>` owns the document being authored.
+- Builders create V2-native actions, predicates, requests, bindings, and workflows.
+- Components register capability contracts and runtime objects.
+- Typed expressions become value expressions and shapes.
 
-### 5. Vertical Slices — Duplication Over Abstraction
+### Rendered plan
 
-Each module is self-contained. No shared base classes for behavior.
-Duplication between slices is intentional.
+- `contracts` describe vendor-specific members and events.
+- `objects` name concrete runtime instances.
+- `bindings` define canonical reads for typed model fields.
+- `workflows` connect subscriptions to actions.
 
-### 6. Vendor Isolation
+### Browser runtime
 
-New component = C# vertical slice with `IInputComponent`. Zero TS runtime changes.
-`component.ts` is the ONLY module that maps vendor to root (`resolveRoot`, `evalRead`).
-Adding a third vendor must only touch `component.ts`. Vendor checks (`if vendor === "x"`)
-in other modules violate this rule — add exports to `component.ts` instead.
+- Resolve object.
+- Resolve member.
+- Evaluate value/predicate.
+- Execute action.
 
-### 7. Fail Fast — Fallbacks Are Exceptions
+Nothing in the runtime invents missing information.
 
-Default thinking is throw, not fallback. When something is missing or unknown, surface
-the error immediately. Fallbacks hide bugs for hours because wrong values propagate silently.
-A fallback is a rare, deliberate, justified exception — never the default response to uncertainty.
+## Architectural Rules
 
-### 8. Plan-Driven IDs — No DOM Scanning
+### 1. The plan is the contract
 
-`IdGenerator` generates every element ID from the model expression at C# render time.
-The plan carries IDs. Runtime uses `getElementById` only — direct lookup, zero scanning.
-If you think you need `querySelectorAll` or DOM traversal, the plan is missing information.
-Fix the C# descriptor to carry it.
+No inline JavaScript in views. No hidden browser behavior outside the rendered plan and explicit component boot slices.
 
-### 9. API Surface Is Frozen
+### 2. Vendor isolation
 
-Enforced by hookify rule `.claude/hookify.protect-api-surface.local.md`.
+Vendor differences live in declared capability contracts and resolvers. They do not leak into unrelated modules.
 
-### 10. Root Cause, Not Patch
+### 3. Fail fast
 
-Trace the full code path. Identify the exact line. Understand WHY before changing WHAT.
-If stuck after 2 attempts: research online, save findings to a temp file, dispatch agents
-with specific input and evidence-based output criteria. Fix the root cause. Verify in browser.
-Run all tests.
+Missing contract data is an error. Wrong shapes are errors. Unsupported paths are errors. Do not guess.
 
+### 4. Surgical runtime
 
+Use explicit ids and explicit object names. Do not introduce wide DOM queries when the plan can carry the information.
+
+### 5. Vertical slices
+
+Each component slice owns its contracts, event payloads, HTML helpers, builder surface, tests, and docs.
+
+### 6. Observability
+
+Tracing follows W3C/Otel-style context propagation. Requests carry `traceparent`. Logs and spans must describe real V2 behavior, not deleted concepts.
+
+## Change Rules
+
+When adding or changing a capability:
+
+1. Model it in V2 terms first.
+2. Keep the C# DSL compile-time safe.
+3. Serialize directly to the V2 schema.
+4. Keep the runtime dumb.
+5. Add or update unit, runtime, and Playwright coverage.
+6. Delete dead code immediately.
+
+## Review Questions
+
+Ask these every time:
+
+- Does this reduce tech debt compared with `main`?
+- Does this keep one active model only?
+- Is this class or helper SOLID and properly encapsulated?
+- Am I keeping code that should be deleted?
+- Does this test prove user-visible behavior instead of internals?
+
+If the answer is not clearly yes, stop and redesign.

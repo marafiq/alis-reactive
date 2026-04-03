@@ -9,11 +9,22 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/HttpPipeline/RealTime";
+    private const string PushResidentStatusPattern = "**/Sandbox/HttpPipeline/RealTime/PushResidentStatus";
 
     private ILocator PushStatusBtn => Page.Locator("#btn-push-status");
     private ILocator ResidentName => Page.Locator("#resident-name");
     private ILocator ResidentStatus => Page.Locator("#resident-status");
     private ILocator ResidentCareLevel => Page.Locator("#resident-care-level");
+
+    private async Task PushResidentStatus()
+    {
+        var response = await Page.RunAndWaitForResponseAsync(
+            async () => await ClickWhenStable(PushStatusBtn),
+            PushResidentStatusPattern);
+
+        Assert.That((int)response.Status, Is.EqualTo(200),
+            "PushResidentStatus must return 200 OK.");
+    }
 
     [Test]
     public async Task resident_details_update_from_second_hub()
@@ -22,7 +33,7 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
         await WaitForTraceMessage("booted", 10000);
         await WaitForTraceMessage("[alis:signalr] connected", 10000);
 
-        await PushStatusBtn.ClickAsync();
+        await PushResidentStatus();
 
         await Expect(ResidentName).ToContainTextAsync("Helen Martinez",
             new() { Timeout = 5000 });
@@ -40,7 +51,7 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
         await WaitForTraceMessage("[alis:signalr] connected", 10000);
 
         // Push to Hub 2 only
-        await PushStatusBtn.ClickAsync();
+        await PushResidentStatus();
 
         await Expect(ResidentName).ToContainTextAsync("Helen Martinez",
             new() { Timeout = 5000 });

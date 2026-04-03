@@ -1,5 +1,4 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -26,31 +25,33 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("checked", coerce: "boolean"), value: isChecked ? "true" : "false");
+            return self.Set("checked", isChecked, coerceAs: "boolean");
         }
 
         /// <summary>
         /// Moves keyboard focus into the checkbox.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeCheckBox, TModel> FocusIn<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("focus"));
+            return self.Call("focus");
         }
 
         /// <summary>
         /// Reads the current checked state for use in conditions or gather.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>A typed source representing the checkbox's current checked state.</returns>
-        public static TypedComponentSource<bool> Value<TModel>(
+        /// <param name="self">The component reference to operate on.</param>
+        /// <returns>A typed value expression representing the checkbox's current checked state.</returns>
+        public static ComponentValueExpression<bool> Value<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return new TypedComponentSource<bool>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            return new ComponentValueExpression<bool>(self.TargetId, _component.Vendor, _component.ValueMemberPath);
         }
     }
 }

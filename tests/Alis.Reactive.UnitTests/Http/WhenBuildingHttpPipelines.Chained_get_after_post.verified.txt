@@ -1,53 +1,109 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.save-status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.list: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::save-status: {
+      contract: element.save-status,
+      elementId: save-status
+    },
+    element::list: {
+      contract: element.list,
+      elementId: list
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/save,
-          gather: [
-            {
-              kind: static,
-              param: name,
-              value: John
+          input: {
+            transport: json,
+            value: {
+              kind: object,
+              fields: {
+                name: {
+                  kind: literal,
+                  value: John
+                }
+              }
             }
-          ],
+          },
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: save-status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::save-status,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: saved
                 }
-              ]
+              }
             }
           ],
-          chained: {
-            verb: GET,
+          next: {
+            method: GET,
             url: /api/list,
             onSuccess: [
               {
-                commands: [
-                  {
-                    kind: mutate-element,
-                    target: list,
-                    mutation: {
-                      kind: set-prop,
-                      prop: textContent
-                    },
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::list,
+                    member: text
+                  },
+                  value: {
+                    kind: literal,
                     value: refreshed
                   }
-                ]
+                }
               }
             ]
           }

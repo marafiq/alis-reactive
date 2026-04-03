@@ -1,11 +1,6 @@
-import { executeReaction } from "../../execution/execute";
+import { executeAction } from "../../execution/execute";
 import { scope } from "../../core/trace";
-import type {
-  Reaction,
-  RequestDescriptor,
-  StatusHandler,
-} from "../../types";
-import { assertNever } from "../../core/assert-never";
+import type { Plan, PlanAction, RequestPlan, ResponseHandlerPlan } from "../../types";
 
 const log = scope("native-action-link");
 const SELECTOR = "a[data-reactive-link]";
@@ -13,7 +8,8 @@ const SELECTOR = "a[data-reactive-link]";
 let initialized = false;
 
 interface NativeActionLinkPayload {
-  reaction: Reaction;
+  plan: Plan;
+  action: PlanAction;
 }
 
 export function initNativeActionLinks(): void {
@@ -39,10 +35,10 @@ function handleClick(event: MouseEvent): void {
   event.preventDefault();
 
   const payload = decodePayload(anchor);
-  bindHrefToSingleRequest(payload.reaction, anchor.getAttribute("href") ?? anchor.href);
+  bindHrefToSingleRequest(payload.action, anchor.getAttribute("href") ?? anchor.href);
   log.debug("activate", { id: anchor.id, href: anchor.href });
-  executeReaction(payload.reaction).catch(err =>
-    log.error("reaction failed", { error: String(err) })
+  executeAction(payload.action, { plan: payload.plan }).catch(error =>
+    log.error("action failed", { error: String(error) })
   );
 }
 
@@ -59,9 +55,9 @@ function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
   }
 }
 
-function bindHrefToSingleRequest(reaction: Reaction, href: string): void {
-  const state = { count: 0, request: undefined as RequestDescriptor | undefined };
-  resolveSingleRequest(reaction, state);
+function bindHrefToSingleRequest(action: PlanAction, href: string): void {
+  const state = { count: 0, request: undefined as RequestPlan | undefined };
+  resolveSingleRequest(action, state);
 
   if (state.count !== 1 || !state.request) {
     throw new Error("NativeActionLink requires exactly one request.");
@@ -70,35 +66,35 @@ function bindHrefToSingleRequest(reaction: Reaction, href: string): void {
   state.request.url = href;
 }
 
-function resolveSingleRequest(
-  reaction: Reaction,
-  state: { count: number; request?: RequestDescriptor }
-): void {
-  switch (reaction.kind) {
-    case "sequential":
+function resolveSingleRequest(action: PlanAction, state: { count: number; request?: RequestPlan }): void {
+  switch (action.kind) {
+    case "sequence":
+      for (const step of action.steps) resolveSingleRequest(step, state);
       return;
-    case "conditional":
-      for (const branch of reaction.branches) {
-        resolveSingleRequest(branch.reaction, state);
-      }
+
+    case "branch":
+      for (const branch of action.cases) resolveSingleRequest(branch.run, state);
       return;
-    case "http":
+
+    case "request":
       state.count++;
       if (state.count > 1) {
         throw new Error("NativeActionLink supports exactly one request.");
       }
-      assertRequestSupported(reaction.request);
-      state.request = reaction.request;
+      assertRequestSupported(action.request);
+      state.request = action.request;
       return;
-    case "parallel-http":
+
+    case "parallel":
       throw new Error("NativeActionLink does not support Parallel().");
+
     default:
-      assertNever(reaction, "reaction kind in NativeActionLink");
+      return;
   }
 }
 
-function assertRequestSupported(request: RequestDescriptor): void {
-  if (request.chained) {
+function assertRequestSupported(request: RequestPlan): void {
+  if (request.next) {
     throw new Error("NativeActionLink does not support chained requests.");
   }
 
@@ -106,36 +102,45 @@ function assertRequestSupported(request: RequestDescriptor): void {
     throw new Error("NativeActionLink does not support validation.");
   }
 
-  if (request.gather?.some(item => item.kind === "all")) {
+  if (request.input?.value.kind === "binding-map" && request.input.value.include === "all") {
     throw new Error("NativeActionLink does not support IncludeAll(). Use explicit gather instead.");
   }
 
+  assertActionContainsNoRequestList(request.before);
   assertHandlersContainNoRequest(request.onSuccess);
   assertHandlersContainNoRequest(request.onError);
+  assertActionContainsNoRequestList(request.onSettled);
 }
 
-function assertHandlersContainNoRequest(handlers?: StatusHandler[]): void {
+function assertHandlersContainNoRequest(handlers?: ResponseHandlerPlan[]): void {
   if (!handlers) return;
   for (const handler of handlers) {
-    if (handler.reaction) {
-      assertNestedReactionContainsNoRequest(handler.reaction);
-    }
+    assertNestedActionContainsNoRequest(handler.run);
   }
 }
 
-function assertNestedReactionContainsNoRequest(reaction: Reaction): void {
-  switch (reaction.kind) {
-    case "sequential":
+function assertActionContainsNoRequestList(actions?: PlanAction[]): void {
+  if (!actions) return;
+  for (const action of actions) {
+    assertNestedActionContainsNoRequest(action);
+  }
+}
+
+function assertNestedActionContainsNoRequest(action: PlanAction): void {
+  switch (action.kind) {
+    case "sequence":
+      for (const step of action.steps) assertNestedActionContainsNoRequest(step);
       return;
-    case "conditional":
-      for (const branch of reaction.branches) {
-        assertNestedReactionContainsNoRequest(branch.reaction);
-      }
+
+    case "branch":
+      for (const branch of action.cases) assertNestedActionContainsNoRequest(branch.run);
       return;
-    case "http":
-    case "parallel-http":
+
+    case "request":
+    case "parallel":
       throw new Error("NativeActionLink response handlers cannot start a second HTTP request.");
+
     default:
-      assertNever(reaction, "reaction kind in NativeActionLink handler");
+      return;
   }
 }

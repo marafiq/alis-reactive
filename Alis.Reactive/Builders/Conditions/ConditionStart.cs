@@ -1,6 +1,6 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Descriptors.Guards;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
@@ -19,11 +19,16 @@ namespace Alis.Reactive.Builders.Conditions
     /// <typeparam name="TModel">The view model type.</typeparam>
     public sealed class ConditionStart<TModel> where TModel : class
     {
+        private readonly PlanAuthoringContext _authoring;
+
         /// <summary>
         /// NEVER make public. Constructed by <see cref="GuardBuilder{TModel}.And(Func{ConditionStart{TModel}, GuardBuilder{TModel}})"/>
         /// and <see cref="GuardBuilder{TModel}.Or(Func{ConditionStart{TModel}, GuardBuilder{TModel}})"/>.
         /// </summary>
-        internal ConditionStart() { }
+        internal ConditionStart(PlanAuthoringContext authoring)
+        {
+            _authoring = authoring;
+        }
 
         /// <summary>
         /// Begins a condition on an event payload property inside a guard lambda.
@@ -37,19 +42,19 @@ namespace Alis.Reactive.Builders.Conditions
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            var source = new EventArgSource<TPayload, TProp>(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source);
+            var source = new EventValueExpression<TPayload, TProp>(path);
+            return new ConditionSourceBuilder<TModel, TProp>(source, _authoring);
         }
 
         /// <summary>
         /// Begins a condition on a component's current value inside a guard lambda.
         /// </summary>
         /// <typeparam name="TProp">The component's value type.</typeparam>
-        /// <param name="source">A typed source from a component's <c>Value()</c> extension.</param>
+        /// <param name="value">A typed value reference from a component's <c>Value()</c> extension.</param>
         /// <returns>A <see cref="ConditionSourceBuilder{TModel, TProp}"/> for applying an operator.</returns>
-        public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
+        public ConditionSourceBuilder<TModel, TProp> When<TProp>(ValueExpression<TProp> value)
         {
-            return new ConditionSourceBuilder<TModel, TProp>(source);
+            return new ConditionSourceBuilder<TModel, TProp>(value, _authoring);
         }
 
         /// <summary>
@@ -61,7 +66,7 @@ namespace Alis.Reactive.Builders.Conditions
         /// </returns>
         public GuardBuilder<TModel> Confirm(string message)
         {
-            return new GuardBuilder<TModel>(new ConfirmGuard(message));
+            return new GuardBuilder<TModel>(new ConfirmPredicate(message), _authoring);
         }
     }
 }

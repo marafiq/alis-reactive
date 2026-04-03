@@ -1,19 +1,17 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Events available on NativeHiddenField.
-    /// Singleton instance — used with .Reactive() event selector lambda:
-    ///   .Reactive(plan, evt => evt.Changed, (args, p) => { ... })
-    /// Hidden inputs rarely fire change events — this exists for completeness.
+    /// Exposes the reactive events available on <see cref="NativeHiddenField"/>.
     /// </summary>
     public sealed class NativeHiddenFieldEvents
     {
+        /// <summary>Gets the singleton event surface instance.</summary>
         public static readonly NativeHiddenFieldEvents Instance = new NativeHiddenFieldEvents();
         private NativeHiddenFieldEvents() { }
 
-        /// <summary>Fires when the hidden input value changes (DOM "change" event).</summary>
-        public TypedEventDescriptor<NativeHiddenFieldChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeHiddenFieldChangeArgs>(
+        /// <summary>Gets the hidden-field change event.</summary>
+        public ReactiveEvent<NativeHiddenFieldChangeArgs> Changed =>
+            new ReactiveEvent<NativeHiddenFieldChangeArgs>(
                 "change", new NativeHiddenFieldChangeArgs());
     }
 }

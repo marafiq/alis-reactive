@@ -1,120 +1,207 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.error: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.retry-hint: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        },
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::status: {
+      contract: element.status,
+      elementId: status
+    },
+    element::error: {
+      contract: element.error,
+      elementId: error
+    },
+    element::retry-hint: {
+      contract: element.retry-hint,
+      elementId: retry-hint
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/save,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::status,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: saved
                 }
-              ]
+              }
             }
           ],
           onError: [
             {
               statusCode: 400,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: error,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::error,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: validation failed
                 }
-              ]
+              }
             },
             {
               statusCode: 500,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: error,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::error,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: server error
                 }
-              ]
+              }
             }
           ]
         }
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.active
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: active
+                  }
+                ]
               },
-              coerceAs: boolean,
-              op: truthy
+              op: truthy,
+              as: {
+                kind: scalar,
+                type: boolean
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: retry-hint,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: try again
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::retry-hint,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: try again
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: retry-hint,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::retry-hint,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

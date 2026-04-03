@@ -1,3 +1,5 @@
+using Alis.Reactive.Playwright.Extensions;
+
 namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.CrossVendor;
 
 [TestFixture]
@@ -97,7 +99,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
         await NavigateAndBoot();
         await Page.Locator("#tw-comp-cond input").FillAsync("x");
         await Expect(Page.Locator("#comp-cond-ind")).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Page.Locator("#tw-comp-cond input").FillAsync("");
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
         AssertNoConsoleErrors();
@@ -216,7 +218,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
             .ToHaveTextAsync("has value", new() { Timeout = 3000 });
 
         // Step 3: clear the value → change event fires → condition evaluates empty → Else branch
-        await Page.Locator("#tw-comp-cond input").FillAsync("");
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 
@@ -250,7 +252,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
             .ToHaveValueAsync("bravo", new() { Timeout = 3000 });
 
         // Step 3: clearing source propagates empty to target
-        await Page.Locator("#tw-source input").FillAsync("");
+        await Page.Locator("#tw-source input").ClearWhenStableAsync(Page);
         await Expect(Page.Locator("#tw-target input"))
             .ToHaveValueAsync("", new() { Timeout = 3000 });
 
@@ -363,7 +365,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
             .ToHaveTextAsync("has value", new() { Timeout = 3000 });
 
         // Now clear — Else branch hides
-        await Page.Locator("#tw-comp-cond input").FillAsync("");
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 
@@ -625,11 +627,11 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
         await Expect(Page.Locator("#comp-cond-ind")).ToBeHiddenAsync();
 
         // Fill empty multiple times — indicator should remain hidden each time
-        await Page.Locator("#tw-comp-cond input").FillAsync("");
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 
-        await Page.Locator("#tw-comp-cond input").FillAsync("");
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 

@@ -178,54 +178,46 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("mutate-element"),
-            "Plan must contain mutate-element commands");
-        Assert.That(planJson, Does.Contain("\"prop\""),
-            "Plan must contain structured prop field for SetValue");
+        AssertV2Plan(planJson);
+        AssertV2MemberAction(planJson);
+        AssertPlanPathProp(planJson, "value");
         AssertNoConsoleErrors();
     }
 
     [Test]
     public async Task plan_carries_native_vendor_for_dropdown_mutations()
     {
-        // The plan must declare vendor "native" so the runtime resolves
-        // the raw DOM element (not ej2_instances). If vendor is wrong,
-        // resolveRoot returns undefined and SetValue silently fails.
+        // The plan must declare the native-element resolver so the runtime resolves
+        // the raw DOM element (not ej2_instances). If resolver is wrong,
+        // object access resolves the wrong root and SetValue silently fails.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""),
-            "Plan must carry vendor 'native' for dropdown mutations — " +
-            "runtime uses this to choose resolveRoot strategy");
+        AssertPlanResolver(planJson, "native-element");
         AssertNoConsoleErrors();
     }
 
     [Test]
     public async Task plan_carries_value_readexpr_for_component_source()
     {
-        // NativeDropDown.ReadExpr is "value" — the plan's ComponentSource must
-        // carry this so the runtime reads el.value (not el.checked or el.textContent).
-        // If readExpr changes or is lost, component value reads return wrong data.
+        // NativeDropDown reads through binding valueMember "value", not an ad-hoc valueMemberPath.
+        // If that member changes or is lost, component value reads return wrong data.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"value\""),
-            "Plan must carry readExpr 'value' for NativeDropDown component sources — " +
-            "runtime walks this path to read the selected value");
+        AssertPlanValueMember(planJson, "value");
         AssertNoConsoleErrors();
     }
 
     [Test]
     public async Task plan_carries_prop_value_for_setvalue_mutation()
     {
-        // SetValue writes to prop "value" (not "checked" or "textContent").
-        // If prop changes, the runtime writes to the wrong DOM property.
+        // SetValue writes through member path prop "value" (not "checked" or "textContent").
+        // If the path changes, the runtime writes to the wrong DOM property.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"prop\": \"value\""),
-            "Plan must carry prop 'value' for SetValue mutation — " +
-            "runtime uses bracket notation root[prop] = val");
+        AssertPlanPathProp(planJson, "value");
         AssertNoConsoleErrors();
     }
 

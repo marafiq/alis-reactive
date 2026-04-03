@@ -7,15 +7,15 @@ Two component values cannot be compared in conditions:
 var rate = p.Component<FusionNumericTextBox>(m => m.MonthlyRate);
 var budget = p.Component<FusionNumericTextBox>(m => m.Budget);
 
-p.When(rate.Value()).Lte(budget.Value())  // ❌ Lte takes TProp, not TypedSource<TProp>
+p.When(rate.Value()).Lte(budget.Value())  // ❌ Lte takes TProp, not ValueExpression<TProp>
 ```
 
 `ConditionSourceBuilder.Lte(TProp operand)` only accepts literal values.
-No overload accepts another `TypedSource<TProp>`.
+No overload accepts another `ValueExpression<TProp>`.
 
 ## Solution
 
-Add 6 overloads to `ConditionSourceBuilder` that accept `TypedSource<TProp>` as the right-hand side.
+Add 6 overloads to `ConditionSourceBuilder` that accept `ValueExpression<TProp>` as the right-hand side.
 Add `RightSource` property to `ValueGuard` for the plan JSON.
 Add 3 lines to the JS runtime to resolve `rightSource`.
 
@@ -46,15 +46,15 @@ Backward compatible: `RightSource` is null for all existing guards. Ignored in J
 ```csharp
 // Alis.Reactive/Builders/Conditions/ConditionSourceBuilder.cs
 
-// Source-vs-source comparison — right side is a TypedSource, not a literal
-public GuardBuilder<TModel> Eq(TypedSource<TProp> right)   => BuildVsSource(GuardOp.Eq, right);
-public GuardBuilder<TModel> NotEq(TypedSource<TProp> right) => BuildVsSource(GuardOp.Neq, right);
-public GuardBuilder<TModel> Gt(TypedSource<TProp> right)   => BuildVsSource(GuardOp.Gt, right);
-public GuardBuilder<TModel> Gte(TypedSource<TProp> right)  => BuildVsSource(GuardOp.Gte, right);
-public GuardBuilder<TModel> Lt(TypedSource<TProp> right)   => BuildVsSource(GuardOp.Lt, right);
-public GuardBuilder<TModel> Lte(TypedSource<TProp> right)  => BuildVsSource(GuardOp.Lte, right);
+// Source-vs-source comparison — right side is a ValueExpression, not a literal
+public GuardBuilder<TModel> Eq(ValueExpression<TProp> right)   => BuildVsSource(GuardOp.Eq, right);
+public GuardBuilder<TModel> NotEq(ValueExpression<TProp> right) => BuildVsSource(GuardOp.Neq, right);
+public GuardBuilder<TModel> Gt(ValueExpression<TProp> right)   => BuildVsSource(GuardOp.Gt, right);
+public GuardBuilder<TModel> Gte(ValueExpression<TProp> right)  => BuildVsSource(GuardOp.Gte, right);
+public GuardBuilder<TModel> Lt(ValueExpression<TProp> right)   => BuildVsSource(GuardOp.Lt, right);
+public GuardBuilder<TModel> Lte(ValueExpression<TProp> right)  => BuildVsSource(GuardOp.Lte, right);
 
-private GuardBuilder<TModel> BuildVsSource(string op, TypedSource<TProp> right)
+private GuardBuilder<TModel> BuildVsSource(string op, ValueExpression<TProp> right)
 {
     var leftSource = _typedSource.ToBindSource();
     var rightSource = right.ToBindSource();
@@ -150,7 +150,7 @@ Areas/Sandbox/Views/Conditions/SourceComparison.cshtml
 - All existing condition syntax (When, Then, ElseIf, Else, And, Or, Not)
 - All existing descriptors (Guard, AllGuard, AnyGuard, InvertGuard)
 - All existing builder classes (ConditionSourceBuilder, GuardBuilder, BranchBuilder)
-- All existing component extensions (.Value() returns TypedComponentSource)
+- All existing component extensions (.Value() returns ComponentValueExpression)
 - Confirm guard
 - Per-action When guard
 - FluentValidator

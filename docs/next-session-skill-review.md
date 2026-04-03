@@ -25,7 +25,7 @@ Real tasks per skill:
 - **reactive-dsl**: Write a view with DomReady + CustomEvent + InputField + Dispatch + RenderPlan
 - **http-pipeline**: Write a form that does POST with Gather (Include + FromEvent), chained response, WhileLoading
 - **conditions-dsl**: Write conditional show/hide with component source, cross-property, guard composition
-- **modern-csharp**: Write a sealed descriptor class with value object invariants, pattern matching, records
+- **modern-csharp**: Write a sealed plan model type with value object invariants, pattern matching, records
 
 ### Round 3: Fix + Top-10 Audit
 Apply fixes from both rounds. Run `verify-skill-top-10-things` on each. Fix description (third-person), add verification steps if missing, save A/B test log as `references/ab-test-log.md`.

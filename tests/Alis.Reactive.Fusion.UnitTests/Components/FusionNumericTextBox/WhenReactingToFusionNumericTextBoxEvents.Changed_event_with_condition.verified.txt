@@ -1,56 +1,117 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: number
+          },
+          access: write
+        }
+      }
+    },
+    element.echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount
+    },
+    element::echo: {
+      contract: element.echo,
+      elementId: echo
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: amount-guarded
+      when: {
+        kind: document-event,
+        name: amount-guarded
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.value
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: value
+                  }
+                ]
               },
-              coerceAs: number,
               op: gte,
-              operand: 100
+              right: {
+                kind: literal,
+                value: 100
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-                  mutation: {
-                    kind: set-prop,
-                    prop: value,
-                    coerce: number
-                  },
-                  value: 100,
-                  vendor: fusion
+            run: {
+              kind: set,
+              target: {
+                object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+                member: value
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: 100
+                },
+                to: {
+                  kind: scalar,
+                  type: number
                 }
-              ]
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: echo,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Under limit
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::echo,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Under limit
+              }
             }
           }
         ]

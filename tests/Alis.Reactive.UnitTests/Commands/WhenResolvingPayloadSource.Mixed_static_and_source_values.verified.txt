@@ -1,49 +1,131 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: test-event
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: label,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    element.label: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
-            },
-            value: Name:
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
           },
-          {
-            kind: mutate-element,
-            target: value,
-            mutation: {
-              kind: set-prop,
+          access: write
+        }
+      }
+    },
+    element.value: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        classAdd: {
+          kind: method,
+          path: [
+            {
+              prop: classList
             },
-            source: {
-              kind: event,
-              path: evt.stringValue
+            {
+              prop: add
+            }
+          ],
+          args: [
+            {
+              kind: scalar,
+              type: string
+            }
+          ],
+          returns: void
+        }
+      }
+    }
+  },
+  objects: {
+    element::label: {
+      contract: element.label,
+      elementId: label
+    },
+    element::value: {
+      contract: element.value,
+      elementId: value
+    },
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: test-event
+      },
+      run: {
+        kind: sequence,
+        steps: [
+          {
+            kind: set,
+            target: {
+              object: element::label,
+              member: text
+            },
+            value: {
+              kind: literal,
+              value: Name:
             }
           },
           {
-            kind: mutate-element,
-            target: status,
-            mutation: {
-              kind: call,
-              method: add,
-              chain: classList,
-              args: [
+            kind: set,
+            target: {
+              object: element::value,
+              member: text
+            },
+            value: {
+              kind: context,
+              scope: event,
+              path: [
                 {
-                  kind: literal,
-                  value: text-green
+                  prop: stringValue
                 }
               ]
             }
+          },
+          {
+            kind: call,
+            target: {
+              object: element::status,
+              member: classAdd
+            },
+            args: [
+              {
+                kind: literal,
+                value: text-green
+              }
+            ]
           }
         ]
       }

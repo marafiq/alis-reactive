@@ -1,83 +1,185 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.auth-status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.create-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.refresh-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.item-count: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::auth-status: {
+      contract: element.auth-status,
+      elementId: auth-status
+    },
+    element::create-result: {
+      contract: element.create-result,
+      elementId: create-result
+    },
+    element::refresh-result: {
+      contract: element.refresh-result,
+      elementId: refresh-result
+    },
+    element::item-count: {
+      contract: element.item-count,
+      elementId: item-count
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.active
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: active
+                  }
+                ]
               },
-              coerceAs: boolean,
-              op: truthy
+              op: truthy,
+              as: {
+                kind: scalar,
+                type: boolean
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: auth-status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: authorized
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::auth-status,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: authorized
+              }
             }
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/create,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: create-result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::create-result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: created
                 }
-              ]
+              }
             }
           ],
-          chained: {
-            verb: GET,
+          next: {
+            method: GET,
             url: /api/refresh,
             onSuccess: [
               {
-                commands: [
-                  {
-                    kind: mutate-element,
-                    target: refresh-result,
-                    mutation: {
-                      kind: set-prop,
-                      prop: textContent
-                    },
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::refresh-result,
+                    member: text
+                  },
+                  value: {
+                    kind: literal,
                     value: refreshed
                   }
-                ]
+                }
               }
             ]
           }
@@ -85,67 +187,72 @@
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.count
-              },
-              coerceAs: number,
-              op: gt,
-              operand: 0
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: item-count,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: count
                   }
+                ]
+              },
+              op: gt,
+              right: {
+                kind: literal,
+                value: 0
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::item-count,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: item-count,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::item-count,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

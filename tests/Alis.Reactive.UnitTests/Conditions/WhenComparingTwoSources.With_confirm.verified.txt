@@ -1,32 +1,105 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TwoSourceModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Rate: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Budget: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_UnitTests_TwoSourceModel__Rate: {
+      contract: fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+      elementId: Alis_Reactive_UnitTests_TwoSourceModel__Rate
+    },
+    component::Alis_Reactive_UnitTests_TwoSourceModel__Budget: {
+      contract: fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Budget,
+      elementId: Alis_Reactive_UnitTests_TwoSourceModel__Budget
+    },
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
+            when: {
               kind: all,
-              guards: [
+              terms: [
                 {
-                  kind: value,
-                  source: {
-                    kind: component,
-                    componentId: Alis_Reactive_UnitTests_TwoSourceModel__Rate,
-                    vendor: fusion,
-                    readExpr: value
+                  kind: compare,
+                  left: {
+                    kind: member,
+                    object: component::Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+                    member: value
                   },
-                  coerceAs: number,
                   op: gt,
-                  rightSource: {
-                    kind: component,
-                    componentId: Alis_Reactive_UnitTests_TwoSourceModel__Budget,
-                    vendor: fusion,
-                    readExpr: value
+                  right: {
+                    kind: member,
+                    object: component::Alis_Reactive_UnitTests_TwoSourceModel__Budget,
+                    member: value
+                  },
+                  as: {
+                    kind: scalar,
+                    type: number
                   }
                 },
                 {
@@ -35,30 +108,22 @@
                 }
               ]
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: dispatch,
-                  event: submit
-                }
-              ]
+            run: {
+              kind: dispatch,
+              name: submit
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Cancelled
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::status,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Cancelled
+              }
             }
           }
         ]

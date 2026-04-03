@@ -40,6 +40,44 @@ public abstract class FusionTestBase
 
     protected static TriggerBuilder<FusionTestModel> Trigger(ReactivePlan<FusionTestModel> plan) => new(plan);
 
+    protected static PipelineBuilder<FusionTestModel> CreateDomReadyPipeline()
+    {
+        var plan = CreatePlan();
+        var scope = plan.Authoring.CreateDomReadyScope();
+        return new PipelineBuilder<FusionTestModel>(plan.Authoring, scope);
+    }
+
+    protected static void WireObjectEvent(
+        ReactivePlan<FusionTestModel> plan,
+        string componentId,
+        string vendor,
+        string bindingPath,
+        string valueMemberPath,
+        string eventName,
+        Action<PipelineBuilder<FusionTestModel>> configure)
+    {
+        var scope = plan.Authoring.CreateObjectEventScope(componentId, vendor, bindingPath, valueMemberPath, eventName);
+        var pipeline = new PipelineBuilder<FusionTestModel>(plan.Authoring, scope);
+        configure(pipeline);
+        plan.AddWorkflow(scope, pipeline);
+    }
+
+    protected static void WireObjectEvent<TArgs>(
+        ReactivePlan<FusionTestModel> plan,
+        string componentId,
+        string vendor,
+        string bindingPath,
+        string valueMemberPath,
+        string eventName,
+        TArgs args,
+        Action<TArgs, PipelineBuilder<FusionTestModel>> configure)
+    {
+        var scope = plan.Authoring.CreateObjectEventScope(componentId, vendor, bindingPath, valueMemberPath, eventName);
+        var pipeline = new PipelineBuilder<FusionTestModel>(plan.Authoring, scope);
+        configure(args, pipeline);
+        plan.AddWorkflow(scope, pipeline);
+    }
+
     protected static void AssertSchemaValid(string planJson)
     {
         using var doc = JsonDocument.Parse(planJson);

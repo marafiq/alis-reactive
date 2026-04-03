@@ -1,7 +1,5 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -11,8 +9,8 @@ namespace Alis.Reactive.Native.Components
     /// <remarks>
     /// <para>
     /// <c>.Reactive()</c> is always the last call in the builder chain.
-    /// Native builders implement <see cref="IHtmlContent"/> directly, so no
-    /// separate <c>.Render()</c> is needed.
+    /// Native builders implement <c>IHtmlContent</c> directly, so no separate
+    /// <c>.Render()</c> is needed.
     /// </para>
     /// <code>
     /// .NativeTextBox(b => b
@@ -34,24 +32,27 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <typeparam name="TArgs">The event args type selected by <paramref name="eventSelector"/>.</typeparam>
         /// <param name="builder">The text box builder to wire events on.</param>
-        /// <param name="plan">The plan to add the reactive entry to.</param>
+        /// <param name="plan">The plan to add the reactive workflow to.</param>
         /// <param name="eventSelector">Selects which event to listen for (e.g. <c>evt => evt.Changed</c>).</param>
         /// <param name="pipeline">Configures the reactive pipeline that runs when the event fires.</param>
         /// <returns>The builder for continued chaining.</returns>
         public static NativeTextBoxBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeTextBoxBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,
-            Func<NativeTextBoxEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<NativeTextBoxEvents, ReactiveEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(NativeTextBoxEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
-
-            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, _component.Vendor, builder.BindingPath, _component.ReadExpr);
-            foreach (var reaction in pb.BuildReactions())
-                plan.AddEntry(new Entry(trigger, reaction));
+            var reactiveEvent = eventSelector(NativeTextBoxEvents.Instance);
+            var scope = plan.Authoring.CreateObjectEventScope(
+                builder.ElementId,
+                _component.Vendor,
+                builder.BindingPath,
+                _component.ValueMemberPath,
+                reactiveEvent.EventName);
+            var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
+            pipeline(reactiveEvent.Payload, pb);
+            plan.AddWorkflow(scope, pb);
 
             return builder;
         }

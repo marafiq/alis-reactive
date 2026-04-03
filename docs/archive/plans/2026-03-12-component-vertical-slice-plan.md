@@ -4,7 +4,7 @@
 
 **Goal:** Eliminate reflection, unify vendor root resolution, fix broken source bindings, make ComponentsMap the single source of truth, and deliver complete FusionNumericTextBox + FusionDropDownList vertical slices.
 
-**Architecture:** Components declare identity via instance interface properties (`Vendor`, `ReadExpr`) — C# 8.0 compatible, no `static abstract`. `ComponentRef<TComponent>` uses `new()` constraint with cached instance. The plan's ComponentsMap is populated at builder creation time. MutateElementCommand carries vendor for root resolution. BindSource is structured (EventSource + ComponentSource) everywhere — commands, guards, and conditions use the same pipeline. `TypedComponentSource<TProp>` preserves compile-time typed conditions.
+**Architecture:** Components declare identity via instance interface properties (`Vendor`, `ReadExpr`) — C# 8.0 compatible, no `static abstract`. `ComponentRef<TComponent>` uses `new()` constraint with cached instance. The plan's ComponentsMap is populated at builder creation time. MutateElementCommand carries vendor for root resolution. BindSource is structured (EventSource + ComponentSource) everywhere — commands, guards, and conditions use the same pipeline. `ComponentValueExpression<TProp>` preserves compile-time typed conditions.
 
 **Tech Stack:** C# (.NET 8, System.Text.Json), TypeScript (Vitest, jsdom), Playwright, NUnit + Verify, JSON Schema 2020-12
 
@@ -143,7 +143,7 @@ IReadableComponent."
 
 **Files:**
 - Modify: `Alis.Reactive/Builders/Conditions/BindSource.cs`
-- Create: `Alis.Reactive/Builders/Conditions/TypedComponentSource.cs`
+- Create: `Alis.Reactive/Builders/Conditions/ComponentValueExpression.cs`
 - Modify: `Alis.Reactive/Schemas/reactive-plan.schema.json`
 - Modify: `Alis.Reactive.SandboxApp/Scripts/types.ts`
 - Test: `dotnet build && npm run typecheck`
@@ -176,18 +176,18 @@ public sealed class ComponentSource : BindSource
 }
 ```
 
-**Step 2: Create TypedComponentSource.cs**
+**Step 2: Create ComponentValueExpression.cs**
 
 ```csharp
 namespace Alis.Reactive.Builders.Conditions;
 
-public sealed class TypedComponentSource<TProp> : TypedSource<TProp>
+public sealed class ComponentValueExpression<TProp> : ValueExpression<TProp>
 {
     private readonly string _componentId;
     private readonly string _vendor;
     private readonly string _readExpr;
 
-    public TypedComponentSource(string componentId, string vendor, string readExpr)
+    public ComponentValueExpression(string componentId, string vendor, string readExpr)
     {
         _componentId = componentId;
         _vendor = vendor;
@@ -249,10 +249,10 @@ Expected: Compiles. No test changes yet — these types are additive.
 **Step 6: Commit**
 
 ```bash
-git add -A && git commit -m "feat: add ComponentSource to BindSource + TypedComponentSource<TProp>
+git add -A && git commit -m "feat: add ComponentSource to BindSource + ComponentValueExpression<TProp>
 
-Structured source for reading component values. TypedComponentSource
-preserves typed condition pipeline alongside EventArgSource."
+Structured source for reading component values. ComponentValueExpression
+preserves typed condition pipeline alongside EventValueExpression."
 ```
 
 ---
@@ -333,8 +333,8 @@ public class ComponentRef<TComponent, TModel>
         return this;
     }
 
-    public TypedComponentSource<TProp> ReadProperty<TProp>(string property)
-        => new TypedComponentSource<TProp>(TargetId, _instance.Vendor, property);
+    public ComponentValueExpression<TProp> ReadProperty<TProp>(string property)
+        => new ComponentValueExpression<TProp>(TargetId, _instance.Vendor, property);
 }
 ```
 
@@ -372,10 +372,10 @@ public ElementBuilder<TModel> SetHtml(BindSource source)
 }
 ```
 
-And overloads accepting TypedSource<TProp> for consistency:
+And overloads accepting ValueExpression<TProp> for consistency:
 
 ```csharp
-public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
+public ElementBuilder<TModel> SetText<TProp>(ValueExpression<TProp> source)
 {
     _pipeline.AddCommand(new MutateElementCommand(
         _targetId, "el.textContent = val", source: source.ToBindSource()));
@@ -809,19 +809,19 @@ Delete ReadExprOverrides, WithReadExpr, HttpRequestBuilder.ReadExpr."
 
 ---
 
-### Task 9: PipelineBuilder.When(TypedSource) — Component Conditions
+### Task 9: PipelineBuilder.When(ValueExpression) — Component Conditions
 
 **Files:**
 - Modify: `Alis.Reactive/Builders/PipelineBuilder.cs` — add When overload
 - Create: `tests/Alis.Reactive.UnitTests/Conditions/WhenConditionReadsComponent.cs`
 - Test: `dotnet test tests/Alis.Reactive.UnitTests`
 
-**Step 1: Add When overload for TypedSource**
+**Step 1: Add When overload for ValueExpression**
 
 In `PipelineBuilder.cs`:
 
 ```csharp
-public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
+public ConditionSourceBuilder<TModel, TProp> When<TProp>(ValueExpression<TProp> source)
 {
     SetMode(PipelineMode.Conditional);
     return new ConditionSourceBuilder<TModel, TProp>(source, this);
@@ -868,7 +868,7 @@ Expected: Snapshot shows `source: { kind: "component", componentId: "...", vendo
 **Step 4: Commit**
 
 ```bash
-git add -A && git commit -m "feat: When(TypedSource) enables conditions reading component values
+git add -A && git commit -m "feat: When(ValueExpression) enables conditions reading component values
 
 Typed condition pipeline works with component sources — preserves
 compile-time coercion inference and guard operator type safety."
@@ -998,12 +998,12 @@ public static ComponentRef<FusionNumericTextBox, TModel> Decrement<TModel>(
 **Step 3: Add property read extensions (typed)**
 
 ```csharp
-public static TypedComponentSource<decimal> Value<TModel>(
+public static ComponentValueExpression<decimal> Value<TModel>(
     this ComponentRef<FusionNumericTextBox, TModel> self)
     where TModel : class
     => self.ReadProperty<decimal>(FusionNumericTextBox.ReadExpr);
 
-public static TypedComponentSource<decimal> Min<TModel>(
+public static ComponentValueExpression<decimal> Min<TModel>(
     this ComponentRef<FusionNumericTextBox, TModel> self)
     where TModel : class
     => self.ReadProperty<decimal>("min");
@@ -1162,7 +1162,7 @@ Add to architecture rules:
 - MutateElementCommand carries vendor — runtime resolves root before jsEmit
 - jsEmit operates on vendor-resolved root, never on raw DOM element for components
 - BindSource is structured everywhere — EventSource + ComponentSource, no raw strings
-- TypedComponentSource preserves typed condition pipeline
+- ComponentValueExpression preserves typed condition pipeline
 
 **Step 2: Full test suite**
 

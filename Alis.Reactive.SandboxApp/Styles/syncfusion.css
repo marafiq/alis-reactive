@@ -8,7 +8,7 @@
   --color-sf-primary-active: 94, 31, 44;
 
   /* SF font → our font */
-  --font-sf: 'Inter', system-ui, sans-serif;
+  --font-sf: 'Avenir Next', 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
 }
 
 .e-control,
@@ -170,7 +170,7 @@
 
 /* Rich Text Editor */
 .e-richtexteditor .e-rte-content .e-content {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-sf);
 }
 
 /* Uploader */

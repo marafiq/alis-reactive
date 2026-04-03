@@ -23,10 +23,11 @@ namespace Alis.Reactive.Fusion.Components
         /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
         /// <c>p.When(p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Document).Value()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the uploader's current file data.</returns>
-        public static TypedComponentSource<string> Value<TModel>(
+        /// <param name="self">The component reference to operate on.</param>
+        /// <returns>A typed value expression representing the uploader's current file data.</returns>
+        public static ComponentValueExpression<string> Value<TModel>(
             this ComponentRef<FusionFileUpload, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
     }
 }

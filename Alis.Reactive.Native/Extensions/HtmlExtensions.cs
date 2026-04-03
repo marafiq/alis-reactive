@@ -29,14 +29,14 @@ namespace Alis.Reactive.Native.Extensions
         /// @Html.RenderPlan(plan)
         /// </code>
         /// <para>
-        /// A trigger is a browser event that starts a reaction: the page loading (<c>DomReady</c>),
+        /// A trigger is a browser event that starts a workflow: the page loading (<c>DomReady</c>),
         /// a custom event (<c>CustomEvent</c>), a server-sent event (<c>ServerPush</c>), or a
         /// SignalR message (<c>SignalR</c>). When the trigger fires, the commands declared in
         /// its callback execute in declaration order.
         /// </para>
         /// <para>
         /// Avoid defining the same event twice in the same view. Duplicate listeners are
-        /// rarely needed and usually indicate the reaction should be combined into one block.
+        /// rarely needed and usually indicate the workflow should be combined into one block.
         /// </para>
         /// </remarks>
         /// <typeparam name="TModel">The view model type</typeparam>

@@ -46,12 +46,12 @@ GATHER_ITEM :=
   | g.IncludeAll()
 ```
 
-| Method | Resolves | Example JSON |
+| Method | Resolves | V2 lowering |
 |--------|----------|--------------|
 | `Static("page", 1)` | Literal at plan time | `{ kind: "static", param: "page", value: 1 }` |
 | `FromEvent(args, x => x.Text, "q")` | Event payload at runtime | `{ kind: "event", param: "q", path: "evt.text" }` |
-| `Include<FusionAutoComplete, M>(m => m.Name)` | Component value at runtime | `{ kind: "component", componentId: "...", vendor: "fusion", readExpr: "value" }` |
-| `IncludeAll()` | All registered components | Expands at render time to ComponentGather items |
+| `Include<FusionAutoComplete, M>(m => m.Name)` | Component value at runtime | value expression targeting the component's registered binding/member |
+| `IncludeAll()` | All registered components | `binding-map: all` |
 
 **FromEvent vs Include:**
 - `FromEvent` — value from the event that triggered this pipeline (e.g., filtering text)

@@ -17,9 +17,10 @@ public class WhenSerializingANativeActionLink
 
         using var doc = JsonDocument.Parse(contract.PayloadJson);
         var root = doc.RootElement;
+        var request = FindFirstRequest(root.GetProperty("action"));
 
-        Assert.That(root.GetProperty("reaction").GetProperty("kind").GetString(), Is.EqualTo("http"));
-        Assert.That(root.GetProperty("reaction").GetProperty("request").GetProperty("url").GetString(), Is.EqualTo(string.Empty));
+        Assert.That(root.TryGetProperty("plan", out _), Is.True);
+        Assert.That(request.GetProperty("url").GetString(), Is.EqualTo("/orders/page/2"));
     }
 
     [Test]
@@ -30,8 +31,8 @@ public class WhenSerializingANativeActionLink
             p => p.Post("/orders/page/2"));
 
         using var doc = JsonDocument.Parse(contract.PayloadJson);
-        var request = doc.RootElement.GetProperty("reaction").GetProperty("request");
-        Assert.That(request.GetProperty("url").GetString(), Is.EqualTo(string.Empty));
+        var request = FindFirstRequest(doc.RootElement.GetProperty("action"));
+        Assert.That(request.GetProperty("url").GetString(), Is.EqualTo("/orders/page/2"));
     }
 
     [Test]
@@ -54,7 +55,7 @@ public class WhenSerializingANativeActionLink
                 p => p.Post("/orders/save")
                     .Response(r => r.Chained(c => c.Get("/orders/after-save")))));
 
-        Assert.That(ex!.Message, Does.Contain("exactly one request"));
+        Assert.That(ex!.Message, Does.Contain("Response.Chained(...) is not supported"));
     }
 
     [Test]
@@ -66,7 +67,7 @@ public class WhenSerializingANativeActionLink
                 p => p.Post("/orders/save")
                     .Response(r => r.OnSuccess(x => x.Post("/orders/after-save")))));
 
-        Assert.That(ex!.Message, Does.Contain("exactly one request"));
+        Assert.That(ex!.Message, Does.Contain("response handlers cannot start a second HTTP request"));
     }
 
     [Test]
@@ -79,12 +80,11 @@ public class WhenSerializingANativeActionLink
                     .Response(r => r.OnSuccess(x => x.Dispatch("deleted")))));
 
         using var doc = JsonDocument.Parse(contract.PayloadJson);
-        var reaction = doc.RootElement.GetProperty("reaction");
-        Assert.That(reaction.GetProperty("kind").GetString(), Is.EqualTo("conditional"));
+        var action = doc.RootElement.GetProperty("action");
+        Assert.That(action.GetProperty("kind").GetString(), Is.EqualTo("branch"));
 
-        var branchReaction = reaction.GetProperty("branches")[0].GetProperty("reaction");
-        Assert.That(branchReaction.GetProperty("kind").GetString(), Is.EqualTo("http"));
-        Assert.That(branchReaction.GetProperty("request").GetProperty("url").GetString(), Is.EqualTo(string.Empty));
+        var request = FindFirstRequest(action);
+        Assert.That(request.GetProperty("url").GetString(), Is.EqualTo("/orders/delete/42"));
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class WhenSerializingANativeActionLink
             NativeActionLinkSerializer.CreateContract<NativeTestModel>(
                 "/orders/save",
                 p => p.Post("/orders/save")
-                    .Validate(new Alis.Reactive.Validation.ValidationDescriptor("form", new System.Collections.Generic.List<Alis.Reactive.Validation.ValidationField>()))));
+                    .Validate(new Alis.Reactive.Validation.FormValidation("form", new System.Collections.Generic.List<Alis.Reactive.Validation.ValidationField>()))));
 
         Assert.That(ex!.Message, Does.Contain("validation"));
     }
@@ -121,6 +121,38 @@ public class WhenSerializingANativeActionLink
                     .Then(t => t.Delete("/orders/delete/42")
                         .Response(r => r.OnSuccess(x => x.Post("/orders/after-delete"))))));
 
-        Assert.That(ex!.Message, Does.Contain("exactly one request"));
+        Assert.That(ex!.Message, Does.Contain("response handlers cannot start a second HTTP request"));
+    }
+
+    private static JsonElement FindFirstRequest(JsonElement action)
+    {
+        var kind = action.GetProperty("kind").GetString();
+        return kind switch
+        {
+            "request" => action.GetProperty("request"),
+            "sequence" => action.GetProperty("steps").EnumerateArray()
+                .Select(FindFirstRequestOrDefault)
+                .First(x => x.ValueKind != JsonValueKind.Undefined),
+            "branch" => action.GetProperty("cases").EnumerateArray()
+                .Select(x => FindFirstRequestOrDefault(x.GetProperty("run")))
+                .First(x => x.ValueKind != JsonValueKind.Undefined),
+            _ => default
+        };
+    }
+
+    private static JsonElement FindFirstRequestOrDefault(JsonElement action)
+    {
+        var kind = action.GetProperty("kind").GetString();
+        return kind switch
+        {
+            "request" => action.GetProperty("request"),
+            "sequence" => action.GetProperty("steps").EnumerateArray()
+                .Select(FindFirstRequestOrDefault)
+                .FirstOrDefault(x => x.ValueKind != JsonValueKind.Undefined),
+            "branch" => action.GetProperty("cases").EnumerateArray()
+                .Select(x => FindFirstRequestOrDefault(x.GetProperty("run")))
+                .FirstOrDefault(x => x.ValueKind != JsonValueKind.Undefined),
+            _ => default
+        };
     }
 }

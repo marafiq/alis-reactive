@@ -1,6 +1,6 @@
 ---
 name: solid-ts-audit
-description: Audits TypeScript modules for SOLID violations, coupling issues, and code smells. Applies before proposing structural changes to TS runtime modules. Covers adding new command kinds, trigger kinds, or vendor types to verify extensibility.
+description: Audits TypeScript modules for SOLID violations, coupling issues, and code smells. Applies before proposing structural changes to TS runtime modules. Covers adding new action kinds, subscription kinds, or vendor resolvers to verify extensibility.
 ---
 
 # SOLID TypeScript Module Audit
@@ -16,7 +16,7 @@ Audit TS modules using SOLID principles (Uncle Bob), code smells (Fowler), and c
 ## When to Use
 
 - Before proposing structural changes to any `.ts` module
-- When adding a new command kind, trigger kind, or vendor type
+- When adding a new action kind, subscription kind, or vendor resolver
 - When a bug fix requires touching 3+ files (Shotgun Surgery signal)
 - When reviewing module boundaries after feature additions
 - When `git log` shows the same files changing together repeatedly
@@ -47,23 +47,23 @@ For each module, ask: **"WHO would request changes to this module?"**
 
 | Actor | Meaning | Example |
 |-------|---------|---------|
-| "Anyone adding a new command kind" | Extension actor | types.ts, execute.ts |
-| "Anyone changing vendor resolution" | Vendor actor | component.ts |
-| "Anyone changing coercion semantics" | Data transformation actor | resolver.ts |
+| "Anyone adding a new action kind" | Extension actor | types/plan.ts, execution/execute.ts |
+| "Anyone changing vendor resolution" | Vendor actor | resolution/contracts.ts |
+| "Anyone changing value shaping semantics" | Data transformation actor | resolution/values.ts, core/coerce.ts |
 | "Anyone changing validation display" | UI actor | error-display.ts |
 
-2+ actors = Divergent Change. One actor through multiple operations (e.g., `resolver.ts` resolve + coerce) is cohesive.
+2+ actors = Divergent Change. One actor through multiple operations (for example, `resolution/values.ts` walking and shaping values) is cohesive.
 
 ### Step 2: Change-Relative Coupling Analysis
 
 | Change scenario | Files touched | Verdict |
 |-----------------|---------------|---------|
-| Add new command kind | ? | >2 = Shotgun Surgery |
-| Add new trigger kind | ? | >2 = Shotgun Surgery |
+| Add new action kind | ? | >2 = Shotgun Surgery |
+| Add new subscription kind | ? | >2 = Shotgun Surgery |
 | Add new vendor | ? | >1 = coupling leak |
 | Add new coercion type | ? | >2 = Shotgun Surgery |
 | Add new validation rule | ? | >2 = Shotgun Surgery |
-| Make a command kind async | ? | >1 = sync/async boundary cascade |
+| Make an action kind async | ? | >1 = sync/async boundary cascade |
 | Fix a bug in conditions | ? | >1 = cascade risk |
 
 **How to measure:** `git log --name-only` on related commits. Files that change together ARE coupled. Only audit coupling for changes that ACTUALLY happen or are LIKELY to happen.
@@ -86,27 +86,26 @@ Dependencies must point toward stability.
 
 ```
 Most stable (pure, no deps)     ←  Everything depends inward
-├── walk.ts                         (zero deps)
-├── types.ts                        (zero deps)
-├── trace.ts                        (zero deps)
-├── resolver.ts                     (depends on walk, component, trace)
-├── component.ts                    (depends on walk, trace)
-├── rule-engine.ts                  (depends on types only)
-├── condition.ts (validation)       (depends on types only)
+├── core/walk.ts                    (zero deps)
+├── types/plan.ts                   (zero deps)
+├── core/trace.ts                   (depends on types/context)
+├── resolution/contracts.ts         (depends on walk, types)
+├── resolution/values.ts            (depends on coerce, walk, contracts)
+├── conditions/conditions.ts        (depends on values, trace)
+├── validation/error-display.ts     (DOM only)
 │
-├── element.ts                      (depends on resolver, component)
-├── conditions.ts (guards)          (depends on resolver, coerce, trace, assert-never)
-├── commands.ts                     (depends on element, conditions, validation, inject)
-├── execute.ts                      (depends on commands, conditions, pipeline)
-├── pipeline/http/gather            (colocated in execution/ — same actor)
-├── gather.ts                       (depends on component, walk, coerce, trace, assert-never)
-├── retry-indicator.ts              (depends on types, trace)
-├── server-push.ts                  (depends on execute, retry-indicator, trace)
-├── signalr.ts                      (depends on execute, retry-indicator, trace, @microsoft/signalr)
+├── validation/orchestrator.ts      (depends on conditions, values, contracts)
+├── validation/live-clear.ts        (depends on contracts, orchestrator, error-display, trace)
+├── execution/execute.ts            (depends on conditions, contracts, values, validation, inject, http)
+├── execution/http.ts               (depends on values, validation, execute, trace)
+├── execution/retry-indicator.ts    (depends on execute, trace)
+├── execution/server-push.ts        (depends on execute, retry-indicator, trace)
+├── execution/signalr.ts            (depends on execute, retry-indicator, trace, @microsoft/signalr)
 │
-├── trigger.ts                      (depends on execute, server-push, signalr)
-├── boot.ts                         (depends on trigger, enrichment, validation, walk-reactions)
-├── root.ts                         (depends on boot — entry point)
+├── execution/trigger.ts            (depends on values, contracts, execute, server-push, signalr, trace)
+├── lifecycle/merge-plan.ts         (depends on contract-map, object-map)
+├── lifecycle/boot.ts               (depends on trigger, live-clear, error-display, merge-plan, trace)
+├── root.ts                         (depends on boot and side-effect component initializers)
 Least stable (side effects, DOM)
 ```
 
@@ -114,29 +113,29 @@ Least stable (side effects, DOM)
 
 ### Step 5: Extension Check (OCP + LSP)
 
-For each discriminated union (`Command`, `Trigger`, `Mutation`, `Guard`, `Reaction`, `BindSource`, `GatherItem`, `MethodArg`):
+For each active discriminated union in the V2 runtime (`PlanAction`, `PlanSubscription`, `PlanPredicate`, `ValueExpr`, `ContractMember`, `RequestInput`):
 
 1. **Where is the switch?** One switch in one place = acceptable (TanStack pattern). Same switch in 2+ files = violation. **Nuance:** Repeated switches on the SAME discriminated union but with DIFFERENT target types (e.g., event object vs DOM element) may be acceptable duplication. Weigh the cost of introducing a target abstraction against the cost of the duplication before refactoring.
 2. **Is the resolved root substitutable?** After `resolveRoot()`, does ANY downstream code check vendor? If yes = LSP violation.
 3. **Can you add a new kind by writing NEW code only?** If modifying existing code = OCP violation.
 
-**Acceptable OCP cost:** Adding a new command kind requires updating `types.ts` (union) + `commands.ts` (switch) + tests. That's the minimum — two files plus tests. If it requires more, investigate.
+**Acceptable OCP cost:** Adding a new action kind requires updating `types/plan.ts` (union) + `execution/execute.ts` (switch) + tests. Adding a new subscription kind should touch `types/plan.ts` + `execution/trigger.ts` + tests. If it requires more, investigate.
 
 ### Step 6: Export Surface Check (ISP)
 
 For each module, count: exports used by other modules vs total exports.
 
 ```
-Module: resolver.ts
-  Exports: resolveSource, resolveEventPath, resolveSourceAs (3)
-  Used by element.ts: resolveSource (1/3)
-  Used by conditions.ts: resolveSource, resolveSourceAs (2/3)
-  Note: coerce lives in core/coerce.ts, not resolver.ts
+Module: resolution/contracts.ts
+  Exports: getObject, getContract, readMemberValue, setMemberValue, callMember (5)
+  Used by execute.ts: getObject, setMemberValue, callMember (3/5)
+  Used by values.ts: getBindingValue, getBindingShape, readMemberValue (3/5)
+  Note: shaping lives in resolution/values.ts, not contracts.ts
 ```
 
 **If <50% of exports are used by any single consumer,** the module may be too broad. Consider splitting.
 
-**Concrete ISP violation:** `PlanRegistry` is exported from `merge-plan.ts` but has zero external importers. All consumers use the delegating functions (`mergePlan`, `getPlan`, etc.). The class export violates ISP — it exposes internals that no consumer needs.
+**Concrete ISP violation:** if `PlanRegistry` is exported from `merge-plan.ts` but all consumers use delegating functions (`mergePlan`, `getPlan`, etc.), the class export violates ISP because it exposes internals that no consumer needs.
 
 **Exception:** Utility modules (walk.ts) can have broad exports — they serve many consumers by design.
 
@@ -167,14 +166,14 @@ function assertNever(value: never, context: string): never {
   throw new Error(`Unhandled ${context}: ${(value as any).kind ?? value}`);
 }
 // In every switch on discriminated unions:
-default: assertNever(cmd, "command kind");
+default: assertNever(action, "action kind");
 ```
 Zero cost. Compile-time enforcement. Strict improvement over silent miss.
 
 ### Async vs Sync Dual Path
-- Current dual path: zero overhead, ~40 lines duplicated — **acceptable for 4 stable reaction kinds**
+- Current dual path: zero overhead, ~40 lines duplicated — **acceptable for 4 stable subscription kinds**
 - Unified async: eliminates duplication, 1 microtick/await overhead — negligible at UI scale
-- Revisit if reaction kinds grow to 8+
+- Revisit if subscription kinds grow to 8+
 
 ### Chaining vs Function Dispatch
 - **C# DSL chaining** — correct for configuration (Fowler endorses for value objects)
@@ -218,9 +217,9 @@ Zero cost. Compile-time enforcement. Strict improvement over silent miss.
 
 ## Red Flags — STOP and Investigate
 
-- Module imports from 5+ other modules (possible god module). Exception: dispatcher modules (like commands.ts) that coordinate N command handlers MUST import those handlers. Check whether each import maps to a distinct case in a switch — if so, it is coordination, not a god module.
+- Module imports from 5+ other modules (possible god module). Exception: dispatcher modules (like execute.ts) that coordinate action handlers may need broad imports. Check whether each import maps to a distinct case in a switch — if so, it is coordination, not a god module.
 - Circular imports between any two modules
-- `vendor` string checked outside component.ts
+- `vendor` string checked outside `resolution/contracts.ts`
 - Module-level `let` mutated by 3+ functions
 - Same `switch(x.kind)` in 2+ files
 - Function with 6+ parameters or any boolean flag parameter

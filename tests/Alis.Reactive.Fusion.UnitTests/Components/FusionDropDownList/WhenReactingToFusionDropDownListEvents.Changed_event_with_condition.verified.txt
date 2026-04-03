@@ -1,55 +1,110 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status
+    },
+    element::echo: {
+      contract: element.echo,
+      elementId: echo
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: status-guarded
+      when: {
+        kind: document-event,
+        name: status-guarded
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.value
-              },
-              coerceAs: string,
-              op: eq,
-              operand: US
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-                  mutation: {
-                    kind: set-prop,
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
                     prop: value
-                  },
-                  value: US,
-                  vendor: fusion
-                }
-              ]
+                  }
+                ]
+              },
+              op: eq,
+              right: {
+                kind: literal,
+                value: US
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+                member: value
+              },
+              value: {
+                kind: literal,
+                value: US
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: echo,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Not US
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::echo,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Not US
+              }
             }
           }
         ]

@@ -109,7 +109,7 @@ pipeline.Component<FusionAutoComplete>(m => m.Search).Disable();
 
 ### Reads — .Value()
 
-`.Value()` returns a `TypedComponentSource<TProp>` — a typed reference to the component's current value on the page. Use it in conditions or pass it to `SetText`:
+`.Value()` returns a `ComponentValueExpression<TProp>` — a typed reference to the component's current value on the page. Use it in conditions or pass it to `SetText`:
 
 ```csharp
 var country = pipeline.Component<FusionDropDownList>(m => m.Country);
@@ -126,11 +126,11 @@ The return type matches the component's semantic type:
 
 | Component | .Value() type |
 |-----------|--------------|
-| NativeTextBox, FusionDropDownList, FusionAutoComplete | `TypedComponentSource<string>` |
-| NativeCheckList, FusionMultiSelect | `TypedComponentSource<string[]>` |
-| NativeCheckBox, FusionSwitch | `TypedComponentSource<bool>` |
-| FusionNumericTextBox | `TypedComponentSource<decimal>` |
-| FusionDatePicker, FusionTimePicker | `TypedComponentSource<DateTime>` |
+| NativeTextBox, FusionDropDownList, FusionAutoComplete | `ComponentValueExpression<string>` |
+| NativeCheckList, FusionMultiSelect | `ComponentValueExpression<string[]>` |
+| NativeCheckBox, FusionSwitch | `ComponentValueExpression<bool>` |
+| FusionNumericTextBox | `ComponentValueExpression<decimal>` |
+| FusionDatePicker, FusionTimePicker | `ComponentValueExpression<DateTime>` |
 
 FusionDateRangePicker exposes two reads:
 

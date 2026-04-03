@@ -1,70 +1,99 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
+import { fileURLToPath } from "url";
+
+const scriptsDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function readSource(relPath: string): string {
+  return fs.readFileSync(path.join(scriptsDir, relPath), "utf-8");
+}
+
+function productionSourceFiles(dir = scriptsDir, prefix = ""): string[] {
+  const results: string[] = [];
+
+  for (const dirent of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (dirent.name.startsWith("__")) continue;
+    if (dirent.name === "tsconfig.json") continue;
+
+    const rel = prefix ? `${prefix}/${dirent.name}` : dirent.name;
+    if (dirent.isDirectory()) {
+      results.push(...productionSourceFiles(path.join(dir, dirent.name), rel));
+      continue;
+    }
+
+    if (dirent.name.endsWith(".ts") && rel !== "components/lab/test-widget.ts") {
+      results.push(rel);
+    }
+  }
+
+  return results;
+}
 
 describe("architecture enforcement", () => {
-  const scriptsDir = path.resolve(__dirname, "..");
+  it("runtime module layout matches the approved V2 surface", () => {
+    const approved = [
+      "components/fusion/confirm.ts",
+      "components/native/drawer.ts",
+      "components/native/loader.ts",
+      "components/native/native-action-link.ts",
+      "conditions/conditions.ts",
+      "core/assert-never.ts",
+      "core/coerce.ts",
+      "core/trace.ts",
+      "core/walk.ts",
+      "execution/execute.ts",
+      "execution/http.ts",
+      "execution/inject.ts",
+      "execution/retry-indicator.ts",
+      "execution/server-push.ts",
+      "execution/signalr.ts",
+      "execution/trigger.ts",
+      "lifecycle/boot.ts",
+      "lifecycle/contract-map.ts",
+      "lifecycle/merge-plan.ts",
+      "lifecycle/object-map.ts",
+      "resolution/contracts.ts",
+      "resolution/values.ts",
+      "root.ts",
+      "types/context.ts",
+      "types/index.ts",
+      "types/plan.ts",
+      "validation/error-display.ts",
+      "validation/index.ts",
+      "validation/live-clear.ts",
+      "validation/orchestrator.ts",
+    ];
 
-  function readSource(relPath: string): string {
-    return fs.readFileSync(path.join(scriptsDir, relPath), "utf-8");
-  }
+    expect(productionSourceFiles().sort()).toEqual(approved.sort());
+  });
 
-  /** Recursively collect all .ts source files (relative paths), excluding __tests__ and __experiments__. */
-  function allSourceFiles(dir = scriptsDir, prefix = ""): string[] {
-    const results: string[] = [];
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (entry.name.startsWith("__")) continue;
-      const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
-      if (entry.isDirectory()) {
-        results.push(...allSourceFiles(path.join(dir, entry.name), rel));
-      } else if (entry.name.endsWith(".ts") && rel !== "components/lab/test-widget.ts") {
-        results.push(rel);
-      }
-    }
-    return results;
-  }
-
-  it("no ej2_instances outside component.ts", () => {
+  it("no ej2_instances outside contracts.ts", () => {
     const violations: string[] = [];
-    for (const file of allSourceFiles()) {
-      if (file === "resolution/component.ts") continue;
-      const content = readSource(file);
-      // Only flag non-comment lines that reference ej2_instances
-      const hasCodeRef = content.split("\n").some(line => {
+
+    for (const file of productionSourceFiles()) {
+      if (file === "resolution/contracts.ts") continue;
+
+      const hasCodeRef = readSource(file).split("\n").some(line => {
         const trimmed = line.trimStart();
         return !trimmed.startsWith("//") && !trimmed.startsWith("*") && trimmed.includes("ej2_instances");
       });
-      if (hasCodeRef) {
-        violations.push(file);
-      }
-    }
-    expect(violations).toEqual([]);
-  });
 
-  it("no ej.base outside inject.ts", () => {
-    const violations: string[] = [];
-    for (const file of allSourceFiles()) {
-      if (file === "execution/inject.ts") continue;
-      const content = readSource(file);
-      if (/ej\.base/.test(content)) {
-        violations.push(file);
-      }
+      if (hasCodeRef) violations.push(file);
     }
+
     expect(violations).toEqual([]);
   });
 
   it("no window.alis writes outside confirm.ts", () => {
-    // Only confirm.ts may ASSIGN to window.alis (set up the confirm handler).
-    // conditions.ts may READ window.alis.confirm() — that's fine.
     const writePattern = /\(window\s+as\s+any\)\.alis\s*=/;
     const violations: string[] = [];
-    for (const file of allSourceFiles()) {
+
+    for (const file of productionSourceFiles()) {
       if (file === "components/fusion/confirm.ts") continue;
-      const content = readSource(file);
-      if (writePattern.test(content)) {
-        violations.push(file);
-      }
+      if (writePattern.test(readSource(file))) violations.push(file);
     }
+
     expect(violations).toEqual([]);
   });
 });

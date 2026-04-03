@@ -1,57 +1,90 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: category-exclude
+      when: {
+        kind: document-event,
+        name: category-exclude
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.category
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: category
+                  }
+                ]
               },
-              coerceAs: string,
               op: not-in,
-              operand: [
-                X,
-                Y
-              ]
+              right: {
+                kind: literal,
+                value: [
+                  X,
+                  Y
+                ]
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Allowed
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::result,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Allowed
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Blocked
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::result,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Blocked
+              }
             }
           }
         ]

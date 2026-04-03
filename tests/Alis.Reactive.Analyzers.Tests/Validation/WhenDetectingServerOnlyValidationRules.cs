@@ -117,8 +117,8 @@ public class MyValidator : AbstractValidator<MyModel>
     [Test]
     public async Task SetValidator_in_ReactiveValidator_does_not_report()
     {
-        // SetValidator is handled by FluentValidationAdapter (recurses into nested validator).
-        // It is not server-only — the adapter extracts nested rules.
+        // SetValidator is handled by FluentValidationRuleExtractor (recurses into nested validator).
+        // It is not server-only — the extractor materializes nested rules.
         const string source = @"
 using FluentValidation;
 using Alis.Reactive.FluentValidator;

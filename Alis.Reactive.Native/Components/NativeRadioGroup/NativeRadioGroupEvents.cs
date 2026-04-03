@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Typed event descriptors for <see cref="NativeRadioGroup"/>.
+    /// Typed reactive events for <see cref="NativeRadioGroup"/>.
     /// </summary>
     /// <remarks>
     /// Used with the <c>.Reactive()</c> event selector lambda:
@@ -18,8 +18,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Fires when the user selects a different radio option.
         /// </summary>
-        public TypedEventDescriptor<NativeRadioGroupChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeRadioGroupChangeArgs>(
+        public ReactiveEvent<NativeRadioGroupChangeArgs> Changed =>
+            new ReactiveEvent<NativeRadioGroupChangeArgs>(
                 "change", new NativeRadioGroupChangeArgs());
     }
 }

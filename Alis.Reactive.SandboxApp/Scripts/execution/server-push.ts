@@ -1,35 +1,31 @@
-import type { ServerPushTrigger, Reaction, ComponentEntry } from "../types";
-import { executeReaction } from "./execute";
-import { showRetryIndicators, removeRetryIndicators, firstMutationTarget } from "./retry-indicator";
+import type { ExecContext, PlanAction, PlanSubscription, ServerPushSubscription } from "../types";
+import { executeAction } from "./execute";
+import { firstMutationTarget, removeRetryIndicators, showRetryIndicators } from "./retry-indicator";
 import { scope } from "../core/trace";
 
 const log = scope("server-push");
 
-interface WiredEntry {
-  readonly trigger: ServerPushTrigger;
-  readonly reaction: Reaction;
-  readonly components?: Record<string, ComponentEntry>;
-}
-
 interface ManagedSource {
   readonly es: EventSource;
   readonly targetIds: Set<string>;
-  readonly wired: WiredEntry[];
+  readonly wired: WiredWorkflow[];
   stopping: boolean;
 }
 
-// Connection pool — singleton EventSource per URL
 const sources = new Map<string, ManagedSource>();
 
-function retrySSE(url: string, entries: readonly WiredEntry[]): void {
+interface WiredWorkflow {
+  readonly subscription: ServerPushSubscription;
+  readonly action: PlanAction;
+  readonly ctx: ExecContext;
+}
+
+function retrySSE(url: string, workflows: readonly WiredWorkflow[]): void {
   removeRetryIndicators(url);
   log.info("manual retry", { url });
 
-  // Re-wire all triggers — creates a fresh EventSource and re-registers handlers.
-  // Signal is intentionally omitted — the original abort context is no longer
-  // meaningful for a fresh connection after manual retry.
-  for (const entry of entries) {
-    wireServerPush(entry.trigger, entry.reaction, entry.components);
+  for (const workflow of workflows) {
+    wireServerPush(workflow.subscription, workflow.action, workflow.ctx);
   }
 }
 
@@ -39,7 +35,7 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
 
   const es = new EventSource(url);
   const targetIds = new Set<string>();
-  const wired: WiredEntry[] = [];
+  const wired: WiredWorkflow[] = [];
 
   es.onopen = () => {
     log.debug("connected", { url });
@@ -54,8 +50,7 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
       log.error("connection closed permanently", { url });
       sources.delete(url);
       if (managed && managed.targetIds.size > 0) {
-        const entries = managed.wired;
-        showRetryIndicators(url, managed.targetIds, () => retrySSE(url, entries));
+        showRetryIndicators(url, managed.targetIds, () => retrySSE(url, managed.wired));
       }
     } else {
       log.warn("connection error (reconnecting)", { url });
@@ -74,37 +69,28 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
     });
   }
 
-  log.debug("created", { url });
   return managed;
 }
 
 export function wireServerPush(
-  trigger: ServerPushTrigger,
-  reaction: Reaction,
-  components?: Record<string, ComponentEntry>,
+  subscription: ServerPushSubscription,
+  action: PlanAction,
+  ctx: ExecContext,
   signal?: AbortSignal
 ): void {
-  const managed = getOrCreate(trigger.url, signal);
-
-  // Track the first target element for retry indicator placement
-  const target = firstMutationTarget(reaction);
+  const managed = getOrCreate(subscription.url, signal);
+  const target = firstMutationTarget(action, ctx);
   if (target) managed.targetIds.add(target);
+  managed.wired.push({ subscription, action, ctx });
 
-  // Store wiring info for retry re-registration (signal omitted — see retrySSE)
-  managed.wired.push({ trigger, reaction, components });
-
-  const handler = (e: MessageEvent) => {
-    // Framework only supports JSON payloads — non-JSON is a server-side bug.
-    // Throw immediately so the developer fixes their SSE endpoint.
-    const evt: Record<string, unknown> = JSON.parse(e.data);
-    log.debug("message", { url: trigger.url, eventType: trigger.eventType });
-    executeReaction(reaction, { evt, components }).catch(err =>
-      log.error("reaction failed", { error: String(err) }));
+  const handler = (event: MessageEvent) => {
+    const detail: Record<string, unknown> = JSON.parse(event.data);
+    executeAction(action, { ...ctx, event: detail }).catch(error =>
+      log.error("action failed", { error: String(error) })
+    );
   };
 
-  // Always use addEventListener — onmessage assignment overwrites previous handlers
-  // when multiple triggers share the same URL without an eventType.
-  const eventName = trigger.eventType ?? "message";
+  const eventName = subscription.eventType ?? "message";
   managed.es.addEventListener(eventName, handler as EventListener);
-  log.debug("listening", { url: trigger.url, eventType: eventName });
+  log.debug("listening", { url: subscription.url, eventType: eventName });
 }

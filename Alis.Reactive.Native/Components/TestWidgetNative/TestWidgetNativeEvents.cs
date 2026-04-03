@@ -1,18 +1,17 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Events available on TestWidgetNative.
-    /// Singleton instance — used with .Reactive() event selector lambda:
-    ///   .Reactive(plan, evt => evt.Changed, (args, p) => { ... })
+    /// Exposes the reactive events available on <see cref="TestWidgetNative"/>.
     /// </summary>
     public sealed class TestWidgetNativeEvents
     {
+        /// <summary>Gets the singleton event surface instance.</summary>
         public static readonly TestWidgetNativeEvents Instance = new TestWidgetNativeEvents();
         private TestWidgetNativeEvents() { }
 
-        /// <summary>Fires when the user changes the input value (DOM "change" event).</summary>
-        public TypedEventDescriptor<TestWidgetNativeChangeArgs> Changed =>
-            new TypedEventDescriptor<TestWidgetNativeChangeArgs>(
+        /// <summary>Gets the widget change event.</summary>
+        public ReactiveEvent<TestWidgetNativeChangeArgs> Changed =>
+            new ReactiveEvent<TestWidgetNativeChangeArgs>(
                 "change", new TestWidgetNativeChangeArgs());
     }
 }

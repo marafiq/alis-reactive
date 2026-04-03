@@ -10,6 +10,6 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionMultiColumnComboBox : FusionComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMemberPath => "value";
     }
 }

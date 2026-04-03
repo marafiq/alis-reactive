@@ -3,12 +3,12 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingClientConditionalRules
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     [Test]
     public void WhenField_truthy_extracts_conditional_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var jobTitle = desc!.Fields.First(f => f.FieldName == "JobTitle");
@@ -22,7 +22,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void WhenField_unconditional_rules_still_extracted()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var name = desc!.Fields.First(f => f.FieldName == "Name");
@@ -33,7 +33,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void WhenField_multiple_rules_in_block_all_get_condition()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveMultipleRulesValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ReactiveMultipleRulesValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
 
@@ -50,7 +50,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void WhenField_eq_extracts_equality_condition()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveEqConditionValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ReactiveEqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var email = desc!.Fields.First(f => f.FieldName == "Email");
@@ -63,7 +63,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void Plain_When_still_skipped_in_mixed_validator()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveMixedValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ReactiveMixedValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();
@@ -78,7 +78,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void WhenField_all_rule_types_extract_with_condition()
     {
-        var desc = _adapter.ExtractRules(typeof(ConditionalAllRulesValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ConditionalAllRulesValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
 
@@ -108,9 +108,9 @@ public class WhenExtractingClientConditionalRules
     }
 
     [Test]
-    public void WhenField_condition_source_field_included_in_descriptor()
+    public void WhenField_condition_source_field_is_included_in_validation_contract()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();

@@ -43,7 +43,7 @@ public class AllPlansConformToSchema : PlanTestBase
     }
 
     [Test]
-    public void Multiple_entries()
+    public void Multiple_workflows()
     {
         var plan = CreatePlan();
         Trigger(plan)

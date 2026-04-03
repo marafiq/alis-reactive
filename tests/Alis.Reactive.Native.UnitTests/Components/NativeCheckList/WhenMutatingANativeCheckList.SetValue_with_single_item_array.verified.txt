@@ -1,26 +1,53 @@
-{
+﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
+  contracts: {
+    native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: array,
+            item: {
+              kind: scalar,
+              type: string
+            }
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies: {
+      contract: native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
+      elementId: Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
-            mutation: {
-              kind: set-prop,
-              prop: value
-            },
-            value: [
-              Dairy
-            ],
-            vendor: native
-          }
-        ]
+      run: {
+        kind: set,
+        target: {
+          object: component::Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
+          member: value
+        },
+        value: {
+          kind: literal,
+          value: [
+            Dairy
+          ]
+        }
       }
     }
   ]

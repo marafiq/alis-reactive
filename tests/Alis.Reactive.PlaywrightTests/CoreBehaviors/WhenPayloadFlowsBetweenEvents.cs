@@ -2,10 +2,10 @@ namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
 /// <summary>
 /// Proves that C# types survive the full serialization path:
-///   C# expression -> ExpressionPathHelper -> plan JSON source binding -> runtime resolve() -> DOM text
+///   C# expression -> ExpressionPathHelper -> plan JSON binding -> runtime value resolution -> DOM text
 ///
 /// Each test targets a specific C# type (int, long, double, string, bool) or a nested dot-path.
-/// If ExpressionPathHelper changes its casing/path logic, or resolver.ts changes its walk logic,
+/// If ExpressionPathHelper changes its casing/path logic, or resolution/values.ts changes its walk logic,
 /// or System.Text.Json changes its serialization, one or more of these tests will catch it.
 ///
 /// The payload is dispatched via dom-ready and consumed via CustomEvent<PayloadShowcaseModel>.
@@ -20,7 +20,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     public async Task int_value_survives_serialization_and_displays_correctly()
     {
         // C# int 42 -> JSON number 42 -> resolveToString -> DOM "42"
-        // If System.Text.Json wraps ints in quotes or resolver.ts coerces differently, this fails.
+        // If System.Text.Json wraps ints in quotes or resolution/values.ts coerces differently, this fails.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -101,12 +101,12 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task all_properties_resolved_shows_success_status()
     {
-        // After ALL SetText mutations complete, the reaction chain also mutates #payload-status:
+        // After ALL SetText mutations complete, the workflow chain also mutates #payload-status:
         //   RemoveClass("text-text-muted") + AddClass("text-green-600") + AddClass("font-semibold") + SetText(...)
         //
         // This is the aggregate indicator — if ANY preceding SetText failed to execute (e.g., because
-        // resolve() threw on a bad path), the sequential reaction would abort and status would stay gray.
-        // Green status = every single source binding in the reaction resolved without error.
+        // resolve() threw on a bad path), the sequential workflow would abort and status would stay gray.
+        // Green status = every single source binding in the workflow resolved without error.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -146,7 +146,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task status_element_has_correct_css_classes_after_all_resolved()
     {
-        // The reaction chain on #payload-status is a 3-mutation sequence:
+        // The workflow chain on #payload-status is a 3-mutation sequence:
         //   1. RemoveClass("text-text-muted")  — removes initial gray styling
         //   2. AddClass("text-green-600")      — adds success color
         //   3. AddClass("font-semibold")       — adds emphasis
@@ -185,7 +185,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
         // mutation is skipped, the final class list will be wrong:
         //   - Missing RemoveClass → "text-text-muted" still present (green + muted conflict)
         //   - Missing AddClass → no green or no semibold (incomplete visual state)
-        //   - Aborted reaction → none of the mutations apply (element stays gray)
+        //   - Aborted workflow → none of the mutations apply (element stays gray)
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 

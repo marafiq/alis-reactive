@@ -1,114 +1,172 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.step1-status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.step2-count: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::step1-status: {
+      contract: element.step1-status,
+      elementId: step1-status
+    },
+    element::step2-count: {
+      contract: element.step2-count,
+      elementId: step2-count
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/step1,
           onSuccess: [
             {
-              reaction: {
-                kind: conditional,
-                branches: [
+              run: {
+                kind: branch,
+                cases: [
                   {
-                    guard: {
-                      kind: value,
-                      source: {
-                        kind: event,
-                        path: evt.active
+                    when: {
+                      kind: compare,
+                      left: {
+                        kind: context,
+                        scope: event,
+                        path: [
+                          {
+                            prop: active
+                          }
+                        ]
                       },
-                      coerceAs: boolean,
-                      op: truthy
+                      op: truthy,
+                      as: {
+                        kind: scalar,
+                        type: boolean
+                      }
                     },
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: step1-status,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: active user
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::step1-status,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: active user
+                      }
                     }
                   },
                   {
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: step1-status,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: inactive user
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::step1-status,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: inactive user
+                      }
                     }
                   }
                 ]
               }
             }
           ],
-          chained: {
-            verb: POST,
+          next: {
+            method: POST,
             url: /api/step2,
             onSuccess: [
               {
-                reaction: {
-                  kind: conditional,
-                  branches: [
+                run: {
+                  kind: branch,
+                  cases: [
                     {
-                      guard: {
-                        kind: value,
-                        source: {
-                          kind: event,
-                          path: evt.count
+                      when: {
+                        kind: compare,
+                        left: {
+                          kind: context,
+                          scope: event,
+                          path: [
+                            {
+                              prop: count
+                            }
+                          ]
                         },
-                        coerceAs: number,
                         op: gt,
-                        operand: 0
+                        right: {
+                          kind: literal,
+                          value: 0
+                        },
+                        as: {
+                          kind: scalar,
+                          type: number
+                        }
                       },
-                      reaction: {
-                        kind: sequential,
-                        commands: [
-                          {
-                            kind: mutate-element,
-                            target: step2-count,
-                            mutation: {
-                              kind: set-prop,
-                              prop: textContent
-                            },
-                            value: has items
-                          }
-                        ]
+                      run: {
+                        kind: set,
+                        target: {
+                          object: element::step2-count,
+                          member: text
+                        },
+                        value: {
+                          kind: literal,
+                          value: has items
+                        }
                       }
                     },
                     {
-                      reaction: {
-                        kind: sequential,
-                        commands: [
-                          {
-                            kind: mutate-element,
-                            target: step2-count,
-                            mutation: {
-                              kind: set-prop,
-                              prop: textContent
-                            },
-                            value: empty
-                          }
-                        ]
+                      run: {
+                        kind: set,
+                        target: {
+                          object: element::step2-count,
+                          member: text
+                        },
+                        value: {
+                          kind: literal,
+                          value: empty
+                        }
                       }
                     }
                   ]

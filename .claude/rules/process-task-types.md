@@ -52,8 +52,8 @@ If touching an unexpected layer, the plan is wrong. Stop and return to planning.
 
 | Step | Layer | What |
 |------|-------|------|
-| 1. C# descriptor | 1 | sealed class, `internal` constructor |
-| 2. Polymorphic registration | 1 | `WriteOnlyPolymorphicConverter` switch |
+| 1. C# plan model type | 1 | sealed class, `internal` constructor |
+| 2. Polymorphic registration | 1 | `WriteOnlyPolymorphicConverter` registration |
 | 3. Builder method | 1 | PipelineBuilder, ElementBuilder, or TriggerBuilder |
 | 4. JSON schema | 1→2 | Failing test drives schema update |
 | 5. TS types | 2→3 | Failing vitest drives type update |
@@ -68,8 +68,8 @@ May span sessions. Track which steps are complete.
 ## Component Onboarding (All Layers)
 
 Load `onboard-fusion-component` skill first. 7-file vertical slice. Zero TS runtime changes.
-If TS changes seem needed, the plan is missing information — fix the C# descriptor.
-`component.ts` owns all vendor knowledge.
+If TS changes seem needed, the plan is missing information — fix the C# plan authoring model.
+`resolution/contracts.ts` owns all vendor knowledge.
 
 ## Writing Tests (Matches Tested Layer)
 

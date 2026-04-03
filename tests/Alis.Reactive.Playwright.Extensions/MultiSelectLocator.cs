@@ -67,7 +67,7 @@ public sealed class MultiSelectLocator
     /// <summary>Click the wrapper to focus and open the popup.</summary>
     public async Task Open()
     {
-        await Wrapper.ClickAsync();
+        await Wrapper.ClickWhenStableAsync(_page);
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
     }
 
@@ -77,11 +77,12 @@ public sealed class MultiSelectLocator
     public async Task SelectItem(string itemText)
     {
         await Open();
-        await Popup.Locator(".e-list-item").GetByText(itemText, new() { Exact = true }).ClickAsync();
+        var option = Popup.Locator(".e-list-item").GetByText(itemText, new() { Exact = true });
+        await option.ClickWhenStableAsync(_page);
         // Wait for popup to close (closePopupOnSelect: true in Box mode)
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Hidden, Timeout = 5000 });
         // Click outside the component to blur — this triggers the SF change event
-        await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
+        await _page.Locator("body").ClickWhenStableAsync(_page);
     }
 
     /// <summary>Select multiple items. SF MultiSelect closes popup after each click
@@ -92,12 +93,13 @@ public sealed class MultiSelectLocator
         foreach (var text in itemTexts)
         {
             await Open();
-            await Popup.Locator(".e-list-item").GetByText(text, new() { Exact = true }).ClickAsync();
+            var option = Popup.Locator(".e-list-item").GetByText(text, new() { Exact = true });
+            await option.ClickWhenStableAsync(_page);
             // Wait for popup to close after selection
             await Popup.WaitForAsync(new() { State = WaitForSelectorState.Hidden, Timeout = 5000 });
         }
         // Click outside the component to blur — triggers the SF change event
-        await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
+        await _page.Locator("body").ClickWhenStableAsync(_page);
     }
 
     /// <summary>Press Escape to close the popup and blur.</summary>

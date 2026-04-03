@@ -11,7 +11,7 @@ namespace Alis.Reactive.Builders
         public HttpRequestBuilder<TModel> Get(string url)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(_authoring, _scope);
             _httpBuilder.SetVerb("GET").SetUrl(url);
             return _httpBuilder;
         }
@@ -20,7 +20,7 @@ namespace Alis.Reactive.Builders
         public HttpRequestBuilder<TModel> Post(string url)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(_authoring, _scope);
             _httpBuilder.SetVerb("POST").SetUrl(url);
             return _httpBuilder;
         }
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Builders
         public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(_authoring, _scope);
             _httpBuilder.SetVerb("POST").SetUrl(url);
             _httpBuilder.Gather(gather);
             return _httpBuilder;
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Builders
         public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(_authoring, _scope);
             _httpBuilder.SetVerb("PUT").SetUrl(url);
             _httpBuilder.Gather(gather);
             return _httpBuilder;
@@ -55,7 +55,7 @@ namespace Alis.Reactive.Builders
         public HttpRequestBuilder<TModel> Delete(string url)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(_authoring, _scope);
             _httpBuilder.SetVerb("DELETE").SetUrl(url);
             return _httpBuilder;
         }
@@ -64,7 +64,7 @@ namespace Alis.Reactive.Builders
         public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
         {
             SetMode(PipelineMode.Parallel);
-            _parallelBuilder = new ParallelBuilder<TModel>();
+            _parallelBuilder = new ParallelBuilder<TModel>(_authoring, _scope);
             foreach (var branch in branches)
             {
                 _parallelBuilder.AddBranch(branch);

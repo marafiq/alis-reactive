@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Typed event descriptors for <see cref="NativeDropDown"/>.
+    /// Typed reactive events for <see cref="NativeDropDown"/>.
     /// </summary>
     /// <remarks>
     /// Used with the <c>.Reactive()</c> event selector lambda:
@@ -18,8 +18,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Fires when the user selects a different option.
         /// </summary>
-        public TypedEventDescriptor<NativeDropDownChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeDropDownChangeArgs>(
+        public ReactiveEvent<NativeDropDownChangeArgs> Changed =>
+            new ReactiveEvent<NativeDropDownChangeArgs>(
                 "change", new NativeDropDownChangeArgs());
     }
 }

@@ -1,24 +1,12 @@
-import type { Reaction, Command } from "../types";
+import type { ExecContext, PlanAction } from "../types";
+import { firstRenderableTarget } from "./execute";
 import { scope } from "../core/trace";
 
 const log = scope("retry-indicator");
-
 const RETRY_ATTR = "data-alis-retry";
 
-/**
- * Extracts the first mutate-element target ID from a reaction's top-level commands.
- * Used to determine where retry indicators should be anchored.
- * Only inspects sequential and conditional reactions — HTTP/parallel-http
- * are skipped (their preFetch commands are not relevant for anchor placement).
- */
-export function firstMutationTarget(reaction: Reaction): string | undefined {
-  let commands: Command[] | undefined;
-  if (reaction.kind === "sequential" || reaction.kind === "conditional") {
-    commands = reaction.commands;
-  }
-
-  const cmd = commands?.find(c => c.kind === "mutate-element");
-  return cmd?.kind === "mutate-element" ? cmd.target : undefined;
+export function firstMutationTarget(action: PlanAction, ctx: ExecContext): string | undefined {
+  return firstRenderableTarget(action, ctx);
 }
 
 export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry: () => void): void {
@@ -37,17 +25,17 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
 
     if (getComputedStyle(anchor).position === "static") anchor.style.position = "relative";
 
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.setAttribute(RETRY_ATTR, key);
-    btn.setAttribute("title", "Connection lost — click to reconnect");
-    btn.className = "alis-retry-indicator";
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
+    const button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute(RETRY_ATTR, key);
+    button.setAttribute("title", "Connection lost — click to reconnect");
+    button.className = "alis-retry-indicator";
+    button.addEventListener("click", event => {
+      event.stopPropagation();
       onRetry();
     });
 
-    anchor.appendChild(btn);
+    anchor.appendChild(button);
   }
 
   if (anchored.size > 0) {

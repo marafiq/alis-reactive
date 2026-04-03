@@ -1,16 +1,9 @@
-// Boot — Plan lifecycle: boot, merge, reset
-//
-// Single responsibility: wire triggers (two-phase) and register plans.
-// Delegates enrichment to enrichment.ts, state to merge-plan.ts PlanRegistry.
-
-import type { Plan, Entry, ComponentEntry } from "../types";
+import type { Plan, RequestPlan, RequestValidation, Workflow } from "../types";
 import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
-import { wireTrigger } from "../execution/trigger";
-import { enrichEntries } from "./enrichment";
+import { wireWorkflow } from "../execution/trigger";
 import { wireLiveValidation, unwireFields } from "../validation/live-clear";
-import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
-import { walkValidationDescriptors } from "./walk-reactions";
+import { clearSummary, findSummaryElement, hideSummaryDiv } from "../validation/error-display";
 import {
   applyMergedPlan,
   getBootedPlan as getTrackedBootedPlan,
@@ -24,42 +17,42 @@ const BOOTED_ATTR = "alisBooted";
 let bootAbort = new AbortController();
 
 export function boot(plan: Plan): void {
-  log.info("booting", { entries: plan.entries.length });
+  log.info("booting", { workflows: plan.workflows.length });
 
-  enrichEntries(plan.entries, plan.components);
-  walkValidationDescriptors(plan.entries, wireLiveValidation);
-  wireEntries(plan.entries, plan.components, bootAbort.signal);
+  wireRequestValidations(plan);
+  wireWorkflows(plan.workflows, plan, bootAbort.signal);
 
   registerBootedPlan(plan);
   document.documentElement.dataset[BOOTED_ATTR] = "true";
   log.info("booted");
 }
 
-/**
- * Two-phase wiring: wire all non-dom-ready listeners first, then execute dom-ready.
- * This ensures custom-event listeners exist before dom-ready dispatches into them.
- */
-function wireEntries(entries: Entry[], components: Record<string, ComponentEntry>, signal?: AbortSignal): void {
-  const deferred: Entry[] = [];
-  for (const entry of entries) {
-    if (entry.trigger.kind === "dom-ready") {
-      deferred.push(entry);
+function wireWorkflows(workflows: Workflow[], plan: Plan, signal?: AbortSignal): void {
+  const deferred: Workflow[] = [];
+
+  for (const workflow of workflows) {
+    if (workflow.when.kind === "dom-ready") {
+      deferred.push(workflow);
     } else {
-      wireTrigger(entry.trigger, entry.reaction, components, signal);
+      wireWorkflow(workflow.when, workflow.run, { plan }, signal);
     }
   }
-  for (const entry of deferred) {
-    wireTrigger(entry.trigger, entry.reaction, components, signal);
+
+  for (const workflow of deferred) {
+    wireWorkflow(workflow.when, workflow.run, { plan }, signal);
   }
 }
 
 export function mergePlan(incoming: Plan): void {
-  const merged = applyMergedPlan(incoming, { enrichEntries, wireEntries, unwireFields });
-
-  walkValidationDescriptors(merged.entries, wireLiveValidation);
+  const merged = applyMergedPlan(incoming, { wireWorkflows, unwireFields });
+  wireRequestValidations(merged);
   clearSummaryForPlan(merged.planId);
 
-  log.info("merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
+  log.info("merge", {
+    planId: merged.planId,
+    newObjects: Object.keys(incoming.objects).length,
+    newWorkflows: incoming.workflows.length,
+  });
 }
 
 export function getBootedPlan(planId: string): Plan | undefined {
@@ -74,6 +67,45 @@ export function resetBootStateForTests(): void {
 }
 
 export const trace = { setLevel };
+
+function wireRequestValidations(plan: Plan): void {
+  for (const workflow of plan.workflows) {
+    walkActionRequests(workflow.run, validation => wireLiveValidation(plan, validation));
+  }
+}
+
+function walkActionRequests(action: import("../types").PlanAction, visitor: (validation: RequestValidation) => void): void {
+  switch (action.kind) {
+    case "sequence":
+      for (const step of action.steps) walkActionRequests(step, visitor);
+      return;
+
+    case "branch":
+      for (const branch of action.cases) walkActionRequests(branch.run, visitor);
+      return;
+
+    case "parallel":
+      for (const step of action.steps) walkActionRequests(step, visitor);
+      if (action.onSettled) walkActionRequests(action.onSettled, visitor);
+      return;
+
+    case "request":
+      walkRequest(action.request, visitor);
+      return;
+
+    default:
+      return;
+  }
+}
+
+function walkRequest(request: RequestPlan, visitor: (validation: RequestValidation) => void): void {
+  if (request.validation) visitor(request.validation);
+  for (const action of request.before ?? []) walkActionRequests(action, visitor);
+  for (const handler of request.onSuccess ?? []) walkActionRequests(handler.run, visitor);
+  for (const handler of request.onError ?? []) walkActionRequests(handler.run, visitor);
+  for (const action of request.onSettled ?? []) walkActionRequests(action, visitor);
+  if (request.next) walkRequest(request.next, visitor);
+}
 
 function clearSummaryForPlan(planId: string): void {
   const el = findSummaryElement(planId);

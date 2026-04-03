@@ -38,7 +38,7 @@ See fenced block in [code-review-protocol.mdc](../rules/code-review-protocol.mdc
 
 | Layer | Command / artifact |
 |--------|-------------------|
-| C# plan / descriptors | `dotnet test tests/Alis.Reactive.UnitTests`, `dotnet build` |
+| C# plan authoring | `dotnet test tests/Alis.Reactive.UnitTests`, `dotnet build` |
 | JSON contract | `Alis.Reactive/Schemas/reactive-plan.schema.json` + schema test |
 | TS runtime | `npm test`, `npm run typecheck`, `npm run lint`; tests under `Alis.Reactive.SandboxApp/Scripts/__tests__/` ([vitest.config.ts](../../vitest.config.ts)) |
 | JS/CSS bundles | `npm run build:all` then `dotnet build` |
@@ -49,7 +49,7 @@ See fenced block in [code-review-protocol.mdc](../rules/code-review-protocol.mdc
 
 ## Primitive checklist (wire / command / trigger change)
 
-1. C# descriptor + JSON polymorphism as repo does (`Serialization/`, `[JsonDerivedType]`, …)  
+1. C# plan model type + JSON polymorphism as repo does (`Serialization/`, `[JsonDerivedType]`, …)  
 2. Builder surface  
 3. Schema + `AssertSchemaValid` (or equivalent)  
 4. TS types (`…/Scripts/types/` — layout per branch)  

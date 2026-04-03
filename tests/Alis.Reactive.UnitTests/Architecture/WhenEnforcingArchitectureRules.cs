@@ -4,20 +4,18 @@ namespace Alis.Reactive.UnitTests;
 public class WhenEnforcingArchitectureRules
 {
     [Test]
-    public void All_descriptor_classes_are_sealed()
+    public void Removed_namespace_stays_deleted()
     {
         var assembly = typeof(ReactivePlan<>).Assembly;
-        var descriptorNamespace = "Alis.Reactive.Descriptors";
+        var removedNamespace = "Alis.Reactive.Descriptors";
 
-        var unsealed = assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && !t.IsNested
-                        && t.Namespace != null && t.Namespace.StartsWith(descriptorNamespace))
-            .Where(t => !t.IsSealed)
+        var lingeringTypes = assembly.GetTypes()
+            .Where(t => t.Namespace != null && t.Namespace.StartsWith(removedNamespace))
             .Select(t => t.FullName)
             .ToList();
 
-        Assert.That(unsealed, Is.Empty,
-            $"Unsealed descriptor classes: {string.Join(", ", unsealed)}");
+        Assert.That(lingeringTypes, Is.Empty,
+            $"Removed namespace should stay deleted, but these types remain: {string.Join(", ", lingeringTypes)}");
     }
 
     [Test]
@@ -26,10 +24,10 @@ public class WhenEnforcingArchitectureRules
         ReactivePlanConfig.Reset();
 
         var extractor = new DummyExtractor();
-        ReactivePlanConfig.UseValidationExtractor(extractor);
+        ReactivePlanConfig.UseFormValidationExtractor(extractor);
 
         Assert.Throws<InvalidOperationException>(() =>
-            ReactivePlanConfig.UseValidationExtractor(extractor));
+            ReactivePlanConfig.UseFormValidationExtractor(extractor));
 
         ReactivePlanConfig.Reset();
     }
@@ -49,16 +47,16 @@ public class WhenEnforcingArchitectureRules
         });
 
         var ex = Assert.Throws<InvalidOperationException>(() => plan.Render());
-        Assert.That(ex!.Message, Does.Contain("UseValidationExtractor"));
+        Assert.That(ex!.Message, Does.Contain("UseFormValidationExtractor"));
 
         ReactivePlanConfig.Reset();
     }
 
     private class FakeValidator { }
 
-    private class DummyExtractor : Validation.IValidationExtractor
+    private class DummyExtractor : Validation.IFormValidationExtractor
     {
-        public Validation.ValidationDescriptor? ExtractRules(Type validatorType, string formId)
+        public Validation.FormValidation? ExtractRules(Type validatorType, string formId)
         {
             return null;
         }

@@ -1,5 +1,5 @@
 /* Retry indicator — shown when a persistent connection (SignalR/SSE) fails.
- * Anchored near the first mutation target element of the affected reaction.
+ * Anchored near the first mutation target element of the affected workflow.
  * Clicking triggers a reconnection attempt via the onRetry callback.
  */
 

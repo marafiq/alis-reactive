@@ -5,13 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Renders an &lt;input type="text"&gt; element for architecture verification.
-    /// Not model-bound — for standalone native test inputs.
-    ///
-    /// Usage:
-    ///   @(Html.TestWidgetNative&lt;TModel&gt;("my-input")
-    ///       .InitialValue("hello")
-    ///       .CssClass("rounded-md border"))
+    /// Builds the standalone native test widget used by architecture verification scenarios.
     /// </summary>
     public class TestWidgetNativeBuilder<TModel> : IHtmlContent where TModel : class
     {
@@ -25,30 +19,38 @@ namespace Alis.Reactive.Native.Components
             _elementId = elementId;
         }
 
-        /// <summary>The element ID — used by .Reactive() to wire events.</summary>
+        /// <summary>Gets the rendered element id used for event wiring.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>Sets CSS classes on the input element.</summary>
+        /// <summary>Adds custom CSS classes to the widget element.</summary>
+        /// <param name="css">The CSS classes to append.</param>
+        /// <returns>The current builder.</returns>
         public TestWidgetNativeBuilder<TModel> CssClass(string css)
         {
             _cssClass = css;
             return this;
         }
 
-        /// <summary>Sets the initial value attribute.</summary>
+        /// <summary>Sets the widget's initial value.</summary>
+        /// <param name="value">The initial value to render.</param>
+        /// <returns>The current builder.</returns>
         public TestWidgetNativeBuilder<TModel> InitialValue(string value)
         {
             _initialValue = value;
             return this;
         }
 
-        /// <summary>Makes the input readonly.</summary>
+        /// <summary>Marks the widget as read-only.</summary>
+        /// <returns>The current builder.</returns>
         public TestWidgetNativeBuilder<TModel> ReadOnly()
         {
             _readOnly = true;
             return this;
         }
 
+        /// <summary>Writes the widget markup.</summary>
+        /// <param name="writer">The writer that receives the markup.</param>
+        /// <param name="encoder">The encoder used for HTML attribute values.</param>
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             writer.Write("<input");

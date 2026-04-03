@@ -27,7 +27,7 @@ One page, zero JavaScript — every behavior below is expressed entirely in C# f
 12. **Toast notification** — on success, `FusionToast` shows a styled notification
 13. **Chained request** — after save succeeds, a follow-up GET fetches a confirmation number and displays it via `SetText(json, j => j.Number)` — typed response body access
 14. **Event decoupling** — the "View Summary" button fires `Dispatch("intake-saved")`; a separate `CustomEvent` handler catches it, loads a partial into a drawer via `Into()`, and opens it — trigger and action are fully decoupled
-15. **Server validation fallback** — if the server returns 400, `ValidationErrors("intake-form")` routes field-level errors to the correct input components
+15. **Server validation handling** — if the server returns 400, `ValidationErrors("intake-form")` routes field-level errors to the correct input components
 
 <img src="/alis-reactive/downloads/resident-intake-demo.gif" alt="Resident Intake form demo — all 15 behaviors in action" />
 
@@ -185,13 +185,13 @@ The facility requirements partial uses `Html.ResolvePlan<T>()` — a partial pla
 2. `RenderPlan()` emits only the plan JSON script tag (no validation summary — that's on the parent)
 3. `ScriptManager()` initializes Syncfusion components in the partial (NumericTextBox)
 4. When loaded via `Into()`, the runtime extracts the plan JSON and calls `mergePlan()`
-5. Components merge into the parent plan — validation fields get enriched with `fieldId`, `vendor`, `readExpr`
+5. Components merge into the parent plan — bindings and validation rules become fully resolvable as soon as the partial's objects are registered
 6. Validation rules that were unenriched at boot time (no component yet) now fire correctly
 7. `IncludeAll()` on save gathers the partial's fields alongside the parent's fields
 </TabItem>
 </Tabs>
 
-The key insight: the parent plan's validator already has rules for `RoomPreference` and `DepositAmount`. At initial render those rules are *unenriched* (no component exists yet). When the partial loads and merges, the runtime enriches those validation fields — and validation just works.
+The key insight: the parent plan's validator already has rules for `RoomPreference` and `DepositAmount`. At initial render those rules cannot resolve because the partial's components are not mounted yet. When the partial loads and merges, those bindings become available — and validation just works.
 
 ## How do conditional sections work?
 
@@ -376,7 +376,7 @@ Every file in the project, for reference.
 
 <Tabs>
 <TabItem label="Index.cshtml">
-```cshtml
+```html
 @model ResidentIntakeModel
 @{
     ViewData["Title"] = "New Resident Intake";
@@ -747,7 +747,7 @@ public class IntakeController : Controller
 ```
 </TabItem>
 <TabItem label="_FacilityRequirements.cshtml">
-```cshtml
+```html
 @model ResidentIntakeModel
 @{
     var plan = Html.ResolvePlan<ResidentIntakeModel>();

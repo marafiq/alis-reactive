@@ -1,292 +1,88 @@
 ---
 title: The JSON Plan Contract
-description: What the plan looks like — every trigger, reaction, command, and source shape with real examples.
+description: The rendered V2 contract consumed by the browser runtime.
 sidebar:
   order: 5
 ---
 
-You've seen the fluent C# — `.Reactive()`, `.Post()`, `.When()`. You know the builders capture intent into a JSON plan. But what does that plan actually look like?
-
-It's structured. Every piece has a `"kind"` field that tells the runtime exactly what to do. Let's trace through every plan shape the framework produces.
-
-## The top-level structure
-
-Every plan has three sections:
+The JSON contract is the only runtime contract.
 
 ```json
 {
+  "version": 2,
   "planId": "MyApp.Models.ResidentModel",
-  "components": { ... },
-  "entries": [ ... ]
+  "sourceId": "resident-form",
+  "contracts": {},
+  "objects": {},
+  "bindings": {},
+  "workflows": []
 }
 ```
 
-`planId` is the model's full type name — used as the merge key for partial views. `components` is the registry of all input components. `entries` is the list of trigger + reaction pairs.
+## Top-level sections
 
-## Triggers — what fires
+### `contracts`
 
-### dom-ready
+Capability contracts define readable members, writable members, methods, and events. They isolate vendor-specific access details.
 
-```json
-{ "kind": "dom-ready" }
-```
+### `objects`
 
-Fires once when the page loads. The simplest trigger.
+Objects name concrete runtime instances. They bind a contract to a DOM element id or an app-level service object.
 
-### custom-event
+### `bindings`
 
-```json
-{ "kind": "custom-event", "event": "resident-loaded" }
-```
+Bindings define the canonical way to read model-facing values from runtime objects.
 
-Fires when `pipeline.Dispatch("resident-loaded")` is called from any pipeline.
+### `workflows`
 
-### component-event
+A workflow combines a subscription with an action tree.
 
-```json
-{
-  "kind": "component-event",
-  "componentId": "IsUrgent",
-  "jsEvent": "change",
-  "vendor": "native",
-  "bindingPath": "IsUrgent",
-  "readExpr": "checked"
-}
-```
+Subscriptions include:
 
-Fires when the component's DOM event fires. The trigger carries the vendor and readExpr so the runtime knows how to construct the execution context — for native components it reads the element property, for fusion it passes the event object directly.
+- `dom-ready`
+- `document-event`
+- `object-event`
+- `server-push`
+- `signalr`
 
-### server-push
+Actions include:
 
-```json
-{
-  "kind": "server-push",
-  "url": "/api/notifications/stream",
-  "eventType": "notification"
-}
-```
+- `sequence`
+- `branch`
+- `parallel`
+- `set`
+- `call`
+- `dispatch`
+- `request`
+- `inject`
+- `show-validation-errors`
 
-Fires when the server pushes data via Server-Sent Events (SSE). The `url` points to the SSE endpoint. The optional `eventType` filters to a specific SSE event type — omit it to receive all messages.
+## Value expressions and shapes
 
-### signalr
+Value expressions are the read language of the contract. They support:
 
-```json
-{
-  "kind": "signalr",
-  "hubUrl": "/hubs/notifications",
-  "methodName": "ReceiveNotification"
-}
-```
+- literals
+- binding reads
+- object member reads
+- context reads
+- object/array construction
+- explicit conversion
 
-Fires when a SignalR hub method is invoked. The `hubUrl` identifies the hub connection (shared across triggers with the same URL). The `methodName` maps to the handler registered on the connection.
+Shapes define the expected structure:
 
-## Reactions — what happens
+- scalar
+- array
+- object
+- any
 
-### sequential
+This is how typed C# authoring stays compile-time safe while runtime stays schema-driven.
 
-The simplest reaction — run commands in order:
+## Partial merge
 
-```json
-{
-  "kind": "sequential",
-  "commands": [
-    { "kind": "mutate-element", "target": "status",
-      "mutation": { "kind": "set-prop", "prop": "textContent" },
-      "value": "Ready" }
-  ]
-}
-```
+`planId` groups related slices.
 
-### conditional
+`sourceId` owns replace/remove behavior for partial content. This is why partial cleanup does not need runtime heuristics.
 
-Evaluate guards, pick the first matching branch:
+## Design rule
 
-```json
-{
-  "kind": "conditional",
-  "branches": [
-    {
-      "guard": { "kind": "value",
-        "source": { "kind": "event", "path": "evt.checked" },
-        "op": "truthy" },
-      "reaction": { "kind": "sequential", "commands": [
-        { "kind": "mutate-element", "target": "section",
-          "mutation": { "kind": "call", "method": "removeAttribute",
-            "args": [{ "kind": "literal", "value": "hidden" }] } }
-      ] }
-    },
-    {
-      "reaction": { "kind": "sequential", "commands": [
-        { "kind": "mutate-element", "target": "section",
-          "mutation": { "kind": "call", "method": "setAttribute",
-            "args": [{ "kind": "literal", "value": "hidden" },
-                     { "kind": "literal", "value": "" }] } }
-      ] }
-    }
-  ]
-}
-```
-
-A branch with no `guard` is the else — always matches if reached. The optional top-level `commands` field (not shown here) runs before branch evaluation.
-
-### http
-
-A single HTTP request with gather, validation, and response handlers:
-
-```json
-{
-  "kind": "http",
-  "request": {
-    "verb": "POST",
-    "url": "/api/save",
-    "gather": [
-      { "kind": "all" }
-    ],
-    "validation": {
-      "formId": "intake-form",
-      "planId": "MyApp.Models.ResidentModel",
-      "fields": [
-        {
-          "fieldName": "Name",
-          "rules": [
-            { "rule": "required", "message": "Name is required" }
-          ]
-        },
-        {
-          "fieldName": "Email",
-          "rules": [
-            { "rule": "required", "message": "Email is required" },
-            { "rule": "email", "message": "Must be a valid email" }
-          ]
-        }
-      ]
-    },
-    "onSuccess": [
-      {
-        "commands": [
-          { "kind": "mutate-element", "target": "status",
-            "mutation": { "kind": "set-prop", "prop": "textContent" },
-            "value": "Saved" }
-        ]
-      }
-    ],
-    "onError": [
-      {
-        "statusCode": 400,
-        "commands": [
-          { "kind": "validation-errors", "formId": "intake-form" }
-        ]
-      }
-    ]
-  }
-}
-```
-
-The request carries everything: HTTP verb, URL, what to gather, how to validate, what to do on success, what to do on error. The runtime follows the instructions — it never decides what to post or how to handle errors.
-
-### parallel-http
-
-Multiple requests fired concurrently:
-
-```json
-{
-  "kind": "parallel-http",
-  "requests": [
-    {
-      "verb": "GET",
-      "url": "/api/facilities",
-      "onSuccess": [{ "commands": [ ... ] }]
-    },
-    {
-      "verb": "GET",
-      "url": "/api/care-levels",
-      "onSuccess": [{ "commands": [ ... ] }]
-    }
-  ],
-  "onAllSettled": [
-    { "kind": "mutate-element", "target": "spinner",
-      "mutation": { "kind": "call", "method": "setAttribute",
-        "args": [{ "kind": "literal", "value": "hidden" },
-                 { "kind": "literal", "value": "" }] } }
-  ]
-}
-```
-
-Each request has its own response handlers. `onAllSettled` fires after all requests complete — regardless of individual success or failure.
-
-## Commands — what to do
-
-Five command kinds:
-
-| Kind | Purpose | Key fields |
-|------|---------|-----------|
-| `mutate-element` | Change a DOM element or component | `target`, `mutation`, `value?`, `source?`, `vendor?` |
-| `dispatch` | Fire a custom event | `event`, `payload?` |
-| `mutate-event` | Modify the event args | `mutation` |
-| `validation-errors` | Route server errors to form fields | `formId` |
-| `into` | Inject response HTML into container | `target` |
-
-## Mutations — how to change
-
-Two primitives. The [Runtime](../runtime/) page explains how they execute via bracket notation.
-
-| Kind | Plan shape |
-|------|-----------|
-| `set-prop` | `{ "prop": "textContent" }` |
-| `call` | `{ "method": "add", "chain": "classList", "args": [...] }` |
-
-## Sources — where values come from
-
-| Kind | Plan shape |
-|------|-----------|
-| `event` | `{ "path": "evt.address.city" }` |
-| `component` | `{ "componentId": "Country", "vendor": "fusion", "readExpr": "value" }` |
-
-How these resolve at runtime is covered in [Runtime — Value resolution](../runtime/#value-resolution--resolverts--walkts).
-
-## Gather — what goes in the request
-
-| Kind | Plan shape | What it collects |
-|------|-----------|-----------------|
-| `all` | `{ "kind": "all" }` | Every registered component's value |
-| `static` | `{ "kind": "static", "param": "action", "value": "create" }` | Fixed value |
-| `component` | `{ "kind": "component", "componentId": "...", "vendor": "...", "readExpr": "..." }` | One component's live value |
-| `event` | `{ "kind": "event", "param": "q", "path": "evt.text" }` | Value from event payload |
-
-`all` is a placeholder — expanded at C# render time to concrete `component` items from the plan's ComponentsMap.
-
-## Components registry — what's on the page
-
-```json
-{
-  "components": {
-    "Name":      { "id": "Name", "vendor": "native", "readExpr": "value", "componentType": "textbox" },
-    "IsUrgent":  { "id": "IsUrgent", "vendor": "native", "readExpr": "checked", "componentType": "checkbox" },
-    "DueDate":   { "id": "DueDate", "vendor": "fusion", "readExpr": "value", "componentType": "datepicker" }
-  }
-}
-```
-
-Every `Html.InputField` call registers here. The runtime uses this for gather (`IncludeAll`), validation (field → component lookup), and enrichment (filling validation field metadata).
-
-## Why structure matters
-
-Every plan is checked against a JSON Schema in unit tests. If a builder produces a shape the schema doesn't allow — wrong `kind`, missing field, invalid combination — the test fails before any browser is involved.
-
-| Concept | Valid kinds |
-|---------|-----------|
-| Triggers | `dom-ready`, `custom-event`, `component-event`, `server-push`, `signalr` |
-| Reactions | `sequential`, `conditional`, `http`, `parallel-http` |
-| Commands | `mutate-element`, `dispatch`, `mutate-event`, `validation-errors`, `into` |
-| Mutations | `set-prop`, `call` |
-| Sources | `event`, `component` |
-| Gather | `all`, `static`, `component`, `event` |
-
-If you need a new capability — say a new mutation kind — it goes into the schema first. The schema is the gatekeeper. The plan is the contract. Both sides (C# and JS) agree on its shape, and neither reaches beyond it.
-
-Now that you know what the plan looks like, the next question is: how do you add new things to it?
-
-## Next
-
-- [The Vertical Slice](../vertical-slice/) — the 7-file pattern for adding a component
-- [Runtime](../runtime/) — how the runtime boots, executes commands, and resolves values
+If a new capability cannot be expressed by extending one of these four sections, it probably does not belong in the framework yet.

@@ -1,49 +1,127 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  components: {
-    Name: {
-      id: comp1,
-      vendor: native,
-      readExpr: value,
-      componentType: textbox,
-      coerceAs: string
-    },
-    Amount: {
-      id: comp2,
-      vendor: fusion,
-      readExpr: value,
-      componentType: numerictextbox,
-      coerceAs: number
-    }
-  },
-  entries: [
-    {
-      trigger: {
-        kind: dom-ready
-      },
-      reaction: {
-        kind: http,
-        request: {
-          verb: POST,
-          url: /api/save,
-          gather: [
+  contracts: {
+    native.textbox: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        value: {
+          kind: property,
+          path: [
             {
-              kind: all
+              prop: value
             }
           ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: read
+        }
+      }
+    },
+    fusion.numerictextbox: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: number
+          },
+          access: read
+        }
+      }
+    },
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::comp1: {
+      contract: native.textbox,
+      elementId: comp1
+    },
+    component::comp2: {
+      contract: fusion.numerictextbox,
+      elementId: comp2
+    },
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  bindings: {
+    Name: {
+      object: component::comp1,
+      valueMember: value,
+      shape: {
+        kind: scalar,
+        type: string
+      }
+    },
+    Amount: {
+      object: component::comp2,
+      valueMember: value,
+      shape: {
+        kind: scalar,
+        type: number
+      }
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: dom-ready
+      },
+      run: {
+        kind: request,
+        request: {
+          method: POST,
+          url: /api/save,
+          input: {
+            transport: json,
+            value: {
+              kind: binding-map,
+              include: all
+            }
+          },
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: saved
                 }
-              ]
+              }
             }
           ]
         }

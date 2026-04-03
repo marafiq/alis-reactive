@@ -1,38 +1,74 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.r: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::r: {
+      contract: element.r,
+      elementId: r
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.score
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: score
+                  }
+                ]
               },
-              coerceAs: number,
               op: gte,
-              operand: 80
+              right: {
+                kind: literal,
+                value: 80
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: r,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: pass
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::r,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: pass
+              }
             }
           }
         ]

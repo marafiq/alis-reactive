@@ -273,7 +273,7 @@ public class ReactiveMixedValidator : ReactiveValidator<TestModel>
         {
             RuleFor(x => x.JobTitle).NotEmpty();
         });
-        // Server-only via .When() — should be skipped by adapter
+        // Server-only via .When() — should be skipped by the extractor
         RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m).When(x => x.Age > 18);
     }
 }

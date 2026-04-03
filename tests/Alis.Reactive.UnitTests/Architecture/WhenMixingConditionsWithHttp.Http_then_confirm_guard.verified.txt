@@ -1,55 +1,78 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.check-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::check-result: {
+      contract: element.check-result,
+      elementId: check-result
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/check,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: check-result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::check-result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: checked
                 }
-              ]
+              }
             }
           ]
         }
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
+            when: {
               kind: confirm,
               message: Proceed with dangerous action?
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: dispatch,
-                  event: danger-confirmed
-                }
-              ]
+            run: {
+              kind: dispatch,
+              name: danger-confirmed
             }
           }
         ]

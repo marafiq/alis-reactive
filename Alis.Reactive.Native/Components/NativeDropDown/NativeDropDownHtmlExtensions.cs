@@ -1,5 +1,5 @@
 using System;
-using Alis.Reactive.Descriptors;
+using Alis.Reactive;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
@@ -25,8 +25,8 @@ namespace Alis.Reactive.Native.Components
             Action<NativeDropDownBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr, "dropdown",
+            setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
+                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMemberPath, "dropdown",
                 CoercionTypes.InferFromType(typeof(TProp))));
 
             var builder = new NativeDropDownBuilder<TModel, TProp>(setup.Helper, setup.Expression);

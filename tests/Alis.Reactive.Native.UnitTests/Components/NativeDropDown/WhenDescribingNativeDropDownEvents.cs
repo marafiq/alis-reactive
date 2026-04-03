@@ -14,18 +14,18 @@ public class WhenDescribingNativeDropDownEvents
     }
 
     [Test]
-    public void Changed_descriptor_has_correct_js_event()
+    public void Changed_event_contract_has_correct_js_event()
     {
-        var descriptor = NativeDropDownEvents.Instance.Changed;
-        Assert.That(descriptor.JsEvent, Is.EqualTo("change"));
+        var reactiveEvent = NativeDropDownEvents.Instance.Changed;
+        Assert.That(reactiveEvent.EventName, Is.EqualTo("change"));
     }
 
     [Test]
-    public void Changed_descriptor_provides_args_instance()
+    public void Changed_event_contract_provides_args_instance()
     {
-        var descriptor = NativeDropDownEvents.Instance.Changed;
-        Assert.That(descriptor.Args, Is.Not.Null);
-        Assert.That(descriptor.Args, Is.TypeOf<NativeDropDownChangeArgs>());
+        var reactiveEvent = NativeDropDownEvents.Instance.Changed;
+        Assert.That(reactiveEvent.Payload, Is.Not.Null);
+        Assert.That(reactiveEvent.Payload, Is.TypeOf<NativeDropDownChangeArgs>());
     }
 
     [Test]

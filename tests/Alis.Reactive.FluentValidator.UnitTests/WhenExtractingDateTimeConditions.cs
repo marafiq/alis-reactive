@@ -8,12 +8,12 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingDateTimeConditions
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     [Test]
     public void WhenField_DateTime_eq_serializes_value_as_unix_ms()
     {
-        var desc = _adapter.ExtractRules(typeof(DateTimeConditionValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(DateTimeConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var nameField = desc!.Fields.First(f => f.FieldName == "Name");
@@ -35,7 +35,7 @@ public class WhenExtractingDateTimeConditions
     [Test]
     public void WhenFieldNot_DateTime_neq_serializes_value_as_unix_ms()
     {
-        var desc = _adapter.ExtractRules(typeof(DateTimeNeqConditionValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(DateTimeNeqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var scoreField = desc!.Fields.First(f => f.FieldName == "Score");
@@ -55,7 +55,7 @@ public class WhenExtractingDateTimeConditions
     public void WhenFieldNot_string_neq_keeps_string_value()
     {
         // Verify non-DateTime conditions are NOT affected by Unix ms serialization
-        var desc = _adapter.ExtractRules(typeof(ReactiveNeqConditionValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ReactiveNeqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var emailField = desc!.Fields.First(f => f.FieldName == "Email");

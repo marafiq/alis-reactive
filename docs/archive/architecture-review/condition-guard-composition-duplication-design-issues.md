@@ -87,7 +87,7 @@ private GuardBuilder<TModel> Build(string op, object? operand = null)
     return ComposeAndWrap(guard);
 }
 
-private GuardBuilder<TModel> BuildVsSource(string op, TypedSource<TProp> right)
+private GuardBuilder<TModel> BuildVsSource(string op, ValueExpression<TProp> right)
 {
     var guard = new ValueGuard(_typedSource.ToBindSource(), _coerceAs, op, right.ToBindSource());
     return ComposeAndWrap(guard);

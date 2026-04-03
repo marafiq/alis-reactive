@@ -3,7 +3,7 @@ namespace Alis.Reactive.UnitTests;
 /// <summary>
 /// Conditions compose freely with HTTP blocks at the outer pipeline level.
 /// The pipeline segments: condition → HTTP → condition → HTTP. Each segment
-/// becomes a separate entry. Covers all HTTP verbs, Chained, Parallel,
+/// becomes a separate workflow. Covers all HTTP verbs, Chained, Parallel,
 /// Confirm, compound guards (And/Or/Not), and gather.
 /// </summary>
 [TestFixture]

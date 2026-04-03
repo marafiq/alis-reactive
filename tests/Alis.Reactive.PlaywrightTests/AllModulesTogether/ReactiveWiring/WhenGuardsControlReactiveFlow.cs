@@ -447,7 +447,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     /// works in isolation from a clean state.
     ///
     /// WHY: proves the Else branch evaluates correctly on first interaction —
-    /// not just as a fallback after other branches have set prior state
+    /// not just as a default branch after other branches have set prior state
     /// </summary>
     [Test]
     public async Task selecting_pending_directly_fires_else_branch()

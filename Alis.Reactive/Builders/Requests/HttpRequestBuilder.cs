@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Reactions;
-using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Configures an HTTP request: URL, verb, request body (gather), loading state,
+    /// Configures an HTTP request: URL, verb, request values, loading state,
     /// client-side validation, and response handlers.
     /// </summary>
     /// <remarks>
@@ -26,14 +24,22 @@ namespace Alis.Reactive.Builders.Requests
     /// <typeparam name="TModel">The view model type.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
     {
+        private readonly PlanAuthoringContext _authoring;
+        private readonly WorkflowScope _scope;
         private string _verb = "GET";
         private string _url = "";
-        private List<GatherItem>? _gather;
+        private List<RequestValuePart>? _requestValues;
         private string? _contentType;
-        private List<Command>? _whileLoading;
+        private List<PlanAction>? _whileLoading;
         private ResponseBuilder<TModel>? _response;
-        private ValidationDescriptor? _validation;
+        private RequestValidation? _validation;
         private Type? _validatorType;
+
+        internal HttpRequestBuilder(PlanAuthoringContext authoring, WorkflowScope scope)
+        {
+            _authoring = authoring;
+            _scope = scope;
+        }
 
         internal HttpRequestBuilder<TModel> SetVerb(string verb)
         {
@@ -73,7 +79,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var builder = new GatherBuilder<TModel>();
             gather(builder);
-            _gather = builder.Items;
+            _requestValues = builder.RequestValues;
             return this;
         }
 
@@ -94,38 +100,39 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the loading-state commands (reverted after the response arrives).</param>
         public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var builder = new PipelineBuilder<TModel>();
+            var builder = new PipelineBuilder<TModel>(_authoring, _scope);
             pipeline(builder);
-            var reaction = builder.BuildReaction();
-            if (!(reaction is SequentialReaction sr))
+            var actions = builder.BuildActions();
+            if (actions.Count != 1 || ContainsStructuredAction(actions[0]))
                 throw new InvalidOperationException(
                     "WhileLoading only supports plain commands (sequential). " +
                     "Conditions, HTTP, and parallel pipelines are not valid here.");
-            _whileLoading = sr.Commands;
+
+            _whileLoading = FlattenSequential(actions[0]);
             return this;
         }
 
         /// <summary>
-        /// Registers client-side validation from a pre-built descriptor.
+        /// Registers client-side validation from a pre-built form validation contract.
         /// When present, the runtime validates the form before sending the request.
         /// If validation fails, the request is aborted.
         /// </summary>
-        public HttpRequestBuilder<TModel> Validate(ValidationDescriptor validation)
+        public HttpRequestBuilder<TModel> Validate(FormValidation validation)
         {
-            _validation = validation;
+            _validation = _authoring.ConvertValidation(validation);
             return this;
         }
 
         /// <summary>
         /// Registers client-side validation by validator type.
-        /// Rules are extracted automatically at Render() time via IValidationExtractor.
+        /// Rules are extracted automatically at Render() time via <see cref="IFormValidationExtractor"/>.
         /// Field IDs use standard convention (property name = element ID).
         /// </summary>
         public HttpRequestBuilder<TModel> Validate<TValidator>(string formId)
             where TValidator : class
         {
             _validatorType = typeof(TValidator);
-            _validation = new ValidationDescriptor(formId, new List<ValidationField>());
+            _validation = new RequestValidation(formId, new List<RequestValidationField>());
             return this;
         }
 
@@ -135,29 +142,61 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="response">Defines the success and error handlers for the response.</param>
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response)
         {
-            var builder = new ResponseBuilder<TModel>();
+            var builder = new ResponseBuilder<TModel>(_authoring, _scope);
             response(builder);
             _response = builder;
             return this;
         }
 
-        internal RequestDescriptor BuildRequestDescriptor()
+        internal RequestPlan BuildRequestPlan()
         {
-            var desc = new RequestDescriptor(
-                _verb,
-                _url,
-                _gather,
-                _contentType,
-                _whileLoading,
-                _response?.SuccessHandlers.Count > 0 ? _response.SuccessHandlers : null,
-                _response?.ErrorHandlers.Count > 0 ? _response.ErrorHandlers : null,
-                _response?.ChainedRequest,
-                _validation);
+            var request = new RequestPlan(_verb, _url);
+
+            if (_requestValues != null && _requestValues.Count > 0)
+                request.Input = new RequestInput(ResolveTransport(), _authoring.BuildRequestValue(_requestValues));
+
+            if (_whileLoading != null && _whileLoading.Count > 0)
+                request.Before = _whileLoading;
+
+            if (_validation != null)
+                request.Validation = _validation;
+
+            _response?.ApplyTo(request);
 
             if (_validatorType != null)
-                desc.AttachValidator(_validatorType);
+                _authoring.TrackPendingValidator(request, _validatorType);
 
-            return desc;
+            return request;
+        }
+
+        private string ResolveTransport()
+        {
+            if (_verb == "GET")
+                return "query";
+
+            return _contentType == "form-data" ? "form-data" : "json";
+        }
+
+        private static bool ContainsStructuredAction(PlanAction action)
+        {
+            if (action is SequenceAction sequence)
+            {
+                foreach (var step in sequence.Steps)
+                    if (ContainsStructuredAction(step))
+                        return true;
+
+                return false;
+            }
+
+            return action is BranchAction || action is RequestAction || action is ParallelAction;
+        }
+
+        private static List<PlanAction> FlattenSequential(PlanAction action)
+        {
+            if (action is SequenceAction sequence)
+                return sequence.Steps;
+
+            return new List<PlanAction> { action };
         }
     }
 }

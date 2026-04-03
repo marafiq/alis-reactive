@@ -1,12 +1,19 @@
-import type { ValidationDescriptor } from "./validation";
-import type { ComponentEntry } from "./plan";
+import type { Plan, RequestValidation } from "./plan";
 
-export type Vendor = "fusion" | "native";
-export type EventPayload = Record<string, unknown>;
+export interface TraceContext {
+  readonly traceId: string;
+  readonly spanId: string;
+  readonly traceFlags: string;
+  readonly parentSpanId?: string;
+}
 
 export interface ExecContext {
-  readonly evt?: Record<string, unknown>;
-  readonly responseBody?: unknown;
-  readonly validationDesc?: ValidationDescriptor;
-  readonly components?: Record<string, ComponentEntry>;
+  readonly plan: Plan;
+  readonly event?: unknown;
+  readonly eventObject?: unknown;
+  readonly response?: unknown;
+  readonly request?: unknown;
+  readonly local?: Record<string, unknown>;
+  readonly validation?: RequestValidation;
+  readonly trace?: TraceContext;
 }

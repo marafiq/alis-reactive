@@ -9,11 +9,22 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 public class WhenHubConnectionEstablishes : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/HttpPipeline/RealTime";
+    private const string PushResidentStatusPattern = "**/Sandbox/HttpPipeline/RealTime/PushResidentStatus";
 
     private ILocator LoadPanelBtn => Page.Locator("#load-panel");
     private ILocator PushStatusBtn => Page.Locator("#btn-push-status");
     private ILocator PanelResidentName => Page.Locator("#panel-resident-name");
     private ILocator PanelResidentStatus => Page.Locator("#panel-resident-status");
+
+    private async Task PushResidentStatus()
+    {
+        var response = await Page.RunAndWaitForResponseAsync(
+            async () => await ClickWhenStable(PushStatusBtn),
+            PushResidentStatusPattern);
+
+        Assert.That((int)response.Status, Is.EqualTo(200),
+            "PushResidentStatus must return 200 OK.");
+    }
 
     [Test]
     public async Task partial_receives_hub_updates_after_loading()
@@ -26,7 +37,7 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
         await Expect(PanelResidentName).ToBeVisibleAsync(new() { Timeout = 10000 });
         await WaitForTraceMessage("merge", 10000);
 
-        await PushStatusBtn.ClickAsync();
+        await PushResidentStatus();
 
         await Expect(PanelResidentName).ToContainTextAsync("Helen Martinez",
             new() { Timeout = 10000 });
@@ -46,7 +57,7 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
         await Expect(PanelResidentName).ToBeVisibleAsync(new() { Timeout = 5000 });
         await WaitForTraceMessage("merge", 5000);
 
-        await PushStatusBtn.ClickAsync();
+        await PushResidentStatus();
 
         // Parent DOM updates
         var parentName = Page.Locator("#resident-name");

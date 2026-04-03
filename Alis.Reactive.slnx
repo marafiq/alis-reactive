@@ -5,7 +5,6 @@
   </Folder>
   <Folder Name="/.claude/memory/">
     <File Path=".claude/memory/MEMORY.md" />
-    <File Path=".claude/memory/component-architecture.md" />
     <File Path=".claude/memory/vertical-slice-design.md" />
     <File Path=".claude/memory/idgenerator-design.md" />
     <File Path=".claude/memory/event-args-mutation-design.md" />
@@ -74,8 +73,8 @@
     <File Path="docs-site/src/content/docs/architecture/component-model.md" />
   </Folder>
   <Folder Name="/docs-site/content/csharp-modules/">
-    <File Path="docs-site/src/content/docs/csharp-modules/plan-and-entries.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/triggers-and-reactions.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/plan-model.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/subscriptions-and-workflows.md" />
     <File Path="docs-site/src/content/docs/csharp-modules/element-mutations.md" />
     <File Path="docs-site/src/content/docs/csharp-modules/conditions.md" />
     <File Path="docs-site/src/content/docs/csharp-modules/http-pipeline.md" />

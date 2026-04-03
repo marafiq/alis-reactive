@@ -1,33 +1,67 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: parallel-http,
-        requests: [
+      run: {
+        kind: parallel,
+        steps: [
           {
-            verb: GET,
-            url: /api/residents
+            kind: request,
+            request: {
+              method: GET,
+              url: /api/residents
+            }
           },
           {
-            verb: GET,
-            url: /api/facilities
+            kind: request,
+            request: {
+              method: GET,
+              url: /api/facilities
+            }
           }
         ],
-        onAllSettled: [
-          {
-            kind: mutate-element,
-            target: result,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
+        onSettled: {
+          kind: set,
+          target: {
+            object: element::result,
+            member: text
+          },
+          value: {
+            kind: literal,
             value: all loaded
           }
-        ]
+        }
       }
     }
   ]

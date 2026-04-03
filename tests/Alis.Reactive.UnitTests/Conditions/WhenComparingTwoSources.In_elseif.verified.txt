@@ -1,93 +1,158 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TwoSourceModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Rate: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Budget: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    element.s: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_UnitTests_TwoSourceModel__Rate: {
+      contract: fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+      elementId: Alis_Reactive_UnitTests_TwoSourceModel__Rate
+    },
+    component::Alis_Reactive_UnitTests_TwoSourceModel__Budget: {
+      contract: fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Budget,
+      elementId: Alis_Reactive_UnitTests_TwoSourceModel__Budget
+    },
+    element::s: {
+      contract: element.s,
+      elementId: s
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: component,
-                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Rate,
-                vendor: fusion,
-                readExpr: value
+            when: {
+              kind: compare,
+              left: {
+                kind: member,
+                object: component::Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+                member: value
               },
-              coerceAs: number,
               op: lt,
-              rightSource: {
-                kind: component,
-                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Budget,
-                vendor: fusion,
-                readExpr: value
-              }
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: s,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Under
-                }
-              ]
-            }
-          },
-          {
-            guard: {
-              kind: value,
-              source: {
-                kind: component,
-                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Rate,
-                vendor: fusion,
-                readExpr: value
+              right: {
+                kind: member,
+                object: component::Alis_Reactive_UnitTests_TwoSourceModel__Budget,
+                member: value
               },
-              coerceAs: number,
-              op: eq,
-              rightSource: {
-                kind: component,
-                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Budget,
-                vendor: fusion,
-                readExpr: value
+              as: {
+                kind: scalar,
+                type: number
               }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: s,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Exact
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::s,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Under
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: s,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Over
-                }
-              ]
+            when: {
+              kind: compare,
+              left: {
+                kind: member,
+                object: component::Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+                member: value
+              },
+              op: eq,
+              right: {
+                kind: member,
+                object: component::Alis_Reactive_UnitTests_TwoSourceModel__Budget,
+                member: value
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::s,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Exact
+              }
+            }
+          },
+          {
+            run: {
+              kind: set,
+              target: {
+                object: element::s,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Over
+              }
             }
           }
         ]

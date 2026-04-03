@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionMultiColumnComboBox"/> component.
+    /// Typed reactive events for the <see cref="FusionMultiColumnComboBox"/> component.
     /// </summary>
     /// <remarks>
     /// Select an event via the <c>.Reactive()</c> lambda:
@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionMultiColumnComboBoxEvents() { }
 
         /// <summary>Fires when the selected value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionMultiColumnComboBoxChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionMultiColumnComboBoxChangeArgs>(
+        public ReactiveEvent<FusionMultiColumnComboBoxChangeArgs> Changed =>
+            new ReactiveEvent<FusionMultiColumnComboBoxChangeArgs>(
                 "change", new FusionMultiColumnComboBoxChangeArgs());
     }
 }

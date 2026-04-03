@@ -1,16 +1,14 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Payload for TestWidgetNative.Changed (DOM "change" event).
-    /// Properties are typed markers for expression-based source binding:
-    ///   p.Element("result").SetText(args, x => x.Value)
-    /// ExpressionPathHelper resolves x => x.Value to "evt.value".
+    /// Represents the payload surface for the native test-widget change event.
     /// </summary>
     public class TestWidgetNativeChangeArgs
     {
-        /// <summary>The input's value after the change.</summary>
+        /// <summary>Gets or sets the widget value after the change.</summary>
         public string? Value { get; set; }
 
+        /// <summary>Creates an empty widget change payload marker.</summary>
         public TestWidgetNativeChangeArgs() { }
     }
 }

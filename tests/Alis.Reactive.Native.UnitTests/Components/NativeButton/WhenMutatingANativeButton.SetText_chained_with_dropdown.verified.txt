@@ -1,32 +1,85 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
+  contracts: {
+    native.component.submitBtn: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Status: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::submitBtn: {
+      contract: native.component.submitBtn,
+      elementId: submitBtn
+    },
+    component::Alis_Reactive_Native_UnitTests_NativeTestModel__Status: {
+      contract: native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
+      elementId: Alis_Reactive_Native_UnitTests_NativeTestModel__Status
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: submitBtn,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: component::submitBtn,
+              member: text
             },
-            value: Updated,
-            vendor: native
+            value: {
+              kind: literal,
+              value: Updated
+            }
           },
           {
-            kind: mutate-element,
-            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
-            mutation: {
-              kind: set-prop,
-              prop: value
+            kind: set,
+            target: {
+              object: component::Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
+              member: value
             },
-            value: active,
-            vendor: native
+            value: {
+              kind: literal,
+              value: active
+            }
           }
         ]
       }

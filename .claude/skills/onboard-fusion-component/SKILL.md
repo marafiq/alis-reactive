@@ -81,7 +81,7 @@ Alis.Reactive.Fusion/Components/FusionXxx/
 ├── FusionXxx.cs                    ← EXISTS? Don't touch
 ├── FusionXxxExtensions.cs          ← EXISTS? ADD methods, don't recreate
 ├── FusionXxxHtmlExtensions.cs      ← EXISTS? Don't touch
-├── FusionXxxEvents.cs              ← EXISTS? ADD event descriptor, don't recreate
+├── FusionXxxEvents.cs              ← EXISTS? ADD event definitions, don't recreate
 ├── FusionXxxReactiveExtensions.cs  ← EXISTS? Don't touch (generic TArgs handles any event)
 └── Events/
     └── FusionXxxOnChanged.cs       ← EXISTS? Don't touch
@@ -96,13 +96,13 @@ Alis.Reactive.Fusion/Components/FusionXxx/
 
 | JS API Pattern | Supported? | Mechanism |
 |---|---|---|
-| `ej2.prop = value` | YES | `self.Emit(new SetPropMutation("prop"), value: val)` |
-| `ej2.method()` | YES | `self.Emit(new CallMutation("method"))` |
-| `ej2.method("arg")` | YES | `self.Emit(new CallMutation("method", args: new[] { new LiteralArg("arg") }))` |
-| `ej2.method(data)` from response | YES | `CallMutation` + `SourceArg(new EventSource(path))` |
-| `ej2.prop` (read for conditions) | YES | `new TypedComponentSource<T>(id, vendor, readExpr)` |
-| `e.prop = true` on event args | YES | `new MutateEventCommand(new SetPropMutation("prop"), value: true)` |
-| `e.method(data)` on event args | YES | `new MutateEventCommand(new CallMutation("method", args: ...))` |
+| `ej2.prop = value` | YES | component property action |
+| `ej2.method()` | YES | component method action |
+| `ej2.method("arg")` | YES | component method action with literal args |
+| `ej2.method(data)` from response | YES | component method action with response-backed value path |
+| `ej2.prop` (read for conditions) | YES | `new ComponentValueExpression<T>(id, vendor, valueMemberPath)` |
+| `e.prop = true` on event args | YES | event-object property action |
+| `e.method(data)` on event args | YES | event-object method action |
 | `evt.text` send to server | YES | `g.FromEvent(args, x => x.Text, "param")` |
 | `ej2.method()` → use return value | NO (v2) | Return value capture not supported |
 | `ej2.method()[0].prop` chained | NO (v2) | Variable concept not in plan |
@@ -114,40 +114,40 @@ Alis.Reactive.Fusion/Components/FusionXxx/
 One-line addition to `FusionXxxExtensions.cs`. Reference: `FusionAutoCompleteExtensions.cs`
 
 ```csharp
-// Void method → CallMutation
+// Void method → component method action
 public static ComponentRef<FusionXxx, TModel> ShowPopup<TModel>(
     this ComponentRef<FusionXxx, TModel> self) where TModel : class
-    => self.Emit(new CallMutation("showPopup"));
+    => self.Call("showPopup");
 
-// Property set → SetPropMutation
+// Property set → component property action
 public static ComponentRef<FusionXxx, TModel> Disable<TModel>(
     this ComponentRef<FusionXxx, TModel> self) where TModel : class
-    => self.Emit(new SetPropMutation("enabled"), value: false);
+    => self.Set("enabled", false, coerceAs: "boolean");
 
-// Property set from response → SetPropMutation + EventSource (ResponseBody overload)
+// Property set from response → component property action + response path
 public static ComponentRef<FusionXxx, TModel> SetDataSource<TModel, TResponse>(
     this ComponentRef<FusionXxx, TModel> self,
     ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
     where TModel : class where TResponse : class
 {
     var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-    return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+    return self.SetFromPath("dataSource", sourcePath);
 }
 
-// Property set from generic event payload → SetPropMutation + EventSource (TSource overload)
+// Property set from generic event payload → component property action + event path
 public static ComponentRef<FusionXxx, TModel> SetDataSource<TModel, TSource>(
     this ComponentRef<FusionXxx, TModel> self,
     TSource source, Expression<Func<TSource, object?>> path)
     where TModel : class
 {
     var sourcePath = ExpressionPathHelper.ToEventPath(path);
-    return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+    return self.SetFromPath("dataSource", sourcePath);
 }
 
-// Read value → TypedComponentSource
-public static TypedComponentSource<string> Value<TModel>(
+// Read value → ComponentValueExpression
+public static ComponentValueExpression<string> Value<TModel>(
     this ComponentRef<FusionXxx, TModel> self) where TModel : class
-    => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
+    => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
 ```
 
 ### Adding an Event (Simple — No Methods on Args)
@@ -166,8 +166,8 @@ public class FusionXxxYyyArgs
 
 **File 2:** Add to `FusionXxxEvents.cs`:
 ```csharp
-public TypedEventDescriptor<FusionXxxYyyArgs> Yyy =>
-    new TypedEventDescriptor<FusionXxxYyyArgs>("yyy", new FusionXxxYyyArgs());
+public ReactiveEvent<FusionXxxYyyArgs> Yyy =>
+    new ReactiveEvent<FusionXxxYyyArgs>("yyy", new FusionXxxYyyArgs());
 ```
 
 The string `"yyy"` is the SF JS event name from docs. The reactive extensions already handle any `TArgs` — no changes needed there.
@@ -187,16 +187,15 @@ public class FusionXxxFilteringArgs
 
 public static class FusionXxxFilteringArgsExtensions
 {
-    // set-prop on event args
+    // property action on event args
     public static void PreventDefault(
         this FusionXxxFilteringArgs args,
         ICommandEmitter pipeline)
     {
-        pipeline.AddCommand(new MutateEventCommand(
-            new SetPropMutation("preventDefaultAction"), value: true));
+        pipeline.SetEventProperty("preventDefaultAction", true, coerceAs: "boolean");
     }
 
-    // call on event args with response data
+    // method action on event args with response data
     public static void UpdateData<TResponse>(
         this FusionXxxFilteringArgs args,
         ICommandEmitter pipeline,
@@ -205,11 +204,7 @@ public static class FusionXxxFilteringArgsExtensions
         where TResponse : class
     {
         var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-        pipeline.AddCommand(new MutateEventCommand(
-            new CallMutation("updateData", args: new MethodArg[]
-            {
-                new SourceArg(new EventSource(sourcePath))
-            })));
+        pipeline.CallEventMemberFromPath("updateData", sourcePath);
     }
 }
 ```
@@ -240,10 +235,10 @@ public static class FusionXxxFilteringArgsExtensions
 
 Read ALL files in `FusionAutoComplete/` as reference. The pattern is 5 base files + 1 event file per event:
 
-1. `FusionXxx.cs` — extends `FusionComponent` (abstract base that provides `Vendor => "fusion"`), implements `IInputComponent`, declares `ReadExpr`
-2. `FusionXxxExtensions.cs` — mutations (SetValue, Enable, ShowPopup, Value, etc.)
+1. `FusionXxx.cs` — extends `FusionComponent` (abstract base that provides `Vendor => "fusion"`), implements `IInputComponent`, declares `ValueMemberPath`
+2. `FusionXxxExtensions.cs` — component action helpers (SetValue, Enable, ShowPopup, Value, etc.)
 3. `FusionXxxHtmlExtensions.cs` — `Html.InputField().Xxx()` factory + `Fields<TItem>()` + `ComponentRegistration`
-4. `FusionXxxEvents.cs` — singleton, one `TypedEventDescriptor` per event
+4. `FusionXxxEvents.cs` — singleton, one `ReactiveEvent<TArgs>` property per event
 5. `FusionXxxReactiveExtensions.cs` — `.Reactive()` on builder, generic `TArgs`
 
 Plus under `Events/`: one file per event (e.g., `FusionXxxOnChanged.cs`, `FusionXxxOnFiltering.cs`). The number of event files varies by component.
@@ -254,7 +249,7 @@ Copy each file, rename class/type names. Do not invent structure.
 
 ### ComponentRegistration (Critical — Inside HtmlExtensions)
 
-The `FusionXxxHtmlExtensions.cs` factory method MUST call `AddToComponentsMap` to register the component with the plan. Without this, the runtime cannot find or gather from the component. Template from `FusionAutoCompleteHtmlExtensions.cs`:
+The `FusionXxxHtmlExtensions.cs` factory method MUST register the component with the plan. Without this, authoring cannot create bindings or gathers for the component. Template from `FusionAutoCompleteHtmlExtensions.cs`:
 
 ```csharp
 public static void FusionXxx<TModel, TProp>(
@@ -262,8 +257,8 @@ public static void FusionXxx<TModel, TProp>(
     Action<XxxBuilder> build)
     where TModel : class
 {
-    setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-        setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "xxx",
+    setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
+        setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMemberPath, "xxx",
         CoercionTypes.InferFromType(typeof(TProp))));
 
     var builder = setup.Helper.EJS().XxxFor(setup.Expression)
@@ -273,22 +268,22 @@ public static void FusionXxx<TModel, TProp>(
 }
 ```
 
-Parameters: `elementId`, `vendor` (from `Component.Vendor`), `bindingPath`, `readExpr` (from `Component.ReadExpr`), `componentType` string (SF component name, lowercase), `CoercionTypes.InferFromType(typeof(TProp))`.
+Parameters: `elementId`, `vendor` (from `Component.Vendor`), `bindingPath`, `valueMemberPath` (from `Component.ValueMemberPath`), `componentType` string (SF component name, lowercase), `CoercionTypes.InferFromType(typeof(TProp))`.
 
 ### Event Naming Convention
 
 Three distinct names per event follow different conventions:
 - **Property name** on the events class: past tense (e.g. `Changed`, `Filtering`)
-- **SF event string** in `TypedEventDescriptor`: present tense (e.g. `"change"`, `"filtering"`)
+- **SF event string** in `ReactiveEvent<TArgs>`: present tense (e.g. `"change"`, `"filtering"`)
 - **Args class name**: uses the SF event string style, not the property name (e.g. `FusionAutoCompleteChangeArgs`, NOT `FusionAutoCompleteChangedArgs`)
 
 ## What Does NOT Change
 
 When onboarding any component, event, method, or prop — **NONE of these change:**
-- TS runtime (trigger.ts, commands.ts, element.ts, gather.ts)
+- TS runtime execution and resolution modules
 - JSON schema (reactive-plan.schema.json)
 - TS types (types/*.ts)
-- Core descriptors (Alis.Reactive project)
+- Core plan authoring model (Alis.Reactive project)
 
 **If you find yourself modifying any of these, STOP — you're doing it wrong.**
 
@@ -319,9 +314,9 @@ Every onboarded component/event needs tests at the layers it touches.
 
 See `references/playwright-patterns.md` for DOM structure details and test templates.
 
-### C# Unit Tests (If Adding New Descriptor Patterns)
+### C# Unit Tests (If Adding New V2 Authoring Patterns)
 
-Only needed when adding a pattern that doesn't exist yet. If you're just adding methods/events using existing mechanisms (SetPropMutation, CallMutation, MutateEventCommand, EventGather), the existing tests already cover the serialization.
+Only needed when adding a pattern that does not already exist in the V2 authoring model. If you are adding methods or events using existing member targeting, action building, or request input patterns, the existing tests already cover serialization.
 
 ### Sandbox Demo (Always Required — Full Vertical Slice)
 

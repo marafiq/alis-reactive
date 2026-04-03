@@ -6,7 +6,7 @@ namespace Alis.Reactive.UnitTests.ValidationEnrichment;
 /// <summary>
 /// Overview #3 — Component registration enforcement.
 /// InputBoundFieldBase.Render() must throw if the component was not registered
-/// via AddToComponentsMap. Silent skips in validation and gather are forbidden.
+/// via RegisterComponent. Silent skips in validation and gather are forbidden.
 ///
 /// These tests use the internal InputBoundFieldBase constructor because the public
 /// DSL (Html.InputField) requires ASP.NET IHtmlHelper, which lives in
@@ -39,7 +39,7 @@ public class WhenEnforcingComponentRegistration
 
         Assert.That(ex!.Message, Does.Contain("Name"),
             "Error must name the specific binding path that failed");
-        Assert.That(ex.Message, Does.Contain("AddToComponentsMap"),
+        Assert.That(ex.Message, Does.Contain("RegisterComponent"),
             "Error must tell the developer how to fix it");
     }
 
@@ -49,7 +49,7 @@ public class WhenEnforcingComponentRegistration
         var plan = new ReactivePlan<EnrichmentTestModel>();
         var writer = new StringWriter();
 
-        plan.AddToComponentsMap("Email", new ComponentRegistration(
+        plan.RegisterComponent("Email", new ComponentRegistration(
             "Email", "native", "Email", "value", "textbox", "string"));
 
         var setup = CreateSetup(plan, writer, x => x.Email, "Email");
@@ -74,7 +74,7 @@ public class WhenEnforcingComponentRegistration
         var writer = new StringWriter();
 
         // Register Name but not Email
-        plan.AddToComponentsMap("Name", new ComponentRegistration(
+        plan.RegisterComponent("Name", new ComponentRegistration(
             "Name", "native", "Name", "value", "textbox", "string"));
 
         var nameSetup = CreateSetup(plan, writer, x => x.Name, "Name");

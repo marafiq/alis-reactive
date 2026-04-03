@@ -1,68 +1,137 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: submit
-      },
-      reaction: {
-        kind: http,
-        request: {
-          verb: POST,
-          url: /api/submit,
-          gather: [
+  contracts: {
+    element.id: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
             {
-              kind: static,
-              param: data,
-              value: test
+              prop: textContent
             }
           ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::id: {
+      contract: element.id,
+      elementId: id
+    },
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: submit
+      },
+      run: {
+        kind: request,
+        request: {
+          method: POST,
+          url: /api/submit,
+          input: {
+            transport: json,
+            value: {
+              kind: object,
+              fields: {
+                data: {
+                  kind: literal,
+                  value: test
+                }
+              }
+            }
+          },
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: id,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+              run: {
+                kind: sequence,
+                steps: [
+                  {
+                    kind: set,
+                    target: {
+                      object: element::id,
+                      member: text
+                    },
+                    value: {
+                      kind: context,
+                      scope: response,
+                      path: [
+                        {
+                          prop: id
+                        }
+                      ]
+                    }
                   },
-                  source: {
-                    kind: event,
-                    path: responseBody.id
+                  {
+                    kind: set,
+                    target: {
+                      object: element::status,
+                      member: text
+                    },
+                    value: {
+                      kind: literal,
+                      value: success
+                    }
                   }
-                },
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: success
-                }
-              ]
+                ]
+              }
             }
           ],
           onError: [
             {
               statusCode: 422,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+              run: {
+                kind: sequence,
+                steps: [
+                  {
+                    kind: set,
+                    target: {
+                      object: element::status,
+                      member: text
+                    },
+                    value: {
+                      kind: literal,
+                      value: invalid
+                    }
                   },
-                  value: invalid
-                },
-                {
-                  kind: validation-errors,
-                  formId: form
-                }
-              ]
+                  {
+                    kind: show-validation-errors,
+                    formId: form
+                  }
+                ]
+              }
             }
           ]
         }

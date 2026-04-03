@@ -1,29 +1,28 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.CustomEventWithAllSupportedTypes,
-  entries: [
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: data-sync
+      when: {
+        kind: document-event,
+        name: data-sync
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: dispatch,
-            event: synced,
-            payload: {
-              intValue: 42,
-              longValue: 9007199254740991,
-              doubleValue: 3.14159,
-              floatValue: 2.718,
-              dateTimeValue: DateTimeOffset_1,
-              stringValue: hello,
-              dateValue: DateTimeOffset_2,
-              boolValue: true
-            }
+      run: {
+        kind: dispatch,
+        name: synced,
+        detail: {
+          kind: literal,
+          value: {
+            intValue: 42,
+            longValue: 9007199254740991,
+            doubleValue: 3.14159,
+            floatValue: 2.718,
+            dateTimeValue: DateTimeOffset_1,
+            stringValue: hello,
+            dateValue: DateTimeOffset_2,
+            boolValue: true
           }
-        ]
+        }
       }
     }
   ]

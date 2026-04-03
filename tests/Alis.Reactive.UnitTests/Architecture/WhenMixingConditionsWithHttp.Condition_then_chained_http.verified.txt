@@ -1,99 +1,175 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.pre-check: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.lookup-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.enrich-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::pre-check: {
+      contract: element.pre-check,
+      elementId: pre-check
+    },
+    element::lookup-result: {
+      contract: element.lookup-result,
+      elementId: lookup-result
+    },
+    element::enrich-result: {
+      contract: element.enrich-result,
+      elementId: enrich-result
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.value
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: value
+                  }
+                ]
               },
-              coerceAs: string,
-              op: not-empty
+              op: not-empty,
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: pre-check,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: has value
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::pre-check,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: has value
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: pre-check,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: empty
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::pre-check,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: empty
+              }
             }
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: GET,
+          method: GET,
           url: /api/lookup,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: lookup-result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::lookup-result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: found
                 }
-              ]
+              }
             }
           ],
-          chained: {
-            verb: POST,
+          next: {
+            method: POST,
             url: /api/enrich,
             onSuccess: [
               {
-                commands: [
-                  {
-                    kind: mutate-element,
-                    target: enrich-result,
-                    mutation: {
-                      kind: set-prop,
-                      prop: textContent
-                    },
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::enrich-result,
+                    member: text
+                  },
+                  value: {
+                    kind: literal,
                     value: enriched
                   }
-                ]
+                }
               }
             ]
           }

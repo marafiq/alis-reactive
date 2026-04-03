@@ -5,13 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Renders a &lt;div data-test-widget&gt; element that auto-mounts as a TestWidget
-    /// with ej2_instances pattern. Not model-bound — for standalone test widgets.
-    ///
-    /// Usage:
-    ///   @Html.TestWidget("my-widget")
-    ///       .InitialValue("hello")
-    ///       .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+    /// Renders the standalone Syncfusion-backed test widget used by architecture verification scenarios.
     /// </summary>
     public class TestWidgetSyncFusionBuilder<TModel> : IHtmlContent where TModel : class
     {
@@ -28,19 +22,28 @@ namespace Alis.Reactive.Fusion.Components
         internal string ElementId => _elementId;
 
         /// <summary>Sets CSS classes on the container element.</summary>
+        /// <param name="css">The CSS classes to render.</param>
+        /// <returns>The current builder.</returns>
         public TestWidgetSyncFusionBuilder<TModel> CssClass(string css)
         {
             _cssClass = css;
             return this;
         }
 
-        /// <summary>Sets the initial value via data-initial-value attribute.</summary>
+        /// <summary>Sets the initial value via the <c>data-initial-value</c> attribute.</summary>
+        /// <param name="value">The initial value to render.</param>
+        /// <returns>The current builder.</returns>
         public TestWidgetSyncFusionBuilder<TModel> InitialValue(string value)
         {
             _initialValue = value;
             return this;
         }
 
+        /// <summary>
+        /// Writes the widget markup.
+        /// </summary>
+        /// <param name="writer">The writer that receives the markup.</param>
+        /// <param name="encoder">The encoder used for HTML output.</param>
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             writer.Write("<div");
@@ -63,5 +66,4 @@ namespace Alis.Reactive.Fusion.Components
             writer.Write("></div>");
         }
     }
-
 }

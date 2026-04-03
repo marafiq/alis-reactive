@@ -9,9 +9,9 @@ type: feedback
 ### Core Insight
 Each layer has its OWN quality process. The process guides critical thinking at each boundary — it's never one flat flow. Decisions must be made with evidence at every transition.
 
-### Layer 1: C# Descriptors & Builders
+### Layer 1: C# Plan Authoring & Builders
 - **Skills**: TDD (pragmatic, not dogmatic), modern-csharp, dotnet-xml-docs
-- **Thinking**: Value Objects, Encapsulation, SOLID (some principles apply to descriptors)
+- **Thinking**: Value Objects, Encapsulation, SOLID in the V2 authoring layer
 - **Key**: What you write here DIRECTLY impacts schema. Think about serialization, business logic coordination with plan
 - **Tests**: Write FAILING unit test FIRST (Red), review it, THEN write code (Green)
 - **Harness**: VerifyJson snapshots + AssertSchemaValid

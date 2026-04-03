@@ -1,74 +1,141 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TwoSourceModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Primary: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Secondary: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    element.match: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_UnitTests_TwoSourceModel__Primary: {
+      contract: fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Primary,
+      elementId: Alis_Reactive_UnitTests_TwoSourceModel__Primary
+    },
+    component::Alis_Reactive_UnitTests_TwoSourceModel__Secondary: {
+      contract: fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Secondary,
+      elementId: Alis_Reactive_UnitTests_TwoSourceModel__Secondary
+    },
+    element::match: {
+      contract: element.match,
+      elementId: match
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: component,
-                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Primary,
-                vendor: fusion,
-                readExpr: value
+            when: {
+              kind: compare,
+              left: {
+                kind: member,
+                object: component::Alis_Reactive_UnitTests_TwoSourceModel__Primary,
+                member: value
               },
-              coerceAs: string,
               op: eq,
-              rightSource: {
-                kind: component,
-                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Secondary,
-                vendor: fusion,
-                readExpr: value
+              right: {
+                kind: member,
+                object: component::Alis_Reactive_UnitTests_TwoSourceModel__Secondary,
+                member: value
+              },
+              as: {
+                kind: scalar,
+                type: string
               }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: match,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::match,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: match,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::match,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

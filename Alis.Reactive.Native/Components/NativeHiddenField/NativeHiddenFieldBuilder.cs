@@ -8,9 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Renders a native HTML &lt;input type="hidden"&gt; element bound to a model property.
-    /// Uses IdGenerator for element ID and MVC NameFor for the name attribute.
-    /// No label, no validation slot — hidden inputs are invisible.
+    /// Builds a native hidden input bound to a model property.
     /// </summary>
     public class NativeHiddenFieldBuilder<TModel, TProp> : IHtmlContent
     {
@@ -27,9 +25,15 @@ namespace Alis.Reactive.Native.Components
             _bindingPath = html.NameFor(expression);
         }
 
+        /// <summary>Gets the rendered element id used for event wiring.</summary>
         internal string ElementId => _elementId;
+
+        /// <summary>Gets the model binding path used for reads and gathers.</summary>
         internal string BindingPath => _bindingPath;
 
+        /// <summary>Writes the hidden input markup.</summary>
+        /// <param name="writer">The writer that receives the markup.</param>
+        /// <param name="encoder">The encoder used for HTML output.</param>
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             var attrs = new System.Collections.Generic.Dictionary<string, object>

@@ -33,4 +33,8 @@
         <InternalsVisibleTo Include="Alis.Reactive.Fusion.UnitTests" />
     </ItemGroup>
 
+    <Target Name="SyncPackagedClientAssets" BeforeTargets="Pack">
+        <Exec Command="npm run build:package-assets" WorkingDirectory="$(MSBuildProjectDirectory)\.." />
+    </Target>
+
 </Project>

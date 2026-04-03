@@ -2,7 +2,7 @@
 
 Related: `process-pipeline.md` (overview) | `process-task-types.md` (tasks by layer)
 
-## Layer 1 — C# Descriptors & Builders
+## Layer 1 — C# Plan Authoring & Builders
 
 **Skills:** `modern-csharp`, `dotnet-xml-docs`, `superpowers:test-driven-development`
 
@@ -15,8 +15,8 @@ Related: `process-pipeline.md` (overview) | `process-task-types.md` (tasks by la
   Why: 5 constructors left public cascaded across 170+ files (M17).
 - Confirm the plan carries all information the runtime needs — runtime is a dumb executor.
   Why: Logic in the runtime splits behavior across two languages — untestable with C# unit tests.
-- Confirm adding a new component does not require modifying existing descriptors (OCP).
-  Why: 100+ vertical slices planned — each shared descriptor change risks all existing slices.
+- Confirm adding a new component does not require reshaping existing contracts or workflows (OCP).
+  Why: 100+ vertical slices planned — each shared plan-model change risks all existing slices.
 
 **Harness:** Write failing test first. `VerifyJson()` captures exact JSON. `AssertSchemaValid()`
 validates against schema. Both run every commit.
@@ -29,7 +29,7 @@ Schema changes require a failing test as evidence. Do not hand-edit the schema
 to match C# output — let a failing `AssertSchemaValid()` test drive the update.
 
 **Process:**
-1. Write C# descriptor/builder change
+1. Write the C# authoring or builder change
 2. Run `VerifyJson()` — snapshot shows new JSON shape
 3. Run `AssertSchemaValid()` — if it fails, that proves the schema needs updating
 4. Review failing test output — does new shape make sense as a contract?
@@ -76,8 +76,8 @@ from TS while present in C# and schema for weeks.
 **Before writing code, verify:**
 - Confirm this is the runtime's job, not information the plan should carry.
   Why: Logic in the runtime is invisible to C# unit tests and schema validation.
-- Confirm no vendor knowledge leaks outside `component.ts`.
-  Why: Adding a third vendor must only touch component.ts — leaks force changes across entire runtime.
+- Confirm no vendor knowledge leaks outside `resolution/contracts.ts`.
+  Why: Adding a third vendor must only touch `resolution/contracts.ts` — leaks force changes across entire runtime.
 - Confirm no fallbacks. Wrong values propagate silently for hours before surfacing.
   Why: Fail-fast surfaces errors at the source. Fallbacks hide them until they reach the browser.
 - Confirm no DOM scanning. Plan carries IDs; runtime uses getElementById only.
@@ -131,7 +131,7 @@ Every code example comes from a working, verified sandbox page.
 **Skills:** `dotnet-xml-docs`, domain skills for the topic
 
 **Before writing, verify:**
-- Confirm dev-facing language. No "runtime", "script tags", "descriptors" in user docs.
+- Confirm dev-facing language. No stale pre-V2 nouns in user docs.
 - Structure as question → answer. Progressive disclosure.
 - No em-dashes in XML docs (Rider flags them).
 

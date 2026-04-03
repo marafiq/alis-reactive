@@ -1,31 +1,84 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: cross-vendor
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
               prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status
+    },
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: cross-vendor
+      },
+      run: {
+        kind: sequence,
+        steps: [
+          {
+            kind: set,
+            target: {
+              object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+              member: value
             },
-            vendor: fusion
+            value: {
+              kind: literal
+            }
           },
           {
-            kind: mutate-element,
-            target: status,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::status,
+              member: text
             },
-            value: Reset via DropDown event
+            value: {
+              kind: literal,
+              value: Reset via DropDown event
+            }
           }
         ]
       }

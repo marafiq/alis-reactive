@@ -1,86 +1,94 @@
 ---
 title: Component Model
-description: How the runtime resolves vendor roots and executes component operations — native or Syncfusion — through one code path.
+description: How component slices lower to V2 contracts, objects, and bindings while keeping vendor differences isolated.
 sidebar:
   order: 8
 ---
 
-A native checkbox is `el.checked`. A Syncfusion date picker is `el.ej2_instances[0].value`. The runtime handles both through one code path. This page explains how.
+A native checkbox still reads `el.checked`. A Syncfusion date picker still reads `el.ej2_instances[0].value`. What changed in V2 is where that knowledge lives: the runtime no longer guesses from ad hoc payload fields. Component slices declare their capabilities once, and plan authoring lowers them into contracts, objects, and bindings.
 
-For the general execution model (bracket notation, command dispatch), see [Runtime](../runtime/).
+For the general execution model, see [Runtime](../runtime/).
 
-## Three metadata fields
+## What a component slice declares
 
-Each component declares three things in C#. The plan carries them. The runtime uses them.
+Each input component declares three pieces of authoring metadata in C#:
 
 | Field | Purpose | Example |
 |-------|---------|---------|
-| **Vendor** | Which root object to resolve | `"native"` or `"fusion"` |
-| **ReadExpr** | Which property to read | `"value"`, `"checked"` |
-| **ComponentType** | What kind of component | `"textbox"`, `"datepicker"` |
+| **Vendor** | Which resolver family to use | `"native"` or `"fusion"` |
+| **ValueMemberPath** | Which member path represents the canonical field value | `"value"`, `"checked"` |
+| **ComponentType** | Which semantic component kind the slice represents | `"textbox"`, `"datepicker"` |
 
-When you write `Html.InputField(plan, m => m.DueDate).FusionDatePicker(...)`, the builder registers `{ vendor: "fusion", readExpr: "value", componentType: "datepicker" }` in the plan's component registry.
+When you write `Html.InputField(plan, m => m.DueDate).FusionDatePicker(...)`, the slice registers that metadata once. Plan authoring then lowers it to:
 
-## Vendor resolution — one function, any vendor
+- a capability contract for that component kind
+- a runtime object for the rendered instance
+- a binding for the model field's canonical value member
+
+The browser runtime only sees the lowered V2 model. It resolves an object, resolves a member, and executes the requested action.
+
+## Vendor resolution stays isolated
 
 ```d2
 direction: right
 
-element: "DOM Element" {
+slice: "Component Slice\nvendor + value member path\ncomponent type" {
   shape: rectangle
   style.fill: "#f0f0f0"
   style.stroke: "#666"
   style.font-size: 18
 }
 
-native_root: "native\nroot = element" {
+contract: "Capability Contract\nresolver + members + events" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 18
 }
 
-fusion_root: "fusion\nroot = el.ej2_instances[0]" {
+object: "Runtime Object\nelementId + contract" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
 
-bracket: "root[prop] = val\nroot[method](args)\nSame code path" {
+runtime: "Runtime\nresolve object\nresolve member\nexecute" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 18
 }
 
-element -> native_root: vendor {
+slice -> contract: lower {
   style.stroke: "#4285f4"
 }
-element -> fusion_root: vendor {
+slice -> object: lower {
   style.stroke: "#f9ab00"
 }
-native_root -> bracket {
+contract -> runtime: resolver {
   style.stroke: "#34a853"
 }
-fusion_root -> bracket {
+object -> runtime: instance {
   style.stroke: "#34a853"
 }
 ```
 
-`component.ts` is the module that resolves vendor roots (`ej2_instances`). `trigger.ts` also has vendor-aware logic for constructing event detail objects — native components read `readExpr` from the element, while fusion components pass the event object directly. After resolving the root, every operation flows through bracket notation — the same two primitives (`set-prop`, `call`) described in [Runtime](../runtime/).
+Only the resolver knows vendor-specific details such as `ej2_instances[0]`. Everything else operates on named members from the contract.
 
-## Every interaction, one pattern
+## Every interaction follows one pattern
 
 | Interaction | Plan carries | Runtime does |
 |-------------|-------------|-------------|
-| **Read** (gather, conditions) | vendor + readExpr | `walk(resolveRoot(el, vendor), readExpr)` |
-| **Write** (SetValue, SetChecked) | vendor + prop | `resolveRoot(el, vendor)[prop] = val` |
-| **Call** (DataBind, ShowPopup) | vendor + method | `resolveRoot(el, vendor)[method]()` |
-| **Wire event** (.Reactive) | vendor + jsEvent | `resolveRoot(el, vendor).addEventListener(jsEvent)` |
+| **Read** (bindings, conditions, gather) | object + member | resolve object, walk member path |
+| **Write** (SetValue, SetChecked) | object + member | resolve object, set member |
+| **Call** (DataBind, ShowPopup) | object + member | resolve object, invoke member |
+| **Wire event** (.Reactive) | object + event contract | subscribe and shape event payload |
 
 ## Adding a new component — zero runtime changes
 
-The component declares its vendor and readExpr. The runtime already knows how to resolve vendors and walk readExprs. No new `if` branches, no new switch cases, no runtime deployment. For the full 7-file pattern, see [The Vertical Slice](../vertical-slice/).
+If the new slice can be expressed with the existing contract/member model, runtime code does not change. You add the slice, declare its value member path and events, and authoring lowers it to the same V2 document shape as every other component.
+
+For the full slice pattern, see [The Vertical Slice](../vertical-slice/).
 
 **Previous:** [Runtime](../runtime/)

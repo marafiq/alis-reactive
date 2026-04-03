@@ -38,7 +38,7 @@ namespace Alis.Reactive.Native.Components
         private string? _cssClass;
 
         // NEVER make public — devs create builders via the .NativeDropDown() factory,
-        // which also registers the component in the plan's ComponentsMap.
+        // which also registers the component in the plan's RegisteredComponents.
         internal NativeDropDownBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
         {
             _html = html;

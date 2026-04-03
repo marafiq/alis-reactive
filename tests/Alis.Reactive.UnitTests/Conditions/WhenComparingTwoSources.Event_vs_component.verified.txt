@@ -1,73 +1,124 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TwoSourceModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Rate: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    element.warn: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_UnitTests_TwoSourceModel__Rate: {
+      contract: fusion.component.Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+      elementId: Alis_Reactive_UnitTests_TwoSourceModel__Rate
+    },
+    element::warn: {
+      contract: element.warn,
+      elementId: warn
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: invoice
+      when: {
+        kind: document-event,
+        name: invoice
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.amount
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: amount
+                  }
+                ]
               },
-              coerceAs: number,
               op: gt,
-              rightSource: {
-                kind: component,
-                componentId: Alis_Reactive_UnitTests_TwoSourceModel__Rate,
-                vendor: fusion,
-                readExpr: value
+              right: {
+                kind: member,
+                object: component::Alis_Reactive_UnitTests_TwoSourceModel__Rate,
+                member: value
+              },
+              as: {
+                kind: scalar,
+                type: number
               }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: warn,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::warn,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: warn,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::warn,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

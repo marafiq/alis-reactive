@@ -1,40 +1,96 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.step-1: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        classAdd: {
+          kind: method,
+          path: [
+            {
+              prop: classList
+            },
+            {
+              prop: add
+            }
+          ],
+          args: [
+            {
+              kind: scalar,
+              type: string
+            }
+          ],
+          returns: void
+        }
+      }
+    },
+    element.step-2: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::step-1: {
+      contract: element.step-1,
+      elementId: step-1
+    },
+    element::step-2: {
+      contract: element.step-2,
+      elementId: step-2
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: step-1,
-            mutation: {
-              kind: call,
-              method: add,
-              chain: classList,
-              args: [
-                {
-                  kind: literal,
-                  value: complete
-                }
-              ]
-            }
+            kind: call,
+            target: {
+              object: element::step-1,
+              member: classAdd
+            },
+            args: [
+              {
+                kind: literal,
+                value: complete
+              }
+            ]
           },
           {
             kind: dispatch,
-            event: step-done
+            name: step-done
           },
           {
-            kind: mutate-element,
-            target: step-2,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::step-2,
+              member: text
             },
-            value: next
+            value: {
+              kind: literal,
+              value: next
+            }
           }
         ]
       }

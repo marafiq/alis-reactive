@@ -14,18 +14,18 @@ public class WhenDescribingFusionSwitchEvents
     }
 
     [Test]
-    public void Changed_descriptor_has_correct_js_event()
+    public void Changed_event_contract_has_correct_js_event()
     {
-        var descriptor = FusionSwitchEvents.Instance.Changed;
-        Assert.That(descriptor.JsEvent, Is.EqualTo("change"));
+        var reactiveEvent = FusionSwitchEvents.Instance.Changed;
+        Assert.That(reactiveEvent.EventName, Is.EqualTo("change"));
     }
 
     [Test]
-    public void Changed_descriptor_provides_args_instance()
+    public void Changed_event_contract_provides_args_instance()
     {
-        var descriptor = FusionSwitchEvents.Instance.Changed;
-        Assert.That(descriptor.Args, Is.Not.Null);
-        Assert.That(descriptor.Args, Is.TypeOf<FusionSwitchChangeArgs>());
+        var reactiveEvent = FusionSwitchEvents.Instance.Changed;
+        Assert.That(reactiveEvent.Payload, Is.Not.Null);
+        Assert.That(reactiveEvent.Payload, Is.TypeOf<FusionSwitchChangeArgs>());
     }
 
     [Test]

@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionFileUpload"/> component.
+    /// Typed reactive events for the <see cref="FusionFileUpload"/> component.
     /// </summary>
     /// <remarks>
     /// Select an event via the <c>.Reactive()</c> lambda:
@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionFileUploadEvents() { }
 
         /// <summary>Fires when files are selected (SF "selected" event).</summary>
-        public TypedEventDescriptor<FusionFileUploadSelectedArgs> Selected =>
-            new TypedEventDescriptor<FusionFileUploadSelectedArgs>(
+        public ReactiveEvent<FusionFileUploadSelectedArgs> Selected =>
+            new ReactiveEvent<FusionFileUploadSelectedArgs>(
                 "selected", new FusionFileUploadSelectedArgs());
     }
 }

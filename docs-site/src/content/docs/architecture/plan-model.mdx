@@ -1,0 +1,78 @@
+---
+title: Plan Model
+description: The V2 JSON document shape and the responsibilities of contracts, objects, bindings, and workflows.
+sidebar:
+  order: 4
+---
+
+The runtime consumes one V2 document:
+
+```json
+{
+  "version": 2,
+  "planId": "MyApp.Models.ResidentModel",
+  "sourceId": "resident-form",
+  "contracts": {},
+  "objects": {},
+  "bindings": {},
+  "workflows": []
+}
+```
+
+## Contracts
+
+Contracts describe capabilities, not instances.
+
+They answer:
+
+- how to resolve the runtime root
+- which members are readable
+- which members are writable
+- which methods are callable
+- which events are available
+
+Vendor-specific details belong here and nowhere else.
+
+## Objects
+
+Objects bind contracts to real runtime instances. They carry element ids or identify app-level services.
+
+## Bindings
+
+Bindings are the canonical model-facing reads. They keep validation, gather, and comparisons aligned on one shape.
+
+## Workflows
+
+Each workflow contains:
+
+- one subscription
+- one action tree
+
+Subscriptions describe when execution starts. Actions describe what happens next.
+
+## Why this model scales
+
+The same capability language covers:
+
+- native DOM reads and writes
+- Syncfusion property access
+- method calls with or without args
+- event-object reads and writes
+- HTTP request shaping
+- validation
+- partial merge and cleanup
+
+That means new features should reuse the existing model instead of inventing one more schema shape.
+
+## Partial merge
+
+`planId` groups related slices. `sourceId` defines ownership for replace/remove semantics.
+
+The runtime merges:
+
+- contracts by key
+- objects by key
+- bindings by key
+- workflows by source ownership
+
+No layer should reintroduce post-hoc plan rewriting.

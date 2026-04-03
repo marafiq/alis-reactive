@@ -1,61 +1,117 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.transfer-detail: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.conflict-msg: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::transfer-detail: {
+      contract: element.transfer-detail,
+      elementId: transfer-detail
+    },
+    element::conflict-msg: {
+      contract: element.conflict-msg,
+      elementId: conflict-msg
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/transfer,
           onSuccess: [
             {
-              reaction: {
-                kind: conditional,
-                branches: [
+              run: {
+                kind: branch,
+                cases: [
                   {
-                    guard: {
-                      kind: value,
-                      source: {
-                        kind: event,
-                        path: evt.count
+                    when: {
+                      kind: compare,
+                      left: {
+                        kind: context,
+                        scope: event,
+                        path: [
+                          {
+                            prop: count
+                          }
+                        ]
                       },
-                      coerceAs: number,
                       op: gt,
-                      operand: 0
+                      right: {
+                        kind: literal,
+                        value: 0
+                      },
+                      as: {
+                        kind: scalar,
+                        type: number
+                      }
                     },
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: transfer-detail,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: items transferred
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::transfer-detail,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: items transferred
+                      }
                     }
                   },
                   {
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: transfer-detail,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: nothing to transfer
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::transfer-detail,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: nothing to transfer
+                      }
                     }
                   }
                 ]
@@ -65,49 +121,54 @@
           onError: [
             {
               statusCode: 409,
-              reaction: {
-                kind: conditional,
-                branches: [
+              run: {
+                kind: branch,
+                cases: [
                   {
-                    guard: {
-                      kind: value,
-                      source: {
-                        kind: event,
-                        path: evt.category
+                    when: {
+                      kind: compare,
+                      left: {
+                        kind: context,
+                        scope: event,
+                        path: [
+                          {
+                            prop: category
+                          }
+                        ]
                       },
-                      coerceAs: string,
                       op: eq,
-                      operand: locked
+                      right: {
+                        kind: literal,
+                        value: locked
+                      },
+                      as: {
+                        kind: scalar,
+                        type: string
+                      }
                     },
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: conflict-msg,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: resource locked
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::conflict-msg,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: resource locked
+                      }
                     }
                   },
                   {
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: conflict-msg,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: conflict detected
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::conflict-msg,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: conflict detected
+                      }
                     }
                   }
                 ]

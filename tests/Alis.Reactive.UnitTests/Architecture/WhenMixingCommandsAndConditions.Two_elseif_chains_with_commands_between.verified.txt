@@ -1,203 +1,359 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.tier: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.divider: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.vip-badge: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.member-badge: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.guest-badge: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::tier: {
+      contract: element.tier,
+      elementId: tier
+    },
+    element::divider: {
+      contract: element.divider,
+      elementId: divider
+    },
+    element::vip-badge: {
+      contract: element.vip-badge,
+      elementId: vip-badge
+    },
+    element::member-badge: {
+      contract: element.member-badge,
+      elementId: member-badge
+    },
+    element::guest-badge: {
+      contract: element.guest-badge,
+      elementId: guest-badge
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: divider,
-            mutation: {
-              kind: call,
-              method: removeAttribute,
-              args: [
-                {
-                  kind: literal,
-                  value: hidden
-                }
-              ]
+            kind: set,
+            target: {
+              object: element::divider,
+              member: hidden
+            },
+            value: {
+              kind: convert,
+              value: {
+                kind: literal,
+                value: false
+              },
+              to: {
+                kind: scalar,
+                type: boolean
+              }
             }
           },
           {
             kind: dispatch,
-            event: tier-evaluated
+            name: tier-evaluated
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.count
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: count
+                  }
+                ]
               },
-              coerceAs: number,
               op: gt,
-              operand: 100
+              right: {
+                kind: literal,
+                value: 100
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: tier,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: gold
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::tier,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: gold
+              }
             }
           },
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.count
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: count
+                  }
+                ]
               },
-              coerceAs: number,
               op: gt,
-              operand: 50
+              right: {
+                kind: literal,
+                value: 50
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: tier,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: silver
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::tier,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: silver
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: tier,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: bronze
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::tier,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: bronze
+              }
             }
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.category
-              },
-              coerceAs: string,
-              op: eq,
-              operand: vip
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: vip-badge,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: category
                   }
+                ]
+              },
+              op: eq,
+              right: {
+                kind: literal,
+                value: vip
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::vip-badge,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           },
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.category
-              },
-              coerceAs: string,
-              op: eq,
-              operand: member
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: member-badge,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: category
                   }
+                ]
+              },
+              op: eq,
+              right: {
+                kind: literal,
+                value: member
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::member-badge,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: guest-badge,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::guest-badge,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

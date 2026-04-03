@@ -1,57 +1,91 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.error: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::error: {
+      contract: element.error,
+      elementId: error
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: save-check
+      when: {
+        kind: document-event,
+        name: save-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.role
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: role
+                  }
+                ]
               },
-              coerceAs: string,
               op: eq,
-              operand: admin
+              right: {
+                kind: literal,
+                value: admin
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: http,
+            run: {
+              kind: request,
               request: {
-                verb: POST,
+                method: POST,
                 url: /api/admin/save,
                 onSuccess: [
                   {
-                    commands: [
-                      {
-                        kind: dispatch,
-                        event: saved
-                      }
-                    ]
+                    run: {
+                      kind: dispatch,
+                      name: saved
+                    }
                   }
                 ]
               }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: error,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Unauthorized
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::error,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Unauthorized
+              }
             }
           }
         ]

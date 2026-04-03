@@ -1,28 +1,63 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
-    {
-      trigger: {
-        kind: component-event,
-        componentId: Status,
-        jsEvent: focus,
-        vendor: fusion,
-        bindingPath: Status,
-        readExpr: value
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: status,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    fusion.component.Status: {
+      kind: component,
+      resolver: fusion-instance,
+      events: {
+        focus: {
+          channel: focus
+        }
+      }
+    },
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
-            },
-            value: Focused
-          }
-        ]
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Status: {
+      contract: fusion.component.Status,
+      elementId: Status
+    },
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: object-event,
+        object: component::Status,
+        event: focus
+      },
+      run: {
+        kind: set,
+        target: {
+          object: element::status,
+          member: text
+        },
+        value: {
+          kind: literal,
+          value: Focused
+        }
       }
     }
   ]

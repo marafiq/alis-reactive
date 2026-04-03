@@ -1,54 +1,87 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: rate-check
+      when: {
+        kind: document-event,
+        name: rate-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.rate
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: rate
+                  }
+                ]
               },
-              coerceAs: number,
               op: lte,
-              operand: 0.5
+              right: {
+                kind: literal,
+                value: 0.5
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Low
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::result,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Low
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: High
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::result,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: High
+              }
             }
           }
         ]

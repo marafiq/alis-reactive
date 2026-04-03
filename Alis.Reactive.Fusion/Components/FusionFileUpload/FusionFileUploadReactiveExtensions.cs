@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 using Syncfusion.EJ2.Inputs;
 
 namespace Alis.Reactive.Fusion.Components
@@ -12,7 +10,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// <c>.Reactive()</c> is always the last call inside the build callback passed to
-    /// <see cref="FusionFileUploadHtmlExtensions.FusionFileUploadusionFileUpload{TModel,TProp}"/>:
+    /// <c>FusionFileUpload(...)</c>:
     /// <code>
     /// Html.InputField(plan, m =&gt; m.Document).FusionFileUpload(b =&gt;
     /// {
@@ -38,23 +36,26 @@ namespace Alis.Reactive.Fusion.Components
         public static UploaderBuilder Reactive<TModel, TArgs>(
             this UploaderBuilder builder,
             ReactivePlan<TModel> plan,
-            Func<FusionFileUploadEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionFileUploadEvents, ReactiveEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(FusionFileUploadEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
+            var reactiveEvent = eventSelector(FusionFileUploadEvents.Instance);
 
             // Uploader uses Uploader(id) — id is set via the constructor, stored in model.Id.
             // name is set via HtmlAttributes.
             var componentId = builder.model.Id;
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
             var bindingPath = (string)attrs["name"];
-
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, Component.Vendor, bindingPath, Component.ReadExpr);
-            foreach (var reaction in pb.BuildReactions())
-                plan.AddEntry(new Entry(trigger, reaction));
+            var scope = plan.Authoring.CreateObjectEventScope(
+                componentId,
+                Component.Vendor,
+                bindingPath,
+                Component.ValueMemberPath,
+                reactiveEvent.EventName);
+            var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
+            pipeline(reactiveEvent.Payload, pb);
+            plan.AddWorkflow(scope, pb);
 
             return builder;
         }

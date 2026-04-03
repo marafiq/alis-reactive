@@ -93,10 +93,10 @@ public class WhenButtonFires : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Dispatch chain: button Click → Dispatch() → CustomEvent listener → DOM mutation ──
+    // ── Dispatch chain: button Click -> Dispatch() -> document-event workflow -> DOM mutation ──
 
     [Test]
-    public async Task dispatch_chain_from_button_reaches_custom_event_listener()
+    public async Task dispatch_chain_from_button_reaches_document_event_workflow()
     {
         await NavigateAndBoot();
 
@@ -104,14 +104,14 @@ public class WhenButtonFires : PlaywrightTestBase
         var transferStatus = Page.Locator("#transfer-status");
         await Expect(transferStatus).Not.ToHaveTextAsync("transfer confirmed");
 
-        // Click Transfer button → dispatches "resident-transferred" →
-        // CustomEvent listener picks it up → sets text + swaps classes
+        // Click Transfer button -> dispatches "resident-transferred" ->
+        // document-event workflow picks it up -> sets text + swaps classes
         await Page.Locator("#btn-transfer").ClickAsync();
 
-        // Verify text mutation from the custom-event listener
+        // Verify text mutation from the document-event workflow
         await Expect(transferStatus).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
 
-        // Verify class mutations from the custom-event listener
+        // Verify class mutations from the document-event workflow
         await Expect(transferStatus).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
 
         AssertNoConsoleErrors();

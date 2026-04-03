@@ -281,7 +281,7 @@ describe("when coercing values", () => {
       expect(toArray(42)).toEqual({ ok: true, value: [42] });
     });
 
-    it("returns Err on plain object — walk should decompose via readExpr", () => {
+    it("returns Err on plain object - structured values should be authored explicitly", () => {
       expect(toArray({ a: 1 }).ok).toBe(false);
     });
 

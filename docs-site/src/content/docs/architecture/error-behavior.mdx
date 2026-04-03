@@ -1,32 +1,32 @@
 ---
 title: Error Behavior
-description: How the runtime handles failures — fail-fast, error boundaries, and exhaustiveness checks.
+description: How the runtime handles failures — fail-fast execution, boundaries, and exhaustiveness checks.
 sidebar:
   order: 9
 ---
 
-The runtime follows one principle: **fail fast, no fallbacks.** If something is wrong — a missing element, an unknown vendor, a corrupted plan — the runtime throws immediately with a clear message. It never guesses, never silently skips, never falls back to a default.
+The runtime follows one principle: **fail fast, no fallbacks.** If something is wrong, the runtime throws immediately with a clear message. It never guesses, never silently skips, and never translates an old shape into the new one.
 
-## Error boundaries
+## Error boundary
 
-The runtime has exactly one error boundary: `trigger.ts`. Every event listener wraps `executeReaction()` in `.catch()`:
+The runtime has one workflow boundary in `trigger.ts`. Each subscription invokes `executeAction()` and logs failures without stopping other subscriptions.
 
 ```d2
 direction: right
 
-listener: "Event fires\n(change, click, DomReady)" {
+listener: "Subscription fires\n(event, dom-ready, live channel)" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 16
 }
-execute: "executeReaction()\nRuns the full pipeline" {
+execute: "executeAction()\nRuns the workflow action" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 16
 }
-catch: ".catch()\nLogs error, continues\nOther listeners unaffected" {
+catch: ".catch()\nLogs error, continues\nOther subscriptions unaffected" {
   shape: rectangle
   style.fill: "#fce8e6"
   style.stroke: "#ea4335"
@@ -40,42 +40,53 @@ execute -> catch: if rejected {
 }
 ```
 
-This means: if one reaction fails (a target element is missing, a vendor root isn't initialized), that reaction's error is logged but **other listeners continue to work**. A broken conditional on field A does not prevent field B's cascade from firing.
+This means one broken workflow does not take down unrelated workflows. The failure is contained to the subscription that threw.
 
 ## Fail-fast errors
 
-Every error throws with an `[alis]` prefix and a specific message. Here's what triggers each:
+Every error throws with an `[alis]` prefix and specific context.
 
-| Module | Condition | Error message |
-|--------|-----------|--------------|
-| `element.ts` | Target element not in DOM | `[alis] target not found: {id}` |
-| `component.ts` | Syncfusion instance not initialized | `[alis] no vendor root for "{id}" (vendor: fusion) — is the component initialized?` |
-| `component.ts` | Unknown vendor string | `[alis] unknown vendor: "{vendor}"` |
-| `component.ts` | Component element not in DOM | `[alis] element not found: {id}` |
-| `trigger.ts` | Component element not in DOM at wire time | `[alis] element not found: {componentId}` |
+| Module | Condition | Error shape |
+|--------|-----------|-------------|
+| `execute.ts` | Target object or member cannot be resolved | `[alis] ...` with object/member context |
+| `contracts.ts` | Syncfusion instance not initialized | `[alis] no vendor root for "{id}" (vendor: fusion) — is the component initialized?` |
+| `contracts.ts` | Unknown resolver or malformed member path | `[alis] ...` with resolver/member details |
+| `contracts.ts` | Object element not in DOM | `[alis] element not found: {id}` |
+| `trigger.ts` | Subscription target not in DOM at wire time | `[alis] element not found: {elementId}` |
 | `root.ts` | Malformed plan JSON | `[alis] failed to parse plan JSON from [data-reactive-plan] element: {parseError}` |
 
-These errors are actionable — each one tells the developer exactly what's missing and where to look.
+These errors are actionable. Each one points at a missing object, bad contract, or malformed payload rather than hiding the fault behind retries or default behavior.
 
 ## Exhaustiveness checks
 
-The runtime uses `assertNever()` from `core/assert-never.ts` to catch unhandled `kind` values at both compile time (TypeScript) and runtime:
+The runtime uses `assertNever()` to catch unhandled discriminated unions at both compile time and runtime.
 
 | Module | What it checks |
-|--------|---------------|
-| `execute.ts` | `reaction.kind` — must be sequential, conditional, http, or parallel-http |
-| `commands.ts` | `command.kind` — must be dispatch, mutate-element, mutate-event, validation-errors, or into |
-| `element.ts` | `mutation.kind` — must be set-prop or call |
-| `element.ts` | `arg.kind` — must be literal or source |
-| `trigger.ts` | `trigger.kind` — must be dom-ready, custom-event, or component-event |
+|--------|----------------|
+| `execute.ts` | `action.kind` — sequence, branch, parallel, set, call, dispatch, request, inject, or show-validation-errors |
+| `values.ts` | `value.kind` — every supported V2 value expression |
+| `contracts.ts` | `member.kind` — property or method |
+| `trigger.ts` | `subscription.kind` — dom-ready, document-event, object-event, server-push, or signalr |
 
-If a new `kind` is added to the C# descriptors without a corresponding runtime handler, `assertNever()` throws: `[alis] Unhandled {context}: {kind}`.
+If a new V2 kind is added without a corresponding runtime handler, `assertNever()` throws: `[alis] Unhandled {context}: {kind}`.
 
-## What the runtime does NOT do
+## What the runtime does not do
 
-- **No retry logic.** A failed `fetch()` is not retried. The `OnError` handler fires once.
-- **No partial recovery.** One malformed plan element in `root.ts` stops the entire boot. Plans are all-or-nothing.
-- **No silent skipping.** If `walk()` hits undefined midway through a path, it returns `undefined` — but this is not an error. The calling code (resolver, conditions) handles undefined as a valid "no value" result.
-- **No global error handler.** Errors surface through browser console via the `.catch()` boundary in `trigger.ts`. There is no `window.onerror` hook or custom error reporting.
+- No retry fallback. A failed request does not silently retry.
+- No legacy compatibility path. The runtime accepts V2 only.
+- No wide DOM scanning. Objects resolve by explicit `elementId`.
+- No partial boot recovery. Malformed plan payloads stop that boot path.
+- No hidden error sink. Failures surface through the subscription boundary and structured logs/traces.
+
+## Observability
+
+Tracing follows a W3C / OTel-style shape:
+
+- request spans carry HTTP attributes such as `http.request.method` and `url.full`
+- outgoing requests propagate `traceparent`
+- request lifecycle events are recorded on the active span
+- logs are structured with severity metadata instead of free-form fallback logging
+
+The runtime stays intentionally dumb: explicit contract resolution, explicit action execution, explicit tracing.
 
 **Previous:** [Component Model](../component-model/)

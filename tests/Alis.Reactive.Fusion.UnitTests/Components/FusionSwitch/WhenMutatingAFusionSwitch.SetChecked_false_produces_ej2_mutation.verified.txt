@@ -1,25 +1,55 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__ReceiveNotifications: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        checked: {
+          kind: property,
+          path: [
+            {
+              prop: checked
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__ReceiveNotifications: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__ReceiveNotifications,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__ReceiveNotifications
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__ReceiveNotifications,
-            mutation: {
-              kind: set-prop,
-              prop: checked,
-              coerce: boolean
-            },
-            value: false,
-            vendor: fusion
+      run: {
+        kind: set,
+        target: {
+          object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__ReceiveNotifications,
+          member: checked
+        },
+        value: {
+          kind: convert,
+          value: {
+            kind: literal,
+            value: false
+          },
+          to: {
+            kind: scalar,
+            type: boolean
           }
-        ]
+        }
       }
     }
   ]

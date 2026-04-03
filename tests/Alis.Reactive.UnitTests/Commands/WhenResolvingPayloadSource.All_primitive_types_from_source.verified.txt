@@ -1,72 +1,207 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.int-value: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.long-value: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.double-value: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.string-value: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.bool-value: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::int-value: {
+      contract: element.int-value,
+      elementId: int-value
+    },
+    element::long-value: {
+      contract: element.long-value,
+      elementId: long-value
+    },
+    element::double-value: {
+      contract: element.double-value,
+      elementId: double-value
+    },
+    element::string-value: {
+      contract: element.string-value,
+      elementId: string-value
+    },
+    element::bool-value: {
+      contract: element.bool-value,
+      elementId: bool-value
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test-event
+      when: {
+        kind: document-event,
+        name: test-event
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: int-value,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::int-value,
+              member: text
             },
-            source: {
-              kind: event,
-              path: evt.intValue
+            value: {
+              kind: context,
+              scope: event,
+              path: [
+                {
+                  prop: intValue
+                }
+              ]
             }
           },
           {
-            kind: mutate-element,
-            target: long-value,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::long-value,
+              member: text
             },
-            source: {
-              kind: event,
-              path: evt.longValue
+            value: {
+              kind: context,
+              scope: event,
+              path: [
+                {
+                  prop: longValue
+                }
+              ]
             }
           },
           {
-            kind: mutate-element,
-            target: double-value,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::double-value,
+              member: text
             },
-            source: {
-              kind: event,
-              path: evt.doubleValue
+            value: {
+              kind: context,
+              scope: event,
+              path: [
+                {
+                  prop: doubleValue
+                }
+              ]
             }
           },
           {
-            kind: mutate-element,
-            target: string-value,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::string-value,
+              member: text
             },
-            source: {
-              kind: event,
-              path: evt.stringValue
+            value: {
+              kind: context,
+              scope: event,
+              path: [
+                {
+                  prop: stringValue
+                }
+              ]
             }
           },
           {
-            kind: mutate-element,
-            target: bool-value,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::bool-value,
+              member: text
             },
-            source: {
-              kind: event,
-              path: evt.boolValue
+            value: {
+              kind: context,
+              scope: event,
+              path: [
+                {
+                  prop: boolValue
+                }
+              ]
             }
           }
         ]

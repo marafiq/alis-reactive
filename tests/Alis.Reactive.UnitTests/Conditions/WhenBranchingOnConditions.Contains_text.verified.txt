@@ -1,54 +1,87 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: text-check
+      when: {
+        kind: document-event,
+        name: text-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.name
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: name
+                  }
+                ]
               },
-              coerceAs: string,
               op: contains,
-              operand: admin
+              right: {
+                kind: literal,
+                value: admin
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Has admin
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::result,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Has admin
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: No admin
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::result,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: No admin
+              }
             }
           }
         ]

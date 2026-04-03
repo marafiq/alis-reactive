@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders.Requests
 {
@@ -11,8 +10,8 @@ namespace Alis.Reactive.Builders.Requests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// "Gather" is the framework term for collecting input values at request time.
-    /// Each gather item resolves to a key/value pair in the request payload.
+    /// "Gather" is the DSL term for authoring request values at request time.
+    /// Each configured value resolves to a key/value pair in the request payload.
     /// </para>
     /// <para>
     /// Component-specific gather methods (e.g., <c>g.Include(m =&gt; m.Name)</c>) are provided
@@ -22,15 +21,14 @@ namespace Alis.Reactive.Builders.Requests
     /// <typeparam name="TModel">The view model type.</typeparam>
     public class GatherBuilder<TModel> where TModel : class
     {
-        internal List<GatherItem> Items { get; } = new List<GatherItem>();
+        internal List<RequestValuePart> RequestValues { get; } = new List<RequestValuePart>();
 
         /// <summary>
-        /// Adds a pre-built gather item. Used by vendor extension methods
-        /// (Fusion, Native) to add their own component gather descriptors.
+        /// Adds a component value to the authored request payload.
         /// </summary>
-        public GatherBuilder<TModel> AddItem(GatherItem item)
+        internal GatherBuilder<TModel> IncludeComponentValue(string key, string componentId, string vendor, string valueMemberPath)
         {
-            Items.Add(item);
+            RequestValues.Add(new ComponentRequestValue(key, componentId, vendor, valueMemberPath));
             return this;
         }
 
@@ -41,7 +39,7 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         public GatherBuilder<TModel> IncludeAll()
         {
-            Items.Add(new AllGather());
+            RequestValues.Add(new IncludeAllBindingsRequestValue());
             return this;
         }
 
@@ -52,7 +50,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="value">The constant value to include.</param>
         public GatherBuilder<TModel> Static(string param, object value)
         {
-            Items.Add(new StaticGather(param, value));
+            RequestValues.Add(new LiteralRequestValue(param, value));
             return this;
         }
 
@@ -68,7 +66,7 @@ namespace Alis.Reactive.Builders.Requests
             string param)
         {
             var eventPath = ExpressionPathHelper.ToEventPath(path);
-            Items.Add(new EventGather(param, eventPath));
+            RequestValues.Add(new ContextRequestValue(param, eventPath));
             return this;
         }
     }

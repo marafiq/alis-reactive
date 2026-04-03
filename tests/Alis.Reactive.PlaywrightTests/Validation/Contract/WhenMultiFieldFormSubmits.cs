@@ -1,3 +1,4 @@
+using Alis.Reactive.Playwright.Extensions;
 using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
@@ -429,7 +430,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_Street").FillAsync(""); // Clear street
+        await Input("Address_Street").ClearWhenStableAsync(Page); // Clear street
         await Input("ReasonForNoContact").FillAsync("No relatives");
 
         await SubmitBtn.ClickAsync();
@@ -447,7 +448,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_City").FillAsync(""); // Clear city
+        await Input("Address_City").ClearWhenStableAsync(Page); // Clear city
         await Input("ReasonForNoContact").FillAsync("No relatives");
 
         await SubmitBtn.ClickAsync();

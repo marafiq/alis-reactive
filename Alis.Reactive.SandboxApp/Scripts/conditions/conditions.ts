@@ -1,200 +1,145 @@
-import type { Guard, ValueGuard, ExecContext } from "../types";
-import { resolveSource, resolveSourceAs } from "../resolution/resolver";
-import { coerce, toString } from "../core/coerce";
+import type { ComparePredicate, ExecContext, PlanPredicate, ValueShape } from "../types";
+import { applyShape, evaluateValue } from "../resolution/values";
 import { scope } from "../core/trace";
-import { assertNever } from "../core/assert-never";
+import { toString } from "../core/coerce";
 
 const log = scope("conditions");
 
-export function evaluateGuard(guard: Guard, ctx?: ExecContext): boolean {
-  switch (guard.kind) {
-    case "value":
-      return evaluateValueGuard(guard, ctx);
+export function evaluatePredicate(predicate: PlanPredicate, ctx: ExecContext): boolean {
+  switch (predicate.kind) {
+    case "compare":
+      return evaluateCompare(predicate, ctx);
     case "all":
-      return guard.guards.every(g => evaluateGuard(g, ctx));
+      return predicate.terms.every(term => evaluatePredicate(term, ctx));
     case "any":
-      return guard.guards.some(g => evaluateGuard(g, ctx));
+      return predicate.terms.some(term => evaluatePredicate(term, ctx));
     case "not":
-      return !evaluateGuard(guard.inner, ctx);
+      return !evaluatePredicate(predicate.term, ctx);
     case "confirm":
-      log.warn("ConfirmGuard in sync context — denying (callers should use async path)");
+      log.warn("confirm predicate in sync context — denying");
       return false;
     default:
-      assertNever(guard, "guard kind");
+      return false;
   }
 }
 
-/**
- * Async guard evaluation — required when branches contain ConfirmGuard.
- * Calls window.alis.confirm(message) for confirm guards.
- */
-export async function evaluateGuardAsync(guard: Guard, ctx?: ExecContext): Promise<boolean> {
-  switch (guard.kind) {
-    case "value":
-      return evaluateValueGuard(guard, ctx);
+export async function evaluatePredicateAsync(predicate: PlanPredicate, ctx: ExecContext): Promise<boolean> {
+  switch (predicate.kind) {
+    case "compare":
+      return evaluateCompare(predicate, ctx);
     case "all":
-      for (const g of guard.guards) {
-        if (!await evaluateGuardAsync(g, ctx)) return false;
+      for (const term of predicate.terms) {
+        if (!await evaluatePredicateAsync(term, ctx)) return false;
       }
       return true;
     case "any":
-      for (const g of guard.guards) {
-        if (await evaluateGuardAsync(g, ctx)) return true;
+      for (const term of predicate.terms) {
+        if (await evaluatePredicateAsync(term, ctx)) return true;
       }
       return false;
     case "not":
-      return !(await evaluateGuardAsync(guard.inner, ctx));
+      return !(await evaluatePredicateAsync(predicate.term, ctx));
     case "confirm":
-      return (window as any).alis?.confirm?.(guard.message) ?? Promise.resolve(false);
+      return (window as any).alis?.confirm?.(predicate.message) ?? Promise.resolve(false);
     default:
-      assertNever(guard, "guard kind");
+      return false;
   }
 }
 
-/**
- * Checks whether a guard tree contains any ConfirmGuard.
- * Used to decide between sync and async evaluation paths.
- */
-export function isConfirmGuard(guard: Guard): boolean {
-  if (guard.kind === "confirm") return true;
-  if (guard.kind === "not") return isConfirmGuard(guard.inner);
-  if (guard.kind === "all" || guard.kind === "any")
-    return guard.guards.some(isConfirmGuard);
-  return false;
-}
+function evaluateCompare(predicate: ComparePredicate, ctx: ExecContext): boolean {
+  const rawLeft = evaluateValue(predicate.left, ctx);
+  const left = coerceWithShape(rawLeft, predicate.as);
 
-/** Evaluates presence/emptiness operators using RAW resolution (no coercion). */
-function evaluatePresenceOp(guard: ValueGuard, ctx?: ExecContext): boolean | undefined {
-  const op = guard.op;
-  if (op === "is-null" || op === "not-null") {
-    const raw = resolveSource(guard.source, ctx);
-    log.trace("eval-presence", { source: guard.source, op, raw });
-    return op === "is-null" ? raw == null : raw != null;
-  }
-  if (op === "is-empty" || op === "not-empty") {
-    const raw = resolveSource(guard.source, ctx);
-    log.trace("eval-presence", { source: guard.source, op, raw });
-    const isEmpty = raw === "" || raw === null || raw === undefined
-      || (Array.isArray(raw) && raw.length === 0);
-    return op === "is-empty" ? isEmpty : !isEmpty;
-  }
-  return undefined; // Not a presence op
-}
-
-interface ResolvedOperands {
-  resolved: unknown;
-  operand: unknown;
-  items: unknown[] | undefined;
-}
-
-/** Resolves source, operand, and items with conditional coercion for value comparison. */
-function resolveGuardOperands(guard: ValueGuard, ctx?: ExecContext): ResolvedOperands {
-  // Truthy/falsy use typed coercion — correctly maps "false" → false for booleans.
-  // Comparison operators use typed coercion on BOTH source and operand so that
-  // comparisons are type-consistent (e.g. both sides are numbers).
-  const resolved = resolveSourceAs(guard.source, guard.coerceAs, ctx);
-
-  // Operand coercion: elementCoerceAs (for array operators) or coerceAs (for scalars).
-  // For non-array operators elementCoerceAs is null, so opCoerceAs === coerceAs — same behavior.
-  const opCoerceAs = guard.elementCoerceAs ?? guard.coerceAs;
-
-  // Source-vs-source: if rightSource present, resolve it instead of literal operand.
-  // For array operands (in, not-in, between), coerce each element individually.
-  // For scalar operands, coerce the whole value.
-  const rawOp = guard.rightSource
-    ? resolveSourceAs(guard.rightSource, opCoerceAs, ctx)
-    : guard.operand;
-  let operand: unknown = rawOp;
-  if (rawOp != null && !guard.rightSource) {
-    operand = Array.isArray(rawOp)
-      ? rawOp.map(v => { const r = coerce(v, opCoerceAs); return r.ok ? r.value : undefined; })
-      : (() => { const r = coerce(rawOp, opCoerceAs); return r.ok ? r.value : undefined; })();
+  switch (predicate.op) {
+    case "is-null":
+      return rawLeft == null;
+    case "not-null":
+      return rawLeft != null;
+    case "is-empty":
+      return isEmpty(rawLeft);
+    case "not-empty":
+      return !isEmpty(rawLeft);
+    case "truthy":
+      return !!left;
+    case "falsy":
+      return !left;
   }
 
-  // For array sources with element coercion: pre-coerce elements so switch cases stay pure.
-  // For non-array operators elementCoerceAs is null → items is undefined → unused.
-  const items = guard.elementCoerceAs != null && Array.isArray(resolved)
-    ? (resolved as unknown[]).map(item => { const r = coerce(item, guard.elementCoerceAs!); return r.ok ? r.value : undefined; })
-    : undefined;
+  const rawRight = predicate.right ? evaluateValue(predicate.right, ctx) : undefined;
+  const right = coerceOperand(rawRight, predicate.as, predicate.itemAs);
 
-  return { resolved, operand, items };
-}
-
-function evaluateValueGuard(guard: ValueGuard, ctx?: ExecContext): boolean {
-  const presenceResult = evaluatePresenceOp(guard, ctx);
-  if (presenceResult !== undefined) return presenceResult;
-
-  const { resolved, operand, items } = resolveGuardOperands(guard, ctx);
-  log.trace("eval", { source: guard.source, op: guard.op, resolved, operand });
-
-  switch (guard.op) {
-    case "eq":       return resolved === operand;
-    case "neq":      return resolved !== operand;
-    case "gt":       return (resolved as number) > (operand as number);
-    case "gte":      return (resolved as number) >= (operand as number);
-    case "lt":       return (resolved as number) < (operand as number);
-    case "lte":      return (resolved as number) <= (operand as number);
-    case "truthy":   return !!resolved;
-    case "falsy":    return !resolved;
-
-    // Membership — operand is coerced per-element above
+  switch (predicate.op) {
+    case "eq":
+      return left === right;
+    case "neq":
+      return left !== right;
+    case "gt":
+      return compareNumbers(left, right) > 0;
+    case "gte":
+      return compareNumbers(left, right) >= 0;
+    case "lt":
+      return compareNumbers(left, right) < 0;
+    case "lte":
+      return compareNumbers(left, right) <= 0;
     case "in":
-      return Array.isArray(operand) && operand.includes(resolved);
+      return Array.isArray(right) && right.includes(left);
     case "not-in":
-      return !Array.isArray(operand) || !operand.includes(resolved);
-
-    // Range — operand is coerced per-element above
+      return !Array.isArray(right) || !right.includes(left);
     case "between":
-      return Array.isArray(operand) && (resolved as number) >= operand[0] && (resolved as number) <= operand[1];
-
-    // Array membership — elements and operand pre-coerced via elementCoerceAs above
-    case "array-contains":
-      return items?.includes(operand) ?? false;
-
-    // Text — resolve source as STRING, not as guard.coerceAs.
-    // guard.coerceAs may be "date" (→ timestamp number) or "number" — text ops
-    // need the string form. resolveSourceAs with "string" calls toString() which
-    // handles Date→ISO, number→digits, boolean→"true"/"false".
-    case "contains": {
-      const str = resolveSourceAs(guard.source, "string", ctx);
-      if (str == null) return false;
-      const opResult = toString(operand);
-      if (!opResult.ok) return false;
-      return (str as string).includes(opResult.value);
+      return Array.isArray(right) && right.length >= 2
+        && compareNumbers(left, right[0]) >= 0
+        && compareNumbers(left, right[1]) <= 0;
+    case "array-contains": {
+      const items = Array.isArray(rawLeft)
+        ? rawLeft.map(item => coerceWithShape(item, predicate.itemAs ?? predicate.as))
+        : [];
+      const target = coerceWithShape(rawRight, predicate.itemAs ?? predicate.as);
+      return items.includes(target);
     }
-    case "starts-with": {
-      const str = resolveSourceAs(guard.source, "string", ctx);
-      if (str == null) return false;
-      const opResult = toString(operand);
-      if (!opResult.ok) return false;
-      return (str as string).startsWith(opResult.value);
-    }
-    case "ends-with": {
-      const str = resolveSourceAs(guard.source, "string", ctx);
-      if (str == null) return false;
-      const opResult = toString(operand);
-      if (!opResult.ok) return false;
-      return (str as string).endsWith(opResult.value);
-    }
-    case "matches": {
-      const str = resolveSourceAs(guard.source, "string", ctx);
-      if (str == null) return false;
-      const opResult = toString(operand);
-      if (!opResult.ok) return false;
+    case "contains":
+      return textValue(left).includes(textValue(right));
+    case "starts-with":
+      return textValue(left).startsWith(textValue(right));
+    case "ends-with":
+      return textValue(left).endsWith(textValue(right));
+    case "matches":
       try {
-        return new RegExp(opResult.value).test(str as string);
+        return new RegExp(textValue(right)).test(textValue(left));
       } catch {
-        log.warn("invalid guard regex", { operand });
+        log.warn("invalid predicate regex", { right });
         return false;
       }
-    }
-    case "min-length": {
-      const str = resolveSourceAs(guard.source, "string", ctx);
-      if (str == null) return false;
-      return (str as string).length >= Number(operand);
-    }
-
+    case "min-length":
+      return textValue(left).length >= Number(right);
     default:
-      throw new Error(`Unknown guard operator: ${guard.op}`);
+      return false;
   }
+}
+
+function coerceOperand(value: unknown, shape?: ValueShape, itemShape?: ValueShape): unknown {
+  if (Array.isArray(value)) {
+    return value.map(item => coerceWithShape(item, itemShape ?? shape));
+  }
+  return coerceWithShape(value, shape);
+}
+
+function coerceWithShape(value: unknown, shape?: ValueShape): unknown {
+  if (!shape) return value;
+  return applyShape(value, shape);
+}
+
+function compareNumbers(left: unknown, right: unknown): number {
+  const a = Number(left);
+  const b = Number(right);
+  if (Number.isNaN(a) || Number.isNaN(b)) return Number.NaN;
+  return a - b;
+}
+
+function isEmpty(value: unknown): boolean {
+  return value === "" || value == null || (Array.isArray(value) && value.length === 0);
+}
+
+function textValue(value: unknown): string {
+  const result = toString(value);
+  return result.ok ? result.value : "";
 }

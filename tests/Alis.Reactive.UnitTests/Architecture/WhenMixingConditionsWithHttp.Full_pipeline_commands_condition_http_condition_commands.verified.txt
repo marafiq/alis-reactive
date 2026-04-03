@@ -1,186 +1,342 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: header,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    element.header: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
-            },
-            value: start
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
           },
-          {
-            kind: mutate-element,
-            target: loading,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: please wait
-          }
-        ]
+          access: write
+        }
       }
     },
+    element.badge: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.loading: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.count: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.footer: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::header: {
+      contract: element.header,
+      elementId: header
+    },
+    element::badge: {
+      contract: element.badge,
+      elementId: badge
+    },
+    element::loading: {
+      contract: element.loading,
+      elementId: loading
+    },
+    element::result: {
+      contract: element.result,
+      elementId: result
+    },
+    element::count: {
+      contract: element.count,
+      elementId: count
+    },
+    element::footer: {
+      contract: element.footer,
+      elementId: footer
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.active
-              },
-              coerceAs: boolean,
-              op: truthy
+            kind: set,
+            target: {
+              object: element::header,
+              member: text
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: badge,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
-                }
-              ]
+            value: {
+              kind: literal,
+              value: start
+            }
+          },
+          {
+            kind: set,
+            target: {
+              object: element::loading,
+              member: text
+            },
+            value: {
+              kind: literal,
+              value: please wait
             }
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: branch,
+        cases: [
+          {
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: active
+                  }
+                ]
+              },
+              op: truthy,
+              as: {
+                kind: scalar,
+                type: boolean
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::badge,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      when: {
+        kind: document-event,
+        name: test
+      },
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/submit,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: ok
                 }
-              ]
+              }
             }
           ]
         }
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: footer,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: done
-          }
-        ]
+      run: {
+        kind: set,
+        target: {
+          object: element::footer,
+          member: text
+        },
+        value: {
+          kind: literal,
+          value: done
+        }
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.count
-              },
-              coerceAs: number,
-              op: gt,
-              operand: 0
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: count,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: count
                   }
+                ]
+              },
+              op: gt,
+              right: {
+                kind: literal,
+                value: 0
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::count,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: count,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::count,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

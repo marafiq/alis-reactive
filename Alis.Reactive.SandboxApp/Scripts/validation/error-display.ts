@@ -1,22 +1,13 @@
-// Error Display — Single responsibility: DOM error manipulation
-//
-// Two destinations: inline (next to field) and summary (aggregated div).
-// Orchestrator decides WHERE to route — this module only executes display.
-// Vendor-agnostic: never touches ej2_instances or vendor-specific APIs.
-//
-// Error spans found by predictable ID: {fieldId}_error (O(1) lookup).
-// Summary found by predictable ID: {planId_sanitized}_validation_summary.
-// No fallbacks. No querySelector scanning. ID-aware only.
-
-import type { ValidationField } from "../types";
+export interface ValidationFieldView {
+  binding: string;
+  elementId?: string;
+}
 
 const ERR_CLASS = "alis-has-error";
 
-// ── Inline errors (next to enriched, visible fields) ────
-
-export function showInline(formId: string, field: ValidationField, message: string): void {
-  if (field.fieldId) {
-    const el = document.getElementById(field.fieldId);
+export function showInline(formId: string, field: ValidationFieldView, message: string): void {
+  if (field.elementId) {
+    const el = document.getElementById(field.elementId);
     if (el) el.classList.add(ERR_CLASS);
   }
 
@@ -28,34 +19,33 @@ export function showInline(formId: string, field: ValidationField, message: stri
   }
 }
 
-export function clearInline(formId: string, field: ValidationField): void {
+export function clearInline(formId: string, field: ValidationFieldView): void {
   const span = findErrorSpan(field);
   if (span) {
     span.textContent = "";
     span.setAttribute("hidden", "");
     span.style.display = "none";
   }
-  if (field.fieldId) {
-    const el = document.getElementById(field.fieldId);
+
+  if (field.elementId) {
+    const el = document.getElementById(field.elementId);
     if (el) el.classList.remove(ERR_CLASS);
   }
 }
 
-export function clearAllInline(formId: string, fields: ValidationField[]): void {
-  for (const f of fields) clearInline(formId, f);
+export function clearAllInline(formId: string, fields: ValidationFieldView[]): void {
+  for (const field of fields) clearInline(formId, field);
 }
 
-// ── Summary errors (for unenriched / hidden fields) ─────
-
-export function addToSummary(summaryEl: HTMLElement, fieldName: string, message: string): void {
+export function addToSummary(summaryEl: HTMLElement, binding: string, message: string): void {
   const item = document.createElement("div");
-  item.dataset.valmsgSummaryFor = fieldName;
+  item.dataset.valmsgSummaryFor = binding;
   item.textContent = message;
   summaryEl.appendChild(item);
 }
 
-export function removeSummaryEntry(summaryEl: HTMLElement, fieldName: string): void {
-  const entry = summaryEl.querySelector(`[data-valmsg-summary-for="${fieldName}"]`);
+export function removeSummaryEntry(summaryEl: HTMLElement, binding: string): void {
+  const entry = summaryEl.querySelector(`[data-valmsg-summary-for="${binding}"]`);
   if (entry) entry.remove();
 }
 
@@ -77,10 +67,13 @@ export function findSummaryElement(planId?: string): HTMLElement | null {
   return document.getElementById(summaryId);
 }
 
-// ── Server error inline display ─────────────────────────
-
-export function showServerErrorInline(formId: string, fieldName: string, message: string, fields: ValidationField[]): void {
-  const field = fields.find(f => f.fieldName === fieldName);
+export function showServerErrorInline(
+  formId: string,
+  binding: string,
+  message: string,
+  fields: ValidationFieldView[]
+): void {
+  const field = fields.find(item => item.binding === binding);
   const span = field ? findErrorSpan(field) : null;
   if (span) {
     span.textContent = message;
@@ -88,16 +81,13 @@ export function showServerErrorInline(formId: string, fieldName: string, message
     span.style.display = "";
   }
 
-  if (field?.fieldId) {
-    const el = document.getElementById(field.fieldId);
+  if (field?.elementId) {
+    const el = document.getElementById(field.elementId);
     if (el) el.classList.add(ERR_CLASS);
   }
 }
 
-// ── Error span lookup — ID only, no scanning ────────────
-
-/** ID-based lookup: O(1). Convention: {fieldId}_error. */
-function findErrorSpan(field: ValidationField): HTMLElement | null {
-  if (!field.fieldId) return null;
-  return document.getElementById(field.fieldId + "_error");
+function findErrorSpan(field: ValidationFieldView): HTMLElement | null {
+  if (!field.elementId) return null;
+  return document.getElementById(field.elementId + "_error");
 }

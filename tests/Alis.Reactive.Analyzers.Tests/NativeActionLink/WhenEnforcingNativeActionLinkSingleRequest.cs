@@ -61,7 +61,7 @@ namespace Alis.Reactive.Builders.Requests
 
     namespace Validation
     {
-        public sealed class ValidationDescriptor
+        public sealed class FormValidation
         {
         }
     }
@@ -75,7 +75,7 @@ namespace Alis.Reactive.Builders.Requests
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather) => this;
         public HttpRequestBuilder<TModel> WhileLoading(Action<Alis.Reactive.Builders.PipelineBuilder<TModel>> pipeline) => this;
         public HttpRequestBuilder<TModel> Validate<TValidator>(string formId) where TValidator : class => this;
-        public HttpRequestBuilder<TModel> Validate(Validation.ValidationDescriptor validation) => this;
+        public HttpRequestBuilder<TModel> Validate(Validation.FormValidation validation) => this;
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response) => this;
     }
 

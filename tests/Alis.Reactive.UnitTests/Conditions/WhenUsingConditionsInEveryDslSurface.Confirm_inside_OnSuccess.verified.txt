@@ -1,58 +1,81 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: delete-check
+      when: {
+        kind: document-event,
+        name: delete-check
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/can-delete,
           onSuccess: [
             {
-              reaction: {
-                kind: conditional,
-                branches: [
+              run: {
+                kind: branch,
+                cases: [
                   {
-                    guard: {
+                    when: {
                       kind: confirm,
                       message: Permanently delete this record?
                     },
-                    reaction: {
-                      kind: http,
+                    run: {
+                      kind: request,
                       request: {
-                        verb: POST,
+                        method: POST,
                         url: /api/delete,
                         onSuccess: [
                           {
-                            commands: [
-                              {
-                                kind: dispatch,
-                                event: deleted
-                              }
-                            ]
+                            run: {
+                              kind: dispatch,
+                              name: deleted
+                            }
                           }
                         ]
                       }
                     }
                   },
                   {
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: status,
-                          mutation: {
-                            kind: set-prop,
-                            prop: textContent
-                          },
-                          value: Cancelled
-                        }
-                      ]
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::status,
+                        member: text
+                      },
+                      value: {
+                        kind: literal,
+                        value: Cancelled
+                      }
                     }
                   }
                 ]

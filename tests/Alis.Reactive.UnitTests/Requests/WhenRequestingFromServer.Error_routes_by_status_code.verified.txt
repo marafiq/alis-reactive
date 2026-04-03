@@ -1,65 +1,121 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: dom-ready
-      },
-      reaction: {
-        kind: http,
-        request: {
-          verb: POST,
-          url: /api/save,
-          gather: [
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
             {
-              kind: static,
-              param: name,
-              value: test
+              prop: textContent
             }
           ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.error: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    },
+    element::error: {
+      contract: element.error,
+      elementId: error
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: dom-ready
+      },
+      run: {
+        kind: request,
+        request: {
+          method: POST,
+          url: /api/save,
+          input: {
+            transport: json,
+            value: {
+              kind: object,
+              fields: {
+                name: {
+                  kind: literal,
+                  value: test
+                }
+              }
+            }
+          },
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: ok
                 }
-              ]
+              }
             }
           ],
           onError: [
             {
               statusCode: 400,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: error,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::error,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: bad request
                 }
-              ]
+              }
             },
             {
               statusCode: 500,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: error,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::error,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: server error
                 }
-              ]
+              }
             }
           ]
         }

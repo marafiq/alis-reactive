@@ -1,18 +1,17 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Events available on NativeButton.
-    /// Singleton instance — used with .Reactive() event selector lambda:
-    ///   .Reactive(plan, evt => evt.Click, (args, p) => { ... })
+    /// Exposes the reactive events available on <see cref="NativeButton"/>.
     /// </summary>
     public sealed class NativeButtonEvents
     {
+        /// <summary>Gets the singleton event surface instance.</summary>
         public static readonly NativeButtonEvents Instance = new NativeButtonEvents();
         private NativeButtonEvents() { }
 
-        /// <summary>Fires when the user clicks the button (DOM "click" event).</summary>
-        public TypedEventDescriptor<NativeButtonClickArgs> Click =>
-            new TypedEventDescriptor<NativeButtonClickArgs>(
+        /// <summary>Gets the button click event.</summary>
+        public ReactiveEvent<NativeButtonClickArgs> Click =>
+            new ReactiveEvent<NativeButtonClickArgs>(
                 "click", new NativeButtonClickArgs());
     }
 }

@@ -67,11 +67,11 @@ Guardrails:
 
 **Example A — New Primitive (all layers):**
 ```
-Task: Add "toggle-class" command to reactive pipeline
+Task: Add "toggle-class" action to the reactive pipeline
 Layers: 1, 2, 3, 4, 5 | Crossings: 1→2, 2→3, 3→4, 4→5
 Skills: modern-csharp, dotnet-xml-docs, solid-ts-audit, bdd-testing
-Read first: existing command descriptors, schema commands section, TS commands.ts
-Input evidence: User request + no existing toggle-class in schema
+Read first: existing action helpers, V2 plan schema, `execution/execute.ts`
+Input evidence: User request + no existing toggle-class action in schema
 Output evidence: VerifyJson snapshot, AssertSchemaValid passes, vitest passes, Playwright passes
 ```
 
@@ -190,9 +190,9 @@ Output evidence: 7-behavior contract covered, blind reviewer passes all tests
 
 | Layer | Example Evidence |
 |-------|-----------------|
-| 1 C# | `src/Alis.Reactive/Commands/ToggleClassCommand.cs:42` — VerifyJson snapshot showing exact JSON |
-| 2 Schema | `"added 'toggle-class' to commands oneOf"` — AssertSchemaValid() failing output |
-| 3 TS | `Scripts/execution/commands.ts:187` — vitest: `"FAIL: toggle-class produces correct mutation"` |
+| 1 C# | `src/Alis.Reactive/Builders/PipelineBuilder.cs:42` — VerifyJson snapshot showing exact JSON |
+| 2 Schema | `"added 'toggle-class' to PlanAction oneOf"` — AssertSchemaValid() failing output |
+| 3 TS | `Scripts/execution/execute.ts:187` — vitest: `"FAIL: toggle-class action applies the expected class change"` |
 | 4 Browser | `selecting_care_level_updates_billing_amount` — field shows "$2,400" after selecting "Memory Care" |
 | 5 Docs | `/Sandbox/ToggleClass` verified — zero CS1591 warnings in file |
 

@@ -10,6 +10,6 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionAutoComplete : FusionComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMemberPath => "value";
     }
 }

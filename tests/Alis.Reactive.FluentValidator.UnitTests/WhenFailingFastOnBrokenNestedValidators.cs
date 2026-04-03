@@ -7,7 +7,7 @@ public class WhenFailingFastOnBrokenNestedValidators
     public void Throws_when_nested_validator_cannot_be_created()
     {
         // Factory that returns null for nested validators
-        var adapter = new FluentValidationAdapter(type =>
+        var extractor = new FluentValidationRuleExtractor(type =>
         {
             if (type == typeof(BrokenNestedValidator))
                 return new BrokenNestedValidator();
@@ -15,13 +15,13 @@ public class WhenFailingFastOnBrokenNestedValidators
         });
 
         Assert.Throws<InvalidOperationException>(() =>
-            adapter.ExtractRules(typeof(BrokenNestedValidator), "testForm"));
+            extractor.ExtractRules(typeof(BrokenNestedValidator), "testForm"));
     }
 
     [Test]
     public void Throws_when_factory_throws_for_nested_validator()
     {
-        var adapter = new FluentValidationAdapter(type =>
+        var extractor = new FluentValidationRuleExtractor(type =>
         {
             if (type == typeof(NestedValidator))
                 return new NestedValidator();
@@ -31,6 +31,6 @@ public class WhenFailingFastOnBrokenNestedValidators
         });
 
         Assert.Throws<InvalidOperationException>(() =>
-            adapter.ExtractRules(typeof(NestedValidator), "testForm"));
+            extractor.ExtractRules(typeof(NestedValidator), "testForm"));
     }
 }

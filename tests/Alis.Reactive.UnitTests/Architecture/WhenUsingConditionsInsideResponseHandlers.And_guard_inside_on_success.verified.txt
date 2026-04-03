@@ -1,89 +1,130 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.qualified: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::qualified: {
+      contract: element.qualified,
+      elementId: qualified
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/evaluate,
           onSuccess: [
             {
-              reaction: {
-                kind: conditional,
-                branches: [
+              run: {
+                kind: branch,
+                cases: [
                   {
-                    guard: {
+                    when: {
                       kind: all,
-                      guards: [
+                      terms: [
                         {
-                          kind: value,
-                          source: {
-                            kind: event,
-                            path: evt.active
+                          kind: compare,
+                          left: {
+                            kind: context,
+                            scope: event,
+                            path: [
+                              {
+                                prop: active
+                              }
+                            ]
                           },
-                          coerceAs: boolean,
-                          op: truthy
+                          op: truthy,
+                          as: {
+                            kind: scalar,
+                            type: boolean
+                          }
                         },
                         {
-                          kind: value,
-                          source: {
-                            kind: event,
-                            path: evt.count
+                          kind: compare,
+                          left: {
+                            kind: context,
+                            scope: event,
+                            path: [
+                              {
+                                prop: count
+                              }
+                            ]
                           },
-                          coerceAs: number,
                           op: gt,
-                          operand: 5
+                          right: {
+                            kind: literal,
+                            value: 5
+                          },
+                          as: {
+                            kind: scalar,
+                            type: number
+                          }
                         }
                       ]
                     },
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: qualified,
-                          mutation: {
-                            kind: call,
-                            method: removeAttribute,
-                            args: [
-                              {
-                                kind: literal,
-                                value: hidden
-                              }
-                            ]
-                          }
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::qualified,
+                        member: hidden
+                      },
+                      value: {
+                        kind: convert,
+                        value: {
+                          kind: literal,
+                          value: false
+                        },
+                        to: {
+                          kind: scalar,
+                          type: boolean
                         }
-                      ]
+                      }
                     }
                   },
                   {
-                    reaction: {
-                      kind: sequential,
-                      commands: [
-                        {
-                          kind: mutate-element,
-                          target: qualified,
-                          mutation: {
-                            kind: call,
-                            method: setAttribute,
-                            args: [
-                              {
-                                kind: literal,
-                                value: hidden
-                              },
-                              {
-                                kind: literal,
-                                value: 
-                              }
-                            ]
-                          }
+                    run: {
+                      kind: set,
+                      target: {
+                        object: element::qualified,
+                        member: hidden
+                      },
+                      value: {
+                        kind: convert,
+                        value: {
+                          kind: literal,
+                          value: true
+                        },
+                        to: {
+                          kind: scalar,
+                          type: boolean
                         }
-                      ]
+                      }
                     }
                   }
                 ]

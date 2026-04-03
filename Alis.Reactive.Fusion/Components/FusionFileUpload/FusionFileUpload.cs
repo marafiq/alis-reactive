@@ -10,6 +10,6 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "filesData";
+        public string ValueMemberPath => "filesData";
     }
 }

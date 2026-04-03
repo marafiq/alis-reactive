@@ -1,7 +1,5 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -30,24 +28,27 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <typeparam name="TArgs">The event args type selected by <paramref name="eventSelector"/>.</typeparam>
         /// <param name="builder">The textarea builder to wire events on.</param>
-        /// <param name="plan">The plan to add the reactive entry to.</param>
+        /// <param name="plan">The plan to add the reactive workflow to.</param>
         /// <param name="eventSelector">Selects which event to listen for (e.g. <c>evt => evt.Changed</c>).</param>
         /// <param name="pipeline">Configures the reactive pipeline that runs when the event fires.</param>
         /// <returns>The builder for continued chaining.</returns>
         public static NativeTextAreaBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeTextAreaBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,
-            Func<NativeTextAreaEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<NativeTextAreaEvents, ReactiveEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(NativeTextAreaEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
-
-            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, _component.Vendor, builder.BindingPath, _component.ReadExpr);
-            foreach (var reaction in pb.BuildReactions())
-                plan.AddEntry(new Entry(trigger, reaction));
+            var reactiveEvent = eventSelector(NativeTextAreaEvents.Instance);
+            var scope = plan.Authoring.CreateObjectEventScope(
+                builder.ElementId,
+                _component.Vendor,
+                builder.BindingPath,
+                _component.ValueMemberPath,
+                reactiveEvent.EventName);
+            var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
+            pipeline(reactiveEvent.Payload, pb);
+            plan.AddWorkflow(scope, pb);
 
             return builder;
         }

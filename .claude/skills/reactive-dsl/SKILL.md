@@ -106,7 +106,7 @@ ACTION :=
 
   -- Text (→ ElementBuilder — supports per-command When)
   | .SetText(bindSource)
-  | .SetText(typedSource)                              -- comp.Value()
+  | .SetText(valueExpr)                                -- comp.Value()
 
   -- HTML (→ PipelineBuilder)
   | .SetHtml("static")
@@ -114,7 +114,7 @@ ACTION :=
 
   -- HTML (→ ElementBuilder)
   | .SetHtml(bindSource)
-  | .SetHtml(typedSource)
+  | .SetHtml(valueExpr)
 
   -- Visibility (→ PipelineBuilder)
   | .Show()
@@ -147,14 +147,14 @@ COMP_ACTION :=
   | .Enable()                                          -- AC, DDL
   | .Disable()                                         -- AC, DDL
 
-  -- Read (→ TypedComponentSource<T> for conditions/SetText)
-  | .Value()        → TypedComponentSource<string>     -- AC, DDL, TextBox, InputMask, RTE
-  | .Value()        → TypedComponentSource<string[]>   -- MS, CheckList
-  | .Value()        → TypedComponentSource<decimal>    -- NumericTextBox
-  | .Value()        → TypedComponentSource<bool>       -- Switch, CheckBox
-  | .Value()        → TypedComponentSource<DateTime>   -- DatePicker, TimePicker, DTP
-  | .StartDate()    → TypedComponentSource<DateTime>   -- DateRangePicker
-  | .EndDate()      → TypedComponentSource<DateTime>   -- DateRangePicker
+  -- Read (→ ComponentValueExpression<T> for conditions/SetText)
+  | .Value()        → ComponentValueExpression<string>     -- AC, DDL, TextBox, InputMask, RTE
+  | .Value()        → ComponentValueExpression<string[]>   -- MS, CheckList
+  | .Value()        → ComponentValueExpression<decimal>    -- NumericTextBox
+  | .Value()        → ComponentValueExpression<bool>       -- Switch, CheckBox
+  | .Value()        → ComponentValueExpression<DateTime>   -- DatePicker, TimePicker, DTP
+  | .StartDate()    → ComponentValueExpression<DateTime>   -- DateRangePicker
+  | .EndDate()      → ComponentValueExpression<DateTime>   -- DateRangePicker
 
   -- App-level (NativeDrawer)
   | .SetSize(DrawerSize.Sm|Md|Lg)
@@ -271,5 +271,5 @@ args is a phantom with no pipeline binding.
 - NumericTextBox needs SF methods (.Min/.Max/.Step) BEFORE .Reactive()
 - AllowFiltering(true) required on MultiSelect/DropDownList for Filtering event
 - Switch/NativeCheckBox model property MUST be `bool`
-- DomReady fires AFTER all custom-event listeners wired (two-phase boot)
+- DomReady fires AFTER all document-event workflows are wired (two-phase boot)
 - One .Reactive() per event — multiple events chain on same builder

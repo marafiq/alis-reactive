@@ -9,7 +9,7 @@ conditions:
     pattern: (tests/|Tests/).*\.cs$
   - field: new_text
     operator: regex_match
-    pattern: new\s+(ComponentEventTrigger|DomReadyTrigger|CustomEventTrigger|Entry|DispatchCommand|SetPropCommand|MutateElementCommand|ElementCommand|AllGuard|AnyGuard|NotGuard)\s*\(
+    pattern: new\s+(ReactivePlanV2Document|Workflow|DomReadySubscription|DocumentEventSubscription|ObjectEventSubscription|ServerPushSubscription|SignalRSubscription|SequenceAction|BranchAction|ParallelAction|SetAction|CallAction|DispatchAction|RequestAction|InjectAction|ShowValidationErrorsAction|ComparePredicate|AllPredicate|AnyPredicate|NotPredicate|ConfirmPredicate|RequestPlan|CapabilityContract|RuntimeObject|FieldBinding)\s*\(
 ---
 
 **Internal constructor used in test code.**
@@ -21,14 +21,10 @@ and create fragile tests that break on refactors even when behavior is unchanged
 
 | Internal Type | Use Instead |
 |---------------|-------------|
-| `ComponentEventTrigger` | `.Reactive()` extension on the component builder |
-| `Entry` | `Html.On(plan, t => t.DomReady(...))` via TriggerBuilder |
-| `DomReadyTrigger` | `Trigger(plan).DomReady(p => ...)` |
-| `CustomEventTrigger` | `Trigger(plan).CustomEvent("name", p => ...)` |
-| `DispatchCommand` | `pipeline.Dispatch("event-name")` |
-| `SetPropCommand` | `pipeline.Component(ref).SetProp(...)` |
-| `ElementCommand` | `pipeline.Element("#id").SetText(...)` |
-| Guards (`All/Any/Not`) | `When(source).Eq(value).And(...)` via condition builders |
+| `Workflow` | `Trigger(plan)...` plus `Then(...)` / `.Reactive(...)` |
+| subscription classes | `Trigger(plan).DomReady(...)`, `.OnCustom(...)`, `.OnServerPush(...)`, `.OnSignalR(...)` |
+| action classes | `pipeline.Set(...)`, `.Call(...)`, `.Dispatch(...)`, `.Request(...)`, `.Inject(...)` |
+| predicate classes | `When(source).Eq(value).And(...)` via condition builders |
+| plan document / object / binding / contract classes | Public plan DSL and component registration APIs |
 
-50 existing violations tracked for gradual migration (9 test files in Native + Fusion).
-Write new tests using the public API. See `memory/feedback_bdd_no_internals.md`.
+Write tests using the public API only. See `memory/feedback_bdd_no_internals.md`.

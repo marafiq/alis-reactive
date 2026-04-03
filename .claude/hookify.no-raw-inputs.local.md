@@ -19,5 +19,5 @@ All input components must go through the Alis.Reactive DSL:
 - `Html.InputField(plan, m => m.Prop).FusionDropDownList(build: b => ...)` — not `.DropDownListFor()`
 - `Html.InputField(plan, m => m.Prop).NativeCheckBox(build: b => ...)` — not `<input type="checkbox">`
 
-Raw elements bypass IdGenerator, ComponentsMap registration, gather, and validation.
+Raw elements bypass stable id generation, object registration, binding gathering, and validation.
 Direct SF builders bypass vendor abstraction and reactive wiring.

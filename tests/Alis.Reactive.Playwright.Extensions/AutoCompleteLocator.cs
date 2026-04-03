@@ -58,8 +58,11 @@ public sealed class AutoCompleteLocator
     /// </summary>
     public async Task Type(string text, int delayMs = 50)
     {
+        await _page.Locator("body").ClickWhenStableAsync(_page);
         await Input.ClickWhenStableAsync(_page);
-        await Input.PressSequentiallyAsync(text, new() { Delay = delayMs });
+        await Input.PressAsync("Meta+a");
+        await Input.PressAsync("Backspace");
+        await _page.Keyboard.TypeAsync(text, new() { Delay = delayMs });
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 15000 });
     }
 

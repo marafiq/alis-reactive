@@ -1,23 +1,48 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.container: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        html: {
+          kind: property,
+          path: [
+            {
+              prop: innerHTML
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::container: {
+      contract: element.container,
+      elementId: container
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: container,
-            mutation: {
-              kind: set-prop,
-              prop: innerHTML
-            },
-            value: <strong>done</strong>
-          }
-        ]
+      run: {
+        kind: set,
+        target: {
+          object: element::container,
+          member: html
+        },
+        value: {
+          kind: literal,
+          value: <strong>done</strong>
+        }
       }
     }
   ]

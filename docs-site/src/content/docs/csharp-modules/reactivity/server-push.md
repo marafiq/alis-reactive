@@ -86,7 +86,7 @@ public async Task FacilityAlertStream(CancellationToken ct)
 
 ### Lazy connections
 
-Writing `t.ServerPush(...)` in C# does **not** open an `EventSource`. It produces a JSON descriptor. The actual connection only opens when the browser loads the page and the runtime processes the plan during boot.
+Writing `t.ServerPush(...)` in C# does **not** open an `EventSource`. It produces a workflow subscription in the JSON plan. The actual connection only opens when the browser loads the page and the runtime processes the plan during boot.
 
 ### Connection pooling
 
@@ -138,6 +138,6 @@ Both use the same URL — one `EventSource`, two event listeners.
 
 **Choose SSE when** you need a lightweight one-way stream with zero client-side library overhead. **Choose SignalR when** you need multiple hubs, group-based routing, or your infrastructure already uses SignalR.
 
-**Previous:** [Triggers & Real-Time](../triggers-and-reactions/) — DomReady, CustomEvent, component events, and the trigger builder API.
+**Previous:** [Subscriptions and Workflows](../subscriptions-and-workflows/) — DomReady, CustomEvent, component events, and the workflow authoring API.
 
 **Next:** [SignalR](../signalr/) — real-time hub method triggers with WebSocket transport.

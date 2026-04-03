@@ -1,52 +1,139 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        min: {
+          kind: property,
+          path: [
+            {
+              prop: min
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: number
+          },
+          access: write
+        },
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: number
+          },
+          access: write
+        },
+        increment: {
+          kind: method,
+          path: [
+            {
+              prop: increment
+            }
+          ],
+          returns: void
+        }
+      }
+    },
+    element.echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount
+    },
+    element::echo: {
+      contract: element.echo,
+      elementId: echo
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            mutation: {
-              kind: set-prop,
-              prop: min,
-              coerce: number
+            kind: set,
+            target: {
+              object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+              member: min
             },
-            value: 0,
-            vendor: fusion
+            value: {
+              kind: convert,
+              value: {
+                kind: literal,
+                value: 0
+              },
+              to: {
+                kind: scalar,
+                type: number
+              }
+            }
           },
           {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            mutation: {
-              kind: set-prop,
-              prop: value,
-              coerce: number
+            kind: set,
+            target: {
+              object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+              member: value
             },
-            value: 50,
-            vendor: fusion
+            value: {
+              kind: convert,
+              value: {
+                kind: literal,
+                value: 50
+              },
+              to: {
+                kind: scalar,
+                type: number
+              }
+            }
           },
           {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
-            mutation: {
-              kind: call,
-              method: increment
-            },
-            vendor: fusion
+            kind: call,
+            target: {
+              object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount,
+              member: increment
+            }
           },
           {
-            kind: mutate-element,
-            target: echo,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::echo,
+              member: text
             },
-            value: Initialized
+            value: {
+              kind: literal,
+              value: Initialized
+            }
           }
         ]
       }

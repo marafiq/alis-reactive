@@ -1,6 +1,6 @@
 ---
 name: vertical-slice-design
-description: Component vertical slice architecture redesign — IInputComponent, ComponentsMap, vendor on commands, structured BindSource, TypedComponentSource for conditions
+description: Component vertical slice architecture redesign — IInputComponent, ComponentsMap, vendor on commands, structured BindSource, ComponentValueExpression for conditions
 type: project
 ---
 
@@ -38,12 +38,12 @@ type: project
 - Matches how Guards already use BindSource — removes inconsistency
 - Runtime element.ts calls `resolveSource()` (switch on kind) instead of `resolveEventPath()`
 
-### 5. TypedComponentSource Preserves Typed Conditions
-- `TypedComponentSource<TProp> : TypedSource<TProp>` — new class alongside EventArgSource
-- `.Value()` returns `TypedComponentSource<decimal>` not `ComponentSource` — carries type info
+### 5. ComponentValueExpression Preserves Typed Conditions
+- `ComponentValueExpression<TProp> : ValueExpression<TProp>` — new class alongside EventValueExpression
+- `.Value()` returns `ComponentValueExpression<decimal>` not `ComponentSource` — carries type info
 - Plugs into existing `ConditionSourceBuilder<TModel, TProp>` unchanged
 - Guard operators remain typed (Gt/Lt only on numbers, Contains only on strings)
-- New PipelineBuilder overload: `When<TProp>(TypedSource<TProp> source)`
+- New PipelineBuilder overload: `When<TProp>(ValueExpression<TProp> source)`
 - Developer experience: `p.When(comp.Value(), g => g.Gt(0), ...)` — fully typed
 
 ### 6. Scope
@@ -62,7 +62,7 @@ type: project
 
 ### 8. Breaking Changes
 - Builder extensions gain `plan` parameter (plan-less overload kept for non-reactive)
-- `.Value()`/`.Checked()` return `TypedComponentSource<T>` instead of `string`
+- `.Value()`/`.Checked()` return `ComponentValueExpression<T>` instead of `string`
 - MutateElementCommand.source: string → BindSource (all snapshots regenerate)
 - `IReadableComponent` → `IInputComponent` (rename)
 

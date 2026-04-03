@@ -94,7 +94,7 @@ public class ResidentValidator : AbstractValidator<ResidentModel>
         // ── Cross-property text rules ─────────────────────────
 
         // Equal(x => x.OtherProp): value must match another field (skips empty)
-        // The OTHER field ("Email") is automatically included in the validation descriptor
+        // The OTHER field ("Email") is automatically included in the validation contract
         RuleFor(x => x.ConfirmEmail).Equal(x => x.Email)
             .WithMessage("Emails must match.");
 
@@ -264,7 +264,7 @@ public class ResidentConditionalValidator : ReactiveValidator<ResidentModel>
 
 **What happens when the user clicks "Save":**
 1. Runtime reads ALL validation rules from the plan
-2. For each field: reads the component value via `resolveRoot` + `walk(readExpr)`
+2. For each field: resolves the registered binding and reads its current value
 3. Evaluates each rule (skips conditional rules whose condition is false)
 4. If any rule fails: shows error inline next to the field (or in summary if hidden)
 5. If all pass: sends the HTTP POST
@@ -307,7 +307,7 @@ Server errors in the `{ errors: { "PropertyName": ["message"] } }` format are au
 ### DO NOT use FV's `.Empty()` or `.ExclusiveBetween()`
 
 ```csharp
-// WRONG — FV has no public interface, adapter can't extract
+// WRONG — FV has no public interface, the extractor cannot produce a client rule
 RuleFor(x => x.Nickname).Empty();
 RuleFor(x => x.Score).ExclusiveBetween(0m, 100m);
 
@@ -320,7 +320,7 @@ RuleFor(x => x.Score).IsExclusiveBetween(0m, 100m);
 ### DO NOT use `.When()` for client-side conditions
 
 ```csharp
-// WRONG — .When() is server-only, adapter skips it entirely
+// WRONG — .When() is server-only, the extractor skips it entirely
 RuleFor(x => x.JobTitle).NotEmpty().When(x => x.IsEmployed);
 
 // CORRECT — use ReactiveValidator + WhenField
@@ -337,8 +337,8 @@ WhenField(x => x.IsEmployed, () =>
 // registered via Html.InputField(). If Email is not in the form,
 // the equalTo rule fails closed (blocks the form).
 
-// The adapter auto-includes peer fields in the descriptor,
-// but the component must be registered via InputField in the view.
+// The extractor includes peer bindings automatically,
+// but the component must still be registered via InputField in the view.
 ```
 
 ### DO NOT use `Html.Element()` for input components
@@ -415,7 +415,7 @@ For `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)`:
 - `field` = model property name of the peer field (NOT the DOM element ID)
 - `coerceAs` = derived from `AdmissionDate`'s `DateTime` type → `"date"`
 - `constraint` is absent — `field` and `constraint` are mutually exclusive
-- The adapter auto-includes `"AdmissionDate"` in the descriptor
+- The extractor auto-includes `"AdmissionDate"` as the peer binding
 
 For `RuleFor(x => x.Age).InclusiveBetween(0, 120)`:
 

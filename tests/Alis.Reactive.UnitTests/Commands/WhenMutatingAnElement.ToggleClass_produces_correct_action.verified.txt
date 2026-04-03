@@ -1,27 +1,53 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.menu: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        classToggle: {
+          kind: method,
+          path: [
+            {
+              prop: classList
+            },
+            {
+              prop: toggle
+            }
+          ],
+          args: [
+            {
+              kind: scalar,
+              type: string
+            }
+          ],
+          returns: void
+        }
+      }
+    }
+  },
+  objects: {
+    element::menu: {
+      contract: element.menu,
+      elementId: menu
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: call,
+        target: {
+          object: element::menu,
+          member: classToggle
+        },
+        args: [
           {
-            kind: mutate-element,
-            target: menu,
-            mutation: {
-              kind: call,
-              method: toggle,
-              chain: classList,
-              args: [
-                {
-                  kind: literal,
-                  value: expanded
-                }
-              ]
-            }
+            kind: literal,
+            value: expanded
           }
         ]
       }

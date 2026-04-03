@@ -67,7 +67,7 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "Reactive callbacks build descriptors at render time \u2014 they do not execute at runtime. " +
+            description: "Reactive callbacks build plan instructions at render time \u2014 they do not execute at runtime. " +
                          "Use p.When(...).Then(...).Else(...) for conditions.",
             helpLinkUri: null);
 

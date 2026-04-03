@@ -22,7 +22,7 @@ type: project
 **Key grammar patterns to express:**
 - `Component<T>().{Prop}(value)` = property write (SetValue, SetChecked, SetText, SetDataSource)
 - `Component<T>().{Method}()` = void method call (DataBind, FocusIn, ShowPopup, etc.)
-- `Component<T>().Value()` = read for conditions (returns TypedComponentSource<TProp>)
+- `Component<T>().Value()` = read for conditions (returns ComponentValueExpression<TProp>)
 - `Element("id").{Prop}(value)` = set-prop (SetText, SetHtml)
 - `Element("id").{Method}(args)` = call (AddClass, RemoveClass, ToggleClass)
 - `Element("id").{Visibility}()` = Show/Hide

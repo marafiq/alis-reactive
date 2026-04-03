@@ -1,7 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
@@ -27,8 +26,8 @@ namespace Alis.Reactive.Native.Components
             Action<NativeCheckListBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr, "checklist",
+            setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
+                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMemberPath, "checklist",
                 CoercionTypes.InferFromType(typeof(TProp))));
 
             var builder = new NativeCheckListBuilder<TModel, TProp>(setup.Helper, setup.Expression);

@@ -1,42 +1,120 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: status-cascade
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Status: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
               prop: value
-            },
-            value: active,
-            vendor: native
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
           },
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Category,
-            mutation: {
-              kind: set-prop,
+          access: write
+        }
+      }
+    },
+    native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Category: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
               prop: value
-            },
-            value: A,
-            vendor: native
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
           },
-          {
-            kind: mutate-element,
-            target: echo,
-            mutation: {
-              kind: set-prop,
+          access: write
+        }
+      }
+    },
+    element.echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Native_UnitTests_NativeTestModel__Status: {
+      contract: native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
+      elementId: Alis_Reactive_Native_UnitTests_NativeTestModel__Status
+    },
+    component::Alis_Reactive_Native_UnitTests_NativeTestModel__Category: {
+      contract: native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Category,
+      elementId: Alis_Reactive_Native_UnitTests_NativeTestModel__Category
+    },
+    element::echo: {
+      contract: element.echo,
+      elementId: echo
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: status-cascade
+      },
+      run: {
+        kind: sequence,
+        steps: [
+          {
+            kind: set,
+            target: {
+              object: component::Alis_Reactive_Native_UnitTests_NativeTestModel__Status,
+              member: value
             },
-            value: Both updated
+            value: {
+              kind: literal,
+              value: active
+            }
+          },
+          {
+            kind: set,
+            target: {
+              object: component::Alis_Reactive_Native_UnitTests_NativeTestModel__Category,
+              member: value
+            },
+            value: {
+              kind: literal,
+              value: A
+            }
+          },
+          {
+            kind: set,
+            target: {
+              object: element::echo,
+              member: text
+            },
+            value: {
+              kind: literal,
+              value: Both updated
+            }
           }
         ]
       }

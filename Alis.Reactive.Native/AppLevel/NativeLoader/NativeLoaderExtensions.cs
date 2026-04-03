@@ -1,5 +1,4 @@
 using Alis.Reactive;
-using Alis.Reactive.Descriptors.Mutations;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -24,8 +23,7 @@ namespace Alis.Reactive.Native.AppLevel
         public static ComponentRef<NativeLoader, TModel> SetTarget<TModel>(
             this ComponentRef<NativeLoader, TModel> self, string targetId)
             where TModel : class
-            => self.Emit(new CallMutation("setAttribute",
-                   args: new MethodArg[] { new LiteralArg("data-target"), new LiteralArg(targetId) }));
+            => self.Call("setAttribute", "data-target", targetId);
 
         /// <summary>
         /// Sets an auto-hide timeout so the loader disappears after the specified duration.
@@ -37,37 +35,34 @@ namespace Alis.Reactive.Native.AppLevel
         public static ComponentRef<NativeLoader, TModel> SetTimeout<TModel>(
             this ComponentRef<NativeLoader, TModel> self, int ms)
             where TModel : class
-            => self.Emit(new CallMutation("setAttribute",
-                   args: new MethodArg[] { new LiteralArg("data-timeout"), new LiteralArg(ms.ToString()) }));
+            => self.Call("setAttribute", "data-timeout", ms.ToString());
 
         /// <summary>
         /// Shows the loader overlay, making it visible and accessible.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeLoader, TModel> Show<TModel>(
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("add", "classList",
-                           new[] { new LiteralArg("alis-loader--visible") }))
-                       .Emit(new CallMutation("removeAttribute",
-                           args: new MethodArg[] { new LiteralArg("aria-hidden") }));
+            return self.Call("classList.add", "alis-loader--visible")
+                       .Call("removeAttribute", "aria-hidden");
         }
 
         /// <summary>
         /// Hides the loader overlay.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeLoader, TModel> Hide<TModel>(
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("remove", "classList",
-                           new[] { new LiteralArg("alis-loader--visible") }))
-                       .Emit(new CallMutation("setAttribute",
-                           args: new MethodArg[] { new LiteralArg("aria-hidden"), new LiteralArg("true") }));
+            return self.Call("classList.remove", "alis-loader--visible")
+                       .Call("setAttribute", "aria-hidden", "true");
         }
 
         /// <summary>

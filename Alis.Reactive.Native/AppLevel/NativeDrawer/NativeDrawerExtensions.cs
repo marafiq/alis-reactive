@@ -1,5 +1,4 @@
 using Alis.Reactive;
-using Alis.Reactive.Descriptors.Mutations;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -25,8 +24,7 @@ namespace Alis.Reactive.Native.AppLevel
         {
             // Remove all size classes, then add the requested one
             foreach (var cls in SizeClasses)
-                self = self.Emit(new CallMutation("remove", "classList",
-                    new[] { new LiteralArg(cls) }));
+                self = self.Call("classList.remove", cls);
 
             var sizeClass = size switch
             {
@@ -35,36 +33,34 @@ namespace Alis.Reactive.Native.AppLevel
                 DrawerSize.Lg => "alis-drawer--lg",
                 _ => "alis-drawer--md"
             };
-            return self.Emit(new CallMutation("add", "classList",
-                new[] { new LiteralArg(sizeClass) }));
+            return self.Call("classList.add", sizeClass);
         }
 
         /// <summary>
         /// Opens the drawer, making it visible and accessible.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeDrawer, TModel> Open<TModel>(
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("add", "classList",
-                           new[] { new LiteralArg("alis-drawer--visible") }))
-                       .Emit(new CallMutation("removeAttribute",
-                           args: new MethodArg[] { new LiteralArg("aria-hidden") }));
+            return self.Call("classList.add", "alis-drawer--visible")
+                       .Call("removeAttribute", "aria-hidden");
         }
 
         /// <summary>
         /// Closes the drawer, hiding the panel.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeDrawer, TModel> Close<TModel>(
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("remove", "classList",
-                       new[] { new LiteralArg("alis-drawer--visible") }));
+            return self.Call("classList.remove", "alis-drawer--visible");
         }
 
         /// <summary>

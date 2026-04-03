@@ -1,21 +1,20 @@
 using System;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
 {
     /// <summary>
     /// Wires browser triggers (page load, custom events, server-sent events, and SignalR)
-    /// to reactions that execute in the browser.
+    /// to workflows that execute in the browser.
     /// </summary>
     /// <remarks>
     /// <para>
     /// Accessed via <c>Html.On(plan, t =&gt; t.DomReady(...).CustomEvent(...))</c>.
-    /// Triggers can be chained: each call adds an independent trigger-reaction pair to the plan.
+    /// Triggers can be chained: each call adds an independent trigger-workflow pair to the plan.
     /// </para>
     /// <para>
     /// Avoid defining the same event name twice in the same view. Duplicate listeners
-    /// are an antipattern unless there is a legitimate reason to split the reaction.
+    /// are an antipattern unless there is a legitimate reason to split the workflow.
     /// </para>
     /// </remarks>
     /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
@@ -33,39 +32,41 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Wires a reaction that executes when the page finishes loading.
+        /// Wires a workflow that executes when the page finishes loading.
         /// </summary>
         /// <remarks>
-        /// DomReady reactions run after all custom-event listeners are wired, so
+        /// DomReady workflows run after all document-event listeners are wired, so
         /// <c>Dispatch("x")</c> inside a DomReady safely reaches any <c>CustomEvent("x", ...)</c>
         /// defined in the same plan.
         /// </remarks>
-        /// <param name="pipeline">Builds the reaction commands (element mutations, dispatches, HTTP calls, etc.).</param>
+        /// <param name="pipeline">Builds the workflow actions (element mutations, dispatches, HTTP calls, etc.).</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> DomReady(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>();
+            var scope = _plan.Authoring.CreateDomReadyScope();
+            var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
             pipeline(pb);
-            AddEntryWithContexts(new DomReadyTrigger(), pb);
+            AddWorkflow(scope, pb);
             return this;
         }
 
         /// <summary>
-        /// Wires a reaction that executes when the named custom event fires in the browser.
+        /// Wires a workflow that executes when the named custom event fires in the browser.
         /// </summary>
         /// <param name="eventName">The event name to listen for (e.g. <c>"order-submitted"</c>).</param>
-        /// <param name="pipeline">Builds the reaction commands.</param>
+        /// <param name="pipeline">Builds the workflow actions.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> CustomEvent(string eventName, Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>();
+            var scope = _plan.Authoring.CreateDocumentEventScope(eventName);
+            var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
             pipeline(pb);
-            AddEntryWithContexts(new CustomEventTrigger(eventName), pb);
+            AddWorkflow(scope, pb);
             return this;
         }
 
         /// <summary>
-        /// Wires a reaction with a typed payload that executes when the named custom event fires.
+        /// Wires a workflow with a typed payload that executes when the named custom event fires.
         /// </summary>
         /// <remarks>
         /// The <typeparamref name="TPayload"/> instance is used only for compile-time type inference;
@@ -79,43 +80,46 @@ namespace Alis.Reactive.Builders
             Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
-            var pb = new PipelineBuilder<TModel>();
+            var scope = _plan.Authoring.CreateDocumentEventScope(eventName);
+            var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
             pipeline(new TPayload(), pb);
-            AddEntryWithContexts(new CustomEventTrigger(eventName), pb);
+            AddWorkflow(scope, pb);
             return this;
         }
 
         /// <summary>
-        /// Wires a reaction that fires when a Server-Sent Events stream sends any message.
+        /// Wires a workflow that fires when a Server-Sent Events stream sends any message.
         /// </summary>
         /// <param name="url">The SSE endpoint URL.</param>
-        /// <param name="pipeline">Builds the reaction commands.</param>
+        /// <param name="pipeline">Builds the workflow actions.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> ServerPush(string url, Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>();
+            var scope = _plan.Authoring.CreateServerPushScope(url, null);
+            var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
             pipeline(pb);
-            AddEntryWithContexts(new ServerPushTrigger(url), pb);
+            AddWorkflow(scope, pb);
             return this;
         }
 
         /// <summary>
-        /// Wires a reaction that fires when the SSE stream sends a specific named event type.
+        /// Wires a workflow that fires when the SSE stream sends a specific named event type.
         /// </summary>
         /// <param name="url">The SSE endpoint URL.</param>
         /// <param name="eventType">The SSE event type to filter for.</param>
-        /// <param name="pipeline">Builds the reaction commands.</param>
+        /// <param name="pipeline">Builds the workflow actions.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> ServerPush(string url, string eventType, Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>();
+            var scope = _plan.Authoring.CreateServerPushScope(url, eventType);
+            var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
             pipeline(pb);
-            AddEntryWithContexts(new ServerPushTrigger(url, eventType), pb);
+            AddWorkflow(scope, pb);
             return this;
         }
 
         /// <summary>
-        /// Wires a reaction with a typed payload when the SSE stream sends a named event type.
+        /// Wires a workflow with a typed payload when the SSE stream sends a named event type.
         /// </summary>
         /// <typeparam name="TPayload">The event payload type, providing typed access to payload properties.</typeparam>
         /// <param name="url">The SSE endpoint URL.</param>
@@ -126,30 +130,32 @@ namespace Alis.Reactive.Builders
             Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
-            var pb = new PipelineBuilder<TModel>();
+            var scope = _plan.Authoring.CreateServerPushScope(url, eventType);
+            var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
             pipeline(new TPayload(), pb);
-            AddEntryWithContexts(new ServerPushTrigger(url, eventType), pb);
+            AddWorkflow(scope, pb);
             return this;
         }
 
         /// <summary>
-        /// Wires a reaction that fires when the server invokes the named SignalR Hub method.
+        /// Wires a workflow that fires when the server invokes the named SignalR Hub method.
         /// </summary>
         /// <param name="hubUrl">The SignalR hub endpoint URL.</param>
         /// <param name="methodName">The hub method name to listen for.</param>
-        /// <param name="pipeline">Builds the reaction commands.</param>
+        /// <param name="pipeline">Builds the workflow actions.</param>
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> SignalR(string hubUrl, string methodName,
             Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>();
+            var scope = _plan.Authoring.CreateSignalRScope(hubUrl, methodName);
+            var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
             pipeline(pb);
-            AddEntryWithContexts(new SignalRTrigger(hubUrl, methodName), pb);
+            AddWorkflow(scope, pb);
             return this;
         }
 
         /// <summary>
-        /// Wires a reaction with a typed payload when the server invokes the named SignalR Hub method.
+        /// Wires a workflow with a typed payload when the server invokes the named SignalR Hub method.
         /// </summary>
         /// <typeparam name="TPayload">The event payload type, providing typed access to payload properties.</typeparam>
         /// <param name="hubUrl">The SignalR hub endpoint URL.</param>
@@ -160,17 +166,17 @@ namespace Alis.Reactive.Builders
             Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
-            var pb = new PipelineBuilder<TModel>();
+            var scope = _plan.Authoring.CreateSignalRScope(hubUrl, methodName);
+            var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
             pipeline(new TPayload(), pb);
-            AddEntryWithContexts(new SignalRTrigger(hubUrl, methodName), pb);
+            AddWorkflow(scope, pb);
             return this;
         }
 
-        // Builds reactions from the pipeline and registers each as a separate entry in the plan
-        private void AddEntryWithContexts(Trigger trigger, PipelineBuilder<TModel> pb)
+        private void AddWorkflow(WorkflowScope scope, PipelineBuilder<TModel> pipeline)
         {
-            foreach (var reaction in pb.BuildReactions())
-                _plan.AddEntry(new Entry(trigger, reaction));
+            foreach (var action in pipeline.BuildActions())
+                _plan.AddWorkflow(scope, action);
         }
     }
 }

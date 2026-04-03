@@ -24,9 +24,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
                 return BadRequest(new { error = "Empty body" });
 
             var count = 0;
-            if (model.ResidentId != null) count++;
-            if (model.FormToken != null) count++;
-            if (model.ResidentName != null) count++;
+            if (!string.IsNullOrWhiteSpace(model.ResidentId)) count++;
+            if (!string.IsNullOrWhiteSpace(model.FormToken)) count++;
+            if (!string.IsNullOrWhiteSpace(model.ResidentName)) count++;
 
             return Ok(new
             {

@@ -1,85 +1,147 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.spinner: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.content: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::spinner: {
+      contract: element.spinner,
+      elementId: spinner
+    },
+    element::content: {
+      contract: element.content,
+      elementId: content
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: GET,
+          method: GET,
           url: /api/slow,
-          whileLoading: [
+          before: [
             {
-              kind: mutate-element,
-              target: spinner,
-              mutation: {
-                kind: call,
-                method: removeAttribute,
-                args: [
-                  {
-                    kind: literal,
-                    value: hidden
-                  }
-                ]
+              kind: set,
+              target: {
+                object: element::spinner,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
+                }
               }
             },
             {
-              kind: mutate-element,
-              target: content,
-              mutation: {
-                kind: call,
-                method: setAttribute,
-                args: [
-                  {
-                    kind: literal,
-                    value: hidden
-                  },
-                  {
-                    kind: literal,
-                    value: 
-                  }
-                ]
+              kind: set,
+              target: {
+                object: element::content,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
+                }
               }
             }
           ],
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: spinner,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
+              run: {
+                kind: sequence,
+                steps: [
+                  {
+                    kind: set,
+                    target: {
+                      object: element::spinner,
+                      member: hidden
+                    },
+                    value: {
+                      kind: convert,
+                      value: {
                         kind: literal,
-                        value: hidden
+                        value: true
                       },
-                      {
-                        kind: literal,
-                        value: 
+                      to: {
+                        kind: scalar,
+                        type: boolean
                       }
-                    ]
-                  }
-                },
-                {
-                  kind: mutate-element,
-                  target: content,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
+                    }
+                  },
+                  {
+                    kind: set,
+                    target: {
+                      object: element::content,
+                      member: hidden
+                    },
+                    value: {
+                      kind: convert,
+                      value: {
                         kind: literal,
-                        value: hidden
+                        value: false
+                      },
+                      to: {
+                        kind: scalar,
+                        type: boolean
                       }
-                    ]
+                    }
                   }
-                }
-              ]
+                ]
+              }
             }
           ]
         }

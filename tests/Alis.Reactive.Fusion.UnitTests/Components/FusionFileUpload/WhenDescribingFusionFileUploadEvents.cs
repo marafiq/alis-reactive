@@ -14,18 +14,18 @@ public class WhenDescribingFusionFileUploadEvents
     }
 
     [Test]
-    public void Selected_descriptor_has_correct_js_event()
+    public void Selected_event_contract_has_correct_js_event()
     {
-        var descriptor = FusionFileUploadEvents.Instance.Selected;
-        Assert.That(descriptor.JsEvent, Is.EqualTo("selected"));
+        var reactiveEvent = FusionFileUploadEvents.Instance.Selected;
+        Assert.That(reactiveEvent.EventName, Is.EqualTo("selected"));
     }
 
     [Test]
-    public void Selected_descriptor_provides_args_instance()
+    public void Selected_event_contract_provides_args_instance()
     {
-        var descriptor = FusionFileUploadEvents.Instance.Selected;
-        Assert.That(descriptor.Args, Is.Not.Null);
-        Assert.That(descriptor.Args, Is.TypeOf<FusionFileUploadSelectedArgs>());
+        var reactiveEvent = FusionFileUploadEvents.Instance.Selected;
+        Assert.That(reactiveEvent.Payload, Is.Not.Null);
+        Assert.That(reactiveEvent.Payload, Is.TypeOf<FusionFileUploadSelectedArgs>());
     }
 
     [Test]

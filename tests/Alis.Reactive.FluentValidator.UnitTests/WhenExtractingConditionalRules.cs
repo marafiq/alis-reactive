@@ -3,12 +3,12 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingConditionalRules
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     [Test]
     public void Conditional_rules_with_When_are_skipped()
     {
-        var desc = _adapter.ExtractRules(typeof(ConditionalValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         // Only Name should appear (JobTitle has .When() so it's skipped)
@@ -19,7 +19,7 @@ public class WhenExtractingConditionalRules
     [Test]
     public void ReactiveValidator_WhenField_merges_conditional_rules()
     {
-        var desc = _adapter.ExtractRules(typeof(ConditionalProviderValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(ConditionalProviderValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();

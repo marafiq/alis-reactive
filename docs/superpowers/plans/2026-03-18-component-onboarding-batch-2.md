@@ -151,7 +151,7 @@ namespace Alis.Reactive.Native.Components
 }
 ```
 
-- [ ] **Step 5:** Create `NativeTextAreaExtensions.cs` — `SetValue(string)`, `FocusIn()`, `Value()` returning `TypedComponentSource<string>`
+- [ ] **Step 5:** Create `NativeTextAreaExtensions.cs` — `SetValue(string)`, `FocusIn()`, `Value()` returning `ComponentValueExpression<string>`
 
 ```csharp
 using Alis.Reactive.Builders.Conditions;
@@ -171,9 +171,9 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeTextArea, TModel> self) where TModel : class
             => self.Emit(new CallMutation("focus"));
 
-        public static TypedComponentSource<string> Value<TModel>(
+        public static ComponentValueExpression<string> Value<TModel>(
             this ComponentRef<NativeTextArea, TModel> self) where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            => new ComponentValueExpression<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
     }
 }
 ```
@@ -290,7 +290,7 @@ public class WhenMutatingANativeTextArea : NativeTestBase
         Trigger(plan).DomReady(p =>
         {
             var source = p.Component<NativeTextArea>(m => m.CareNotes).Value();
-            Assert.That(source, Is.InstanceOf<Alis.Reactive.Builders.Conditions.TypedComponentSource<string>>());
+            Assert.That(source, Is.InstanceOf<Alis.Reactive.Builders.Conditions.ComponentValueExpression<string>>());
         });
     }
 }
@@ -410,7 +410,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
 - [ ] **Step 1:** Create `FusionDateTimePicker.cs` — sealed, `FusionComponent`, `IInputComponent`, `ReadExpr => "value"`
 - [ ] **Step 2:** Create `Events/FusionDateTimePickerOnChanged.cs` — `DateTime? Value`, `bool IsInteracted`
 - [ ] **Step 3:** Create `FusionDateTimePickerEvents.cs` — singleton, `Changed` → `"change"`
-- [ ] **Step 4:** Create `FusionDateTimePickerExtensions.cs` — `SetValue(DateTime)`, `Value()` → `TypedComponentSource<DateTime>`, coercion = `"date"`
+- [ ] **Step 4:** Create `FusionDateTimePickerExtensions.cs` — `SetValue(DateTime)`, `Value()` → `ComponentValueExpression<DateTime>`, coercion = `"date"`
 - [ ] **Step 5:** Create `FusionDateTimePickerHtmlExtensions.cs` — factory using `setup.Helper.EJS().DateTimePickerFor(setup.Expression)`, register in ComponentsMap
 - [ ] **Step 6:** Create `FusionDateTimePickerReactiveExtensions.cs` — `.Reactive()` on SF `DateTimePickerBuilder`
 - [ ] **Step 7:** Add `AppointmentTime` to `FusionTestModel`
@@ -455,8 +455,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
 - [ ] **Step 2:** Create event args — `DateTime? StartDate`, `DateTime? EndDate`, `int DaySpan`, `bool IsInteracted`
 - [ ] **Step 3:** Create events singleton — `Changed` → `"change"`
 - [ ] **Step 4:** Create extensions:
-  - `StartDate()` → `TypedComponentSource<DateTime>` with readExpr `"startDate"`
-  - `EndDate()` → `TypedComponentSource<DateTime>` with readExpr `"endDate"`
+  - `StartDate()` → `ComponentValueExpression<DateTime>` with readExpr `"startDate"`
+  - `EndDate()` → `ComponentValueExpression<DateTime>` with readExpr `"endDate"`
   - `Value()` → same as `StartDate()` (primary read)
   - No `SetValue()` — DateRangePicker is set by user interaction, not programmatically
 - [ ] **Step 5:** Create HTML extensions — `setup.Helper.EJS().DateRangePickerFor(setup.Expression)`. Register TWO ComponentsMap entries: one with readExpr `"startDate"`, one with readExpr `"endDate"`, using qualified binding paths (e.g. `StayStart`, `StayEnd`).
@@ -493,7 +493,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
 - [ ] **Step 1:** Phantom type — `ReadExpr => "value"` (MaskedTextBox reads `.value` from ej2 instance)
 - [ ] **Step 2:** Event args — `string? Value`, `bool IsInteracted`
 - [ ] **Step 3:** Events singleton — `Changed` → `"change"`
-- [ ] **Step 4:** Extensions — `SetValue(string)`, `Value()` → `TypedComponentSource<string>`
+- [ ] **Step 4:** Extensions — `SetValue(string)`, `Value()` → `ComponentValueExpression<string>`
 - [ ] **Step 5:** HTML extensions — `setup.Helper.EJS().MaskedTextBoxFor(setup.Expression)` with `Mask()` builder method
 - [ ] **Step 6:** Reactive extensions
 - [ ] **Step 7:** Test base property, build
@@ -527,7 +527,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
 - [ ] **Step 1:** Phantom type — `ReadExpr => "value"`
 - [ ] **Step 2:** Event args — `string? Value`, `bool IsInteracted`
 - [ ] **Step 3:** Events singleton — `Changed` → `"change"`
-- [ ] **Step 4:** Extensions — `SetValue(string)`, `Value()` → `TypedComponentSource<string>`
+- [ ] **Step 4:** Extensions — `SetValue(string)`, `Value()` → `ComponentValueExpression<string>`
 - [ ] **Step 5:** HTML extensions — `setup.Helper.EJS().RichTextEditorFor(setup.Expression)`, register ComponentsMap
 - [ ] **Step 6:** Reactive extensions
 - [ ] **Step 7:** Test base, build
@@ -561,7 +561,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
 - [ ] **Step 1:** Phantom type — `ReadExpr => "checked"` (Switch reads `.checked` from ej2 instance)
 - [ ] **Step 2:** Event args — `bool Checked`, `bool IsInteracted`
 - [ ] **Step 3:** Events singleton — `Changed` → `"change"`
-- [ ] **Step 4:** Extensions — `SetChecked(bool)` → `SetPropMutation("checked", coerce: "boolean")`, `Value()` → `TypedComponentSource<bool>`
+- [ ] **Step 4:** Extensions — `SetChecked(bool)` → `SetPropMutation("checked", coerce: "boolean")`, `Value()` → `ComponentValueExpression<bool>`
 - [ ] **Step 5:** HTML extensions — `setup.Helper.EJS().SwitchFor(setup.Expression)`, register ComponentsMap with `readExpr: "checked"`
 - [ ] **Step 6:** Reactive extensions
 - [ ] **Step 7:** Test base, build

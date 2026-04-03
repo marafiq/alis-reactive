@@ -457,13 +457,13 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Clear seeded values so validation will fail
-        await Page.Locator($"#{Scope}ResidentName").FillAsync("");
-        await Page.Locator($"#{Scope}CareNotes").FillAsync("");
+        await Page.Locator($"#{Scope}ResidentName").ClearWhenStableAsync(Page);
+        await Page.Locator($"#{Scope}CareNotes").ClearWhenStableAsync(Page);
         var monthlyRate = new ComponentScope(Page, Scope).NumericTextBox("MonthlyRate");
         await monthlyRate.Clear();
         await monthlyRate.FillAndBlur("0");
 
-        await Page.Locator("#submit-json-btn").ClickAsync();
+        await ClickWhenStable(Page.Locator("#submit-json-btn"));
 
         // Echo should remain in its default state (em dash)
         await Expect(Page.Locator("#echo-resident-name"))
@@ -480,9 +480,9 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Clear the seeded resident name
-        await Page.Locator($"#{Scope}ResidentName").FillAsync("");
+        await Page.Locator($"#{Scope}ResidentName").ClearWhenStableAsync(Page);
 
-        await Page.Locator("#submit-json-btn").ClickAsync();
+        await ClickWhenStable(Page.Locator("#submit-json-btn"));
 
         // Validation error message should appear for ResidentName
         var errorSlot = Page.Locator($"span[data-valmsg-for='ResidentName']");
@@ -496,9 +496,9 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Clear the seeded care notes
-        await Page.Locator($"#{Scope}CareNotes").FillAsync("");
+        await Page.Locator($"#{Scope}CareNotes").ClearWhenStableAsync(Page);
 
-        await Page.Locator("#submit-json-btn").ClickAsync();
+        await ClickWhenStable(Page.Locator("#submit-json-btn"));
 
         var errorSlot = Page.Locator($"span[data-valmsg-for='CareNotes']");
         await Expect(errorSlot).ToContainTextAsync("required", new() { Timeout = 5000 });
@@ -511,7 +511,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
 
         // MobilityLevel is not seeded — submit without selecting it
-        await Page.Locator("#submit-json-btn").ClickAsync();
+        await ClickWhenStable(Page.Locator("#submit-json-btn"));
 
         var errorSlot = Page.Locator($"span[data-valmsg-for='MobilityLevel']");
         await Expect(errorSlot).ToContainTextAsync("required", new() { Timeout = 5000 });
@@ -524,7 +524,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
 
         // First submit — validation should block (missing required fields)
-        await Page.Locator("#submit-json-btn").ClickAsync();
+        await ClickWhenStable(Page.Locator("#submit-json-btn"));
         await Expect(Page.Locator($"span[data-valmsg-for='MobilityLevel']"))
             .ToContainTextAsync("required", new() { Timeout = 5000 });
 

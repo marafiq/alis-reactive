@@ -3,12 +3,12 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingLengthRules
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     [Test]
     public void MaximumLength_produces_maxLength_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(MaxLengthValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(MaxLengthValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc!.Fields[0].Rules[0].Rule, Is.EqualTo("maxLength"));
@@ -18,7 +18,7 @@ public class WhenExtractingLengthRules
     [Test]
     public void MinimumLength_produces_minLength_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(MinLengthValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(MinLengthValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc!.Fields[0].Rules[0].Rule, Is.EqualTo("minLength"));
@@ -28,7 +28,7 @@ public class WhenExtractingLengthRules
     [Test]
     public void Both_minLength_and_maxLength_on_same_field()
     {
-        var desc = _adapter.ExtractRules(typeof(BothLengthValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(BothLengthValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var rules = desc!.Fields[0].Rules;

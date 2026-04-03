@@ -1,62 +1,117 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.r: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::r: {
+      contract: element.r,
+      elementId: r
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
+            when: {
               kind: all,
-              guards: [
+              terms: [
                 {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.active
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: active
+                      }
+                    ]
                   },
-                  coerceAs: boolean,
-                  op: truthy
+                  op: truthy,
+                  as: {
+                    kind: scalar,
+                    type: boolean
+                  }
                 },
                 {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.score
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: score
+                      }
+                    ]
                   },
-                  coerceAs: number,
                   op: gt,
-                  operand: 50
+                  right: {
+                    kind: literal,
+                    value: 50
+                  },
+                  as: {
+                    kind: scalar,
+                    type: number
+                  }
                 },
                 {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.status
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: status
+                      }
+                    ]
                   },
-                  coerceAs: string,
                   op: eq,
-                  operand: verified
+                  right: {
+                    kind: literal,
+                    value: verified
+                  },
+                  as: {
+                    kind: scalar,
+                    type: string
+                  }
                 }
               ]
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: r,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: all three
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::r,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: all three
+              }
             }
           }
         ]

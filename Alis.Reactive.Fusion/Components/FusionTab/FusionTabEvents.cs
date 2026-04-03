@@ -1,18 +1,19 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Events available on FusionTab.
-    /// Singleton instance — used with .Reactive() event selector lambda:
-    ///   .Reactive(evt => evt.Selected, (args, p) => { ... })
+    /// Exposes the events supported by the Fusion Tab component.
     /// </summary>
     public sealed class FusionTabEvents
     {
+        /// <summary>
+        /// Gets the singleton event catalog for Fusion Tab.
+        /// </summary>
         public static readonly FusionTabEvents Instance = new FusionTabEvents();
         private FusionTabEvents() { }
 
         /// <summary>Fires when a tab is selected (SF "selected" event).</summary>
-        public TypedEventDescriptor<FusionTabSelectedArgs> Selected =>
-            new TypedEventDescriptor<FusionTabSelectedArgs>(
+        public ReactiveEvent<FusionTabSelectedArgs> Selected =>
+            new ReactiveEvent<FusionTabSelectedArgs>(
                 "selected", new FusionTabSelectedArgs());
     }
 }

@@ -8,7 +8,7 @@ public class WhenComposingAPlan : PlanTestBase
         VerifyJson(CreatePlan().Render());
 
     [Test]
-    public Task Multiple_entries()
+    public Task Multiple_workflows()
     {
         var plan = CreatePlan();
         Trigger(plan)

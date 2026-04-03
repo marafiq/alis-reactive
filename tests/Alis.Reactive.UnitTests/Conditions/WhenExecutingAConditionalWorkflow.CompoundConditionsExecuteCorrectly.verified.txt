@@ -1,81 +1,119 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.admin-panel: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::admin-panel: {
+      contract: element.admin-panel,
+      elementId: admin-panel
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: compound-check
+      when: {
+        kind: document-event,
+        name: compound-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
+            when: {
               kind: all,
-              guards: [
+              terms: [
                 {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.isActive
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: isActive
+                      }
+                    ]
                   },
-                  coerceAs: boolean,
-                  op: truthy
+                  op: truthy,
+                  as: {
+                    kind: scalar,
+                    type: boolean
+                  }
                 },
                 {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.isAdmin
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: isAdmin
+                      }
+                    ]
                   },
-                  coerceAs: boolean,
-                  op: truthy
+                  op: truthy,
+                  as: {
+                    kind: scalar,
+                    type: boolean
+                  }
                 }
               ]
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: admin-panel,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::admin-panel,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: admin-panel,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::admin-panel,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

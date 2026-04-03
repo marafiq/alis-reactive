@@ -1,24 +1,48 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
+  contracts: {
+    native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__MobilityLevel: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Native_UnitTests_NativeTestModel__MobilityLevel: {
+      contract: native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__MobilityLevel,
+      elementId: Alis_Reactive_Native_UnitTests_NativeTestModel__MobilityLevel
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Native_UnitTests_NativeTestModel__MobilityLevel,
-            mutation: {
-              kind: set-prop,
-              prop: value
-            },
-            value: Ambulatory,
-            vendor: native
-          }
-        ]
+      run: {
+        kind: set,
+        target: {
+          object: component::Alis_Reactive_Native_UnitTests_NativeTestModel__MobilityLevel,
+          member: value
+        },
+        value: {
+          kind: literal,
+          value: Ambulatory
+        }
       }
     }
   ]

@@ -1,5 +1,5 @@
 using System;
-using Alis.Reactive.Descriptors;
+using Alis.Reactive;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
@@ -24,8 +24,8 @@ namespace Alis.Reactive.Native.Components
             Action<NativeCheckBoxBuilder<TModel, bool>> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr, "checkbox",
+            setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
+                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMemberPath, "checkbox",
                 CoercionTypes.InferFromType(typeof(bool))));
 
             var builder = new NativeCheckBoxBuilder<TModel, bool>(setup.Helper, setup.Expression);

@@ -1,362 +1,89 @@
 ---
 title: Runtime
-description: How the JS runtime discovers plans, boots in two phases, and executes commands — traced through every module.
+description: How the browser runtime resolves contracts, values, workflows, and requests in the V2 design.
 sidebar:
   order: 7
 ---
 
-The runtime is a plan interpreter. It reads the JSON plan that C# builders produce and executes the described behavior. It does not invent behavior — it follows instructions.
+The runtime is intentionally dumb.
 
-## Module structure
+It receives the rendered V2 contract and performs four jobs:
 
-```
-Scripts/
-├── root.ts                          entry point — discovers [data-reactive-plan], calls boot()
-├── lifecycle/
-│   ├── boot.ts                      two-phase boot — wire listeners, then execute DomReady
-│   ├── enrichment.ts                fills validation field metadata from ComponentsMap
-│   ├── merge-plan.ts                composes partial plans (ResolvePlan merges into parent)
-│   └── walk-reactions.ts            traverses reaction tree for validation + live-clear wiring
-├── execution/
-│   ├── execute.ts                   reaction dispatcher — sequential, conditional, http, parallel
-│   ├── commands.ts                  command dispatcher — dispatch, mutate-element, mutate-event, into
-│   ├── element.ts                   bracket notation — root[prop] = val, root[method](args)
-│   ├── trigger.ts                   wires dom-ready, custom-event, component-event listeners
-│   ├── gather.ts                    collects component + event values for HTTP requests
-│   ├── http.ts                      builds and executes fetch(), routes responses
-│   ├── pipeline.ts                  orchestrates: pre-fetch → validate → request → parallel
-│   └── inject.ts                    injects HTML into containers, merges embedded plans
-├── resolution/
-│   ├── resolver.ts                  walks BindSource — event paths or component reads
-│   └── component.ts                 vendor root resolution (see Component Model)
-├── conditions/                      evaluates guards — value, all, any, not, confirm
-├── validation/                      client-side validation from plan descriptors
-├── components/                      component-specific side effects (drawer, loader, confirm)
-├── core/                            walk.ts, coerce.ts, trace.ts, assert-never.ts
-└── types/                           TypeScript interfaces mirroring the JSON plan schema
-```
+1. merge plans
+2. resolve objects and members
+3. evaluate values and predicates
+4. execute actions
 
-## Boot — `root.ts` → `boot.ts`
+## Runtime modules
 
-`root.ts` runs on every page load. It finds all `[data-reactive-plan]` elements, parses their JSON, composes partial plans via `composeInitialPlans()`, and calls `boot()` for each. No global state. No `window.alis` (one exception: `window.alis.confirm` for the confirm guard dialog).
+- `lifecycle/boot.ts`
+- `lifecycle/merge-plan.ts`
+- `resolution/contracts.ts`
+- `resolution/values.ts`
+- `execution/trigger.ts`
+- `execution/execute.ts`
+- `execution/http.ts`
+- `validation/orchestrator.ts`
 
-`boot()` orchestrates three steps:
+Each module owns one concern. If behavior leaks across those boundaries, refactor it.
 
-```d2
-direction: right
+## Subscription wiring
 
-enrich: "enrichment.ts\nFill validation fields\nfrom ComponentsMap" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 16
-}
-validation: "walk-reactions.ts\nFind validation descriptors\nWire live-clear listeners" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-wire: "wireEntries()\nTwo-phase trigger wiring" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
+The runtime wires V2 subscriptions:
 
-enrich -> validation -> wire
-```
+- `dom-ready`
+- `document-event`
+- `object-event`
+- `server-push`
+- `signalr`
 
-**Enrichment** walks validation descriptors and fills in `fieldId`, `vendor`, `readExpr`, and `coerceAs` on each field from the ComponentsMap. The `coerceAs` field carries the type inferred from `typeof(TProp)` at C# registration time — used by the condition reader for typed comparison (e.g., Unix ms for dates). This is the only runtime enrichment — gather placeholders and component trigger refs are already resolved at C# render time.
+The contract already tells the runtime:
 
-**Two-phase boot** guarantees event chains work regardless of declaration order. Phase 1 wires all CustomEvent and component-event listeners. Phase 2 runs DomReady reactions — which may dispatch events that Phase 1 listeners catch. Without this, a DomReady dispatch would fire before the listener exists and vanish silently.
+- which object is involved
+- which event name to use
+- which contract member or event payload shape applies
 
-At this point, the page is live. Listeners are attached. The runtime is waiting.
+That is why the runtime does not need DOM discovery or vendor guessing.
 
-## When a trigger fires — `trigger.ts` → `execute.ts` → `element.ts`
+## Action execution
 
-The user checks a checkbox. The `change` listener fires. The runtime makes three decisions — each one narrowing scope until the DOM changes.
+`execute.ts` dispatches on V2 action kind:
 
-```d2
-direction: right
+- `sequence`
+- `branch`
+- `parallel`
+- `set`
+- `call`
+- `dispatch`
+- `request`
+- `inject`
+- `show-validation-errors`
 
-trigger: "trigger.ts\nEvent fires" {
-  shape: rectangle
-  style.fill: "#fce8e6"
-  style.stroke: "#ea4335"
-  style.font-size: 16
-}
-reaction: "execute.ts\nReaction kind?" {
-  shape: diamond
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-command: "commands.ts\nCommand kind?" {
-  shape: diamond
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 16
-}
-mutation: "element.ts\nMutation kind?" {
-  shape: diamond
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-dom: "DOM changes" {
-  shape: rectangle
-  style.fill: "#d4edda"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
+## Request execution
 
-trigger -> reaction -> command -> mutation -> dom
-```
+`http.ts` is responsible for:
 
-### Trigger wiring — `trigger.ts`
+- input shaping
+- validation gating
+- `traceparent` propagation
+- response routing
+- chained requests
+- settled handlers
 
-Attaches listeners based on `trigger.kind`. Each creates an execution context and calls `executeReaction()`.
+HTTP behavior belongs there, not in views or component slices.
 
-| Trigger kind | What it wires | Context |
-|-------------|---------------|---------|
-| `dom-ready` | Immediate execution (or `DOMContentLoaded`) | `{ components }` |
-| `custom-event` | `document.addEventListener(eventName)` | `{ evt: detail, components }` |
-| `component-event` | `resolveRoot(el, vendor).addEventListener(jsEvent)` | `{ evt: payload, components }` |
-| `server-push` | `new EventSource(url)` — SSE stream listener | `{ evt: parsed data, components }` |
-| `signalr` | `HubConnection.on(methodName)` — SignalR hub listener | `{ evt: method args, components }` |
+## Tracing
 
-For component events, `trigger.ts` contains vendor-specific logic: native components read `readExpr` from the element and package it into the detail, fusion components pass the event object directly. All listeners use `AbortSignal` for clean teardown.
+Tracing uses W3C/Otel-style context propagation:
 
-For server-push and signalr, the runtime manages persistent connections shared by triggers with the same endpoint/hub URL. SSE uses the browser's native `EventSource` with automatic reconnection. SignalR uses `@microsoft/signalr` with `withAutomaticReconnect()`. Both show a retry indicator when all retries are exhausted.
+- workflow and action spans are nested
+- requests emit client spans
+- outgoing requests carry `traceparent`
 
-### Decision 1 — Reaction kind (`execute.ts`)
+Tracing should describe real V2 behavior, not recreate deleted abstractions.
 
-| Kind | Behavior | Sync/Async |
-|------|----------|-----------|
-| `sequential` | Execute each command in order | Sync |
-| `conditional` | Evaluate guards, pick matching branch (if/elseif/else) | Async (guards) |
-| `http` | Validate → gather → fetch → route response | Async (fetch) |
-| `parallel-http` | `Promise.all` on requests, then `OnAllSettled` | Async |
+## Merge and cleanup
 
-The tree is recursive — a conditional branch can contain an HTTP reaction, and vice versa — but at each node the dispatch is a flat switch on `kind`.
+Plan merge is keyed by `planId` and `sourceId`.
 
-### Decision 2 — Command kind (`commands.ts`)
-
-| Kind | Module | What it does |
-|------|--------|-------------|
-| `dispatch` | inline | Fires `CustomEvent` on `document` |
-| `mutate-element` | `element.ts` | Bracket notation on DOM element or component root |
-| `mutate-event` | inline | Modifies `ctx.evt` (e.g., `preventDefaultAction = true`) |
-| `validation-errors` | `validation/` | Routes server-side errors to form fields |
-| `into` | `inject.ts` | Injects response HTML, merges any embedded plans |
-
-Each command can carry an optional `when` guard — if it fails, the command is skipped but the pipeline continues.
-
-### Decision 3 — Mutation kind (`element.ts` / `commands.ts`)
-
-Two primitives, three targets:
-
-- **`set-prop`** — `root[prop] = val`
-- **`call`** — `root[method](args)`
-
-| Target | Module | How root is resolved |
-|--------|--------|---------------------|
-| DOM element | `element.ts` | `getElementById(target)` |
-| Component | `element.ts` | `resolveRoot(el, vendor)` |
-| Event args | `commands.ts` | `ctx.evt` |
-
-The plan carries every name as a string. The runtime applies it via bracket notation — no catalog, no switch on method names.
-
-## Value resolution — `resolver.ts` → `walk.ts`
-
-Commands and conditions need dynamic values. `resolver.ts` dispatches by `source.kind`:
-
-| Source | Resolution path |
-|--------|---------------|
-| `event` | `walk(ctx, "evt.address.city")` |
-| `component` | `resolveRoot(el, vendor)` → `walk(root, readExpr)` via `evalRead()` in `component.ts` |
-
-Both converge on `walk()` — the most important function in the runtime:
-
-```d2
-direction: right
-
-path: "'evt.address.city'" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 16
-}
-split: "split('.')\n['evt','address','city']" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-step1: "ctx['evt']" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-step2: "evt['address']" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-step3: "addr['city']\n→ 'Portland'" {
-  shape: rectangle
-  style.fill: "#d4edda"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-
-path -> split -> step1 -> step2 -> step3
-```
-
-Split on dots, walk each segment with bracket notation. If any segment is null, return `undefined`. This is how the C# expression `x => x.Address.City` reaches the browser value — `ExpressionPathHelper` converts it to `"evt.address.city"` at build time, `walk()` traverses it at runtime.
-
-## Coercion — `coerce.ts`
-
-The coerce module serves two distinct operations that share the type system but never mix:
-
-| Operation | Function | Purpose | Used by |
-|-----------|----------|---------|---------|
-| **Comparison** | `coerce(raw, type)` | Convert to typed value for operators | Conditions, Mutations, Validation comparison rules |
-| **Serialization** | `toString(raw)` | Convert to string for HTTP transport | Gather (FormData, GET). JSON uses `JSON.stringify` on raw values. |
-
-Every coerce function returns `CoerceResult<T>` — a discriminated union `{ ok: true, value: T } | { ok: false, error: string }`. Functions never throw. Callers decide how to handle `Err`:
-
-| Consumer | On Err | Why |
-|----------|--------|-----|
-| Conditions | Guard → false, else branch runs | User interaction must not crash |
-| Validation | Rule fails, shows error message | User sees field error, not app crash |
-| Mutations | `coerceOrThrow()` — throws with stack trace | Developer error in plan needs debugging |
-| Gather | Log warning, skip field | Don't crash entire HTTP request |
-
-Supported coercion types (inferred from C# `typeof(TProp)` via `CoercionTypes.InferFromType`):
-
-| CoercionType | C# types | Comparison result | Serialization result |
-|-------------|----------|-------------------|---------------------|
-| `"string"` | `string`, `Enum` | identity | identity |
-| `"number"` | `int`, `decimal`, `double`, ... | number | `"4250"` |
-| `"boolean"` | `bool` | `true`/`false` | `"true"`/`"false"` |
-| `"date"` | `DateTime`, `DateTimeOffset`, `DateOnly` | Unix ms (getTime) | ISO 8601 (toISOString) |
-| `"array"` | `T[]`, `List<T>`, ... | identity | JSON.stringify |
-| `"raw"` | everything else | pass-through | Err (plain objects) |
-
-The plan carries `coerceAs` on `ComponentEntry` (from `typeof(TProp)`), `ValueGuard` (from conditions), `SetPropMutation` (from mutations), and `ValidationRule` (from FluentValidation). The runtime never infers or guesses a coercion type — it reads the plan.
-
-## Condition evaluation — `conditions.ts`
-
-```d2
-direction: right
-
-guard: "guard.kind?" {
-  shape: diamond
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-value: "value\nresolve → coerce → operator" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 16
-}
-all: "all — AND" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-any: "any — OR" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-not: "not — invert" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-confirm: "confirm — dialog" {
-  shape: rectangle
-  style.fill: "#fce8e6"
-  style.stroke: "#ea4335"
-  style.font-size: 16
-}
-result: "true / false" {
-  shape: rectangle
-  style.fill: "#d4edda"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-
-guard -> value
-guard -> all
-guard -> any
-guard -> not
-guard -> confirm
-value -> result
-all -> result
-any -> result
-not -> result
-confirm -> result
-```
-
-`value` guards resolve via `resolver.ts`, coerce both sides, apply the operator (20+ operators). `all`/`any`/`not` compose recursively. `confirm` is the only async guard — shows a browser dialog via `window.alis.confirm`.
-
-## Module dependency graph
-
-```d2
-direction: right
-
-root: "root.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
-boot: "boot.ts" { shape: rectangle; style.fill: "#fef7e0"; style.stroke: "#f9ab00"; style.font-size: 14 }
-trigger: "trigger.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
-execute: "execute.ts" { shape: rectangle; style.fill: "#fef7e0"; style.stroke: "#f9ab00"; style.font-size: 14 }
-commands: "commands.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
-element: "element.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
-gather: "gather.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
-component: "component.ts" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
-resolver: "resolver.ts" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
-coerce: "coerce.ts" { shape: rectangle; style.fill: "#f0f0f0"; style.stroke: "#666"; style.font-size: 14 }
-walk: "walk.ts" { shape: rectangle; style.fill: "#f0f0f0"; style.stroke: "#666"; style.font-size: 14 }
-conditions: "conditions.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
-validation: "validation/" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
-
-root -> boot
-boot -> trigger
-trigger -> execute
-execute -> commands
-execute -> conditions
-commands -> element
-commands -> resolver
-commands -> conditions
-commands -> coerce
-element -> component
-element -> resolver
-element -> coerce
-gather -> component
-gather -> coerce
-gather -> walk
-resolver -> component
-resolver -> walk
-resolver -> coerce
-component -> walk
-conditions -> resolver
-conditions -> coerce
-validation -> coerce
-validation -> component
-```
-
-Every arrow is a function call. No circular dependencies. Any user action follows this graph — only the reaction kind and command kind change.
-
-For how `resolveRoot()` works for different vendors, see [Component Model](../component-model/).
-
-**Previous:** [The Vertical Slice](../vertical-slice/)
+Source-owned slices are replaced or removed without scanning the DOM for hidden state.

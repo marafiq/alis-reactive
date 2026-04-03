@@ -1,96 +1,120 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.action-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::action-result: {
+      contract: element.action-result,
+      elementId: action-result
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
-        preFetch: [
+      run: {
+        kind: sequence,
+        steps: [
           {
             kind: dispatch,
-            event: step-1
+            name: step-1
           },
           {
             kind: dispatch,
-            event: step-2
-          }
-        ],
-        request: {
-          verb: POST,
-          url: /api/action,
-          onSuccess: [
-            {
-              commands: [
+            name: step-2
+          },
+          {
+            kind: request,
+            request: {
+              method: POST,
+              url: /api/action,
+              onSuccess: [
                 {
-                  kind: mutate-element,
-                  target: action-result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: acted
+                  run: {
+                    kind: set,
+                    target: {
+                      object: element::action-result,
+                      member: text
+                    },
+                    value: {
+                      kind: literal,
+                      value: acted
+                    }
+                  }
                 }
               ]
             }
-          ]
-        }
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: dispatch,
-            event: step-4
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: dispatch,
+        name: step-4
+      }
+    },
+    {
+      when: {
+        kind: document-event,
+        name: test
+      },
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.active
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: active
+                  }
+                ]
               },
-              coerceAs: boolean,
-              op: truthy
+              op: truthy,
+              as: {
+                kind: scalar,
+                type: boolean
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: dispatch,
-                  event: step-3-active
-                }
-              ]
+            run: {
+              kind: dispatch,
+              name: step-3-active
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: dispatch,
-                  event: step-3-inactive
-                }
-              ]
+            run: {
+              kind: dispatch,
+              name: step-3-inactive
             }
           }
         ]

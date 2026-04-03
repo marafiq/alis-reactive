@@ -1,53 +1,83 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: status-check
+      when: {
+        kind: document-event,
+        name: status-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.isActive
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: isActive
+                  }
+                ]
               },
-              coerceAs: boolean,
-              op: truthy
+              op: truthy,
+              as: {
+                kind: scalar,
+                type: boolean
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Online
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::status,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Online
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Offline
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::status,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Offline
+              }
             }
           }
         ]

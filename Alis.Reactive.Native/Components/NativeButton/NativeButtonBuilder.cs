@@ -1,23 +1,11 @@
 using System.IO;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Renders a native HTML &lt;button&gt; element with an explicit id.
-    /// Not model-bound — buttons don't carry data.
-    ///
-    /// Usage:
-    ///   @Html.NativeButton("save-btn", "Save")
-    ///       .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
-    ///       .Reactive(plan, evt => evt.Click, (args, p) =>
-    ///       {
-    ///           p.Post("/api/save", g => g.Static("name", "John"))
-    ///            .Response(r => r.OnSuccess(s => ...));
-    ///       })
-    ///
-    /// .Reactive() is always the last call — native builders are IHtmlContent
-    /// directly (no .Render() needed).
+    /// Builds a native button element with an explicit id for reactive wiring.
     /// </summary>
     public class NativeButtonBuilder<TModel> : IHtmlContent where TModel : class
     {
@@ -32,23 +20,30 @@ namespace Alis.Reactive.Native.Components
             _text = text;
         }
 
-        /// <summary>The element ID — used by .Reactive() to wire events.</summary>
+        /// <summary>Gets the rendered element id used for event wiring.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>Sets the button type attribute (default: "button").</summary>
+        /// <summary>Sets the button <c>type</c> attribute.</summary>
+        /// <param name="type">The button type to render.</param>
+        /// <returns>The current builder.</returns>
         public NativeButtonBuilder<TModel> Type(string type)
         {
             _type = type;
             return this;
         }
 
-        /// <summary>Sets CSS classes on the button element.</summary>
+        /// <summary>Adds custom CSS classes to the button element.</summary>
+        /// <param name="css">The CSS classes to append.</param>
+        /// <returns>The current builder.</returns>
         public NativeButtonBuilder<TModel> CssClass(string css)
         {
             _cssClass = css;
             return this;
         }
 
+        /// <summary>Writes the button markup.</summary>
+        /// <param name="writer">The writer that receives the markup.</param>
+        /// <param name="encoder">The encoder used for HTML attribute and content values.</param>
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             writer.Write("<button");
@@ -69,5 +64,4 @@ namespace Alis.Reactive.Native.Components
             writer.Write("</button>");
         }
     }
-
 }

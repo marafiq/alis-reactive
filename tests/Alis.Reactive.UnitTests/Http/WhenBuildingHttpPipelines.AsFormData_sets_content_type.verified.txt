@@ -1,34 +1,63 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: dom-ready
-      },
-      reaction: {
-        kind: http,
-        request: {
-          verb: POST,
-          url: /api/upload,
-          gather: [
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
             {
-              kind: all
+              prop: textContent
             }
           ],
-          contentType: form-data,
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: dom-ready
+      },
+      run: {
+        kind: request,
+        request: {
+          method: POST,
+          url: /api/upload,
+          input: {
+            transport: form-data,
+            value: {
+              kind: binding-map,
+              include: all
+            }
+          },
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: uploaded
                 }
-              ]
+              }
             }
           ]
         }

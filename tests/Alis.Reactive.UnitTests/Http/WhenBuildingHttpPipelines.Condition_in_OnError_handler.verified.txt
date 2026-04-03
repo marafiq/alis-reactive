@@ -1,66 +1,131 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: submit
-      },
-      reaction: {
-        kind: http,
-        request: {
-          verb: POST,
-          url: /api/save,
-          gather: [
+  contracts: {
+    element.ok: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
             {
-              kind: static,
-              param: data,
-              value: x
+              prop: hidden
             }
           ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.error: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::ok: {
+      contract: element.ok,
+      elementId: ok
+    },
+    element::error: {
+      contract: element.error,
+      elementId: error
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: submit
+      },
+      run: {
+        kind: request,
+        request: {
+          method: POST,
+          url: /api/save,
+          input: {
+            transport: json,
+            value: {
+              kind: object,
+              fields: {
+                data: {
+                  kind: literal,
+                  value: x
+                }
+              }
+            }
+          },
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: ok,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
+              run: {
+                kind: set,
+                target: {
+                  object: element::ok,
+                  member: hidden
+                },
+                value: {
+                  kind: convert,
+                  value: {
+                    kind: literal,
+                    value: false
+                  },
+                  to: {
+                    kind: scalar,
+                    type: boolean
                   }
                 }
-              ]
+              }
             }
           ],
           onError: [
             {
               statusCode: 400,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: error,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
+              run: {
+                kind: sequence,
+                steps: [
+                  {
+                    kind: set,
+                    target: {
+                      object: element::error,
+                      member: hidden
+                    },
+                    value: {
+                      kind: convert,
+                      value: {
                         kind: literal,
-                        value: hidden
+                        value: false
+                      },
+                      to: {
+                        kind: scalar,
+                        type: boolean
                       }
-                    ]
+                    }
+                  },
+                  {
+                    kind: show-validation-errors,
+                    formId: form
                   }
-                },
-                {
-                  kind: validation-errors,
-                  formId: form
-                }
-              ]
+                ]
+              }
             }
           ]
         }

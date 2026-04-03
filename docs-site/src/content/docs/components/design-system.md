@@ -13,7 +13,7 @@ Alis.Reactive ships 13 tag helpers that replace raw `<div>` soup with semantic l
 
 Add the NuGet package and register the tag helpers:
 
-```cshtml title="_ViewImports.cshtml"
+```html title="_ViewImports.cshtml"
 @addTagHelper *, Alis.Reactive.NativeTagHelpers
 ```
 

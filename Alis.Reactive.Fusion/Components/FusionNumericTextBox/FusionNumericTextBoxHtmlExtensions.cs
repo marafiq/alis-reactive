@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.Descriptors;
+using Alis.Reactive;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
@@ -31,8 +31,8 @@ namespace Alis.Reactive.Fusion.Components
             Action<NumericTextBoxBuilder> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ReadExpr, "numerictextbox",
+            setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
+                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMemberPath, "numerictextbox",
                 CoercionTypes.InferFromType(typeof(TProp))));
 
             var builder = setup.Helper.EJS().NumericTextBoxFor(setup.Expression)

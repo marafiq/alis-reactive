@@ -1,27 +1,66 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: composed-confirm
+      when: {
+        kind: document-event,
+        name: composed-confirm
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
+            when: {
               kind: all,
-              guards: [
+              terms: [
                 {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.score
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: score
+                      }
+                    ]
                   },
-                  coerceAs: number,
                   op: gt,
-                  operand: 0
+                  right: {
+                    kind: literal,
+                    value: 0
+                  },
+                  as: {
+                    kind: scalar,
+                    type: number
+                  }
                 },
                 {
                   kind: confirm,
@@ -29,30 +68,22 @@
                 }
               ]
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: dispatch,
-                  event: do-delete
-                }
-              ]
+            run: {
+              kind: dispatch,
+              name: do-delete
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Aborted
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::status,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Aborted
+              }
             }
           }
         ]

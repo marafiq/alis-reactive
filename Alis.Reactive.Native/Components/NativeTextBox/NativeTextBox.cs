@@ -11,6 +11,6 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeTextBox : NativeComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMemberPath => "value";
     }
 }

@@ -1,23 +1,40 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        focusIn: {
+          kind: method,
+          path: [
+            {
+              prop: focusIn
+            }
+          ],
+          returns: void
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime,
-            mutation: {
-              kind: call,
-              method: focusIn
-            },
-            vendor: fusion
-          }
-        ]
+      run: {
+        kind: call,
+        target: {
+          object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime,
+          member: focusIn
+        }
       }
     }
   ]

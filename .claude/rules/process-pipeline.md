@@ -9,7 +9,7 @@ Every change flows through layers. Each has skills, thinking, and a test harness
 A failing test drives every boundary crossing.
 
 ```
-Layer 1: C# Descriptors & Builders
+Layer 1: C# Plan Authoring & Builders
    │  Skills: TDD, modern-csharp, dotnet-xml-docs
    │  Verify: Value Objects, Encapsulation, Serialization impact, SOLID
    │  Harness: VerifyJson snapshots + AssertSchemaValid

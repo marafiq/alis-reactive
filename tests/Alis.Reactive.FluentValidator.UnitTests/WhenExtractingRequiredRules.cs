@@ -3,12 +3,12 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingRequiredRules
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     [Test]
     public void NotEmpty_produces_required_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(RequiredValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(RequiredValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc!.Fields, Has.Count.EqualTo(1));
@@ -22,7 +22,7 @@ public class WhenExtractingRequiredRules
     [Test]
     public void NotNull_produces_required_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(NotNullValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(NotNullValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc!.Fields[0].Rules[0].Rule, Is.EqualTo("required"));
@@ -31,7 +31,7 @@ public class WhenExtractingRequiredRules
     [Test]
     public void Custom_message_overrides_default()
     {
-        var desc = _adapter.ExtractRules(typeof(RequiredWithCustomMessageValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(RequiredWithCustomMessageValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc!.Fields[0].Rules[0].Message, Is.EqualTo("Name cannot be blank."));

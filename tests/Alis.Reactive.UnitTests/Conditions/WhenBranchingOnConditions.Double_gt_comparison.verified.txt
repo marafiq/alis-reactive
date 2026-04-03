@@ -1,54 +1,87 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: temp-check
+      when: {
+        kind: document-event,
+        name: temp-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.temperature
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: temperature
+                  }
+                ]
               },
-              coerceAs: number,
               op: gt,
-              operand: 98.6
+              right: {
+                kind: literal,
+                value: 98.6
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Fever
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::result,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Fever
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Normal
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::result,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Normal
+              }
             }
           }
         ]

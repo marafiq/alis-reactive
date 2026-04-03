@@ -1,48 +1,140 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.street: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.city: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.zip: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::street: {
+      contract: element.street,
+      elementId: street
+    },
+    element::city: {
+      contract: element.city,
+      elementId: city
+    },
+    element::zip: {
+      contract: element.zip,
+      elementId: zip
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test-event
+      when: {
+        kind: document-event,
+        name: test-event
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: street,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::street,
+              member: text
             },
-            source: {
-              kind: event,
-              path: evt.address.street
+            value: {
+              kind: context,
+              scope: event,
+              path: [
+                {
+                  prop: address
+                },
+                {
+                  prop: street
+                }
+              ]
             }
           },
           {
-            kind: mutate-element,
-            target: city,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::city,
+              member: text
             },
-            source: {
-              kind: event,
-              path: evt.address.city
+            value: {
+              kind: context,
+              scope: event,
+              path: [
+                {
+                  prop: address
+                },
+                {
+                  prop: city
+                }
+              ]
             }
           },
           {
-            kind: mutate-element,
-            target: zip,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::zip,
+              member: text
             },
-            source: {
-              kind: event,
-              path: evt.address.zip
+            value: {
+              kind: context,
+              scope: event,
+              path: [
+                {
+                  prop: address
+                },
+                {
+                  prop: zip
+                }
+              ]
             }
           }
         ]

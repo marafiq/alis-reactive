@@ -9,8 +9,8 @@ public class WhenGatheringRegisteredComponents : PlanTestBase
     public Task IncludeAll_expands_registered_components()
     {
         var plan = CreatePlan();
-        plan.AddToComponentsMap("Name", new ComponentRegistration("comp1", "native", "Name", "value", "textbox", "string"));
-        plan.AddToComponentsMap("Amount", new ComponentRegistration("comp2", "fusion", "Amount", "value", "numerictextbox", "number"));
+        plan.RegisterComponent("Name", new ComponentRegistration("comp1", "native", "Name", "value", "textbox", "string"));
+        plan.RegisterComponent("Amount", new ComponentRegistration("comp2", "fusion", "Amount", "value", "numerictextbox", "number"));
 
         Trigger(plan).DomReady(p =>
             p.Post("/api/save", g => g.IncludeAll())
@@ -26,7 +26,7 @@ public class WhenGatheringRegisteredComponents : PlanTestBase
     public Task IncludeAll_with_static_mixes_both()
     {
         var plan = CreatePlan();
-        plan.AddToComponentsMap("Status", new ComponentRegistration("comp1", "native", "Status", "value", "textbox", "string"));
+        plan.RegisterComponent("Status", new ComponentRegistration("comp1", "native", "Status", "value", "textbox", "string"));
 
         Trigger(plan).DomReady(p =>
             p.Post("/api/save", g => g
@@ -44,7 +44,7 @@ public class WhenGatheringRegisteredComponents : PlanTestBase
     public void IncludeAll_expands_conforms_to_schema()
     {
         var plan = CreatePlan();
-        plan.AddToComponentsMap("Name", new ComponentRegistration("comp1", "native", "Name", "value", "textbox", "string"));
+        plan.RegisterComponent("Name", new ComponentRegistration("comp1", "native", "Name", "value", "textbox", "string"));
 
         Trigger(plan).DomReady(p =>
             p.Post("/api/save", g => g.IncludeAll())
@@ -66,12 +66,14 @@ public class WhenGatheringRegisteredComponents : PlanTestBase
 
         var json = plan.Render();
         using var doc = JsonDocument.Parse(json);
-        var gather = doc.RootElement
-            .GetProperty("entries")[0]
-            .GetProperty("reaction")
+        var input = doc.RootElement
+            .GetProperty("workflows")[0]
+            .GetProperty("run")
             .GetProperty("request")
-            .GetProperty("gather");
+            .GetProperty("input")
+            .GetProperty("value");
 
-        Assert.That(gather.GetArrayLength(), Is.EqualTo(1));
+        Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("binding-map"));
+        Assert.That(input.GetProperty("include").GetString(), Is.EqualTo("all"));
     }
 }

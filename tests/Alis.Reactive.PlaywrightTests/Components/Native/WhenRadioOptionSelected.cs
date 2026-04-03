@@ -213,7 +213,7 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""));
+        AssertPlanResolver(planJson, "native-element");
         AssertNoConsoleErrors();
     }
 
@@ -222,7 +222,7 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"value\""));
+        AssertPlanValueMember(planJson, "value");
         AssertNoConsoleErrors();
     }
 

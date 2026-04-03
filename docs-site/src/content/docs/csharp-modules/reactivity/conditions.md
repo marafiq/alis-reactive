@@ -13,7 +13,7 @@ From the [Grammar Tree](../../mental-model/#the-grammar-tree) — the conditions
 pipeline.When(source).OPERATOR                    § start a condition
 ├── .Then(then => { })                            § true branch
 ├── .ElseIf(source).OPERATOR.Then(then => { })    § additional branches
-├── .Else(else_ => { })                           § fallback branch
+├── .Else(else_ => { })                           § default branch
 ├── .And(source).OPERATOR                         § all must be true
 ├── .Or(source).OPERATOR                          § any can be true
 ├── .Not()                                        § invert the guard
@@ -153,7 +153,7 @@ pipeline.When(args, x => x.Name).MinLength(3)
 
 ### Array operator
 
-For array-typed sources (like multi-select values):
+For array-typed value expressions (like multi-select values):
 
 ```csharp
 pipeline.When(selectedServices.Value()).ArrayContains("physical-therapy")
@@ -215,7 +215,7 @@ pipeline.When(args, x => x.Score).Gte(90)
 
 ### Else
 
-The fallback branch when no preceding condition matches:
+The default branch when no preceding condition matches:
 
 ```csharp
 pipeline.When(args, x => x.CareLevel).Eq("memory-care")

@@ -1,5 +1,3 @@
-using Alis.Reactive.Descriptors.Mutations;
-
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -19,31 +17,33 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Selects a tab by index: ej2.select(index).
         /// </summary>
+        /// <param name="self">The component reference to operate on.</param>
+        /// <param name="index">The zero-based tab index.</param>
+        /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<FusionTab, TModel> Select<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class
-            => self.Emit(new CallMutation("select", args: new MethodArg[]
-            {
-                new LiteralArg(index)
-            }));
+            => self.Call("select", index);
 
         /// <summary>
         /// Shows or hides a tab by index: ej2.hideTab(index, isHidden).
         /// </summary>
+        /// <param name="self">The component reference to operate on.</param>
+        /// <param name="index">The zero-based tab index.</param>
+        /// <param name="isHidden"><see langword="true"/> to hide the tab; otherwise, <see langword="false"/>.</param>
+        /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<FusionTab, TModel> HideTab<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index, bool isHidden = true)
             where TModel : class
-            => self.Emit(new CallMutation("hideTab", args: new MethodArg[]
-            {
-                new LiteralArg(index),
-                new LiteralArg(isHidden)
-            }));
+            => self.Call("hideTab", index, isHidden);
 
         /// <summary>
         /// Sets the selected tab index via property: ej2.selectedItem = index.
         /// </summary>
+        /// <param name="self">The component reference to operate on.</param>
+        /// <param name="index">The zero-based tab index.</param>
+        /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<FusionTab, TModel> SetSelectedItem<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class
-            => self.Emit(new SetPropMutation("selectedItem", coerce: "number"),
-                value: index.ToString());
+            => self.Set("selectedItem", index, coerceAs: "number");
     }
 }

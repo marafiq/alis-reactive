@@ -1,50 +1,114 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: single-command-condition-check
-      },
-      reaction: {
-        kind: conditional,
-        commands: [
-          {
-            kind: mutate-element,
-            target: single-command-condition-result,
-            mutation: {
-              kind: set-prop,
+  contracts: {
+    element.single-command-condition-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
               prop: textContent
-            },
-            value: Always runs
-          }
-        ],
-        branches: [
-          {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.score
-              },
-              coerceAs: number,
-              op: gte,
-              operand: 90
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: single-command-condition-bonus,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Bonus!
-                }
-              ]
             }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.single-command-condition-bonus: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::single-command-condition-result: {
+      contract: element.single-command-condition-result,
+      elementId: single-command-condition-result
+    },
+    element::single-command-condition-bonus: {
+      contract: element.single-command-condition-bonus,
+      elementId: single-command-condition-bonus
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: single-command-condition-check
+      },
+      run: {
+        kind: sequence,
+        steps: [
+          {
+            kind: set,
+            target: {
+              object: element::single-command-condition-result,
+              member: text
+            },
+            value: {
+              kind: literal,
+              value: Always runs
+            }
+          },
+          {
+            kind: branch,
+            cases: [
+              {
+                when: {
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: score
+                      }
+                    ]
+                  },
+                  op: gte,
+                  right: {
+                    kind: literal,
+                    value: 90
+                  },
+                  as: {
+                    kind: scalar,
+                    type: number
+                  }
+                },
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::single-command-condition-bonus,
+                    member: text
+                  },
+                  value: {
+                    kind: literal,
+                    value: Bonus!
+                  }
+                }
+              }
+            ]
           }
         ]
       }

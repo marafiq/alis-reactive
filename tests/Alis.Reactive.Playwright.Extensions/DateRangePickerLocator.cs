@@ -102,6 +102,9 @@ public sealed class DateRangePickerLocator
     public async Task SelectRange(int startYear, int startMonth, int startDay,
         int endYear, int endMonth, int endDay)
     {
+        var previousValue = await Input.InputValueAsync();
+
+        await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
         await RangeIcon.ClickWhenStableAsync(_page);
         await RangePopup.WaitForAsync(new() { State = WaitForSelectorState.Visible });
 
@@ -141,8 +144,7 @@ public sealed class DateRangePickerLocator
                 .ClickWhenStableAsync(_page);
         }
 
-        // Click Apply to confirm the range selection
-        await ApplyButton.ClickWhenStableAsync(_page);
+        await ConfirmSelectionIfRequired(previousValue);
     }
 
     // ─── Private Helpers ───
@@ -187,5 +189,119 @@ public sealed class DateRangePickerLocator
         }
 
         throw new TimeoutException($"Calendar title did not change from '{previousText}' within {timeoutMs}ms.");
+    }
+
+    private async Task ConfirmSelectionIfRequired(string? previousValue)
+    {
+        var deadline = DateTime.UtcNow.AddSeconds(8);
+        while (DateTime.UtcNow < deadline)
+        {
+            if (!await RangePopup.IsVisibleAsync() && await WaitForCommittedRange(previousValue, timeoutMs: 500))
+                return;
+
+            if (await RangePopup.IsVisibleAsync() && await ApplyButton.CountAsync() > 0)
+            {
+                if (await TryWaitForApplyButtonReady(timeoutMs: 1000))
+                {
+                    await TryCommitSelectionWithApply();
+
+                    if (!await RangePopup.IsVisibleAsync())
+                    {
+                        await WaitForCommittedRange(previousValue, timeoutMs: 1500);
+                        if (HasCommittedRange(await Input.InputValueAsync(), previousValue))
+                            return;
+                    }
+                }
+            }
+
+            await _page.WaitForTimeoutAsync(100);
+        }
+
+        throw new TimeoutException(
+            $"DateRangePicker '{_componentId}' did not commit a new range selection within the expected time.");
+    }
+
+    private async Task<bool> WaitForCommittedRange(string? previousValue, int timeoutMs)
+    {
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+        while (DateTime.UtcNow < deadline)
+        {
+            var currentValue = await Input.InputValueAsync();
+            if (HasCommittedRange(currentValue, previousValue))
+                return true;
+
+            await _page.WaitForTimeoutAsync(100);
+        }
+
+        return false;
+    }
+
+    private async Task<bool> TryWaitForApplyButtonReady(int timeoutMs)
+    {
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+        while (DateTime.UtcNow < deadline)
+        {
+            if (await ApplyButton.IsVisibleAsync() && await ApplyButton.IsEnabledAsync())
+                return true;
+
+            await _page.WaitForTimeoutAsync(100);
+        }
+
+        return false;
+    }
+
+    private async Task TryCommitSelectionWithApply()
+    {
+        try
+        {
+            var box = await ApplyButton.BoundingBoxAsync();
+            if (box is not null)
+            {
+                await _page.Mouse.ClickAsync(
+                    box.X + (box.Width / 2),
+                    box.Y + (box.Height / 2));
+                await WaitForPopupToHide(timeoutMs: 1500);
+                return;
+            }
+        }
+        catch (PlaywrightException)
+        {
+            // Syncfusion re-renders the footer while closing; fall back to locator click below.
+        }
+
+        try
+        {
+            await ApplyButton.ClickWithoutScrollingWhenStableAsync(_page, timeoutMs: 1500);
+        }
+        catch (TimeoutException)
+        {
+            // The popup can still be animating or re-rendering around the apply action.
+        }
+        catch (PlaywrightException)
+        {
+            // Syncfusion can detach the button while committing the selected range.
+        }
+
+        await WaitForPopupToHide(timeoutMs: 1500);
+    }
+
+    private async Task WaitForPopupToHide(int timeoutMs)
+    {
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+        while (DateTime.UtcNow < deadline)
+        {
+            if (!await RangePopup.IsVisibleAsync())
+                return;
+
+            await _page.WaitForTimeoutAsync(50);
+        }
+    }
+
+    private static bool HasCommittedRange(string currentValue, string? previousValue)
+    {
+        if (string.IsNullOrWhiteSpace(currentValue))
+            return false;
+
+        return !string.Equals(currentValue, previousValue, StringComparison.Ordinal);
     }
 }

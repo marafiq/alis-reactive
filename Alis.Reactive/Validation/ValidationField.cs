@@ -4,40 +4,28 @@ using System.Text.Json.Serialization;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// Describes a single field's validation rules within a form.
-    /// Enriched at C# render time from ComponentsMap, then at TS boot from plan.components.
+    /// Holds the validation rules for a single binding within a form.
+    /// Validation now flows through bindings in the V2 plan rather than through
+    /// per-field component enrichment.
     /// </summary>
     public sealed class ValidationField
     {
         /// <summary>Model property name using dot notation (e.g. "Address.Street").</summary>
         public string FieldName { get; }
 
-        public List<ValidationRule> Rules { get; }
-
-        /// <summary>Element ID from component registration. Null when unenriched.</summary>
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? FieldId { get; internal set; }
-
-        /// <summary>Vendor string ("native" or "fusion"). Null when unenriched.</summary>
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Vendor { get; internal set; }
-
-        /// <summary>Property path to read value (e.g. "value", "checked"). Null when unenriched.</summary>
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? ReadExpr { get; internal set; }
-
-        /// <summary>Coercion type from component registration (e.g. "date", "number"). Null when unenriched.</summary>
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? CoerceAs { get; internal set; }
+        /// <summary>
+        /// Gets the validation rules associated with the binding.
+        /// </summary>
+        public IReadOnlyList<ValidationRule> Rules { get; }
 
         /// <summary>
         /// NEVER make public. Constructed exclusively by framework builders. Public constructors
-        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
+        /// on framework-owned contract types allow devs to bypass the builder API and create invalid plan state.
         /// </summary>
         internal ValidationField(string fieldName, List<ValidationRule> rules)
         {
             FieldName = fieldName;
-            Rules = rules;
+            Rules = rules.ToArray();
         }
     }
 }

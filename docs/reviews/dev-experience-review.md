@@ -309,7 +309,7 @@ and consistent with the rest of the API.
    When/Then/ElseIf/Then/Else chain, documents the return type, and notes the exception
    for orphaned lambdas. This is the highest-quality method doc I have reviewed.
 
-3. **The `TypedSource<TProp>` overloads** (`And<TProp>(TypedSource<TProp> source)`)
+3. **The `ValueExpression<TProp>` overloads** (`And<TProp>(ValueExpression<TProp> source)`)
    are documented clearly: "Adds an AND condition from a component's current value."
    The `source` param doc says "A typed source from a component's Value() extension"
    which tells me how to get one.
@@ -356,8 +356,8 @@ are all domain-appropriate.
 
 Every mutation method has a clear summary. The overloaded `SetText` methods distinguish
 between static strings, event payload sources, response body sources, `BindSource`,
-and `TypedSource<TProp>`. The remarks on `SetText(BindSource)` helpfully point to the
-typed overload: "Prefer the SetText<TProp>(TypedSource<TProp>) overload when a
+and `ValueExpression<TProp>`. The remarks on `SetText(BindSource)` helpfully point to the
+typed overload: "Prefer the SetText<TProp>(ValueExpression<TProp>) overload when a
 component's Value() method is available."
 
 **Rating: 9/10**

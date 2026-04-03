@@ -22,8 +22,8 @@ In `Program.cs`, register the validation extractor:
 using Alis.Reactive;
 using Alis.Reactive.FluentValidator;
 
-ReactivePlanConfig.UseValidationExtractor(
-    new FluentValidationAdapter(type => (IValidator?)Activator.CreateInstance(type)));
+ReactivePlanConfig.UseFormValidationExtractor(
+    new FluentValidationRuleExtractor(type => (IValidator?)Activator.CreateInstance(type)));
 ```
 
 In `_Layout.cshtml`, load the runtime (once, for all pages):
@@ -188,4 +188,4 @@ You can see this example running in the sandbox at `/Sandbox/Todo`.
 ## Next Steps
 
 - [The Contract](../../architecture/the-contract/) -- how the JSON plan works
-- [Features](../../csharp-modules/plan-and-entries/) -- full reference for plans, triggers, conditions, and HTTP
+- [Plan Model](../../csharp-modules/plan-model/) -- full reference for plans, subscriptions, conditions, and HTTP

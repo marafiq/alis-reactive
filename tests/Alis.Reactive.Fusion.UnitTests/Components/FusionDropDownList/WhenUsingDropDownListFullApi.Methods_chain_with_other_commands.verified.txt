@@ -1,40 +1,101 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        },
+        showPopup: {
+          kind: method,
+          path: [
+            {
+              prop: showPopup
+            }
+          ],
+          returns: void
+        }
+      }
+    },
+    element.echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status
+    },
+    element::echo: {
+      contract: element.echo,
+      elementId: echo
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-            mutation: {
-              kind: set-prop,
-              prop: value
+            kind: set,
+            target: {
+              object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+              member: value
             },
-            value: US,
-            vendor: fusion
+            value: {
+              kind: literal,
+              value: US
+            }
           },
           {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
-            mutation: {
-              kind: call,
-              method: showPopup
-            },
-            vendor: fusion
+            kind: call,
+            target: {
+              object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status,
+              member: showPopup
+            }
           },
           {
-            kind: mutate-element,
-            target: echo,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::echo,
+              member: text
             },
-            value: Initialized
+            value: {
+              kind: literal,
+              value: Initialized
+            }
           }
         ]
       }

@@ -1,24 +1,48 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Fusion.UnitTests.FusionTestModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime: {
+      contract: fusion.component.Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime,
+      elementId: Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime,
-            mutation: {
-              kind: set-prop,
-              prop: value
-            },
-            value: 2026-06-15T14:30,
-            vendor: fusion
-          }
-        ]
+      run: {
+        kind: set,
+        target: {
+          object: component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime,
+          member: value
+        },
+        value: {
+          kind: literal,
+          value: 2026-06-15T14:30
+        }
       }
     }
   ]

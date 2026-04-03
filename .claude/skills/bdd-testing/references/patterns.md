@@ -161,13 +161,13 @@ public class ServerPartialValidator : ReactiveValidator<ResidentModel>
 .Validate<ResidentValidator>("partial-form")
 ```
 
-Nested properties must use SetValidator (adapter limitation):
+Nested properties must use `SetValidator` so the client-rule extractor can walk the nested validator:
 
 ```csharp
 // CORRECT
 RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
 
-// WRONG — adapter silently drops these
+// WRONG — the extractor does not produce client rules for this direct nested path
 RuleFor(x => x.Address.Street).NotEmpty();
 ```
 
@@ -201,7 +201,7 @@ const desc = { formId: "form", fields: [...] };
 
 Required DOM elements:
 - Summary div: `data-reactive-validation-summary="{planId}"`
-- Form: `id` matches descriptor's `formId`
+- Form: `id` matches the validation contract's `formId`
 - Error spans: `data-valmsg-for="{fieldName}"`
 - Hidden sections: `hidden` attribute
 - Component IDs: `{TypeScope}__{PropertyPath}` from IdGenerator
@@ -231,7 +231,7 @@ expect(summaryDiv().textContent).toContain("Hidden required");  // IN summary
 | Symptom | Wrong Fix | Right Fix |
 |---------|-----------|-----------|
 | Phantom summary errors | Revert unenriched→summary | Fix validator scope (too wide) |
-| Address rules not extracted | Add direct `RuleFor(x.Address.Street)` | Use `SetValidator` (adapter limitation) |
+| Address rules not extracted | Add direct `RuleFor(x.Address.Street)` | Use `SetValidator` so nested rules are extracted through the child validator |
 | Condition fires on empty dropdown | Revert fail-closed | Fix eq/neq to return false on empty source |
 | Hidden field error silently passes | Remove hidden field validation | Move `valid = false` outside `if (summaryEl)` |
 

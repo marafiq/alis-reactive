@@ -1,8 +1,6 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -18,24 +16,27 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly FusionDropDownList Component = new FusionDropDownList();
 
         /// <summary>Sets the selected value.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <param name="value">The value to select, or <see langword="null"/> to clear.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownList, TModel> SetValue<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self, string? value)
             where TModel : class
-            => self.Emit(new SetPropMutation("value"), value: value);
+            => self.Set("value", value);
 
         /// <summary>Sets the displayed text without changing the underlying value.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <param name="text">The text to display.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownList, TModel> SetText<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self, string text)
             where TModel : class
-            => self.Emit(new SetPropMutation("text"), value: text);
+            => self.Set("text", text);
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TSource">The event payload type containing the items.</typeparam>
+        /// <param name="self">The component reference to operate on.</param>
         /// <param name="source">The event payload instance.</param>
         /// <param name="path">Expression selecting the items collection from the payload.</param>
         /// <returns>The component reference for method chaining.</returns>
@@ -45,12 +46,13 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+            return self.SetFromPath("dataSource", sourcePath);
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TResponse">The response body type containing the items.</typeparam>
+        /// <param name="self">The component reference to operate on.</param>
         /// <param name="source">The response body instance.</param>
         /// <param name="path">Expression selecting the items collection from the response.</param>
         /// <returns>The component reference for method chaining.</returns>
@@ -61,57 +63,62 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+            return self.SetFromPath("dataSource", sourcePath);
         }
 
         /// <summary>Flushes pending property changes to the component in the browser.</summary>
         /// <remarks>
-        /// Call after <see cref="SetDataSource{TModel,TSource}"/> or
-        /// <see cref="SetDataSource{TModel,TResponse}"/> to make the new items appear.
+        /// Call after either <c>SetDataSource(...)</c> overload to make the new items appear.
         /// </remarks>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownList, TModel> DataBind<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("dataBind"));
+            => self.Call("dataBind");
 
         /// <summary>Moves focus into the dropdown.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownList, TModel> FocusIn<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("focusIn"));
+            => self.Call("focusIn");
 
         /// <summary>Removes focus from the dropdown.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownList, TModel> FocusOut<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("focusOut"));
+            => self.Call("focusOut");
 
         /// <summary>Opens the dropdown popup.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownList, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("showPopup"));
+            => self.Call("showPopup");
 
         /// <summary>Closes the dropdown popup.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownList, TModel> HidePopup<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("hidePopup"));
+            => self.Call("hidePopup");
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
         /// <c>p.When(p.Component&lt;FusionDropDownList&gt;(m =&gt; m.Country).Value()).Eq("US").Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the dropdown's current value.</returns>
-        public static TypedComponentSource<string> Value<TModel>(
+        /// <param name="self">The component reference to operate on.</param>
+        /// <returns>A typed value expression representing the dropdown's current value.</returns>
+        public static ComponentValueExpression<string> Value<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
     }
 }

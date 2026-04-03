@@ -43,10 +43,9 @@ public class WhenDropdownItemSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("mutate-element"),
-            "Plan must contain mutate-element commands");
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
-            "Plan must contain fusion vendor");
+        AssertV2Plan(planJson);
+        AssertV2MemberAction(planJson);
+        AssertPlanResolver(planJson, "fusion-instance");
         AssertNoConsoleErrors();
     }
 

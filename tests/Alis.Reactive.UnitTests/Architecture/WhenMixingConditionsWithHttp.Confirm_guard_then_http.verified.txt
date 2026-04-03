@@ -1,60 +1,108 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.confirmed: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.delete-result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::confirmed: {
+      contract: element.confirmed,
+      elementId: confirmed
+    },
+    element::delete-result: {
+      contract: element.delete-result,
+      elementId: delete-result
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
+            when: {
               kind: confirm,
               message: Are you sure?
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: confirmed,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: yes
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::confirmed,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: yes
+              }
             }
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/delete,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: delete-result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::delete-result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: deleted
                 }
-              ]
+              }
             }
           ]
         }

@@ -87,7 +87,7 @@
 - Strongly values SOLID principles and vertical slice isolation
 - "Plan should carry information, runtime is dumb executor of plan behaviors"
 - **Don't treat existing tests like a bible** — redesign tests to match architecture
-- **TypedSource<TProp> is sacred** — never break typed condition access
+- **ValueExpression<TProp> is sacred** — never break typed condition access
 - **BDD tests must be DEEP** — test user workflows, not framework plumbing
 - **Duplication over abstraction** — each vertical slice is self-contained
 - **Senior living domain** — use realistic models (residents, facilities, care levels)

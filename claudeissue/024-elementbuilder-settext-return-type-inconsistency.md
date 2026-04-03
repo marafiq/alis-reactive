@@ -32,13 +32,13 @@ The `ElementBuilder` has 7 overloads of `SetText` and `SetHtml` with two differe
 | `SetText(source, expression)` | `PipelineBuilder` | Pipeline commands |
 | `SetText(ResponseBody, expression)` | `PipelineBuilder` | Pipeline commands |
 | `SetText(BindSource)` | `ElementBuilder` | Element mutations (AddClass, Show, When, etc.) |
-| `SetText(TypedSource)` | `ElementBuilder` | Element mutations |
+| `SetText(ValueExpression)` | `ElementBuilder` | Element mutations |
 
 The same method name (`SetText`) has different return types depending on the overload. The developer cannot predict the chaining behavior from the method name alone.
 
 The design intent appears to be:
 - Static value overloads (string, expression) → you're done with this element, return to pipeline
-- Source-binding overloads (BindSource, TypedSource) → you might want to add a `.When()` guard, stay on element
+- Source-binding overloads (BindSource, ValueExpression) → you might want to add a `.When()` guard, stay on element
 
 But this intent is implicit and undocumented. The API violates the Principle of Least Surprise — a developer who learns the `SetText(string)` pattern expects all `SetText` overloads to behave the same way.
 

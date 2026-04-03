@@ -12,7 +12,7 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingDateOnlyRules
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     // --- Test model with DateOnly property ---
 
@@ -55,7 +55,7 @@ public class WhenExtractingDateOnlyRules
     {
         // Bug: SerializeDateConstraint has no DateOnly branch — falls through to `return value`,
         // returning the raw DateOnly struct. The constraint is a DateOnly, not a string.
-        var desc = _adapter.ExtractRules(typeof(DateOnlyGreaterThanOrEqualToValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(DateOnlyGreaterThanOrEqualToValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc!.Fields[0].Rules[0];
@@ -74,7 +74,7 @@ public class WhenExtractingDateOnlyRules
     public void DateOnly_LessThanOrEqualTo_constraint_is_serialized_as_yyyy_MM_dd_string()
     {
         // Bug: same SerializeDateConstraint fallthrough for LessThanOrEqualTo
-        var desc = _adapter.ExtractRules(typeof(DateOnlyLessThanOrEqualToValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(DateOnlyLessThanOrEqualToValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc!.Fields[0].Rules[0];
@@ -94,7 +94,7 @@ public class WhenExtractingDateOnlyRules
     {
         // Bug: MapRangeValidator calls SerializeDateConstraint for both bounds,
         // but SerializeDateConstraint falls through for DateOnly — returns raw objects.
-        var desc = _adapter.ExtractRules(typeof(DateOnlyRangeValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(DateOnlyRangeValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc!.Fields[0].Rules[0];

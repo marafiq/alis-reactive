@@ -21,11 +21,11 @@ Fix 3 SonarQube CRITICALs and 2 vendor isolation leaks in the TS runtime.
 
 ## Task 9: Vendor Isolation Leaks
 
-2 known leaks where vendor string checks exist outside `component.ts`:
-- `trigger.ts:45` — `if (trigger.vendor === "native")` for event detail extraction
-- `live-clear.ts:44` — `if (field.vendor === "native")` for DOM event wiring
+2 known leaks where vendor string checks exist outside `resolution/contracts.ts`:
+- `execution/trigger.ts` — vendor-specific event-root logic
+- `validation/live-clear.ts` — vendor-specific event wiring
 
-**Approach**: Move vendor-specific logic into `component.ts` exports. Adding a third vendor must only touch `component.ts`. These leaks force changes across the runtime.
+**Approach**: Move vendor-specific logic into `resolution/contracts.ts`. Adding a third vendor must only touch `resolution/contracts.ts`. These leaks force changes across the runtime.
 
 **Layers**: 3 (TS Runtime)
 **Skills**: Load `solid-ts-audit` first

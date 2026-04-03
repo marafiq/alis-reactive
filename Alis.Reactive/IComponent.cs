@@ -15,16 +15,16 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// Interface for components that can be read — provides ReadExpr as an instance property.
+    /// Interface for components that can be read — provides ValueMemberPath as an instance property.
     /// Used by gather and validation extensions as a generic constraint (with new()).
     /// </summary>
     public interface IInputComponent : IComponent
     {
         /// <summary>
-        /// The property path from the vendor-determined root for reading.
+        /// The property path from the vendor root for reading.
         /// Examples: "value", "checked"
         /// </summary>
-        string ReadExpr { get; }
+        string ValueMemberPath { get; }
     }
 
     /// <summary>

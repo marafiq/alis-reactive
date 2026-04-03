@@ -38,6 +38,44 @@ public abstract class NativeTestBase
 
     protected static TriggerBuilder<NativeTestModel> Trigger(ReactivePlan<NativeTestModel> plan) => new(plan);
 
+    protected static PipelineBuilder<NativeTestModel> CreateDomReadyPipeline()
+    {
+        var plan = CreatePlan();
+        var scope = plan.Authoring.CreateDomReadyScope();
+        return new PipelineBuilder<NativeTestModel>(plan.Authoring, scope);
+    }
+
+    protected static void WireObjectEvent(
+        ReactivePlan<NativeTestModel> plan,
+        string componentId,
+        string vendor,
+        string bindingPath,
+        string valueMemberPath,
+        string eventName,
+        Action<PipelineBuilder<NativeTestModel>> configure)
+    {
+        var scope = plan.Authoring.CreateObjectEventScope(componentId, vendor, bindingPath, valueMemberPath, eventName);
+        var pipeline = new PipelineBuilder<NativeTestModel>(plan.Authoring, scope);
+        configure(pipeline);
+        plan.AddWorkflow(scope, pipeline);
+    }
+
+    protected static void WireObjectEvent<TArgs>(
+        ReactivePlan<NativeTestModel> plan,
+        string componentId,
+        string vendor,
+        string bindingPath,
+        string valueMemberPath,
+        string eventName,
+        TArgs args,
+        Action<TArgs, PipelineBuilder<NativeTestModel>> configure)
+    {
+        var scope = plan.Authoring.CreateObjectEventScope(componentId, vendor, bindingPath, valueMemberPath, eventName);
+        var pipeline = new PipelineBuilder<NativeTestModel>(plan.Authoring, scope);
+        configure(args, pipeline);
+        plan.AddWorkflow(scope, pipeline);
+    }
+
     protected static void AssertSchemaValid(string planJson)
     {
         using var doc = JsonDocument.Parse(planJson);

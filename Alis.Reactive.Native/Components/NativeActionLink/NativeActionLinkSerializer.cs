@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Reactions;
-using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -22,83 +19,71 @@ namespace Alis.Reactive.Native.Components
             Action<PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var pb = new PipelineBuilder<TModel>();
+            var authoring = new PlanAuthoringContext(typeof(TModel).FullName ?? typeof(TModel).Name);
+            var scope = authoring.CreateDomReadyScope();
+            var pb = new PipelineBuilder<TModel>(authoring, scope);
             pipeline(pb);
 
-            var reaction = pb.BuildReaction();
-            var state = new RequestProjectionState();
-            var projectedReaction = ProjectReaction(reaction, href, state);
+            var action = pb.BuildAction();
+            var state = new RequestInspectionState();
+            InspectAction(action, href, state);
+
             if (state.RequestCount != 1)
             {
                 throw new InvalidOperationException(
-                    "NativeActionLink supports exactly one request in its click reaction tree.");
+                    "NativeActionLink supports exactly one request in its click workflow tree.");
             }
 
             var payloadJson = JsonSerializer.Serialize(
-                new NativeActionLinkPayload(projectedReaction),
+                new NativeActionLinkPayload(authoring.Document, action),
                 CompactOptions);
 
             return new NativeActionLinkContract(payloadJson);
         }
 
-        private static Reaction ProjectReaction(
-            Reaction reaction,
-            string href,
-            RequestProjectionState state)
+        private static void InspectAction(PlanAction action, string href, RequestInspectionState state)
         {
-            if (reaction is SequentialReaction sequential)
+            switch (action)
             {
-                return new SequentialReaction(sequential.Commands);
-            }
+                case SequenceAction sequence:
+                    foreach (var step in sequence.Steps)
+                        InspectAction(step, href, state);
+                    return;
 
-            if (reaction is ConditionalReaction conditional)
-            {
-                var projectedBranches = new List<Branch>();
-                foreach (var branch in conditional.Branches)
-                {
-                    projectedBranches.Add(new Branch(branch.Guard, ProjectReaction(branch.Reaction, href, state)));
-                }
+                case BranchAction branch:
+                    foreach (var @case in branch.Cases)
+                        InspectAction(@case.Run, href, state);
+                    return;
 
-                var commands = conditional.Commands == null
-                    ? null
-                    : new List<Command>(conditional.Commands);
-                return new ConditionalReaction(commands, projectedBranches);
-            }
+                case RequestAction requestAction:
+                    state.RequestCount++;
+                    if (state.RequestCount > 1)
+                    {
+                        throw new InvalidOperationException(
+                            "NativeActionLink supports exactly one request in its click workflow tree.");
+                    }
 
-            if (reaction is HttpReaction http)
-            {
-                state.RequestCount++;
-                if (state.RequestCount > 1)
-                {
+                    ValidateRequest(requestAction.Request, href);
+                    return;
+
+                case ParallelAction _:
                     throw new InvalidOperationException(
-                        "NativeActionLink supports exactly one request in its click reaction tree.");
-                }
+                        "NativeActionLink does not support Parallel(...) request chains.");
 
-                if (!string.Equals(href, http.Request.Url, StringComparison.Ordinal))
-                {
-                    throw new InvalidOperationException(
-                        "NativeActionLink href must match the request URL in the configured request chain.");
-                }
-
-                var preFetch = http.PreFetch == null
-                    ? null
-                    : new List<Command>(http.PreFetch);
-                var request = ProjectRequest(http.Request);
-                return new HttpReaction(preFetch, request);
+                default:
+                    return;
             }
-
-            if (reaction is ParallelHttpReaction)
-            {
-                throw new InvalidOperationException(
-                    "NativeActionLink does not support Parallel(...) request chains.");
-            }
-
-            throw new InvalidOperationException("Unsupported NativeActionLink reaction shape.");
         }
 
-        private static RequestDescriptor ProjectRequest(RequestDescriptor request)
+        private static void ValidateRequest(RequestPlan request, string href)
         {
-            if (request.Chained != null)
+            if (!string.Equals(href, request.Url, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    "NativeActionLink href must match the request URL in the configured request chain.");
+            }
+
+            if (request.Next != null)
             {
                 throw new InvalidOperationException(
                     "NativeActionLink supports exactly one request. Response.Chained(...) is not supported.");
@@ -110,61 +95,50 @@ namespace Alis.Reactive.Native.Components
                     "NativeActionLink does not support validation. Use a plan-backed trigger for validated flows.");
             }
 
-            if (request.Gather != null)
+            if (request.Input?.Value is BindingMapValueExpr map && Equals(map.Include, "all"))
             {
-                foreach (var item in request.Gather)
-                {
-                    if (item is AllGather)
-                    {
-                        throw new InvalidOperationException(
-                            "NativeActionLink does not support IncludeAll(). Use explicit gather instead.");
-                    }
-                }
+                throw new InvalidOperationException(
+                    "NativeActionLink does not support IncludeAll(). Use explicit gather instead.");
             }
 
-            return new RequestDescriptor(
-                request.Verb,
-                string.Empty,
-                request.Gather == null ? null : new List<GatherItem>(request.Gather),
-                request.ContentType,
-                request.WhileLoading == null ? null : new List<Command>(request.WhileLoading),
-                ProjectHandlers(request.OnSuccess, new RequestProjectionState { RequestCount = 1 }),
-                ProjectHandlers(request.OnError, new RequestProjectionState { RequestCount = 1 }),
-                chained: null,
-                validation: null);
+            EnsureHandlersDoNotStartRequest(request.OnSuccess);
+            EnsureHandlersDoNotStartRequest(request.OnError);
         }
 
-        private static List<StatusHandler>? ProjectHandlers(List<StatusHandler>? handlers, RequestProjectionState state)
+        private static void EnsureHandlersDoNotStartRequest(System.Collections.Generic.List<ResponseHandlerPlan>? handlers)
         {
-            if (handlers == null || handlers.Count == 0)
-            {
-                return null;
-            }
+            if (handlers == null)
+                return;
 
-            var projected = new List<StatusHandler>();
             foreach (var handler in handlers)
-            {
-                if (handler.Reaction != null)
-                {
-                    var reaction = ProjectReaction(handler.Reaction, string.Empty, state);
-                    projected.Add(handler.StatusCode.HasValue
-                        ? new StatusHandler(handler.StatusCode.Value, reaction)
-                        : new StatusHandler(reaction));
-                    continue;
-                }
-
-                if (handler.Commands != null)
-                {
-                    projected.Add(handler.StatusCode.HasValue
-                        ? new StatusHandler(handler.StatusCode.Value, handler.Commands)
-                        : new StatusHandler(handler.Commands));
-                }
-            }
-
-            return projected.Count == 0 ? null : projected;
+                EnsureNoNestedRequests(handler.Run);
         }
 
-        private sealed class RequestProjectionState
+        private static void EnsureNoNestedRequests(PlanAction action)
+        {
+            switch (action)
+            {
+                case SequenceAction sequence:
+                    foreach (var step in sequence.Steps)
+                        EnsureNoNestedRequests(step);
+                    return;
+
+                case BranchAction branch:
+                    foreach (var @case in branch.Cases)
+                        EnsureNoNestedRequests(@case.Run);
+                    return;
+
+                case RequestAction _:
+                case ParallelAction _:
+                    throw new InvalidOperationException(
+                        "NativeActionLink response handlers cannot start a second HTTP request.");
+
+                default:
+                    return;
+            }
+        }
+
+        private sealed class RequestInspectionState
         {
             public int RequestCount { get; set; }
         }
@@ -182,11 +156,13 @@ namespace Alis.Reactive.Native.Components
 
     internal sealed class NativeActionLinkPayload
     {
-        public NativeActionLinkPayload(Reaction reaction)
+        public NativeActionLinkPayload(ReactivePlanV2Document plan, PlanAction action)
         {
-            Reaction = reaction;
+            Plan = plan;
+            Action = action;
         }
 
-        public Reaction Reaction { get; }
+        public ReactivePlanV2Document Plan { get; }
+        public PlanAction Action { get; }
     }
 }

@@ -3,12 +3,12 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingMultipleRulesPerField
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     [Test]
     public void All_rules_for_single_field_extracted_in_order()
     {
-        var desc = _adapter.ExtractRules(typeof(MultipleRulesValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(MultipleRulesValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc!.Fields, Has.Count.EqualTo(1));

@@ -1,70 +1,120 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.item: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::item: {
+      contract: element.item,
+      elementId: item
+    },
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: delete-check
+      when: {
+        kind: document-event,
+        name: delete-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
+            when: {
               kind: confirm,
               message: Are you sure you want to delete?
             },
-            reaction: {
-              kind: sequential,
-              commands: [
+            run: {
+              kind: sequence,
+              steps: [
                 {
-                  kind: mutate-element,
-                  target: item,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
+                  kind: set,
+                  target: {
+                    object: element::item,
+                    member: hidden
+                  },
+                  value: {
+                    kind: convert,
+                    value: {
+                      kind: literal,
+                      value: true
+                    },
+                    to: {
+                      kind: scalar,
+                      type: boolean
+                    }
                   }
                 },
                 {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+                  kind: set,
+                  target: {
+                    object: element::status,
+                    member: text
                   },
-                  value: Deleted
+                  value: {
+                    kind: literal,
+                    value: Deleted
+                  }
                 },
                 {
                   kind: dispatch,
-                  event: item-deleted
+                  name: item-deleted
                 }
               ]
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Cancelled
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::status,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Cancelled
+              }
             }
           }
         ]

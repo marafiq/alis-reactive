@@ -36,7 +36,7 @@ The correct behavior is to throw at build time: "Unsupported type for guard coer
 
 1. **No silent "works sometimes" behavior**: The developer knows at build time that their type needs explicit coercion mapping.
 2. **Extensibility story**: If `Guid` should be supported, it should be mapped to `"string"` coercion explicitly. The fix forces this decision rather than hiding it behind `"raw"`.
-3. **Consistent with typed conditions**: The `TypedSource<TProp>` and `ConditionSourceBuilder<TModel, TProp>` design was built for type safety. A raw fallback undermines this design.
+3. **Consistent with typed conditions**: The `ValueExpression<TProp>` and `ConditionSourceBuilder<TModel, TProp>` design was built for type safety. A raw fallback undermines this design.
 
 ## How This Fix Will Not Break Existing Features
 

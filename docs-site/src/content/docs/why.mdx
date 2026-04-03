@@ -30,7 +30,7 @@ ASP.NET's unobtrusive validation and AJAX recognized this pain. `data-val-requir
 
 - **No type safety.** `data-val-*` attributes are strings. Rename a property and they silently break.
 - **Limited validators.** "Required when another field is checked" or "greater than that field's value" means custom JS.
-- **No reactivity.** Cascading dropdowns, conditional panels, inter-field reactions -- you intercept jQuery Validation internals or hand-wire `$(document).on("change")` alongside the declarative attributes.
+- **No reactivity.** Cascading dropdowns, conditional panels, inter-field workflows -- you intercept jQuery Validation internals or hand-wire `$(document).on("change")` alongside the declarative attributes.
 - **Vendor components break it.** Syncfusion, Telerik, and others have their own lifecycle and APIs (`el.ej2_instances[0].value`). Unobtrusive attributes cannot express "read from a FusionAutoComplete."
 - **Not discoverable.** New developers see `data-val-*`, `data-ajax-*`, inline scripts, and separate `.js` files. No single place describes what the page does.
 
@@ -90,7 +90,7 @@ plan -> runtime: boot {
 
 1. **C# fluent builders** express your intent. You write C# in your `.cshtml` views -- `Element("panel").Show()`, `Component<NativeCheckBox>(m => m.IsActive).SetChecked(true)` -- and the builders capture what should happen.
 
-2. **The JSON plan** is the contract. `plan.Render()` serializes your intent to JSON. This plan is schema-validated and carries every trigger, every condition, every mutation.
+2. **The JSON plan** is the contract. `plan.Render()` serializes your intent to JSON. This plan is schema-validated and carries every subscription, every predicate, and every action.
 
 3. **The JS runtime** executes the plan. A 2kb ESM module reads the JSON and executes the intents as expressed.
 

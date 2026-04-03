@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
     /// Factory extension for creating FusionTab (non-input component).
-    /// No InputField wrapper. No ComponentsMap registration.
+    /// No InputField wrapper. No RegisteredComponents registration.
     /// Uses explicit string elementId (not model-expression-derived).
     /// </summary>
     public static class FusionTabHtmlExtensions
@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<TabBuilder> build)
             where TModel : class
         {
-            // NO ComponentsMap registration — Tab is NOT an input component
+            // NO RegisteredComponents registration — Tab is NOT an input component
 
             var builder = html.EJS().Tab(elementId);
             build(builder);

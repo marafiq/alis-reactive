@@ -190,7 +190,7 @@ A pipeline is a series of behaviors that progressively reveals what is available
 3. `t.CustomEvent<T>("name", (payload, pipeline) => { ... })` — on typed event
 4. `.Reactive(plan, evt, (args, pipeline) => { ... })` — on component event
 5. `.Then(pipeline => { ... })` — condition branch
-6. `.Else(pipeline => { ... })` — condition fallback
+6. `.Else(pipeline => { ... })` — condition default branch
 7. `.OnSuccess(pipeline => { ... })` — HTTP 200
 8. `.OnSuccess<T>((json, pipeline) => { ... })` — typed HTTP 200
 9. `.OnError(statusCode, pipeline => { ... })` — HTTP error
@@ -229,7 +229,7 @@ pipeline.Component<TComponent>(m => m.Prop)             § TModel inferred from 
 ├── .FocusIn() / .FocusOut()                         focus management
 ├── ...                                              (more: ShowPopup, HidePopup, Increment, Decrement, Enable, Disable, ...)
 │
-│   Reads — returns TypedComponentSource<TProp> for conditions:
+│   Reads — returns ComponentValueExpression<TProp> for conditions:
 ├── .Value()                                         every component — typed per component
 │                                                    (string, string[], bool, decimal, DateTime)
 ├── .StartDate() / .EndDate()                        FusionDateRangePicker — two reads
@@ -323,7 +323,7 @@ pipeline.When(comp.Value()).Gt(0m)                   test component value agains
 § Branch — chain additional paths after .Then():
 ├── .ElseIf(args, x => x.Prop).{Op}().Then(...)      ↻ additional branch
 ├── .ElseIf(comp.Value()).{Op}().Then(...)            ↻ branch on component
-└── .Else(otherwise => { ... })                      ↻ fallback
+└── .Else(otherwise => { ... })                      ↻ default branch
 
 pipeline.Confirm("message")                          § ask user before proceeding
 └── .Then(then => { ... }) / .Else(otherwise => { ... })
@@ -398,8 +398,8 @@ The following pages cover each module in detail:
 
 | | Module | What it addresses |
 |-|--------|------------------|
-| 📋 | [**Plans and Rendering**](../plan-and-entries/) | Setting up a view, rendering the plan |
-| ⚡ | [**Triggers**](../reactivity/triggers-and-reactions/) | What fires the pipeline — page load, events, component interactions |
+| 📋 | [**Plan Model**](../plan-model/) | Setting up a view, rendering the plan |
+| ⚡ | [**Subscriptions and Workflows**](../reactivity/subscriptions-and-workflows/) | What starts execution — page load, events, and component interactions |
 | 🔧 | [**Element Mutations**](../reactivity/element-mutations/) | Targeting DOM elements — text, HTML, classes, visibility |
 | 🧩 | [**Component API**](../reactivity/component-api/) | Targeting components — write, call, read values |
 | 🔀 | [**Conditions**](../reactivity/conditions/) | Branching — When/Then/ElseIf/Else, operators, composition |

@@ -12,6 +12,6 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeRadioGroup : NativeComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMemberPath => "value";
     }
 }

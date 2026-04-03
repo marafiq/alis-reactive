@@ -1,151 +1,248 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
-    {
-      trigger: {
-        kind: custom-event,
-        event: save-resident
-      },
-      reaction: {
-        kind: http,
-        request: {
-          verb: POST,
-          url: /api/residents,
-          gather: [
+  contracts: {
+    element.spinner: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
             {
-              kind: static,
-              param: name,
-              value: Margaret
-            },
-            {
-              kind: all
+              prop: hidden
             }
           ],
-          whileLoading: [
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.save-btn: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
             {
-              kind: mutate-element,
-              target: spinner,
-              mutation: {
-                kind: call,
-                method: removeAttribute,
-                args: [
-                  {
-                    kind: literal,
-                    value: hidden
-                  }
-                ]
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::spinner: {
+      contract: element.spinner,
+      elementId: spinner
+    },
+    element::save-btn: {
+      contract: element.save-btn,
+      elementId: save-btn
+    },
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: document-event,
+        name: save-resident
+      },
+      run: {
+        kind: request,
+        request: {
+          method: POST,
+          url: /api/residents,
+          input: {
+            transport: json,
+            value: {
+              kind: object,
+              fields: {
+                name: {
+                  kind: literal,
+                  value: Margaret
+                }
+              }
+            }
+          },
+          before: [
+            {
+              kind: set,
+              target: {
+                object: element::spinner,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
+                }
               }
             },
             {
-              kind: mutate-element,
-              target: save-btn,
-              mutation: {
-                kind: call,
-                method: setAttribute,
-                args: [
-                  {
-                    kind: literal,
-                    value: hidden
-                  },
-                  {
-                    kind: literal,
-                    value: 
-                  }
-                ]
+              kind: set,
+              target: {
+                object: element::save-btn,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
+                }
               }
             }
           ],
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: spinner,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
+              run: {
+                kind: sequence,
+                steps: [
+                  {
+                    kind: set,
+                    target: {
+                      object: element::spinner,
+                      member: hidden
+                    },
+                    value: {
+                      kind: convert,
+                      value: {
                         kind: literal,
-                        value: hidden
+                        value: true
                       },
-                      {
-                        kind: literal,
-                        value: 
+                      to: {
+                        kind: scalar,
+                        type: boolean
                       }
-                    ]
-                  }
-                },
-                {
-                  kind: mutate-element,
-                  target: save-btn,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
-                },
-                {
-                  kind: mutate-element,
-                  target: result,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+                    }
                   },
-                  source: {
-                    kind: event,
-                    path: responseBody.id
+                  {
+                    kind: set,
+                    target: {
+                      object: element::save-btn,
+                      member: hidden
+                    },
+                    value: {
+                      kind: convert,
+                      value: {
+                        kind: literal,
+                        value: false
+                      },
+                      to: {
+                        kind: scalar,
+                        type: boolean
+                      }
+                    }
+                  },
+                  {
+                    kind: set,
+                    target: {
+                      object: element::result,
+                      member: text
+                    },
+                    value: {
+                      kind: context,
+                      scope: response,
+                      path: [
+                        {
+                          prop: id
+                        }
+                      ]
+                    }
                   }
-                }
-              ]
+                ]
+              }
             }
           ],
           onError: [
             {
               statusCode: 400,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: spinner,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
+              run: {
+                kind: sequence,
+                steps: [
+                  {
+                    kind: set,
+                    target: {
+                      object: element::spinner,
+                      member: hidden
+                    },
+                    value: {
+                      kind: convert,
+                      value: {
                         kind: literal,
-                        value: hidden
+                        value: true
                       },
-                      {
-                        kind: literal,
-                        value: 
+                      to: {
+                        kind: scalar,
+                        type: boolean
                       }
-                    ]
-                  }
-                },
-                {
-                  kind: mutate-element,
-                  target: save-btn,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
+                    }
+                  },
+                  {
+                    kind: set,
+                    target: {
+                      object: element::save-btn,
+                      member: hidden
+                    },
+                    value: {
+                      kind: convert,
+                      value: {
                         kind: literal,
-                        value: hidden
+                        value: false
+                      },
+                      to: {
+                        kind: scalar,
+                        type: boolean
                       }
-                    ]
+                    }
+                  },
+                  {
+                    kind: show-validation-errors,
+                    formId: resident-form
                   }
-                },
-                {
-                  kind: validation-errors,
-                  formId: resident-form
-                }
-              ]
+                ]
+              }
             }
           ]
         }

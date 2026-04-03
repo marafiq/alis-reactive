@@ -1,0 +1,95 @@
+﻿{
+  version: 2,
+  planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
+  contracts: {
+    native.component.Allergies: {
+      kind: component,
+      resolver: native-element,
+      events: {
+        change: {
+          channel: change,
+          eventObject: {
+            contract: event-object.native_component_Allergies.change
+          },
+          data: {
+            value: {
+              kind: member,
+              object: $eventObject,
+              member: value
+            }
+          }
+        }
+      }
+    },
+    event-object.native_component_Allergies.change: {
+      kind: event-object,
+      resolver: event-object,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: currentTarget
+            },
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    element.echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Allergies: {
+      contract: native.component.Allergies,
+      elementId: Allergies
+    },
+    element::echo: {
+      contract: element.echo,
+      elementId: echo
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: object-event,
+        object: component::Allergies,
+        event: change
+      },
+      run: {
+        kind: set,
+        target: {
+          object: element::echo,
+          member: text
+        },
+        value: {
+          kind: literal,
+          value: Option toggled
+        }
+      }
+    }
+  ]
+}

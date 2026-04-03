@@ -6,7 +6,7 @@ namespace Alis.Reactive.FluentValidator
 {
     /// <summary>
     /// Implemented by ReactiveValidator to expose client-extractable conditions
-    /// registered via WhenField(). The adapter reads this during extraction.
+    /// registered via WhenField(). The rule extractor reads this during extraction.
     /// </summary>
     internal interface IClientConditionSource
     {

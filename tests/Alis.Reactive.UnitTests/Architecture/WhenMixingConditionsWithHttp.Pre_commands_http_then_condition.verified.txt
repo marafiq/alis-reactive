@@ -1,94 +1,155 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.spinner: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.warning: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::spinner: {
+      contract: element.spinner,
+      elementId: spinner
+    },
+    element::warning: {
+      contract: element.warning,
+      elementId: warning
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
-        preFetch: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: spinner,
-            mutation: {
-              kind: call,
-              method: removeAttribute,
-              args: [
-                {
-                  kind: literal,
-                  value: hidden
-                }
-              ]
+            kind: set,
+            target: {
+              object: element::spinner,
+              member: hidden
+            },
+            value: {
+              kind: convert,
+              value: {
+                kind: literal,
+                value: false
+              },
+              to: {
+                kind: scalar,
+                type: boolean
+              }
             }
           },
           {
             kind: dispatch,
-            event: loading-started
-          }
-        ],
-        request: {
-          verb: POST,
-          url: /api/data,
-          onSuccess: [
-            {
-              commands: [
+            name: loading-started
+          },
+          {
+            kind: request,
+            request: {
+              method: POST,
+              url: /api/data,
+              onSuccess: [
                 {
-                  kind: mutate-element,
-                  target: spinner,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
+                  run: {
+                    kind: set,
+                    target: {
+                      object: element::spinner,
+                      member: hidden
+                    },
+                    value: {
+                      kind: convert,
+                      value: {
                         kind: literal,
-                        value: hidden
+                        value: true
                       },
-                      {
-                        kind: literal,
-                        value: 
+                      to: {
+                        kind: scalar,
+                        type: boolean
                       }
-                    ]
+                    }
                   }
                 }
               ]
             }
-          ]
-        }
+          }
+        ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.active
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: active
+                  }
+                ]
               },
-              coerceAs: boolean,
-              op: falsy
+              op: falsy,
+              as: {
+                kind: scalar,
+                type: boolean
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: warning,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: account disabled
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::warning,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: account disabled
+              }
             }
           }
         ]

@@ -11,7 +11,7 @@ public class MixedPayload
 /// <summary>
 /// Pipeline segmentation: commands → condition → commands → condition.
 /// Each When().Then().Else() is an independent block — they do not interfere
-/// with each other. Each segment becomes a separate entry on the same trigger.
+/// with each other. Each segment becomes a separate workflow on the same trigger.
 /// </summary>
 [TestFixture]
 public class WhenMixingCommandsAndConditions : PlanTestBase
@@ -19,7 +19,7 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
     // ── Two independent When blocks ──
 
     [Test]
-    public Task Two_independent_when_blocks_both_produce_entries()
+    public Task Two_independent_when_blocks_both_produce_workflows()
     {
         var plan = CreatePlan();
         Trigger(plan).CustomEvent<MixedPayload>("test", (args, p) =>
@@ -392,8 +392,8 @@ public class WhenMixingCommandsAndConditions : PlanTestBase
 
         var json = plan.Render();
         AssertSchemaValid(json);
-        Assert.That(json, Does.Contain("sequential"));
-        Assert.That(json, Does.Not.Contain("conditional"));
+        Assert.That(json, Does.Contain("\"kind\":\"sequence\""));
+        Assert.That(json, Does.Not.Contain("\"kind\":\"branch\""));
         return VerifyJson(json);
     }
 

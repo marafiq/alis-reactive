@@ -34,11 +34,11 @@ public class WhenPlanDrivesComponentDiscovery : PlaywrightTestBase
         // Expression-based lookup — compile-time checked
         var physician = _plan.FindComponent(m => m.Physician);
         Assert.That(physician, Is.Not.Null);
-        Assert.That(physician!.Vendor, Is.EqualTo("fusion"));
-        Assert.That(physician.ReadExpr, Is.EqualTo("value"));
+        Assert.That(physician!.ComponentType, Is.EqualTo("autocomplete"));
 
         var medication = _plan.FindComponent(m => m.MedicationType);
         Assert.That(medication, Is.Not.Null);
+        Assert.That(medication!.ComponentType, Is.EqualTo("autocomplete"));
 
         AssertNoConsoleErrors();
     }

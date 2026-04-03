@@ -23,7 +23,7 @@ p.When(args, x => x.Value).Eq("active")
 
 ### From a component value
 
-Use `.Value()` on a `ComponentRef` to get a typed source. The runtime reads the component's current value via the plan's `readExpr`:
+Use `.Value()` on a `ComponentRef` to get a typed value expression. The runtime resolves the component object and reads its bound value member:
 
 ```csharp
 var name = p.Component<NativeTextBox>(m => m.ResidentName);
@@ -57,7 +57,7 @@ p.When(args, x => x.Age).Gte(65)
 
 ### Source-vs-source comparison
 
-Every comparison operator also accepts a `TypedSource<TProp>` on the right-hand side, enabling comparisons between two live values:
+Every comparison operator also accepts a `ValueExpression<TProp>` on the right-hand side, enabling comparisons between two live values:
 
 ```csharp
 var startDate = p.Component<FusionDateRangePicker>(m => m.StayStart);
@@ -236,7 +236,7 @@ p.Confirm("Discharge this resident?")
 
 ## Branching: Then / ElseIf / Else
 
-Every guard terminates with `.Then()`, which starts the reaction body and returns a `BranchBuilder`.
+Every guard terminates with `.Then()`, which starts the branch body and returns a `BranchBuilder`.
 
 ### Simple if/else
 

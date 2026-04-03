@@ -1,83 +1,127 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.panel: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::panel: {
+      contract: element.panel,
+      elementId: panel
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: direct-or-check
+      when: {
+        kind: document-event,
+        name: direct-or-check
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
+            when: {
               kind: any,
-              guards: [
+              terms: [
                 {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.role
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: role
+                      }
+                    ]
                   },
-                  coerceAs: string,
                   op: eq,
-                  operand: admin
+                  right: {
+                    kind: literal,
+                    value: admin
+                  },
+                  as: {
+                    kind: scalar,
+                    type: string
+                  }
                 },
                 {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.role
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: role
+                      }
+                    ]
                   },
-                  coerceAs: string,
                   op: eq,
-                  operand: superuser
+                  right: {
+                    kind: literal,
+                    value: superuser
+                  },
+                  as: {
+                    kind: scalar,
+                    type: string
+                  }
                 }
               ]
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: panel,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::panel,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: panel,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::panel,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

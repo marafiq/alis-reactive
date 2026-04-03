@@ -15,7 +15,7 @@
 2. **Phantom type pattern** — vendor abstraction via instance properties (`IComponent.Vendor`, `IInputComponent.ReadExpr`), no reflection, no magic strings.
 3. **Vertical slice isolation** — zero cross-slice references across 23 components, 7-file pattern enforced by convention.
 4. **Open/Closed polymorphism** — `WriteOnlyPolymorphicConverter<T>` avoids `[JsonDerivedType]` attribute bloat. New commands added without touching base.
-5. **Type-safe condition chain** — `When().Eq().Then().Else()` with compile-time type inference via `TypedSource<TProp>`.
+5. **Type-safe condition chain** — `When().Eq().Then().Else()` with compile-time type inference via `ValueExpression<TProp>`.
 
 ## Issue Files
 

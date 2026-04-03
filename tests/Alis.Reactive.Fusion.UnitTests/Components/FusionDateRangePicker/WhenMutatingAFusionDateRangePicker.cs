@@ -1,5 +1,4 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Sources;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.Fusion.UnitTests;
@@ -8,60 +7,63 @@ namespace Alis.Reactive.Fusion.UnitTests;
 public class WhenMutatingAFusionDateRangePicker : FusionTestBase
 {
     [Test]
-    public void StartDate_returns_typed_component_source_with_startDate_readExpr()
+    public Task StartDate_returns_component_value_expression_with_startDate_value_member_path()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
             var source = p.Component<FusionDateRangePicker>(m => m.StayPeriod).StartDate();
-            Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("startDate"));
+            Assert.That(source, Is.TypeOf<ComponentValueExpression<DateTime>>());
+            Assert.That(source.CoercionType, Is.EqualTo("date"));
+            Assert.That(source.ElementCoercionType, Is.Null);
+            p.Element("start-echo").SetText(source);
         });
+
+        var json = plan.Render();
+        Assert.That(json, Does.Contain("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
+        Assert.That(json, Does.Contain("startDate"));
+        AssertSchemaValid(json);
+        return VerifyJson(json);
     }
 
     [Test]
-    public void EndDate_returns_typed_component_source_with_endDate_readExpr()
+    public Task EndDate_returns_component_value_expression_with_endDate_value_member_path()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
             var source = p.Component<FusionDateRangePicker>(m => m.StayPeriod).EndDate();
-            Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("endDate"));
+            Assert.That(source, Is.TypeOf<ComponentValueExpression<DateTime>>());
+            Assert.That(source.CoercionType, Is.EqualTo("date"));
+            Assert.That(source.ElementCoercionType, Is.Null);
+            p.Element("end-echo").SetText(source);
         });
+
+        var json = plan.Render();
+        Assert.That(json, Does.Contain("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
+        Assert.That(json, Does.Contain("endDate"));
+        AssertSchemaValid(json);
+        return VerifyJson(json);
     }
 
     [Test]
-    public void Value_returns_typed_component_source_with_value_readExpr_and_DateTime_array()
+    public Task Value_returns_component_value_expression_with_value_member_path_and_DateTime_array()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
             var source = p.Component<FusionDateRangePicker>(m => m.StayPeriod).Value();
-            Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime[]>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("value"));
+            Assert.That(source, Is.TypeOf<ComponentValueExpression<DateTime[]>>());
+            Assert.That(source.CoercionType, Is.EqualTo("array"));
+            Assert.That(source.ElementCoercionType, Is.EqualTo("date"));
+            p.Element("range-echo").SetText(source);
         });
+
+        var json = plan.Render();
+        Assert.That(json, Does.Contain("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
+        Assert.That(json, Does.Contain("value"));
+        AssertSchemaValid(json);
+        return VerifyJson(json);
     }
 
     [Test]

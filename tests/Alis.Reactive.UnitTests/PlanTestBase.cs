@@ -25,6 +25,13 @@ public abstract class PlanTestBase
 
     protected static Builders.TriggerBuilder<TestModel> Trigger(ReactivePlan<TestModel> plan) => new(plan);
 
+    protected static Builders.PipelineBuilder<TestModel> CreateDomReadyPipeline()
+    {
+        var plan = CreatePlan();
+        var scope = plan.Authoring.CreateDomReadyScope();
+        return new Builders.PipelineBuilder<TestModel>(plan.Authoring, scope);
+    }
+
     protected static void AssertSchemaValid(string planJson)
     {
         using var doc = JsonDocument.Parse(planJson);

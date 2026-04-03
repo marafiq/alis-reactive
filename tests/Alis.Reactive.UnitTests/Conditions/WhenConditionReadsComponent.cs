@@ -10,7 +10,7 @@ namespace Alis.Reactive.UnitTests;
 public sealed class StubFusionNumericTextBox : IComponent, IInputComponent
 {
     public string Vendor => "fusion";
-    public string ReadExpr => "value";
+    public string ValueMemberPath => "value";
 }
 
 /// <summary>
@@ -20,10 +20,10 @@ public static class StubFusionNumericTextBoxExtensions
 {
     private static readonly StubFusionNumericTextBox _component = new();
 
-    public static TypedComponentSource<decimal> Value<TModel>(
+    public static ComponentValueExpression<decimal> Value<TModel>(
         this ComponentRef<StubFusionNumericTextBox, TModel> self)
         where TModel : class
-        => new TypedComponentSource<decimal>(self.TargetId, _component.Vendor, _component.ReadExpr);
+        => new ComponentValueExpression<decimal>(self.TargetId, _component.Vendor, _component.ValueMemberPath);
 }
 
 public class AmountModel

@@ -87,12 +87,12 @@ The use cases **UC1–UC6** below are **cross-cutting scenarios** (how pieces co
 
 | Layer | Responsibility | Primary files |
 |-------|----------------|-----------------|
-| **Entry** | `When<TPayload,TProp>(payload, path)`, `When<TProp>(TypedSource)`, `Confirm(message)` | [`PipelineBuilder.Conditions.cs`](../../Alis.Reactive/Builders/PipelineBuilder.Conditions.cs) |
+| **Entry** | `When<TPayload,TProp>(payload, path)`, `When<TProp>(ValueExpression)`, `Confirm(message)` | [`PipelineBuilder.Conditions.cs`](../../Alis.Reactive/Builders/PipelineBuilder.Conditions.cs) |
 | **Source + operators** | `ConditionSourceBuilder` — comparison operators, `And`/`Or`/`Not`, `Then` | [`ConditionSourceBuilder.cs`](../../Alis.Reactive/Builders/Conditions/ConditionSourceBuilder.cs), [`ConditionStart.cs`](../../Alis.Reactive/Builders/Conditions/ConditionStart.cs) |
 | **Guard chain** | `GuardBuilder` — `Then` → nested `PipelineBuilder` for branch body → `BuildReaction()` | [`GuardBuilder.cs`](../../Alis.Reactive/Builders/Conditions/GuardBuilder.cs) |
 | **Branch list** | `ElseIf` / `Else` — `Branch` list backing `ConditionalReaction` | [`BranchBuilder.cs`](../../Alis.Reactive/Builders/Conditions/BranchBuilder.cs) |
 | **Segment flush** | Second `When` after a completed conditional block calls [`FlushSegment`](../../Alis.Reactive/Builders/PipelineBuilder.cs) | [`PipelineBuilder.cs`](../../Alis.Reactive/Builders/PipelineBuilder.cs) (`FlushSegment`, `_segments`, `BuildReactions`) |
-| **Typed sources** | `TypedSource` / `TypedComponentSource` for component-based `When` | [`TypedSource.cs`](../../Alis.Reactive/Builders/Conditions/TypedSource.cs), [`TypedComponentSource.cs`](../../Alis.Reactive/Builders/Conditions/TypedComponentSource.cs) |
+| **Typed sources** | `ValueExpression` / `ComponentValueExpression` for component-based `When` | [`ValueExpression.cs`](../../Alis.Reactive/Builders/Conditions/ValueExpression.cs), [`ComponentValueExpression.cs`](../../Alis.Reactive/Builders/Conditions/ComponentValueExpression.cs) |
 
 **Wire output:** `conditional` reaction (`commands?` + `branches[]`), each [`Branch`](../../Alis.Reactive/Descriptors/Reactions/Branch.cs) with `guard?` + nested `reaction` (often `sequential` from `Then`). **Guards** table above applies **inside** branches.
 

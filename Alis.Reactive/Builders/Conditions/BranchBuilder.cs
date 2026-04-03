@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Descriptors.Reactions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// <remarks>
     /// <para>
     /// Returned by <see cref="GuardBuilder{TModel}.Then"/>. Branches evaluate in declaration
-    /// order: the first branch whose guard passes wins. <c>Else</c> is the fallback when no
+    /// order: the first branch whose guard passes wins. <c>Else</c> is the default branch when no
     /// guard passes and must be the last branch.
     /// </para>
     /// <code>
@@ -28,7 +28,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// <typeparam name="TModel">The view model type.</typeparam>
     public sealed class BranchBuilder<TModel> where TModel : class
     {
-        private readonly List<Branch> _branches;
+        private readonly List<BranchCase> _branches;
         private bool _elseCalled;
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Alis.Reactive.Builders.Conditions
         /// NEVER make public. Constructed by <see cref="GuardBuilder{TModel}.Then"/> when
         /// the first branch is created.
         /// </summary>
-        internal BranchBuilder(PipelineBuilder<TModel> pipeline, List<Branch> branches)
+        internal BranchBuilder(PipelineBuilder<TModel> pipeline, List<BranchCase> branches)
         {
             Pipeline = pipeline;
             _branches = branches;
@@ -63,32 +63,32 @@ namespace Alis.Reactive.Builders.Conditions
                 throw new InvalidOperationException(
                     "Cannot add ElseIf after Else. Else must be the last branch.");
 
-            var source = new EventArgSource<TPayload, TProp>(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+            var source = new EventValueExpression<TPayload, TProp>(path);
+            return new ConditionSourceBuilder<TModel, TProp>(source, Pipeline.Authoring, this);
         }
 
         /// <summary>
         /// Adds a conditional branch that tests a component's current value.
         /// </summary>
         /// <typeparam name="TProp">The component's value type.</typeparam>
-        /// <param name="source">A typed source from a component's <c>Value()</c> extension.</param>
+        /// <param name="value">A typed value reference from a component's <c>Value()</c> extension.</param>
         /// <returns>A <see cref="ConditionSourceBuilder{TModel, TProp}"/> for applying an operator, then <c>Then</c>.</returns>
         /// <exception cref="InvalidOperationException">Thrown when called after <see cref="Else"/>.</exception>
-        public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
+        public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(ValueExpression<TProp> value)
         {
             if (_elseCalled)
                 throw new InvalidOperationException(
                     "Cannot add ElseIf after Else. Else must be the last branch.");
 
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+            return new ConditionSourceBuilder<TModel, TProp>(value, Pipeline.Authoring, this);
         }
 
         /// <summary>
-        /// Adds the fallback branch that executes when no previous guard passes. Must be the
+        /// Adds the default branch that executes when no previous guard passes. Must be the
         /// last branch. Only one <c>Else</c> is allowed per condition block.
         /// </summary>
         /// <param name="pipeline">
-        /// Builds the pipeline commands for the fallback branch. The callback receives
+        /// Builds the pipeline actions for the default branch. The callback receives
         /// a fresh <see cref="PipelineBuilder{TModel}"/> scoped to this branch.
         /// </param>
         /// <exception cref="InvalidOperationException">
@@ -100,10 +100,9 @@ namespace Alis.Reactive.Builders.Conditions
                 throw new InvalidOperationException(
                     "Else has already been called. Only one Else branch is allowed and it must be last.");
 
-            var pb = new PipelineBuilder<TModel>();
+            var pb = new PipelineBuilder<TModel>(Pipeline.Authoring, Pipeline.Scope);
             pipeline(pb);
-            var reaction = pb.BuildReaction();
-            _branches.Add(new Branch(null, reaction));
+            _branches.Add(new BranchCase(pb.BuildAction()));
             _elseCalled = true;
         }
 
@@ -111,7 +110,7 @@ namespace Alis.Reactive.Builders.Conditions
         /// Adds a branch to the shared list. Called by <see cref="GuardBuilder{TModel}.Then"/>
         /// when continuing an existing branch chain.
         /// </summary>
-        internal void AddBranch(Branch branch)
+        internal void AddBranch(BranchCase branch)
         {
             if (_elseCalled)
                 throw new InvalidOperationException(

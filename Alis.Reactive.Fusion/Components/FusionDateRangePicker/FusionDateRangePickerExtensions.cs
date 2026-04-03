@@ -28,22 +28,24 @@ namespace Alis.Reactive.Fusion.Components
         /// Pass to a <c>When()</c> condition guard:
         /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).StartDate()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the range's start date.</returns>
-        public static TypedComponentSource<DateTime> StartDate<TModel>(
+        /// <param name="self">The component reference to operate on.</param>
+        /// <returns>A typed value expression representing the range's start date.</returns>
+        public static ComponentValueExpression<DateTime> StartDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "startDate");
+            => new ComponentValueExpression<DateTime>(self.TargetId, Component.Vendor, "startDate");
 
         /// <summary>Reads the end date for use in conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard:
         /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).EndDate()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the range's end date.</returns>
-        public static TypedComponentSource<DateTime> EndDate<TModel>(
+        /// <param name="self">The component reference to operate on.</param>
+        /// <returns>A typed value expression representing the range's end date.</returns>
+        public static ComponentValueExpression<DateTime> EndDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "endDate");
+            => new ComponentValueExpression<DateTime>(self.TargetId, Component.Vendor, "endDate");
 
         /// <summary>Reads both dates as an array for use in conditions or gather.</summary>
         /// <remarks>
@@ -55,10 +57,11 @@ namespace Alis.Reactive.Fusion.Components
         /// when you need individual date access in conditions.
         /// </para>
         /// </remarks>
-        /// <returns>A typed source representing the full date range (start and end).</returns>
-        public static TypedComponentSource<DateTime[]> Value<TModel>(
+        /// <param name="self">The component reference to operate on.</param>
+        /// <returns>A typed value expression representing the full date range (start and end).</returns>
+        public static ComponentValueExpression<DateTime[]> Value<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<DateTime[]>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new ComponentValueExpression<DateTime[]>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
     }
 }

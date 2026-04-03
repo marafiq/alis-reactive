@@ -34,11 +34,11 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     {
         // THIS IS THE CRITICAL TWO-PHASE BOOT REGRESSION TEST.
         //
-        // Two-phase boot guarantees: custom-event listeners wire BEFORE dom-ready executes.
+        // Two-phase boot guarantees: document-event listeners wire BEFORE dom-ready executes.
         // Without this, dom-ready dispatches "test" but nobody is listening yet — chain breaks silently.
         //
-        // Phase 1: trigger.ts logs "[alis:trigger] custom-event: listening" for each custom-event entry
-        // Phase 2: dom-ready executes, which triggers "[alis:command] dispatch" for the first dispatch
+        // Phase 1: trigger.ts emits a workflow.listen span for each document-event workflow.
+        // Phase 2: execute.ts emits an action.dispatch span for the first dom-ready dispatch.
         //
         // If someone refactors boot.ts to remove two-phase ordering, the dispatch trace would
         // appear BEFORE the listening traces — and this test catches it.
@@ -47,38 +47,46 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
 
         var messages = _consoleMessages;
 
-        // Find the LAST custom-event listener wiring (phase 1 must complete fully)
+        // Find the LAST document-event listener wiring (phase 1 must complete fully)
         var lastWireIndex = -1;
         for (var i = 0; i < messages.Count; i++)
         {
-            if (messages[i].Contains("[alis:trigger]") && messages[i].Contains("custom-event"))
+            if (messages[i].Contains("\"span_name\":\"alis.workflow.listen\"")
+                && messages[i].Contains("\"alis.subscription.kind\":\"document-event\""))
                 lastWireIndex = i;
         }
 
-        // Find the FIRST dispatch command (phase 2 starts when dom-ready executes)
+        // Find the FIRST dispatch span (phase 2 starts when dom-ready executes)
         var firstDispatchIndex = messages.FindIndex(m =>
-            m.Contains("[alis:command]") && m.Contains("dispatch"));
+            m.Contains("\"span_name\":\"alis.action.dispatch\"")
+            && m.Contains("\"alis.event_name\":\"test\""));
 
         Assert.That(lastWireIndex, Is.GreaterThanOrEqualTo(0),
-            "Custom-event listener wiring must be traced (phase 1)");
+            "Document-event listener wiring must be traced (phase 1)");
         Assert.That(firstDispatchIndex, Is.GreaterThanOrEqualTo(0),
-            "Dispatch command must be traced (phase 2)");
+            "Dispatch action must be traced (phase 2)");
         Assert.That(lastWireIndex, Is.LessThan(firstDispatchIndex),
-            "All custom-event listeners must wire (phase 1) BEFORE dom-ready dispatches (phase 2). " +
+            "All document-event listeners must wire (phase 1) BEFORE dom-ready dispatches (phase 2). " +
             "If this fails, two-phase boot is broken — dispatch chains will silently fail.");
     }
 
     [Test]
     public async Task trace_captures_all_three_dispatch_events()
     {
-        // Every dispatch in the chain must produce a trace entry.
+        // Every dispatch in the chain must produce a trace line.
         // If the runtime skips tracing for any dispatch, we lose observability.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        AssertTraceContains("command", "\"event\":\"test\"");
-        AssertTraceContains("command", "\"event\":\"test-received\"");
-        AssertTraceContains("command", "\"event\":\"final\"");
+        Assert.That(_consoleMessages.Any(m =>
+            m.Contains("\"span_name\":\"alis.action.dispatch\"")
+            && m.Contains("\"alis.event_name\":\"test\"")), Is.True);
+        Assert.That(_consoleMessages.Any(m =>
+            m.Contains("\"span_name\":\"alis.action.dispatch\"")
+            && m.Contains("\"alis.event_name\":\"test-received\"")), Is.True);
+        Assert.That(_consoleMessages.Any(m =>
+            m.Contains("\"span_name\":\"alis.action.dispatch\"")
+            && m.Contains("\"alis.event_name\":\"final\"")), Is.True);
 
         AssertNoConsoleErrors();
     }
@@ -94,17 +102,19 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var dispatchMessages = _consoleMessages
-            .Where(m => m.Contains("[alis:command]") && m.Contains("dispatch"))
+            .Where(m =>
+                m.Contains("\"body\":\"span.start\"")
+                && m.Contains("\"span_name\":\"alis.action.dispatch\""))
             .ToList();
 
         Assert.That(dispatchMessages, Has.Count.EqualTo(3),
             "Exactly 3 dispatch traces expected (test, test-received, final)");
 
-        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"test\"")), Is.True,
+        Assert.That(dispatchMessages.Any(m => m.Contains("\"alis.event_name\":\"test\"")), Is.True,
             "Dispatch trace must include event name 'test'");
-        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"test-received\"")), Is.True,
+        Assert.That(dispatchMessages.Any(m => m.Contains("\"alis.event_name\":\"test-received\"")), Is.True,
             "Dispatch trace must include event name 'test-received'");
-        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"final\"")), Is.True,
+        Assert.That(dispatchMessages.Any(m => m.Contains("\"alis.event_name\":\"final\"")), Is.True,
             "Dispatch trace must include event name 'final'");
 
         AssertNoConsoleErrors();
@@ -121,16 +131,19 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var mutateMessages = _consoleMessages
-            .Where(m => m.Contains("[alis:command]") && m.Contains("mutate-element"))
+            .Where(m =>
+                (m.Contains("\"span_name\":\"alis.action.set\"")
+                 || m.Contains("\"span_name\":\"alis.action.call\""))
+                && m.Contains("\"alis.target_element_id\":"))
             .ToList();
 
-        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-1\"")), Is.True,
+        Assert.That(mutateMessages.Any(m => m.Contains("\"alis.target_element_id\":\"step-1\"")), Is.True,
             "Mutation trace must include target 'step-1'");
-        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-2\"")), Is.True,
+        Assert.That(mutateMessages.Any(m => m.Contains("\"alis.target_element_id\":\"step-2\"")), Is.True,
             "Mutation trace must include target 'step-2'");
-        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-3\"")), Is.True,
+        Assert.That(mutateMessages.Any(m => m.Contains("\"alis.target_element_id\":\"step-3\"")), Is.True,
             "Mutation trace must include target 'step-3'");
-        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"chain-status\"")), Is.True,
+        Assert.That(mutateMessages.Any(m => m.Contains("\"alis.target_element_id\":\"chain-status\"")), Is.True,
             "Mutation trace must include target 'chain-status'");
 
         AssertNoConsoleErrors();

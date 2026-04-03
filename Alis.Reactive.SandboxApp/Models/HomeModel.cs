@@ -2,5 +2,5 @@ namespace Alis.Reactive.SandboxApp.Models;
 
 public class HomeModel
 {
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 }

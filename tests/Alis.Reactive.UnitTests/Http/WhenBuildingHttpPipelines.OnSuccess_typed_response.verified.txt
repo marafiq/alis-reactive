@@ -1,43 +1,103 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.message: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    },
+    element.count: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::message: {
+      contract: element.message,
+      elementId: message
+    },
+    element::count: {
+      contract: element.count,
+      elementId: count
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: GET,
+          method: GET,
           url: /api/data,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: message,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+              run: {
+                kind: sequence,
+                steps: [
+                  {
+                    kind: set,
+                    target: {
+                      object: element::message,
+                      member: text
+                    },
+                    value: {
+                      kind: context,
+                      scope: response,
+                      path: [
+                        {
+                          prop: message
+                        }
+                      ]
+                    }
                   },
-                  source: {
-                    kind: event,
-                    path: responseBody.message
+                  {
+                    kind: set,
+                    target: {
+                      object: element::count,
+                      member: text
+                    },
+                    value: {
+                      kind: context,
+                      scope: response,
+                      path: [
+                        {
+                          prop: count
+                        }
+                      ]
+                    }
                   }
-                },
-                {
-                  kind: mutate-element,
-                  target: count,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  source: {
-                    kind: event,
-                    path: responseBody.count
-                  }
-                }
-              ]
+                ]
+              }
             }
           ]
         }

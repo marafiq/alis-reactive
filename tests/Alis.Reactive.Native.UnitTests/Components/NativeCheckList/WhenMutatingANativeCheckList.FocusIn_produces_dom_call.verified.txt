@@ -1,23 +1,40 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
+  contracts: {
+    native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        focus: {
+          kind: method,
+          path: [
+            {
+              prop: focus
+            }
+          ],
+          returns: void
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies: {
+      contract: native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
+      elementId: Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
-            mutation: {
-              kind: call,
-              method: focus
-            },
-            vendor: native
-          }
-        ]
+      run: {
+        kind: call,
+        target: {
+          object: component::Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
+          member: focus
+        }
       }
     }
   ]

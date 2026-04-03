@@ -1,14 +1,12 @@
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 using Alis.Reactive.Native.Components;
 
 namespace Alis.Reactive.Native.UnitTests;
 
 /// <summary>
 /// Tests the .Reactive() wiring path end-to-end.
-/// NativeRadioGroup.Reactive() creates N entries (one per radio option),
-/// each with a ComponentEventTrigger and auto-sync command.
+/// NativeRadioGroup.Reactive() creates N workflows (one per radio option),
+/// each with its own object-event subscription and auto-sync action.
 /// </summary>
 [TestFixture]
 public class WhenWiringNativeRadioGroupReactiveExtension : NativeTestBase
@@ -17,13 +15,14 @@ public class WhenWiringNativeRadioGroupReactiveExtension : NativeTestBase
     public Task Component_event_trigger_produces_valid_plan()
     {
         var plan = CreatePlan();
-        var descriptor = NativeRadioGroupEvents.Instance.Changed;
-
-        var pb = new PipelineBuilder<NativeTestModel>();
-        pb.Element("echo").SetText("Mobility changed");
-
-        var trigger = new ComponentEventTrigger("MobilityLevel_r0", descriptor.JsEvent, "native", "MobilityLevel", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        WireObjectEvent(
+            plan,
+            "MobilityLevel_r0",
+            "native",
+            "MobilityLevel",
+            "value",
+            NativeRadioGroupEvents.Instance.Changed.EventName,
+            pb => pb.Element("echo").SetText("Mobility changed"));
 
         var json = plan.Render();
         AssertSchemaValid(json);
@@ -34,16 +33,21 @@ public class WhenWiringNativeRadioGroupReactiveExtension : NativeTestBase
     public Task Component_event_trigger_with_condition()
     {
         var plan = CreatePlan();
-        var descriptor = NativeRadioGroupEvents.Instance.Changed;
-        var args = descriptor.Args;
-
-        var pb = new PipelineBuilder<NativeTestModel>();
-        pb.When(args, x => x.Value).Eq("Wheelchair")
-            .Then(then => then.Element("panel").Show())
-            .Else(else_ => else_.Element("panel").Hide());
-
-        var trigger = new ComponentEventTrigger("MobilityLevel_r1", descriptor.JsEvent, "native", "MobilityLevel", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        var reactiveEvent = NativeRadioGroupEvents.Instance.Changed;
+        WireObjectEvent(
+            plan,
+            "MobilityLevel_r1",
+            "native",
+            "MobilityLevel",
+            "value",
+            reactiveEvent.EventName,
+            reactiveEvent.Payload,
+            (args, pb) =>
+            {
+                pb.When(args, x => x.Value).Eq("Wheelchair")
+                    .Then(then => then.Element("panel").Show())
+                    .Else(else_ => else_.Element("panel").Hide());
+            });
 
         var json = plan.Render();
         AssertSchemaValid(json);
@@ -51,19 +55,20 @@ public class WhenWiringNativeRadioGroupReactiveExtension : NativeTestBase
     }
 
     [Test]
-    public Task Multiple_radio_entries_produce_valid_plan()
+    public Task Multiple_radio_workflows_produce_valid_plan()
     {
         var plan = CreatePlan();
-        var descriptor = NativeRadioGroupEvents.Instance.Changed;
-
-        // Simulate 3 radio options producing 3 entries
+        // Simulate 3 radio options producing 3 workflows
         for (int i = 0; i < 3; i++)
         {
-            var pb = new PipelineBuilder<NativeTestModel>();
-            pb.Element("echo").SetText("Option selected");
-
-            var trigger = new ComponentEventTrigger($"MobilityLevel_r{i}", descriptor.JsEvent, "native", "MobilityLevel", "value");
-            plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+            WireObjectEvent(
+                plan,
+                $"MobilityLevel_r{i}",
+                "native",
+                "MobilityLevel",
+                "value",
+                NativeRadioGroupEvents.Instance.Changed.EventName,
+                pb => pb.Element("echo").SetText("Option selected"));
         }
 
         var json = plan.Render();

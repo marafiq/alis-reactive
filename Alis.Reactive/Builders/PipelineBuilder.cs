@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Requests;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Reactions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
 {
@@ -19,34 +18,167 @@ namespace Alis.Reactive.Builders
     /// <para>
     /// Commands execute in declaration order. Conditions (<c>When</c>/<c>Then</c>/<c>Else</c>)
     /// and HTTP calls (<c>Get</c>/<c>Post</c>) create branching points that produce
-    /// separate reaction segments.
+    /// separate workflow segments.
     /// </para>
     /// </remarks>
     /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
-    public partial class PipelineBuilder<TModel> : ICommandEmitter where TModel : class
+    public partial class PipelineBuilder<TModel> where TModel : class
     {
         private enum PipelineMode { Sequential, Http, Parallel, Conditional }
 
-        internal List<Command> Commands { get; } = new List<Command>();
-        internal List<Branch>? ConditionalBranches { get; private set; }
+        private readonly PlanAuthoringContext _authoring;
+        private readonly WorkflowScope _scope;
+
+        internal List<PlanAction> Actions { get; } = new List<PlanAction>();
+        internal List<BranchCase>? ConditionalBranches { get; private set; }
         private HttpRequestBuilder<TModel>? _httpBuilder;
         private ParallelBuilder<TModel>? _parallelBuilder;
         private PipelineMode _mode = PipelineMode.Sequential;
 
         /// <summary>
-        /// Completed reaction segments. When a new When() is called after a previous
+        /// Completed workflow segments. When a new When() is called after a previous
         /// When().Then().Else() block, the current segment (commands + branches) is
-        /// flushed here so both conditionals produce independent reactions.
+        /// flushed here so both conditionals produce independent workflows.
         /// </summary>
-        private List<Reaction>? _segments;
+        private List<PlanAction>? _segments;
 
-        /// <summary>
-        /// Adds a command to the pipeline. Vendor extensions accept
-        /// <see cref="ICommandEmitter"/>, not <see cref="PipelineBuilder{TModel}"/> directly.
-        /// </summary>
-        void ICommandEmitter.AddCommand(Command command)
+        internal PipelineBuilder(PlanAuthoringContext authoring, WorkflowScope scope)
         {
-            Commands.Add(command);
+            _authoring = authoring;
+            _scope = scope;
+        }
+
+        internal PlanAuthoringContext Authoring => _authoring;
+        internal WorkflowScope Scope => _scope;
+
+        internal void AddAction(PlanAction action)
+        {
+            Actions.Add(action);
+        }
+
+        internal void SetElementProperty(string elementId, string propertyPath, object? value, string? coerceAs = null)
+        {
+            AddAction(_authoring.CreateSetActionForElement(
+                elementId,
+                vendor: null,
+                memberPath: propertyPath,
+                literal: value,
+                coerceAs: coerceAs));
+        }
+
+        internal void SetElementProperty(string elementId, string propertyPath, ValueExpr valueExpr, string? valueCoerceAs = null, string? coerceAs = null)
+        {
+            AddAction(_authoring.CreateSetActionForElement(
+                elementId,
+                vendor: null,
+                propertyPath,
+                valueExpr: valueExpr,
+                valueCoerceAs: valueCoerceAs,
+                coerceAs: coerceAs));
+        }
+
+        internal void SetElementPropertyFromPath(string elementId, string propertyPath, string valueMemberPath, string? coerceAs = null)
+        {
+            SetElementProperty(elementId, propertyPath, _authoring.CreateContextValue(valueMemberPath), coerceAs: coerceAs);
+        }
+
+        internal void CallElementMember(string elementId, string memberPath, params object?[] args)
+        {
+            AddAction(_authoring.CreateCallActionForElement(
+                elementId,
+                vendor: null,
+                memberPath,
+                BuildLiteralArguments(args),
+                BuildLiteralArgumentShapes(args)));
+        }
+
+        internal void CallElementMemberFromPath(string elementId, string memberPath, string valueMemberPath, string? valueCoerceAs = null)
+        {
+            AddAction(_authoring.CreateCallActionForElement(
+                elementId,
+                vendor: null,
+                memberPath: memberPath,
+                args: new List<ValueExpr> { _authoring.CreateContextValue(valueMemberPath) },
+                argShapes: new List<ValueShape> { PlanAuthoringContext.ResolveAssignedShape(valueCoerceAs, literal: null, coerceAs: null) }));
+        }
+
+        internal void SetComponentProperty(string componentId, string vendor, string propertyPath, object? value, string? coerceAs = null)
+        {
+            AddAction(_authoring.CreateSetActionForElement(
+                componentId,
+                vendor,
+                memberPath: propertyPath,
+                literal: value,
+                coerceAs: coerceAs));
+        }
+
+        internal void SetComponentProperty(string componentId, string vendor, string propertyPath, ValueExpr valueExpr, string? valueCoerceAs = null, string? coerceAs = null)
+        {
+            AddAction(_authoring.CreateSetActionForElement(
+                componentId,
+                vendor,
+                propertyPath,
+                valueExpr: valueExpr,
+                valueCoerceAs: valueCoerceAs,
+                coerceAs: coerceAs));
+        }
+
+        internal void SetComponentPropertyFromPath(string componentId, string vendor, string propertyPath, string valueMemberPath, string? coerceAs = null)
+        {
+            SetComponentProperty(componentId, vendor, propertyPath, _authoring.CreateContextValue(valueMemberPath), coerceAs: coerceAs);
+        }
+
+        internal void CallComponentMember(string componentId, string vendor, string memberPath, params object?[] args)
+        {
+            AddAction(_authoring.CreateCallActionForElement(
+                componentId,
+                vendor,
+                memberPath,
+                BuildLiteralArguments(args),
+                BuildLiteralArgumentShapes(args)));
+        }
+
+        internal void CallComponentMemberFromPath(string componentId, string vendor, string memberPath, string valueMemberPath, string? valueCoerceAs = null)
+        {
+            AddAction(_authoring.CreateCallActionForElement(
+                componentId,
+                vendor,
+                memberPath: memberPath,
+                args: new List<ValueExpr> { _authoring.CreateContextValue(valueMemberPath) },
+                argShapes: new List<ValueShape> { PlanAuthoringContext.ResolveAssignedShape(valueCoerceAs, literal: null, coerceAs: null) }));
+        }
+
+        internal void SetEventProperty(string propertyPath, object? value, string? coerceAs = null)
+        {
+            AddAction(_authoring.CreateSetActionForEvent(_scope, propertyPath, literal: value, coerceAs: coerceAs));
+        }
+
+        internal void SetEventProperty(string propertyPath, ValueExpr valueExpr, string? valueCoerceAs = null, string? coerceAs = null)
+        {
+            AddAction(_authoring.CreateSetActionForEvent(
+                _scope,
+                propertyPath,
+                valueExpr: valueExpr,
+                valueCoerceAs: valueCoerceAs,
+                coerceAs: coerceAs));
+        }
+
+        internal void CallEventMember(string memberPath, params object?[] args)
+        {
+            AddAction(_authoring.CreateCallActionForEvent(
+                _scope,
+                memberPath,
+                BuildLiteralArguments(args),
+                BuildLiteralArgumentShapes(args)));
+        }
+
+        internal void CallEventMemberFromPath(string memberPath, string valueMemberPath, string? valueCoerceAs = null)
+        {
+            AddAction(_authoring.CreateCallActionForEvent(
+                _scope,
+                memberPath: memberPath,
+                args: new List<ValueExpr> { _authoring.CreateContextValue(valueMemberPath) },
+                argShapes: new List<ValueShape> { PlanAuthoringContext.ResolveAssignedShape(valueCoerceAs, literal: null, coerceAs: null) }));
         }
 
         /// <summary>
@@ -56,7 +188,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
-            Commands.Add(new DispatchCommand(eventName));
+            Actions.Add(new DispatchAction(eventName));
             return this;
         }
 
@@ -69,7 +201,12 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
-            Commands.Add(new DispatchCommand(eventName, payload));
+            var action = new DispatchAction(eventName)
+            {
+                Detail = new LiteralValueExpr(payload)
+            };
+
+            Actions.Add(action);
             return this;
         }
 
@@ -168,7 +305,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
-            Commands.Add(new ValidationErrorsCommand(formId));
+            Actions.Add(new ShowValidationErrorsAction(formId));
             return this;
         }
 
@@ -185,13 +322,37 @@ namespace Alis.Reactive.Builders
         /// <seealso cref="ValidationErrors"/>
         public PipelineBuilder<TModel> Into(string elementId)
         {
-            Commands.Add(new IntoCommand(elementId));
+            Actions.Add(new InjectAction(_authoring.EnsureElementObjectForAction(elementId)));
             return this;
         }
 
-        internal void SetConditionalBranches(List<Branch> branches)
+        internal void SetConditionalBranches(List<BranchCase> branches)
         {
             ConditionalBranches = branches;
+        }
+
+        private static List<ValueExpr>? BuildLiteralArguments(object?[] args)
+        {
+            if (args.Length == 0)
+                return null;
+
+            var values = new List<ValueExpr>(args.Length);
+            foreach (var arg in args)
+                values.Add(new LiteralValueExpr(arg));
+
+            return values;
+        }
+
+        private static List<ValueShape>? BuildLiteralArgumentShapes(object?[] args)
+        {
+            if (args.Length == 0)
+                return null;
+
+            var shapes = new List<ValueShape>(args.Length);
+            foreach (var arg in args)
+                shapes.Add(PlanAuthoringContext.InferShape(arg));
+
+            return shapes;
         }
 
         /// <summary>
@@ -201,38 +362,52 @@ namespace Alis.Reactive.Builders
         /// </summary>
         internal void FlushSegment()
         {
-            _segments ??= new List<Reaction>();
+            _segments ??= new List<PlanAction>();
 
             if (_mode == PipelineMode.Http && _httpBuilder != null)
             {
-                // HTTP mode: pre-HTTP commands belong inside the HttpReaction
-                _segments.Add(new HttpReaction(
-                    Commands.Count > 0 ? new List<Command>(Commands) : null,
-                    _httpBuilder.BuildRequestDescriptor()));
-                Commands.Clear();
+                var requestAction = new RequestAction(_httpBuilder.BuildRequestPlan());
+                if (Actions.Count > 0)
+                {
+                    var steps = new List<PlanAction>(Actions) { requestAction };
+                    _segments.Add(PlanAuthoringContext.SequenceOrSingle(steps));
+                }
+                else
+                {
+                    _segments.Add(requestAction);
+                }
+
+                Actions.Clear();
                 _httpBuilder = null;
             }
             else if (_mode == PipelineMode.Parallel && _parallelBuilder != null)
             {
-                _segments.Add(_parallelBuilder.BuildReaction(
-                    Commands.Count > 0 ? new List<Command>(Commands) : null));
-                Commands.Clear();
+                var parallelAction = _parallelBuilder.BuildAction();
+                if (Actions.Count > 0)
+                {
+                    var steps = new List<PlanAction>(Actions) { parallelAction };
+                    _segments.Add(PlanAuthoringContext.SequenceOrSingle(steps));
+                }
+                else
+                {
+                    _segments.Add(parallelAction);
+                }
+
+                Actions.Clear();
                 _parallelBuilder = null;
             }
             else
             {
-                // Sequential/Conditional: flush commands as a standalone reaction
-                if (Commands.Count > 0)
+                if (Actions.Count > 0)
                 {
-                    _segments.Add(new SequentialReaction(new List<Command>(Commands)));
-                    Commands.Clear();
+                    _segments.Add(PlanAuthoringContext.SequenceOrSingle(new List<PlanAction>(Actions)));
+                    Actions.Clear();
                 }
             }
 
-            // Flush current conditional block
             if (ConditionalBranches != null && ConditionalBranches.Count > 0)
             {
-                _segments.Add(new ConditionalReaction(null, ConditionalBranches.ToArray()));
+                _segments.Add(new BranchAction(new List<BranchCase>(ConditionalBranches)));
                 ConditionalBranches = null;
             }
 
@@ -240,57 +415,69 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// Returns the single reaction for this pipeline.
+        /// Returns the single action for this pipeline.
         /// </summary>
         /// <remarks>
         /// Throws if the pipeline produced multiple segments. Callers that
-        /// need multi-segment support must use <see cref="BuildReactions"/> instead.
+        /// need multi-segment support must use <see cref="BuildActions"/> instead.
         /// </remarks>
-        /// <returns>The single reaction built from the pipeline commands.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the pipeline contains multiple reaction segments.</exception>
-        internal Reaction BuildReaction()
+        /// <returns>The single action built from the pipeline commands.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the pipeline contains multiple action segments.</exception>
+        internal PlanAction BuildAction()
         {
-            var reactions = BuildReactions();
-            if (reactions.Count > 1)
+            var actions = BuildActions();
+            if (actions.Count > 1)
                 throw new InvalidOperationException(
-                    $"BuildReaction() requires exactly one reaction segment but found {reactions.Count}. " +
-                    "Use BuildReactions() for pipelines with multiple When() blocks.");
-            return reactions[0];
+                    $"BuildAction() requires exactly one action segment but found {actions.Count}. " +
+                    "Use BuildActions() for pipelines with multiple When() blocks.");
+
+            return actions[0];
         }
 
         /// <summary>
-        /// Builds all reactions from the pipeline. A single When() block produces
-        /// one reaction. Multiple When() blocks produce multiple reactions.
-        /// Commands between/around conditions produce sequential reactions.
+        /// Builds all action segments from the pipeline. A single When() block produces
+        /// one action. Multiple When() blocks produce multiple actions.
+        /// Commands between or around conditions produce sequential actions.
         /// </summary>
-        /// <returns>All reaction segments built from the pipeline commands.</returns>
-        internal List<Reaction> BuildReactions()
+        /// <returns>All action segments built from the pipeline commands.</returns>
+        internal List<PlanAction> BuildActions()
         {
-            // If no segments were flushed, build a single reaction (common case)
             if (_segments == null || _segments.Count == 0)
             {
-                return new List<Reaction> { BuildSingleReaction() };
+                return new List<PlanAction> { BuildSingleAction() };
             }
 
-            // Flush any trailing content (commands, branches, HTTP, parallel)
             FlushSegment();
 
             return _segments;
         }
 
-        private Reaction BuildSingleReaction()
+        private PlanAction BuildSingleAction()
         {
             return _mode switch
             {
-                PipelineMode.Parallel => _parallelBuilder!.BuildReaction(
-                    Commands.Count > 0 ? Commands : null),
-                PipelineMode.Http => new HttpReaction(
-                    Commands.Count > 0 ? Commands : null,
-                    _httpBuilder!.BuildRequestDescriptor()),
-                PipelineMode.Conditional => new ConditionalReaction(
-                    Commands.Count > 0 ? Commands : null,
-                    ConditionalBranches!.ToArray()),
-                _ => new SequentialReaction(Commands),
+                PipelineMode.Parallel => Actions.Count > 0
+                    ? PlanAuthoringContext.SequenceOrSingle(new List<PlanAction>(Actions)
+                    {
+                        _parallelBuilder!.BuildAction()
+                    })
+                    : (PlanAction)_parallelBuilder!.BuildAction(),
+
+                PipelineMode.Http => Actions.Count > 0
+                    ? PlanAuthoringContext.SequenceOrSingle(new List<PlanAction>(Actions)
+                    {
+                        new RequestAction(_httpBuilder!.BuildRequestPlan())
+                    })
+                    : (PlanAction)new RequestAction(_httpBuilder!.BuildRequestPlan()),
+
+                PipelineMode.Conditional => Actions.Count > 0
+                    ? PlanAuthoringContext.SequenceOrSingle(new List<PlanAction>(Actions)
+                    {
+                        new BranchAction(ConditionalBranches!)
+                    })
+                    : (PlanAction)new BranchAction(ConditionalBranches!),
+
+                _ => PlanAuthoringContext.SequenceOrSingle(Actions),
             };
         }
     }

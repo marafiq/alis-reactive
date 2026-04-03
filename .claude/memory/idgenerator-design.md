@@ -112,8 +112,8 @@ It uses `IdGenerator.For<TModel>(expr)` to get the exact same ID the element was
 - `Alis.Reactive.Fusion/Extensions/FusionGatherExtensions.cs` — `Include<T>(expr)` uses IdGenerator
 
 ### Validation
-- `Alis.Reactive.FluentValidator/FluentValidationAdapter.cs` — use IdGenerator for fieldId
-- `Alis.Reactive/Descriptors/Requests/ValidationDescriptor.cs` — remove WithPrefix()
+- `Alis.Reactive.FluentValidator/FluentValidationRuleExtractor.cs` — use IdGenerator for fieldId
+- `Alis.Reactive/Validation/FormValidation.cs` — keep validation field identity aligned with generated element ids
 
 ### Views (update all existing)
 - All views using `NativeDropDownFor`, `NumericTextBoxFor`, `Component<T>(expr)`, `Include<T>(expr)`

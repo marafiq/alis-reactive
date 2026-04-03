@@ -57,11 +57,11 @@ export default defineConfig({
 					label: 'Features',
 					items: [
 						{ label: 'Reactive Mental Model', slug: 'csharp-modules/mental-model' },
-						{ label: 'Plans and Rendering', slug: 'csharp-modules/plan-and-entries' },
+						{ label: 'Plan Model', slug: 'csharp-modules/plan-model' },
 						{
 							label: 'Reactivity',
 							items: [
-								{ label: 'Triggers', slug: 'csharp-modules/reactivity/triggers-and-reactions' },
+								{ label: 'Subscriptions and Workflows', slug: 'csharp-modules/reactivity/subscriptions-and-workflows' },
 								{ label: 'Server-Sent Events', slug: 'csharp-modules/reactivity/server-push' },
 								{ label: 'SignalR', slug: 'csharp-modules/reactivity/signalr' },
 								{ label: 'Element Mutations', slug: 'csharp-modules/reactivity/element-mutations' },
@@ -91,7 +91,7 @@ export default defineConfig({
 							items: [
 								{ label: 'Overview', slug: 'architecture/fluent-builders' },
 								{ label: 'The Builders', slug: 'architecture/the-builders' },
-								{ label: 'Descriptors & Plan', slug: 'architecture/descriptors-and-plan' },
+								{ label: 'Plan Model', slug: 'architecture/plan-model' },
 								{ label: 'The JSON Plan Contract', slug: 'architecture/the-contract' },
 								{ label: 'The Vertical Slice', slug: 'architecture/vertical-slice' },
 							],

@@ -88,7 +88,7 @@ public sealed class DatePickerLocator
         await NavigateToMonth(Popup, year, month);
 
         var dayCell = Popup.Locator($"td.e-cell:not(.e-other-month) span.e-day:text-is(\"{day}\")");
-        await dayCell.ClickWhenStableAsync(_page);
+        await dayCell.ClickWithoutScrollingWhenStableAsync(_page);
     }
 
     // ─── Private Helpers ───
@@ -110,9 +110,9 @@ public sealed class DatePickerLocator
                     return;
 
                 if (target < currentMonth)
-                    await popup.Locator(".e-prev").ClickWhenStableAsync(_page);
+                    await popup.Locator(".e-prev").ClickWithoutScrollingWhenStableAsync(_page);
                 else
-                    await popup.Locator(".e-next").ClickWhenStableAsync(_page);
+                    await popup.Locator(".e-next").ClickWithoutScrollingWhenStableAsync(_page);
 
                 await WaitForTitleChange(title, titleText.Trim());
             }

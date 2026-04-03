@@ -28,7 +28,7 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task events_page_renders_plan_json()
     {
-        // The plan JSON section must contain valid JSON with an entries array.
+        // The plan JSON section must contain valid V2 plan JSON with workflows.
         // If plan.Render() or plan.RenderFormatted() breaks, this section is empty or malformed.
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
 
@@ -38,12 +38,13 @@ public class WhenPlanBoots : PlaywrightTestBase
         var text = await planJson.TextContentAsync();
         Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
 
-        // Validate it's actual JSON with expected structure
-        Assert.That(text, Does.Contain("\"entries\""), "Plan must have entries array");
-        Assert.That(text, Does.Contain("\"dom-ready\""), "Plan must contain dom-ready trigger");
-        Assert.That(text, Does.Contain("\"custom-event\""), "Plan must contain custom-event triggers");
-        Assert.That(text, Does.Contain("\"dispatch\""), "Plan must contain dispatch commands");
-        Assert.That(text, Does.Contain("\"mutate-element\""), "Plan must contain mutate-element commands");
+        // Validate it's actual JSON with expected V2 structure
+        Assert.That(text, Does.Contain("\"version\": 2"), "Plan must declare V2");
+        Assert.That(text, Does.Contain("\"workflows\""), "Plan must have workflows array");
+        Assert.That(text, Does.Contain("\"dom-ready\""), "Plan must contain dom-ready subscriptions");
+        Assert.That(text, Does.Contain("\"document-event\""), "Plan must contain custom event subscriptions");
+        Assert.That(text, Does.Contain("\"dispatch\""), "Plan must contain dispatch actions");
+        Assert.That(text, Does.Contain("\"set\""), "Plan must contain set actions");
 
         AssertNoConsoleErrors();
     }
@@ -72,11 +73,11 @@ public class WhenPlanBoots : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_has_correct_entry_count()
+    public async Task plan_json_has_correct_workflow_count()
     {
-        // Parse the plan JSON from #plan-json element and verify it has exactly 4 entries,
+        // Parse the plan JSON from #plan-json element and verify it has exactly 4 workflows,
         // matching the 4 Html.On() calls in the view (dom-ready, test, test-received, final).
-        // Proves plan serialization includes all entries — if an entry silently drops,
+        // Proves plan serialization includes all workflows — if one silently drops,
         // the chain breaks and this test catches it before Playwright chain tests run.
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
 
@@ -85,9 +86,9 @@ public class WhenPlanBoots : PlaywrightTestBase
         Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
 
         var doc = System.Text.Json.JsonDocument.Parse(text!);
-        var entries = doc.RootElement.GetProperty("entries");
-        Assert.That(entries.GetArrayLength(), Is.EqualTo(4),
-            "Plan must have exactly 4 entries (1 dom-ready + 3 custom-event)");
+        var workflows = doc.RootElement.GetProperty("workflows");
+        Assert.That(workflows.GetArrayLength(), Is.EqualTo(4),
+            "Plan must have exactly 4 workflows (1 dom-ready + 3 document-event)");
 
         AssertNoConsoleErrors();
     }

@@ -11,7 +11,7 @@ Build automated tools that catch C# → Schema and Schema → TS type drift befo
 **Problem**: Schema drifted 3 times in 33 revisions (M21). Each discovered by accident.
 
 **Approach options** (decide in planning):
-1. Build-time MSBuild target — serialize every descriptor class sample, validate against schema
+1. Build-time MSBuild target — serialize every plan model sample, validate against schema
 2. Standalone tool — like ApiDocGenerator, run via `npm run` script
 3. Hook — hookify rule that checks schema alignment on edit
 

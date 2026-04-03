@@ -1,5 +1,4 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -15,31 +14,34 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();
 
         /// <summary>Sets the HTML content value.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <param name="value">The HTML content to set.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionRichTextEditor, TModel> SetValue<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.Set("value", value);
         }
 
         /// <summary>Moves focus into the rich text editor.</summary>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionRichTextEditor, TModel> FocusIn<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("focusIn"));
+            => self.Call("focusIn");
 
         /// <summary>Reads the current HTML content for use in conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
         /// <c>p.When(p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.Notes).Value()).NotNull().Then(p =&gt; { ... })</c>.
         /// </remarks>
-        /// <returns>A typed source representing the editor's current HTML content.</returns>
-        public static TypedComponentSource<string> Value<TModel>(
+        /// <param name="self">The component reference to operate on.</param>
+        /// <returns>A typed value expression representing the editor's current HTML content.</returns>
+        public static ComponentValueExpression<string> Value<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
     }
 }

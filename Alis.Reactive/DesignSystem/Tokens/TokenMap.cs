@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Alis.Reactive.DesignSystem.Tokens
 {
+    /// <summary>
+    /// Maps design-system tokens to the concrete CSS utility classes rendered in markup.
+    /// </summary>
     public static class TokenMap
     {
         private static readonly Dictionary<SpacingScale, string> GapMap = new Dictionary<SpacingScale, string>
@@ -119,15 +122,54 @@ namespace Alis.Reactive.DesignSystem.Tokens
             { AccentColor.Muted, "border-text-muted" }
         };
 
+        /// <summary>Gets the gap utility class for a spacing token.</summary>
+        /// <param name="scale">The spacing token to map.</param>
+        /// <returns>The corresponding gap utility class.</returns>
         public static string Gap(SpacingScale scale) => GapMap[scale];
+
+        /// <summary>Gets the horizontal gap utility class for a spacing token.</summary>
+        /// <param name="scale">The spacing token to map.</param>
+        /// <returns>The corresponding horizontal gap utility class.</returns>
         public static string GapX(SpacingScale scale) => GapXMap[scale];
+
+        /// <summary>Gets the vertical gap utility class for a spacing token.</summary>
+        /// <param name="scale">The spacing token to map.</param>
+        /// <returns>The corresponding vertical gap utility class.</returns>
         public static string GapY(SpacingScale scale) => GapYMap[scale];
+
+        /// <summary>Gets the vertical padding utility class for a spacing token.</summary>
+        /// <param name="scale">The spacing token to map.</param>
+        /// <returns>The corresponding vertical padding utility class.</returns>
         public static string Py(SpacingScale scale) => PyMap[scale];
+
+        /// <summary>Gets the flex alignment utility class for an alignment token.</summary>
+        /// <param name="align">The alignment token to map.</param>
+        /// <returns>The corresponding alignment utility class.</returns>
         public static string Items(AlignItems align) => ItemsMap[align];
+
+        /// <summary>Gets the flex justification utility class for a justification token.</summary>
+        /// <param name="justify">The justification token to map.</param>
+        /// <returns>The corresponding justification utility class.</returns>
         public static string Justify(JustifyContent justify) => JustifyMap[justify];
+
+        /// <summary>Gets the text color utility class for a text color token.</summary>
+        /// <param name="color">The text color token to map.</param>
+        /// <returns>The corresponding text color utility class.</returns>
         public static string Color(TextColor color) => ColorMap[color];
+
+        /// <summary>Gets the text size utility class for a text size token.</summary>
+        /// <param name="size">The text size token to map.</param>
+        /// <returns>The corresponding text size utility class.</returns>
         public static string Size(TextSize size) => SizeMap[size];
+
+        /// <summary>Gets the grid column utility class for a column token.</summary>
+        /// <param name="cols">The grid column token to map.</param>
+        /// <returns>The corresponding grid column utility class.</returns>
         public static string Cols(GridCols cols) => ColsMap[cols];
+
+        /// <summary>Gets the accent border utility class for an accent token.</summary>
+        /// <param name="accent">The accent token to map.</param>
+        /// <returns>The corresponding accent utility class.</returns>
         public static string Accent(AccentColor accent) => AccentMap[accent];
     }
 }

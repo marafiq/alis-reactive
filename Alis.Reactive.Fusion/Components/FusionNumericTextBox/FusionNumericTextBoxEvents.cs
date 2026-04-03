@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionNumericTextBox"/> component.
+    /// Typed reactive events for the <see cref="FusionNumericTextBox"/> component.
     /// </summary>
     /// <remarks>
     /// Select an event via the <c>.Reactive()</c> lambda:
@@ -14,18 +14,18 @@ namespace Alis.Reactive.Fusion.Components
         private FusionNumericTextBoxEvents() { }
 
         /// <summary>Fires when the numeric value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionNumericTextBoxChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionNumericTextBoxChangeArgs>(
+        public ReactiveEvent<FusionNumericTextBoxChangeArgs> Changed =>
+            new ReactiveEvent<FusionNumericTextBoxChangeArgs>(
                 "change", new FusionNumericTextBoxChangeArgs());
 
         /// <summary>Fires when the component receives focus (SF "focus" event).</summary>
-        public TypedEventDescriptor<FusionNumericTextBoxFocusArgs> Focus =>
-            new TypedEventDescriptor<FusionNumericTextBoxFocusArgs>(
+        public ReactiveEvent<FusionNumericTextBoxFocusArgs> Focus =>
+            new ReactiveEvent<FusionNumericTextBoxFocusArgs>(
                 "focus", new FusionNumericTextBoxFocusArgs());
 
         /// <summary>Fires when the component loses focus (SF "blur" event).</summary>
-        public TypedEventDescriptor<FusionNumericTextBoxBlurArgs> Blur =>
-            new TypedEventDescriptor<FusionNumericTextBoxBlurArgs>(
+        public ReactiveEvent<FusionNumericTextBoxBlurArgs> Blur =>
+            new ReactiveEvent<FusionNumericTextBoxBlurArgs>(
                 "blur", new FusionNumericTextBoxBlurArgs());
     }
 }

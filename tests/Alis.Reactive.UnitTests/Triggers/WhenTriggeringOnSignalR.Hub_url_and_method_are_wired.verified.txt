@@ -1,20 +1,16 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: signalr,
         hubUrl: /hubs/notifications,
-        methodName: ReceiveUpdate
+        method: ReceiveUpdate
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: dispatch,
-            event: update-received
-          }
-        ]
+      run: {
+        kind: dispatch,
+        name: update-received
       }
     }
   ]

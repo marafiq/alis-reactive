@@ -1,129 +1,201 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.go-badge: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    },
+    element.has-results: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::go-badge: {
+      contract: element.go-badge,
+      elementId: go-badge
+    },
+    element::has-results: {
+      contract: element.has-results,
+      elementId: has-results
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.value
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: value
+                  }
+                ]
               },
-              coerceAs: string,
               op: eq,
-              operand: go
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: go-badge,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: parallel-http,
-        requests: [
-          {
-            verb: GET,
-            url: /api/first
-          },
-          {
-            verb: GET,
-            url: /api/second
-          }
-        ]
-      }
-    },
-    {
-      trigger: {
-        kind: custom-event,
-        event: test
-      },
-      reaction: {
-        kind: conditional,
-        branches: [
-          {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.count
+              right: {
+                kind: literal,
+                value: go
               },
-              coerceAs: number,
-              op: gt,
-              operand: 0
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: has-results,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::go-badge,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      when: {
+        kind: document-event,
+        name: test
+      },
+      run: {
+        kind: parallel,
+        steps: [
+          {
+            kind: request,
+            request: {
+              method: GET,
+              url: /api/first
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: has-results,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
+            kind: request,
+            request: {
+              method: GET,
+              url: /api/second
+            }
+          }
+        ]
+      }
+    },
+    {
+      when: {
+        kind: document-event,
+        name: test
+      },
+      run: {
+        kind: branch,
+        cases: [
+          {
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: count
                   }
+                ]
+              },
+              op: gt,
+              right: {
+                kind: literal,
+                value: 0
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::has-results,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
+            }
+          },
+          {
+            run: {
+              kind: set,
+              target: {
+                object: element::has-results,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
+                }
+              }
             }
           }
         ]

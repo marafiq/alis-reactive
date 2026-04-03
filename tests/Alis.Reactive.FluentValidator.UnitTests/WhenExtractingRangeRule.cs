@@ -3,12 +3,12 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 [TestFixture]
 public class WhenExtractingRangeRule
 {
-    private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
+    private readonly FluentValidationRuleExtractor _ruleExtractor = RuleExtractorFactory.Create();
 
     [Test]
     public void InclusiveBetween_produces_range_rule_with_array_constraint()
     {
-        var desc = _adapter.ExtractRules(typeof(RangeValidator), "testForm");
+        var desc = _ruleExtractor.ExtractRules(typeof(RangeValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc!.Fields[0].Rules[0];

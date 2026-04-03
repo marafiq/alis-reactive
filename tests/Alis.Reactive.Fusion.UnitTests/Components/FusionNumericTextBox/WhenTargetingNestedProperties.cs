@@ -1,6 +1,4 @@
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.Fusion.UnitTests;
@@ -21,14 +19,18 @@ public class WhenTargetingNestedProperties : FusionTestBase
     public Task Nested_property_target_uses_underscores()
     {
         var plan = CreatePlan();
-        var descriptor = FusionNumericTextBoxEvents.Instance.Changed;
-
-        var pb = new PipelineBuilder<FusionTestModel>();
-        pb.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).SetValue(12345);
-        pb.Element("echo").SetText("PostalCode set");
-
-        var trigger = new ComponentEventTrigger("Address_PostalCode", descriptor.JsEvent, "fusion", "Address.PostalCode", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        WireObjectEvent(
+            plan,
+            "Address_PostalCode",
+            "fusion",
+            "Address.PostalCode",
+            "value",
+            FusionNumericTextBoxEvents.Instance.Changed.EventName,
+            pb =>
+            {
+                pb.Component<FusionNumericTextBox>(m => m.Address!.PostalCode).SetValue(12345);
+                pb.Element("echo").SetText("PostalCode set");
+            });
 
         var json = plan.Render();
         AssertSchemaValid(json);
@@ -39,13 +41,14 @@ public class WhenTargetingNestedProperties : FusionTestBase
     public Task Vendor_field_serialized_in_trigger()
     {
         var plan = CreatePlan();
-        var descriptor = FusionNumericTextBoxEvents.Instance.Changed;
-
-        var pb = new PipelineBuilder<FusionTestModel>();
-        pb.Element("echo").SetText("changed");
-
-        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        WireObjectEvent(
+            plan,
+            "Amount",
+            "fusion",
+            "Amount",
+            "value",
+            FusionNumericTextBoxEvents.Instance.Changed.EventName,
+            pb => pb.Element("echo").SetText("changed"));
 
         var json = plan.Render();
         AssertSchemaValid(json);
@@ -55,14 +58,14 @@ public class WhenTargetingNestedProperties : FusionTestBase
     [Test]
     public void Component_expression_resolves_to_element_id()
     {
-        var pb = new PipelineBuilder<FusionTestModel>();
+        var pb = CreateDomReadyPipeline();
         var compRef = pb.Component<FusionNumericTextBox>(m => m.Address!.PostalCode);
         compRef.SetValue(99);
 
-        var reaction = pb.BuildReaction();
-        var json = System.Text.Json.JsonSerializer.Serialize(reaction,
+        var action = pb.BuildAction();
+        var json = System.Text.Json.JsonSerializer.Serialize(action,
             new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
 
-        Assert.That(json, Does.Contain("\"target\":\"Alis_Reactive_Fusion_UnitTests_FusionTestModel__Address_PostalCode\""));
+        Assert.That(json, Does.Contain("\"object\":\"component::Alis_Reactive_Fusion_UnitTests_FusionTestModel__Address_PostalCode\""));
     }
 }

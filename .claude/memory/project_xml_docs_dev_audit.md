@@ -20,8 +20,8 @@ Three agents role-played as .NET MVC developers reading only XML docs. Results b
 ### Confusion Gaps (dev would need to experiment)
 
 5. "Phantom" pattern is jargon — repeated across triggers and element builders without centralized explanation.
-6. TypedComponentSource return value is opaque — Value() returns it but no "what to do next" guidance.
-7. BindSource/TypedSource overloads lack usage examples.
+6. ComponentValueExpression return value is opaque — Value() returns it but no "what to do next" guidance.
+7. BindSource/ValueExpression overloads lack usage examples.
 8. BuildReaction()/BuildReactions() audience unclear — public but feels internal.
 9. ComponentsMap public but feels internal — docs should state who it's for.
 10. "Producer" in HtmlExtensions.On() is undefined jargon.

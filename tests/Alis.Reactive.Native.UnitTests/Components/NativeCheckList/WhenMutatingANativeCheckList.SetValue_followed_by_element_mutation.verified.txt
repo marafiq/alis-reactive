@@ -1,34 +1,91 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
+  contracts: {
+    native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: array,
+            item: {
+              kind: scalar,
+              type: string
+            }
+          },
+          access: write
+        }
+      }
+    },
+    element.echo: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies: {
+      contract: native.component.Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
+      elementId: Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies
+    },
+    element::echo: {
+      contract: element.echo,
+      elementId: echo
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
+      run: {
+        kind: sequence,
+        steps: [
           {
-            kind: mutate-element,
-            target: Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
-            mutation: {
-              kind: set-prop,
-              prop: value
+            kind: set,
+            target: {
+              object: component::Alis_Reactive_Native_UnitTests_NativeTestModel__Allergies,
+              member: value
             },
-            value: [
-              Shellfish,
-              Gluten
-            ],
-            vendor: native
+            value: {
+              kind: literal,
+              value: [
+                Shellfish,
+                Gluten
+              ]
+            }
           },
           {
-            kind: mutate-element,
-            target: echo,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
+            kind: set,
+            target: {
+              object: element::echo,
+              member: text
             },
-            value: Allergies updated
+            value: {
+              kind: literal,
+              value: Allergies updated
+            }
           }
         ]
       }

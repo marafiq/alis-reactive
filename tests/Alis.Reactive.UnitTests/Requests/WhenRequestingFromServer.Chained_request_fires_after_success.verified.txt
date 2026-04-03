@@ -1,46 +1,97 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.residents: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.facilities: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::residents: {
+      contract: element.residents,
+      elementId: residents
+    },
+    element::facilities: {
+      contract: element.facilities,
+      elementId: facilities
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: GET,
+          method: GET,
           url: /api/residents,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: residents,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::residents,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: loaded
                 }
-              ]
+              }
             }
           ],
-          chained: {
-            verb: GET,
+          next: {
+            method: GET,
             url: /api/facilities,
             onSuccess: [
               {
-                commands: [
-                  {
-                    kind: mutate-element,
-                    target: facilities,
-                    mutation: {
-                      kind: set-prop,
-                      prop: textContent
-                    },
+                run: {
+                  kind: set,
+                  target: {
+                    object: element::facilities,
+                    member: text
+                  },
+                  value: {
+                    kind: literal,
                     value: loaded
                   }
-                ]
+                }
               }
             ]
           }

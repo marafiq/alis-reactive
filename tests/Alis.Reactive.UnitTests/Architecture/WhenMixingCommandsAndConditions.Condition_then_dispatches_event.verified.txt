@@ -1,59 +1,99 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.active
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: active
+                  }
+                ]
               },
-              coerceAs: boolean,
-              op: truthy
+              op: truthy,
+              as: {
+                kind: scalar,
+                type: boolean
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
+            run: {
+              kind: sequence,
+              steps: [
                 {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+                  kind: set,
+                  target: {
+                    object: element::status,
+                    member: text
                   },
-                  value: active
+                  value: {
+                    kind: literal,
+                    value: active
+                  }
                 },
                 {
                   kind: dispatch,
-                  event: user-activated
+                  name: user-activated
                 }
               ]
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
+            run: {
+              kind: sequence,
+              steps: [
                 {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+                  kind: set,
+                  target: {
+                    object: element::status,
+                    member: text
                   },
-                  value: inactive
+                  value: {
+                    kind: literal,
+                    value: inactive
+                  }
                 },
                 {
                   kind: dispatch,
-                  event: user-deactivated
+                  name: user-deactivated
                 }
               ]
             }

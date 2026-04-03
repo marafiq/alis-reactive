@@ -1,173 +1,298 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.auth-status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.full-access: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        },
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.tier-badge: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        hidden: {
+          kind: property,
+          path: [
+            {
+              prop: hidden
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: boolean
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::auth-status: {
+      contract: element.auth-status,
+      elementId: auth-status
+    },
+    element::full-access: {
+      contract: element.full-access,
+      elementId: full-access
+    },
+    element::tier-badge: {
+      contract: element.tier-badge,
+      elementId: tier-badge
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/auth,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: auth-status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::auth-status,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: authenticated
                 }
-              ]
+              }
             }
           ]
         }
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
+            when: {
               kind: all,
-              guards: [
+              terms: [
                 {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.active
-                  },
-                  coerceAs: boolean,
-                  op: truthy
-                },
-                {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.value
-                  },
-                  coerceAs: string,
-                  op: not-empty
-                },
-                {
-                  kind: value,
-                  source: {
-                    kind: event,
-                    path: evt.count
-                  },
-                  coerceAs: number,
-                  op: gte,
-                  operand: 1
-                }
-              ]
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: full-access,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
                       {
-                        kind: literal,
-                        value: hidden
+                        prop: active
                       }
                     ]
+                  },
+                  op: truthy,
+                  as: {
+                    kind: scalar,
+                    type: boolean
                   }
                 },
                 {
-                  kind: mutate-element,
-                  target: full-access,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: value
+                      }
+                    ]
                   },
-                  value: all checks passed
+                  op: not-empty,
+                  as: {
+                    kind: scalar,
+                    type: string
+                  }
+                },
+                {
+                  kind: compare,
+                  left: {
+                    kind: context,
+                    scope: event,
+                    path: [
+                      {
+                        prop: count
+                      }
+                    ]
+                  },
+                  op: gte,
+                  right: {
+                    kind: literal,
+                    value: 1
+                  },
+                  as: {
+                    kind: scalar,
+                    type: number
+                  }
+                }
+              ]
+            },
+            run: {
+              kind: sequence,
+              steps: [
+                {
+                  kind: set,
+                  target: {
+                    object: element::full-access,
+                    member: hidden
+                  },
+                  value: {
+                    kind: convert,
+                    value: {
+                      kind: literal,
+                      value: false
+                    },
+                    to: {
+                      kind: scalar,
+                      type: boolean
+                    }
+                  }
+                },
+                {
+                  kind: set,
+                  target: {
+                    object: element::full-access,
+                    member: text
+                  },
+                  value: {
+                    kind: literal,
+                    value: all checks passed
+                  }
                 }
               ]
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: full-access,
-                  mutation: {
-                    kind: call,
-                    method: setAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      },
-                      {
-                        kind: literal,
-                        value: 
-                      }
-                    ]
-                  }
+            run: {
+              kind: set,
+              target: {
+                object: element::full-access,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: true
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.category
-              },
-              coerceAs: string,
-              op: in,
-              operand: [
-                premium,
-                enterprise
-              ]
-            },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: tier-badge,
-                  mutation: {
-                    kind: call,
-                    method: removeAttribute,
-                    args: [
-                      {
-                        kind: literal,
-                        value: hidden
-                      }
-                    ]
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: category
                   }
+                ]
+              },
+              op: in,
+              right: {
+                kind: literal,
+                value: [
+                  premium,
+                  enterprise
+                ]
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
+            },
+            run: {
+              kind: set,
+              target: {
+                object: element::tier-badge,
+                member: hidden
+              },
+              value: {
+                kind: convert,
+                value: {
+                  kind: literal,
+                  value: false
+                },
+                to: {
+                  kind: scalar,
+                  type: boolean
                 }
-              ]
+              }
             }
           }
         ]

@@ -20,8 +20,8 @@ CONFIRM :=
     .Then(t => { PIPELINE })
 ```
 
-Each `When/Then/Else` block is an **independent reaction**. Multiple blocks in one
-pipeline don't interfere — they produce separate conditional reactions in the plan.
+Each `When/Then/Else` block is an **independent branch**. Multiple blocks in one
+pipeline don't interfere — they produce separate conditional workflows in the plan.
 
 ## Source — Where the Value Comes From
 
@@ -31,7 +31,7 @@ SOURCE :=
   | args, x => x.Property                              -- TProp inferred from property type
 
   -- Component read (anywhere — pipeline, response handler, DomReady)
-  | comp.Value()                                        -- TypedComponentSource<T>
+  | comp.Value()                                        -- ComponentValueExpression<T>
   | comp.StartDate()                                    -- DateRangePicker only
   | comp.EndDate()                                      -- DateRangePicker only
 
@@ -82,7 +82,7 @@ OPERATOR :=
   -- Array (TProp must be array, e.g. string[])
   | .ArrayContains(item)    -- array includes item
 
-  -- Source-vs-source (right side is TypedSource, not literal)
+  -- Source-vs-source (right side is ValueExpression, not literal)
   | .Eq(otherSource)        -- left == right (runtime values)
   | .NotEq(otherSource)
   | .Gt(otherSource)
@@ -151,8 +151,8 @@ BRANCH :=
 
 BRANCH_CHAIN :=
   | .ElseIf(SOURCE).OPERATOR.Then(t => { PIPELINE })    -- next condition
-  | .ElseIf(typedSource).OPERATOR.Then(...)             -- component source
-  | .Else(e => { PIPELINE })                            -- fallback (terminal, void)
+  | .ElseIf(valueExpr).OPERATOR.Then(...)               -- component value expression
+  | .Else(e => { PIPELINE })                            -- default branch (terminal, void)
 ```
 
 Each branch body is a full pipeline — Element, Component, Dispatch, HTTP, nested When.
@@ -162,12 +162,12 @@ Each branch body is a full pipeline — Element, Component, Dispatch, HTTP, nest
 ```
 PER_COMMAND_GUARD :=
   var el = p.Element("id");
-  el.SetText(typedSource);                               -- returns ElementBuilder
+  el.SetText(valueExpr);                                 -- returns ElementBuilder
   el.When(payload, x => x.Prop, csb => csb.OPERATOR);   -- guard on previous command
 ```
 
-`.When()` is ONLY on `ElementBuilder` — returned by `.SetText(TypedSource)`,
-`.SetText(BindSource)`, `.SetHtml(TypedSource)`, `.SetHtml(BindSource)`.
+`.When()` is ONLY on `ElementBuilder` — returned by `.SetText(ValueExpression)`,
+`.SetText(BindSource)`, `.SetHtml(ValueExpression)`, `.SetHtml(BindSource)`.
 
 **NOT after:** `.Show()`, `.Hide()`, `.AddClass()`, `.SetText("static")`,
 `.SetText(payload, x => x.Prop)` — these return `PipelineBuilder`.
@@ -198,7 +198,7 @@ p.When(left.Value()).Gt(right.Value())
  .Else(e => e.Element("warning").Hide());
 ```
 
-Both sides must be `TypedSource<TProp>` with same `TProp`.
+Both sides must be `ValueExpression<TProp>` with same `TProp`.
 
 ## Recipes — Common Patterns
 

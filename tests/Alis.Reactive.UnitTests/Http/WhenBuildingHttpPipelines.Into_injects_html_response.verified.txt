@@ -1,23 +1,34 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.container: {
+      kind: element,
+      resolver: native-element
+    }
+  },
+  objects: {
+    element::container: {
+      contract: element.container,
+      elementId: container
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: GET,
+          method: GET,
           url: /api/partial,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: into,
-                  target: container
-                }
-              ]
+              run: {
+                kind: inject,
+                object: element::container
+              }
             }
           ]
         }

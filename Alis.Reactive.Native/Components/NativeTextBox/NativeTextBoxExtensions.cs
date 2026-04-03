@@ -1,5 +1,4 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -26,31 +25,33 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeTextBox, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.Set("value", value);
         }
 
         /// <summary>
         /// Moves keyboard focus into the text input.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeTextBox, TModel> FocusIn<TModel>(
             this ComponentRef<NativeTextBox, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("focus"));
+            return self.Call("focus");
         }
 
         /// <summary>
         /// Reads the current text input value for use in conditions or gather.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>A typed source representing the input's current value.</returns>
-        public static TypedComponentSource<string> Value<TModel>(
+        /// <param name="self">The component reference to operate on.</param>
+        /// <returns>A typed value expression representing the input's current value.</returns>
+        public static ComponentValueExpression<string> Value<TModel>(
             this ComponentRef<NativeTextBox, TModel> self)
             where TModel : class
         {
-            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            return new ComponentValueExpression<string>(self.TargetId, _component.Vendor, _component.ValueMemberPath);
         }
     }
 }

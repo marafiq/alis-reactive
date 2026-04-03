@@ -1,19 +1,15 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: data-loaded
+      when: {
+        kind: document-event,
+        name: data-loaded
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: dispatch,
-            event: refresh
-          }
-        ]
+      run: {
+        kind: dispatch,
+        name: refresh
       }
     }
   ]

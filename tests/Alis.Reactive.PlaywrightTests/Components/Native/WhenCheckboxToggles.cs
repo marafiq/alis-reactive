@@ -34,10 +34,9 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("mutate-element"),
-            "Plan must contain mutate-element commands");
-        Assert.That(planJson, Does.Contain("\"prop\""),
-            "Plan must contain structured prop field");
+        AssertV2Plan(planJson);
+        AssertV2MemberAction(planJson);
+        AssertPlanPathProp(planJson, "checked");
         AssertNoConsoleErrors();
     }
 
@@ -202,59 +201,48 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task plan_carries_native_vendor_for_checkbox_mutations()
     {
-        // The plan must declare vendor "native" so the runtime resolves
-        // the raw DOM element (not ej2_instances). If vendor is missing or wrong,
-        // resolveRoot returns the wrong object and SetChecked silently breaks.
+        // The plan must declare the native-element resolver so the runtime resolves
+        // the raw DOM element (not ej2_instances). If resolver is missing or wrong,
+        // object access returns the wrong root and SetChecked silently breaks.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""),
-            "Plan must carry vendor 'native' for checkbox mutations — " +
-            "runtime uses this to choose resolveRoot strategy");
+        AssertPlanResolver(planJson, "native-element");
         AssertNoConsoleErrors();
     }
 
     [Test]
     public async Task plan_carries_checked_readexpr_for_component_source()
     {
-        // NativeCheckBox.ReadExpr is "checked" — the plan's ComponentSource must
-        // carry this so the runtime reads el.checked (not el.value).
-        // If readExpr changes or is lost, component value reads return wrong data.
+        // NativeCheckBox reads through binding valueMember "checked", not a free-form valueMemberPath.
+        // If that member changes or is lost, component value reads return wrong data.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"checked\""),
-            "Plan must carry readExpr 'checked' for NativeCheckBox component sources — " +
-            "runtime walks this path to read the checkbox state");
+        AssertPlanValueMember(planJson, "checked");
         AssertNoConsoleErrors();
     }
 
     [Test]
     public async Task plan_carries_boolean_coerce_for_setchecked()
     {
-        // SetChecked emits coerce:"boolean" so the runtime coerces the string "false"
-        // to boolean false before assigning to el.checked. Without coerce, the string
-        // "false" is truthy and the checkbox stays checked.
+        // SetChecked carries a boolean shape so the runtime assigns a boolean,
+        // not a stringly value, to el.checked.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"coerce\": \"boolean\""),
-            "Plan must carry coerce 'boolean' for SetChecked — " +
-            "without it, string 'false' is truthy and checkbox stays checked");
+        AssertPlanScalarType(planJson, "boolean");
         AssertNoConsoleErrors();
     }
 
     [Test]
     public async Task plan_carries_prop_checked_for_setchecked_mutation()
     {
-        // SetChecked writes to prop "checked" (not "value"). If prop changes,
-        // the runtime writes to the wrong DOM property.
+        // SetChecked writes through member path prop "checked" (not "value").
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"prop\": \"checked\""),
-            "Plan must carry prop 'checked' for SetChecked mutation — " +
-            "runtime uses bracket notation root[prop] = val");
+        AssertPlanPathProp(planJson, "checked");
         AssertNoConsoleErrors();
     }
 

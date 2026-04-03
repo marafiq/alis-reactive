@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionAutoComplete"/> component.
+    /// Typed reactive events for the <see cref="FusionAutoComplete"/> component.
     /// </summary>
     /// <remarks>
     /// Select an event via the <c>.Reactive()</c> lambda:
@@ -14,13 +14,13 @@ namespace Alis.Reactive.Fusion.Components
         private FusionAutoCompleteEvents() { }
 
         /// <summary>Fires when the selected value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionAutoCompleteChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionAutoCompleteChangeArgs>(
+        public ReactiveEvent<FusionAutoCompleteChangeArgs> Changed =>
+            new ReactiveEvent<FusionAutoCompleteChangeArgs>(
                 "change", new FusionAutoCompleteChangeArgs());
 
         /// <summary>Fires when the user types to filter (SF "filtering" event).</summary>
-        public TypedEventDescriptor<FusionAutoCompleteFilteringArgs> Filtering =>
-            new TypedEventDescriptor<FusionAutoCompleteFilteringArgs>(
+        public ReactiveEvent<FusionAutoCompleteFilteringArgs> Filtering =>
+            new ReactiveEvent<FusionAutoCompleteFilteringArgs>(
                 "filtering", new FusionAutoCompleteFilteringArgs());
     }
 }

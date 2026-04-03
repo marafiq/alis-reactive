@@ -1,25 +1,31 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Reactions;
-using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Builds a parallel HTTP reaction — multiple requests fire concurrently.
+    /// Builds a parallel HTTP workflow — multiple requests fire concurrently.
     /// Each branch owns its own response chain. OnAllSettled fires after all branches complete.
     /// </summary>
     public class ParallelBuilder<TModel> where TModel : class
     {
-        private readonly List<RequestDescriptor> _branches = new List<RequestDescriptor>();
-        private PipelineBuilder<TModel>? _onAllSettled;
+        private readonly PlanAuthoringContext _authoring;
+        private readonly WorkflowScope _scope;
+        private readonly List<HttpRequestBuilder<TModel>> _branches = new List<HttpRequestBuilder<TModel>>();
+        private List<PlanAction>? _onAllSettled;
+
+        internal ParallelBuilder(PlanAuthoringContext authoring, WorkflowScope scope)
+        {
+            _authoring = authoring;
+            _scope = scope;
+        }
 
         internal void AddBranch(Action<HttpRequestBuilder<TModel>> request)
         {
-            var builder = new HttpRequestBuilder<TModel>();
+            var builder = new HttpRequestBuilder<TModel>(_authoring, _scope);
             request(builder);
-            _branches.Add(builder.BuildRequestDescriptor());
+            _branches.Add(builder);
         }
 
         /// <summary>
@@ -28,23 +34,51 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the commands that run after all branches complete.</param>
         public ParallelBuilder<TModel> OnAllSettled(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>();
+            var pb = new PipelineBuilder<TModel>(_authoring, _scope);
             pipeline(pb);
-            var reaction = pb.BuildReaction();
-            if (!(reaction is SequentialReaction))
+            var actions = pb.BuildActions();
+            if (actions.Count != 1 || ContainsStructuredAction(actions[0]))
                 throw new InvalidOperationException(
                     "OnAllSettled only supports plain commands (sequential). " +
                     "Conditions, HTTP, and parallel pipelines are not valid here.");
-            _onAllSettled = pb;
+
+            _onAllSettled = FlattenSequential(actions[0]);
             return this;
         }
 
-        internal ParallelHttpReaction BuildReaction(List<Command>? preFetch)
+        internal ParallelAction BuildAction()
         {
-            return new ParallelHttpReaction(
-                preFetch,
-                _branches,
-                _onAllSettled?.Commands.Count > 0 ? _onAllSettled.Commands : null);
+            var steps = new List<PlanAction>();
+            foreach (var branch in _branches)
+                steps.Add(new RequestAction(branch.BuildRequestPlan()));
+
+            var action = new ParallelAction(steps);
+            if (_onAllSettled != null && _onAllSettled.Count > 0)
+                action.OnSettled = PlanAuthoringContext.SequenceOrSingle(_onAllSettled);
+
+            return action;
+        }
+
+        private static bool ContainsStructuredAction(PlanAction action)
+        {
+            if (action is SequenceAction sequence)
+            {
+                foreach (var step in sequence.Steps)
+                    if (ContainsStructuredAction(step))
+                        return true;
+
+                return false;
+            }
+
+            return action is BranchAction || action is RequestAction || action is ParallelAction;
+        }
+
+        private static List<PlanAction> FlattenSequential(PlanAction action)
+        {
+            if (action is SequenceAction sequence)
+                return sequence.Steps;
+
+            return new List<PlanAction> { action };
         }
     }
 }

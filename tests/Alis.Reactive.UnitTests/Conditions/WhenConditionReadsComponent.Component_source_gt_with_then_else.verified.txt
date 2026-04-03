@@ -1,55 +1,104 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.AmountModel,
-  entries: [
+  contracts: {
+    fusion.component.Alis_Reactive_UnitTests_AmountModel__Amount: {
+      kind: component,
+      resolver: fusion-instance,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: any
+          },
+          access: read
+        }
+      }
+    },
+    element.status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::Alis_Reactive_UnitTests_AmountModel__Amount: {
+      contract: fusion.component.Alis_Reactive_UnitTests_AmountModel__Amount,
+      elementId: Alis_Reactive_UnitTests_AmountModel__Amount
+    },
+    element::status: {
+      contract: element.status,
+      elementId: status
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: component,
-                componentId: Alis_Reactive_UnitTests_AmountModel__Amount,
-                vendor: fusion,
-                readExpr: value
+            when: {
+              kind: compare,
+              left: {
+                kind: member,
+                object: component::Alis_Reactive_UnitTests_AmountModel__Amount,
+                member: value
               },
-              coerceAs: number,
               op: gt,
-              operand: 0
+              right: {
+                kind: literal,
+                value: 0
+              },
+              as: {
+                kind: scalar,
+                type: number
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: positive
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::status,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: positive
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: zero or negative
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::status,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: zero or negative
+              }
             }
           }
         ]

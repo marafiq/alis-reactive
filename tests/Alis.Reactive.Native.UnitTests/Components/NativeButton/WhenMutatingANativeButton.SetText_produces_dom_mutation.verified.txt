@@ -1,24 +1,48 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
+  contracts: {
+    native.component.submitBtn: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::submitBtn: {
+      contract: native.component.submitBtn,
+      elementId: submitBtn
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: submitBtn,
-            mutation: {
-              kind: set-prop,
-              prop: textContent
-            },
-            value: Save,
-            vendor: native
-          }
-        ]
+      run: {
+        kind: set,
+        target: {
+          object: component::submitBtn,
+          member: text
+        },
+        value: {
+          kind: literal,
+          value: Save
+        }
       }
     }
   ]

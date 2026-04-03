@@ -1,12 +1,11 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Descriptors.Requests;
 
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
     /// Vendor-agnostic gather extensions for any <see cref="IComponent"/> + <see cref="IInputComponent"/>.
-    /// Works for both Native and Fusion components: vendor and readExpr
+    /// Works for both Native and Fusion components: vendor and member-read path
     /// are resolved from the component instance at build time.
     /// </summary>
     /// <remarks>
@@ -32,12 +31,7 @@ namespace Alis.Reactive.Builders.Requests
             var component = new TComponent();
             var elementId = IdGenerator.For<TModel>(expr);
             var propertyName = ExpressionPathHelper.ToPropertyName(expr);
-            self.AddItem(new ComponentGather(
-                elementId,
-                component.Vendor,
-                propertyName,
-                component.ReadExpr));
-            return self;
+            return self.IncludeComponentValue(propertyName, elementId, component.Vendor, component.ValueMemberPath);
         }
 
         /// <summary>
@@ -45,6 +39,7 @@ namespace Alis.Reactive.Builders.Requests
         /// Use for non-model-bound components (grids, string-id controls) that cannot use
         /// the expression-based <see cref="Include{TComponent,TModel}(GatherBuilder{TModel}, System.Linq.Expressions.Expression{System.Func{TModel, object}})"/> overload.
         /// </summary>
+        /// <param name="self">The gather builder.</param>
         /// <param name="refId">The element ID of the component on the page.</param>
         /// <param name="name">The key name in the request payload.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
@@ -55,12 +50,7 @@ namespace Alis.Reactive.Builders.Requests
             where TModel : class
         {
             var component = new TComponent();
-            self.AddItem(new ComponentGather(
-                refId,
-                component.Vendor,
-                name,
-                component.ReadExpr));
-            return self;
+            return self.IncludeComponentValue(name, refId, component.Vendor, component.ValueMemberPath);
         }
     }
 }

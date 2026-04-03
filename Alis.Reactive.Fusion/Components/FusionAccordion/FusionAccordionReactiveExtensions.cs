@@ -1,7 +1,5 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -20,24 +18,31 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionAccordion Component = new FusionAccordion();
 
+        /// <summary>
+        /// Attaches a reactive workflow to a Fusion Accordion event.
+        /// </summary>
+        /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
+        /// <typeparam name="TArgs">The event payload type inferred from the selected event.</typeparam>
+        /// <param name="builder">The accordion builder to attach behavior to.</param>
+        /// <param name="eventSelector">Selects the event to listen for.</param>
+        /// <param name="pipeline">Builds the workflow executed when the event fires.</param>
+        /// <returns>The current builder.</returns>
         public static FusionAccordionBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionAccordionBuilder<TModel> builder,
-            Func<FusionAccordionEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionAccordionEvents, ReactiveEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(FusionAccordionEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
-
-            var trigger = new ComponentEventTrigger(
+            var reactiveEvent = eventSelector(FusionAccordionEvents.Instance);
+            var scope = builder.Plan.Authoring.CreateObjectEventScope(
                 builder.ElementId,
-                descriptor.JsEvent,
                 Component.Vendor,
-                builder.ElementId);       // bindingPath = elementId for non-input
-
-            foreach (var reaction in pb.BuildReactions())
-                builder.Plan.AddEntry(new Entry(trigger, reaction));
+                builder.ElementId,
+                null,
+                reactiveEvent.EventName);
+            var pb = new PipelineBuilder<TModel>(builder.Plan.Authoring, scope);
+            pipeline(reactiveEvent.Payload, pb);
+            builder.Plan.AddWorkflow(scope, pb);
 
             return builder;
         }

@@ -1,0 +1,108 @@
+﻿{
+  version: 2,
+  planId: Alis.Reactive.UnitTests.TestModel,
+  contracts: {
+    element.result: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::result: {
+      contract: element.result,
+      elementId: result
+    }
+  },
+  workflows: [
+    {
+      when: {
+        kind: dom-ready
+      },
+      run: {
+        kind: request,
+        request: {
+          method: POST,
+          url: /api/save,
+          input: {
+            transport: json,
+            value: {
+              kind: object,
+              fields: {
+                name: {
+                  kind: literal,
+                  value: test
+                }
+              }
+            }
+          },
+          validation: {
+            formId: testForm,
+            fields: [
+              {
+                binding: Name,
+                rules: [
+                  {
+                    rule: required,
+                    message: Name is required
+                  }
+                ]
+              },
+              {
+                binding: Email,
+                rules: [
+                  {
+                    rule: required,
+                    message: Email is required
+                  },
+                  {
+                    rule: email,
+                    message: Must be a valid email
+                  }
+                ]
+              }
+            ]
+          },
+          onSuccess: [
+            {
+              run: {
+                kind: set,
+                target: {
+                  object: element::result,
+                  member: text
+                },
+                value: {
+                  kind: literal,
+                  value: saved
+                }
+              }
+            }
+          ],
+          onError: [
+            {
+              statusCode: 400,
+              run: {
+                kind: show-validation-errors,
+                formId: testForm
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

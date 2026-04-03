@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.Components
@@ -38,21 +36,24 @@ namespace Alis.Reactive.Fusion.Components
         public static MultiSelectBuilder Reactive<TModel, TArgs>(
             this MultiSelectBuilder builder,
             ReactivePlan<TModel> plan,
-            Func<FusionMultiSelectEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionMultiSelectEvents, ReactiveEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(FusionMultiSelectEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
-            pipeline(descriptor.Args, pb);
+            var reactiveEvent = eventSelector(FusionMultiSelectEvents.Instance);
 
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
             var componentId = (string)attrs["id"];
             var bindingPath = (string)attrs["name"];
-
-            var trigger = new ComponentEventTrigger(componentId, descriptor.JsEvent, Component.Vendor, bindingPath, Component.ReadExpr);
-            foreach (var reaction in pb.BuildReactions())
-                plan.AddEntry(new Entry(trigger, reaction));
+            var scope = plan.Authoring.CreateObjectEventScope(
+                componentId,
+                Component.Vendor,
+                bindingPath,
+                Component.ValueMemberPath,
+                reactiveEvent.EventName);
+            var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
+            pipeline(reactiveEvent.Payload, pb);
+            plan.AddWorkflow(scope, pb);
 
             return builder;
         }

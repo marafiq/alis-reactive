@@ -1,24 +1,48 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.Native.UnitTests.NativeTestModel,
-  entries: [
+  contracts: {
+    native.component.mobilityRadios: {
+      kind: component,
+      resolver: native-element,
+      members: {
+        value: {
+          kind: property,
+          path: [
+            {
+              prop: value
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    component::mobilityRadios: {
+      contract: native.component.mobilityRadios,
+      elementId: mobilityRadios
+    }
+  },
+  workflows: [
     {
-      trigger: {
+      when: {
         kind: dom-ready
       },
-      reaction: {
-        kind: sequential,
-        commands: [
-          {
-            kind: mutate-element,
-            target: mobilityRadios,
-            mutation: {
-              kind: set-prop,
-              prop: value
-            },
-            value: Bedridden,
-            vendor: native
-          }
-        ]
+      run: {
+        kind: set,
+        target: {
+          object: component::mobilityRadios,
+          member: value
+        },
+        value: {
+          kind: literal,
+          value: Bedridden
+        }
       }
     }
   ]

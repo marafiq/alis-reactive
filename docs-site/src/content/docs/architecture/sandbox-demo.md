@@ -128,7 +128,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers
 
 ### Header and plan setup
 
-```cshtml
+```html
 @model XxxModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
@@ -213,7 +213,7 @@ Include one section per capability the component supports:
 
 DomReady and custom event handlers go in the `@{ }` block at the top:
 
-```cshtml
+```html
 @{
     // DomReady — property write + read
     Html.On(plan, t => t.DomReady(p =>

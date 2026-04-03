@@ -1,12 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Event args for the SF Tab "selected" event.
-    /// Fires when a tab is selected.
-    ///
-    /// Properties are primitives — safe for echo and conditions.
-    /// SF args also contain selectedItem/previousItem (DOM objects) — intentionally omitted
-    /// as they would serialize as [object Object].
+    /// Payload for the Fusion Tab <c>selected</c> event.
     /// </summary>
     public class FusionTabSelectedArgs
     {
@@ -19,6 +14,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether the selection was triggered by a swipe gesture.</summary>
         public bool IsSwiped { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FusionTabSelectedArgs"/> class.
+        /// </summary>
         public FusionTabSelectedArgs() { }
     }
 }

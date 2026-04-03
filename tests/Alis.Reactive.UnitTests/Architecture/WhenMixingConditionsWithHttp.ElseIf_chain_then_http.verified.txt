@@ -1,108 +1,172 @@
 ﻿{
+  version: 2,
   planId: Alis.Reactive.UnitTests.TestModel,
-  entries: [
+  contracts: {
+    element.role: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    },
+    element.log-status: {
+      kind: element,
+      resolver: native-element,
+      members: {
+        text: {
+          kind: property,
+          path: [
+            {
+              prop: textContent
+            }
+          ],
+          shape: {
+            kind: scalar,
+            type: string
+          },
+          access: write
+        }
+      }
+    }
+  },
+  objects: {
+    element::role: {
+      contract: element.role,
+      elementId: role
+    },
+    element::log-status: {
+      contract: element.log-status,
+      elementId: log-status
+    }
+  },
+  workflows: [
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: conditional,
-        branches: [
+      run: {
+        kind: branch,
+        cases: [
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.value
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: value
+                  }
+                ]
               },
-              coerceAs: string,
               op: eq,
-              operand: admin
+              right: {
+                kind: literal,
+                value: admin
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: role,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Administrator
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::role,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Administrator
+              }
             }
           },
           {
-            guard: {
-              kind: value,
-              source: {
-                kind: event,
-                path: evt.value
+            when: {
+              kind: compare,
+              left: {
+                kind: context,
+                scope: event,
+                path: [
+                  {
+                    prop: value
+                  }
+                ]
               },
-              coerceAs: string,
               op: eq,
-              operand: user
+              right: {
+                kind: literal,
+                value: user
+              },
+              as: {
+                kind: scalar,
+                type: string
+              }
             },
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: role,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Standard User
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::role,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Standard User
+              }
             }
           },
           {
-            reaction: {
-              kind: sequential,
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: role,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
-                  value: Guest
-                }
-              ]
+            run: {
+              kind: set,
+              target: {
+                object: element::role,
+                member: text
+              },
+              value: {
+                kind: literal,
+                value: Guest
+              }
             }
           }
         ]
       }
     },
     {
-      trigger: {
-        kind: custom-event,
-        event: test
+      when: {
+        kind: document-event,
+        name: test
       },
-      reaction: {
-        kind: http,
+      run: {
+        kind: request,
         request: {
-          verb: POST,
+          method: POST,
           url: /api/log,
           onSuccess: [
             {
-              commands: [
-                {
-                  kind: mutate-element,
-                  target: log-status,
-                  mutation: {
-                    kind: set-prop,
-                    prop: textContent
-                  },
+              run: {
+                kind: set,
+                target: {
+                  object: element::log-status,
+                  member: text
+                },
+                value: {
+                  kind: literal,
                   value: logged
                 }
-              ]
+              }
             }
           ]
         }

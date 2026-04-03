@@ -146,7 +146,7 @@ public class FusionFileUploadSelectedArgs
 
 3. **`FusionFileUploadEvents.cs`** — singleton, `Selected` → `"selected"`
 
-4. **`FusionFileUploadExtensions.cs`** — `Value()` → `TypedComponentSource<string>` (reads as string for conditions — file input .files is not useful in conditions, but the pattern requires it)
+4. **`FusionFileUploadExtensions.cs`** — `Value()` → `ComponentValueExpression<string>` (reads as string for conditions — file input .files is not useful in conditions, but the pattern requires it)
 
 5. **`FusionFileUploadHtmlExtensions.cs`** — factory. SF Uploader has no `UploaderFor()`, so use direct `EJS().Uploader(id)`:
 
@@ -175,7 +175,7 @@ public static void FileUpload<TModel, TProp>(
 Under `tests/Alis.Reactive.Fusion.UnitTests/Components/FusionFileUpload/`:
 
 1. `WhenDescribingFusionFileUploadEvents.cs` — singleton, jsEvent = "selected", args type
-2. `WhenMutatingAFusionFileUpload.cs` — Value source type (TypedComponentSource<string>), readExpr = "element.files"
+2. `WhenMutatingAFusionFileUpload.cs` — Value source type (ComponentValueExpression<string>), readExpr = "element.files"
 
 ### Task 4: FusionFileUpload sandbox page
 
