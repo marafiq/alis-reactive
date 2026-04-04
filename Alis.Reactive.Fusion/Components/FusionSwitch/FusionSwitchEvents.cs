@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -9,6 +11,16 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionSwitchEvents
     {
+        private static readonly CapabilityProperty CheckedEventMember = CapabilityProperty.Named("checked");
+        private static readonly CapabilityProperty IsInteractedEventMember = CapabilityProperty.Named("isInteracted");
+
+        private static readonly EventContractAuthoring ChangedContract =
+            EventPayloadContractAuthoring.Define<FusionSwitchChangeArgs>(payload =>
+            {
+                payload.Read(args => args.Checked, CheckedEventMember);
+                payload.Read(args => args.IsInteracted, IsInteractedEventMember);
+            });
+
         /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionSwitchEvents Instance = new FusionSwitchEvents();
         private FusionSwitchEvents() { }
@@ -16,6 +28,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Fires when the switch state changes (SF "change" event).</summary>
         public ReactiveEvent<FusionSwitchChangeArgs> Changed =>
             new ReactiveEvent<FusionSwitchChangeArgs>(
-                "change", new FusionSwitchChangeArgs());
+                "change", ChangedContract);
     }
 }

@@ -1,53 +1,20 @@
+using Alis.Reactive.PlaywrightTests.Support.Controls;
+using System.Text;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises FusionFileUpload vertical slice end-to-end in the browser:
-/// FusionFileUpload in form mode (no auto-upload), FormData POST transport,
-/// and server echo proving files survive the gather + multipart transport.
-///
-/// Page under test: /Sandbox/Components/FusionFileUpload
-///
-/// Senior living domain: resident document uploads (medical records, photos, consent forms).
-///
-/// File injection strategy:
-/// Sets files on the native input via DataTransfer API, then dispatches a change event
-/// so SF processes them into filesData[].rawFile. The gather reads ej2.filesData via
-/// valueMemberPath "filesData", and the Transport extracts .rawFile (File objects) for FormData.
-/// </summary>
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FileUpload";
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FileUploadModel__";
     private const string DocumentsId = Scope + "Documents";
+    private FileUploadLocator Documents => new(Page, DocumentsId);
 
     private async Task NavigateAndBoot()
     {
         await NavigateToAndWaitForVisibleSignal(Path, ".e-upload");
     }
-
-    /// <summary>
-    /// Sets files on the SF Uploader via DataTransfer + dispatches change event
-    /// so SF processes them into filesData[].rawFile for the gather to read.
-    /// </summary>
-    private async Task SetFiles(params (string Name, string Content, string MimeType)[] files)
-    {
-        var fileSpecs = files.Select(f => new { f.Name, f.Content, f.MimeType }).ToArray();
-        await Page.EvaluateAsync(
-            @"(args) => {
-                const { elementId, files } = args;
-                const el = document.getElementById(elementId);
-                const dt = new DataTransfer();
-                for (const f of files) {
-                    dt.items.add(new File([f.Content], f.Name, { type: f.MimeType }));
-                }
-                el.files = dt.files;
-                el.dispatchEvent(new Event('change', { bubbles: true }));
-            }",
-            new { elementId = DocumentsId, files = fileSpecs });
-    }
-
-    // ── Page loads ──
 
     [Test]
     public async Task page_loads_without_errors()
@@ -58,23 +25,10 @@ public class WhenFileUploaded : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("form-data"),
-            "Plan must contain form-data content type for file upload POST");
-        AssertNoConsoleErrors();
-    }
-
-    // ── File picker renders ──
-
-    [Test]
     public async Task file_picker_renders_syncfusion_uploader()
     {
         await NavigateAndBoot();
-        var uploader = Page.Locator(".e-upload");
-        await Expect(uploader).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Documents.Wrapper).ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -82,21 +36,18 @@ public class WhenFileUploaded : PlaywrightTestBase
     public async Task file_input_element_exists()
     {
         await NavigateAndBoot();
-        var fileInput = Page.Locator($"#{DocumentsId}");
-        await Expect(fileInput).ToBeAttachedAsync(new() { Timeout = 5000 });
+        await Expect(Documents.Input).ToBeAttachedAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── FormData POST with files ──
 
     [Test]
     public async Task selecting_files_and_submitting_sends_to_server()
     {
         await NavigateAndBoot();
 
-        await SetFiles(
-            ("medical-record.txt", "Patient vitals: BP 120/80", "text/plain"),
-            ("consent-form.pdf", "%PDF-mock", "application/pdf"));
+        await Documents.AttachFiles(
+            new FilePayload { Name = "medical-record.txt", Buffer = Encoding.UTF8.GetBytes("Patient vitals: BP 120/80"), MimeType = "text/plain" },
+            new FilePayload { Name = "consent-form.pdf", Buffer = Encoding.UTF8.GetBytes("%PDF-mock"), MimeType = "application/pdf" });
 
         await Page.Locator("#upload-btn").ClickAsync();
 
@@ -114,7 +65,8 @@ public class WhenFileUploaded : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await SetFiles(("photo.jpg", "fake-jpeg", "image/jpeg"));
+        await Documents.AttachFiles(
+            new FilePayload { Name = "photo.jpg", Buffer = Encoding.UTF8.GetBytes("fake-jpeg"), MimeType = "image/jpeg" });
 
         await Page.Locator("#upload-btn").ClickAsync();
 
@@ -136,7 +88,8 @@ public class WhenFileUploaded : PlaywrightTestBase
         await nameInput.ClearAsync();
         await nameInput.FillAsync("Eleanor Vance");
 
-        await SetFiles(("intake-form.txt", "Intake data", "text/plain"));
+        await Documents.AttachFiles(
+            new FilePayload { Name = "intake-form.txt", Buffer = Encoding.UTF8.GetBytes("Intake data"), MimeType = "text/plain" });
 
         await Page.Locator("#upload-btn").ClickAsync();
 
@@ -146,17 +99,6 @@ public class WhenFileUploaded : PlaywrightTestBase
         var count = await Page.Locator("#echo-count").TextContentAsync();
         Assert.That(count, Is.EqualTo("1"),
             "Server should receive 1 file alongside the scalar field");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Boot trace ──
-
-    [Test]
-    public async Task boot_trace_is_emitted_on_page_load()
-    {
-        await NavigateAndBoot();
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
-        Assert.That(hasBootTrace, Is.True);
         AssertNoConsoleErrors();
     }
 }

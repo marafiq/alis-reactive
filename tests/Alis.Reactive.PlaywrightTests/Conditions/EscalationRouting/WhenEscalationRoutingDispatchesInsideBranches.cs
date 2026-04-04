@@ -1,5 +1,4 @@
-using Alis.Reactive.Playwright.Extensions;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.EscalationRouting;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.EscalationRouting;
 
@@ -7,69 +6,52 @@ namespace Alis.Reactive.PlaywrightTests.Conditions.EscalationRouting;
 public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Conditions/EscalationRouting";
-
-    private PagePlan<EscalationRoutingModel> _plan = null!;
+    private EscalationRoutingPage _page = null!;
 
     private ILocator IsolationReviewButton => Page.Locator("#btn-escalation-isolation");
     private ILocator OverrideReviewButton => Page.Locator("#btn-escalation-override");
     private ILocator RoutineReviewButton => Page.Locator("#btn-escalation-routine");
 
-    private ILocator TriggerPrecheck => _plan.Element("trigger-precheck");
-    private ILocator TriggerAudit => _plan.Element("trigger-audit");
-    private ILocator TriggerResult => _plan.Element("trigger-result");
-    private ILocator TriggerBadge => _plan.Element("trigger-badge");
-    private ILocator TriggerSummary => _plan.Element("trigger-summary");
-
-    private ILocator ComponentPrecheck => _plan.Element("component-precheck");
-    private ILocator ComponentAudit => _plan.Element("component-audit");
-    private ILocator ComponentResult => _plan.Element("component-result");
-    private ILocator ComponentBadge => _plan.Element("component-badge");
-    private ILocator ComponentSummary => _plan.Element("component-summary");
-
-    private NumericTextBoxLocator AssessmentScore => _plan.NumericTextBox(m => m.AssessmentScore);
-    private SwitchLocator SupervisorOverride => _plan.Switch(m => m.SupervisorOverride);
-    private DropDownListLocator CareTrack => _plan.DropDownList(m => m.CareTrack);
-
     private async Task NavigateAndBoot()
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#btn-escalation-isolation");
-        _plan = await PagePlan<EscalationRoutingModel>.FromPage(Page);
+        _page = new EscalationRoutingPage(Page);
     }
 
     private async Task AssertTriggerRouteAsync(string expectedAudit, string expectedResult, string? expectedBadge)
     {
-        await Expect(TriggerPrecheck).ToHaveTextAsync("Escalation reviewed");
-        await Expect(TriggerAudit).ToHaveTextAsync(expectedAudit);
-        await Expect(TriggerResult).ToHaveTextAsync(expectedResult);
+        await Expect(_page.TriggerPrecheck).ToHaveTextAsync("Escalation reviewed");
+        await Expect(_page.TriggerAudit).ToHaveTextAsync(expectedAudit);
+        await Expect(_page.TriggerResult).ToHaveTextAsync(expectedResult);
         if (expectedBadge is null)
         {
-            await Expect(TriggerBadge).ToBeHiddenAsync();
+            await Expect(_page.TriggerBadge).ToBeHiddenAsync();
         }
         else
         {
-            await Expect(TriggerBadge).ToBeVisibleAsync();
-            await Expect(TriggerBadge).ToHaveTextAsync(expectedBadge);
+            await Expect(_page.TriggerBadge).ToBeVisibleAsync();
+            await Expect(_page.TriggerBadge).ToHaveTextAsync(expectedBadge);
         }
 
-        await Expect(TriggerSummary).ToHaveTextAsync("Escalation complete");
+        await Expect(_page.TriggerSummary).ToHaveTextAsync("Escalation complete");
     }
 
     private async Task AssertComponentRouteAsync(string expectedAudit, string expectedResult, string? expectedBadge)
     {
-        await Expect(ComponentPrecheck).ToHaveTextAsync("Escalation evaluated", new() { Timeout = 5000 });
-        await Expect(ComponentAudit).ToHaveTextAsync(expectedAudit, new() { Timeout = 5000 });
-        await Expect(ComponentResult).ToHaveTextAsync(expectedResult, new() { Timeout = 5000 });
+        await Expect(_page.ComponentPrecheck).ToHaveTextAsync("Escalation evaluated", new() { Timeout = 5000 });
+        await Expect(_page.ComponentAudit).ToHaveTextAsync(expectedAudit, new() { Timeout = 5000 });
+        await Expect(_page.ComponentResult).ToHaveTextAsync(expectedResult, new() { Timeout = 5000 });
         if (expectedBadge is null)
         {
-            await Expect(ComponentBadge).ToBeHiddenAsync();
+            await Expect(_page.ComponentBadge).ToBeHiddenAsync();
         }
         else
         {
-            await Expect(ComponentBadge).ToBeVisibleAsync();
-            await Expect(ComponentBadge).ToHaveTextAsync(expectedBadge);
+            await Expect(_page.ComponentBadge).ToBeVisibleAsync();
+            await Expect(_page.ComponentBadge).ToHaveTextAsync(expectedBadge);
         }
 
-        await Expect(ComponentSummary).ToHaveTextAsync("Escalation decision complete");
+        await Expect(_page.ComponentSummary).ToHaveTextAsync("Escalation decision complete");
     }
 
     [Test]
@@ -112,10 +94,10 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await AssessmentScore.FillAndBlur("95");
+        await _page.AssessmentScore.FillAndBlur("95");
         await AssertComponentRouteAsync("Monitor route dispatched", "Monitor closely", "Monitor");
 
-        await SupervisorOverride.Toggle();
+        await _page.SupervisorOverride.Toggle();
 
         await AssertComponentRouteAsync("Isolation route dispatched", "Escalate now", "Escalate");
         AssertNoConsoleErrors();
@@ -126,10 +108,10 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await AssessmentScore.FillAndBlur("95");
+        await _page.AssessmentScore.FillAndBlur("95");
         await AssertComponentRouteAsync("Monitor route dispatched", "Monitor closely", "Monitor");
 
-        await CareTrack.Select("Memory Care");
+        await _page.CareTrack.Select("Memory Care");
 
         await AssertComponentRouteAsync("Isolation route dispatched", "Escalate now", "Escalate");
         AssertNoConsoleErrors();
@@ -140,12 +122,39 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await AssessmentScore.FillAndBlur("70");
+        await _page.AssessmentScore.FillAndBlur("70");
         await AssertComponentRouteAsync("Monitor route dispatched", "Monitor closely", "Monitor");
 
-        await AssessmentScore.FillAndBlur("40");
+        await _page.AssessmentScore.FillAndBlur("40");
 
         await AssertComponentRouteAsync("Routine route dispatched", "Routine follow-up", null);
         AssertNoConsoleErrors();
+    }
+
+    private sealed class EscalationRoutingPage
+    {
+        private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Conditions_EscalationRouting_EscalationRoutingModel__";
+        private readonly IPage _page;
+
+        public EscalationRoutingPage(IPage page)
+        {
+            _page = page;
+        }
+
+        public ILocator TriggerPrecheck => _page.Locator("#trigger-precheck");
+        public ILocator TriggerAudit => _page.Locator("#trigger-audit");
+        public ILocator TriggerResult => _page.Locator("#trigger-result");
+        public ILocator TriggerBadge => _page.Locator("#trigger-badge");
+        public ILocator TriggerSummary => _page.Locator("#trigger-summary");
+
+        public ILocator ComponentPrecheck => _page.Locator("#component-precheck");
+        public ILocator ComponentAudit => _page.Locator("#component-audit");
+        public ILocator ComponentResult => _page.Locator("#component-result");
+        public ILocator ComponentBadge => _page.Locator("#component-badge");
+        public ILocator ComponentSummary => _page.Locator("#component-summary");
+
+        public NumericTextBoxLocator AssessmentScore => new(_page, Scope + "AssessmentScore");
+        public SwitchLocator SupervisorOverride => new(_page, Scope + "SupervisorOverride");
+        public DropDownListLocator CareTrack => new(_page, Scope + "CareTrack");
     }
 }

@@ -1,5 +1,7 @@
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -16,8 +18,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionFileUploadExtensions
     {
-        private static readonly FusionFileUpload Component = new FusionFileUpload();
-
         /// <summary>Reads the current file data for use in conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
@@ -25,9 +25,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the uploader's current file data.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<FusionFileUpload, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<string>();
     }
 }

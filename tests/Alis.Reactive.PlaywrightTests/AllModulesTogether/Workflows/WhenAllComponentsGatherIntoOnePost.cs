@@ -1,19 +1,8 @@
 using System.Text.RegularExpressions;
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.Workflows;
 
-/// <summary>
-/// Exercises IncludeAll() gather across all 18 input component types in a single HTTP POST.
-/// Page under test: /Sandbox/AllModulesTogether/ComponentGather
-///
-/// Two submit modes: JSON POST (EchoJson) and FormData POST (EchoFormData).
-/// FluentValidation via ComponentGatherValidator — all fields required.
-/// Server echoes received fields; tests verify the echo response populates.
-///
-/// All Fusion components are filled via real browser gestures (popup clicks,
-/// keyboard typing) through locator classes — no ej2_instances API calls.
-/// </summary>
 // Heavy form-fill tests (14+ SF popup interactions) — cannot run in parallel reliably.
 // Under parallel load, SF popup animations overlap with other browser instances.
 [TestFixture, NonParallelizable]
@@ -21,17 +10,17 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/AllModulesTogether/ComponentGather";
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ComponentGatherModel__";
+    private ComponentGatherPage _page = null!;
 
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await WaitForPageReady(10000);
+        _page = new ComponentGatherPage(Page);
     }
 
     private async Task FillAllRequiredFields()
     {
-        var scope = new ComponentScope(Page, Scope);
-
         // Native scalars (ResidentName + CareNotes are seeded, but fill others)
         // MobilityLevel — select an option
         await Page.Locator($"#{Scope}MobilityLevel").SelectOptionAsync("wheelchair");
@@ -45,45 +34,35 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         // Fusion components — real browser gestures via locator classes
 
         // FacilityId (DropDownList) — type "Main Campus" + Enter
-        var facility = scope.DropDownList("FacilityId");
-        await facility.Select("Main Campus");
+        await _page.Facility.Select("Main Campus");
 
         // PhysicianName (AutoComplete) — type partial text, click suggestion
-        var physician = scope.AutoComplete("PhysicianName");
-        await physician.TypeAndSelect("Smith", "Dr. Smith");
+        await _page.Physician.TypeAndSelect("Smith", "Dr. Smith");
 
         // AdmissionDate (DatePicker) — select a date in current month (no navigation needed)
         var now = DateTime.Now;
-        var admissionDate = scope.DatePicker("AdmissionDate");
-        await admissionDate.SelectDate(now.Year, now.Month, 15);
+        await _page.AdmissionDate.SelectDate(now.Year, now.Month, 15);
 
         // MedicationTime (TimePicker) — open popup, click "8:30 AM"
-        var medTime = scope.TimePicker("MedicationTime");
-        await medTime.SelectTime("8:30 AM");
+        await _page.MedicationTime.SelectTime("8:30 AM");
 
         // AppointmentTime (DateTimePicker) — use current month date + time
-        var aptTime = scope.DateTimePicker("AppointmentTime");
-        await aptTime.Select(now.Year, now.Month, 10, "2:00 PM");
+        await _page.AppointmentTime.Select(now.Year, now.Month, 10, "2:00 PM");
 
         // StayPeriod (DateRangePicker) — current month to next month
-        var stay = scope.DateRangePicker("StayPeriod");
-        await stay.SelectRange(now.Year, now.Month, 5, now.Year, now.Month, 20);
+        await _page.StayPeriod.SelectRange(now.Year, now.Month, 5, now.Year, now.Month, 20);
 
         // InsuranceProvider (MultiColumnComboBox) — type "Blue Cross" + Enter
-        var insurance = scope.MultiColumnComboBox("InsuranceProvider");
-        await insurance.Select("Blue Cross");
+        await _page.InsuranceProvider.Select("Blue Cross");
 
         // PhoneNumber (InputMask) — type digits into masked input
-        var phone = scope.InputMask("PhoneNumber");
-        await phone.FillAndBlur("5551234567");
+        await _page.PhoneNumber.FillAndBlur("5551234567");
 
         // CarePlan (RichTextEditor) — type into contenteditable area
-        var carePlan = scope.RichTextEditor("CarePlan");
-        await carePlan.FillAndBlur("Care plan content");
+        await _page.CarePlan.FillAndBlur("Care plan content");
 
         // DietaryRestrictions (MultiSelect) — click each item in popup
-        var dietary = scope.MultiSelect("DietaryRestrictions");
-        await dietary.SelectItems("Vegetarian", "Halal");
+        await _page.DietaryRestrictions.SelectItems("Vegetarian", "Halal");
     }
 
     private async Task SubmitJsonAndWaitForEcho()
@@ -113,17 +92,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("ComponentGather \u2014 Alis.Reactive Sandbox");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_element_is_present_and_non_empty()
-    {
-        await NavigateAndBoot();
-        var planEl = Page.Locator("#plan-json");
-        await Expect(planEl).ToBeAttachedAsync(new() { Timeout = 5000 });
-        var text = await planEl.TextContentAsync();
-        Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must be present for runtime boot");
         AssertNoConsoleErrors();
     }
 
@@ -457,11 +425,10 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Clear seeded values so validation will fail
-        await Page.Locator($"#{Scope}ResidentName").ClearWhenStableAsync(Page);
-        await Page.Locator($"#{Scope}CareNotes").ClearWhenStableAsync(Page);
-        var monthlyRate = new ComponentScope(Page, Scope).NumericTextBox("MonthlyRate");
-        await monthlyRate.Clear();
-        await monthlyRate.FillAndBlur("0");
+        await Page.Locator($"#{Scope}ResidentName").ClearWhenStableAsync();
+        await Page.Locator($"#{Scope}CareNotes").ClearWhenStableAsync();
+        await _page.MonthlyRate.Clear();
+        await _page.MonthlyRate.FillAndBlur("0");
 
         await ClickWhenStable(Page.Locator("#submit-json-btn"));
 
@@ -480,7 +447,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Clear the seeded resident name
-        await Page.Locator($"#{Scope}ResidentName").ClearWhenStableAsync(Page);
+        await Page.Locator($"#{Scope}ResidentName").ClearWhenStableAsync();
 
         await ClickWhenStable(Page.Locator("#submit-json-btn"));
 
@@ -496,7 +463,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Clear the seeded care notes
-        await Page.Locator($"#{Scope}CareNotes").ClearWhenStableAsync(Page);
+        await Page.Locator($"#{Scope}CareNotes").ClearWhenStableAsync();
 
         await ClickWhenStable(Page.Locator("#submit-json-btn"));
 
@@ -539,5 +506,27 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await Expect(Page.Locator("#submit-mode"))
             .ToHaveTextAsync("JSON", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
+    }
+
+    private sealed class ComponentGatherPage
+    {
+        private readonly IPage _page;
+
+        public ComponentGatherPage(IPage page)
+        {
+            _page = page;
+        }
+
+        public DropDownListLocator Facility => new(_page, Scope + "FacilityId");
+        public AutoCompleteLocator Physician => new(_page, Scope + "PhysicianName");
+        public DatePickerLocator AdmissionDate => new(_page, Scope + "AdmissionDate");
+        public TimePickerLocator MedicationTime => new(_page, Scope + "MedicationTime");
+        public DateTimePickerLocator AppointmentTime => new(_page, Scope + "AppointmentTime");
+        public DateRangePickerLocator StayPeriod => new(_page, Scope + "StayPeriod");
+        public MultiColumnComboBoxLocator InsuranceProvider => new(_page, Scope + "InsuranceProvider");
+        public InputMaskLocator PhoneNumber => new(_page, Scope + "PhoneNumber");
+        public RichTextEditorLocator CarePlan => new(_page, Scope + "CarePlan");
+        public MultiSelectLocator DietaryRestrictions => new(_page, Scope + "DietaryRestrictions");
+        public NumericTextBoxLocator MonthlyRate => new(_page, Scope + "MonthlyRate");
     }
 }

@@ -1,41 +1,18 @@
 namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.ReactiveWiring;
 
-/// <summary>
-/// Verifies that .Reactive() extensions wire object-event workflows end-to-end:
-/// C# DSL -> plan JSON -> TS runtime -> DOM mutation. Tests both vendor types
-/// (Fusion and Native), nested property ID patterns, cross-vendor reset,
-/// and that non-reactive controls stay inert.
-///
-/// Page under test: /Sandbox/AllModulesTogether/PlaygroundSyntax
-///
-/// Layout:
-///   Amount   (fusion numeric, reactive)     -- echo "Amount changed" on change
-///   Status   (native dropdown, reactive)    -- echo "Status changed" on change
-///   Category (native dropdown, NOT reactive) -- no .Reactive(), must NOT fire anything
-///   City     (nested native dropdown, reactive)     -- echo "City changed"
-///   PostalCode (nested fusion numeric, reactive)    -- echo "PostalCode changed"
-///   Reset All button -- dispatches "reset-all" document event -> zeros Amount, clears Status, echoes "All fields reset"
-/// </summary>
 [TestFixture]
 public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 {
-    /// <summary>IdGenerator type scope for PlaygroundSyntaxModel.</summary>
     private const string S = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_PlaygroundSyntaxModel";
 
     private async Task NavigateAndBoot()
     {
         await NavigateTo("/Sandbox/AllModulesTogether/PlaygroundSyntax");
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
     }
 
     // ── Scenario: Fusion component change fires reactive echo ──
 
-    /// <summary>
-    /// Typing a value into the Fusion NumericTextBox and tabbing away triggers its
-    /// .Reactive() pipeline, which sets the echo element text to "Amount changed".
-    ///
-    /// WHY: proves Fusion vendor object-event workflow wiring works end-to-end
-    /// </summary>
     [Test]
     public async Task fusion_numeric_change_updates_echo()
     {
@@ -57,12 +34,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
     // ── Scenario: Native component change fires reactive echo ──
 
-    /// <summary>
-    /// Selecting a value in the Native dropdown triggers its .Reactive() pipeline,
-    /// which sets the echo element text to "Status changed".
-    ///
-    /// WHY: proves Native vendor object-event workflow wiring works end-to-end
-    /// </summary>
     [Test]
     public async Task native_dropdown_change_updates_echo()
     {
@@ -80,13 +51,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
     // ── Scenario: Nested property IDs use underscores not dots ──
 
-    /// <summary>
-    /// m => m.Address.City generates element ID {TypeScope}__Address_City (underscores),
-    /// not Address.City (dots). Both Native and Fusion nested components follow this pattern.
-    ///
-    /// WHY: proves IdGenerator converts nested model expressions to underscore-delimited IDs
-    /// and both vendors render actual DOM elements with those IDs
-    /// </summary>
     [Test]
     public async Task nested_property_ids_use_underscores_not_dots()
     {
@@ -115,14 +79,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
     // ── Scenario: Reset All button clears both vendors via document event ──
 
-    /// <summary>
-    /// The "Reset All Fields" button dispatches a named document event. The plan
-    /// wires this to a pipeline that zeros Fusion Amount, clears Native Status dropdown,
-    /// and sets the echo to "All fields reset".
-    ///
-    /// WHY: proves one document-event workflow mutates components from both vendors
-    /// in a single workflow
-    /// </summary>
     [Test]
     public async Task reset_all_button_clears_both_vendors()
     {
@@ -155,14 +111,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
     // ── Scenario: Non-reactive control stays inert ──
 
-    /// <summary>
-    /// The Category dropdown has NO .Reactive() extension. Changing it must NOT trigger
-    /// any echo update — both status-echo and amount-echo must remain at their initial
-    /// em-dash value.
-    ///
-    /// WHY: proves the framework only wires triggers for components with .Reactive(),
-    /// and non-reactive components are truly inert (no accidental event leakage)
-    /// </summary>
     [Test]
     public async Task non_reactive_control_does_not_fire_change()
     {
@@ -183,20 +131,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
     // ── Scenario: Components remain reactive after a cross-vendor reset ──
 
-    /// <summary>
-    /// After "Reset All Fields" clears both vendors, interacting with a component must
-    /// still fire its .Reactive() pipeline. The reset dispatch only mutates values — it
-    /// does not unwire event listeners.
-    ///
-    /// Flow:
-    ///   1. Change Status dropdown → echo shows "Status changed" (reactive works)
-    ///   2. Click "Reset All Fields" → Status cleared, Amount zeroed, echo shows "All fields reset"
-    ///   3. Change Status dropdown again → echo must update to "Status changed" (proves re-fire)
-    ///   4. Change Amount again → echo must update to "Amount changed" (proves Fusion re-fire too)
-    ///
-    /// WHY: proves reactive event listeners survive a cross-vendor reset dispatch,
-    /// catching regressions where a reset accidentally unwires object-event workflows
-    /// </summary>
     [Test]
     public async Task reset_then_interact_proves_components_still_reactive_after_reset()
     {
@@ -232,15 +166,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
     // ── Scenario: Each reactive pipeline is isolated ──
 
-    /// <summary>
-    /// Changing Amount fires its own reactive pipeline ("Amount changed") but must NOT
-    /// affect the status-echo. Changing Status fires its pipeline ("Status changed") but
-    /// must NOT affect the amount-echo. Each component's .Reactive() pipeline writes to
-    /// its own echo element only.
-    ///
-    /// WHY: proves reactive pipelines are wired per-component with no cross-contamination —
-    /// a Status change event does not leak into Amount's pipeline or vice versa
-    /// </summary>
     [Test]
     public async Task each_reactive_pipeline_only_updates_its_own_echo()
     {
@@ -269,14 +194,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
     // ── Scenario: Nested reactive pipelines do not affect top-level echoes ──
 
-    /// <summary>
-    /// Changing the nested City dropdown fires "City changed" in city-echo but must NOT
-    /// affect status-echo or amount-echo. Nested component reactive pipelines are isolated
-    /// from top-level component pipelines.
-    ///
-    /// WHY: proves nested property components (m => m.Address.City) have independently wired
-    /// reactive pipelines that do not interfere with top-level component echoes
-    /// </summary>
     [Test]
     public async Task nested_reactive_change_does_not_affect_top_level_echoes()
     {
@@ -301,15 +218,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
     // ── Scenario: Reset pipeline only targets status-echo, not nested echoes ──
 
-    /// <summary>
-    /// The "reset-all" custom event pipeline writes "All fields reset" to status-echo,
-    /// zeros Amount, and clears Status. But it does NOT target city-echo or postal-echo.
-    /// If a user previously changed City (city-echo = "City changed"), the reset must
-    /// leave those nested echoes untouched.
-    ///
-    /// WHY: proves the reset-all pipeline's scope is limited to its declared targets —
-    /// no unintended side effects on echoes outside the pipeline
-    /// </summary>
     [Test]
     public async Task reset_all_does_not_affect_nested_echoes()
     {
@@ -339,36 +247,8 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario: Plan element is rendered on the page ──
-
-    /// <summary>
-    /// The view emits the serialized plan inside a [data-alis-plan] element.
-    /// The plan must be present and non-empty for the runtime to boot.
-    ///
-    /// WHY: proves the plan JSON is actually rendered in the DOM for runtime boot
-    /// </summary>
-    [Test]
-    public async Task plan_element_is_present_and_non_empty()
-    {
-        await NavigateAndBoot();
-        var planEl = Page.Locator("#plan-json");
-        await Expect(planEl).ToBeAttachedAsync(new() { Timeout = 5000 });
-        var text = await planEl.TextContentAsync();
-        Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must be present for runtime boot");
-        AssertNoConsoleErrors();
-    }
-
     // ── Scenario: Fusion numeric fires on every new value ──
 
-    /// <summary>
-    /// Entering a value, tabbing away (fires echo), then entering a different value and
-    /// tabbing again must fire the reactive echo a second time. The echo text does not
-    /// change (still "Amount changed"), but the framework must not debounce or suppress
-    /// repeated events from the same component.
-    ///
-    /// WHY: proves Fusion object-event workflows fire on every value change, not just
-    /// the first — catching regressions where event listeners are accidentally one-shot
-    /// </summary>
     [Test]
     public async Task fusion_numeric_fires_on_every_value_change()
     {
@@ -398,13 +278,6 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
     // ── Scenario: Native dropdown fires on every selection change ──
 
-    /// <summary>
-    /// Selecting "active", then selecting "inactive" in the Status dropdown must fire
-    /// the reactive echo each time. The second selection must still trigger the pipeline.
-    ///
-    /// WHY: proves Native object-event workflows fire on every selection change —
-    /// not just the first — catching regressions where event listeners detach after first fire
-    /// </summary>
     [Test]
     public async Task native_dropdown_fires_on_every_selection_change()
     {

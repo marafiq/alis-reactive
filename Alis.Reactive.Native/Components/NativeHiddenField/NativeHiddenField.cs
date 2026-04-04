@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -5,9 +7,10 @@ namespace Alis.Reactive.Native.Components
     /// Phantom type — constrains which vertical slice extensions are available.
     /// Participates in RegisteredComponents for gather (IncludeAll picks it up).
     /// </summary>
-    public sealed class NativeHiddenField : NativeComponent, IInputComponent
+    public sealed class NativeHiddenField : NativeComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("hiddenfield", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

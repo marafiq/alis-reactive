@@ -21,7 +21,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionTimePickerReactiveExtensions
     {
-        private static readonly FusionTimePicker Component = new FusionTimePicker();
 
         /// <summary>
         /// Wires a FusionTimePicker event to a reactive pipeline that executes in the browser.
@@ -44,15 +43,13 @@ namespace Alis.Reactive.Fusion.Components
 
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
             var componentId = (string)attrs["id"];
-            var bindingPath = (string)attrs["name"];
             var scope = plan.Authoring.CreateObjectEventScope(
                 componentId,
-                Component.Vendor,
-                bindingPath,
-                Component.ValueMemberPath,
-                reactiveEvent.EventName);
+                FusionTimePicker.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             plan.AddWorkflow(scope, pb);
 
             return builder;

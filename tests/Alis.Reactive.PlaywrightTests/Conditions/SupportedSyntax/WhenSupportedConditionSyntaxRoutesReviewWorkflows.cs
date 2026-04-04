@@ -1,5 +1,4 @@
-using Alis.Reactive.Playwright.Extensions;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.SupportedSyntax;
 
@@ -7,67 +6,52 @@ namespace Alis.Reactive.PlaywrightTests.Conditions.SupportedSyntax;
 public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Conditions/SupportedSyntax";
-
-    private PagePlan<SupportedSyntaxModel> _plan = null!;
+    private SupportedSyntaxPage _page = null!;
 
     private ILocator PriorityReviewButton => Page.Locator("#btn-trigger-priority");
     private ILocator StandardReviewButton => Page.Locator("#btn-trigger-standard");
     private ILocator DeferredReviewButton => Page.Locator("#btn-trigger-deferred");
 
-    private ILocator TriggerPrecheck => _plan.Element("trigger-precheck");
-    private ILocator TriggerAudit => _plan.Element("trigger-audit");
-    private ILocator TriggerResult => _plan.Element("trigger-result");
-    private ILocator TriggerBadge => _plan.Element("trigger-badge");
-    private ILocator TriggerSummary => _plan.Element("trigger-summary");
-
-    private ILocator ReactivePrecheck => _plan.Element("reactive-precheck");
-    private ILocator ReactiveAudit => _plan.Element("reactive-audit");
-    private ILocator ReactiveResult => _plan.Element("reactive-result");
-    private ILocator ReactiveBadge => _plan.Element("reactive-badge");
-    private ILocator ReactiveSummary => _plan.Element("reactive-summary");
-
-    private NumericTextBoxLocator RiskScore => _plan.NumericTextBox(m => m.RiskScore);
-
     private async Task NavigateAndBoot()
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#btn-trigger-priority");
-        _plan = await PagePlan<SupportedSyntaxModel>.FromPage(Page);
+        _page = new SupportedSyntaxPage(Page);
     }
 
     private async Task AssertTriggerPathAsync(string expectedResult, string? expectedBadge)
     {
-        await Expect(TriggerPrecheck).ToHaveTextAsync("Review started");
-        await Expect(TriggerAudit).ToHaveTextAsync("Audit logged");
-        await Expect(TriggerResult).ToHaveTextAsync(expectedResult);
+        await Expect(_page.TriggerPrecheck).ToHaveTextAsync("Review started");
+        await Expect(_page.TriggerAudit).ToHaveTextAsync("Audit logged");
+        await Expect(_page.TriggerResult).ToHaveTextAsync(expectedResult);
         if (expectedBadge is null)
         {
-            await Expect(TriggerBadge).ToBeHiddenAsync();
+            await Expect(_page.TriggerBadge).ToBeHiddenAsync();
         }
         else
         {
-            await Expect(TriggerBadge).ToBeVisibleAsync();
-            await Expect(TriggerBadge).ToHaveTextAsync(expectedBadge);
+            await Expect(_page.TriggerBadge).ToBeVisibleAsync();
+            await Expect(_page.TriggerBadge).ToHaveTextAsync(expectedBadge);
         }
 
-        await Expect(TriggerSummary).ToHaveTextAsync("Workflow complete");
+        await Expect(_page.TriggerSummary).ToHaveTextAsync("Workflow complete");
     }
 
     private async Task AssertReactivePathAsync(string expectedResult, string? expectedBadge)
     {
-        await Expect(ReactivePrecheck).ToHaveTextAsync("Risk evaluated", new() { Timeout = 5000 });
-        await Expect(ReactiveAudit).ToHaveTextAsync("Audit logged", new() { Timeout = 5000 });
-        await Expect(ReactiveResult).ToHaveTextAsync(expectedResult, new() { Timeout = 5000 });
+        await Expect(_page.ReactivePrecheck).ToHaveTextAsync("Risk evaluated", new() { Timeout = 5000 });
+        await Expect(_page.ReactiveAudit).ToHaveTextAsync("Audit logged", new() { Timeout = 5000 });
+        await Expect(_page.ReactiveResult).ToHaveTextAsync(expectedResult, new() { Timeout = 5000 });
         if (expectedBadge is null)
         {
-            await Expect(ReactiveBadge).ToBeHiddenAsync();
+            await Expect(_page.ReactiveBadge).ToBeHiddenAsync();
         }
         else
         {
-            await Expect(ReactiveBadge).ToBeVisibleAsync();
-            await Expect(ReactiveBadge).ToHaveTextAsync(expectedBadge);
+            await Expect(_page.ReactiveBadge).ToBeVisibleAsync();
+            await Expect(_page.ReactiveBadge).ToHaveTextAsync(expectedBadge);
         }
 
-        await Expect(ReactiveSummary).ToHaveTextAsync("Assessment complete");
+        await Expect(_page.ReactiveSummary).ToHaveTextAsync("Assessment complete");
     }
 
     [Test]
@@ -121,7 +105,7 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
     {
         await NavigateAndBoot();
 
-        await RiskScore.FillAndBlur("95");
+        await _page.RiskScore.FillAndBlur("95");
 
         await AssertReactivePathAsync("Urgent follow-up", "Urgent");
         AssertNoConsoleErrors();
@@ -132,7 +116,7 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
     {
         await NavigateAndBoot();
 
-        await RiskScore.FillAndBlur("75");
+        await _page.RiskScore.FillAndBlur("75");
 
         await AssertReactivePathAsync("Standard follow-up", "Standard");
         AssertNoConsoleErrors();
@@ -143,7 +127,7 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
     {
         await NavigateAndBoot();
 
-        await RiskScore.FillAndBlur("40");
+        await _page.RiskScore.FillAndBlur("40");
 
         await AssertReactivePathAsync("Routine follow-up", null);
         AssertNoConsoleErrors();
@@ -154,14 +138,39 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
     {
         await NavigateAndBoot();
 
-        await RiskScore.FillAndBlur("95");
+        await _page.RiskScore.FillAndBlur("95");
         await AssertReactivePathAsync("Urgent follow-up", "Urgent");
 
-        await RiskScore.FillAndBlur("40");
+        await _page.RiskScore.FillAndBlur("40");
         await AssertReactivePathAsync("Routine follow-up", null);
 
-        await RiskScore.FillAndBlur("95");
+        await _page.RiskScore.FillAndBlur("95");
         await AssertReactivePathAsync("Urgent follow-up", "Urgent");
         AssertNoConsoleErrors();
+    }
+
+    private sealed class SupportedSyntaxPage
+    {
+        private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Conditions_SupportedSyntax_SupportedSyntaxModel__";
+        private readonly IPage _page;
+
+        public SupportedSyntaxPage(IPage page)
+        {
+            _page = page;
+        }
+
+        public ILocator TriggerPrecheck => _page.Locator("#trigger-precheck");
+        public ILocator TriggerAudit => _page.Locator("#trigger-audit");
+        public ILocator TriggerResult => _page.Locator("#trigger-result");
+        public ILocator TriggerBadge => _page.Locator("#trigger-badge");
+        public ILocator TriggerSummary => _page.Locator("#trigger-summary");
+
+        public ILocator ReactivePrecheck => _page.Locator("#reactive-precheck");
+        public ILocator ReactiveAudit => _page.Locator("#reactive-audit");
+        public ILocator ReactiveResult => _page.Locator("#reactive-result");
+        public ILocator ReactiveBadge => _page.Locator("#reactive-badge");
+        public ILocator ReactiveSummary => _page.Locator("#reactive-summary");
+
+        public NumericTextBoxLocator RiskScore => new(_page, Scope + "RiskScore");
     }
 }

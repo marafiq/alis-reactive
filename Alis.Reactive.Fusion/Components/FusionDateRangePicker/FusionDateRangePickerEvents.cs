@@ -1,3 +1,6 @@
+using System;
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -9,6 +12,20 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionDateRangePickerEvents
     {
+        private static readonly CapabilityProperty StartDateEventMember = CapabilityProperty.Named("startDate");
+        private static readonly CapabilityProperty EndDateEventMember = CapabilityProperty.Named("endDate");
+        private static readonly CapabilityProperty DaySpanEventMember = CapabilityProperty.Named("daySpan");
+        private static readonly CapabilityProperty IsInteractedEventMember = CapabilityProperty.Named("isInteracted");
+
+        private static readonly EventContractAuthoring ChangedContract =
+            EventPayloadContractAuthoring.Define<FusionDateRangePickerChangeArgs>(payload =>
+            {
+                payload.Read(args => args.StartDate, StartDateEventMember);
+                payload.Read(args => args.EndDate, EndDateEventMember);
+                payload.Read(args => args.DaySpan, DaySpanEventMember);
+                payload.Read(args => args.IsInteracted, IsInteractedEventMember);
+            });
+
         /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionDateRangePickerEvents Instance = new FusionDateRangePickerEvents();
         private FusionDateRangePickerEvents() { }
@@ -16,6 +33,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Fires when the date range value changes (SF "change" event).</summary>
         public ReactiveEvent<FusionDateRangePickerChangeArgs> Changed =>
             new ReactiveEvent<FusionDateRangePickerChangeArgs>(
-                "change", new FusionDateRangePickerChangeArgs());
+                "change", ChangedContract);
     }
 }

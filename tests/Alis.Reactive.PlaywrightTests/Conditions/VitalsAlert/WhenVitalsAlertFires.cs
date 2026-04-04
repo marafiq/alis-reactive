@@ -1,21 +1,7 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.VitalsAlert;
 
-/// <summary>
-/// Exercises realistic condition → HTTP patterns with FusionNumericTextBox:
-///   Section 1: When(comp.Value()).Gt(140) → POST alert, Else → text only
-///   Section 2: ElseIf severity ladder → different POST per tier
-///   Section 3: Command sandwich — before + condition + after always execute
-///
-/// Page under test: /Sandbox/Conditions/VitalsAlert
-///
-/// This is the first test in the codebase where HTTP lives INSIDE a condition branch.
-/// All prior condition tests only flip element text/visibility. This slice proves
-/// condition branches can contain full HTTP pipelines with typed responses.
-///
-/// Senior living domain: nurse vital sign monitoring with automated alerts.
-/// </summary>
 [TestFixture]
 public class WhenVitalsAlertFires : PlaywrightTestBase
 {
@@ -29,7 +15,7 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await WaitForPageReady(10000);
     }
 
     // ── Section 1: Condition → HTTP in Then ──

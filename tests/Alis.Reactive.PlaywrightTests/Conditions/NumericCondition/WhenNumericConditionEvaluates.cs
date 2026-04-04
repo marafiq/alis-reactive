@@ -1,16 +1,7 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.NumericCondition;
 
-/// <summary>
-/// Exercises conditions with FusionNumericTextBox components end-to-end in the browser:
-/// simple Gt, ElseIf ladder, AND compound, and cross-component source-vs-source.
-///
-/// Page under test: /Sandbox/Conditions/NumericCondition
-///
-/// Senior living domain: vital sign thresholds (heart rate, blood pressure).
-/// Each section is an independent condition scenario — no shared state between sections.
-/// </summary>
 [TestFixture]
 public class WhenNumericConditionEvaluates : PlaywrightTestBase
 {
@@ -28,7 +19,7 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await WaitForPageReady(10000);
     }
 
     // ── Section 1: Simple condition — Gt(100) ──

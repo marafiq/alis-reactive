@@ -2,12 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 
-/// <summary>
-/// Live-clear behavior: after submit shows validation errors,
-/// typing into a field should clear the error. But if the user
-/// clears the field again, the error should re-appear on the next keystroke
-/// (re-evaluate, not just clear).
-/// </summary>
 [TestFixture]
 public class WhenErrorsClearOnCorrection : PlaywrightTestBase
 {
@@ -22,7 +16,7 @@ public class WhenErrorsClearOnCorrection : PlaywrightTestBase
     public async Task error_clears_when_user_types_valid_value()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         // Clear resident name and submit → error shows
         await Input("ResidentName").ClearAsync();
@@ -42,7 +36,7 @@ public class WhenErrorsClearOnCorrection : PlaywrightTestBase
     public async Task error_reappears_when_user_empties_previously_corrected_field()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         // Step 1: Clear name, submit → error shows
         await Input("ResidentName").ClearAsync();

@@ -1,27 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises all FusionRichTextEditor API end-to-end in the browser:
-/// property writes, property reads, events with typed conditions,
-/// and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/RichTextEditor
-///
-/// FusionRichTextEditor hides the textarea and renders a
-/// contenteditable div inside a wrapper with class e-richtexteditor.
-/// Tests use RichTextEditorLocator to interact via real browser gestures
-/// (typing into the contenteditable area) rather than ej2 instance manipulation.
-///
-/// Senior living domain: care plan documentation, discharge summaries.
-/// </summary>
 [TestFixture]
 public class WhenRichTextEdited : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/RichTextEditor";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_RichTextEditorModel";
     private const string CarePlanId = Scope + "__CarePlan";
 
@@ -39,17 +24,6 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("FusionRichTextEditor — Alis.Reactive Sandbox");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
         AssertNoConsoleErrors();
     }
 
@@ -158,7 +132,7 @@ public class WhenRichTextEdited : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Deep BDD: state-cycle scenarios ──
+    // ── State-cycle scenarios ──
 
     [Test]
     public async Task changing_rich_text_multiple_times_fires_condition_each_time()

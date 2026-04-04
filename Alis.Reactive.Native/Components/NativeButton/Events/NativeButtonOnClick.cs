@@ -6,6 +6,6 @@ namespace Alis.Reactive.Native.Components
     public class NativeButtonClickArgs
     {
         /// <summary>Creates an empty click payload marker.</summary>
-        public NativeButtonClickArgs() { }
+        internal NativeButtonClickArgs() { }
     }
 }

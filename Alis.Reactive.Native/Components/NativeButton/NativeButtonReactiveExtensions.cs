@@ -8,7 +8,6 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeButtonReactiveExtensions
     {
-        private static readonly NativeButton _component = new NativeButton();
 
         /// <summary>Attaches a reactive workflow to a native button event.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
@@ -28,12 +27,11 @@ namespace Alis.Reactive.Native.Components
             var reactiveEvent = eventSelector(NativeButtonEvents.Instance);
             var scope = plan.Authoring.CreateObjectEventScope(
                 builder.ElementId,
-                _component.Vendor,
-                null,
-                null,
-                reactiveEvent.EventName);
+                NativeButton.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             plan.AddWorkflow(scope, pb);
 
             return builder;

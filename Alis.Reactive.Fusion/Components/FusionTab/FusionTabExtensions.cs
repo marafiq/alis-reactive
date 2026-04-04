@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -14,6 +16,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionTabExtensions
     {
+        private static readonly CapabilityMethod SelectMethod = CapabilityMethod.Named("select");
+        private static readonly CapabilityMethod HideTabMethod = CapabilityMethod.Named("hideTab");
+        private static readonly CapabilityProperty SelectedItemProperty = CapabilityProperty.Named("selectedItem");
+
         /// <summary>
         /// Selects a tab by index: ej2.select(index).
         /// </summary>
@@ -22,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<FusionTab, TModel> Select<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class
-            => self.Call("select", index);
+            => self.Call(SelectMethod, index);
 
         /// <summary>
         /// Shows or hides a tab by index: ej2.hideTab(index, isHidden).
@@ -34,7 +40,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionTab, TModel> HideTab<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index, bool isHidden = true)
             where TModel : class
-            => self.Call("hideTab", index, isHidden);
+            => self.Call(HideTabMethod, index, isHidden);
 
         /// <summary>
         /// Sets the selected tab index via property: ej2.selectedItem = index.
@@ -44,6 +50,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<FusionTab, TModel> SetSelectedItem<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class
-            => self.Set("selectedItem", index, coerceAs: "number");
+            => self.Set(SelectedItemProperty, index);
     }
 }

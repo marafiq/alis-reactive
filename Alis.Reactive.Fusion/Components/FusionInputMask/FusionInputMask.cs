@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -7,9 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// Use as a type parameter in <c>p.Component&lt;FusionInputMask&gt;(m =&gt; m.PhoneNumber)</c>
     /// to access FusionInputMask-specific mutations and value reading.
     /// </remarks>
-    public sealed class FusionInputMask : FusionComponent, IInputComponent
+    public sealed class FusionInputMask : FusionComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("inputmask", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

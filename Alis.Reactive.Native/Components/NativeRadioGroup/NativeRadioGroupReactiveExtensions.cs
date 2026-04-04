@@ -23,7 +23,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeRadioGroupReactiveExtensions
     {
-        private static readonly NativeRadioGroup _component = new NativeRadioGroup();
 
         /// <summary>
         /// Wires a <see cref="NativeRadioGroup"/> browser event into a reactive pipeline.
@@ -50,12 +49,11 @@ namespace Alis.Reactive.Native.Components
                 var radioId = $"{builder.ElementId}_r{i}";
                 var scope = plan.Authoring.CreateObjectEventScope(
                     radioId,
-                    _component.Vendor,
-                    builder.BindingPath,
-                    _component.ValueMemberPath,
-                    reactiveEvent.EventName);
+                    NativeRadioGroup.Definition,
+                    reactiveEvent.EventName,
+                    reactiveEvent.ContractAuthoring);
                 var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-                pipeline(reactiveEvent.Payload, pb);
+                pipeline(default!, pb);
                 plan.AddWorkflow(scope, pb);
             }
 

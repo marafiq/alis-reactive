@@ -86,6 +86,7 @@ export type ValueExpr =
   | BindingValueExpr
   | MemberValueExpr
   | ContextValueExpr
+  | AccessValueExpr
   | ObjectValueExpr
   | ArrayValueExpr
   | ConvertValueExpr;
@@ -110,6 +111,12 @@ export interface ContextValueExpr {
   kind: "context";
   scope: "event" | "response" | "request" | "local";
   path?: PathSegment[];
+}
+
+export interface AccessValueExpr {
+  kind: "access";
+  value: ValueExpr;
+  path: PathSegment[];
 }
 
 export interface ObjectValueExpr {

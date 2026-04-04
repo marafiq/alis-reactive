@@ -24,7 +24,7 @@ namespace Alis.Reactive.Native.AppLevel
         {
             // Remove all size classes, then add the requested one
             foreach (var cls in SizeClasses)
-                self = self.Call("classList.remove", cls);
+                self = self.Call(global::Alis.Reactive.Native.AppLevel.NativeDrawer.RemoveCssClass, cls);
 
             var sizeClass = size switch
             {
@@ -33,7 +33,7 @@ namespace Alis.Reactive.Native.AppLevel
                 DrawerSize.Lg => "alis-drawer--lg",
                 _ => "alis-drawer--md"
             };
-            return self.Call("classList.add", sizeClass);
+            return self.Call(global::Alis.Reactive.Native.AppLevel.NativeDrawer.AddCssClass, sizeClass);
         }
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            return self.Call("classList.add", "alis-drawer--visible")
-                       .Call("removeAttribute", "aria-hidden");
+            return self.Call(global::Alis.Reactive.Native.AppLevel.NativeDrawer.AddCssClass, "alis-drawer--visible")
+                       .Call(global::Alis.Reactive.Native.AppLevel.NativeDrawer.RemoveAttribute, "aria-hidden");
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            return self.Call("classList.remove", "alis-drawer--visible");
+            return self.Call(global::Alis.Reactive.Native.AppLevel.NativeDrawer.RemoveCssClass, "alis-drawer--visible");
         }
 
         /// <summary>

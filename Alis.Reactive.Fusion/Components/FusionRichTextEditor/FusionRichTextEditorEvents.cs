@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -9,6 +11,16 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionRichTextEditorEvents
     {
+        private static readonly CapabilityProperty ValueEventMember = CapabilityProperty.Named("value");
+        private static readonly CapabilityProperty IsInteractedEventMember = CapabilityProperty.Named("isInteracted");
+
+        private static readonly EventContractAuthoring ChangedContract =
+            EventPayloadContractAuthoring.Define<FusionRichTextEditorChangeArgs>(payload =>
+            {
+                payload.Read(args => args.Value, ValueEventMember);
+                payload.Read(args => args.IsInteracted, IsInteractedEventMember);
+            });
+
         /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionRichTextEditorEvents Instance = new FusionRichTextEditorEvents();
         private FusionRichTextEditorEvents() { }
@@ -16,6 +28,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Fires when the rich text content changes (SF "change" event).</summary>
         public ReactiveEvent<FusionRichTextEditorChangeArgs> Changed =>
             new ReactiveEvent<FusionRichTextEditorChangeArgs>(
-                "change", new FusionRichTextEditorChangeArgs());
+                "change", ChangedContract);
     }
 }

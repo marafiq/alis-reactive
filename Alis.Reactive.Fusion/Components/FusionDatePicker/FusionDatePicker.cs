@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -7,9 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// Use as a type parameter in <c>p.Component&lt;FusionDatePicker&gt;(m =&gt; m.AdmissionDate)</c>
     /// to access FusionDatePicker-specific mutations and value reading.
     /// </remarks>
-    public sealed class FusionDatePicker : FusionComponent, IInputComponent
+    public sealed class FusionDatePicker : FusionComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("datepicker", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

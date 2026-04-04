@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -9,6 +11,14 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeTextAreaEvents
     {
+        private static readonly CapabilityProperty ValueEventMember = CapabilityProperty.FromSegments("value", NativeEventPaths.FromCurrentTarget(NativeTextArea.Value.Path));
+
+        private static readonly EventContractAuthoring ChangedContract =
+            EventPayloadContractAuthoring.Define<NativeTextAreaChangeArgs>(payload =>
+            {
+                payload.Read(args => args.Value, ValueEventMember);
+            });
+
         /// <summary>
         /// Shared instance used by the <c>.Reactive()</c> extension.
         /// </summary>
@@ -20,6 +30,6 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         public ReactiveEvent<NativeTextAreaChangeArgs> Changed =>
             new ReactiveEvent<NativeTextAreaChangeArgs>(
-                "change", new NativeTextAreaChangeArgs());
+                "change", ChangedContract);
     }
 }

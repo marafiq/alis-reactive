@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
 {
@@ -15,6 +16,18 @@ namespace Alis.Reactive.Builders
     /// <typeparam name="TModel">The view model type.</typeparam>
     public class ElementBuilder<TModel> where TModel : class
     {
+        private static readonly CapabilityMethod AddCssClass =
+            CapabilityMethod.FromSegments("addCssClass", new[] { PathSegment.FromProp("classList"), PathSegment.FromProp("add") });
+        private static readonly CapabilityMethod RemoveCssClass =
+            CapabilityMethod.FromSegments("removeCssClass", new[] { PathSegment.FromProp("classList"), PathSegment.FromProp("remove") });
+        private static readonly CapabilityMethod ToggleCssClass =
+            CapabilityMethod.FromSegments("toggleCssClass", new[] { PathSegment.FromProp("classList"), PathSegment.FromProp("toggle") });
+        private static readonly CapabilityProperty TextContent =
+            CapabilityProperty.FromSegments("text", new[] { PathSegment.FromProp("textContent") });
+        private static readonly CapabilityProperty HtmlContent =
+            CapabilityProperty.FromSegments("html", new[] { PathSegment.FromProp("innerHTML") });
+        private static readonly CapabilityProperty Hidden = CapabilityProperty.Named("hidden");
+
         private readonly PipelineBuilder<TModel> _pipeline;
         private readonly string _elementId;
 
@@ -35,7 +48,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> AddClass(string className)
         {
-            _pipeline.CallElementMember(_elementId, "classList.add", className);
+            _pipeline.CallElementMember(_elementId, AddCssClass, className);
             return _pipeline;
         }
 
@@ -46,7 +59,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> RemoveClass(string className)
         {
-            _pipeline.CallElementMember(_elementId, "classList.remove", className);
+            _pipeline.CallElementMember(_elementId, RemoveCssClass, className);
             return _pipeline;
         }
 
@@ -57,7 +70,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> ToggleClass(string className)
         {
-            _pipeline.CallElementMember(_elementId, "classList.toggle", className);
+            _pipeline.CallElementMember(_elementId, ToggleCssClass, className);
             return _pipeline;
         }
 
@@ -68,7 +81,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetText(string text)
         {
-            _pipeline.SetElementProperty(_elementId, "textContent", text);
+            _pipeline.SetElementProperty(_elementId, TextContent, text);
             return _pipeline;
         }
 
@@ -85,8 +98,13 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetText<TSource>(TSource payload, Expression<Func<TSource, object?>> path)
         {
-            var valueMemberPath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.SetElementPropertyFromPath(_elementId, "textContent", valueMemberPath);
+            var sourceValue = _pipeline.DescribeEventPayload(path);
+            _pipeline.SetElementProperty(
+                _elementId,
+                TextContent,
+                sourceValue.Expression,
+                sourceValue.Shape,
+                ValueShapeFactory.String());
             return _pipeline;
         }
 
@@ -100,8 +118,13 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> response, Expression<Func<TResponse, object?>> path)
             where TResponse : class
         {
-            var valueMemberPath = ExpressionPathHelper.ToResponsePath(path);
-            _pipeline.SetElementPropertyFromPath(_elementId, "textContent", valueMemberPath);
+            var sourceValue = _pipeline.Authoring.Values.DescribeResponsePayload(path);
+            _pipeline.SetElementProperty(
+                _elementId,
+                TextContent,
+                sourceValue.Expression,
+                sourceValue.Shape,
+                ValueShapeFactory.String());
             return _pipeline;
         }
 
@@ -118,13 +141,14 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TProp">The value type.</typeparam>
         /// <param name="value">The typed value reference to resolve.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>
-        public ElementBuilder<TModel> SetText<TProp>(ValueExpression<TProp> value)
+        public ElementBuilder<TModel> SetText<TProp>(ReactiveValue<TProp> value)
         {
             _pipeline.SetElementProperty(
                 _elementId,
-                "textContent",
-                value.ToValueExpr(_pipeline.Authoring),
-                value.CoercionType);
+                TextContent,
+                value.ToPlanValue(_pipeline.Authoring.Values),
+                value.ValueShape,
+                ValueShapeFactory.String());
             return this;
         }
 
@@ -135,7 +159,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetHtml(string html)
         {
-            _pipeline.SetElementProperty(_elementId, "innerHTML", html);
+            _pipeline.SetElementProperty(_elementId, HtmlContent, html);
             return _pipeline;
         }
 
@@ -148,8 +172,13 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> SetHtml<TSource>(TSource payload, Expression<Func<TSource, object?>> path)
         {
-            var valueMemberPath = ExpressionPathHelper.ToEventPath(path);
-            _pipeline.SetElementPropertyFromPath(_elementId, "innerHTML", valueMemberPath);
+            var sourceValue = _pipeline.DescribeEventPayload(path);
+            _pipeline.SetElementProperty(
+                _elementId,
+                HtmlContent,
+                sourceValue.Expression,
+                sourceValue.Shape,
+                ValueShapeFactory.String());
             return _pipeline;
         }
 
@@ -166,13 +195,14 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TProp">The value type.</typeparam>
         /// <param name="value">The typed value reference to resolve.</param>
         /// <returns>This element builder for chaining additional mutations.</returns>
-        public ElementBuilder<TModel> SetHtml<TProp>(ValueExpression<TProp> value)
+        public ElementBuilder<TModel> SetHtml<TProp>(ReactiveValue<TProp> value)
         {
             _pipeline.SetElementProperty(
                 _elementId,
-                "innerHTML",
-                value.ToValueExpr(_pipeline.Authoring),
-                value.CoercionType);
+                HtmlContent,
+                value.ToPlanValue(_pipeline.Authoring.Values),
+                value.ValueShape,
+                ValueShapeFactory.String());
             return this;
         }
 
@@ -182,7 +212,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Show()
         {
-            _pipeline.SetElementProperty(_elementId, "hidden", false, coerceAs: "boolean");
+            _pipeline.SetElementProperty(_elementId, Hidden, false);
             return _pipeline;
         }
 
@@ -192,7 +222,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining additional commands.</returns>
         public PipelineBuilder<TModel> Hide()
         {
-            _pipeline.SetElementProperty(_elementId, "hidden", true, coerceAs: "boolean");
+            _pipeline.SetElementProperty(_elementId, Hidden, true);
             return _pipeline;
         }
     }

@@ -1,13 +1,17 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
     /// Test widget for architecture verification — fusion vendor.
     /// Phantom type — proves vendor resolves root via ej2_instances[0],
-    /// and valueMemberPath walks from that root.
+    /// and bindingMember walks from that root.
     /// </summary>
-    public sealed class TestWidgetSyncFusion : FusionComponent, IInputComponent
+    public sealed class TestWidgetSyncFusion : FusionComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly ComponentMetadata Definition =
+            DescribeBindable("testwidget-syncfusion", Value, ValueShapeFactory.String());
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

@@ -1,91 +1,65 @@
-using Alis.Reactive.Playwright.Extensions;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.HttpMixing;
 
-/// <summary>
-/// As a UI author
-/// I want real component .Reactive() flows to mix HTTP and supported conditions cleanly
-/// So that browser-visible outcomes stay correct across success, error, and reevaluation paths
-/// </summary>
 [TestFixture]
 public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Conditions/HttpMixing";
-
-    private PagePlan<HttpMixingModel> _plan = null!;
-
-    private NativeTextBoxLocator ReactiveResidentName => _plan.TextBox(m => m.ReactiveResidentName);
-    private NativeTextBoxLocator ReactiveFollowUpName => _plan.TextBox(m => m.ReactiveFollowUpName);
-    private NativeTextBoxLocator ReactiveErrorCategory => _plan.TextBox(m => m.ReactiveErrorCategory);
-
-    private ILocator ReactiveResidentPre => Page.Locator("#s9-pre");
-    private ILocator ReactiveResidentHttpResult => Page.Locator("#s9-http-result");
-    private ILocator ReactiveResidentBadge => Page.Locator("#s9-badge");
-    private ILocator ReactiveResidentTail => Page.Locator("#s9-tail");
-
-    private ILocator ReactiveSuccessPre => Page.Locator("#s10-pre");
-    private ILocator ReactiveSuccessHttpResult => Page.Locator("#s10-http-result");
-    private ILocator ReactiveSuccessClassification => Page.Locator("#s10-classification");
-    private ILocator ReactiveSuccessTail => Page.Locator("#s10-tail");
-
-    private ILocator ReactiveErrorPre => Page.Locator("#s11-pre");
-    private ILocator ReactiveErrorStatus => Page.Locator("#s11-status");
-    private ILocator ReactiveErrorMessage => Page.Locator("#s11-error-msg");
-    private ILocator ReactiveErrorTail => Page.Locator("#s11-tail");
+    private HttpMixingPage _page = null!;
 
     private async Task NavigateAndBoot()
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#s1-btn-active");
-        _plan = await PagePlan<HttpMixingModel>.FromPage(Page);
+        _page = new HttpMixingPage(Page);
     }
 
     private async Task AssertVipResidentPathAsync(string expectedName)
     {
-        await Expect(ReactiveResidentPre).ToHaveTextAsync("saving");
-        await Expect(ReactiveResidentHttpResult).ToHaveTextAsync(expectedName, new() { Timeout = 5000 });
-        await Expect(ReactiveResidentBadge).ToBeVisibleAsync();
-        await Expect(ReactiveResidentTail).ToHaveTextAsync("complete");
+        await Expect(_page.ReactiveResidentPre).ToHaveTextAsync("saving");
+        await Expect(_page.ReactiveResidentHttpResult).ToHaveTextAsync(expectedName, new() { Timeout = 5000 });
+        await Expect(_page.ReactiveResidentBadge).ToBeVisibleAsync();
+        await Expect(_page.ReactiveResidentTail).ToHaveTextAsync("complete");
     }
 
     private async Task AssertStandardResidentPathAsync(string expectedName)
     {
-        await Expect(ReactiveResidentPre).ToHaveTextAsync("saving");
-        await Expect(ReactiveResidentHttpResult).ToHaveTextAsync(expectedName, new() { Timeout = 5000 });
-        await Expect(ReactiveResidentBadge).ToBeHiddenAsync();
-        await Expect(ReactiveResidentTail).ToHaveTextAsync("complete");
+        await Expect(_page.ReactiveResidentPre).ToHaveTextAsync("saving");
+        await Expect(_page.ReactiveResidentHttpResult).ToHaveTextAsync(expectedName, new() { Timeout = 5000 });
+        await Expect(_page.ReactiveResidentBadge).ToBeHiddenAsync();
+        await Expect(_page.ReactiveResidentTail).ToHaveTextAsync("complete");
     }
 
     private async Task AssertLongSuccessPathAsync(string expectedName)
     {
-        await Expect(ReactiveSuccessPre).ToHaveTextAsync("loading");
-        await Expect(ReactiveSuccessHttpResult).ToHaveTextAsync(expectedName, new() { Timeout = 5000 });
-        await Expect(ReactiveSuccessClassification).ToHaveTextAsync("long name");
-        await Expect(ReactiveSuccessTail).ToHaveTextAsync("success complete");
+        await Expect(_page.ReactiveSuccessPre).ToHaveTextAsync("loading");
+        await Expect(_page.ReactiveSuccessHttpResult).ToHaveTextAsync(expectedName, new() { Timeout = 5000 });
+        await Expect(_page.ReactiveSuccessClassification).ToHaveTextAsync("long name");
+        await Expect(_page.ReactiveSuccessTail).ToHaveTextAsync("success complete");
     }
 
     private async Task AssertShortSuccessPathAsync(string expectedName)
     {
-        await Expect(ReactiveSuccessPre).ToHaveTextAsync("loading");
-        await Expect(ReactiveSuccessHttpResult).ToHaveTextAsync(expectedName, new() { Timeout = 5000 });
-        await Expect(ReactiveSuccessClassification).ToHaveTextAsync("short name");
-        await Expect(ReactiveSuccessTail).ToHaveTextAsync("success complete");
+        await Expect(_page.ReactiveSuccessPre).ToHaveTextAsync("loading");
+        await Expect(_page.ReactiveSuccessHttpResult).ToHaveTextAsync(expectedName, new() { Timeout = 5000 });
+        await Expect(_page.ReactiveSuccessClassification).ToHaveTextAsync("short name");
+        await Expect(_page.ReactiveSuccessTail).ToHaveTextAsync("success complete");
     }
 
     private async Task AssertSpecificErrorPathAsync()
     {
-        await Expect(ReactiveErrorPre).ToHaveTextAsync("validating");
-        await Expect(ReactiveErrorStatus).ToHaveTextAsync("failed", new() { Timeout = 5000 });
-        await Expect(ReactiveErrorMessage).ToHaveTextAsync("missing required fields", new() { Timeout = 5000 });
-        await Expect(ReactiveErrorTail).ToHaveTextAsync("error complete");
+        await Expect(_page.ReactiveErrorPre).ToHaveTextAsync("validating");
+        await Expect(_page.ReactiveErrorStatus).ToHaveTextAsync("failed", new() { Timeout = 5000 });
+        await Expect(_page.ReactiveErrorMessage).ToHaveTextAsync("missing required fields", new() { Timeout = 5000 });
+        await Expect(_page.ReactiveErrorTail).ToHaveTextAsync("error complete");
     }
 
     private async Task AssertGenericErrorPathAsync()
     {
-        await Expect(ReactiveErrorPre).ToHaveTextAsync("validating");
-        await Expect(ReactiveErrorStatus).ToHaveTextAsync("failed", new() { Timeout = 5000 });
-        await Expect(ReactiveErrorMessage).ToHaveTextAsync("validation error", new() { Timeout = 5000 });
-        await Expect(ReactiveErrorTail).ToHaveTextAsync("error complete");
+        await Expect(_page.ReactiveErrorPre).ToHaveTextAsync("validating");
+        await Expect(_page.ReactiveErrorStatus).ToHaveTextAsync("failed", new() { Timeout = 5000 });
+        await Expect(_page.ReactiveErrorMessage).ToHaveTextAsync("validation error", new() { Timeout = 5000 });
+        await Expect(_page.ReactiveErrorTail).ToHaveTextAsync("error complete");
     }
 
     [Test]
@@ -93,7 +67,7 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ReactiveResidentName.FillAndBlur("VIP Alice");
+        await _page.ReactiveResidentName.FillAndBlur("VIP Alice");
 
         await AssertVipResidentPathAsync("VIP Alice");
         AssertNoConsoleErrors();
@@ -104,7 +78,7 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ReactiveResidentName.FillAndBlur("Bob");
+        await _page.ReactiveResidentName.FillAndBlur("Bob");
 
         await AssertStandardResidentPathAsync("Bob");
         AssertNoConsoleErrors();
@@ -115,13 +89,13 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ReactiveResidentName.FillAndBlur("VIP Alice");
+        await _page.ReactiveResidentName.FillAndBlur("VIP Alice");
         await AssertVipResidentPathAsync("VIP Alice");
 
-        await ReactiveResidentName.FillAndBlur("Bob");
+        await _page.ReactiveResidentName.FillAndBlur("Bob");
         await AssertStandardResidentPathAsync("Bob");
 
-        await ReactiveResidentName.FillAndBlur("VIP Nora");
+        await _page.ReactiveResidentName.FillAndBlur("VIP Nora");
         await AssertVipResidentPathAsync("VIP Nora");
         AssertNoConsoleErrors();
     }
@@ -131,7 +105,7 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ReactiveFollowUpName.FillAndBlur("Morning rounds");
+        await _page.ReactiveFollowUpName.FillAndBlur("Morning rounds");
 
         await AssertLongSuccessPathAsync("Morning rounds");
         AssertNoConsoleErrors();
@@ -142,7 +116,7 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ReactiveFollowUpName.FillAndBlur("OT");
+        await _page.ReactiveFollowUpName.FillAndBlur("OT");
 
         await AssertShortSuccessPathAsync("OT");
         AssertNoConsoleErrors();
@@ -153,13 +127,13 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ReactiveFollowUpName.FillAndBlur("Morning rounds");
+        await _page.ReactiveFollowUpName.FillAndBlur("Morning rounds");
         await AssertLongSuccessPathAsync("Morning rounds");
 
-        await ReactiveFollowUpName.FillAndBlur("OT");
+        await _page.ReactiveFollowUpName.FillAndBlur("OT");
         await AssertShortSuccessPathAsync("OT");
 
-        await ReactiveFollowUpName.FillAndBlur("Evening meds");
+        await _page.ReactiveFollowUpName.FillAndBlur("Evening meds");
         await AssertLongSuccessPathAsync("Evening meds");
         AssertNoConsoleErrors();
     }
@@ -169,7 +143,7 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ReactiveErrorCategory.FillAndBlur("required");
+        await _page.ReactiveErrorCategory.FillAndBlur("required");
 
         await AssertSpecificErrorPathAsync();
         AssertNoConsoleErrorsExcept("400");
@@ -180,7 +154,7 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ReactiveErrorCategory.FillAndBlur("format");
+        await _page.ReactiveErrorCategory.FillAndBlur("format");
 
         await AssertGenericErrorPathAsync();
         AssertNoConsoleErrorsExcept("400");
@@ -191,14 +165,44 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await ReactiveErrorCategory.FillAndBlur("required");
+        await _page.ReactiveErrorCategory.FillAndBlur("required");
         await AssertSpecificErrorPathAsync();
 
-        await ReactiveErrorCategory.FillAndBlur("format");
+        await _page.ReactiveErrorCategory.FillAndBlur("format");
         await AssertGenericErrorPathAsync();
 
-        await ReactiveErrorCategory.FillAndBlur("required");
+        await _page.ReactiveErrorCategory.FillAndBlur("required");
         await AssertSpecificErrorPathAsync();
         AssertNoConsoleErrorsExcept("400");
+    }
+
+    private sealed class HttpMixingPage
+    {
+        private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Conditions_HttpMixing_HttpMixingModel__";
+        private readonly IPage _page;
+
+        public HttpMixingPage(IPage page)
+        {
+            _page = page;
+        }
+
+        public NativeTextBoxLocator ReactiveResidentName => new(_page, Scope + "ReactiveResidentName");
+        public NativeTextBoxLocator ReactiveFollowUpName => new(_page, Scope + "ReactiveFollowUpName");
+        public NativeTextBoxLocator ReactiveErrorCategory => new(_page, Scope + "ReactiveErrorCategory");
+
+        public ILocator ReactiveResidentPre => _page.Locator("#s9-pre");
+        public ILocator ReactiveResidentHttpResult => _page.Locator("#s9-http-result");
+        public ILocator ReactiveResidentBadge => _page.Locator("#s9-badge");
+        public ILocator ReactiveResidentTail => _page.Locator("#s9-tail");
+
+        public ILocator ReactiveSuccessPre => _page.Locator("#s10-pre");
+        public ILocator ReactiveSuccessHttpResult => _page.Locator("#s10-http-result");
+        public ILocator ReactiveSuccessClassification => _page.Locator("#s10-classification");
+        public ILocator ReactiveSuccessTail => _page.Locator("#s10-tail");
+
+        public ILocator ReactiveErrorPre => _page.Locator("#s11-pre");
+        public ILocator ReactiveErrorStatus => _page.Locator("#s11-status");
+        public ILocator ReactiveErrorMessage => _page.Locator("#s11-error-msg");
+        public ILocator ReactiveErrorTail => _page.Locator("#s11-tail");
     }
 }

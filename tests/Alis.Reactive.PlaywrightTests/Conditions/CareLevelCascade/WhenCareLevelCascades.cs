@@ -1,20 +1,7 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.CareLevelCascade;
 
-/// <summary>
-/// Exercises condition → component mutation patterns end-to-end:
-///   Section 1: DropDown condition → SetValue on another DropDown (cascade)
-///   Section 2: DropDown condition → SetChecked on Switch (cross-component type)
-///
-/// Page under test: /Sandbox/Conditions/CareLevelCascade
-///
-/// This is the first test where condition branches MUTATE other components.
-/// All prior condition tests only flip element text/visibility. This slice proves
-/// Then/Else branches can SetValue on dropdowns and SetChecked on switches.
-///
-/// Senior living domain: care level drives protocol assignment and escort requirements.
-/// </summary>
 [TestFixture]
 public class WhenCareLevelCascades : PlaywrightTestBase
 {
@@ -32,7 +19,7 @@ public class WhenCareLevelCascades : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await WaitForPageReady(10000);
     }
 
     private async Task SelectCareLevelAndWait(string text)

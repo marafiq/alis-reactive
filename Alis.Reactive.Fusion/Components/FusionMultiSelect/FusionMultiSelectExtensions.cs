@@ -2,6 +2,8 @@ using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -13,7 +15,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionMultiSelectExtensions
     {
-        private static readonly FusionMultiSelect Component = new FusionMultiSelect();
+        private static readonly CapabilityProperty DataSourceProperty = CapabilityProperty.Named("dataSource");
+        private static readonly CapabilityMethod DataBindMethod = CapabilityMethod.Named("dataBind");
+        private static readonly CapabilityMethod ShowPopupMethod = CapabilityMethod.Named("showPopup");
+        private static readonly CapabilityMethod HidePopupMethod = CapabilityMethod.Named("hidePopup");
 
         /// <summary>Sets the selected values.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -22,7 +27,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiSelect, TModel> SetValue<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self, string[]? value)
             where TModel : class
-            => self.Set("value", value);
+            => self.Set(FusionMultiSelect.Value, value);
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -35,10 +40,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionMultiSelect, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
             where TModel : class
-        {
-            var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.SetFromPath("dataSource", sourcePath);
-        }
+            => self.SetFromEvent(DataSourceProperty, path);
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -52,10 +54,7 @@ namespace Alis.Reactive.Fusion.Components
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
             where TModel : class
             where TResponse : class
-        {
-            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.SetFromPath("dataSource", sourcePath);
-        }
+            => self.SetFromResponse(DataSourceProperty, path);
 
         /// <summary>Flushes pending property changes to the component in the browser.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -63,7 +62,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiSelect, TModel> DataBind<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class
-            => self.Call("dataBind");
+            => self.Call(DataBindMethod);
 
         /// <summary>Opens the selection popup.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -71,7 +70,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiSelect, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class
-            => self.Call("showPopup");
+            => self.Call(ShowPopupMethod);
 
         /// <summary>Closes the selection popup.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -79,7 +78,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiSelect, TModel> HidePopup<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class
-            => self.Call("hidePopup");
+            => self.Call(HidePopupMethod);
 
         /// <summary>Reads the current selected values for use in conditions or gather.</summary>
         /// <remarks>
@@ -88,9 +87,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the multi-select's current values.</returns>
-        public static ComponentValueExpression<string[]> Value<TModel>(
+        public static ReactiveValue<string[]> Value<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<string[]>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<string[]>();
     }
 }

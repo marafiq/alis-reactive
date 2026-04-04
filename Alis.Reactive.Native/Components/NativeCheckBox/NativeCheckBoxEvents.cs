@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -9,6 +11,14 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeCheckBoxEvents
     {
+        private static readonly CapabilityProperty CheckedEventMember = CapabilityProperty.FromSegments("checked", NativeEventPaths.FromCurrentTarget(NativeCheckBox.Checked.Path));
+
+        private static readonly EventContractAuthoring ChangedContract =
+            EventPayloadContractAuthoring.Define<NativeCheckBoxChangeArgs>(payload =>
+            {
+                payload.Read(args => args.Checked, CheckedEventMember);
+            });
+
         /// <summary>
         /// Shared instance used by the <c>.Reactive()</c> extension.
         /// </summary>
@@ -20,6 +30,6 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         public ReactiveEvent<NativeCheckBoxChangeArgs> Changed =>
             new ReactiveEvent<NativeCheckBoxChangeArgs>(
-                "change", new NativeCheckBoxChangeArgs());
+                "change", ChangedContract);
     }
 }

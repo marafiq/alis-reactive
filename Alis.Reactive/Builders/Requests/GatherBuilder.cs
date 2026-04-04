@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
@@ -21,14 +22,28 @@ namespace Alis.Reactive.Builders.Requests
     /// <typeparam name="TModel">The view model type.</typeparam>
     public class GatherBuilder<TModel> where TModel : class
     {
+        private readonly PlanAuthoringContext _authoring;
+        private readonly WorkflowScope _scope;
+
+        internal GatherBuilder(PlanAuthoringContext authoring, WorkflowScope scope)
+        {
+            _authoring = authoring;
+            _scope = scope;
+        }
+
         internal List<RequestValuePart> RequestValues { get; } = new List<RequestValuePart>();
 
         /// <summary>
         /// Adds a component value to the authored request payload.
         /// </summary>
-        internal GatherBuilder<TModel> IncludeComponentValue(string key, string componentId, string vendor, string valueMemberPath)
+        internal GatherBuilder<TModel> IncludeComponentValue(
+            string key,
+            string componentId,
+            ComponentMetadata component,
+            CapabilityProperty binding,
+            ValueShape? shape = null)
         {
-            RequestValues.Add(new ComponentRequestValue(key, componentId, vendor, valueMemberPath));
+            RequestValues.Add(new ComponentRequestValue(key, componentId, component, binding, shape));
             return this;
         }
 
@@ -65,8 +80,7 @@ namespace Alis.Reactive.Builders.Requests
             Expression<Func<TArgs, TProp>> path,
             string param)
         {
-            var eventPath = ExpressionPathHelper.ToEventPath(path);
-            RequestValues.Add(new ContextRequestValue(param, eventPath));
+            RequestValues.Add(new ContextRequestValue(param, _authoring.Values.DescribeEventPayload(_scope, path).Expression));
             return this;
         }
     }

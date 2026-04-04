@@ -4,29 +4,24 @@
   "scripts": {
     "build": "esbuild Alis.Reactive.SandboxApp/Scripts/root.ts --bundle --outfile=Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js --format=esm --minify",
     "build:css": "npx @tailwindcss/cli -i Alis.Reactive.SandboxApp/Styles/app.css -o Alis.Reactive.SandboxApp/wwwroot/css/design-system.css --minify",
-    "build:package-assets": "npm run build && npm run build:css && npm run sync:package-assets",
+    "build:package-assets": "npm run build && npm run build:css",
     "build:test-widget": "esbuild Alis.Reactive.SandboxApp/Scripts/components/lab/test-widget.ts --bundle --format=iife --outfile=Alis.Reactive.SandboxApp/wwwroot/js/test-widget.js",
     "build:all": "npm run build:package-assets && npm run build:test-widget",
-    "sync:package-assets": "node scripts/sync-package-assets.mjs",
     "watch": "esbuild Alis.Reactive.SandboxApp/Scripts/root.ts --bundle --outfile=Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js --format=esm --watch",
     "watch:css": "npx @tailwindcss/cli -i Alis.Reactive.SandboxApp/Styles/app.css -o Alis.Reactive.SandboxApp/wwwroot/css/design-system.css --watch",
     "typecheck": "tsc --project Alis.Reactive.SandboxApp/Scripts/tsconfig.json --noEmit",
     "lint": "eslint Alis.Reactive.SandboxApp/Scripts/",
     "lint:fix": "eslint Alis.Reactive.SandboxApp/Scripts/ --fix",
-    "build:api-docs": "dotnet run --project tools/ApiDocGenerator",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "build:api-docs": "dotnet run --project tools/ApiDocGenerator"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@tailwindcss/cli": "^4.2.1",
     "esbuild": "^0.25.0",
     "eslint": "^9.39.4",
-    "jsdom": "^27.0.1",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.8.0",
-    "typescript-eslint": "^8.57.1",
-    "vitest": "^3.2.4"
+    "typescript-eslint": "^8.57.1"
   },
   "dependencies": {
     "@microsoft/signalr": "^10.0.0",

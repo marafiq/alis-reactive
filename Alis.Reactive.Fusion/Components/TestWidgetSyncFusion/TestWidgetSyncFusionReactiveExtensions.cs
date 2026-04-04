@@ -8,7 +8,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class TestWidgetSyncFusionReactiveExtensions
     {
-        private static readonly TestWidgetSyncFusion _component = new TestWidgetSyncFusion();
 
         /// <summary>
         /// Attaches a reactive workflow to a Syncfusion test widget event.
@@ -30,12 +29,11 @@ namespace Alis.Reactive.Fusion.Components
             var reactiveEvent = eventSelector(TestWidgetSyncFusionEvents.Instance);
             var scope = plan.Authoring.CreateObjectEventScope(
                 builder.ElementId,
-                _component.Vendor,
-                null,
-                _component.ValueMemberPath,
-                reactiveEvent.EventName);
+                TestWidgetSyncFusion.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             plan.AddWorkflow(scope, pb);
 
             return builder;

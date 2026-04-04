@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Native.AppLevel
 {
     /// <summary>
@@ -12,6 +14,14 @@ namespace Alis.Reactive.Native.AppLevel
     /// </remarks>
     public sealed class NativeLoader : NativeComponent, IAppLevelComponent
     {
+        internal static readonly CapabilityMethod SetAttribute = Method("setAttribute");
+        internal static readonly CapabilityMethod RemoveAttribute = Method("removeAttribute");
+        internal static readonly CapabilityMethod AddCssClass =
+            Method("addCssClass", PathSegment.FromProp("classList"), PathSegment.FromProp("add"));
+        internal static readonly CapabilityMethod RemoveCssClass =
+            Method("removeCssClass", PathSegment.FromProp("classList"), PathSegment.FromProp("remove"));
+        internal static readonly ComponentMetadata Definition = Describe("loader");
+
         /// <summary>
         /// The well-known element ID used by the loader in the layout.
         /// </summary>
@@ -19,5 +29,7 @@ namespace Alis.Reactive.Native.AppLevel
 
         /// <inheritdoc />
         public string DefaultId => ElementId;
+
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

@@ -1,6 +1,7 @@
 using System;
-using System.Globalization;
 using Alis.Reactive.Builders.Conditions;
+
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -13,7 +14,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionDatePickerExtensions
     {
-        private static readonly FusionDatePicker Component = new FusionDatePicker();
+        private static readonly CapabilityMethod FocusInMethod = CapabilityMethod.Named("focusIn");
+        private static readonly CapabilityMethod FocusOutMethod = CapabilityMethod.Named("focusOut");
 
         /// <summary>Sets the selected date.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -23,7 +25,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionDatePicker, TModel> self, DateTime value)
             where TModel : class
         {
-            return self.Set("value", value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+            return self.Set(FusionDatePicker.Value, value);
         }
 
         /// <summary>Moves focus into the date picker.</summary>
@@ -32,7 +34,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionDatePicker, TModel> FocusIn<TModel>(
             this ComponentRef<FusionDatePicker, TModel> self)
             where TModel : class
-            => self.Call("focusIn");
+            => self.Call(FocusInMethod);
 
         /// <summary>Removes focus from the date picker.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -40,7 +42,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionDatePicker, TModel> FocusOut<TModel>(
             this ComponentRef<FusionDatePicker, TModel> self)
             where TModel : class
-            => self.Call("focusOut");
+            => self.Call(FocusOutMethod);
 
         /// <summary>Reads the current date value for use in conditions or gather.</summary>
         /// <remarks>
@@ -49,9 +51,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the date picker's current value.</returns>
-        public static ComponentValueExpression<DateTime> Value<TModel>(
+        public static ReactiveValue<DateTime> Value<TModel>(
             this ComponentRef<FusionDatePicker, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<DateTime>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<DateTime>();
     }
 }

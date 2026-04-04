@@ -31,8 +31,8 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMemberPath, "switch",
-                CoercionTypes.InferFromType(typeof(bool))));
+                setup.ElementId, ReactiveComponentMetadata.For(Component), setup.BindingPath,
+                ValueShapeFactory.FromClrType(typeof(bool))));
 
             var builder = setup.Helper.EJS().SwitchFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });

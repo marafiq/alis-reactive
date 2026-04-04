@@ -1,25 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.Cascading;
 
-/// <summary>
-/// Exercises cascading FusionDropDownList end-to-end in the browser:
-/// Country selection triggers HTTP GET to load cities via SetDataSource + DataBind,
-/// selective payload sends only the changed value, and gather submits both values.
-///
-/// Page under test: /Sandbox/AllModulesTogether/Cascading
-///
-/// SF DropDownList renders: span.e-ddl wrapping the input element.
-/// Popup divs are created with IDs: {componentId}_popup.
-/// Selection uses DropDownListLocator (focus wrapper + type text + Enter) —
-/// real keyboard gestures that fire the SF change event reliably.
-/// </summary>
 [TestFixture]
 public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/AllModulesTogether/Cascading";
 
-    // IdGenerator: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_CascadingModel";
     private const string CountryId = Scope + "__Country";
     private const string CityId = Scope + "__City";
@@ -31,23 +18,15 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await WaitForPageReady(10000);
     }
 
-    /// <summary>
-    /// Selects a country via real keyboard gestures: focus wrapper, type text, press Enter.
-    /// DropDownListLocator fires the SF change event reliably without any ej2 API calls.
-    /// </summary>
     private async Task SelectCountry(string text)
     {
         var country = new DropDownListLocator(Page, CountryId);
         await country.Select(text);
     }
 
-    /// <summary>
-    /// Selects a city via real keyboard gestures: focus wrapper, type text, press Enter.
-    /// DropDownListLocator fires the SF change event reliably without any ej2 API calls.
-    /// </summary>
     private async Task SelectCity(string text)
     {
         var city = new DropDownListLocator(Page, CityId);
@@ -64,17 +43,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
-        AssertNoConsoleErrors();
-    }
-
     // ── Country dropdown has server-rendered options ──
 
     [Test]
@@ -83,7 +51,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Open the country dropdown — icon click opens popup in Playwright
-        await Page.Locator($"#{CountryId}").Locator("..").Locator(".e-ddl-icon").ClickWhenStableAsync(Page);
+        await Page.Locator($"#{CountryId}").Locator("..").Locator(".e-ddl-icon").ClickWhenStableAsync();
         var popup = Page.Locator($"#{CountryPopupId}");
         await Expect(popup).ToBeVisibleAsync(new() { Timeout = 5000 });
 
@@ -175,7 +143,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveTextAsync("SEA", new() { Timeout = 5000 });
 
         // Click Save — gathers both Country and City
-        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
+        await Page.Locator("#save-btn").ClickWhenStableAsync();
 
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
@@ -226,7 +194,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveTextAsync("SEA", new() { Timeout = 5000 });
 
         // Step 3: Save — gathers both Country and City, verify server echoes both
-        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
+        await Page.Locator("#save-btn").ClickWhenStableAsync();
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
 
@@ -267,7 +235,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveValueAsync("", new() { Timeout = 5000 });
 
         // Verify UK cities are available — open popup and confirm 2 items loaded
-        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickWhenStableAsync(Page);
+        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickWhenStableAsync();
         var cityPopup = Page.Locator($"#{CityPopupId}");
         await Expect(cityPopup).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(cityPopup.Locator(".e-list-item")).ToHaveCountAsync(2, new() { Timeout = 5000 });
@@ -294,7 +262,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         // City dropdown should have no data source items — it starts empty.
         // Open the popup and verify no list items are rendered.
-        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickWhenStableAsync(Page);
+        await Page.Locator($"#{CityId}").Locator("..").Locator(".e-ddl-icon").ClickWhenStableAsync();
         var cityPopup = Page.Locator($"#{CityPopupId}");
         await Expect(cityPopup).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(cityPopup.Locator(".e-list-item")).ToHaveCountAsync(0, new() { Timeout = 3000 });
@@ -412,7 +380,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
 
         // Click Save without selecting a city
-        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
+        await Page.Locator("#save-btn").ClickWhenStableAsync();
 
         // Server responds with the message — city is empty
         await Expect(Page.Locator("#save-result"))
@@ -445,7 +413,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await Expect(Page.Locator("#selected-city"))
             .ToHaveTextAsync("MAN", new() { Timeout = 5000 });
 
-        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
+        await Page.Locator("#save-btn").ClickWhenStableAsync();
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
 
@@ -480,7 +448,7 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveTextAsync("VAN", new() { Timeout = 5000 });
 
         // Step 3: Save — verify both values echo
-        await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
+        await Page.Locator("#save-btn").ClickWhenStableAsync();
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
 

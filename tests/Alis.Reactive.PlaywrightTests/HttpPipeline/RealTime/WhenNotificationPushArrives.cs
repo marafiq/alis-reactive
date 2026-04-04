@@ -1,10 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 
-/// <summary>
-/// As a care coordinator
-/// I want to see notification updates in real time
-/// So that I don't miss important events about my residents
-/// </summary>
 [TestFixture]
 public class WhenNotificationPushArrives : PlaywrightTestBase
 {
@@ -15,6 +10,11 @@ public class WhenNotificationPushArrives : PlaywrightTestBase
     private ILocator NotifCount => Page.Locator("#notif-count");
     private ILocator NotifMessage => Page.Locator("#notif-message");
     private ILocator NotifPriority => Page.Locator("#notif-priority");
+
+    private async Task WaitForNotificationFeed()
+    {
+        await Expect(NotifCount).Not.ToContainTextAsync("—", new() { Timeout = 10000 });
+    }
 
     private async Task PushNotification()
     {
@@ -30,8 +30,8 @@ public class WhenNotificationPushArrives : PlaywrightTestBase
     public async Task notification_count_and_message_update_on_screen()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await WaitForPageReady(10000);
+        await WaitForNotificationFeed();
 
         await PushNotification();
 
@@ -45,8 +45,8 @@ public class WhenNotificationPushArrives : PlaywrightTestBase
     public async Task notification_indicator_turns_green_after_first_message()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await WaitForPageReady(10000);
+        await WaitForNotificationFeed();
 
         await PushNotification();
 
@@ -60,8 +60,8 @@ public class WhenNotificationPushArrives : PlaywrightTestBase
     public async Task multiple_clicks_each_update_the_ui()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await WaitForPageReady(10000);
+        await WaitForNotificationFeed();
 
         await PushNotification();
         await Expect(NotifCount).ToContainTextAsync("99", new() { Timeout = 5000 });

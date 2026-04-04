@@ -20,7 +20,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeDropDownReactiveExtensions
     {
-        private static readonly NativeDropDown _component = new NativeDropDown();
 
         /// <summary>
         /// Wires a <see cref="NativeDropDown"/> browser event into a reactive pipeline.
@@ -43,12 +42,11 @@ namespace Alis.Reactive.Native.Components
             var reactiveEvent = eventSelector(NativeDropDownEvents.Instance);
             var scope = plan.Authoring.CreateObjectEventScope(
                 builder.ElementId,
-                _component.Vendor,
-                builder.BindingPath,
-                _component.ValueMemberPath,
-                reactiveEvent.EventName);
+                NativeDropDown.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             plan.AddWorkflow(scope, pb);
 
             return builder;

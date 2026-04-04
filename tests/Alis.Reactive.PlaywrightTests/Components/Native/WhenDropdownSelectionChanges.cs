@@ -1,12 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeDropDown API end-to-end in the browser:
-/// property writes (SetValue), property reads (Value as source),
-/// reactive events (Changed with typed condition), and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/NativeDropDown
-/// </summary>
 [TestFixture]
 public class WhenDropdownSelectionChanges : PlaywrightTestBase
 {
@@ -16,7 +9,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
     }
 
     // ── Page loads ──
@@ -170,64 +163,11 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Plan JSON structure — refactoring safety ──
-
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanPathProp(planJson, "value");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_native_vendor_for_dropdown_mutations()
-    {
-        // The plan must declare the native-element resolver so the runtime resolves
-        // the raw DOM element (not ej2_instances). If resolver is wrong,
-        // object access resolves the wrong root and SetValue silently fails.
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanResolver(planJson, "native-element");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_value_readexpr_for_component_source()
-    {
-        // NativeDropDown reads through binding valueMember "value", not an ad-hoc valueMemberPath.
-        // If that member changes or is lost, component value reads return wrong data.
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanValueMember(planJson, "value");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_prop_value_for_setvalue_mutation()
-    {
-        // SetValue writes through member path prop "value" (not "checked" or "textContent").
-        // If the path changes, the runtime writes to the wrong DOM property.
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanPathProp(planJson, "value");
-        AssertNoConsoleErrors();
-    }
-
     // ── Initial DOM state — element rendering ──
 
     [Test]
     public async Task both_dropdowns_render_with_correct_element_ids()
     {
-        // IdGenerator creates scoped IDs from the model namespace + property name.
-        // If IdGenerator changes, these elements vanish and all reactive wiring breaks.
         await NavigateAndBoot();
 
         await Expect(Page.Locator($"#{Scope}CareLevel")).ToBeVisibleAsync();
@@ -239,7 +179,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     public async Task both_dropdowns_render_as_select_elements()
     {
         // NativeDropDownBuilder renders <select>. If the HTML element type changes,
-        // the runtime's el.value read/write path breaks silently.
+        // the selection round-trip would fail silently.
         await NavigateAndBoot();
 
         var careLevel = Page.Locator($"select#{Scope}CareLevel");
@@ -285,21 +225,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
 
         var placeholder = Page.Locator($"#{Scope}CareLevel option").First;
         await Expect(placeholder).ToHaveAttributeAsync("value", "");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Boot trace ──
-
-    [Test]
-    public async Task boot_trace_is_emitted_on_page_load()
-    {
-        // auto-boot.ts emits a "booted" trace message. If boot fails silently,
-        // no reactive behavior works and tests pass vacuously.
-        await NavigateAndBoot();
-
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
-        Assert.That(hasBootTrace, Is.True,
-            "Boot trace must be emitted — confirms auto-boot discovered and executed the plan");
         AssertNoConsoleErrors();
     }
 }

@@ -4,8 +4,8 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 
 /// <summary>
 /// Bug F2: SerializeDateConstraint does not handle DateOnly — returns the raw DateOnly object
-/// instead of a "yyyy-MM-dd" string. InferCoerceAs correctly maps DateOnly → "date", so the
-/// branch `if (coerceAs == "date" && constraint != null) constraint = SerializeDateConstraint(constraint)`
+/// instead of a "yyyy-MM-dd" string. InferCompareAs correctly maps DateOnly → "date", so the
+/// branch `if (shapeToken == "date" && constraint != null) constraint = SerializeDateConstraint(constraint)`
 /// IS reached, but SerializeDateConstraint falls through to `return value` because it only handles
 /// DateTime and DateTimeOffset. The constraint is serialised as a raw CLR object, not a string.
 /// </summary>
@@ -60,8 +60,8 @@ public class WhenExtractingDateOnlyRules
         Assert.That(desc, Is.Not.Null);
         var rule = desc!.Fields[0].Rules[0];
         Assert.That(rule.Rule, Is.EqualTo("min"));
-        Assert.That(rule.CoerceAs, Is.EqualTo("date"),
-            "InferCoerceAs should map DateOnly to 'date'");
+        Assert.That(rule.ShapeToken, Is.EqualTo("date"),
+            "InferCompareAs should map DateOnly to 'date'");
 
         // THIS ASSERTION FAILS TODAY — constraint is a raw DateOnly object, not a string
         Assert.That(rule.Constraint, Is.InstanceOf<string>(),
@@ -79,8 +79,8 @@ public class WhenExtractingDateOnlyRules
         Assert.That(desc, Is.Not.Null);
         var rule = desc!.Fields[0].Rules[0];
         Assert.That(rule.Rule, Is.EqualTo("max"));
-        Assert.That(rule.CoerceAs, Is.EqualTo("date"),
-            "InferCoerceAs should map DateOnly to 'date'");
+        Assert.That(rule.ShapeToken, Is.EqualTo("date"),
+            "InferCompareAs should map DateOnly to 'date'");
 
         // THIS ASSERTION FAILS TODAY — constraint is a raw DateOnly object, not a string
         Assert.That(rule.Constraint, Is.InstanceOf<string>(),
@@ -99,8 +99,8 @@ public class WhenExtractingDateOnlyRules
         Assert.That(desc, Is.Not.Null);
         var rule = desc!.Fields[0].Rules[0];
         Assert.That(rule.Rule, Is.EqualTo("range"));
-        Assert.That(rule.CoerceAs, Is.EqualTo("date"),
-            "InferCoerceAs should map DateOnly to 'date'");
+        Assert.That(rule.ShapeToken, Is.EqualTo("date"),
+            "InferCompareAs should map DateOnly to 'date'");
 
         var constraint = rule.Constraint as object[];
         Assert.That(constraint, Is.Not.Null, "range constraint must be an array");

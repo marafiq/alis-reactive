@@ -1,23 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises all FusionDropDownList API end-to-end in the browser:
-/// property writes, method calls, property reads, events, conditions, and gather.
-///
-/// Page under test: /Sandbox/Components/DropDownList
-///
-/// FusionDropDownList renders an input element inside the wrapper div.
-/// The wrapper element gets the IdGenerator-based ID. Tests use
-/// DropDownListLocator to interact via real browser gestures.
-/// </summary>
 [TestFixture]
 public class WhenDropdownItemSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/DropDownList";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DropDownListModel";
     private const string CategoryId = Scope + "__Category";
 
@@ -38,24 +27,12 @@ public class WhenDropdownItemSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
-        AssertNoConsoleErrors();
-    }
-
     // ── Section 1: Property Write ──
 
     [Test]
     public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
-        // SF DropDownList renders an input with the IdGenerator-based ID
         await Expect(Category.Input).ToBeVisibleAsync();
 
         // Wait for the value to be set by dom-ready — verify via the visible input

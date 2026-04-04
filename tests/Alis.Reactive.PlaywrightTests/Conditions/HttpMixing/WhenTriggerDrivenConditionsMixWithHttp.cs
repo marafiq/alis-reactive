@@ -1,17 +1,12 @@
 namespace Alis.Reactive.PlaywrightTests.Conditions.HttpMixing;
 
-/// <summary>
-/// Browser-level verification that conditions compose freely with HTTP blocks.
-/// Each section mirrors a unit test scenario from WhenMixingConditionsWithHttp,
-/// WhenMixingCommandsAndConditions, and WhenUsingConditionsInsideResponseHandlers.
-/// </summary>
 [TestFixture]
 public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
 {
     private async Task NavigateAndBoot()
     {
         await NavigateTo("/Sandbox/Conditions/HttpMixing");
-        await WaitForTraceMessage("booted", 10000);
+        await WaitForPageReady(10000);
     }
 
     // ════════════════════════════════════════════════════════════════════

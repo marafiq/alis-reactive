@@ -76,8 +76,8 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMemberPath, "autocomplete",
-                CoercionTypes.InferFromType(typeof(TProp))));
+                setup.ElementId, ReactiveComponentMetadata.For(Component), setup.BindingPath,
+                ValueShapeFactory.FromClrType(typeof(TProp))));
 
             var builder = setup.Helper.EJS().AutoCompleteFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });

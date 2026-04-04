@@ -31,8 +31,8 @@ namespace Alis.Reactive.Native.Components
             var bindingPath = html.NameFor(expression);
 
             plan.RegisterComponent(bindingPath, new ComponentRegistration(
-                elementId, _component.Vendor, bindingPath, _component.ValueMemberPath, "hiddenfield",
-                CoercionTypes.InferFromType(typeof(TProp))));
+                elementId, ReactiveComponentMetadata.For(_component), bindingPath,
+                ValueShapeFactory.FromClrType(typeof(TProp))));
 
             return new NativeHiddenFieldBuilder<TModel, TProp>(html, expression);
         }

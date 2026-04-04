@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -7,9 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// Use as a type parameter in <c>p.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician)</c>
     /// to access FusionAutoComplete-specific mutations and value reading.
     /// </remarks>
-    public sealed class FusionAutoComplete : FusionComponent, IInputComponent
+    public sealed class FusionAutoComplete : FusionComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("autocomplete", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

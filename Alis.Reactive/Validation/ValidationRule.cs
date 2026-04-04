@@ -33,11 +33,11 @@ namespace Alis.Reactive.Validation
         public string? Field { get; }
 
         /// <summary>
-        /// Coercion type for comparison — derived from TProperty at extraction time.
+        /// Comparison shape hint derived from the validated property type.
         /// "number" for numeric types, "date" for DateTime/DateOnly, omitted for string comparison.
         /// </summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? CoerceAs { get; }
+        public string? ShapeToken { get; }
 
         /// <summary>
         /// Optional condition — rule only applies when condition is met.
@@ -51,14 +51,14 @@ namespace Alis.Reactive.Validation
         /// on framework-owned contract types allow devs to bypass the builder API and create invalid plan state.
         /// </summary>
         internal ValidationRule(string rule, string message, object? constraint = null,
-            ValidationCondition? when = null, string? field = null, string? coerceAs = null)
+            ValidationCondition? when = null, string? field = null, string? shapeToken = null)
         {
             Rule = rule;
             Message = message;
             Constraint = constraint;
             When = when;
             Field = field;
-            CoerceAs = coerceAs;
+            ShapeToken = shapeToken;
         }
     }
 }

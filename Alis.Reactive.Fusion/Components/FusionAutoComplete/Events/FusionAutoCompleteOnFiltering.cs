@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -25,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a new instance. Framework-internal: instances are created by the component event surface.
         /// </summary>
-        public FusionAutoCompleteFilteringArgs() { }
+        internal FusionAutoCompleteFilteringArgs() { }
     }
 
     /// <summary>
@@ -38,6 +39,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionAutoCompleteFilteringArgsExtensions
     {
+        private static readonly CapabilityProperty PreventDefaultProperty =
+            CapabilityProperty.FromSegments("preventDefault", new[] { PathSegment.FromProp("preventDefaultAction") });
+        private static readonly CapabilityMethod UpdateDataMethod = CapabilityMethod.Named("updateData");
+
         /// <summary>
         /// Suppresses the default client-side filtering so only server results appear.
         /// </summary>
@@ -52,7 +57,7 @@ namespace Alis.Reactive.Fusion.Components
             PipelineBuilder<TModel> pipeline)
             where TModel : class
         {
-            pipeline.SetEventProperty("preventDefaultAction", true, coerceAs: "boolean");
+            pipeline.SetEventProperty(PreventDefaultProperty, true);
         }
 
         /// <summary>
@@ -77,8 +82,11 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             where TResponse : class
         {
-            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            pipeline.CallEventMemberFromPath("updateData", sourcePath);
+            var payload = pipeline.Authoring.Values.DescribeResponsePayload(path);
+            pipeline.CallEventMember(
+                UpdateDataMethod,
+                new[] { payload.Expression },
+                new[] { payload.Shape });
         }
     }
 }

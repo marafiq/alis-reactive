@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../Alis.Reactive.Components/Alis.Reactive.Components.csproj" />
     <ProjectReference Include="../../Alis.Reactive/Alis.Reactive.csproj" />
     <ProjectReference Include="../../Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
     <ProjectReference Include="../../Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />

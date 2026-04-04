@@ -32,7 +32,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     public async Task hidden_veteran_section_with_truthy_condition_skips_rule()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
         // IsVeteran unchecked → veteran-section hidden
@@ -49,7 +49,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     public async Task shown_veteran_section_with_truthy_condition_fires_rule()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
         // Check IsVeteran → veteran-section shown
@@ -69,7 +69,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     public async Task toggling_checkbox_toggles_visibility_and_validation_together()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
 
@@ -102,7 +102,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     public async Task independent_hides_physician_and_memory_sections()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
 
@@ -120,7 +120,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     public async Task assisted_living_shows_physician_section_and_requires_physician()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
         await Input("CareLevel").SelectOptionAsync("Assisted Living");
@@ -139,7 +139,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     public async Task memory_care_shows_memory_section_and_requires_assessment()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
         await Input("CareLevel").SelectOptionAsync("Memory Care");
@@ -161,7 +161,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     public async Task unchecked_emergency_contact_requires_reason_and_hides_contact_fields()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
         // HasEmergencyContact unchecked by default
@@ -182,7 +182,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     public async Task checked_emergency_contact_requires_name_phone_and_hides_reason()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
         await Input("HasEmergencyContact").CheckAsync();
@@ -206,7 +206,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     public async Task toggling_emergency_contact_flips_all_validation_rules()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
 

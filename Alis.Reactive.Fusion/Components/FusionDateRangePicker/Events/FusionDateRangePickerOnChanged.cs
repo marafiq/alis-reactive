@@ -26,6 +26,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a new instance. Framework-internal: instances are created by the component event surface.
         /// </summary>
-        public FusionDateRangePickerChangeArgs() { }
+        internal FusionDateRangePickerChangeArgs() { }
     }
 }

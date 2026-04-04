@@ -25,7 +25,6 @@ export default tseslint.config(
     ignores: [
       "Alis.Reactive.SandboxApp/Scripts/core/coerce.ts",         // coerce.ts IS the implementation
       "Alis.Reactive.SandboxApp/Scripts/components/lab/**",       // lab test components are exempt
-      "Alis.Reactive.SandboxApp/Scripts/__tests__/**",            // test files are exempt
     ],
     rules: {
       // -- Bug catchers (errors) --
@@ -56,11 +55,4 @@ export default tseslint.config(
     },
   },
 
-  // Test files: relax some rules
-  {
-    files: ["Alis.Reactive.SandboxApp/Scripts/__tests__/**/*.ts"],
-    rules: {
-      "@typescript-eslint/no-explicit-any": "off",
-    },
-  },
 );

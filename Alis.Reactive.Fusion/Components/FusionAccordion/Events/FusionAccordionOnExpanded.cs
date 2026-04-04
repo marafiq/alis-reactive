@@ -14,6 +14,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Initializes a new instance of the <see cref="FusionAccordionExpandedArgs"/> class.
         /// </summary>
-        public FusionAccordionExpandedArgs() { }
+        internal FusionAccordionExpandedArgs() { }
     }
 }

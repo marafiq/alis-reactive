@@ -15,16 +15,12 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// Interface for components that can be read — provides ValueMemberPath as an instance property.
-    /// Used by gather and validation extensions as a generic constraint (with new()).
+    /// Marker for components that expose a bindable browser value.
+    /// The actual browser member is declared once on the component type via
+    /// the slice-owned component metadata.
     /// </summary>
-    public interface IInputComponent : IComponent
+    public interface IBindableComponent : IComponent
     {
-        /// <summary>
-        /// The property path from the vendor root for reading.
-        /// Examples: "value", "checked"
-        /// </summary>
-        string ValueMemberPath { get; }
     }
 
     /// <summary>

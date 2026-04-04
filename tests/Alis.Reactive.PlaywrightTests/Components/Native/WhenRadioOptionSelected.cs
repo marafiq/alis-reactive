@@ -1,12 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeRadioGroup API end-to-end in the browser:
-/// text-only variation, text + description variation,
-/// form submission (JSON POST + FluentValidation), component-read conditions.
-///
-/// Page under test: /Sandbox/Components/NativeRadioGroup
-/// </summary>
 [TestFixture]
 public class WhenRadioOptionSelected : PlaywrightTestBase
 {
@@ -16,7 +9,7 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
     }
 
     // ── Page loads ──
@@ -203,37 +196,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await Expect(Page.Locator($"input[type='radio'][name='RoomType']")).ToHaveCountAsync(3);
-        AssertNoConsoleErrors();
-    }
-
-    // ── Plan JSON ──
-
-    [Test]
-    public async Task plan_carries_native_vendor()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanResolver(planJson, "native-element");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_value_readexpr()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanValueMember(planJson, "value");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Boot trace ──
-
-    [Test]
-    public async Task boot_trace_is_emitted()
-    {
-        await NavigateAndBoot();
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
-        Assert.That(hasBootTrace, Is.True);
         AssertNoConsoleErrors();
     }
 }

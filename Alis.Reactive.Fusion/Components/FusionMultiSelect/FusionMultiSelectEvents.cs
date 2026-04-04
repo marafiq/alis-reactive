@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -9,6 +11,23 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionMultiSelectEvents
     {
+        private static readonly CapabilityProperty ValueEventMember = CapabilityProperty.Named("value");
+        private static readonly CapabilityProperty IsInteractedEventMember = CapabilityProperty.Named("isInteracted");
+        private static readonly CapabilityProperty TextEventMember = CapabilityProperty.Named("text");
+
+        private static readonly EventContractAuthoring ChangedContract =
+            EventPayloadContractAuthoring.Define<FusionMultiSelectChangeArgs>(payload =>
+            {
+                payload.Read(args => args.Value, ValueEventMember);
+                payload.Read(args => args.IsInteracted, IsInteractedEventMember);
+            });
+
+        private static readonly EventContractAuthoring FilteringContract =
+            EventPayloadContractAuthoring.Define<FusionMultiSelectFilteringArgs>(payload =>
+            {
+                payload.Read(args => args.Text, TextEventMember);
+            });
+
         /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionMultiSelectEvents Instance = new FusionMultiSelectEvents();
         private FusionMultiSelectEvents() { }
@@ -16,11 +35,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Fires when the selected value changes (SF "change" event).</summary>
         public ReactiveEvent<FusionMultiSelectChangeArgs> Changed =>
             new ReactiveEvent<FusionMultiSelectChangeArgs>(
-                "change", new FusionMultiSelectChangeArgs());
+                "change", ChangedContract);
 
         /// <summary>Fires when the user types to filter (SF "filtering" event).</summary>
         public ReactiveEvent<FusionMultiSelectFilteringArgs> Filtering =>
             new ReactiveEvent<FusionMultiSelectFilteringArgs>(
-                "filtering", new FusionMultiSelectFilteringArgs());
+                "filtering", FilteringContract);
     }
 }

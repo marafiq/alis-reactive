@@ -2,13 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.AppLevel;
 
-/// <summary>
-/// As a facility administrator using the slide-out drawer
-/// I want to open drawers of different sizes with different content
-/// So that I can view resident details, care plan notes, or add a new resident
-///
-/// Page under test: /Sandbox/Components/Drawer
-/// </summary>
 [TestFixture]
 public class WhenDrawerOpensAndCloses : PlaywrightTestBase
 {
@@ -17,7 +10,7 @@ public class WhenDrawerOpensAndCloses : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await WaitForPageReady(10000);
     }
 
     private ILocator Drawer => Page.Locator("#alis-drawer");

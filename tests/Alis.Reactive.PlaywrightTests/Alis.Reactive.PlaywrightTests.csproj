@@ -15,7 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
         <ProjectReference Include="../../Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
     </ItemGroup>
 

@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -8,9 +10,11 @@ namespace Alis.Reactive.Native.Components
     /// <c>.NativeTextArea()</c> factory to create a model-bound textarea with
     /// label, validation, and reactive event support.
     /// </remarks>
-    public sealed class NativeTextArea : NativeComponent, IInputComponent
+    public sealed class NativeTextArea : NativeComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly CapabilityMethod Focus = Method("focus");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("textarea", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

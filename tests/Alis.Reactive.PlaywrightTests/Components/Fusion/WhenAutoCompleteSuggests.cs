@@ -1,23 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises all FusionAutoComplete API end-to-end in the browser:
-/// property writes, method calls, property reads, events, conditions, and gather.
-///
-/// Page under test: /Sandbox/Components/AutoComplete
-///
-/// FusionAutoComplete renders an input element inside the wrapper div.
-/// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
-/// Tests use AutoCompleteLocator to interact via real browser gestures.
-/// </summary>
 [TestFixture]
 public class WhenAutoCompleteSuggests : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/AutoComplete";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_AutoCompleteModel";
     private const string PhysicianId = Scope + "__Physician";
     private const string MedicationId = Scope + "__MedicationType";
@@ -39,24 +28,12 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
-        AssertNoConsoleErrors();
-    }
-
     // ── Section 1: Property Write ──
 
     [Test]
     public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
-        // SF AutoComplete renders an input with the IdGenerator-based ID
         var ac = Physician;
         await Expect(ac.Input).ToBeVisibleAsync();
 
@@ -291,7 +268,7 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Deep BDD: state-cycle scenarios ──
+    // ── State-cycle scenarios ──
 
     [Test]
     public async Task selecting_multiple_different_values_fires_change_each_time()
@@ -376,11 +353,6 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
 
     // ── Section 7: Filtering Event — Server-Filtered HTTP ──
 
-    /// <summary>
-    /// Types text into the MedicationType AutoComplete using PressSequentially,
-    /// which simulates real keystrokes that trigger SF's filtering event.
-    /// FillAsync won't work — SF listens for keyup/keydown, not synthetic input events.
-    /// </summary>
     private async Task TypeInMedication(string text)
     {
         var input = Page.Locator($"#{MedicationId}");

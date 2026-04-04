@@ -1,5 +1,7 @@
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -11,7 +13,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionColorPickerExtensions
     {
-        private static readonly FusionColorPicker Component = new FusionColorPicker();
+        private static readonly CapabilityProperty DisabledProperty = CapabilityProperty.Named("disabled");
+        private static readonly CapabilityMethod ToggleMethod = CapabilityMethod.Named("toggle");
 
         /// <summary>Sets the color value (hex string, e.g. "#ff0000").</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -20,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, string? value)
             where TModel : class
-            => self.Set("value", value);
+            => self.Set(FusionColorPicker.Value, value);
 
         /// <summary>Toggles the ColorPicker popup open/closed.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -28,7 +31,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> Toggle<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
-            => self.Call("toggle");
+            => self.Call(ToggleMethod);
 
         /// <summary>Sets the disabled state of the ColorPicker.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -37,7 +40,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> Disable<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, bool disabled = true)
             where TModel : class
-            => self.Set("disabled", disabled, coerceAs: "boolean");
+            => self.Set(DisabledProperty, disabled);
 
         /// <summary>Reads the current color value for use in conditions or gather.</summary>
         /// <remarks>
@@ -46,9 +49,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the color picker's current hex value.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<string>();
     }
 }

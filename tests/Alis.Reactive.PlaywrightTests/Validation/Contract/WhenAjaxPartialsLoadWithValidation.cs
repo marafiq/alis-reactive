@@ -36,7 +36,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
     public async Task full_ajax_partial_lifecycle()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         // Step 1: Submit with placeholder — parent errors only, NO address in summary
         await ClickWhenStable(SubmitBtn);
@@ -85,7 +85,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
     public async Task reloading_partial_replaces_html_and_revalidates()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillParentFields();
         await SelectCustomAddress();
@@ -116,7 +116,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
     public async Task confirm_email_mismatch_shows_inline_error()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await Input("Name").FillAsync("Jane Smith");
         await Input("Email").FillAsync("a@b.com");
@@ -142,7 +142,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
     public async Task live_clear_works_on_reloaded_partial_fields()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillParentFields();
         await SelectCustomAddress();
@@ -177,7 +177,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
     public async Task partial_zipcode_change_fires_own_reactive_entry()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await SelectCustomAddress();
 

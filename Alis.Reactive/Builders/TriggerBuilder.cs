@@ -78,11 +78,10 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> CustomEvent<TPayload>(string eventName,
             Action<TPayload, PipelineBuilder<TModel>> pipeline)
-            where TPayload : new()
         {
             var scope = _plan.Authoring.CreateDocumentEventScope(eventName);
             var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
-            pipeline(new TPayload(), pb);
+            pipeline(default!, pb);
             AddWorkflow(scope, pb);
             return this;
         }
@@ -128,11 +127,10 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> ServerPush<TPayload>(string url, string eventType,
             Action<TPayload, PipelineBuilder<TModel>> pipeline)
-            where TPayload : new()
         {
             var scope = _plan.Authoring.CreateServerPushScope(url, eventType);
             var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
-            pipeline(new TPayload(), pb);
+            pipeline(default!, pb);
             AddWorkflow(scope, pb);
             return this;
         }
@@ -164,11 +162,10 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining additional triggers.</returns>
         public TriggerBuilder<TModel> SignalR<TPayload>(string hubUrl, string methodName,
             Action<TPayload, PipelineBuilder<TModel>> pipeline)
-            where TPayload : new()
         {
             var scope = _plan.Authoring.CreateSignalRScope(hubUrl, methodName);
             var pb = new PipelineBuilder<TModel>(_plan.Authoring, scope);
-            pipeline(new TPayload(), pb);
+            pipeline(default!, pb);
             AddWorkflow(scope, pb);
             return this;
         }

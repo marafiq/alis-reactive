@@ -12,8 +12,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeTextBoxExtensions
     {
-        private static readonly NativeTextBox _component = new NativeTextBox();
-
         /// <summary>
         /// Sets the text input value in the browser.
         /// </summary>
@@ -25,7 +23,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeTextBox, TModel> self, string value)
             where TModel : class
         {
-            return self.Set("value", value);
+            return self.Set(NativeTextBox.Value, value);
         }
 
         /// <summary>
@@ -38,7 +36,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeTextBox, TModel> self)
             where TModel : class
         {
-            return self.Call("focus");
+            return self.Call(NativeTextBox.Focus);
         }
 
         /// <summary>
@@ -47,11 +45,11 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the input's current value.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<NativeTextBox, TModel> self)
             where TModel : class
         {
-            return new ComponentValueExpression<string>(self.TargetId, _component.Vendor, _component.ValueMemberPath);
+            return self.CreateValue<string>();
         }
     }
 }

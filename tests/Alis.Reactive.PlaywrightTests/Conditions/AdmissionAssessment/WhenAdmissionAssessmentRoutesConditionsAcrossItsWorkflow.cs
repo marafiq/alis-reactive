@@ -1,7 +1,4 @@
-using System.Linq.Expressions;
-using Alis.Reactive;
-using Alis.Reactive.Playwright.Extensions;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessment;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.AdmissionAssessment;
 
@@ -9,61 +6,54 @@ namespace Alis.Reactive.PlaywrightTests.Conditions.AdmissionAssessment;
 public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Conditions/AdmissionAssessment";
+    private const string Step1Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Conditions_AdmissionAssessment_Step1DemographicsModel__";
+    private const string Step2Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Conditions_AdmissionAssessment_Step2ClinicalModel__";
+    private const string Step3Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Conditions_AdmissionAssessment_Step3FunctionalModel__";
+    private const string Step4Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Conditions_AdmissionAssessment_Step4ReviewModel__";
 
     private async Task NavigateAndBoot()
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#next-1");
     }
 
-    private static string IdFor<TModel>(Expression<Func<TModel, object?>> expr) where TModel : class
-        => IdGenerator.For(expr);
-
-    private ILocator Input<TModel>(Expression<Func<TModel, object?>> expr) where TModel : class
-        => Page.Locator($"#{IdFor(expr)}");
-
-    private DropDownListLocator DropDown<TModel>(Expression<Func<TModel, object?>> expr) where TModel : class
-        => new(Page, IdFor(expr));
-
-    private ILocator SwitchWrapper<TModel>(Expression<Func<TModel, object?>> expr) where TModel : class
-        => Page.Locator($".e-switch-wrapper:has(#{IdFor(expr)})");
-
     private ILocator ErrorFor(string formId, string fieldName)
         => Page.Locator($"#{formId} span[data-valmsg-for='{fieldName}']");
 
-    private async Task FillAndBlur<TModel>(Expression<Func<TModel, object?>> expr, string value) where TModel : class
+    private static string Id(string scope, string member) => scope + member;
+
+    private NativeTextBoxLocator TextBox(string scope, string member) => new(Page, Id(scope, member));
+    private NumericTextBoxLocator NumberBox(string scope, string member) => new(Page, Id(scope, member));
+    private DropDownListLocator DropDown(string scope, string member) => new(Page, Id(scope, member));
+    private SwitchLocator Switch(string scope, string member) => new(Page, Id(scope, member));
+
+    private async Task FillAndBlur(string scope, string member, string value)
     {
-        var input = Input(expr);
-        await input.ClickAsync();
-        await input.FillAsync(value);
-        await input.PressAsync("Tab");
+        await TextBox(scope, member).FillAndBlur(value);
     }
 
-    private async Task ToggleSwitch<TModel>(Expression<Func<TModel, object?>> expr) where TModel : class
+    private async Task ToggleSwitch(string scope, string member)
     {
-        await SwitchWrapper(expr).ClickWhenStableAsync(Page);
+        await Switch(scope, member).Toggle();
     }
 
-    private async Task TypeAndSelectAutoComplete<TModel>(
-        Expression<Func<TModel, object?>> expr,
-        string searchText,
-        string itemText) where TModel : class
+    private async Task TypeAndSelectAutoComplete(string scope, string member, string searchText, string itemText)
     {
-        var id = IdFor(expr);
-        var input = Page.Locator($"#{id}");
-        var popup = Page.Locator($"#{id}_popup");
+        var fieldId = Id(scope, member);
+        var input = Page.Locator($"#{fieldId}");
+        var popup = Page.Locator($"#{fieldId}_popup");
 
-        await input.ClickWhenStableAsync(Page);
+        await input.ClickWhenStableAsync();
         await input.PressSequentiallyAsync(searchText, new() { Delay = 50 });
         await popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 15000 });
-        await popup.Locator(".e-list-item").GetByText(itemText, new() { Exact = true }).ClickWhenStableAsync(Page);
+        await popup.Locator(".e-list-item").GetByText(itemText, new() { Exact = true }).ClickWhenStableAsync();
         await popup.WaitForAsync(new() { State = WaitForSelectorState.Hidden, Timeout = 15000 });
     }
 
     private async Task CompleteStep1(string residentName, string age, string diagnosis)
     {
-        await FillAndBlur<Step1DemographicsModel>(m => m.ResidentName, residentName);
-        await FillAndBlur<Step1DemographicsModel>(m => m.Age, age);
-        await DropDown<Step1DemographicsModel>(m => m.PrimaryDiagnosis).Select(diagnosis);
+        await FillAndBlur(Step1Scope, "ResidentName", residentName);
+        await FillAndBlur(Step1Scope, "Age", age);
+        await DropDown(Step1Scope, "PrimaryDiagnosis").Select(diagnosis);
         await ClickWhenStable(Page.Locator("#next-1"));
         await Expect(Page.Locator("#step-2")).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
@@ -85,14 +75,14 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
     {
         await NavigateAndBoot();
 
-        await FillAndBlur<Step1DemographicsModel>(m => m.Age, "88");
+        await FillAndBlur(Step1Scope, "Age", "88");
         await Expect(Page.Locator("#risk-badge")).ToHaveTextAsync("High Risk", new() { Timeout = 5000 });
 
-        await ToggleSwitch<Step1DemographicsModel>(m => m.IsVeteran);
+        await ToggleSwitch(Step1Scope, "IsVeteran");
         await Expect(Page.Locator("#veteran-section")).ToBeVisibleAsync();
 
-        await TypeAndSelectAutoComplete<Step1DemographicsModel>(m => m.AttendingPhysician, "Sarah", "Dr. Sarah Chen");
-        await Expect(Input<Step1DemographicsModel>(m => m.AttendingPhysician)).ToHaveValueAsync("Dr. Sarah Chen");
+        await TypeAndSelectAutoComplete(Step1Scope, "AttendingPhysician", "Sarah", "Dr. Sarah Chen");
+        await Expect(Page.Locator($"#{Id(Step1Scope, "AttendingPhysician")}")).ToHaveValueAsync("Dr. Sarah Chen");
 
         AssertNoConsoleErrors();
     }
@@ -107,12 +97,12 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         await Expect(Page.Locator("#cardiac-section")).ToBeHiddenAsync();
         await Expect(Page.Locator("#diabetes-section")).ToBeHiddenAsync();
 
-        await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "12");
+        await FillAndBlur(Step2Scope, "CognitiveScore", "12");
         await Expect(Page.Locator("#cognitive-status")).ToContainTextAsync("Memory Care", new() { Timeout = 5000 });
 
-        await ToggleSwitch<Step2ClinicalModel>(m => m.Wanders);
+        await ToggleSwitch(Step2Scope, "Wanders");
         await Expect(Page.Locator("#wander-details")).ToBeVisibleAsync();
-        await DropDown<Step2ClinicalModel>(m => m.WanderFrequency).Select("Frequently");
+        await DropDown(Step2Scope, "WanderFrequency").Select("Frequently");
         await Expect(Page.Locator("#elopement-result")).ToContainTextAsync("Elopement risk flagged", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
@@ -125,21 +115,21 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         await CompleteStep1("Robert Miles", "88", "Other");
         await CompleteStep2();
 
-        await DropDown<Step3FunctionalModel>(m => m.MobilityAid).Select("Wheelchair");
+        await DropDown(Step3Scope, "MobilityAid").Select("Wheelchair");
         await Expect(Page.Locator("#escort-indicator")).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Page.Locator("#room-result")).ToContainTextAsync("Accessible room scheduled", new() { Timeout = 5000 });
 
-        await DropDown<Step3FunctionalModel>(m => m.FallHistory).Select("1-2 falls");
+        await DropDown(Step3Scope, "FallHistory").Select("1-2 falls");
         await Expect(Page.Locator("#fall-details")).ToBeVisibleAsync();
-        await ToggleSwitch<Step3FunctionalModel>(m => m.CausedInjury);
+        await ToggleSwitch(Step3Scope, "CausedInjury");
         await Expect(Page.Locator("#injury-details")).ToBeVisibleAsync();
-        await DropDown<Step3FunctionalModel>(m => m.InjuryType).Select("Head Injury");
+        await DropDown(Step3Scope, "InjuryType").Select("Head Injury");
         await Expect(Page.Locator("#neuro-result")).ToContainTextAsync("Neuro consult ordered", new() { Timeout = 5000 });
 
-        await ToggleSwitch<Step3FunctionalModel>(m => m.TakesPainMedication);
+        await ToggleSwitch(Step3Scope, "TakesPainMedication");
         await Expect(Page.Locator("#pain-section")).ToBeVisibleAsync();
-        await FillAndBlur<Step3FunctionalModel>(m => m.PainLocation, "Lower back");
-        await FillAndBlur<Step3FunctionalModel>(m => m.PainLevel, "8");
+        await FillAndBlur(Step3Scope, "PainLocation", "Lower back");
+        await FillAndBlur(Step3Scope, "PainLevel", "8");
         await Expect(Page.Locator("#pain-result")).ToContainTextAsync("Pain management required", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
@@ -157,7 +147,7 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         await Expect(ErrorFor("screening-form", "EmergencyContact")).ToContainTextAsync("required", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-4")).ToBeVisibleAsync();
 
-        await FillAndBlur<Step4ReviewModel>(m => m.EmergencyContact, "Sam Hart 555-0101");
+        await FillAndBlur(Step4Scope, "EmergencyContact", "Sam Hart 555-0101");
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
         await Expect(Page.Locator("#submit-result")).ToContainTextAsync("Assessment complete for Evelyn Hart", new() { Timeout = 5000 });

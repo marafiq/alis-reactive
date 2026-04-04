@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -14,6 +16,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionAccordionExtensions
     {
+        private static readonly CapabilityMethod ExpandItemMethod = CapabilityMethod.Named("expandItem");
+        private static readonly CapabilityMethod EnableItemMethod = CapabilityMethod.Named("enableItem");
+
         /// <summary>
         /// Expands or collapses a panel by index.
         /// Runtime: ej2.expandItem(isExpand, index)
@@ -25,7 +30,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> ExpandItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, bool isExpand, int index)
             where TModel : class
-            => self.Call("expandItem", isExpand, index);
+            => self.Call(ExpandItemMethod, isExpand, index);
 
         /// <summary>
         /// Enables or disables a panel by index.
@@ -38,6 +43,6 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> EnableItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, int index, bool isEnable = true)
             where TModel : class
-            => self.Call("enableItem", index, isEnable);
+            => self.Call(EnableItemMethod, index, isEnable);
     }
 }

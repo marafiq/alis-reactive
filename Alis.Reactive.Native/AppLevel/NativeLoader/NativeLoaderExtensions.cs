@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native.AppLevel
         public static ComponentRef<NativeLoader, TModel> SetTarget<TModel>(
             this ComponentRef<NativeLoader, TModel> self, string targetId)
             where TModel : class
-            => self.Call("setAttribute", "data-target", targetId);
+            => self.Call(global::Alis.Reactive.Native.AppLevel.NativeLoader.SetAttribute, "data-target", targetId);
 
         /// <summary>
         /// Sets an auto-hide timeout so the loader disappears after the specified duration.
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Native.AppLevel
         public static ComponentRef<NativeLoader, TModel> SetTimeout<TModel>(
             this ComponentRef<NativeLoader, TModel> self, int ms)
             where TModel : class
-            => self.Call("setAttribute", "data-timeout", ms.ToString());
+            => self.Call(global::Alis.Reactive.Native.AppLevel.NativeLoader.SetAttribute, "data-timeout", ms.ToString());
 
         /// <summary>
         /// Shows the loader overlay, making it visible and accessible.
@@ -47,8 +47,8 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            return self.Call("classList.add", "alis-loader--visible")
-                       .Call("removeAttribute", "aria-hidden");
+            return self.Call(global::Alis.Reactive.Native.AppLevel.NativeLoader.AddCssClass, "alis-loader--visible")
+                       .Call(global::Alis.Reactive.Native.AppLevel.NativeLoader.RemoveAttribute, "aria-hidden");
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            return self.Call("classList.remove", "alis-loader--visible")
-                       .Call("setAttribute", "aria-hidden", "true");
+            return self.Call(global::Alis.Reactive.Native.AppLevel.NativeLoader.RemoveCssClass, "alis-loader--visible")
+                       .Call(global::Alis.Reactive.Native.AppLevel.NativeLoader.SetAttribute, "aria-hidden", "true");
         }
 
         /// <summary>

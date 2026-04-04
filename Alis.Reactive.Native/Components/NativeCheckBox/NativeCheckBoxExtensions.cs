@@ -12,8 +12,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeCheckBoxExtensions
     {
-        private static readonly NativeCheckBox _component = new NativeCheckBox();
-
         /// <summary>
         /// Sets the checkbox checked state in the browser.
         /// </summary>
@@ -25,7 +23,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.Set("checked", isChecked, coerceAs: "boolean");
+            return self.Set(NativeCheckBox.Checked, isChecked);
         }
 
         /// <summary>
@@ -38,7 +36,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return self.Call("focus");
+            return self.Call(NativeCheckBox.Focus);
         }
 
         /// <summary>
@@ -47,11 +45,11 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the checkbox's current checked state.</returns>
-        public static ComponentValueExpression<bool> Value<TModel>(
+        public static ReactiveValue<bool> Value<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return new ComponentValueExpression<bool>(self.TargetId, _component.Vendor, _component.ValueMemberPath);
+            return self.CreateValue<bool>();
         }
     }
 }

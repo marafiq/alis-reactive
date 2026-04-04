@@ -32,8 +32,8 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMemberPath, "colorpicker",
-                CoercionTypes.InferFromType(typeof(TProp))));
+                setup.ElementId, ReactiveComponentMetadata.For(Component), setup.BindingPath,
+                ValueShapeFactory.FromClrType(typeof(TProp))));
 
             // CRITICAL: Pass htmlAttributes as a parameter to ColorPickerFor(), NOT as a fluent
             // .HtmlAttributes() call. The fluent method does not override the element ID on

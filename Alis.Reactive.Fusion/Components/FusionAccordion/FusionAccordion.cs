@@ -2,10 +2,11 @@ namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
     /// FusionAccordion — non-input container component.
-    /// Has events and methods but no form value (no ValueMemberPath, no IInputComponent).
+    /// Has events and methods but no form value.
     /// </summary>
     public sealed class FusionAccordion : FusionComponent
     {
-        // NO ValueMemberPath — this component has no form value to read
+        internal static readonly ComponentMetadata Definition = Describe("accordion");
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

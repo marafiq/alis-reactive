@@ -16,7 +16,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionTabReactiveExtensions
     {
-        private static readonly FusionTab Component = new FusionTab();
 
         /// <summary>
         /// Attaches a reactive workflow to a Fusion Tab event.
@@ -36,12 +35,11 @@ namespace Alis.Reactive.Fusion.Components
             var reactiveEvent = eventSelector(FusionTabEvents.Instance);
             var scope = builder.Plan.Authoring.CreateObjectEventScope(
                 builder.ElementId,
-                Component.Vendor,
-                null,
-                null,
-                reactiveEvent.EventName);
+                FusionTab.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(builder.Plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             builder.Plan.AddWorkflow(scope, pb);
 
             return builder;

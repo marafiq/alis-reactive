@@ -1,6 +1,8 @@
 using System.Globalization;
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -12,7 +14,11 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionNumericTextBoxExtensions
     {
-        private static readonly FusionNumericTextBox Component = new FusionNumericTextBox();
+        private static readonly CapabilityProperty MinimumProperty = CapabilityProperty.Named("min");
+        private static readonly CapabilityMethod FocusInMethod = CapabilityMethod.Named("focusIn");
+        private static readonly CapabilityMethod FocusOutMethod = CapabilityMethod.Named("focusOut");
+        private static readonly CapabilityMethod IncrementMethod = CapabilityMethod.Named("increment");
+        private static readonly CapabilityMethod DecrementMethod = CapabilityMethod.Named("decrement");
 
         /// <summary>Sets the numeric value.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -22,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal value)
             where TModel : class
         {
-            return self.Set("value", value, coerceAs: "number");
+            return self.Set(FusionNumericTextBox.Value, value);
         }
 
         /// <summary>Sets the minimum allowed value.</summary>
@@ -33,7 +39,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal min)
             where TModel : class
         {
-            return self.Set("min", min, coerceAs: "number");
+            return self.Set(MinimumProperty, min);
         }
 
         /// <summary>Moves focus into the numeric input.</summary>
@@ -42,7 +48,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionNumericTextBox, TModel> FocusIn<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Call("focusIn");
+            => self.Call(FocusInMethod);
 
         /// <summary>Removes focus from the numeric input.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -50,7 +56,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionNumericTextBox, TModel> FocusOut<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Call("focusOut");
+            => self.Call(FocusOutMethod);
 
         /// <summary>Increments the value by one step.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -58,7 +64,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionNumericTextBox, TModel> Increment<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Call("increment");
+            => self.Call(IncrementMethod);
 
         /// <summary>Decrements the value by one step.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -66,7 +72,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionNumericTextBox, TModel> Decrement<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Call("decrement");
+            => self.Call(DecrementMethod);
 
         /// <summary>Reads the current numeric value for use in conditions or gather.</summary>
         /// <remarks>
@@ -75,9 +81,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the numeric input's current value.</returns>
-        public static ComponentValueExpression<decimal> Value<TModel>(
+        public static ReactiveValue<decimal> Value<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<decimal>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<decimal>();
     }
 }

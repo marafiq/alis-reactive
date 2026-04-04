@@ -18,6 +18,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Initializes a new instance. Framework use only.
         /// </summary>
-        public NativeCheckListChangeArgs() { }
+        internal NativeCheckListChangeArgs() { }
     }
 }

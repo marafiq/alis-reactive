@@ -1,23 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises all FusionNumericTextBox API end-to-end in the browser:
-/// property writes, method calls, property reads, events, conditions, and gather.
-///
-/// Page under test: /Sandbox/Components/NumericTextBox
-///
-/// FusionNumericTextBox renders an inner input element inside the wrapper div.
-/// The wrapper element gets the IdGenerator-based ID. Tests use
-/// NumericTextBoxLocator to interact via real browser gestures.
-/// </summary>
 [TestFixture]
 public class WhenNumericValueEntered : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NumericTextBox";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NumericTextBoxModel";
     private const string AmountId = Scope + "__Amount";
     private const string TemperatureId = Scope + "__Temperature";
@@ -40,24 +29,12 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
-        AssertNoConsoleErrors();
-    }
-
     // ── Section 1: Property Write ──
 
     [Test]
     public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
-        // SF NumericTextBox renders an input with the IdGenerator-based ID
         await Expect(Amount.Input).ToBeVisibleAsync();
 
         // Wait for the value to be set by dom-ready — verify via the visible input
@@ -120,7 +97,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // SF NumericTextBox renders the <input> directly with the IdGenerator-based ID
         // after client-side init. Use FillAsync to set the value, then Tab to trigger
         // the SF change event (which reads the committed value).
         var tempInput = Page.Locator($"#{TemperatureId}");

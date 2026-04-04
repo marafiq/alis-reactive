@@ -1,12 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeHiddenField API end-to-end in the browser:
-/// hidden inputs with seeded values, property reads (Value as source),
-/// and POST gather (IncludeAll picks up hidden fields).
-///
-/// Page under test: /Sandbox/Components/NativeHiddenField
-/// </summary>
 [TestFixture]
 public class WhenHiddenStateIsPersisted : PlaywrightTestBase
 {
@@ -16,7 +9,7 @@ public class WhenHiddenStateIsPersisted : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
     }
 
     // -- Page loads --

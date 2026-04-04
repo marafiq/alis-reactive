@@ -1,10 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 
-/// <summary>
-/// As a shift supervisor
-/// I want to see resident status updates from a different hub
-/// So that I know when care levels change across the facility
-/// </summary>
 [TestFixture]
 public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
 {
@@ -15,6 +10,11 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
     private ILocator ResidentName => Page.Locator("#resident-name");
     private ILocator ResidentStatus => Page.Locator("#resident-status");
     private ILocator ResidentCareLevel => Page.Locator("#resident-care-level");
+
+    private async Task WaitForResidentFeed()
+    {
+        await Expect(ResidentName).Not.ToContainTextAsync("—", new() { Timeout = 10000 });
+    }
 
     private async Task PushResidentStatus()
     {
@@ -30,8 +30,8 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
     public async Task resident_details_update_from_second_hub()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await WaitForPageReady(10000);
+        await WaitForResidentFeed();
 
         await PushResidentStatus();
 
@@ -47,8 +47,8 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
     public async Task two_hubs_operate_independently()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await WaitForPageReady(10000);
+        await WaitForResidentFeed();
 
         // Push to Hub 2 only
         await PushResidentStatus();

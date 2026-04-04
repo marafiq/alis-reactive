@@ -21,7 +21,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionFileUploadReactiveExtensions
     {
-        private static readonly FusionFileUpload Component = new FusionFileUpload();
 
         /// <summary>
         /// Wires a FusionFileUpload event to a reactive pipeline that executes in the browser.
@@ -46,15 +45,13 @@ namespace Alis.Reactive.Fusion.Components
             // name is set via HtmlAttributes.
             var componentId = builder.model.Id;
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
-            var bindingPath = (string)attrs["name"];
             var scope = plan.Authoring.CreateObjectEventScope(
                 componentId,
-                Component.Vendor,
-                bindingPath,
-                Component.ValueMemberPath,
-                reactiveEvent.EventName);
+                FusionFileUpload.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             plan.AddWorkflow(scope, pb);
 
             return builder;

@@ -1,3 +1,6 @@
+using System;
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -9,6 +12,16 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionDatePickerEvents
     {
+        private static readonly CapabilityProperty ValueEventMember = CapabilityProperty.Named("value");
+        private static readonly CapabilityProperty IsInteractedEventMember = CapabilityProperty.Named("isInteracted");
+
+        private static readonly EventContractAuthoring ChangedContract =
+            EventPayloadContractAuthoring.Define<FusionDatePickerChangeArgs>(payload =>
+            {
+                payload.Read(args => args.Value, ValueEventMember);
+                payload.Read(args => args.IsInteracted, IsInteractedEventMember);
+            });
+
         /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionDatePickerEvents Instance = new FusionDatePickerEvents();
         private FusionDatePickerEvents() { }
@@ -16,6 +29,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Fires when the date value changes (SF "change" event).</summary>
         public ReactiveEvent<FusionDatePickerChangeArgs> Changed =>
             new ReactiveEvent<FusionDatePickerChangeArgs>(
-                "change", new FusionDatePickerChangeArgs());
+                "change", ChangedContract);
     }
 }

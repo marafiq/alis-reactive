@@ -27,8 +27,8 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMemberPath, "checklist",
-                CoercionTypes.InferFromType(typeof(TProp))));
+                setup.ElementId, ReactiveComponentMetadata.For(_component), setup.BindingPath,
+                ValueShapeFactory.FromClrType(typeof(TProp))));
 
             var builder = new NativeCheckListBuilder<TModel, TProp>(setup.Helper, setup.Expression);
             build(builder);

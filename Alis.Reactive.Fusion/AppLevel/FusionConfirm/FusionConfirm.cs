@@ -5,10 +5,14 @@ namespace Alis.Reactive.Fusion.AppLevel
     /// </summary>
     public sealed class FusionConfirm : FusionComponent, IAppLevelComponent
     {
+        internal static readonly ComponentMetadata Definition = Describe("confirm");
+
         /// <summary>Gets the DOM element id used for the singleton confirm host.</summary>
         public const string ElementId = "alisConfirmDialog";
 
         /// <summary>Gets the default component id used when resolving the app-level dialog.</summary>
         public string DefaultId => ElementId;
+
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

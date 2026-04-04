@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Builders.Requests
 {
     internal abstract class RequestValuePart { }
@@ -18,29 +20,36 @@ namespace Alis.Reactive.Builders.Requests
 
     internal sealed class ContextRequestValue : RequestValuePart
     {
-        internal ContextRequestValue(string key, string path)
+        internal ContextRequestValue(string key, ValueExpr value)
         {
             Key = key;
-            Path = path;
+            Value = value;
         }
 
         internal string Key { get; }
-        internal string Path { get; }
+        internal ValueExpr Value { get; }
     }
 
     internal sealed class ComponentRequestValue : RequestValuePart
     {
-        internal ComponentRequestValue(string key, string componentId, string vendor, string valueMemberPath)
+        internal ComponentRequestValue(
+            string key,
+            string componentId,
+            ComponentMetadata component,
+            CapabilityProperty binding,
+            ValueShape? shape = null)
         {
             Key = key;
             ComponentId = componentId;
-            Vendor = vendor;
-            ValueMemberPath = valueMemberPath;
+            Component = component;
+            Binding = binding;
+            Shape = shape;
         }
 
         internal string Key { get; }
         internal string ComponentId { get; }
-        internal string Vendor { get; }
-        internal string ValueMemberPath { get; }
+        internal ComponentMetadata Component { get; }
+        internal CapabilityProperty Binding { get; }
+        internal ValueShape? Shape { get; }
     }
 }

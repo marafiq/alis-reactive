@@ -9,8 +9,6 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeHiddenFieldExtensions
     {
-        private static readonly NativeHiddenField _component = new NativeHiddenField();
-
         /// <summary>Sets the hidden field value from a literal string.</summary>
         /// <param name="self">The component reference to operate on.</param>
         /// <param name="value">The value to assign.</param>
@@ -19,7 +17,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeHiddenField, TModel> self, string value)
             where TModel : class
         {
-            return self.Set("value", value);
+            return self.Set(NativeHiddenField.Value, value);
         }
 
         /// <summary>Sets the hidden field value from another component read.</summary>
@@ -27,10 +25,10 @@ namespace Alis.Reactive.Native.Components
         /// <param name="source">The component value expression to copy from.</param>
         /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel>(
-            this ComponentRef<NativeHiddenField, TModel> self, ComponentValueExpression<string> source)
+            this ComponentRef<NativeHiddenField, TModel> self, ReactiveValue<string> source)
             where TModel : class
         {
-            return self.Set("value", source);
+            return self.Set(NativeHiddenField.Value, source);
         }
 
         /// <summary>Sets the hidden field value from an HTTP response path.</summary>
@@ -45,19 +43,16 @@ namespace Alis.Reactive.Native.Components
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
             where TModel : class
             where TResponse : class
-        {
-            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.SetFromPath("value", sourcePath);
-        }
+            => self.SetFromResponse(NativeHiddenField.Value, path);
 
         /// <summary>Reads the current hidden field value for conditions and gather.</summary>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the hidden field value.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<NativeHiddenField, TModel> self)
             where TModel : class
         {
-            return new ComponentValueExpression<string>(self.TargetId, _component.Vendor, _component.ValueMemberPath);
+            return self.CreateValue<string>();
         }
     }
 }

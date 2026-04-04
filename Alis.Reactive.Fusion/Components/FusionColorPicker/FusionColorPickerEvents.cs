@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -9,6 +11,14 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionColorPickerEvents
     {
+        private static readonly CapabilityProperty ValueEventMember = CapabilityProperty.Named("value");
+
+        private static readonly EventContractAuthoring ChangedContract =
+            EventPayloadContractAuthoring.Define<FusionColorPickerChangeArgs>(payload =>
+            {
+                payload.Read(args => args.Value, ValueEventMember);
+            });
+
         /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionColorPickerEvents Instance = new FusionColorPickerEvents();
         private FusionColorPickerEvents() { }
@@ -16,6 +26,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Fires when the color value changes (SF "change" event).</summary>
         public ReactiveEvent<FusionColorPickerChangeArgs> Changed =>
             new ReactiveEvent<FusionColorPickerChangeArgs>(
-                "change", new FusionColorPickerChangeArgs());
+                "change", ChangedContract);
     }
 }

@@ -1,5 +1,7 @@
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -11,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionInputMaskExtensions
     {
-        private static readonly FusionInputMask Component = new FusionInputMask();
+        private static readonly CapabilityMethod FocusInMethod = CapabilityMethod.Named("focusIn");
 
         /// <summary>Sets the masked input value.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -21,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionInputMask, TModel> self, string value)
             where TModel : class
         {
-            return self.Set("value", value);
+            return self.Set(FusionInputMask.Value, value);
         }
 
         /// <summary>Moves focus into the masked input.</summary>
@@ -30,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInputMask, TModel> FocusIn<TModel>(
             this ComponentRef<FusionInputMask, TModel> self)
             where TModel : class
-            => self.Call("focusIn");
+            => self.Call(FocusInMethod);
 
         /// <summary>Reads the current masked value for use in conditions or gather.</summary>
         /// <remarks>
@@ -39,9 +41,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the masked input's current value.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<FusionInputMask, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<string>();
     }
 }

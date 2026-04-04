@@ -1,6 +1,8 @@
 using System;
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -21,7 +23,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionDateRangePickerExtensions
     {
-        private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();
+        private static readonly CapabilityProperty StartDateProperty = CapabilityProperty.Named("startDate");
+        private static readonly CapabilityProperty EndDateProperty = CapabilityProperty.Named("endDate");
 
         /// <summary>Reads the start date for use in conditions or gather.</summary>
         /// <remarks>
@@ -30,10 +33,10 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the range's start date.</returns>
-        public static ComponentValueExpression<DateTime> StartDate<TModel>(
+        public static ReactiveValue<DateTime> StartDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<DateTime>(self.TargetId, Component.Vendor, "startDate");
+            => self.CreateValue<DateTime>(StartDateProperty);
 
         /// <summary>Reads the end date for use in conditions or gather.</summary>
         /// <remarks>
@@ -42,10 +45,10 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the range's end date.</returns>
-        public static ComponentValueExpression<DateTime> EndDate<TModel>(
+        public static ReactiveValue<DateTime> EndDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<DateTime>(self.TargetId, Component.Vendor, "endDate");
+            => self.CreateValue<DateTime>(EndDateProperty);
 
         /// <summary>Reads both dates as an array for use in conditions or gather.</summary>
         /// <remarks>
@@ -59,9 +62,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the full date range (start and end).</returns>
-        public static ComponentValueExpression<DateTime[]> Value<TModel>(
+        public static ReactiveValue<DateTime[]> Value<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<DateTime[]>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<DateTime[]>();
     }
 }

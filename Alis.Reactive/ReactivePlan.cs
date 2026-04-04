@@ -8,7 +8,7 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Collects reactive workflows and registered components for a view, then
-    /// renders the V2 execution plan for the browser runtime.
+        /// renders the execution plan for the browser runtime.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -78,6 +78,17 @@ namespace Alis.Reactive
         internal IReadOnlyDictionary<string, ComponentRegistration> RegisteredComponents => _authoring.Components;
         internal PlanAuthoringContext Authoring => _authoring;
 
+        internal void EnsureComponentRegistered(string bindingPath)
+        {
+            if (_authoring.Components.ContainsKey(bindingPath))
+                return;
+
+            throw new InvalidOperationException(
+                $"Component for '{bindingPath}' was rendered without calling " +
+                $"plan.RegisterComponent(). Validation and gather will not work. " +
+                $"Add plan.RegisterComponent(\"{bindingPath}\", ...) in your HtmlExtensions factory.");
+        }
+
         /// <summary>
         /// Registers a component for a model property so validation and gather can find it.
         /// Called by component builders, not intended for direct use in views.
@@ -93,16 +104,16 @@ namespace Alis.Reactive
             if (_authoring.Components.TryGetValue(bindingPath, out var existing))
             {
                 if (existing.ComponentId == registration.ComponentId
-                    && existing.Vendor == registration.Vendor
-                    && existing.ValueMemberPath == registration.ValueMemberPath
-                    && existing.ComponentType == registration.ComponentType
-                    && existing.CoerceAs == registration.CoerceAs)
+                    && existing.Component.Vendor == registration.Component.Vendor
+                    && CapabilityPath.Same(existing.Binding.Path, registration.Binding.Path)
+                    && string.Equals(existing.Component.Kind, registration.Component.Kind, StringComparison.Ordinal)
+                    && ValueShapeFactory.AreEquivalent(existing.BindingShape, registration.BindingShape))
                     return;
 
                 throw new InvalidOperationException(
                     $"Duplicate component registration for binding path '{bindingPath}': " +
-                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ValueMemberPath}, {existing.ComponentType}, {existing.CoerceAs}] vs " +
-                    $"new [{registration.ComponentId}, {registration.Vendor}, {registration.ValueMemberPath}, {registration.ComponentType}, {registration.CoerceAs}]. " +
+                    $"existing [{existing.ComponentId}, {existing.Component.Vendor}, {CapabilityPath.Format(existing.Binding.Path)}, {existing.Component.Kind}, {ValueShapeFactory.Describe(existing.BindingShape)}] vs " +
+                    $"new [{registration.ComponentId}, {registration.Component.Vendor}, {CapabilityPath.Format(registration.Binding.Path)}, {registration.Component.Kind}, {ValueShapeFactory.Describe(registration.BindingShape)}]. " +
                     "Each binding path must map to exactly one component.");
             }
 
@@ -125,13 +136,13 @@ namespace Alis.Reactive
         /// </summary>
         /// <remarks>
         /// Called by <c>Html.RenderPlan(plan)</c>, not called directly in views.
-        /// Resolves validation rules before rendering the V2 plan document.
+        /// Resolves validation rules before rendering the plan document.
         /// </remarks>
         /// <returns>The rendered plan string consumed by the browser.</returns>
         public string Render()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(_authoring.Document, CompactOptions);
+            return JsonSerializer.Serialize(_authoring.Plan, CompactOptions);
         }
 
         /// <summary>
@@ -141,7 +152,7 @@ namespace Alis.Reactive
         public string RenderFormatted()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(_authoring.Document, FormattedOptions);
+            return JsonSerializer.Serialize(_authoring.Plan, FormattedOptions);
         }
 
         // Resolve validation rules before serialization.

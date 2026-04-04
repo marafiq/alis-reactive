@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -7,9 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// Use as a type parameter in <c>p.Component&lt;FusionSwitch&gt;(m =&gt; m.ReceiveNotifications)</c>
     /// to access FusionSwitch-specific mutations and value reading.
     /// </remarks>
-    public sealed class FusionSwitch : FusionComponent, IInputComponent
+    public sealed class FusionSwitch : FusionComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "checked";
+        internal static readonly CapabilityProperty Checked = Property("checked");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("switch", Checked);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

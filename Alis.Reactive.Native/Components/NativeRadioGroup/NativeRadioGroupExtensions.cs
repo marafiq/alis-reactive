@@ -14,8 +14,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeRadioGroupExtensions
     {
-        private static readonly NativeRadioGroup _component = new NativeRadioGroup();
-
         /// <summary>
         /// Sets the selected radio button value in the browser.
         /// </summary>
@@ -27,7 +25,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeRadioGroup, TModel> self, string value)
             where TModel : class
         {
-            return self.Set("value", value);
+            return self.Set(NativeRadioGroup.Value, value);
         }
 
         /// <summary>
@@ -43,10 +41,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeRadioGroup, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
             where TModel : class
-        {
-            var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.SetFromPath("value", sourcePath);
-        }
+            => self.SetFromEvent(NativeRadioGroup.Value, path);
 
         /// <summary>
         /// Moves keyboard focus into the radio group.
@@ -58,7 +53,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeRadioGroup, TModel> self)
             where TModel : class
         {
-            return self.Call("focus");
+            return self.Call(NativeRadioGroup.Focus);
         }
 
         /// <summary>
@@ -67,11 +62,11 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the radio group's selected value.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<NativeRadioGroup, TModel> self)
             where TModel : class
         {
-            return new ComponentValueExpression<string>(self.TargetId, _component.Vendor, _component.ValueMemberPath);
+            return self.CreateValue<string>();
         }
     }
 }

@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -8,9 +10,11 @@ namespace Alis.Reactive.Native.Components
     /// <c>.NativeCheckBox()</c> factory to create a model-bound checkbox with
     /// label, validation, and reactive event support.
     /// </remarks>
-    public sealed class NativeCheckBox : NativeComponent, IInputComponent
+    public sealed class NativeCheckBox : NativeComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "checked";
+        internal static readonly CapabilityProperty Checked = Property("checked");
+        internal static readonly CapabilityMethod Focus = Method("focus");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("checkbox", Checked);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

@@ -25,8 +25,8 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             setup.Plan.RegisterComponent(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMemberPath, "checkbox",
-                CoercionTypes.InferFromType(typeof(bool))));
+                setup.ElementId, ReactiveComponentMetadata.For(_component), setup.BindingPath,
+                ValueShapeFactory.FromClrType(typeof(bool))));
 
             var builder = new NativeCheckBoxBuilder<TModel, bool>(setup.Helper, setup.Expression);
             build(builder);

@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -7,9 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// Use as a type parameter in <c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Amount)</c>
     /// to access FusionNumericTextBox-specific mutations and value reading.
     /// </remarks>
-    public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
+    public sealed class FusionNumericTextBox : FusionComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("numerictextbox", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

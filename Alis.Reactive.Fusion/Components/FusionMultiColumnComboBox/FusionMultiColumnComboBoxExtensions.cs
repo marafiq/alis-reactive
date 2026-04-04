@@ -2,6 +2,8 @@ using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -13,7 +15,13 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionMultiColumnComboBoxExtensions
     {
-        private static readonly FusionMultiColumnComboBox Component = new FusionMultiColumnComboBox();
+        private static readonly CapabilityProperty TextProperty = CapabilityProperty.Named("text");
+        private static readonly CapabilityProperty DataSourceProperty = CapabilityProperty.Named("dataSource");
+        private static readonly CapabilityMethod DataBindMethod = CapabilityMethod.Named("dataBind");
+        private static readonly CapabilityMethod FocusInMethod = CapabilityMethod.Named("focusIn");
+        private static readonly CapabilityMethod FocusOutMethod = CapabilityMethod.Named("focusOut");
+        private static readonly CapabilityMethod ShowPopupMethod = CapabilityMethod.Named("showPopup");
+        private static readonly CapabilityMethod HidePopupMethod = CapabilityMethod.Named("hidePopup");
 
         /// <summary>Sets the selected value.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -22,7 +30,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiColumnComboBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self, string? value)
             where TModel : class
-            => self.Set("value", value);
+            => self.Set(FusionMultiColumnComboBox.Value, value);
 
         /// <summary>Sets the displayed text without changing the underlying value.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -31,7 +39,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiColumnComboBox, TModel> SetText<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self, string text)
             where TModel : class
-            => self.Set("text", text);
+            => self.Set(TextProperty, text);
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -44,10 +52,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionMultiColumnComboBox, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
             where TModel : class
-        {
-            var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.SetFromPath("dataSource", sourcePath);
-        }
+            => self.SetFromEvent(DataSourceProperty, path);
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -61,10 +66,7 @@ namespace Alis.Reactive.Fusion.Components
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
             where TModel : class
             where TResponse : class
-        {
-            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.SetFromPath("dataSource", sourcePath);
-        }
+            => self.SetFromResponse(DataSourceProperty, path);
 
         /// <summary>Flushes pending property changes to the component in the browser.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -72,7 +74,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiColumnComboBox, TModel> DataBind<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
-            => self.Call("dataBind");
+            => self.Call(DataBindMethod);
 
         /// <summary>Moves focus into the combo box.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -80,7 +82,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiColumnComboBox, TModel> FocusIn<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
-            => self.Call("focusIn");
+            => self.Call(FocusInMethod);
 
         /// <summary>Removes focus from the combo box.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -88,7 +90,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiColumnComboBox, TModel> FocusOut<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
-            => self.Call("focusOut");
+            => self.Call(FocusOutMethod);
 
         /// <summary>Opens the multi-column dropdown popup.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -96,7 +98,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiColumnComboBox, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
-            => self.Call("showPopup");
+            => self.Call(ShowPopupMethod);
 
         /// <summary>Closes the multi-column dropdown popup.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -104,7 +106,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiColumnComboBox, TModel> HidePopup<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
-            => self.Call("hidePopup");
+            => self.Call(HidePopupMethod);
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
         /// <remarks>
@@ -113,9 +115,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the combo box's current value.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<string>();
     }
 }

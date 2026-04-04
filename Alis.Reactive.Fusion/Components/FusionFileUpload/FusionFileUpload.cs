@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -7,9 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// Use as a type parameter in <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Documents)</c>
     /// to access FusionFileUpload-specific mutations and value reading.
     /// </remarks>
-    public sealed class FusionFileUpload : FusionComponent, IInputComponent
+    public sealed class FusionFileUpload : FusionComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "filesData";
+        internal static readonly CapabilityProperty Files = Property("files", PathSegment.FromProp("filesData"));
+        internal static readonly ComponentMetadata Definition = DescribeBindable("fileupload", Files);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

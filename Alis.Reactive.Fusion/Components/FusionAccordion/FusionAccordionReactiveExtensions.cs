@@ -16,7 +16,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionAccordionReactiveExtensions
     {
-        private static readonly FusionAccordion Component = new FusionAccordion();
 
         /// <summary>
         /// Attaches a reactive workflow to a Fusion Accordion event.
@@ -36,12 +35,11 @@ namespace Alis.Reactive.Fusion.Components
             var reactiveEvent = eventSelector(FusionAccordionEvents.Instance);
             var scope = builder.Plan.Authoring.CreateObjectEventScope(
                 builder.ElementId,
-                Component.Vendor,
-                builder.ElementId,
-                null,
-                reactiveEvent.EventName);
+                FusionAccordion.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(builder.Plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             builder.Plan.AddWorkflow(scope, pb);
 
             return builder;

@@ -14,8 +14,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeCheckListExtensions
     {
-        private static readonly NativeCheckList _component = new NativeCheckList();
-
         /// <summary>
         /// Sets the checked values in the browser.
         /// </summary>
@@ -27,7 +25,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self, string[] value)
             where TModel : class
         {
-            return self.Set("value", value);
+            return self.Set(NativeCheckList.Value, value);
         }
 
         /// <summary>
@@ -43,10 +41,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
             where TModel : class
-        {
-            var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.SetFromPath("value", sourcePath);
-        }
+            => self.SetFromEvent(NativeCheckList.Value, path);
 
         /// <summary>
         /// Moves keyboard focus into the check list.
@@ -58,7 +53,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class
         {
-            return self.Call("focus");
+            return self.Call(NativeCheckList.Focus);
         }
 
         /// <summary>
@@ -67,11 +62,11 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the check list's selected values as a string array.</returns>
-        public static ComponentValueExpression<string[]> Value<TModel>(
+        public static ReactiveValue<string[]> Value<TModel>(
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class
         {
-            return new ComponentValueExpression<string[]>(self.TargetId, _component.Vendor, _component.ValueMemberPath);
+            return self.CreateValue<string[]>();
         }
     }
 }

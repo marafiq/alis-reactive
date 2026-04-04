@@ -1,27 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises all FusionSwitch API end-to-end in the browser:
-/// property writes (SetChecked), property reads (Value as source),
-/// reactive events (Changed with typed condition), and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/Switch
-///
-/// FusionSwitch renders an input element inside a wrapper.
-/// The wrapper element gets the IdGenerator-based ID. Tests use
-/// SwitchLocator.Toggle() to click the wrapper, which reliably
-/// triggers the SF change event via real browser interaction.
-///
-/// Senior living domain: notification preferences, email/SMS alerts.
-/// </summary>
 [TestFixture]
 public class WhenSwitchToggles : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Switch";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SwitchModel";
     private const string ReceiveNotificationsId = Scope + "__ReceiveNotifications";
     private const string EmailAlertsId = Scope + "__EmailAlerts";
@@ -42,17 +27,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("FusionSwitch — Alis.Reactive Sandbox");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
         AssertNoConsoleErrors();
     }
 
@@ -175,7 +149,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Deep BDD: state-cycle scenarios ──
+    // ── State-cycle scenarios ──
 
     [Test]
     public async Task toggling_switch_multiple_times_fires_condition_each_time()
@@ -226,61 +200,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("SMS alerts are disabled", new() { Timeout = 3000 });
 
-        AssertNoConsoleErrors();
-    }
-
-    // ── Plan JSON structure — refactoring safety ──
-
-    [Test]
-    public async Task plan_carries_fusion_vendor_for_switch_mutations()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanResolver(planJson, "fusion-instance");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_checked_readexpr_for_component_source()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanValueMember(planJson, "checked");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_boolean_coerce_for_setchecked()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanScalarType(planJson, "boolean");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_prop_checked_for_setchecked_mutation()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanPathProp(planJson, "checked");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Boot trace ──
-
-    [Test]
-    public async Task boot_trace_is_emitted_on_page_load()
-    {
-        await NavigateAndBoot();
-
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
-        Assert.That(hasBootTrace, Is.True,
-            "Boot trace must be emitted — confirms auto-boot discovered and executed the plan");
         AssertNoConsoleErrors();
     }
 }

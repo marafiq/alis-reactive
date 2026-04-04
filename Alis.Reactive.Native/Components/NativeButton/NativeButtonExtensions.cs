@@ -13,7 +13,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeButton, TModel> self, string text)
             where TModel : class
         {
-            return self.Set("textContent", text);
+            return self.Set(NativeButton.Text, text);
         }
 
         /// <summary>Moves focus to the button element.</summary>
@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeButton, TModel> self)
             where TModel : class
         {
-            return self.Call("focus");
+            return self.Call(NativeButton.Focus);
         }
     }
 }

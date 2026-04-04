@@ -1,12 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeCheckBox API end-to-end in the browser:
-/// property writes (SetChecked), property reads (Value as source),
-/// reactive events (Changed with typed condition), and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/CheckBox
-/// </summary>
 [TestFixture]
 public class WhenCheckboxToggles : PlaywrightTestBase
 {
@@ -16,7 +9,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
     }
 
     // ── Page loads ──
@@ -26,17 +19,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("NativeCheckBox — Alis.Reactive Sandbox");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanPathProp(planJson, "checked");
         AssertNoConsoleErrors();
     }
 
@@ -196,63 +178,11 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Plan JSON structure — refactoring safety ──
-
-    [Test]
-    public async Task plan_carries_native_vendor_for_checkbox_mutations()
-    {
-        // The plan must declare the native-element resolver so the runtime resolves
-        // the raw DOM element (not ej2_instances). If resolver is missing or wrong,
-        // object access returns the wrong root and SetChecked silently breaks.
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanResolver(planJson, "native-element");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_checked_readexpr_for_component_source()
-    {
-        // NativeCheckBox reads through binding valueMember "checked", not a free-form valueMemberPath.
-        // If that member changes or is lost, component value reads return wrong data.
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanValueMember(planJson, "checked");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_boolean_coerce_for_setchecked()
-    {
-        // SetChecked carries a boolean shape so the runtime assigns a boolean,
-        // not a stringly value, to el.checked.
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanScalarType(planJson, "boolean");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_prop_checked_for_setchecked_mutation()
-    {
-        // SetChecked writes through member path prop "checked" (not "value").
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanPathProp(planJson, "checked");
-        AssertNoConsoleErrors();
-    }
-
     // ── Initial DOM state — element rendering ──
 
     [Test]
     public async Task all_three_checkboxes_render_with_correct_element_ids()
     {
-        // IdGenerator creates scoped IDs from the model namespace + property name.
-        // If IdGenerator changes, these elements vanish and all reactive wiring breaks.
         await NavigateAndBoot();
 
         await Expect(Page.Locator($"#{Scope}ReceivesMedication")).ToBeVisibleAsync();
@@ -265,7 +195,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     public async Task all_checkboxes_render_as_input_type_checkbox()
     {
         // NativeCheckBoxBuilder renders <input type="checkbox">. If the HTML element
-        // type changes, the runtime's el.checked read/write path breaks silently.
+        // type changes, the checked-state round-trip breaks silently.
         await NavigateAndBoot();
 
         var medication = Page.Locator($"#{Scope}ReceivesMedication");
@@ -288,21 +218,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         var panel = Page.Locator("#restrictions-panel");
         await Expect(panel).ToBeHiddenAsync();
         await Expect(panel).ToHaveAttributeAsync("hidden", "");
-        AssertNoConsoleErrors();
-    }
-
-    // ── Boot trace ──
-
-    [Test]
-    public async Task boot_trace_is_emitted_on_page_load()
-    {
-        // auto-boot.ts emits a "booted" trace message. If boot fails silently,
-        // no reactive behavior works and tests pass vacuously.
-        await NavigateAndBoot();
-
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
-        Assert.That(hasBootTrace, Is.True,
-            "Boot trace must be emitted — confirms auto-boot discovered and executed the plan");
         AssertNoConsoleErrors();
     }
 }

@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -9,9 +11,11 @@ namespace Alis.Reactive.Native.Components
     /// label, validation, and reactive event support. The container element holds
     /// the selected values as a <c>string[]</c>.
     /// </remarks>
-    public sealed class NativeCheckList : NativeComponent, IInputComponent
+    public sealed class NativeCheckList : NativeComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly CapabilityMethod Focus = Method("focus");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("checklist", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

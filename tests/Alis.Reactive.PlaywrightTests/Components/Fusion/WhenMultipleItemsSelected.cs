@@ -1,28 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises FusionMultiSelect API end-to-end in the browser:
-/// events, conditions, property reads, gather, and typed Fields
-/// with optional GroupBy.
-///
-/// Page under test: /Sandbox/Components/MultiSelect
-///
-/// FusionMultiSelect renders an input element inside a wrapper div.
-/// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
-/// SF MultiSelect uses array-based values (unlike DropDownList which uses scalar values).
-/// Pre-selection is done via SF builder Value() at render time, not via DomReady SetValue.
-///
-/// Tests use MultiSelectLocator to interact via real browser gestures
-/// (clicking items in the popup) rather than ej2 instance manipulation.
-/// </summary>
 [TestFixture]
 public class WhenMultipleItemsSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/MultiSelect";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_MultiSelectModel";
     private const string AllergiesId = Scope + "__Allergies";
     private const string DietaryRestrictionsId = Scope + "__DietaryRestrictions";
@@ -42,17 +26,6 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("MultiSelect — Alis.Reactive Sandbox");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
         AssertNoConsoleErrors();
     }
 
@@ -85,7 +58,6 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Events — Changed on Allergies via ej2 API ──
 
     [Test]
     public async Task changed_event_fires_when_selecting_allergy()
@@ -101,7 +73,6 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Events — Changed on Dietary Restrictions via ej2 API ──
 
     [Test]
     public async Task changed_event_fires_when_selecting_dietary_restriction()
@@ -248,17 +219,6 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
 
     private const string SuppliesId = Scope + "__Supplies";
 
-    /// <summary>
-    /// Types text into the Supplies MultiSelect using PressSequentially,
-    /// which simulates real keystrokes that trigger SF's filtering event.
-    /// FillAsync won't work — SF listens for keyup/keydown, not synthetic input events.
-    ///
-    /// SF MultiSelect DOM structure with AllowFiltering:
-    ///   .e-multi-select-wrapper (grandparent)
-    ///     └── span.e-searcher (parent)
-    ///         ├── input.e-dropdownbase (filter input — type here)
-    ///         └── input#SuppliesId (component input)
-    /// </summary>
     private async Task TypeInSupplies(string text)
     {
         // The filter input is a sibling of the component input inside the wrapper

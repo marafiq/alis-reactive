@@ -11,6 +11,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Initializes a new instance of the <see cref="TestWidgetSyncFusionItemsChangedArgs"/> class.
         /// </summary>
-        public TestWidgetSyncFusionItemsChangedArgs() { }
+        internal TestWidgetSyncFusionItemsChangedArgs() { }
     }
 }

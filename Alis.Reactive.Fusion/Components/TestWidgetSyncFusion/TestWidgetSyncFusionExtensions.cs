@@ -2,6 +2,8 @@ using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -9,7 +11,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class TestWidgetSyncFusionExtensions
     {
-        private static readonly TestWidgetSyncFusion _component = new TestWidgetSyncFusion();
+        private static readonly CapabilityMethod FocusMethod = CapabilityMethod.Named("focus");
+        private static readonly CapabilityMethod ClearMethod = CapabilityMethod.Named("clear");
+        private static readonly CapabilityMethod SetItemsMethod = CapabilityMethod.Named("setItems");
 
         /// <summary>Sets the widget value from a literal string.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
@@ -18,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<TestWidgetSyncFusion, TModel> SetValue<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self, string value)
-            where TModel : class => self.Set("value", value);
+            where TModel : class => self.Set(TestWidgetSyncFusion.Value, value);
 
         /// <summary>Sets the widget value from an event payload path.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
@@ -31,10 +35,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<TestWidgetSyncFusion, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
             where TModel : class
-        {
-            var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.SetFromPath("value", sourcePath);
-        }
+            => self.SetFromEvent(TestWidgetSyncFusion.Value, path);
 
         /// <summary>Sets the widget value from an HTTP response path.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
@@ -48,10 +49,7 @@ namespace Alis.Reactive.Fusion.Components
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
             where TModel : class
             where TResponse : class
-        {
-            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.SetFromPath("value", sourcePath);
-        }
+            => self.SetFromResponse(TestWidgetSyncFusion.Value, path);
 
         /// <summary>Sets the widget value from another typed value expression.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
@@ -60,17 +58,17 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="source">The source to copy from.</param>
         /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<TestWidgetSyncFusion, TModel> SetValue<TModel, TProp>(
-            this ComponentRef<TestWidgetSyncFusion, TModel> self, ValueExpression<TProp> source)
+            this ComponentRef<TestWidgetSyncFusion, TModel> self, ReactiveValue<TProp> source)
             where TModel : class
-            => self.Set("value", source);
+            => self.Set(TestWidgetSyncFusion.Value, source);
 
         /// <summary>Reads the current widget value for conditions and gathers.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the widget value.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => new ComponentValueExpression<string>(self.TargetId, _component.Vendor, _component.ValueMemberPath);
+            where TModel : class => self.CreateValue<string>();
 
         /// <summary>Calls the widget <c>focus</c> method.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
@@ -78,7 +76,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<TestWidgetSyncFusion, TModel> Focus<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => self.Call("focus");
+            where TModel : class => self.Call(FocusMethod);
 
         /// <summary>Calls the widget <c>clear</c> method.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
@@ -86,7 +84,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<TestWidgetSyncFusion, TModel> Clear<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => self.Call("clear");
+            where TModel : class => self.Call(ClearMethod);
 
         /// <summary>Calls <c>setItems</c> with items read from an event payload path.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
@@ -99,10 +97,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<TestWidgetSyncFusion, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
             where TModel : class
-        {
-            var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.CallFromPath("setItems", sourcePath);
-        }
+            => self.CallFromEvent(SetItemsMethod, path);
 
         /// <summary>Calls <c>setItems</c> with items read from an HTTP response path.</summary>
         /// <typeparam name="TModel">The page model type that owns the reactive plan.</typeparam>
@@ -116,9 +111,6 @@ namespace Alis.Reactive.Fusion.Components
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
             where TModel : class
             where TResponse : class
-        {
-            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.CallFromPath("setItems", sourcePath);
-        }
+            => self.CallFromResponse(SetItemsMethod, path);
     }
 }

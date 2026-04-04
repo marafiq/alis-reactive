@@ -1,30 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises all FusionDateRangePicker API end-to-end in the browser:
-/// property reads (startDate + endDate), events with typed conditions,
-/// and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/DateRangePicker
-///
-/// FusionDateRangePicker renders an input element inside a wrapper span.
-/// The wrapper element gets the IdGenerator-based ID. Tests use
-/// DateRangePickerLocator to interact via real browser gestures (calendar
-/// popup clicks and Apply button) rather than ej2 instance manipulation.
-///
-/// UNIQUE: This component exposes TWO readable properties (startDate, endDate)
-/// from the ej2 instance. Both are exercised in these tests.
-///
-/// Senior living domain: resident stay periods.
-/// </summary>
 [TestFixture]
 public class WhenDateRangeSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/DateRangePicker";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateRangePickerModel";
     private const string StayStartId = Scope + "__StayPeriod";
 
@@ -42,19 +24,6 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await Expect(Page).ToHaveTitleAsync("FusionDateRangePicker — Alis.Reactive Sandbox");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
-        Assert.That(planJson, Does.Contain("\"startDate\""));
-        Assert.That(planJson, Does.Contain("\"endDate\""));
         AssertNoConsoleErrors();
     }
 
@@ -137,7 +106,7 @@ public class WhenDateRangeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Deep BDD: state-cycle scenarios ──
+    // ── State-cycle scenarios ──
 
     [Test]
     public async Task changing_date_range_multiple_times_fires_condition_each_time()

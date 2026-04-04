@@ -11,13 +11,13 @@ namespace Alis.Reactive.Native.Components
         /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<TestWidgetNative, TModel> SetValue<TModel>(
             this ComponentRef<TestWidgetNative, TModel> self, string value)
-            where TModel : class => self.Set("value", value);
+            where TModel : class => self.Set(TestWidgetNative.Value, value);
 
         /// <summary>Moves focus to the widget input.</summary>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>The component reference for continued chaining.</returns>
         public static ComponentRef<TestWidgetNative, TModel> Focus<TModel>(
             this ComponentRef<TestWidgetNative, TModel> self)
-            where TModel : class => self.Call("focus");
+            where TModel : class => self.Call(TestWidgetNative.Focus);
     }
 }

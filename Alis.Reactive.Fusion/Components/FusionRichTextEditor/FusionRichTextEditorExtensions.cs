@@ -1,5 +1,7 @@
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -11,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionRichTextEditorExtensions
     {
-        private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();
+        private static readonly CapabilityMethod FocusInMethod = CapabilityMethod.Named("focusIn");
 
         /// <summary>Sets the HTML content value.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -21,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionRichTextEditor, TModel> self, string value)
             where TModel : class
         {
-            return self.Set("value", value);
+            return self.Set(FusionRichTextEditor.Value, value);
         }
 
         /// <summary>Moves focus into the rich text editor.</summary>
@@ -30,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionRichTextEditor, TModel> FocusIn<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class
-            => self.Call("focusIn");
+            => self.Call(FocusInMethod);
 
         /// <summary>Reads the current HTML content for use in conditions or gather.</summary>
         /// <remarks>
@@ -39,9 +41,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the editor's current HTML content.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<string>();
     }
 }

@@ -33,7 +33,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task parent_field_errors_show_inline()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await ClickWhenStable(SubmitBtn);
 
@@ -50,7 +50,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task partial_field_errors_show_inline()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await ClickWhenStable(SubmitBtn);
 
@@ -68,7 +68,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task all_unconditional_required_fields_across_parent_and_partials()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await ClickWhenStable(SubmitBtn);
 
@@ -92,7 +92,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task conditional_rule_where_condition_source_is_in_parent_and_field_is_in_parent()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
         await Input("IsVeteran").CheckAsync();
@@ -108,7 +108,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task conditional_rule_where_field_is_in_partial()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
         await Input("Address_ZipCode").FillAsync("abc");
@@ -126,7 +126,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task equalto_compares_two_parent_fields()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         await FillAllRequired();
         await Input("Email").FillAsync("a@b.com");
@@ -145,7 +145,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task address_partial_zipcode_change_fires_partial_owned_dispatch()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         // Type into field and tab out to fire native change event
         await Input("Address_ZipCode").ClickAsync();
@@ -162,7 +162,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task emergency_partial_phone_change_updates_status()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         // Type into field and tab out to fire native change event
         await Input("EmergencyPhone").ClickAsync();
@@ -178,7 +178,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task partial_reactive_workflows_do_not_interfere_with_parent_validation()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         // Trigger partial reactive behavior
         await Input("Address_ZipCode").ClickAsync();
@@ -202,7 +202,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     public async Task fixing_all_fields_across_parent_and_partials_results_in_success()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
 
         // Submit empty → errors
         await ClickWhenStable(SubmitBtn);

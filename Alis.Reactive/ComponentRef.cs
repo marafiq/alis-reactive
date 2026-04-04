@@ -1,5 +1,8 @@
+using System;
+using System.Linq.Expressions;
 using Alis.Reactive.Builders;
 using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
 {
@@ -15,7 +18,7 @@ namespace Alis.Reactive
         where TComponent : IComponent, new()
         where TModel : class
     {
-        private static readonly TComponent _instance = new TComponent();
+        private static readonly ComponentMetadata _component = ReactiveComponentMetadata.For<TComponent>();
 
         internal string TargetId { get; }
         internal PipelineBuilder<TModel> Emitter { get; }
@@ -27,51 +30,105 @@ namespace Alis.Reactive
         }
 
         internal ComponentRef<TComponent, TModel> Set(
-            string memberPath,
+            CapabilityProperty member,
             object? value,
-            string? coerceAs = null)
+            ValueShape? assignedShape = null)
         {
-            Emitter.SetComponentProperty(TargetId, _instance.Vendor, memberPath, value, coerceAs);
-            return this;
-        }
-
-        internal ComponentRef<TComponent, TModel> SetFromPath(
-            string memberPath,
-            string valueMemberPath,
-            string? coerceAs = null)
-        {
-            Emitter.SetComponentPropertyFromPath(TargetId, _instance.Vendor, memberPath, valueMemberPath, coerceAs);
+            Emitter.SetComponentProperty(TargetId, _component, member, value, assignedShape);
             return this;
         }
 
         internal ComponentRef<TComponent, TModel> Set<TProp>(
-            string memberPath,
-            ValueExpression<TProp> value,
-            string? coerceAs = null)
+            CapabilityProperty member,
+            ReactiveValue<TProp> value,
+            ValueShape? assignedShape = null)
         {
             Emitter.SetComponentProperty(
                 TargetId,
-                _instance.Vendor,
-                memberPath,
-                value.ToValueExpr(Emitter.Authoring),
-                value.CoercionType,
-                coerceAs);
+                _component,
+                member,
+                value.ToPlanValue(Emitter.Authoring.Values),
+                value.ValueShape,
+                assignedShape);
             return this;
         }
 
-        internal ComponentRef<TComponent, TModel> Call(string memberPath, params object?[] args)
+        internal ReactiveValue<TProp> CreateValue<TProp>()
         {
-            Emitter.CallComponentMember(TargetId, _instance.Vendor, memberPath, args);
+            var binding = _component.Binding
+                ?? throw new InvalidOperationException($"{typeof(TComponent).Name} does not declare a bindable component member.");
+
+            return ReactiveValue<TProp>.FromComponentValue(TargetId, _component, binding);
+        }
+
+        internal ReactiveValue<TProp> CreateValue<TProp>(CapabilityProperty member) =>
+            ReactiveValue<TProp>.FromComponentValue(TargetId, _component, member);
+
+        internal ComponentRef<TComponent, TModel> SetFromEvent<TSource>(
+            CapabilityProperty member,
+            Expression<Func<TSource, object?>> path,
+            ValueShape? assignedShape = null)
+        {
+            var payload = Emitter.DescribeEventPayload(path);
+            Emitter.SetComponentProperty(
+                TargetId,
+                _component,
+                member,
+                payload.Expression,
+                payload.Shape,
+                assignedShape);
             return this;
         }
 
-        internal ComponentRef<TComponent, TModel> CallFromPath(
-            string memberPath,
-            string valueMemberPath,
-            string? valueCoerceAs = null)
+        internal ComponentRef<TComponent, TModel> SetFromResponse<TSource>(
+            CapabilityProperty member,
+            Expression<Func<TSource, object?>> path,
+            ValueShape? assignedShape = null)
         {
-            Emitter.CallComponentMemberFromPath(TargetId, _instance.Vendor, memberPath, valueMemberPath, valueCoerceAs);
+            var payload = Emitter.Authoring.Values.DescribeResponsePayload(path);
+            Emitter.SetComponentProperty(
+                TargetId,
+                _component,
+                member,
+                payload.Expression,
+                payload.Shape,
+                assignedShape);
             return this;
         }
+
+        internal ComponentRef<TComponent, TModel> Call(CapabilityMethod member, params object?[] args)
+        {
+            Emitter.CallComponentMember(TargetId, _component, member, args);
+            return this;
+        }
+
+        internal ComponentRef<TComponent, TModel> CallFromEvent<TSource>(
+            CapabilityMethod member,
+            Expression<Func<TSource, object?>> path)
+        {
+            var payload = Emitter.DescribeEventPayload(path);
+            Emitter.CallComponentMember(
+                TargetId,
+                _component,
+                member,
+                new[] { payload.Expression },
+                new[] { payload.Shape });
+            return this;
+        }
+
+        internal ComponentRef<TComponent, TModel> CallFromResponse<TSource>(
+            CapabilityMethod member,
+            Expression<Func<TSource, object?>> path)
+        {
+            var payload = Emitter.Authoring.Values.DescribeResponsePayload(path);
+            Emitter.CallComponentMember(
+                TargetId,
+                _component,
+                member,
+                new[] { payload.Expression },
+                new[] { payload.Shape });
+            return this;
+        }
+
     }
 }

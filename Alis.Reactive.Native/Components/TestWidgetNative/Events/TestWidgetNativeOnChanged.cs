@@ -9,6 +9,6 @@ namespace Alis.Reactive.Native.Components
         public string? Value { get; set; }
 
         /// <summary>Creates an empty widget change payload marker.</summary>
-        public TestWidgetNativeChangeArgs() { }
+        internal TestWidgetNativeChangeArgs() { }
     }
 }

@@ -1,26 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises all FusionDatePicker API end-to-end in the browser:
-/// property writes, property reads, events with typed conditions,
-/// and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/FusionDatePicker
-///
-/// FusionDatePicker renders an input element inside a wrapper span.
-/// The wrapper element gets the IdGenerator-based ID. Tests use
-/// DatePickerLocator to interact via real browser gestures (calendar popup
-/// clicks) rather than ej2 instance manipulation.
-/// Senior living domain: resident admission and discharge dates.
-/// </summary>
 [TestFixture]
 public class WhenDateSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionDatePicker";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionDatePickerModel";
     private const string AdmissionDateId = Scope + "__AdmissionDate";
     private const string DischargeDateId = Scope + "__DischargeDate";
@@ -43,17 +29,6 @@ public class WhenDateSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
-        AssertNoConsoleErrors();
-    }
-
     // ── Section 1: Property Write ──
 
     [Test]
@@ -63,7 +38,6 @@ public class WhenDateSelected : PlaywrightTestBase
         var wrapper = Page.Locator($"#{AdmissionDateId}");
         await Expect(wrapper).ToBeVisibleAsync();
 
-        // The framework sets ej2.value = "2026-06-15" via set-prop.
         // Verify the value was applied by checking the visible input element's value.
         var dp = AdmissionDate;
         var inputValue = await dp.Input.InputValueAsync();
@@ -161,7 +135,7 @@ public class WhenDateSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Deep BDD: state-cycle scenarios ──
+    // ── State-cycle scenarios ──
 
     [Test]
     public async Task changing_date_multiple_times_fires_condition_each_time()

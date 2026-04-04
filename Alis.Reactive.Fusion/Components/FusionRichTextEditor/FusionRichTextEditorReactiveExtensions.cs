@@ -21,7 +21,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionRichTextEditorReactiveExtensions
     {
-        private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();
 
         /// <summary>
         /// Wires a FusionRichTextEditor event to a reactive pipeline that executes in the browser.
@@ -47,15 +46,13 @@ namespace Alis.Reactive.Fusion.Components
             // textarea's id attribute, not HtmlAttributes.
             var componentId = builder.model.Id;
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
-            var bindingPath = (string)attrs["name"];
             var scope = plan.Authoring.CreateObjectEventScope(
                 componentId,
-                Component.Vendor,
-                bindingPath,
-                Component.ValueMemberPath,
-                reactiveEvent.EventName);
+                FusionRichTextEditor.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             plan.AddWorkflow(scope, pb);
 
             return builder;

@@ -15,25 +15,29 @@
         <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
-    <!-- Ship JS/CSS as NuGet content files with a configurable output path -->
+    <!-- Ship the sandbox-built JS/CSS directly so the package and sandbox share one runtime artifact. -->
     <ItemGroup>
-        <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="buildTransitive\assets\js\" />
-        <None Include="assets\css\design-system.css" Pack="true" PackagePath="buildTransitive\assets\css\" />
+        <None Include="..\Alis.Reactive.SandboxApp\wwwroot\js\alis-reactive.js"
+              Link="assets\js\alis-reactive.js"
+              Pack="true"
+              PackagePath="buildTransitive\assets\js\" />
+        <None Include="..\Alis.Reactive.SandboxApp\wwwroot\css\design-system.css"
+              Link="assets\css\design-system.css"
+              Pack="true"
+              PackagePath="buildTransitive\assets\css\" />
         <None Include="build\Alis.Reactive.targets" Pack="true" PackagePath="buildTransitive\" />
         <None Include="build\Alis.Reactive.targets" Pack="true" PackagePath="build\" />
     </ItemGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="Alis.Reactive.Components" />
         <InternalsVisibleTo Include="Alis.Reactive.Fusion" />
         <InternalsVisibleTo Include="Alis.Reactive.Native" />
-        <InternalsVisibleTo Include="Alis.Reactive.UnitTests" />
         <InternalsVisibleTo Include="Alis.Reactive.FluentValidator" />
         <InternalsVisibleTo Include="Alis.Reactive.FluentValidator.UnitTests" />
-        <InternalsVisibleTo Include="Alis.Reactive.Native.UnitTests" />
-        <InternalsVisibleTo Include="Alis.Reactive.Fusion.UnitTests" />
     </ItemGroup>
 
-    <Target Name="SyncPackagedClientAssets" BeforeTargets="Pack">
+    <Target Name="BuildPackagedClientAssets" BeforeTargets="Pack">
         <Exec Command="npm run build:package-assets" WorkingDirectory="$(MSBuildProjectDirectory)\.." />
     </Target>
 

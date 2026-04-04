@@ -6,7 +6,7 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo("/Sandbox/Conditions/Guards");
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
     }
 
     // ── int (ElseIf grade ladder) ──
@@ -168,7 +168,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Nested payload — deep dot-path ──
 
     [Test]
     public async Task nested_payload_deep_path_eq()
@@ -554,7 +553,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     {
         // Dispatch with address:null → When(address).IsNull() should be true
         // Then dispatch with address:{city:"NYC"} → IsNull() should be false
-        // Proves null-safe dot-path walking doesn't throw
         await NavigateAndBoot();
         var result = Page.Locator("#nested-null-result");
 
@@ -577,7 +575,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     public async Task missing_key_in_payload_evaluates_as_null()
     {
         // Dispatch with {id:3} (no address key at all) → When(address).IsNull() should be true
-        // Proves walk.ts returns undefined for missing keys, and IsNull treats undefined as null
         await NavigateAndBoot();
         var result = Page.Locator("#nested-null-result");
 
@@ -733,7 +730,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await NavigateAndBoot();
         var result = Page.Locator("#null-leaf-result");
 
-        // address key entirely missing → walk.ts returns undefined → else
         await Page.Locator("#btn-null-leaf-missing").ClickAsync();
         await Expect(result).ToHaveTextAsync("Not Seattle");
 

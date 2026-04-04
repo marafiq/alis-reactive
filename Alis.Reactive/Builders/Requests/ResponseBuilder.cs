@@ -48,12 +48,11 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Registers a typed JSON success handler. The ResponseBody&lt;T&gt; phantom enables
-        /// compile-time path walking into the response body — same pattern as
-        /// CustomEvent&lt;T&gt; provides typed access to event payloads.
+        /// Registers a typed JSON success handler. The ResponseBody&lt;T&gt; surface enables
+        /// compile-time selection of response members in the same way ReactiveEvent payloads
+        /// enable compile-time selection of event members.
         ///
         /// Usage: .OnSuccess&lt;ApiResponse&gt;((json, s) =&gt; s.Element("x").SetText(json, r =&gt; r.Data.Name))
-        /// Generates: source = "responseBody.data.name" — resolved at runtime via walk(ctx, path).
         /// </summary>
         public ResponseBuilder<TModel> OnSuccess<TResponse>(
             Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> pipeline)

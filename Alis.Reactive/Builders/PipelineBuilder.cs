@@ -51,134 +51,124 @@ namespace Alis.Reactive.Builders
         internal PlanAuthoringContext Authoring => _authoring;
         internal WorkflowScope Scope => _scope;
 
+        internal AuthoredValue DescribeEventPayload<TSource>(Expression<Func<TSource, object?>> path) =>
+            _authoring.Values.DescribeEventPayload(_scope, path);
+
+        internal AuthoredValue DescribeEventPayload<TSource, TProp>(Expression<Func<TSource, TProp>> path) =>
+            _authoring.Values.DescribeEventPayload(_scope, path);
+
         internal void AddAction(PlanAction action)
         {
             Actions.Add(action);
         }
 
-        internal void SetElementProperty(string elementId, string propertyPath, object? value, string? coerceAs = null)
+        internal void SetElementProperty(string elementId, CapabilityProperty property, object? value, ValueShape? assignedShape = null)
         {
             AddAction(_authoring.CreateSetActionForElement(
                 elementId,
-                vendor: null,
-                memberPath: propertyPath,
+                component: null,
+                member: property,
                 literal: value,
-                coerceAs: coerceAs));
+                assignedShape: assignedShape));
         }
 
-        internal void SetElementProperty(string elementId, string propertyPath, ValueExpr valueExpr, string? valueCoerceAs = null, string? coerceAs = null)
+        internal void SetElementProperty(string elementId, CapabilityProperty property, ValueExpr valueExpr, ValueShape sourceShape, ValueShape? assignedShape = null)
         {
             AddAction(_authoring.CreateSetActionForElement(
                 elementId,
-                vendor: null,
-                propertyPath,
+                component: null,
+                property,
                 valueExpr: valueExpr,
-                valueCoerceAs: valueCoerceAs,
-                coerceAs: coerceAs));
+                sourceShape: sourceShape,
+                assignedShape: assignedShape));
         }
 
-        internal void SetElementPropertyFromPath(string elementId, string propertyPath, string valueMemberPath, string? coerceAs = null)
-        {
-            SetElementProperty(elementId, propertyPath, _authoring.CreateContextValue(valueMemberPath), coerceAs: coerceAs);
-        }
-
-        internal void CallElementMember(string elementId, string memberPath, params object?[] args)
+        internal void CallElementMember(string elementId, CapabilityMethod member, params object?[] args)
         {
             AddAction(_authoring.CreateCallActionForElement(
                 elementId,
-                vendor: null,
-                memberPath,
+                component: null,
+                member,
                 BuildLiteralArguments(args),
                 BuildLiteralArgumentShapes(args)));
         }
 
-        internal void CallElementMemberFromPath(string elementId, string memberPath, string valueMemberPath, string? valueCoerceAs = null)
-        {
-            AddAction(_authoring.CreateCallActionForElement(
-                elementId,
-                vendor: null,
-                memberPath: memberPath,
-                args: new List<ValueExpr> { _authoring.CreateContextValue(valueMemberPath) },
-                argShapes: new List<ValueShape> { PlanAuthoringContext.ResolveAssignedShape(valueCoerceAs, literal: null, coerceAs: null) }));
-        }
-
-        internal void SetComponentProperty(string componentId, string vendor, string propertyPath, object? value, string? coerceAs = null)
+        internal void SetComponentProperty(string componentId, ComponentMetadata component, CapabilityProperty property, object? value, ValueShape? assignedShape = null)
         {
             AddAction(_authoring.CreateSetActionForElement(
                 componentId,
-                vendor,
-                memberPath: propertyPath,
+                component,
+                property,
                 literal: value,
-                coerceAs: coerceAs));
+                assignedShape: assignedShape));
         }
 
-        internal void SetComponentProperty(string componentId, string vendor, string propertyPath, ValueExpr valueExpr, string? valueCoerceAs = null, string? coerceAs = null)
+        internal void SetComponentProperty(string componentId, ComponentMetadata component, CapabilityProperty property, ValueExpr valueExpr, ValueShape sourceShape, ValueShape? assignedShape = null)
         {
             AddAction(_authoring.CreateSetActionForElement(
                 componentId,
-                vendor,
-                propertyPath,
+                component,
+                property,
                 valueExpr: valueExpr,
-                valueCoerceAs: valueCoerceAs,
-                coerceAs: coerceAs));
+                sourceShape: sourceShape,
+                assignedShape: assignedShape));
         }
 
-        internal void SetComponentPropertyFromPath(string componentId, string vendor, string propertyPath, string valueMemberPath, string? coerceAs = null)
-        {
-            SetComponentProperty(componentId, vendor, propertyPath, _authoring.CreateContextValue(valueMemberPath), coerceAs: coerceAs);
-        }
-
-        internal void CallComponentMember(string componentId, string vendor, string memberPath, params object?[] args)
+        internal void CallComponentMember(string componentId, ComponentMetadata component, CapabilityMethod member, params object?[] args)
         {
             AddAction(_authoring.CreateCallActionForElement(
                 componentId,
-                vendor,
-                memberPath,
+                component,
+                member,
                 BuildLiteralArguments(args),
                 BuildLiteralArgumentShapes(args)));
         }
 
-        internal void CallComponentMemberFromPath(string componentId, string vendor, string memberPath, string valueMemberPath, string? valueCoerceAs = null)
+        internal void CallComponentMember(string componentId, ComponentMetadata component, CapabilityMethod member, IReadOnlyList<ValueExpr> args, IReadOnlyList<ValueShape> argShapes)
         {
             AddAction(_authoring.CreateCallActionForElement(
                 componentId,
-                vendor,
-                memberPath: memberPath,
-                args: new List<ValueExpr> { _authoring.CreateContextValue(valueMemberPath) },
-                argShapes: new List<ValueShape> { PlanAuthoringContext.ResolveAssignedShape(valueCoerceAs, literal: null, coerceAs: null) }));
+                component,
+                member,
+                args,
+                argShapes));
         }
 
-        internal void SetEventProperty(string propertyPath, object? value, string? coerceAs = null)
-        {
-            AddAction(_authoring.CreateSetActionForEvent(_scope, propertyPath, literal: value, coerceAs: coerceAs));
-        }
-
-        internal void SetEventProperty(string propertyPath, ValueExpr valueExpr, string? valueCoerceAs = null, string? coerceAs = null)
+        internal void SetEventProperty(CapabilityProperty property, object? value, ValueShape? assignedShape = null)
         {
             AddAction(_authoring.CreateSetActionForEvent(
                 _scope,
-                propertyPath,
-                valueExpr: valueExpr,
-                valueCoerceAs: valueCoerceAs,
-                coerceAs: coerceAs));
+                property,
+                literal: value,
+                assignedShape: assignedShape));
         }
 
-        internal void CallEventMember(string memberPath, params object?[] args)
+        internal void SetEventProperty(CapabilityProperty property, ValueExpr valueExpr, ValueShape sourceShape, ValueShape? assignedShape = null)
+        {
+            AddAction(_authoring.CreateSetActionForEvent(
+                _scope,
+                property,
+                valueExpr: valueExpr,
+                sourceShape: sourceShape,
+                assignedShape: assignedShape));
+        }
+
+        internal void CallEventMember(CapabilityMethod member, params object?[] args)
         {
             AddAction(_authoring.CreateCallActionForEvent(
                 _scope,
-                memberPath,
+                member,
                 BuildLiteralArguments(args),
                 BuildLiteralArgumentShapes(args)));
         }
 
-        internal void CallEventMemberFromPath(string memberPath, string valueMemberPath, string? valueCoerceAs = null)
+        internal void CallEventMember(CapabilityMethod member, IReadOnlyList<ValueExpr> args, IReadOnlyList<ValueShape> argShapes)
         {
             AddAction(_authoring.CreateCallActionForEvent(
                 _scope,
-                memberPath: memberPath,
-                args: new List<ValueExpr> { _authoring.CreateContextValue(valueMemberPath) },
-                argShapes: new List<ValueShape> { PlanAuthoringContext.ResolveAssignedShape(valueCoerceAs, literal: null, coerceAs: null) }));
+                member,
+                args,
+                argShapes));
         }
 
         /// <summary>

@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -8,9 +10,11 @@ namespace Alis.Reactive.Native.Components
     /// <c>.NativeDropDown()</c> factory to create a model-bound dropdown with
     /// label, validation, and reactive event support.
     /// </remarks>
-    public sealed class NativeDropDown : NativeComponent, IInputComponent
+    public sealed class NativeDropDown : NativeComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly CapabilityMethod Focus = Method("focus");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("dropdown", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

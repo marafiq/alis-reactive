@@ -14,7 +14,7 @@ public class WhenExtractingFullCoverageRules
         var rule = desc.Fields.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "required");
         Assert.That(rule.Constraint, Is.Null);
         Assert.That(rule.Field, Is.Null);
-        Assert.That(rule.CoerceAs, Is.Null);
+        Assert.That(rule.ShapeToken, Is.Null);
     }
 
     // ── empty ────────────────────────────────────────────────
@@ -75,7 +75,7 @@ public class WhenExtractingFullCoverageRules
         Assert.That(rule.Constraint, Is.Null);
     }
 
-    // ── range (inclusive) with coerceAs ───────────────────────
+    // ── range (inclusive) with shapeToken ───────────────────────
 
     [Test]
     public void Age_range_extracts_with_number_coercion()
@@ -86,10 +86,10 @@ public class WhenExtractingFullCoverageRules
         Assert.That(constraint, Is.Not.Null);
         Assert.That(constraint![0], Is.EqualTo(0));
         Assert.That(constraint[1], Is.EqualTo(120));
-        Assert.That(rule.CoerceAs, Is.EqualTo("number"));
+        Assert.That(rule.ShapeToken, Is.EqualTo("number"));
     }
 
-    // ── exclusiveRange with coerceAs ─────────────────────────
+    // ── exclusiveRange with shapeToken ─────────────────────────
 
     [Test]
     public void Score_exclusiveRange_extracts_with_number_coercion()
@@ -100,10 +100,10 @@ public class WhenExtractingFullCoverageRules
         Assert.That(constraint, Is.Not.Null);
         Assert.That(constraint![0], Is.EqualTo(0m));
         Assert.That(constraint[1], Is.EqualTo(100m));
-        Assert.That(rule.CoerceAs, Is.EqualTo("number"));
+        Assert.That(rule.ShapeToken, Is.EqualTo("number"));
     }
 
-    // ── min / max with coerceAs: "number" ────────────────────
+    // ── min / max with shapeToken: "number" ────────────────────
 
     [Test]
     public void Salary_min_extracts_with_number_coercion()
@@ -111,7 +111,7 @@ public class WhenExtractingFullCoverageRules
         var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Salary").Rules.First(r => r.Rule == "min");
         Assert.That(rule.Constraint, Is.EqualTo(0m));
-        Assert.That(rule.CoerceAs, Is.EqualTo("number"));
+        Assert.That(rule.ShapeToken, Is.EqualTo("number"));
         Assert.That(rule.Field, Is.Null);
     }
 
@@ -121,10 +121,10 @@ public class WhenExtractingFullCoverageRules
         var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "Salary").Rules.First(r => r.Rule == "max");
         Assert.That(rule.Constraint, Is.EqualTo(500000m));
-        Assert.That(rule.CoerceAs, Is.EqualTo("number"));
+        Assert.That(rule.ShapeToken, Is.EqualTo("number"));
     }
 
-    // ── gt / lt with coerceAs: "number" ──────────────────────
+    // ── gt / lt with shapeToken: "number" ──────────────────────
 
     [Test]
     public void MonthlyRate_gt_extracts_with_number_coercion()
@@ -132,7 +132,7 @@ public class WhenExtractingFullCoverageRules
         var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Rule == "gt");
         Assert.That(rule.Constraint, Is.EqualTo(0m));
-        Assert.That(rule.CoerceAs, Is.EqualTo("number"));
+        Assert.That(rule.ShapeToken, Is.EqualTo("number"));
     }
 
     [Test]
@@ -141,7 +141,7 @@ public class WhenExtractingFullCoverageRules
         var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Rule == "lt");
         Assert.That(rule.Constraint, Is.EqualTo(1000000m));
-        Assert.That(rule.CoerceAs, Is.EqualTo("number"));
+        Assert.That(rule.ShapeToken, Is.EqualTo("number"));
     }
 
     // ── equalTo (cross-property via field) ───────────────────
@@ -177,7 +177,7 @@ public class WhenExtractingFullCoverageRules
         Assert.That(rule.Field, Is.Null);
     }
 
-    // ── min with coerceAs: "date" ────────────────────────────
+    // ── min with shapeToken: "date" ────────────────────────────
 
     [Test]
     public void AdmissionDate_min_extracts_with_date_coercion_and_ISO_format()
@@ -185,11 +185,11 @@ public class WhenExtractingFullCoverageRules
         var desc = _ruleExtractor.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.Fields.First(f => f.FieldName == "AdmissionDate").Rules.First(r => r.Rule == "min");
         Assert.That(rule.Constraint, Is.EqualTo("2020-01-01"));
-        Assert.That(rule.CoerceAs, Is.EqualTo("date"));
+        Assert.That(rule.ShapeToken, Is.EqualTo("date"));
         Assert.That(rule.Field, Is.Null);
     }
 
-    // ── gt cross-property with coerceAs: "date" ─────────────
+    // ── gt cross-property with shapeToken: "date" ─────────────
 
     [Test]
     public void DischargeDate_gt_extracts_with_field_and_date_coercion()
@@ -198,7 +198,7 @@ public class WhenExtractingFullCoverageRules
         var rule = desc.Fields.First(f => f.FieldName == "DischargeDate").Rules.First(r => r.Rule == "gt");
         Assert.That(rule.Field, Is.EqualTo("AdmissionDate"));
         Assert.That(rule.Constraint, Is.Null);
-        Assert.That(rule.CoerceAs, Is.EqualTo("date"));
+        Assert.That(rule.ShapeToken, Is.EqualTo("date"));
     }
 
     // ── All fields present ───────────────────────────────────
@@ -248,7 +248,7 @@ public class WhenExtractingFullCoverageRules
             }
         }
 
-        // Same rule types, constraints, fields, and coerceAs values
+        // Same rule types, constraints, fields, and shapeToken values
         foreach (var uField in unconditional.Fields)
         {
             var cField = conditional.Fields.First(f => f.FieldName == uField.FieldName);
@@ -258,8 +258,8 @@ public class WhenExtractingFullCoverageRules
             {
                 Assert.That(cField.Rules[i].Rule, Is.EqualTo(uField.Rules[i].Rule),
                     $"'{uField.FieldName}'[{i}] rule type mismatch");
-                Assert.That(cField.Rules[i].CoerceAs, Is.EqualTo(uField.Rules[i].CoerceAs),
-                    $"'{uField.FieldName}'[{i}] coerceAs mismatch");
+                Assert.That(cField.Rules[i].ShapeToken, Is.EqualTo(uField.Rules[i].ShapeToken),
+                    $"'{uField.FieldName}'[{i}] shapeToken mismatch");
                 Assert.That(cField.Rules[i].Field, Is.EqualTo(uField.Rules[i].Field),
                     $"'{uField.FieldName}'[{i}] field mismatch");
                 Assert.That(cField.Rules[i].Constraint?.ToString(), Is.EqualTo(uField.Rules[i].Constraint?.ToString()),

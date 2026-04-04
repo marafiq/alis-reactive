@@ -5,6 +5,9 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public sealed class NativeButtonEvents
     {
+        private static readonly EventContractAuthoring ClickContract =
+            EventPayloadContractAuthoring.Define<NativeButtonClickArgs>(_ => { });
+
         /// <summary>Gets the singleton event surface instance.</summary>
         public static readonly NativeButtonEvents Instance = new NativeButtonEvents();
         private NativeButtonEvents() { }
@@ -12,6 +15,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Gets the button click event.</summary>
         public ReactiveEvent<NativeButtonClickArgs> Click =>
             new ReactiveEvent<NativeButtonClickArgs>(
-                "click", new NativeButtonClickArgs());
+                "click", ClickContract);
     }
 }

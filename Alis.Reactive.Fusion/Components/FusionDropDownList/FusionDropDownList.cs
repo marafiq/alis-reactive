@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -7,9 +9,10 @@ namespace Alis.Reactive.Fusion.Components
     /// Use as a type parameter in <c>p.Component&lt;FusionDropDownList&gt;(m =&gt; m.Country)</c>
     /// to access FusionDropDownList-specific mutations and value reading.
     /// </remarks>
-    public sealed class FusionDropDownList : FusionComponent, IInputComponent
+    public sealed class FusionDropDownList : FusionComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("dropdownlist", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

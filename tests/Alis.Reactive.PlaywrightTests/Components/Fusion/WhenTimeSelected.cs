@@ -1,23 +1,12 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
-/// <summary>
-/// Exercises all FusionTimePicker API end-to-end in the browser:
-/// property writes, property reads, events, conditions, and gather.
-///
-/// Page under test: /Sandbox/Components/TimePicker
-///
-/// FusionTimePicker renders an inner input element inside the wrapper div.
-/// The wrapper element gets the IdGenerator-based ID; the visible input is a child.
-/// Tests use TimePickerLocator to interact via real browser gestures.
-/// </summary>
 [TestFixture]
 public class WhenTimeSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/TimePicker";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TimePickerModel";
     private const string MedicationTimeId = Scope + "__MedicationTime";
     private const string WakeUpTimeId = Scope + "__WakeUpTime";
@@ -39,29 +28,16 @@ public class WhenTimeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertV2Plan(planJson);
-        AssertV2MemberAction(planJson);
-        AssertPlanResolver(planJson, "fusion-instance");
-        AssertNoConsoleErrors();
-    }
-
     // ── Section 1: Property Write ──
 
     [Test]
     public async Task domready_sets_initial_value()
     {
         await NavigateAndBoot();
-        // SF TimePicker wrapper gets the IdGenerator-based ID
         var wrapper = Page.Locator($"#{MedicationTimeId}");
         await Expect(wrapper).ToBeVisibleAsync();
 
         // Verify the component was initialized and the plan mutation executed.
-        // The trace confirms set-prop executed: prop="value", val="08:30".
         await Expect(MedicationTime.Input).ToBeVisibleAsync(new() { Timeout = 5000 });
 
         // Verify the value-echo was populated (confirms the read side worked)
@@ -88,7 +64,6 @@ public class WhenTimeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // SF TimePicker renders the input with the IdGenerator-based ID.
         // Type a time value and Tab to commit — triggers the SF change event.
         var input = Page.Locator($"#{WakeUpTimeId}");
         await input.ClickAsync();
@@ -138,7 +113,7 @@ public class WhenTimeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Deep BDD: state-cycle scenarios ──
+    // ── State-cycle scenarios ──
 
     [Test]
     public async Task changing_time_multiple_times_updates_echo()

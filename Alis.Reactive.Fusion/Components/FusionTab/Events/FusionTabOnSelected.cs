@@ -17,6 +17,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Initializes a new instance of the <see cref="FusionTabSelectedArgs"/> class.
         /// </summary>
-        public FusionTabSelectedArgs() { }
+        internal FusionTabSelectedArgs() { }
     }
 }

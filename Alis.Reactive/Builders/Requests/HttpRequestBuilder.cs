@@ -77,7 +77,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="gather">Adds gather items for the request body or URL params.</param>
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {
-            var builder = new GatherBuilder<TModel>();
+            var builder = new GatherBuilder<TModel>(_authoring, _scope);
             gather(builder);
             _requestValues = builder.RequestValues;
             return this;

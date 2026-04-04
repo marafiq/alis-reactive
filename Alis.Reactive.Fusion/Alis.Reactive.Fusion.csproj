@@ -19,12 +19,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Alis.Reactive.Components\Alis.Reactive.Components.csproj" />
       <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
-      <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <InternalsVisibleTo Include="Alis.Reactive.Fusion.UnitTests" />
     </ItemGroup>
 
 </Project>

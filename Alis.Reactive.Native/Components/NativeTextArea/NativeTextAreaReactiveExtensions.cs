@@ -19,7 +19,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeTextAreaReactiveExtensions
     {
-        private static readonly NativeTextArea _component = new NativeTextArea();
 
         /// <summary>
         /// Wires a <see cref="NativeTextArea"/> browser event into a reactive pipeline.
@@ -42,12 +41,11 @@ namespace Alis.Reactive.Native.Components
             var reactiveEvent = eventSelector(NativeTextAreaEvents.Instance);
             var scope = plan.Authoring.CreateObjectEventScope(
                 builder.ElementId,
-                _component.Vendor,
-                builder.BindingPath,
-                _component.ValueMemberPath,
-                reactiveEvent.EventName);
+                NativeTextArea.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             plan.AddWorkflow(scope, pb);
 
             return builder;

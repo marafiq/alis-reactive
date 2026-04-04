@@ -24,7 +24,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionDropDownListReactiveExtensions
     {
-        private static readonly FusionDropDownList Component = new FusionDropDownList();
 
         /// <summary>
         /// Wires a FusionDropDownList event to a reactive pipeline that executes in the browser.
@@ -47,15 +46,13 @@ namespace Alis.Reactive.Fusion.Components
 
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
             var componentId = (string)attrs["id"];
-            var bindingPath = (string)attrs["name"];
             var scope = plan.Authoring.CreateObjectEventScope(
                 componentId,
-                Component.Vendor,
-                bindingPath,
-                Component.ValueMemberPath,
-                reactiveEvent.EventName);
+                FusionDropDownList.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             plan.AddWorkflow(scope, pb);
 
             return builder;

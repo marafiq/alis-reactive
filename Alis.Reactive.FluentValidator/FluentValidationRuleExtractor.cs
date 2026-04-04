@@ -66,7 +66,7 @@ namespace Alis.Reactive.FluentValidator
                 var rules = new List<ValidationRule>();
                 foreach (var er in kvp.Value)
                 {
-                    rules.Add(new ValidationRule(er.Rule, er.Message, er.Constraint, er.When, er.Field, er.CoerceAs));
+                    rules.Add(new ValidationRule(er.Rule, er.Message, er.Constraint, er.When, er.Field, er.ShapeToken));
                 }
                 fields.Add(new ValidationField(propertyPath, rules));
             }
@@ -315,11 +315,11 @@ namespace Alis.Reactive.FluentValidator
             string ruleType, object? from, object? to,
             string message, ValidationCondition? ruleCondition)
         {
-            var coerceAs = InferCoerceAs(from?.GetType());
-            var serializedFrom = coerceAs == "date" && from != null ? SerializeDateConstraint(from) : from;
-            var serializedTo = coerceAs == "date" && to != null ? SerializeDateConstraint(to) : to;
+            var shapeToken = InferCompareAs(from?.GetType());
+            var serializedFrom = shapeToken == "date" && from != null ? SerializeDateConstraint(from) : from;
+            var serializedTo = shapeToken == "date" && to != null ? SerializeDateConstraint(to) : to;
             return new ExtractedRule(ruleType, message,
-                new object[] { serializedFrom!, serializedTo! }, ruleCondition, field: null, coerceAs: coerceAs);
+                new object[] { serializedFrom!, serializedTo! }, ruleCondition, field: null, shapeToken: shapeToken);
         }
 
         private static ExtractedRule MapComparisonValidator(
@@ -327,8 +327,8 @@ namespace Alis.Reactive.FluentValidator
             string? customMsg, ValidationCondition? ruleCondition)
         {
             var (field, constraint, propertyType) = ResolveComparisonOperands(cv);
-            var coerceAs = InferCoerceAs(propertyType);
-            if (coerceAs == "date" && constraint != null)
+            var shapeToken = InferCompareAs(propertyType);
+            if (shapeToken == "date" && constraint != null)
                 constraint = SerializeDateConstraint(constraint);
 
             var (ruleType, defaultMsg) = cv.Comparison switch
@@ -356,7 +356,7 @@ namespace Alis.Reactive.FluentValidator
                     $"This FluentValidation comparison is not supported for client-side extraction.")
             };
 
-            return new ExtractedRule(ruleType, customMsg ?? defaultMsg, constraint, ruleCondition, field, coerceAs);
+            return new ExtractedRule(ruleType, customMsg ?? defaultMsg, constraint, ruleCondition, field, shapeToken);
         }
 
         private static (string? field, object? constraint, Type? propertyType) ResolveComparisonOperands(
@@ -377,7 +377,7 @@ namespace Alis.Reactive.FluentValidator
             return (null, cv.ValueToCompare, cv.ValueToCompare?.GetType());
         }
 
-        private static string? InferCoerceAs(Type? propertyType)
+        private static string? InferCompareAs(Type? propertyType)
         {
             if (propertyType == null) return null;
             var t = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
@@ -424,18 +424,18 @@ namespace Alis.Reactive.FluentValidator
             public string Message { get; }
             public object? Constraint { get; }
             public string? Field { get; }
-            public string? CoerceAs { get; }
+            public string? ShapeToken { get; }
             public ValidationCondition? When { get; }
 
             public ExtractedRule(string rule, string message, object? constraint,
-                ValidationCondition? when = null, string? field = null, string? coerceAs = null)
+                ValidationCondition? when = null, string? field = null, string? shapeToken = null)
             {
                 Rule = rule;
                 Message = message;
                 Constraint = constraint;
                 When = when;
                 Field = field;
-                CoerceAs = coerceAs;
+                ShapeToken = shapeToken;
             }
         }
     }

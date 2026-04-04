@@ -9,7 +9,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
     private async Task WaitForDomReadyGet()
     {
         await NavigateTo("/Sandbox/HttpPipeline/Http");
-        await WaitForTraceMessage("booted", 10000);
+        await WaitForPageReady(10000);
         // DomReady GET fires automatically — wait for response data to arrive
         await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }

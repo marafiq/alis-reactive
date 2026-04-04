@@ -1,12 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeTextBox API end-to-end in the browser:
-/// property writes (SetValue), property reads (Value as source),
-/// reactive events (Changed with typed condition), and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/NativeTextBox
-/// </summary>
 [TestFixture]
 public class WhenTextInputChanges : PlaywrightTestBase
 {
@@ -16,7 +9,7 @@ public class WhenTextInputChanges : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
     }
 
     // ── Page loads ──
@@ -122,7 +115,7 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Deep BDD: reactive re-evaluation cycles ──
+    // ── Reactive re-evaluation cycles ──
 
     [Test]
     public async Task typing_then_clearing_then_retyping_fires_condition_each_time()

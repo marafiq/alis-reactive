@@ -2,6 +2,8 @@ using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -13,7 +15,14 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionAutoCompleteExtensions
     {
-        private static readonly FusionAutoComplete Component = new FusionAutoComplete();
+        private static readonly CapabilityProperty TextProperty = CapabilityProperty.Named("text");
+        private static readonly CapabilityProperty DataSourceProperty = CapabilityProperty.Named("dataSource");
+        private static readonly CapabilityProperty EnabledProperty = CapabilityProperty.Named("enabled");
+        private static readonly CapabilityMethod DataBindMethod = CapabilityMethod.Named("dataBind");
+        private static readonly CapabilityMethod FocusInMethod = CapabilityMethod.Named("focusIn");
+        private static readonly CapabilityMethod FocusOutMethod = CapabilityMethod.Named("focusOut");
+        private static readonly CapabilityMethod ShowPopupMethod = CapabilityMethod.Named("showPopup");
+        private static readonly CapabilityMethod HidePopupMethod = CapabilityMethod.Named("hidePopup");
 
         /// <summary>Sets the selected value.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -22,7 +31,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> SetValue<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self, string? value)
             where TModel : class
-            => self.Set("value", value);
+            => self.Set(FusionAutoComplete.Value, value);
 
         /// <summary>Sets the displayed text without changing the underlying value.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -31,7 +40,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> SetText<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self, string text)
             where TModel : class
-            => self.Set("text", text);
+            => self.Set(TextProperty, text);
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -44,10 +53,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionAutoComplete, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
             where TModel : class
-        {
-            var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.SetFromPath("dataSource", sourcePath);
-        }
+            => self.SetFromEvent(DataSourceProperty, path);
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -61,10 +67,7 @@ namespace Alis.Reactive.Fusion.Components
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
             where TModel : class
             where TResponse : class
-        {
-            var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.SetFromPath("dataSource", sourcePath);
-        }
+            => self.SetFromResponse(DataSourceProperty, path);
 
         /// <summary>
         /// Flushes pending property changes to the component in the browser.
@@ -78,7 +81,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> DataBind<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.Call("dataBind");
+            => self.Call(DataBindMethod);
 
         /// <summary>Moves focus into the autocomplete input.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -86,7 +89,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> FocusIn<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.Call("focusIn");
+            => self.Call(FocusInMethod);
 
         /// <summary>Removes focus from the autocomplete input.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -94,7 +97,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> FocusOut<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.Call("focusOut");
+            => self.Call(FocusOutMethod);
 
         /// <summary>Opens the suggestion popup.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -102,7 +105,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.Call("showPopup");
+            => self.Call(ShowPopupMethod);
 
         /// <summary>Closes the suggestion popup.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -110,7 +113,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> HidePopup<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.Call("hidePopup");
+            => self.Call(HidePopupMethod);
 
         // NOTE: showSpinner/hideSpinner have no visible effect on SF AutoComplete.
         // refresh() causes focus loss mid-typing, not usable during filtering.
@@ -122,7 +125,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> Enable<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.Set("enabled", true, coerceAs: "boolean");
+            => self.Set(EnabledProperty, true);
 
         /// <summary>Disables the autocomplete input, preventing user interaction.</summary>
         /// <param name="self">The component reference to operate on.</param>
@@ -130,7 +133,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> Disable<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.Set("enabled", false, coerceAs: "boolean");
+            => self.Set(EnabledProperty, false);
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
         /// <remarks>
@@ -139,9 +142,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the autocomplete's current value.</returns>
-        public static ComponentValueExpression<string> Value<TModel>(
+        public static ReactiveValue<string> Value<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<string>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<string>();
     }
 }

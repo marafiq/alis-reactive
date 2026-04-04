@@ -18,7 +18,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeCheckBoxReactiveExtensions
     {
-        private static readonly NativeCheckBox _component = new NativeCheckBox();
 
         /// <summary>
         /// Wires a <see cref="NativeCheckBox"/> browser event into a reactive pipeline.
@@ -41,12 +40,11 @@ namespace Alis.Reactive.Native.Components
             var reactiveEvent = eventSelector(NativeCheckBoxEvents.Instance);
             var scope = plan.Authoring.CreateObjectEventScope(
                 builder.ElementId,
-                _component.Vendor,
-                builder.BindingPath,
-                _component.ValueMemberPath,
-                reactiveEvent.EventName);
+                NativeCheckBox.Definition,
+                reactiveEvent.EventName,
+                reactiveEvent.ContractAuthoring);
             var pb = new PipelineBuilder<TModel>(plan.Authoring, scope);
-            pipeline(reactiveEvent.Payload, pb);
+            pipeline(default!, pb);
             plan.AddWorkflow(scope, pb);
 
             return builder;

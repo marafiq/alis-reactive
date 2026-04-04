@@ -35,7 +35,7 @@ namespace Alis.Reactive.Native.Components
             }
 
             var payloadJson = JsonSerializer.Serialize(
-                new NativeActionLinkPayload(authoring.Document, action),
+                new NativeActionLinkPayload(authoring.Plan, action),
                 CompactOptions);
 
             return new NativeActionLinkContract(payloadJson);
@@ -156,13 +156,13 @@ namespace Alis.Reactive.Native.Components
 
     internal sealed class NativeActionLinkPayload
     {
-        public NativeActionLinkPayload(ReactivePlanV2Document plan, PlanAction action)
+        public NativeActionLinkPayload(AuthoredPlan plan, PlanAction action)
         {
             Plan = plan;
             Action = action;
         }
 
-        public ReactivePlanV2Document Plan { get; }
+        public AuthoredPlan Plan { get; }
         public PlanAction Action { get; }
     }
 }

@@ -1,5 +1,7 @@
 using Alis.Reactive.Builders.Conditions;
 
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -11,8 +13,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionSwitchExtensions
     {
-        private static readonly FusionSwitch Component = new FusionSwitch();
-
         /// <summary>Sets the checked state of the switch.</summary>
         /// <param name="self">The component reference to operate on.</param>
         /// <param name="isChecked"><see langword="true"/> to check, <see langword="false"/> to uncheck.</param>
@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionSwitch, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.Set("checked", isChecked, coerceAs: "boolean");
+            return self.Set(FusionSwitch.Checked, isChecked);
         }
 
         /// <summary>Reads the current checked state for use in conditions or gather.</summary>
@@ -31,9 +31,9 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <param name="self">The component reference to operate on.</param>
         /// <returns>A typed value expression representing the switch's current checked state.</returns>
-        public static ComponentValueExpression<bool> Value<TModel>(
+        public static ReactiveValue<bool> Value<TModel>(
             this ComponentRef<FusionSwitch, TModel> self)
             where TModel : class
-            => new ComponentValueExpression<bool>(self.TargetId, Component.Vendor, Component.ValueMemberPath);
+            => self.CreateValue<bool>();
     }
 }

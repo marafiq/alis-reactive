@@ -1,3 +1,5 @@
+using Alis.Reactive.PlanModel;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -13,9 +15,10 @@ namespace Alis.Reactive.Fusion.Components
     /// individual dates, use <c>comp.StartDate()</c> or <c>comp.EndDate()</c> in conditions.
     /// </para>
     /// </remarks>
-    public sealed class FusionDateRangePicker : FusionComponent, IInputComponent
+    public sealed class FusionDateRangePicker : FusionComponent, IBindableComponent
     {
-        /// <inheritdoc />
-        public string ValueMemberPath => "value";
+        internal static readonly CapabilityProperty Value = Property("value");
+        internal static readonly ComponentMetadata Definition = DescribeBindable("daterangepicker", Value);
+        internal override ComponentMetadata Metadata => Definition;
     }
 }

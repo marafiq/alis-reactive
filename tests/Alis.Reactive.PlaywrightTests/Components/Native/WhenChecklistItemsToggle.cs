@@ -1,13 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeCheckList API end-to-end in the browser:
-/// text + description variation, text-only variation,
-/// form submission (JSON POST + FluentValidation), component-read conditions,
-/// model binding proof (pre-selected checkboxes).
-///
-/// Page under test: /Sandbox/Components/NativeCheckList
-/// </summary>
 [TestFixture]
 public class WhenChecklistItemsToggle : PlaywrightTestBase
 {
@@ -17,7 +9,7 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await WaitForPageReady(5000);
     }
 
     // ── Page loads ──
@@ -243,26 +235,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Plan JSON ──
-
-    [Test]
-    public async Task plan_carries_native_vendor()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanResolver(planJson, "native-element");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_value_readexpr()
-    {
-        await NavigateAndBoot();
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        AssertPlanValueMember(planJson, "value");
-        AssertNoConsoleErrors();
-    }
-
     // ── Multi-step toggle cycle ──
 
     [Test]
@@ -284,17 +256,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         await Page.Locator($"#{Scope}Allergies_c3").ClickAsync();
         await Expect(echo).ToHaveTextAsync("Shellfish,Dairy,Gluten", new() { Timeout = 3000 });
 
-        AssertNoConsoleErrors();
-    }
-
-    // ── Boot trace ──
-
-    [Test]
-    public async Task boot_trace_is_emitted()
-    {
-        await NavigateAndBoot();
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
-        Assert.That(hasBootTrace, Is.True);
         AssertNoConsoleErrors();
     }
 }

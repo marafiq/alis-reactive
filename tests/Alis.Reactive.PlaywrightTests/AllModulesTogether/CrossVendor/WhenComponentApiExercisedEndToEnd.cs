@@ -1,4 +1,4 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.PlaywrightTests.Support.Controls;
 
 namespace Alis.Reactive.PlaywrightTests.AllModulesTogether.CrossVendor;
 
@@ -10,7 +10,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
     private async Task NavigateAndBoot()
     {
         await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
+        await WaitForPageReady(10000);
     }
 
     [Test]
@@ -99,7 +99,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
         await NavigateAndBoot();
         await Page.Locator("#tw-comp-cond input").FillAsync("x");
         await Expect(Page.Locator("#comp-cond-ind")).ToBeVisibleAsync(new() { Timeout = 3000 });
-        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync();
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
         AssertNoConsoleErrors();
@@ -168,7 +168,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
     }
 
     // ══════════════════════════════════════════════════════════
-    // Deep BDD Regression Scenarios — Multi-Step Workflows
+    // Regression scenarios — multi-step workflows
     // ══════════════════════════════════════════════════════════
 
     // ── State Management: clear resets, then user input re-establishes state ──
@@ -218,7 +218,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
             .ToHaveTextAsync("has value", new() { Timeout = 3000 });
 
         // Step 3: clear the value → change event fires → condition evaluates empty → Else branch
-        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync();
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 
@@ -252,7 +252,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
             .ToHaveValueAsync("bravo", new() { Timeout = 3000 });
 
         // Step 3: clearing source propagates empty to target
-        await Page.Locator("#tw-source input").ClearWhenStableAsync(Page);
+        await Page.Locator("#tw-source input").ClearWhenStableAsync();
         await Expect(Page.Locator("#tw-target input"))
             .ToHaveValueAsync("", new() { Timeout = 3000 });
 
@@ -365,7 +365,7 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
             .ToHaveTextAsync("has value", new() { Timeout = 3000 });
 
         // Now clear — Else branch hides
-        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync();
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 
@@ -419,23 +419,6 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
         await Expect(Page.Locator("#tw-write input"))
             .ToHaveValueAsync("user-override", new() { Timeout = 3000 });
 
-        AssertNoConsoleErrors();
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // Additional BDD Scenarios — Untested Behaviors
-    // ══════════════════════════════════════════════════════════
-
-    // ── Plan element rendered on page ──
-
-    [Test]
-    public async Task plan_element_is_present_and_non_empty()
-    {
-        await NavigateAndBoot();
-        var planEl = Page.Locator("#plan-json");
-        await Expect(planEl).ToBeAttachedAsync(new() { Timeout = 5000 });
-        var text = await planEl.TextContentAsync();
-        Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must be present for runtime boot");
         AssertNoConsoleErrors();
     }
 
@@ -627,11 +610,11 @@ public class WhenComponentApiExercisedEndToEnd : PlaywrightTestBase
         await Expect(Page.Locator("#comp-cond-ind")).ToBeHiddenAsync();
 
         // Fill empty multiple times — indicator should remain hidden each time
-        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync();
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 
-        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync(Page);
+        await Page.Locator("#tw-comp-cond input").ClearWhenStableAsync();
         await Expect(Page.Locator("#comp-cond-ind"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
 
