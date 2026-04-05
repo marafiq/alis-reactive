@@ -16,7 +16,7 @@ import { evaluateConditionAsync, setValueEvaluator } from "../conditions/conditi
 import { executeRequest } from "./http";
 import { injectHtml } from "./inject";
 import { assertNever } from "../core/assert-never";
-import { applyShape } from "../core/coerce";
+import { applyShape } from "../core/shape-convert";
 import { walkPath, walk } from "../core/walk";
 
 const log = scope("execute");

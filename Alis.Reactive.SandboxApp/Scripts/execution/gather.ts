@@ -5,7 +5,7 @@
 import type { Plan, GatherInput, RequestInput, Transport } from "../types";
 import type { ExecContext } from "../types";
 import { readDefaultValue, getJsType } from "../resolution/resolver";
-import { applyShape, toString } from "../core/coerce";
+import { applyShape, toString } from "../core/shape-convert";
 import { scope } from "../core/trace";
 import { evaluateValue } from "./execute";
 

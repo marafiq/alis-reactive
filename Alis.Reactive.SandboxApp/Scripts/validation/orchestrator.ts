@@ -11,7 +11,7 @@ import type { ExecContext } from "../types";
 import { readDefaultValue } from "../resolution/resolver";
 import { evaluateCondition } from "../conditions/conditions";
 import { scope } from "../core/trace";
-import { toString } from "../core/coerce";
+import { toString } from "../core/shape-convert";
 import { ruleFails, type PeerReader } from "./rule-engine";
 import {
   showInline, clearInline,

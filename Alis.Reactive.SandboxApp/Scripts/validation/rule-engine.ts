@@ -1,26 +1,17 @@
 // Rule Engine — Pure validation rule evaluation
-// No DOM, no vendor, no side effects. Takes a value and V3 ValidationRule -> pass/fail.
-// V3 rules use `name` (not `rule`), `constraint` (ValueProducer), `otherComponent` (not `field`).
+// No DOM, no vendor, no side effects. Takes a value + ValidationRule → pass/fail.
+// Uses Shape for ALL type-aware comparisons via convertByShape from shape-convert.
 
-import { coerce, toString, applyShape, shapeToCoercionType } from "../core/coerce";
-import type { CoercionType } from "../core/coerce";
-import type { ValidationRule, ValidationRuleName } from "../types";
+import { convertByShape, toString } from "../core/shape-convert";
+import type { ValidationRule, Shape } from "../types";
 
-/** Reads a peer component's raw value for cross-property comparisons. */
 export interface PeerReader {
   readPeer(componentKey: string): unknown;
 }
 
-function compareValues(a: unknown, b: unknown, shape?: import("../types").Shape): number {
-  if (!shape) {
-    throw new Error(
-      "[alis:validation] compareValues called without shape. " +
-      "Comparison rules (min, max, gt, lt, range, exclusiveRange) require explicit shape in the plan."
-    );
-  }
-  const shapeType = shapeToCoercionType(shape);
-  const ra = coerce(a, shapeType);
-  const rb = coerce(b, shapeType);
+function compareValues(a: unknown, b: unknown, shape: Shape): number {
+  const ra = convertByShape(a, shape);
+  const rb = convertByShape(b, shape);
   if (!ra.ok || !rb.ok) return NaN;
   const ca = ra.value as number;
   const cb = rb.value as number;
@@ -30,26 +21,18 @@ function compareValues(a: unknown, b: unknown, shape?: import("../types").Shape)
 
 function resolveTarget(rule: ValidationRule, peerReader: PeerReader): unknown {
   if (rule.otherComponent) {
-    const peer = peerReader.readPeer(rule.otherComponent);
-    if (peer == null) return undefined;
-    return peer;
+    return peerReader.readPeer(rule.otherComponent) ?? undefined;
   }
-  // V3: constraint is a ValueProducer — for simple rules, use its literal value
-  if (rule.constraint) {
-    if (rule.constraint.kind === "literal") return rule.constraint.value;
-    // For non-literal constraints, the caller must resolve them externally
-    return undefined;
-  }
+  if (rule.constraint?.kind === "literal") return rule.constraint.value;
   return undefined;
 }
-
-// -- Comparison rule evaluators --
 
 function failsComparisonRule(
   rule: ValidationRule, value: unknown, empty: boolean, peerReader: PeerReader,
 ): boolean {
   const target = resolveTarget(rule, peerReader);
   if (target === undefined) return true;
+  if (!rule.shape) return true; // comparison requires shape
   const cmp = compareValues(value, target, rule.shape);
   switch (rule.name) {
     case "min": return !empty && (Number.isNaN(cmp) || cmp < 0);
@@ -60,20 +43,18 @@ function failsComparisonRule(
   }
 }
 
-function failsRangeRule(
-  rule: ValidationRule, value: unknown, empty: boolean,
-): boolean {
-  // V3: constraint for range is an array literal [lo, hi]
+function failsRangeRule(rule: ValidationRule, value: unknown, empty: boolean): boolean {
   if (!rule.constraint || rule.constraint.kind !== "literal") return true;
   const arr = rule.constraint.value;
   if (!Array.isArray(arr) || arr.length < 2) return true;
-  const [lo, hi] = arr;
   if (empty) return false;
+  if (!rule.shape) return true;
+  const [lo, hi] = arr;
   const cmpLo = compareValues(value, lo, rule.shape);
   const cmpHi = compareValues(value, hi, rule.shape);
   if (Number.isNaN(cmpLo) || Number.isNaN(cmpHi)) return true;
   if (rule.name === "range") return cmpLo < 0 || cmpHi > 0;
-  return cmpLo <= 0 || cmpHi >= 0; // exclusiveRange
+  return cmpLo <= 0 || cmpHi >= 0;
 }
 
 function failsEqualityRule(
@@ -104,8 +85,6 @@ function failsEqualityRule(
   }
 }
 
-// -- Main dispatcher --
-
 export function ruleFails(
   rule: ValidationRule,
   value: unknown,
@@ -130,22 +109,17 @@ export function ruleFails(
     }
     case "url":         return !empty && !/^https?:\/\/.+/.test(str);
     case "creditCard":  return !empty && !luhn(str.replace(/\D/g, ""));
-
     case "min": case "max": case "gt": case "lt":
       return failsComparisonRule(rule, value, empty, peerReader);
-
     case "range": case "exclusiveRange":
       return failsRangeRule(rule, value, empty);
-
     case "equalTo": case "notEqual": case "notEqualTo":
       return failsEqualityRule(rule, value, empty, peerReader);
-
     case "atLeastOne":  return Array.isArray(value) ? value.length === 0 : empty;
     default:            return true;
   }
 }
 
-/** Extract the literal constraint value from a ValidationRule's constraint ValueProducer. */
 function getConstraintValue(rule: ValidationRule): unknown {
   if (!rule.constraint) return undefined;
   if (rule.constraint.kind === "literal") return rule.constraint.value;
