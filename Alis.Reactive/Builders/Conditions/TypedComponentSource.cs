@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders.Conditions
         private readonly string _vendor;
         private readonly string _valueMember;
 
-        public TypedComponentSource(string componentId, string vendor, string valueMember)
+        internal TypedComponentSource(string componentId, string vendor, string valueMember)
         {
             _componentId = componentId;
             _vendor = vendor;

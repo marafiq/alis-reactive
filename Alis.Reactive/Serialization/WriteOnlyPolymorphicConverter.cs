@@ -10,6 +10,6 @@ namespace Alis.Reactive.Serialization
             => JsonSerializer.Serialize(writer, value, value!.GetType(), options);
 
         public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => throw new NotSupportedException("Plan descriptors are write-only.");
+            => throw new NotSupportedException("Plan types are write-only.");
     }
 }
