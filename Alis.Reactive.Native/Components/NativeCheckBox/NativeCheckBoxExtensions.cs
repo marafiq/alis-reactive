@@ -1,5 +1,5 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -26,7 +26,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("checked", coerce: "boolean"), value: isChecked ? "true" : "false");
+            return self.EmitSet("checked", ValueProducer.Literal(isChecked));
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("focus"));
+            return self.EmitCall("focus");
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return new TypedComponentSource<bool>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            return new TypedComponentSource<bool>(self.TargetId, _component.Vendor, _component.ValueMember);
         }
     }
 }

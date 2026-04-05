@@ -1,7 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -41,12 +40,12 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var descriptor = eventSelector(NativeCheckBoxEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
+            var pb = new PipelineBuilder<TModel>(plan.Context);
             pipeline(descriptor.Args, pb);
 
-            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, _component.Vendor, builder.BindingPath, _component.ReadExpr);
+            var trigger = StartsWhen.ComponentEvent(builder.ElementId, descriptor.JsEvent);
             foreach (var reaction in pb.BuildReactions())
-                plan.AddEntry(new Entry(trigger, reaction));
+                plan.Context.AddBehavior(Behavior.On(trigger, reaction));
 
             return builder;
         }

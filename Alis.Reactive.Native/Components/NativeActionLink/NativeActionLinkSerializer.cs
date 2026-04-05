@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Reactions;
-using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -22,7 +20,9 @@ namespace Alis.Reactive.Native.Components
             Action<PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var pb = new PipelineBuilder<TModel>();
+            var plan = Plan.Create("action-link", null);
+            var context = new PlanBuildContext(plan, new Dictionary<string, ComponentRegistration>());
+            var pb = new PipelineBuilder<TModel>(context);
             pipeline(pb);
 
             var reaction = pb.BuildReaction();
@@ -46,26 +46,23 @@ namespace Alis.Reactive.Native.Components
             string href,
             RequestProjectionState state)
         {
-            if (reaction is SequentialReaction sequential)
+            if (reaction is SequenceReaction sequential)
             {
-                return new SequentialReaction(sequential.Commands);
+                return Reaction.Sequence(sequential.Steps);
             }
 
-            if (reaction is ConditionalReaction conditional)
+            if (reaction is BranchReaction conditional)
             {
-                var projectedBranches = new List<Branch>();
-                foreach (var branch in conditional.Branches)
+                var projectedCases = new List<BranchCase>();
+                foreach (var branchCase in conditional.Cases)
                 {
-                    projectedBranches.Add(new Branch(branch.Guard, ProjectReaction(branch.Reaction, href, state)));
+                    projectedCases.Add(new BranchCase(branchCase.When, ProjectReaction(branchCase.Reaction, href, state)));
                 }
 
-                var commands = conditional.Commands == null
-                    ? null
-                    : new List<Command>(conditional.Commands);
-                return new ConditionalReaction(commands, projectedBranches);
+                return Reaction.Branch(projectedCases);
             }
 
-            if (reaction is HttpReaction http)
+            if (reaction is RequestReaction http)
             {
                 state.RequestCount++;
                 if (state.RequestCount > 1)
@@ -80,14 +77,11 @@ namespace Alis.Reactive.Native.Components
                         "NativeActionLink href must match the request URL in the configured request chain.");
                 }
 
-                var preFetch = http.PreFetch == null
-                    ? null
-                    : new List<Command>(http.PreFetch);
                 var request = ProjectRequest(http.Request);
-                return new HttpReaction(preFetch, request);
+                return Reaction.Request(request);
             }
 
-            if (reaction is ParallelHttpReaction)
+            if (reaction is ParallelReaction)
             {
                 throw new InvalidOperationException(
                     "NativeActionLink does not support Parallel(...) request chains.");
@@ -96,25 +90,25 @@ namespace Alis.Reactive.Native.Components
             throw new InvalidOperationException("Unsupported NativeActionLink reaction shape.");
         }
 
-        private static RequestDescriptor ProjectRequest(RequestDescriptor request)
+        private static Request ProjectRequest(Request request)
         {
-            if (request.Chained != null)
+            if (request.Next != null)
             {
                 throw new InvalidOperationException(
                     "NativeActionLink supports exactly one request. Response.Chained(...) is not supported.");
             }
 
-            if (request.Validation != null)
+            if (request.ValidatorType != null)
             {
                 throw new InvalidOperationException(
                     "NativeActionLink does not support validation. Use a plan-backed trigger for validated flows.");
             }
 
-            if (request.Gather != null)
+            if (request.Input is GatherInput gather)
             {
-                foreach (var item in request.Gather)
+                foreach (var field in gather.Components)
                 {
-                    if (item is AllGather)
+                    if (field.Component == "*" && field.Key == "*")
                     {
                         throw new InvalidOperationException(
                             "NativeActionLink does not support IncludeAll(). Use explicit gather instead.");
@@ -122,42 +116,30 @@ namespace Alis.Reactive.Native.Components
                 }
             }
 
-            return new RequestDescriptor(
-                request.Verb,
-                string.Empty,
-                request.Gather == null ? null : new List<GatherItem>(request.Gather),
-                request.ContentType,
-                request.WhileLoading == null ? null : new List<Command>(request.WhileLoading),
-                ProjectHandlers(request.OnSuccess, new RequestProjectionState { RequestCount = 1 }),
-                ProjectHandlers(request.OnError, new RequestProjectionState { RequestCount = 1 }),
-                chained: null,
-                validation: null);
+            var projected = new Request(request.Method, string.Empty);
+            projected.Input = request.Input;
+            projected.Before = request.Before;
+            projected.Success = ProjectHandlers(request.Success, new RequestProjectionState { RequestCount = 1 });
+            projected.Error = ProjectHandlers(request.Error, new RequestProjectionState { RequestCount = 1 });
+            return projected;
         }
 
-        private static List<StatusHandler>? ProjectHandlers(List<StatusHandler>? handlers, RequestProjectionState state)
+        private static List<ResponseHandler> ProjectHandlers(List<ResponseHandler> handlers, RequestProjectionState state)
         {
             if (handlers == null || handlers.Count == 0)
             {
                 return null;
             }
 
-            var projected = new List<StatusHandler>();
+            var projected = new List<ResponseHandler>();
             foreach (var handler in handlers)
             {
                 if (handler.Reaction != null)
                 {
                     var reaction = ProjectReaction(handler.Reaction, string.Empty, state);
-                    projected.Add(handler.StatusCode.HasValue
-                        ? new StatusHandler(handler.StatusCode.Value, reaction)
-                        : new StatusHandler(reaction));
-                    continue;
-                }
-
-                if (handler.Commands != null)
-                {
-                    projected.Add(handler.StatusCode.HasValue
-                        ? new StatusHandler(handler.StatusCode.Value, handler.Commands)
-                        : new StatusHandler(handler.Commands));
+                    var projectedHandler = new ResponseHandler(reaction);
+                    projectedHandler.Status = handler.Status;
+                    projected.Add(projectedHandler);
                 }
             }
 

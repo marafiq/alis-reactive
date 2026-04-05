@@ -1,8 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -14,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static ComponentRef<TestWidgetSyncFusion, TModel> SetValue<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self, string value)
-            where TModel : class => self.Emit(new SetPropMutation("value"), value: value);
+            where TModel : class => self.EmitSet("value", ValueProducer.Literal(value));
 
         // ── Property Write (event payload) ──
 
@@ -24,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
+            return self.EmitSet("value", ValueProducer.Read(PayloadSource.Event(), sourcePath));
         }
 
         // ── Property Write (response body) ──
@@ -36,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
+            return self.EmitSet("value", ValueProducer.Read(PayloadSource.Success(), sourcePath));
         }
 
         // ── Property Write (component read) ──
@@ -44,23 +43,23 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<TestWidgetSyncFusion, TModel> SetValue<TModel, TProp>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self, TypedSource<TProp> source)
             where TModel : class
-            => self.Emit(new SetPropMutation("value"), source: source.ToBindSource());
+            => self.EmitSet("value", source.ToValueProducer());
 
         // ── Property Read ──
 
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            where TModel : class => new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember);
 
         // ── Void Method (no args) ──
 
         public static ComponentRef<TestWidgetSyncFusion, TModel> Focus<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => self.Emit(new CallMutation("focus"));
+            where TModel : class => self.EmitCall("focus");
 
         public static ComponentRef<TestWidgetSyncFusion, TModel> Clear<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class => self.Emit(new CallMutation("clear"));
+            where TModel : class => self.EmitCall("clear");
 
         // ── Method + arg (event payload) ──
 
@@ -70,7 +69,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new CallMutation("setItems", args: new MethodArg[] { new SourceArg(new EventSource(sourcePath)) }));
+            return self.EmitCall("setItems", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Read(PayloadSource.Event(), sourcePath) });
         }
 
         // ── Method + arg (response body) ──
@@ -82,7 +81,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new CallMutation("setItems", args: new MethodArg[] { new SourceArg(new EventSource(sourcePath)) }));
+            return self.EmitCall("setItems", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Read(PayloadSource.Success(), sourcePath) });
         }
     }
 }

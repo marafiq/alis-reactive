@@ -5,6 +5,7 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.Internal;
 using FluentValidation.Validators;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 using Alis.Reactive.FluentValidator.Validators;
 
@@ -29,13 +30,13 @@ namespace Alis.Reactive.FluentValidator
 
         /// <summary>
         /// Extract client rules from the given validator type for a form.
-        /// Returns null if no extractable rules are found.
+        /// Returns an empty list if no extractable rules are found.
         /// Fields carry only fieldName + rules. Runtime enriches component info from plan.components.
         /// </summary>
-        public ValidationDescriptor? ExtractRules(Type validatorType, string formId)
+        public List<ValidationField> ExtractRules(Type validatorType, string formId)
         {
             var validator = _factory(validatorType);
-            if (validator == null) return null;
+            if (validator == null) return new List<ValidationField>();
 
             // Intermediate: property path → ordered list of (ruleType, message, constraint)
             var fieldRules = new Dictionary<string, List<ExtractedRule>>();
@@ -49,7 +50,7 @@ namespace Alis.Reactive.FluentValidator
 
             ExtractFromValidator(validator, "", fieldRules, _factory, clientConditions);
 
-            // Ensure cross-property peer fields are in the descriptor (runtime needs them for value reading)
+            // Ensure cross-property peer fields are present in the extracted form contract for value reads.
             var peerFields = fieldRules
                 .SelectMany(kvp => kvp.Value)
                 .Where(er => !string.IsNullOrEmpty(er.Field) && !fieldRules.ContainsKey(er.Field!))
@@ -66,14 +67,12 @@ namespace Alis.Reactive.FluentValidator
                 var rules = new List<ValidationRule>();
                 foreach (var er in kvp.Value)
                 {
-                    rules.Add(new ValidationRule(er.Rule, er.Message, er.Constraint, er.When, er.Field, er.CoerceAs));
+                    rules.Add(new ValidationRule(er.Rule, er.Message, er.Constraint, er.When, er.Field, er.Shape));
                 }
                 fields.Add(new ValidationField(propertyPath, rules));
             }
 
-            if (fields.Count == 0) return null;
-
-            return new ValidationDescriptor(formId, fields);
+            return fields;
         }
 
         private static void ExtractFromValidator(
@@ -315,11 +314,12 @@ namespace Alis.Reactive.FluentValidator
             string ruleType, object? from, object? to,
             string message, ValidationCondition? ruleCondition)
         {
-            var coerceAs = InferCoerceAs(from?.GetType());
-            var serializedFrom = coerceAs == "date" && from != null ? SerializeDateConstraint(from) : from;
-            var serializedTo = coerceAs == "date" && to != null ? SerializeDateConstraint(to) : to;
+            var shape = Shape.FromClrType(from?.GetType());
+            var isDate = shape == Shape.Date;
+            var serializedFrom = isDate && from != null ? SerializeDateConstraint(from) : from;
+            var serializedTo = isDate && to != null ? SerializeDateConstraint(to) : to;
             return new ExtractedRule(ruleType, message,
-                new object[] { serializedFrom!, serializedTo! }, ruleCondition, field: null, coerceAs: coerceAs);
+                new object[] { serializedFrom!, serializedTo! }, ruleCondition, field: null, shape: shape);
         }
 
         private static ExtractedRule MapComparisonValidator(
@@ -327,8 +327,8 @@ namespace Alis.Reactive.FluentValidator
             string? customMsg, ValidationCondition? ruleCondition)
         {
             var (field, constraint, propertyType) = ResolveComparisonOperands(cv);
-            var coerceAs = InferCoerceAs(propertyType);
-            if (coerceAs == "date" && constraint != null)
+            var shape = Shape.FromClrType(propertyType);
+            if (shape == Shape.Date && constraint != null)
                 constraint = SerializeDateConstraint(constraint);
 
             var (ruleType, defaultMsg) = cv.Comparison switch
@@ -356,7 +356,7 @@ namespace Alis.Reactive.FluentValidator
                     $"This FluentValidation comparison is not supported for client-side extraction.")
             };
 
-            return new ExtractedRule(ruleType, customMsg ?? defaultMsg, constraint, ruleCondition, field, coerceAs);
+            return new ExtractedRule(ruleType, customMsg ?? defaultMsg, constraint, ruleCondition, field, shape);
         }
 
         private static (string? field, object? constraint, Type? propertyType) ResolveComparisonOperands(
@@ -375,19 +375,6 @@ namespace Alis.Reactive.FluentValidator
             }
 
             return (null, cv.ValueToCompare, cv.ValueToCompare?.GetType());
-        }
-
-        private static string? InferCoerceAs(Type? propertyType)
-        {
-            if (propertyType == null) return null;
-            var t = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
-            if (t == typeof(decimal) || t == typeof(int) || t == typeof(long) ||
-                t == typeof(double) || t == typeof(float) || t == typeof(byte) || t == typeof(short) ||
-                t == typeof(uint) || t == typeof(ushort) || t == typeof(ulong))
-                return "number";
-            if (t == typeof(DateTime) || t == typeof(DateTimeOffset) || t == typeof(DateOnly))
-                return "date";
-            return null;
         }
 
         private static object SerializeDateConstraint(object value)
@@ -424,18 +411,18 @@ namespace Alis.Reactive.FluentValidator
             public string Message { get; }
             public object? Constraint { get; }
             public string? Field { get; }
-            public string? CoerceAs { get; }
+            public Shape Shape { get; }
             public ValidationCondition? When { get; }
 
             public ExtractedRule(string rule, string message, object? constraint,
-                ValidationCondition? when = null, string? field = null, string? coerceAs = null)
+                ValidationCondition? when = null, string? field = null, Shape? shape = null)
             {
                 Rule = rule;
                 Message = message;
                 Constraint = constraint;
                 When = when;
                 Field = field;
-                CoerceAs = coerceAs;
+                Shape = shape ?? Shape.None;
             }
         }
     }

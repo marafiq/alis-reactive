@@ -1,4 +1,4 @@
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -6,10 +6,10 @@ namespace Alis.Reactive.Native.Components
     {
         public static ComponentRef<TestWidgetNative, TModel> SetValue<TModel>(
             this ComponentRef<TestWidgetNative, TModel> self, string value)
-            where TModel : class => self.Emit(new SetPropMutation("value"), value: value);
+            where TModel : class => self.EmitSet("value", ValueProducer.Literal(value));
 
         public static ComponentRef<TestWidgetNative, TModel> Focus<TModel>(
             this ComponentRef<TestWidgetNative, TModel> self)
-            where TModel : class => self.Emit(new CallMutation("focus"));
+            where TModel : class => self.EmitCall("focus");
     }
 }

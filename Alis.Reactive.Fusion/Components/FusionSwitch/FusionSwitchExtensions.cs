@@ -1,5 +1,5 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionSwitch, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("checked", coerce: "boolean"), value: isChecked ? "true" : "false");
+            return self.EmitSet("checked", ValueProducer.Literal(isChecked));
         }
 
         /// <summary>Reads the current checked state for use in conditions or gather.</summary>
@@ -33,6 +33,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<FusionSwitch, TModel> self)
             where TModel : class
-            => new TypedComponentSource<bool>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new TypedComponentSource<bool>(self.TargetId, Component.Vendor, Component.ValueMember);
     }
 }

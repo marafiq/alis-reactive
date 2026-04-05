@@ -1,4 +1,4 @@
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -10,19 +10,19 @@ namespace Alis.Reactive.Fusion.AppLevel
             this ComponentRef<FusionConfirm, TModel> self, string message)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("content"), value: message)
-                       .Emit(new CallMutation("dataBind"));
+            return self.EmitSet("content", ValueProducer.Literal(message))
+                       .EmitCall("dataBind");
         }
 
         public static ComponentRef<FusionConfirm, TModel> Show<TModel>(
             this ComponentRef<FusionConfirm, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("show"));
+            => self.EmitCall("show");
 
         public static ComponentRef<FusionConfirm, TModel> Hide<TModel>(
             this ComponentRef<FusionConfirm, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("hide"));
+            => self.EmitCall("hide");
 
         public static IHtmlContent FusionConfirmDialog(this IHtmlHelper html)
             => new HtmlString($"<div id=\"{FusionConfirm.ElementId}\"></div>\n");

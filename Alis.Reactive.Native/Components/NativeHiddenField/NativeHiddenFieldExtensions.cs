@@ -1,8 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -14,19 +13,19 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeHiddenField, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.EmitSet("value", ValueProducer.Literal(value));
         }
 
-        // ── Property Write (component source — cross-plan value binding) ──
+        // -- Property Write (component source -- cross-plan value binding) --
 
         public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel>(
             this ComponentRef<NativeHiddenField, TModel> self, TypedComponentSource<string> source)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), source: source.ToBindSource());
+            return self.EmitSet("value", source.ToValueProducer());
         }
 
-        // ── Property Write (response body) ──
+        // -- Property Write (response body) --
 
         public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel, TResponse>(
             this ComponentRef<NativeHiddenField, TModel> self,
@@ -35,14 +34,14 @@ namespace Alis.Reactive.Native.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
+            return self.EmitSet("value", ValueProducer.Read(PayloadSource.Success(), "body", Path.Parse(sourcePath)));
         }
 
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeHiddenField, TModel> self)
             where TModel : class
         {
-            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember);
         }
     }
 }

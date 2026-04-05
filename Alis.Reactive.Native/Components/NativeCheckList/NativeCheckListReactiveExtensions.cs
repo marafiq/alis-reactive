@@ -1,7 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -43,16 +42,14 @@ namespace Alis.Reactive.Native.Components
         {
             var descriptor = eventSelector(NativeCheckListEvents.Instance);
 
-            var pb = new PipelineBuilder<TModel>();
+            var pb = new PipelineBuilder<TModel>(plan.Context);
             pipeline(descriptor.Args, pb);
 
-            // Single entry on the hidden input — checklist.ts dispatches change after sync
-            var trigger = new ComponentEventTrigger(
-                builder.ElementId, descriptor.JsEvent, _component.Vendor,
-                builder.BindingPath, _component.ReadExpr);
+            // Single entry on the hidden input -- checklist.ts dispatches change after sync
+            var trigger = StartsWhen.ComponentEvent(builder.ElementId, descriptor.JsEvent);
 
             foreach (var reaction in pb.BuildReactions())
-                plan.AddEntry(new Entry(trigger, reaction));
+                plan.Context.AddBehavior(Behavior.On(trigger, reaction));
 
             return builder;
         }

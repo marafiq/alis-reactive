@@ -27,6 +27,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionFileUpload, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember);
     }
 }

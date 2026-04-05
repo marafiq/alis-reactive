@@ -49,7 +49,7 @@ namespace Alis.Reactive.Native.Extensions
         public static void On<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan,
             Action<TriggerBuilder<TModel>> trigger) where TModel : class
         {
-            var builder = new TriggerBuilder<TModel>(plan);
+            var builder = new TriggerBuilder<TModel>(plan, plan.Context);
             trigger(builder);
         }
     }

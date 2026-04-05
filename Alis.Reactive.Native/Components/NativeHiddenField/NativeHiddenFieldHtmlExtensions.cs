@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
-using Alis.Reactive.Descriptors;
+using Alis.Reactive.PlanModel;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -9,7 +9,7 @@ namespace Alis.Reactive.Native.Components
 {
     /// <summary>
     /// Factory extension for creating NativeHiddenFieldBuilder.
-    /// Hidden fields bypass InputField wrapper entirely — no label, no validation slot.
+    /// Hidden fields bypass InputField wrapper entirely -- no label, no validation slot.
     /// Registers in ComponentsMap for gather (IncludeAll picks it up).
     /// </summary>
     public static class NativeHiddenFieldHtmlExtensions
@@ -18,7 +18,7 @@ namespace Alis.Reactive.Native.Components
 
         /// <summary>
         /// Creates a hidden field bound to the model property.
-        /// Registers in ComponentsMap for gather — no InputField wrapper.
+        /// Registers in ComponentsMap for gather -- no InputField wrapper.
         /// Returns IHtmlContent for direct rendering in views: @Html.HiddenFieldFor(plan, m => m.Id)
         /// </summary>
         public static NativeHiddenFieldBuilder<TModel, TProp> HiddenFieldFor<TModel, TProp>(
@@ -31,8 +31,8 @@ namespace Alis.Reactive.Native.Components
             var bindingPath = html.NameFor(expression);
 
             plan.AddToComponentsMap(bindingPath, new ComponentRegistration(
-                elementId, _component.Vendor, bindingPath, _component.ReadExpr, "hiddenfield",
-                CoercionTypes.InferFromType(typeof(TProp))));
+                elementId, _component.Vendor, bindingPath, _component.ValueMember, "hiddenfield",
+                Shape.FromClrType(typeof(TProp))));
 
             return new NativeHiddenFieldBuilder<TModel, TProp>(html, expression);
         }

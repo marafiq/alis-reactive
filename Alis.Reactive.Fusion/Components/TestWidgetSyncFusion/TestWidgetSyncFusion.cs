@@ -8,6 +8,6 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class TestWidgetSyncFusion : FusionComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMember => "value";
     }
 }

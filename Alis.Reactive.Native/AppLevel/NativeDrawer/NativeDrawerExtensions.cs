@@ -1,5 +1,5 @@
 using Alis.Reactive;
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -25,8 +25,8 @@ namespace Alis.Reactive.Native.AppLevel
         {
             // Remove all size classes, then add the requested one
             foreach (var cls in SizeClasses)
-                self = self.Emit(new CallMutation("remove", "classList",
-                    new[] { new LiteralArg(cls) }));
+                self = self.EmitCall("remove",
+                    new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(cls) });
 
             var sizeClass = size switch
             {
@@ -35,8 +35,8 @@ namespace Alis.Reactive.Native.AppLevel
                 DrawerSize.Lg => "alis-drawer--lg",
                 _ => "alis-drawer--md"
             };
-            return self.Emit(new CallMutation("add", "classList",
-                new[] { new LiteralArg(sizeClass) }));
+            return self.EmitCall("add",
+                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(sizeClass) });
         }
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("add", "classList",
-                           new[] { new LiteralArg("alis-drawer--visible") }))
-                       .Emit(new CallMutation("removeAttribute",
-                           args: new MethodArg[] { new LiteralArg("aria-hidden") }));
+            return self.EmitCall("add",
+                           new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-drawer--visible") })
+                       .EmitCall("removeAttribute",
+                           new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
         }
 
         /// <summary>
@@ -63,8 +63,8 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("remove", "classList",
-                       new[] { new LiteralArg("alis-drawer--visible") }));
+            return self.EmitCall("remove",
+                       new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-drawer--visible") });
         }
 
         /// <summary>

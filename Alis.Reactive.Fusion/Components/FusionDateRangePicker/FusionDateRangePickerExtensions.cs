@@ -59,6 +59,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime[]> Value<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<DateTime[]>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new TypedComponentSource<DateTime[]>(self.TargetId, Component.Vendor, Component.ValueMember);
     }
 }

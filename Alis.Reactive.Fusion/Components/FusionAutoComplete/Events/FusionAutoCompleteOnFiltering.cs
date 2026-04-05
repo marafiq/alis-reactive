@@ -1,9 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -53,10 +51,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="pipeline">The current pipeline builder.</param>
         public static void PreventDefault(
             this FusionAutoCompleteFilteringArgs args,
-            ICommandEmitter pipeline)
+            IReactionEmitter pipeline)
         {
-            pipeline.AddCommand(new MutateEventCommand(
-                new SetPropMutation("preventDefaultAction"), value: true));
+            pipeline.AddStep(Reaction.Set(PayloadSource.Event(), "preventDefaultAction", ValueProducer.Literal(true)));
         }
 
         /// <summary>
@@ -74,17 +71,14 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="path">Expression selecting the items collection from the response.</param>
         public static void UpdateData<TResponse>(
             this FusionAutoCompleteFilteringArgs args,
-            ICommandEmitter pipeline,
+            IReactionEmitter pipeline,
             ResponseBody<TResponse> source,
             Expression<Func<TResponse, object?>> path)
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            pipeline.AddCommand(new MutateEventCommand(
-                new CallMutation("updateData", args: new MethodArg[]
-                {
-                    new SourceArg(new EventSource(sourcePath))
-                })));
+            pipeline.AddStep(Reaction.Call(PayloadSource.Event(), "updateData",
+                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Read(PayloadSource.Success(), sourcePath) }));
         }
     }
 }

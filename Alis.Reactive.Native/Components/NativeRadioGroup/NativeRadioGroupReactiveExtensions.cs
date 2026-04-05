@@ -1,7 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -49,16 +48,14 @@ namespace Alis.Reactive.Native.Components
 
             for (int i = 0; i < builder.Options.Count; i++)
             {
-                var pb = new PipelineBuilder<TModel>();
+                var pb = new PipelineBuilder<TModel>(plan.Context);
                 pipeline(descriptor.Args, pb);
 
                 var radioId = $"{builder.ElementId}_r{i}";
-                var trigger = new ComponentEventTrigger(
-                    radioId, descriptor.JsEvent, _component.Vendor,
-                    builder.BindingPath, _component.ReadExpr);
+                var trigger = StartsWhen.ComponentEvent(radioId, descriptor.JsEvent);
 
                 foreach (var reaction in pb.BuildReactions())
-                    plan.AddEntry(new Entry(trigger, reaction));
+                    plan.Context.AddBehavior(Behavior.On(trigger, reaction));
             }
 
             return builder;

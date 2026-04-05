@@ -1,6 +1,5 @@
-using System.Globalization;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -22,8 +21,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value", coerce: "number"),
-                value: value.ToString(CultureInfo.InvariantCulture));
+            return self.EmitSet("value", ValueProducer.Literal(value));
         }
 
         /// <summary>Sets the minimum allowed value.</summary>
@@ -33,8 +31,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal min)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("min", coerce: "number"),
-                value: min.ToString(CultureInfo.InvariantCulture));
+            return self.EmitSet("min", ValueProducer.Literal(min));
         }
 
         /// <summary>Moves focus into the numeric input.</summary>
@@ -42,28 +39,28 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionNumericTextBox, TModel> FocusIn<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("focusIn"));
+            => self.EmitCall("focusIn");
 
         /// <summary>Removes focus from the numeric input.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionNumericTextBox, TModel> FocusOut<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("focusOut"));
+            => self.EmitCall("focusOut");
 
         /// <summary>Increments the value by one step.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionNumericTextBox, TModel> Increment<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("increment"));
+            => self.EmitCall("increment");
 
         /// <summary>Decrements the value by one step.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionNumericTextBox, TModel> Decrement<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("decrement"));
+            => self.EmitCall("decrement");
 
         /// <summary>Reads the current numeric value for use in conditions or gather.</summary>
         /// <remarks>
@@ -74,6 +71,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<decimal> Value<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => new TypedComponentSource<decimal>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            => new TypedComponentSource<decimal>(self.TargetId, Component.Vendor, Component.ValueMember);
     }
 }
