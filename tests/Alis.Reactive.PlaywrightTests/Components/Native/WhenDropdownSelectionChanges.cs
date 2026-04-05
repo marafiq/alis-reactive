@@ -180,8 +180,8 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"set\""),
             "Plan must contain set reactions");
-        Assert.That(planJson, Does.Contain("\"prop\""),
-            "Plan must contain structured prop field for SetValue");
+        Assert.That(planJson, Does.Contain("\"property\""),
+            "Plan must contain structured property field for SetValue");
         AssertNoConsoleErrors();
     }
 
