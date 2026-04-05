@@ -52,6 +52,7 @@ namespace Alis.Reactive.Fusion.Components
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
             var bindingPath = (string)attrs["name"];
 
+            plan.Context.EnsureComponent(componentId, Component.Vendor);
             var trigger = StartsWhen.ComponentEvent(componentId, descriptor.JsEvent);
             foreach (var reaction in pb.BuildReactions())
                 plan.Context.AddBehavior(Behavior.On(trigger, reaction));

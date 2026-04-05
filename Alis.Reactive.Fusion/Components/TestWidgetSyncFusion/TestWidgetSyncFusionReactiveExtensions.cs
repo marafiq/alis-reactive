@@ -19,6 +19,7 @@ namespace Alis.Reactive.Fusion.Components
             var pb = new PipelineBuilder<TModel>(plan.Context);
             pipeline(descriptor.Args, pb);
 
+            plan.Context.EnsureComponent(builder.ElementId, "fusion");
             var trigger = StartsWhen.ComponentEvent(builder.ElementId, descriptor.JsEvent);
             foreach (var reaction in pb.BuildReactions())
                 plan.Context.AddBehavior(Behavior.On(trigger, reaction));
