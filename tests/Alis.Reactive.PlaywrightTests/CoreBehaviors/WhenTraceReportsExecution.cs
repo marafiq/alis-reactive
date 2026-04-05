@@ -38,7 +38,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         // Without this, dom-ready dispatches "test" but nobody is listening yet — chain breaks silently.
         //
         // Phase 1: trigger.ts logs "[alis:trigger] custom-event: listening" for each custom-event entry
-        // Phase 2: dom-ready executes, which triggers "[alis:command] dispatch" for the first dispatch
+        // Phase 2: dom-ready executes, which triggers "[alis:execute] dispatch" for the first dispatch
         //
         // If someone refactors boot.ts to remove two-phase ordering, the dispatch trace would
         // appear BEFORE the listening traces — and this test catches it.
@@ -55,14 +55,14 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
                 lastWireIndex = i;
         }
 
-        // Find the FIRST dispatch command (phase 2 starts when dom-ready executes)
+        // Find the FIRST dispatch reaction (phase 2 starts when dom-ready executes)
         var firstDispatchIndex = messages.FindIndex(m =>
-            m.Contains("[alis:command]") && m.Contains("dispatch"));
+            m.Contains("[alis:execute]") && m.Contains("dispatch"));
 
         Assert.That(lastWireIndex, Is.GreaterThanOrEqualTo(0),
             "Custom-event listener wiring must be traced (phase 1)");
         Assert.That(firstDispatchIndex, Is.GreaterThanOrEqualTo(0),
-            "Dispatch command must be traced (phase 2)");
+            "Dispatch reaction must be traced (phase 2)");
         Assert.That(lastWireIndex, Is.LessThan(firstDispatchIndex),
             "All custom-event listeners must wire (phase 1) BEFORE dom-ready dispatches (phase 2). " +
             "If this fails, two-phase boot is broken — dispatch chains will silently fail.");
@@ -94,7 +94,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var dispatchMessages = _consoleMessages
-            .Where(m => m.Contains("[alis:command]") && m.Contains("dispatch"))
+            .Where(m => m.Contains("[alis:execute]") && m.Contains("dispatch"))
             .ToList();
 
         Assert.That(dispatchMessages, Has.Count.EqualTo(3),
@@ -114,14 +114,14 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     public async Task trace_captures_mutate_element_targets()
     {
         // Verify mutation targets appear in trace (step-1, step-2, step-3, chain-status).
-        // Proves trace.ts captures element mutation details — if mutateElement stops
+        // Proves trace.ts captures set/call reaction details — if set/call stops
         // logging the target field, we lose the ability to diagnose which element
         // a mutation acted on in production traces.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
         var mutateMessages = _consoleMessages
-            .Where(m => m.Contains("[alis:command]") && m.Contains("mutate-element"))
+            .Where(m => m.Contains("[alis:execute]") && m.Contains("set|call"))
             .ToList();
 
         Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-1\"")), Is.True,

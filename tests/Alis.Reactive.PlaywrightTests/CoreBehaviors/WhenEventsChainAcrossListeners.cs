@@ -41,7 +41,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var finalDispatch = _consoleMessages
-            .FirstOrDefault(m => m.Contains("[alis:command]")
+            .FirstOrDefault(m => m.Contains("[alis:execute]")
                                  && m.Contains("dispatch")
                                  && m.Contains("\"event\":\"final\""));
 

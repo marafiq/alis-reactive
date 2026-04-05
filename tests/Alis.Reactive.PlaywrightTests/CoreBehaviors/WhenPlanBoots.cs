@@ -28,7 +28,7 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task events_page_renders_plan_json()
     {
-        // The plan JSON section must contain valid JSON with an entries array.
+        // The plan JSON section must contain valid JSON with an behaviors array.
         // If plan.Render() or plan.RenderFormatted() breaks, this section is empty or malformed.
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
 
@@ -39,7 +39,7 @@ public class WhenPlanBoots : PlaywrightTestBase
         Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
 
         // Validate it's actual JSON with expected structure
-        Assert.That(text, Does.Contain("\"entries\""), "Plan must have entries array");
+        Assert.That(text, Does.Contain("\"entries\""), "Plan must have behaviors array");
         Assert.That(text, Does.Contain("\"dom-ready\""), "Plan must contain dom-ready trigger");
         Assert.That(text, Does.Contain("\"custom-event\""), "Plan must contain custom-event triggers");
         Assert.That(text, Does.Contain("\"dispatch\""), "Plan must contain dispatch commands");
@@ -74,9 +74,9 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task plan_json_has_correct_entry_count()
     {
-        // Parse the plan JSON from #plan-json element and verify it has exactly 4 entries,
+        // Parse the plan JSON from #plan-json element and verify it has exactly 4 behaviors,
         // matching the 4 Html.On() calls in the view (dom-ready, test, test-received, final).
-        // Proves plan serialization includes all entries — if an entry silently drops,
+        // Proves plan serialization includes all behaviors — if an behavior silently drops,
         // the chain breaks and this test catches it before Playwright chain tests run.
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
 
@@ -85,9 +85,9 @@ public class WhenPlanBoots : PlaywrightTestBase
         Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
 
         var doc = System.Text.Json.JsonDocument.Parse(text!);
-        var entries = doc.RootElement.GetProperty("entries");
+        var entries = doc.RootElement.GetProperty("behaviors");
         Assert.That(entries.GetArrayLength(), Is.EqualTo(4),
-            "Plan must have exactly 4 entries (1 dom-ready + 3 custom-event)");
+            "Plan must have exactly 4 behaviors (1 dom-ready + 3 custom-event)");
 
         AssertNoConsoleErrors();
     }
