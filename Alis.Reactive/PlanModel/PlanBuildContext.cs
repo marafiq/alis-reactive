@@ -123,6 +123,11 @@ namespace Alis.Reactive.PlanModel
             }
         }
 
+        /// <summary>
+        /// Returns all registered input components for IncludeAll expansion at build time.
+        /// </summary>
+        internal IReadOnlyDictionary<string, ComponentRegistration> GetRegisteredComponents() => _components;
+
         internal void AddBehavior(Behavior behavior)
         {
             _plan.MutableBehaviors.Add(behavior);

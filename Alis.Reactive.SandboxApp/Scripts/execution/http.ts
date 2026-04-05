@@ -77,19 +77,19 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     } else {
       const errorCtx: ExecContext = { ...ctx, response: body ?? undefined };
       await routeHandlers(req.error, response.status, plan, errorCtx);
-      runComplete(req, plan, ctx);
+      await runComplete(req, plan, ctx);
       return; // no chained on error
     }
   } catch (err) {
     const status = err instanceof TypeError ? 0 : -1;
     log.error(status === 0 ? "network error" : "client error", { url: req.url, error: String(err) });
     await routeHandlers(req.error, status, plan, ctx);
-    runComplete(req, plan, ctx);
+    await runComplete(req, plan, ctx);
     return; // no chained on error
   }
 
   // 6. Complete
-  runComplete(req, plan, ctx);
+  await runComplete(req, plan, ctx);
 
   // 7. Chained — only after success
   if (req.next) {

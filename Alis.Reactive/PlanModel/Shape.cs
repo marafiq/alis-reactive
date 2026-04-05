@@ -62,6 +62,11 @@ namespace Alis.Reactive.PlanModel
                 type == typeof(float) || type == typeof(double) || type == typeof(decimal))
                 return Number;
 
+            if (type == typeof(Guid) || type == typeof(TimeSpan) || type == typeof(TimeOnly))
+                return String;
+            if (type.IsEnum)
+                return String;
+
             if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
             {
                 var elementType = type.IsArray ? type.GetElementType()! : type.GetGenericArguments()[0];
@@ -107,10 +112,7 @@ namespace Alis.Reactive.PlanModel
 
         public override int GetHashCode()
         {
-            var hash = Kind.GetHashCode();
-            if (Item != null) hash ^= Item.GetHashCode();
-            if (Inner != null) hash ^= Inner.GetHashCode();
-            return hash;
+            return HashCode.Combine(Kind, Item, Inner);
         }
 
         public static bool operator ==(Shape left, Shape right) => Equals(left, right);

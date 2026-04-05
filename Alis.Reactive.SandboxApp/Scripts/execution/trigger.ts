@@ -4,13 +4,9 @@ import { executeReaction } from "./execute";
 import { wireServerPush } from "./server-push";
 import { wireSignalR } from "./signalr";
 import { assertNever } from "../core/assert-never";
+import { scope } from "../core/trace";
 
-const log = {
-  debug: (msg: string, data?: unknown) => {
-    if ((globalThis as any).__alisDebug) console.log(`[alis:trigger] ${msg}`, data);
-  },
-  error: (msg: string, data?: unknown) => console.error(`[alis:trigger] ${msg}`, data),
-};
+const log = scope("trigger");
 
 export function wireBehavior(
   trigger: StartsWhen,

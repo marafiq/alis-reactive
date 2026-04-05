@@ -11,9 +11,9 @@ namespace Alis.Reactive.PlanModel
 
         internal Component(string id, string vendor, string type)
         {
-            Id = id;
-            Vendor = vendor;
-            Type = type;
+            Id = id ?? throw new System.ArgumentNullException(nameof(id));
+            Vendor = vendor ?? throw new System.ArgumentNullException(nameof(vendor));
+            Type = type ?? throw new System.ArgumentNullException(nameof(type));
         }
 
         internal static Component Create(string id, string vendor, string type) =>

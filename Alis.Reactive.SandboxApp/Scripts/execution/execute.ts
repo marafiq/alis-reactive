@@ -28,14 +28,6 @@ export function setActivePlan(plan: Plan): void {
   activePlan = plan;
 }
 
-export function getActivePlan(): Plan | undefined {
-  return activePlan;
-}
-
-export function clearActivePlanForTests(): void {
-  activePlan = undefined;
-}
-
 function requirePlan(plan?: Plan): Plan {
   const p = plan ?? activePlan;
   if (!p) throw new Error("[alis] no active plan — was boot() called?");
@@ -100,7 +92,7 @@ export async function executeReaction(
       return;
 
     case "show-validation-errors":
-      showValidationErrors(reaction, p, ctx);
+      await showValidationErrors(reaction, p, ctx);
       return;
 
     default:
@@ -159,11 +151,11 @@ function executeInject(reaction: InjectReaction, plan: Plan, ctx?: ExecContext):
 
 // ── Show validation errors reaction ────────────────────────
 
-function showValidationErrors(
+async function showValidationErrors(
   reaction: ShowValidationErrorsReaction,
   plan: Plan,
   ctx?: ExecContext,
-): void {
+): Promise<void> {
   // Delegates to the validation module
   // The container key identifies which ContainerScope holds the rules
   const comp = plan.components[reaction.container];
@@ -171,9 +163,8 @@ function showValidationErrors(
   if (!comp.container) throw new Error(`[alis] component "${reaction.container}" has no container scope`);
 
   // Import validation dynamically to avoid circular deps
-  import("../validation").then(({ validateContainer }) => {
-    validateContainer(plan, reaction.container, ctx);
-  });
+  const { validateContainer } = await import("../validation");
+  validateContainer(plan, reaction.container, ctx);
 }
 
 // ── Value evaluation ───────────────────────────────────────

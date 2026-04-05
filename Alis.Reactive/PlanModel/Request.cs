@@ -18,8 +18,8 @@ namespace Alis.Reactive.PlanModel
 
         internal Request(string method, string url)
         {
-            Method = method;
-            Url = url;
+            Method = method ?? throw new System.ArgumentNullException(nameof(method));
+            Url = url ?? throw new System.ArgumentNullException(nameof(url));
         }
 
         internal static Request Get(string url) => new Request("GET", url);
@@ -42,17 +42,12 @@ namespace Alis.Reactive.PlanModel
     {
         public string Kind => "gather";
         public List<GatherField> Components { get; }
-        public List<StaticField> Statics { get; }
-        public List<EventField> Events { get; }
         public string Transport { get; }
 
-        internal GatherInput(List<GatherField> components, string transport,
-            List<StaticField> statics = null, List<EventField> events = null)
+        internal GatherInput(List<GatherField> components, string transport)
         {
             Components = components;
             Transport = transport;
-            Statics = statics != null && statics.Count > 0 ? statics : null;
-            Events = events != null && events.Count > 0 ? events : null;
         }
     }
 

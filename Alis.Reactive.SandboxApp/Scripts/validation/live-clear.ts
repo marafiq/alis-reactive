@@ -3,7 +3,7 @@
 // Uses SHARED resolver for vendor root resolution.
 
 import type { Plan, Component, ContainerScope } from "../types";
-import { resolveVendorRoot, getJsType } from "../resolution/resolver";
+import { resolveVendorRoot } from "../resolution/resolver";
 import { clearInline } from "./error-display";
 import { scope } from "../core/trace";
 

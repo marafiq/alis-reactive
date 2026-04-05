@@ -22,7 +22,9 @@ for (const el of planEls) {
   if (traceLevel) trace.setLevel(traceLevel);
 
   try {
-    plans.push(JSON.parse(el.textContent!));
+    const text = el.textContent?.trim();
+    if (!text) throw new Error("[alis] empty plan element");
+    plans.push(JSON.parse(text));
   } catch (e) {
     throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(e as Error).message}`);
   }

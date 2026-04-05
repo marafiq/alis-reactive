@@ -28,7 +28,7 @@ export function applyShape(value: unknown, shape?: Shape): unknown {
     case "number":   { const r = toNumber(value); return r.ok ? r.value : value; }
     case "boolean":  { const r = toBoolean(value); return r.ok ? r.value : value; }
     case "date":     { const r = toDate(value); return r.ok ? r.value : value; }
-    case "array":    { const r = toArray(value); return r.ok ? r.value : value; }
+    case "array":    { const r = toArray(value); if (!r.ok) return value; return shape.item ? r.value.map(v => applyShape(v, shape.item)) : r.value; }
     case "nullable": return value == null ? null : applyShape(value, shape.inner);
     case "raw":      return value;
     case "any":      return value;
@@ -41,16 +41,6 @@ export function applyShape(value: unknown, shape?: Shape): unknown {
 }
 
 /**
- * Convert and unwrap — throws on failure.
- * For developer-facing contexts where a type mismatch is a plan bug.
- */
-export function convertOrThrow(value: unknown, shape: Shape): unknown {
-  const result = convertByShape(value, shape);
-  if (!result.ok) throw new Error(`[alis] shape conversion failed: ${result.error}`);
-  return result.value;
-}
-
-/**
  * Convert a value according to a Shape. Returns Result — never throws.
  */
 export function convertByShape(value: unknown, shape: Shape): ConvertResult<unknown> {
@@ -59,7 +49,11 @@ export function convertByShape(value: unknown, shape: Shape): ConvertResult<unkn
     case "number":   return toNumber(value);
     case "boolean":  return toBoolean(value);
     case "date":     return toDate(value);
-    case "array":    return toArray(value);
+    case "array": {
+      const r = toArray(value);
+      if (!r.ok) return r;
+      return shape.item ? ok(r.value.map(v => applyShape(v, shape.item))) : r;
+    }
     case "nullable": return value == null ? ok(null) : convertByShape(value, shape.inner);
     case "raw":      return ok(value);
     case "any":      return ok(value);
@@ -69,15 +63,6 @@ export function convertByShape(value: unknown, shape: Shape): ConvertResult<unkn
       throw new Error(`[alis] unknown shape kind: "${(_ as Shape).kind}"`);
     }
   }
-}
-
-/**
- * Compare two values using Shape-aware conversion.
- * Used by conditions and validation rule engine.
- */
-export function compareWithShape(a: unknown, b: unknown, shape?: Shape): { ca: unknown; cb: unknown } {
-  if (!shape) return { ca: a, cb: b };
-  return { ca: applyShape(a, shape), cb: applyShape(b, shape) };
 }
 
 // ── Conversion functions ──────────────────────────────────

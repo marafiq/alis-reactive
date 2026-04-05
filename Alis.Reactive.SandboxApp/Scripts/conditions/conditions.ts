@@ -67,15 +67,6 @@ export async function evaluateConditionAsync(condition: Condition, plan: Plan, c
   }
 }
 
-/** Checks whether a condition tree contains any ConfirmCondition. */
-export function isConfirmCondition(condition: Condition): boolean {
-  if (condition.kind === "confirm") return true;
-  if (condition.kind === "not") return isConfirmCondition(condition.term);
-  if (condition.kind === "all" || condition.kind === "any")
-    return condition.terms.some(isConfirmCondition);
-  return false;
-}
-
 // -- Compare evaluation --
 
 function evaluateCompare(cond: CompareCondition, plan: Plan, ctx?: ExecContext): boolean {

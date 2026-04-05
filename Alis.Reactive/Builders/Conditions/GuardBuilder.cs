@@ -84,8 +84,12 @@ namespace Alis.Reactive.Builders.Conditions
 
         public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(
-                _pipeline?.Context ?? _branchBuilder?.Pipeline.Context);
+            var context = _pipeline?.Context ?? _branchBuilder?.Pipeline.Context;
+            if (context == null)
+                throw new InvalidOperationException(
+                    "Then() requires a pipeline context. Use When() from a PipelineBuilder, not from a standalone ConditionStart.");
+
+            var pb = new PipelineBuilder<TModel>(context);
             pipeline(pb);
             var reaction = pb.BuildReaction();
             var branchCase = BranchCase.Of(Condition, reaction);

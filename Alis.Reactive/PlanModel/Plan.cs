@@ -20,7 +20,7 @@ namespace Alis.Reactive.PlanModel
 
         private Plan(string planId)
         {
-            PlanId = planId;
+            PlanId = planId ?? throw new System.ArgumentNullException(nameof(planId));
             MutableTypes = new Dictionary<string, JsType>();
             MutableComponents = new Dictionary<string, Component>();
             MutableBehaviors = new List<Behavior>();

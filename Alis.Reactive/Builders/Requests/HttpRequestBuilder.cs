@@ -73,11 +73,27 @@ namespace Alis.Reactive.Builders.Requests
         {
             var request = new Request(_verb, _url);
 
-            if (_gatherBuilder != null && (_gatherBuilder.Fields.Count > 0 || _gatherBuilder.IsIncludeAll || _gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0))
+            if (_gatherBuilder != null)
             {
-                var statics = _gatherBuilder.StaticFields.Count > 0 ? _gatherBuilder.StaticFields : null;
-                var events = _gatherBuilder.EventFields.Count > 0 ? _gatherBuilder.EventFields : null;
-                request.Input = new GatherInput(_gatherBuilder.Fields, _transport, statics, events);
+                // Expand IncludeAll: add a GatherField for every registered input component
+                if (_gatherBuilder.IsIncludeAll)
+                {
+                    var registered = _context.GetRegisteredComponents();
+                    foreach (var kvp in registered)
+                    {
+                        var reg = kvp.Value;
+                        // Only add if not already explicitly included
+                        if (!_gatherBuilder.Fields.Exists(f => f.Component == reg.ComponentId))
+                        {
+                            _gatherBuilder.AddField(GatherField.Of(reg.ComponentId, kvp.Key));
+                        }
+                    }
+                }
+            }
+
+            if (_gatherBuilder != null && _gatherBuilder.Fields.Count > 0)
+            {
+                request.Input = new GatherInput(_gatherBuilder.Fields, _transport);
             }
 
             if (_container != null)

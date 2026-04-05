@@ -55,6 +55,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class LiteralProducer : ValueProducer
     {
         public string Kind => "literal";
+        [JsonInclude]
         public object Value { get; }
         public Shape Shape { get; }
 

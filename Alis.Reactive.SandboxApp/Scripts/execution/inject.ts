@@ -16,7 +16,9 @@ export function injectHtml(container: HTMLElement, html: string): void {
   const planEls = temp.querySelectorAll<HTMLElement>("[data-reactive-plan]");
   const plans: Plan[] = [];
   for (const el of planEls) {
-    plans.push(JSON.parse(el.textContent!));
+    const text = el.textContent?.trim();
+    if (!text) throw new Error("[alis] empty plan element in injected HTML");
+    plans.push(JSON.parse(text));
     el.remove();
   }
 

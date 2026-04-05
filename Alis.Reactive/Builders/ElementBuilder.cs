@@ -77,10 +77,9 @@ namespace Alis.Reactive.Builders
         public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
         {
             _pipeline.Context.EnsureProperty(_componentKey, "text", "textContent", Shape.String, "write");
-            var readSource = source.ToComponentSource();
             _pipeline.Steps.Add(Reaction.Set(
                 ComponentSource.Of(_componentKey), "text",
-                ValueProducer.Read(readSource, source.ReadMember, shape: source.Shape)));
+                source.ToValueProducer()));
             return this;
         }
 
@@ -105,10 +104,9 @@ namespace Alis.Reactive.Builders
         public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
         {
             _pipeline.Context.EnsureProperty(_componentKey, "html", "innerHTML", Shape.String, "write");
-            var readSource = source.ToComponentSource();
             _pipeline.Steps.Add(Reaction.Set(
                 ComponentSource.Of(_componentKey), "html",
-                ValueProducer.Read(readSource, source.ReadMember, shape: source.Shape)));
+                source.ToValueProducer()));
             return this;
         }
 

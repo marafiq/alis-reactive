@@ -190,9 +190,10 @@ namespace Alis.Reactive
             if (_componentsMap.TryGetValue(vc.Field, out var fieldReg))
                 fieldComponentId = fieldReg.ComponentId;
 
+            var valueMember = fieldReg?.ValueMember ?? "value";
             var left = ValueProducer.Read(
                 ComponentSource.Of(fieldComponentId),
-                "value");
+                valueMember);
 
             ValueProducer right = vc.Value != null
                 ? ValueProducer.LiteralRaw(vc.Value, Shape.Any)
