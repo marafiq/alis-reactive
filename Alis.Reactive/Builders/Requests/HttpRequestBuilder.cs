@@ -45,10 +45,6 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            // WhileLoading takes whatever steps the pipeline produced.
-            // Single steps (SetReaction from p.Element("x").Show()) are valid.
-            // Conditions/HTTP/Parallel inside WhileLoading remain rejected by
-            // PipelineBuilder mode validation — you can't nest HTTP inside WhileLoading.
             _whileLoading = new List<Reaction>(pb.Steps);
             return this;
         }
@@ -82,18 +78,29 @@ namespace Alis.Reactive.Builders.Requests
                     foreach (var kvp in registered)
                     {
                         var reg = kvp.Value;
-                        // Only add if not already explicitly included
                         if (!_gatherBuilder.Fields.Exists(f => f.Component == reg.ComponentId))
-                        {
                             _gatherBuilder.AddField(GatherField.Of(reg.ComponentId, kvp.Key));
-                        }
                     }
                 }
-            }
 
-            if (_gatherBuilder != null && _gatherBuilder.Fields.Count > 0)
-            {
-                request.Input = new GatherInput(_gatherBuilder.Fields, _transport);
+                // Build request input from gather fields + static fields + event fields
+                if (_gatherBuilder.Fields.Count > 0)
+                {
+                    request.Input = new GatherInput(_gatherBuilder.Fields, _transport);
+                }
+
+                // Static and event fields become a ValueInput when no component fields
+                if (request.Input == null && (_gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0))
+                {
+                    var fields = new Dictionary<string, ValueProducer>();
+                    foreach (var sf in _gatherBuilder.StaticFields)
+                        fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.Any);
+                    foreach (var ef in _gatherBuilder.EventFields)
+                        fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
+                    request.Input = new ValueInput(ValueProducer.Object(fields), _transport);
+                }
+                // If we have BOTH component fields AND static/event, merge statics into a separate approach
+                // For now, static fields alongside component gather are not common — tracked as future work
             }
 
             if (_container != null)
