@@ -3,6 +3,7 @@
 // Used by modules that need to traverse the reaction tree.
 
 import type { Behavior, Reaction, Request } from "../types";
+import { assertNever } from "../core/assert-never";
 
 type RequestVisitor = (req: Request) => void;
 
@@ -28,7 +29,15 @@ function walkReaction(reaction: Reaction, visitor: RequestVisitor): void {
     case "request":
       walkRequest(reaction.request, visitor);
       break;
-    // set, call, dispatch, inject, show-validation-errors — no nested requests
+    case "set":
+    case "call":
+    case "dispatch":
+    case "inject":
+    case "show-validation-errors":
+      // Leaf reactions — no nested requests to walk
+      break;
+    default:
+      assertNever(reaction, "reaction kind");
   }
 }
 

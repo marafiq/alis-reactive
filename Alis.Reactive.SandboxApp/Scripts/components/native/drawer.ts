@@ -1,6 +1,6 @@
 // drawer.ts — self-initializing side-effect module
 // Wires close button, Escape key, and transition cleanup.
-// Plan-driven open/close uses existing native mutations (AddClass/RemoveClass).
+// Plan-driven open/close uses existing native set reactions (AddClass/RemoveClass).
 export {}; // Module marker — prevents TS global-scope collisions
 
 function close(container: HTMLElement): void {

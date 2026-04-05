@@ -1,5 +1,5 @@
 // server-push.ts — SSE (EventSource) trigger wiring.
-// Uses V3 ServerPushTrigger. No old types.
+// Uses ServerPushTrigger from the plan schema.
 
 import type { ServerPushTrigger, Reaction, Plan } from "../types";
 import { executeReaction } from "./execute";
@@ -8,7 +8,7 @@ import { scope } from "../core/trace";
 
 const log = scope("server-push");
 
-interface WiredEntry {
+interface WiredBehavior {
   readonly trigger: ServerPushTrigger;
   readonly reaction: Reaction;
   readonly plan: Plan;
@@ -17,19 +17,19 @@ interface WiredEntry {
 interface ManagedSource {
   readonly es: EventSource;
   readonly targetIds: Set<string>;
-  readonly wired: WiredEntry[];
+  readonly wired: WiredBehavior[];
   stopping: boolean;
 }
 
 // Connection pool — singleton EventSource per URL
 const sources = new Map<string, ManagedSource>();
 
-function retrySSE(url: string, entries: readonly WiredEntry[]): void {
+function retrySSE(url: string, behaviors: readonly WiredBehavior[]): void {
   removeRetryIndicators(url);
   log.info("manual retry", { url });
 
-  for (const entry of entries) {
-    wireServerPush(entry.trigger, entry.reaction, entry.plan);
+  for (const b of behaviors) {
+    wireServerPush(b.trigger, b.reaction, b.plan);
   }
 }
 
@@ -39,7 +39,7 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
 
   const es = new EventSource(url);
   const targetIds = new Set<string>();
-  const wired: WiredEntry[] = [];
+  const wired: WiredBehavior[] = [];
 
   es.onopen = () => {
     log.debug("connected", { url });
@@ -54,8 +54,8 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
       log.error("connection closed permanently", { url });
       sources.delete(url);
       if (managed && managed.targetIds.size > 0) {
-        const entries = managed.wired;
-        showRetryIndicators(url, managed.targetIds, () => retrySSE(url, entries));
+        const wiredBehaviors = managed.wired;
+        showRetryIndicators(url, managed.targetIds, () => retrySSE(url, wiredBehaviors));
       }
     } else {
       log.warn("connection error (reconnecting)", { url });

@@ -10,8 +10,8 @@
 //   6. Call method: walk the method's path and call
 
 import type {
-  Plan, Component, JsType, Property, Method, Source,
-  ComponentSource, PayloadSource, Shape, Path, Vendor,
+  Plan, JsType, Property, Method, Source,
+  PayloadSource, Path, Vendor,
 } from "../types";
 import type { ExecContext } from "../types";
 import { walkPath, walkPathParent } from "../core/walk";
@@ -56,8 +56,10 @@ export function resolveVendorRoot(el: HTMLElement, vendor: Vendor): unknown {
       if (!root) throw new Error(`[alis] no vendor root for "${el.id}" (vendor: fusion) — is the component initialized?`);
       return root;
     }
-    default:
-      throw new Error(`[alis] unknown vendor: "${vendor}"`);
+    default: {
+      const _: never = vendor;
+      throw new Error(`[alis] unknown vendor: "${_}"`);
+    }
   }
 }
 
@@ -71,8 +73,10 @@ function resolvePayload(source: PayloadSource, ctx?: ExecContext): unknown {
     case "request":  return ctx.request;
     case "dispatch": return ctx.event;
     case "local":    return ctx.local;
-    default:
-      throw new Error(`[alis] unknown payload scope: "${(source as any).scope}"`);
+    default: {
+      const _: never = source.scope;
+      throw new Error(`[alis] unknown payload scope: "${_}"`);
+    }
   }
 }
 
@@ -149,7 +153,7 @@ function resolveCallable(root: unknown, path: Path): { fn: Function; owner: unkn
 
 // ── Default value ──────────────────────────────────────────
 
-/** Read the component's default value using its JsType's defaultValue descriptor. */
+/** Read the component's default value using its JsType's defaultValue definition. */
 export function readDefaultValue(plan: Plan, componentKey: string): unknown {
   const jsType = getJsType(plan, componentKey);
   if (!jsType.defaultValue) {

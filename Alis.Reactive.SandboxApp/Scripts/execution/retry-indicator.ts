@@ -1,5 +1,4 @@
 // retry-indicator.ts — Visual retry indicators for lost SSE/SignalR connections.
-// V3 reactions only — no old types.
 
 import { scope } from "../core/trace";
 

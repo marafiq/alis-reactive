@@ -1,5 +1,5 @@
 // merge-plan.ts — Plan registry and merge logic.
-// V3 plans: types, components, behaviors. No old Entry/ComponentEntry types.
+// Plans: types, components, behaviors. Merge logic for partial plan injection.
 
 import type { Plan, Behavior } from "../types";
 

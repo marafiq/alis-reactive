@@ -2,12 +2,25 @@
 // Each payload scope maps to a concrete runtime value.
 
 export interface ExecContext {
-  /** The triggering event payload (component event args, custom event detail, SSE/SignalR message). */
+  /**
+   * Event payload — the triggering data for this reaction.
+   * Sources: component event args, custom event detail, SSE/SignalR message, OR dispatch data.
+   * Resolved by PayloadSource with scope "event" or "dispatch".
+   */
   readonly event?: unknown;
-  /** The HTTP response body (set by request handler on success/error). */
+  /**
+   * HTTP response body — set by the request handler on success or error.
+   * Resolved by PayloadSource with scope "success" or "error".
+   */
   readonly response?: unknown;
-  /** The gathered request body (set before HTTP fetch). */
+  /**
+   * Outgoing request payload — the gathered values before HTTP fetch.
+   * Resolved by PayloadSource with scope "request".
+   */
   readonly request?: unknown;
-  /** Local scratch data for intermediate computation. */
+  /**
+   * Local scratch data for intermediate computation.
+   * Resolved by PayloadSource with scope "local". Not currently used.
+   */
   readonly local?: Record<string, unknown>;
 }

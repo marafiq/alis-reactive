@@ -2,7 +2,7 @@
 // Uses the SHARED resolver via gather.ts for value gathering.
 // Supports before/success/error/complete handlers and chained requests.
 
-import type { Request, ResponseHandler, Plan, Reaction } from "../types";
+import type { Request, ResponseHandler, Plan } from "../types";
 import type { ExecContext } from "../types";
 import { resolveGather, type GatherResult } from "./gather";
 import { executeReaction } from "./execute";
@@ -59,6 +59,10 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     // 3. Gather -> freeze
     const gatherResult = resolveGather(req.input, req.method, plan, ctx);
     const resolved = buildFetch(req, gatherResult);
+
+    // Write gathered payload to ctx so PayloadSource(scope: "request") resolves correctly
+    const requestPayload = gatherResult.body instanceof FormData ? {} : gatherResult.body;
+    ctx = { ...ctx, request: requestPayload };
 
     log.debug("fetch", { method: req.method, url: resolved.url });
 

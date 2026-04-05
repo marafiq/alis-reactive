@@ -1,5 +1,5 @@
 // native-action-link.ts — Click handler for <a data-reactive-link> elements.
-// V3: uses Plan + Reaction types. No old Command/RequestDescriptor types.
+// Uses Plan + Reaction types for V3 plan-driven navigation.
 
 import { executeReaction } from "../../execution/execute";
 import { scope } from "../../core/trace";

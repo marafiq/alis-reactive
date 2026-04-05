@@ -1,7 +1,7 @@
 // core/walk.ts — Path walking primitives.
 // Two flavors:
-//   walkPath(root, Path)  — structured path segments (V3 plan-driven)
-//   walk(root, string)    — dot-notation string (legacy, used in tests/validation)
+//   walkPath(root, Path)  — structured path segments (plan-driven property resolution)
+//   walk(root, string)    — dot-notation string (payload path resolution and validation)
 
 import type { Path, PathSegment } from "../types";
 
@@ -51,8 +51,8 @@ export function walkPathParent(root: unknown, path: Path): { owner: any; key: st
 
 /**
  * Walks a dot-notation path on any object.
- * Kept for backward compatibility with validation condition readers
- * and tests that use string paths.
+ * Used for payload path resolution (e.g. "address.city" on event payload)
+ * and validation condition evaluation.
  */
 export function walk(root: unknown, path: string): unknown {
   const parts = path.split(".");

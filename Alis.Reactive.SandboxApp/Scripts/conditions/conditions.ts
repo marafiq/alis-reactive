@@ -6,8 +6,7 @@ import type { Condition, CompareCondition, Plan, ValueProducer } from "../types"
 import type { ExecContext } from "../types";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
-import { applyShape, toString, coerce } from "../core/coerce";
-import type { CoercionType } from "../core/coerce";
+import { applyShape, toString } from "../core/coerce";
 
 const log = scope("conditions");
 

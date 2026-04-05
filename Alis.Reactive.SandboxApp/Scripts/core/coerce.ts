@@ -3,7 +3,7 @@
 // Contract: each function returns CoerceResult<T> — never throws.
 // Ok(value) for meaningful conversions. Err(message) for type mismatches.
 // Callers decide how to handle Err:
-//   - Conditions: guard evaluates to false (else branch)
+//   - Conditions: condition evaluates to false (else branch)
 //   - Validation: rule fails (shows error message to user)
 //   - Mutations: coerceOrThrow() — developer error → throw with stack trace
 //   - Gather: log warning, skip field
@@ -36,12 +36,16 @@ export function coerce(value: unknown, type: CoercionType): CoerceResult<unknown
     case "date":    return toDate(value);
     case "array":   return toArray(value);
     case "raw":     return ok(value);
+    default: {
+      const _: never = type;
+      throw new Error(`[alis:coerce] unknown coercion type: "${_}"`);
+    }
   }
 }
 
 /**
  * Coerce and unwrap — throws on Err.
- * For developer-facing contexts (mutations, tests) where a type mismatch
+ * For developer-facing contexts (set/call reactions, tests) where a type mismatch
  * is a plan bug that needs a stack trace.
  */
 export function coerceOrThrow(value: unknown, type: CoercionType): unknown {
@@ -175,7 +179,7 @@ export function toArray(value: unknown): CoerceResult<unknown[]> {
 // ── Shape-based coercion ─────────────────────────────────
 
 /**
- * Map a Shape to a CoercionType for backward compatibility with existing coerce().
+ * Map a Shape to a CoercionType for use with the coerce() function.
  * Used when the V3 schema specifies shape and we need the coercion behavior.
  */
 export function shapeToCoercionType(shape: Shape): CoercionType {
@@ -189,6 +193,10 @@ export function shapeToCoercionType(shape: Shape): CoercionType {
     case "array":    return "array";
     case "object":   return "raw";
     case "nullable": return shapeToCoercionType(shape.inner);
+    default: {
+      const _: never = shape;
+      throw new Error(`[alis:coerce] unknown shape kind: "${(_ as any).kind}"`);
+    }
   }
 }
 

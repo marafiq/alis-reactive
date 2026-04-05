@@ -2,7 +2,7 @@
 // Reads component default values via plan.types[].defaultValue.
 // Supports GatherInput (component fields) and ValueInput (pre-computed value).
 
-import type { Plan, GatherInput, GatherField, ValueInput, RequestInput, Transport } from "../types";
+import type { Plan, GatherInput, RequestInput, Transport } from "../types";
 import type { ExecContext } from "../types";
 import { readDefaultValue, getJsType } from "../resolution/resolver";
 import { applyShape, toString } from "../core/coerce";

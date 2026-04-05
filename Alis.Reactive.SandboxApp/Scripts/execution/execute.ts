@@ -1,23 +1,23 @@
 // execute.ts — The main reaction executor.
 // Dispatches on Reaction.kind using the V3 reaction tree.
-// Every mutation uses the SHARED resolver (resolveSource + JsType).
+// Every action uses the SHARED resolver (resolveSource + JsType).
 
 import type {
   Reaction, SetReaction, CallReaction, DispatchReaction,
-  InjectReaction, ShowValidationErrorsReaction, Plan, Source, ValueProducer,
+  InjectReaction, ShowValidationErrorsReaction, Plan, ValueProducer,
 } from "../types";
 import type { ExecContext } from "../types";
 import { scope } from "../core/trace";
 import {
-  resolveSource, getJsTypeForSource, getJsType,
-  setProperty, callMethod, readProperty, readDefaultValue, resolveComponent,
+  resolveSource, getJsTypeForSource,
+  setProperty, callMethod, readProperty,
 } from "../resolution/resolver";
 import { evaluateConditionAsync, setValueEvaluator } from "../conditions/conditions";
 import { executeRequest } from "./http";
 import { injectHtml } from "./inject";
 import { assertNever } from "../core/assert-never";
 import { applyShape } from "../core/coerce";
-import { walkPath } from "../core/walk";
+import { walkPath, walk } from "../core/walk";
 
 const log = scope("execute");
 
@@ -58,12 +58,16 @@ export async function executeReaction(
       }
       return;
 
-    case "parallel":
-      await Promise.all(reaction.steps.map(s => executeReaction(s, p, ctx)));
+    case "parallel": {
+      const results = await Promise.allSettled(reaction.steps.map(s => executeReaction(s, p, ctx)));
+      for (const r of results) {
+        if (r.status === "rejected") log.error("parallel step failed", { error: String(r.reason) });
+      }
       if (reaction.onSettled) {
         await executeReaction(reaction.onSettled, p, ctx);
       }
       return;
+    }
 
     case "branch":
       for (const c of reaction.cases) {
@@ -88,11 +92,11 @@ export async function executeReaction(
       return;
 
     case "dispatch":
-      executeDispatch(reaction);
+      executeDispatch(reaction, p, ctx);
       return;
 
     case "inject":
-      executeInject(reaction, p);
+      executeInject(reaction, p, ctx);
       return;
 
     case "show-validation-errors":
@@ -130,9 +134,9 @@ function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): voi
 
 // ── Dispatch reaction ──────────────────────────────────────
 
-function executeDispatch(reaction: DispatchReaction): void {
+function executeDispatch(reaction: DispatchReaction, plan: Plan, ctx?: ExecContext): void {
   const detail = reaction.data
-    ? evaluateValue(reaction.data, requirePlan())
+    ? evaluateValue(reaction.data, plan, ctx)
     : {};
   log.trace("dispatch", { event: reaction.event, detail });
   document.dispatchEvent(new CustomEvent(reaction.event, { detail }));
@@ -140,12 +144,12 @@ function executeDispatch(reaction: DispatchReaction): void {
 
 // ── Inject reaction ────────────────────────────────────────
 
-function executeInject(reaction: InjectReaction, plan: Plan): void {
+function executeInject(reaction: InjectReaction, plan: Plan, ctx?: ExecContext): void {
   const comp = plan.components[reaction.component];
   if (!comp) throw new Error(`[alis] inject target component not found: ${reaction.component}`);
   const container = document.getElementById(comp.id);
   if (!container) throw new Error(`[alis] inject target element not found: ${comp.id}`);
-  const value = evaluateValue(reaction.value, plan);
+  const value = evaluateValue(reaction.value, plan, ctx);
   if (typeof value === "string") {
     injectHtml(container, value);
   } else {
@@ -193,12 +197,17 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
         }
         throw new Error(`[alis] member "${producer.member}" not found on type`);
       }
-      // For payload sources, walk the member as a dot path on the payload
+      // For payload sources: member is a dot-path (e.g. "evt.address.city" or "responseBody.data.name").
+      // The prefix (evt, responseBody, etc.) was already resolved by resolveSource — strip it and walk the rest.
+      // If a structured path exists, prefer it; otherwise walk the member as a dot-path on the payload root.
       if (producer.path) {
         return applyShape(walkPath(root as any, producer.path), producer.shape);
       }
-      // Direct member access on payload
-      return applyShape((root as any)?.[producer.member], producer.shape);
+      // Walk the member as a dot-path, skipping the prefix segment that resolveSource already resolved
+      const dotParts = producer.member.split(".");
+      // The first segment is the scope prefix (evt, responseBody, etc.) — skip it
+      const valueParts = dotParts.length > 1 ? dotParts.slice(1) : dotParts;
+      return applyShape(walk(root as any, valueParts.join(".")), producer.shape);
     }
 
     case "object": {
