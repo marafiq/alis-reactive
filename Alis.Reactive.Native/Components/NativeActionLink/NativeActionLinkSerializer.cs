@@ -41,109 +41,54 @@ namespace Alis.Reactive.Native.Components
             return new NativeActionLinkContract(payloadJson);
         }
 
-        private static Reaction ProjectReaction(
-            Reaction reaction,
-            string href,
-            RequestProjectionState state)
+        private static Reaction ProjectReaction(Reaction reaction, string href, RequestProjectionState state)
         {
-            if (reaction is SequenceReaction sequential)
+            switch (reaction)
             {
-                return Reaction.Sequence(sequential.Steps);
-            }
+                case SequenceReaction sequential:
+                    return Reaction.Sequence(sequential.Steps);
 
-            if (reaction is BranchReaction conditional)
-            {
-                var projectedCases = new List<BranchCase>();
-                foreach (var branchCase in conditional.Cases)
-                {
-                    projectedCases.Add(new BranchCase(branchCase.When, ProjectReaction(branchCase.Reaction, href, state)));
-                }
+                case BranchReaction conditional:
+                    var projectedCases = new List<BranchCase>();
+                    foreach (var c in conditional.Cases)
+                        projectedCases.Add(new BranchCase(c.When, ProjectReaction(c.Reaction, href, state)));
+                    return Reaction.Branch(projectedCases);
 
-                return Reaction.Branch(projectedCases);
-            }
+                case RequestReaction http:
+                    state.RequestCount++;
+                    if (state.RequestCount > 1)
+                        throw new InvalidOperationException(
+                            "NativeActionLink supports exactly one request.");
+                    if (!string.Equals(href, http.Request.Url, StringComparison.Ordinal))
+                        throw new InvalidOperationException(
+                            "NativeActionLink href must match the request URL.");
+                    return Reaction.Request(ProjectRequest(http.Request));
 
-            if (reaction is RequestReaction http)
-            {
-                state.RequestCount++;
-                if (state.RequestCount > 1)
-                {
+                case ParallelReaction _:
                     throw new InvalidOperationException(
-                        "NativeActionLink supports exactly one request in its click reaction tree.");
-                }
+                        "NativeActionLink does not support Parallel.");
 
-                if (!string.Equals(href, http.Request.Url, StringComparison.Ordinal))
-                {
-                    throw new InvalidOperationException(
-                        "NativeActionLink href must match the request URL in the configured request chain.");
-                }
-
-                var request = ProjectRequest(http.Request);
-                return Reaction.Request(request);
+                default:
+                    return reaction;
             }
-
-            if (reaction is ParallelReaction)
-            {
-                throw new InvalidOperationException(
-                    "NativeActionLink does not support Parallel(...) request chains.");
-            }
-
-            throw new InvalidOperationException("Unsupported NativeActionLink reaction shape.");
         }
 
         private static Request ProjectRequest(Request request)
         {
             if (request.Next != null)
-            {
                 throw new InvalidOperationException(
-                    "NativeActionLink supports exactly one request. Response.Chained(...) is not supported.");
-            }
+                    "NativeActionLink does not support chained requests.");
 
             if (request.ValidatorType != null)
-            {
                 throw new InvalidOperationException(
-                    "NativeActionLink does not support validation. Use a plan-backed trigger for validated flows.");
-            }
-
-            if (request.Input is GatherInput gather)
-            {
-                foreach (var field in gather.Components)
-                {
-                    if (field.Component == "*" && field.Key == "*")
-                    {
-                        throw new InvalidOperationException(
-                            "NativeActionLink does not support IncludeAll(). Use explicit gather instead.");
-                    }
-                }
-            }
+                    "NativeActionLink does not support validation.");
 
             var projected = new Request(request.Method, string.Empty);
             projected.Input = request.Input;
             projected.Before = request.Before;
-            projected.Success = ProjectHandlers(request.Success, new RequestProjectionState { RequestCount = 1 });
-            projected.Error = ProjectHandlers(request.Error, new RequestProjectionState { RequestCount = 1 });
+            projected.Success = request.Success;
+            projected.Error = request.Error;
             return projected;
-        }
-
-        private static List<ResponseHandler> ProjectHandlers(List<ResponseHandler> handlers, RequestProjectionState state)
-        {
-            if (handlers == null || handlers.Count == 0)
-            {
-                return null;
-            }
-
-            var projected = new List<ResponseHandler>();
-            foreach (var handler in handlers)
-            {
-                if (handler.Reaction != null)
-                {
-                    var reaction = ProjectReaction(handler.Reaction, string.Empty, state);
-                    var projectedHandler = new ResponseHandler(reaction);
-                    projectedHandler.Status = handler.Status;
-                    projected.Add(projectedHandler);
-                }
-            }
-
-            return projected.Count == 0 ? null : projected;
         }
 
         private sealed class RequestProjectionState
@@ -154,21 +99,13 @@ namespace Alis.Reactive.Native.Components
 
     internal sealed class NativeActionLinkContract
     {
-        internal NativeActionLinkContract(string payloadJson)
-        {
-            PayloadJson = payloadJson;
-        }
-
+        internal NativeActionLinkContract(string payloadJson) { PayloadJson = payloadJson; }
         internal string PayloadJson { get; }
     }
 
     internal sealed class NativeActionLinkPayload
     {
-        public NativeActionLinkPayload(Reaction reaction)
-        {
-            Reaction = reaction;
-        }
-
+        public NativeActionLinkPayload(Reaction reaction) { Reaction = reaction; }
         public Reaction Reaction { get; }
     }
 }
