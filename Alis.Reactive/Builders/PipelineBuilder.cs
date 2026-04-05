@@ -38,7 +38,7 @@ namespace Alis.Reactive.Builders
 
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
-            Steps.Add(Reaction.Dispatch(eventName, ValueProducer.FromPayload(payload)));
+            Steps.Add(Reaction.Dispatch(eventName, ValueProducer.LiteralRaw(payload, Shape.Any)));
             return this;
         }
 

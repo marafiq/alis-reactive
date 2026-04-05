@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Serialization;
 
@@ -37,53 +35,12 @@ namespace Alis.Reactive.PlanModel
             new LiteralProducer(null, Shape.None);
 
         /// <summary>
-        /// Creates a literal for a scalar value. For non-scalars, delegates to
-        /// FromValue which produces the correct ValueProducer kind (Array, Object).
+        /// Creates a literal with any JSON-serializable value.
+        /// System.Text.Json handles serialization at Render time.
+        /// No reflection. No type inspection. The serializer does the work.
         /// </summary>
-        internal static ValueProducer LiteralRaw(object value, Shape shape)
-        {
-            if (value == null) return new LiteralProducer(null, shape);
-            if (IsScalar(value)) return new LiteralProducer(value, shape);
-            // Non-scalar: build proper ValueProducer structure
-            return FromValue(value, shape);
-        }
-
-        /// <summary>
-        /// Converts any CLR value to the correct ValueProducer kind:
-        /// scalar → LiteralProducer, array → ArrayProducer, object → ObjectProducer.
-        /// </summary>
-        internal static ValueProducer FromValue(object value, Shape shape)
-        {
-            if (value == null) return new LiteralProducer(null, shape);
-            if (IsScalar(value)) return new LiteralProducer(value, shape);
-
-            if (value is IEnumerable enumerable && !(value is string))
-            {
-                var items = new List<ValueProducer>();
-                var itemShape = shape.Kind == "array" && shape.Item != null ? shape.Item : Shape.Any;
-                foreach (var item in enumerable)
-                    items.Add(FromValue(item, itemShape));
-                return new ArrayProducer(items, shape);
-            }
-
-            // Object: reflect properties
-            var fields = new Dictionary<string, ValueProducer>();
-            foreach (var prop in value.GetType().GetProperties(
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-            {
-                if (!prop.CanRead) continue;
-                var val = prop.GetValue(value);
-                var propShape = Shape.FromClrType(prop.PropertyType);
-                fields[prop.Name] = FromValue(val, propShape);
-            }
-            return new ObjectProducer(fields, shape);
-        }
-
-        private static bool IsScalar(object value) =>
-            value is string || value is bool ||
-            value is int || value is long || value is decimal || value is double || value is float ||
-            value is short || value is byte || value is sbyte || value is ushort || value is uint || value is ulong ||
-            value is DateTime;
+        internal static ValueProducer LiteralRaw(object value, Shape shape) =>
+            new LiteralProducer(value, shape);
 
         internal static ValueProducer Read(Source from, string member, Path path = null, Shape shape = null) =>
             new ReadProducer(from, member, path, shape);
@@ -93,13 +50,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static ValueProducer Array(List<ValueProducer> items, Shape shape = null) =>
             new ArrayProducer(items, shape);
-
-        /// <summary>
-        /// Converts a POCO payload into an ObjectProducer by reflecting properties.
-        /// Handles nested objects and arrays recursively via FromValue.
-        /// </summary>
-        internal static ValueProducer FromPayload<T>(T payload) =>
-            FromValue(payload, Shape.Any);
     }
 
     public sealed class LiteralProducer : ValueProducer
