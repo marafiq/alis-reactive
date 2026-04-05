@@ -1,163 +1,98 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Reactions;
-using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Builders.Requests
 {
-    /// <summary>
-    /// Configures an HTTP request: URL, verb, request body (gather), loading state,
-    /// client-side validation, and response handlers.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Accessed via the pipeline's HTTP methods:
-    /// <c>p.Post("/api/save", gather: g =&gt; g.IncludeAll()).Response(response: r =&gt; r.OnSuccess(...))</c>.
-    /// </para>
-    /// <para>
-    /// Typical call order: verb (set by <see cref="PipelineBuilder{TModel}"/>)
-    /// → <see cref="Gather"/> → <see cref="WhileLoading"/>
-    /// → <see cref="Validate{TValidator}"/> → <see cref="Response"/>.
-    /// All steps are optional except the verb and URL.
-    /// </para>
-    /// </remarks>
-    /// <typeparam name="TModel">The view model type.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
     {
+        private readonly PlanBuildContext _context;
         private string _verb = "GET";
         private string _url = "";
-        private List<GatherItem>? _gather;
-        private string? _contentType;
-        private List<Command>? _whileLoading;
-        private ResponseBuilder<TModel>? _response;
-        private ValidationDescriptor? _validation;
-        private Type? _validatorType;
+        private List<GatherField> _gather;
+        private string _transport = "json";
+        private List<Reaction> _whileLoading;
+        private ResponseBuilder<TModel> _response;
+        private string _container;
+        private Type _validatorType;
 
-        internal HttpRequestBuilder<TModel> SetVerb(string verb)
+        internal HttpRequestBuilder(PlanBuildContext context)
         {
-            _verb = verb;
-            return this;
+            _context = context;
         }
 
-        internal HttpRequestBuilder<TModel> SetUrl(string url)
-        {
-            _url = url;
-            return this;
-        }
+        internal HttpRequestBuilder<TModel> SetVerb(string verb) { _verb = verb; return this; }
+        internal HttpRequestBuilder<TModel> SetUrl(string url) { _url = url; return this; }
 
-        // ── Public convenience verbs (used in Chained / Parallel lambdas) ──
-
-        /// <summary>Sets the request verb to GET. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
-        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Get(string url) { _verb = "GET"; _url = url; return this; }
-
-        /// <summary>Sets the request verb to POST. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
-        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Post(string url) { _verb = "POST"; _url = url; return this; }
-
-        /// <summary>Sets the request verb to PUT. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
-        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Put(string url) { _verb = "PUT"; _url = url; return this; }
-
-        /// <summary>Sets the request verb to DELETE. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
-        /// <param name="url">The request URL.</param>
         public HttpRequestBuilder<TModel> Delete(string url) { _verb = "DELETE"; _url = url; return this; }
 
-        /// <summary>
-        /// Configures gather items for the request body/URL params.
-        /// </summary>
-        /// <param name="gather">Adds gather items for the request body or URL params.</param>
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {
-            var builder = new GatherBuilder<TModel>();
+            var builder = new GatherBuilder<TModel>(_context);
             gather(builder);
-            _gather = builder.Items;
+            _gather = builder.Fields;
             return this;
         }
 
-        /// <summary>
-        /// Sends the request body as application/json (default).
-        /// </summary>
-        public HttpRequestBuilder<TModel> AsJson() { _contentType = null; return this; }
+        public HttpRequestBuilder<TModel> AsJson() { _transport = "json"; return this; }
+        public HttpRequestBuilder<TModel> AsFormData() { _transport = "form-data"; return this; }
 
-        /// <summary>
-        /// Sends the request body as multipart/form-data. Required for file uploads.
-        /// </summary>
-        public HttpRequestBuilder<TModel> AsFormData() { _contentType = "form-data"; return this; }
-
-        /// <summary>
-        /// Configures commands to execute while the request is in-flight.
-        /// These commands are reverted after the response arrives.
-        /// </summary>
-        /// <param name="pipeline">Builds the loading-state commands (reverted after the response arrives).</param>
         public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var builder = new PipelineBuilder<TModel>();
-            pipeline(builder);
-            var reaction = builder.BuildReaction();
-            if (!(reaction is SequentialReaction sr))
-                throw new InvalidOperationException(
-                    "WhileLoading only supports plain commands (sequential). " +
-                    "Conditions, HTTP, and parallel pipelines are not valid here.");
-            _whileLoading = sr.Commands;
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(pb);
+            _whileLoading = pb.Steps;
             return this;
         }
 
-        /// <summary>
-        /// Registers client-side validation from a pre-built descriptor.
-        /// When present, the runtime validates the form before sending the request.
-        /// If validation fails, the request is aborted.
-        /// </summary>
-        public HttpRequestBuilder<TModel> Validate(ValidationDescriptor validation)
-        {
-            _validation = validation;
-            return this;
-        }
-
-        /// <summary>
-        /// Registers client-side validation by validator type.
-        /// Rules are extracted automatically at Render() time via IValidationExtractor.
-        /// Field IDs use standard convention (property name = element ID).
-        /// </summary>
         public HttpRequestBuilder<TModel> Validate<TValidator>(string formId)
             where TValidator : class
         {
             _validatorType = typeof(TValidator);
-            _validation = new ValidationDescriptor(formId, new List<ValidationField>());
+            _container = formId;
             return this;
         }
 
-        /// <summary>
-        /// Configures success/error response handlers.
-        /// </summary>
-        /// <param name="response">Defines the success and error handlers for the response.</param>
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response)
         {
-            var builder = new ResponseBuilder<TModel>();
+            var builder = new ResponseBuilder<TModel>(_context);
             response(builder);
             _response = builder;
             return this;
         }
 
-        internal RequestDescriptor BuildRequestDescriptor()
+        internal Request BuildRequest()
         {
-            var desc = new RequestDescriptor(
-                _verb,
-                _url,
-                _gather,
-                _contentType,
-                _whileLoading,
-                _response?.SuccessHandlers.Count > 0 ? _response.SuccessHandlers : null,
-                _response?.ErrorHandlers.Count > 0 ? _response.ErrorHandlers : null,
-                _response?.ChainedRequest,
-                _validation);
+            var request = new Request(_verb, _url);
 
+            if (_gather != null && _gather.Count > 0)
+                request.Input = new GatherInput(_gather, _transport);
+
+            if (_container != null)
+                request.Container = _container;
+
+            if (_whileLoading != null && _whileLoading.Count > 0)
+                request.Before = _whileLoading;
+
+            if (_response != null)
+            {
+                if (_response.SuccessHandlers.Count > 0)
+                    request.Success = _response.SuccessHandlers;
+                if (_response.ErrorHandlers.Count > 0)
+                    request.Error = _response.ErrorHandlers;
+                if (_response.ChainedRequest != null)
+                    request.Next = _response.ChainedRequest;
+            }
+
+            // Validator type stored for resolution at Render() time
             if (_validatorType != null)
-                desc.AttachValidator(_validatorType);
+                request.ValidatorType = _validatorType;
 
-            return desc;
+            return request;
         }
     }
 }

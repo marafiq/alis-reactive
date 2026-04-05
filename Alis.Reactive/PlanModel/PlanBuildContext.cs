@@ -42,15 +42,15 @@ namespace Alis.Reactive.PlanModel
         /// Ensures a registered input component exists in the plan with its JsType.
         /// Returns the component key.
         /// </summary>
-        internal string EnsureInputComponent(string componentId, string vendor, string readExpr, Shape shape)
+        internal string EnsureInputComponent(string componentId, string vendor, string valueMember, Shape shape)
         {
             var key = componentId;
             if (!_plan.Components.ContainsKey(key))
             {
                 var typeKey = vendor + "." + componentId;
                 var jsType = new JsType()
-                    .WithProperty(readExpr, Path.Parse(readExpr), shape, "read")
-                    .WithDefaultValue(readExpr, shape);
+                    .WithProperty(valueMember, Path.Parse(valueMember), shape, "read")
+                    .WithDefaultValue(valueMember, shape);
 
                 _plan.Types[typeKey] = jsType;
                 _plan.Components[key] = Component.Create(componentId, vendor, typeKey);
@@ -99,20 +99,7 @@ namespace Alis.Reactive.PlanModel
             foreach (var kvp in _components)
             {
                 var reg = kvp.Value;
-                var shape = Shape.FromClrType(null); // Will be enriched from CoerceAs
-                // Map CoerceAs string to Shape
-                switch (reg.CoerceAs)
-                {
-                    case "string": shape = Shape.String; break;
-                    case "number": shape = Shape.Number; break;
-                    case "boolean": shape = Shape.Boolean; break;
-                    case "date": shape = Shape.Date; break;
-                    case "raw": shape = Shape.Raw; break;
-                    case "array": shape = Shape.ArrayOf(Shape.Any); break;
-                    default: shape = Shape.Any; break;
-                }
-
-                EnsureInputComponent(reg.ComponentId, reg.Vendor, reg.ReadExpr, shape);
+                EnsureInputComponent(reg.ComponentId, reg.Vendor, reg.ValueMember, reg.Shape);
             }
         }
 

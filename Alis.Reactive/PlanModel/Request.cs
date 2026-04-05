@@ -25,6 +25,13 @@ namespace Alis.Reactive.PlanModel
         internal static Request Put(string url) => new Request("PUT", url);
         internal static Request Delete(string url) => new Request("DELETE", url);
         internal static Request Patch(string url) => new Request("PATCH", url);
+
+        /// <summary>
+        /// Validator type for deferred extraction at Render() time.
+        /// Not serialized — used only during plan construction.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        internal System.Type ValidatorType { get; set; }
     }
 
     internal abstract class RequestInput
