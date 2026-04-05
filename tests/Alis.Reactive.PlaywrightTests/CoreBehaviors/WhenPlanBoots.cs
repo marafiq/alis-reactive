@@ -39,7 +39,7 @@ public class WhenPlanBoots : PlaywrightTestBase
         Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
 
         // Validate it's actual JSON with expected structure
-        Assert.That(text, Does.Contain("\"entries\""), "Plan must have behaviors array");
+        Assert.That(text, Does.Contain("\"behaviors\""), "Plan must have behaviors array");
         Assert.That(text, Does.Contain("\"dom-ready\""), "Plan must contain dom-ready trigger");
         Assert.That(text, Does.Contain("\"custom-event\""), "Plan must contain custom-event triggers");
         Assert.That(text, Does.Contain("\"dispatch\""), "Plan must contain dispatch commands");

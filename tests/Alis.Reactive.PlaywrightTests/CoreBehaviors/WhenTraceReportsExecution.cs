@@ -76,9 +76,9 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        AssertTraceContains("command", "\"event\":\"test\"");
-        AssertTraceContains("command", "\"event\":\"test-received\"");
-        AssertTraceContains("command", "\"event\":\"final\"");
+        AssertTraceContains("execute", "\"event\":\"test\"");
+        AssertTraceContains("execute", "\"event\":\"test-received\"");
+        AssertTraceContains("execute", "\"event\":\"final\"");
 
         AssertNoConsoleErrors();
     }
@@ -121,7 +121,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var mutateMessages = _consoleMessages
-            .Where(m => m.Contains("[alis:execute]") && m.Contains("set|call"))
+            .Where(m => m.Contains("[alis:execute]") && m.Contains("set") || m.Contains("call"))
             .ToList();
 
         Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-1\"")), Is.True,
