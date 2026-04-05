@@ -34,10 +34,10 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     {
         // THIS IS THE CRITICAL TWO-PHASE BOOT REGRESSION TEST.
         //
-        // Two-phase boot guarantees: custom-event listeners wire BEFORE dom-ready executes.
+        // Two-phase boot guarantees: document-event listeners wire BEFORE dom-ready executes.
         // Without this, dom-ready dispatches "test" but nobody is listening yet — chain breaks silently.
         //
-        // Phase 1: trigger.ts logs "[alis:trigger] custom-event: listening" for each custom-event entry
+        // Phase 1: trigger.ts logs "[alis:trigger] document-event: listening" for each document-event behavior
         // Phase 2: dom-ready executes, which triggers "[alis:execute] dispatch" for the first dispatch
         //
         // If someone refactors boot.ts to remove two-phase ordering, the dispatch trace would
@@ -47,11 +47,11 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
 
         var messages = _consoleMessages;
 
-        // Find the LAST custom-event listener wiring (phase 1 must complete fully)
+        // Find the LAST document-event listener wiring (phase 1 must complete fully)
         var lastWireIndex = -1;
         for (var i = 0; i < messages.Count; i++)
         {
-            if (messages[i].Contains("[alis:trigger]") && messages[i].Contains("custom-event"))
+            if (messages[i].Contains("[alis:trigger]") && messages[i].Contains("document-event"))
                 lastWireIndex = i;
         }
 
@@ -60,11 +60,11 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
             m.Contains("[alis:execute]") && m.Contains("dispatch"));
 
         Assert.That(lastWireIndex, Is.GreaterThanOrEqualTo(0),
-            "Custom-event listener wiring must be traced (phase 1)");
+            "Document-event listener wiring must be traced (phase 1)");
         Assert.That(firstDispatchIndex, Is.GreaterThanOrEqualTo(0),
             "Dispatch reaction must be traced (phase 2)");
         Assert.That(lastWireIndex, Is.LessThan(firstDispatchIndex),
-            "All custom-event listeners must wire (phase 1) BEFORE dom-ready dispatches (phase 2). " +
+            "All document-event listeners must wire (phase 1) BEFORE dom-ready dispatches (phase 2). " +
             "If this fails, two-phase boot is broken — dispatch chains will silently fail.");
     }
 
