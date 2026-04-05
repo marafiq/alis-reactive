@@ -52,9 +52,14 @@ export function wireBehavior(
       log.debug("component-event", { component: trigger.component, event: trigger.event, channel });
 
       (root as EventTarget).addEventListener(channel, (e: any) => {
-        const eventData = comp.vendor === "native"
-          ? ((e as CustomEvent)?.detail ?? e)
-          : (e ?? {});
+        // Native: use currentTarget (the element) so conditions can read .checked, .value etc.
+        // Fusion: SF passes the args object directly as the event
+        // CustomEvent (from dispatch): use .detail
+        const eventData = e instanceof CustomEvent
+          ? (e.detail ?? {})
+          : comp.vendor === "native"
+            ? (e.currentTarget ?? e.target ?? e)
+            : (e ?? {});
         const ctx: ExecContext = { event: eventData };
         executeReaction(reaction, plan, ctx).catch(err =>
           log.error("reaction failed", { error: String(err) }));
