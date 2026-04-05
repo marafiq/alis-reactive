@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Serialization;
 
@@ -35,16 +37,46 @@ namespace Alis.Reactive.PlanModel
             new LiteralProducer(null, Shape.None);
 
         /// <summary>
-        /// Creates a literal value producer. Value must be a scalar: string, numeric,
-        /// bool, DateTime, or null. Arrays and objects must use Array() or Object().
+        /// Creates a literal for a scalar value. For non-scalars, delegates to
+        /// FromValue which produces the correct ValueProducer kind (Array, Object).
         /// </summary>
         internal static ValueProducer LiteralRaw(object value, Shape shape)
         {
-            if (value != null && !IsScalar(value))
-                throw new ArgumentException(
-                    $"LiteralRaw only accepts scalar values (string, number, bool, DateTime, null). " +
-                    $"Got {value.GetType().Name}. Use ValueProducer.Array() or ValueProducer.Object() instead.");
-            return new LiteralProducer(value, shape);
+            if (value == null) return new LiteralProducer(null, shape);
+            if (IsScalar(value)) return new LiteralProducer(value, shape);
+            // Non-scalar: build proper ValueProducer structure
+            return FromValue(value, shape);
+        }
+
+        /// <summary>
+        /// Converts any CLR value to the correct ValueProducer kind:
+        /// scalar → LiteralProducer, array → ArrayProducer, object → ObjectProducer.
+        /// </summary>
+        internal static ValueProducer FromValue(object value, Shape shape)
+        {
+            if (value == null) return new LiteralProducer(null, shape);
+            if (IsScalar(value)) return new LiteralProducer(value, shape);
+
+            if (value is IEnumerable enumerable && !(value is string))
+            {
+                var items = new List<ValueProducer>();
+                var itemShape = shape.Kind == "array" && shape.Item != null ? shape.Item : Shape.Any;
+                foreach (var item in enumerable)
+                    items.Add(FromValue(item, itemShape));
+                return new ArrayProducer(items, shape);
+            }
+
+            // Object: reflect properties
+            var fields = new Dictionary<string, ValueProducer>();
+            foreach (var prop in value.GetType().GetProperties(
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            {
+                if (!prop.CanRead) continue;
+                var val = prop.GetValue(value);
+                var propShape = Shape.FromClrType(prop.PropertyType);
+                fields[prop.Name] = FromValue(val, propShape);
+            }
+            return new ObjectProducer(fields, shape);
         }
 
         private static bool IsScalar(object value) =>
@@ -63,26 +95,11 @@ namespace Alis.Reactive.PlanModel
             new ArrayProducer(items, shape);
 
         /// <summary>
-        /// Converts a POCO payload into an ObjectProducer by reflecting over its
-        /// accessible instance properties. Each property value must be scalar or null.
-        /// Used by Dispatch to build a typed event payload object.
+        /// Converts a POCO payload into an ObjectProducer by reflecting properties.
+        /// Handles nested objects and arrays recursively via FromValue.
         /// </summary>
-        internal static ValueProducer FromPayload<T>(T payload)
-        {
-            var fields = new Dictionary<string, ValueProducer>();
-            var bindingFlags = System.Reflection.BindingFlags.Instance
-                | System.Reflection.BindingFlags.GetProperty
-                | (System.Reflection.BindingFlags)16; // Public instance properties
-            foreach (var prop in typeof(T).GetProperties(bindingFlags))
-            {
-                var val = prop.GetValue(payload);
-                if (val == null)
-                    fields[prop.Name] = Null();
-                else
-                    fields[prop.Name] = LiteralRaw(val, Shape.FromClrType(prop.PropertyType));
-            }
-            return Object(fields);
-        }
+        internal static ValueProducer FromPayload<T>(T payload) =>
+            FromValue(payload, Shape.Any);
     }
 
     public sealed class LiteralProducer : ValueProducer
