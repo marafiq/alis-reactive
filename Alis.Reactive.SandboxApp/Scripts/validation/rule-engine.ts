@@ -18,9 +18,9 @@ function compareValues(a: unknown, b: unknown, shape?: import("../types").Shape)
       "Comparison rules (min, max, gt, lt, range, exclusiveRange) require explicit shape in the plan."
     );
   }
-  const coerceAs = shapeToCoercionType(shape);
-  const ra = coerce(a, coerceAs);
-  const rb = coerce(b, coerceAs);
+  const shapeType = shapeToCoercionType(shape);
+  const ra = coerce(a, shapeType);
+  const rb = coerce(b, shapeType);
   if (!ra.ok || !rb.ok) return NaN;
   const ca = ra.value as number;
   const cb = rb.value as number;

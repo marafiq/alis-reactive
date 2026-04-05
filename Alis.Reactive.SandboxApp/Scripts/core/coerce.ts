@@ -58,7 +58,7 @@ export function coerceOrThrow(value: unknown, type: CoercionType): unknown {
  * Ok(String(v)) for number/boolean
  * Ok(toISOString()) for Date (ISO 8601, server-parseable, round-trips with toDate)
  * Ok(JSON.stringify()) for Array (preserves structure)
- * Err for plain Object (walk should have decomposed via readExpr)
+ * Err for plain Object (walk should have decomposed via valueMember)
  */
 export function toString(value: unknown): CoerceResult<string> {
   if (value == null) return ok("");
@@ -68,7 +68,7 @@ export function toString(value: unknown): CoerceResult<string> {
   if (Array.isArray(value)) return ok(JSON.stringify(value));
   return err(
     `toString() received a plain object — ` +
-    `missing coerceAs or wrong readExpr. Got: ${JSON.stringify(value)}`
+    `missing shape or wrong valueMember. Got: ${JSON.stringify(value)}`
   );
 }
 
@@ -117,7 +117,7 @@ export function toBoolean(value: unknown): CoerceResult<boolean> {
   if (Array.isArray(value)) return ok(value.length > 0);
   return err(
     `toBoolean() received a plain object — ` +
-    `missing coerceAs or wrong readExpr. Got: ${JSON.stringify(value)}`
+    `missing shape or wrong valueMember. Got: ${JSON.stringify(value)}`
   );
 }
 
@@ -158,7 +158,7 @@ export function toDate(value: unknown): CoerceResult<number> {
  * Ok(identity) for Array
  * Ok([]) for null/undefined/""
  * Ok([scalar]) for any scalar (wrap in single-element array)
- * Err for plain Object (walk should have decomposed via readExpr)
+ * Err for plain Object (walk should have decomposed via valueMember)
  */
 export function toArray(value: unknown): CoerceResult<unknown[]> {
   if (Array.isArray(value)) return ok(value);
