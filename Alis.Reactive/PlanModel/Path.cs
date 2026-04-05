@@ -1,17 +1,37 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
+    /// <summary>
+    /// Serializes Path as a bare JSON array of PathSegments.
+    /// Schema expects: [{ "kind": "property", "name": "value" }]
+    /// </summary>
+    internal sealed class PathJsonConverter : JsonConverter<Path>
+    {
+        public override void Write(Utf8JsonWriter writer, Path value, JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+            foreach (var segment in value.Segments)
+                JsonSerializer.Serialize(writer, segment, options);
+            writer.WriteEndArray();
+        }
+
+        public override Path Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => throw new NotSupportedException("Plan types are write-only.");
+    }
+
     public sealed class PathSegment
     {
         public string Kind { get; }
+
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Name { get; }
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Index { get; }
 
         private PathSegment(string kind, string name, int? index)
@@ -28,10 +48,12 @@ namespace Alis.Reactive.PlanModel
             new PathSegment("index", null, index);
     }
 
+    [JsonConverter(typeof(PathJsonConverter))]
     public sealed class Path
     {
         internal static readonly Path None = new Path(Array.Empty<PathSegment>());
 
+        [JsonIgnore]
         public IReadOnlyList<PathSegment> Segments { get; }
 
         internal bool IsNone => Segments.Count == 0;
@@ -64,8 +86,8 @@ namespace Alis.Reactive.PlanModel
             var segments = new List<PathSegment>(parts.Length);
             foreach (var part in parts)
             {
-                if (int.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index))
-                    segments.Add(PathSegment.AtIndex(index));
+                if (int.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out var idx))
+                    segments.Add(PathSegment.AtIndex(idx));
                 else
                     segments.Add(PathSegment.Property(part));
             }

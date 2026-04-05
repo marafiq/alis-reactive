@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -6,13 +8,13 @@ namespace Alis.Reactive.PlanModel
     {
         public string Method { get; }
         public string Url { get; }
-        public string Container { get; set; }
-        public RequestInput Input { get; set; }
-        public List<Reaction> Before { get; set; }
-        public List<ResponseHandler> Success { get; set; }
-        public List<ResponseHandler> Error { get; set; }
-        public List<Reaction> Complete { get; set; }
-        public Request Next { get; set; }
+        public string Container { get; internal set; }
+        public RequestInput Input { get; internal set; }
+        public List<Reaction> Before { get; internal set; }
+        public List<ResponseHandler> Success { get; internal set; }
+        public List<ResponseHandler> Error { get; internal set; }
+        public List<Reaction> Complete { get; internal set; }
+        public Request Next { get; internal set; }
 
         internal Request(string method, string url)
         {
@@ -26,14 +28,11 @@ namespace Alis.Reactive.PlanModel
         internal static Request Delete(string url) => new Request("DELETE", url);
         internal static Request Patch(string url) => new Request("PATCH", url);
 
-        /// <summary>
-        /// Validator type for deferred extraction at Render() time.
-        /// Not serialized — used only during plan construction.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
         internal System.Type ValidatorType { get; set; }
     }
 
+    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<RequestInput>))]
     public abstract class RequestInput
     {
         private protected RequestInput() { }
@@ -81,7 +80,7 @@ namespace Alis.Reactive.PlanModel
 
     public sealed class ResponseHandler
     {
-        public int? Status { get; set; }
+        public int? Status { get; internal set; }
         public Reaction Reaction { get; }
 
         internal ResponseHandler(Reaction reaction)
