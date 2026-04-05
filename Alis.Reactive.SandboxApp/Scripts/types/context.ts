@@ -1,12 +1,10 @@
-import type { ValidationDescriptor } from "./validation";
-import type { ComponentEntry } from "./plan";
+import type { Component } from "./plan";
 
-export type Vendor = "fusion" | "native";
 export type EventPayload = Record<string, unknown>;
 
 export interface ExecContext {
-  readonly evt?: Record<string, unknown>;
-  readonly responseBody?: unknown;
-  readonly validationDesc?: ValidationDescriptor;
-  readonly components?: Record<string, ComponentEntry>;
+  readonly planId: string;
+  readonly types: import("./plan").Plan["types"];
+  readonly components: Record<string, Component>;
+  readonly payload?: Record<string, unknown>;
 }
