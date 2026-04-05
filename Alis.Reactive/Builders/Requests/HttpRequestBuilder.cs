@@ -45,7 +45,12 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            _whileLoading = pb.Steps;
+            var reaction = pb.BuildReaction();
+            if (!(reaction is SequenceReaction seq))
+                throw new InvalidOperationException(
+                    "WhileLoading only supports plain commands (sequential). " +
+                    "Conditions, HTTP, and parallel pipelines are not valid here.");
+            _whileLoading = seq.Steps;
             return this;
         }
 
@@ -92,7 +97,6 @@ namespace Alis.Reactive.Builders.Requests
                     request.Next = _response.ChainedRequest;
             }
 
-            // Validator type stored for resolution at Render() time
             if (_validatorType != null)
                 request.ValidatorType = _validatorType;
 

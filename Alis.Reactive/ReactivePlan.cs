@@ -56,7 +56,9 @@ namespace Alis.Reactive
                     return;
 
                 throw new InvalidOperationException(
-                    $"Duplicate component registration for binding path '{bindingPath}'.");
+                    $"Duplicate component registration for binding path '{bindingPath}': " +
+                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ValueMember}, {existing.ComponentType}, {existing.Shape.Kind}] vs " +
+                    $"new [{entry.ComponentId}, {entry.Vendor}, {entry.ValueMember}, {entry.ComponentType}, {entry.Shape.Kind}].");
             }
 
             _componentsMap[bindingPath] = entry;
