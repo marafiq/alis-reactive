@@ -165,9 +165,21 @@ namespace Alis.Reactive.Builders
                 PipelineMode.Parallel => _parallelBuilder!.BuildReaction(
                     Steps.Count > 0 ? Steps : null),
                 PipelineMode.Http => BuildHttpReaction(),
-                PipelineMode.Conditional => Reaction.Branch(ConditionalBranches ?? new List<BranchCase>()),
+                PipelineMode.Conditional => BuildConditionalReaction(),
                 _ => Reaction.Sequence(Steps),
             };
+        }
+
+        private Reaction BuildConditionalReaction()
+        {
+            var branch = Reaction.Branch(ConditionalBranches ?? new List<BranchCase>());
+            if (Steps.Count > 0)
+            {
+                // Pre-conditional steps + branch = sequence
+                var all = new List<Reaction>(Steps) { branch };
+                return Reaction.Sequence(all);
+            }
+            return branch;
         }
 
         private Reaction BuildHttpReaction()
