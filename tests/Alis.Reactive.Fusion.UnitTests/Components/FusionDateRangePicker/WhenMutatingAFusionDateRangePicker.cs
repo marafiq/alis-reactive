@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.UnitTests;
 public class WhenMutatingAFusionDateRangePicker : FusionTestBase
 {
     [Test]
-    public void StartDate_returns_typed_component_source_with_startDate_readExpr()
+    public void StartDate_returns_typed_component_source_with_startDate_valueMember()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
@@ -19,7 +19,7 @@ public class WhenMutatingAFusionDateRangePicker : FusionTestBase
     }
 
     [Test]
-    public void EndDate_returns_typed_component_source_with_endDate_readExpr()
+    public void EndDate_returns_typed_component_source_with_endDate_valueMember()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
@@ -30,7 +30,7 @@ public class WhenMutatingAFusionDateRangePicker : FusionTestBase
     }
 
     [Test]
-    public void Value_returns_typed_component_source_with_value_readExpr_and_DateTime_array()
+    public void Value_returns_typed_component_source_with_value_valueMember_and_DateTime_array()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>

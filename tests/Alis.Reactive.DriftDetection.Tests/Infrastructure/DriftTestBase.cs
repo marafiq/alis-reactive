@@ -91,7 +91,7 @@ public abstract class DriftTestBase
     /// <summary>
     /// Asserts that specific named properties are present in the JSON element at the given path.
     /// Use instead of AssertAllPropertiesPresent when a definition has mutually exclusive
-    /// optional properties (e.g., ValueGuard operand vs rightSource) or when some properties
+    /// optional properties (e.g., CompareCondition operand vs rightSource) or when some properties
     /// are not reachable via the DSL.
     /// </summary>
     protected static void AssertPropertiesPresent(

@@ -34,8 +34,24 @@ namespace Alis.Reactive.PlanModel
         internal static ValueProducer Null() =>
             new LiteralProducer(null, Shape.None);
 
-        internal static ValueProducer LiteralRaw(object value, Shape shape) =>
-            new LiteralProducer(value, shape);
+        /// <summary>
+        /// Creates a literal value producer. Value must be a scalar: string, numeric,
+        /// bool, DateTime, or null. Arrays and objects must use Array() or Object().
+        /// </summary>
+        internal static ValueProducer LiteralRaw(object value, Shape shape)
+        {
+            if (value != null && !IsScalar(value))
+                throw new ArgumentException(
+                    $"LiteralRaw only accepts scalar values (string, number, bool, DateTime, null). " +
+                    $"Got {value.GetType().Name}. Use ValueProducer.Array() or ValueProducer.Object() instead.");
+            return new LiteralProducer(value, shape);
+        }
+
+        private static bool IsScalar(object value) =>
+            value is string || value is bool ||
+            value is int || value is long || value is decimal || value is double || value is float ||
+            value is short || value is byte || value is sbyte || value is ushort || value is uint || value is ulong ||
+            value is DateTime;
 
         internal static ValueProducer Read(Source from, string member, Path path = null, Shape shape = null) =>
             new ReadProducer(from, member, path, shape);
@@ -45,6 +61,28 @@ namespace Alis.Reactive.PlanModel
 
         internal static ValueProducer Array(List<ValueProducer> items, Shape shape = null) =>
             new ArrayProducer(items, shape);
+
+        /// <summary>
+        /// Converts a POCO payload into an ObjectProducer by reflecting over its
+        /// accessible instance properties. Each property value must be scalar or null.
+        /// Used by Dispatch to build a typed event payload object.
+        /// </summary>
+        internal static ValueProducer FromPayload<T>(T payload)
+        {
+            var fields = new Dictionary<string, ValueProducer>();
+            var bindingFlags = System.Reflection.BindingFlags.Instance
+                | System.Reflection.BindingFlags.GetProperty
+                | (System.Reflection.BindingFlags)16; // Public instance properties
+            foreach (var prop in typeof(T).GetProperties(bindingFlags))
+            {
+                var val = prop.GetValue(payload);
+                if (val == null)
+                    fields[prop.Name] = Null();
+                else
+                    fields[prop.Name] = LiteralRaw(val, Shape.FromClrType(prop.PropertyType));
+            }
+            return Object(fields);
+        }
     }
 
     public sealed class LiteralProducer : ValueProducer

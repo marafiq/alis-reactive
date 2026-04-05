@@ -38,16 +38,21 @@ namespace Alis.Reactive.PlanModel
         private protected RequestInput() { }
     }
 
-    public sealed class GatherInput : RequestInput
+    internal sealed class GatherInput : RequestInput
     {
         public string Kind => "gather";
         public List<GatherField> Components { get; }
+        public List<StaticField> Statics { get; }
+        public List<EventField> Events { get; }
         public string Transport { get; }
 
-        internal GatherInput(List<GatherField> components, string transport)
+        internal GatherInput(List<GatherField> components, string transport,
+            List<StaticField> statics = null, List<EventField> events = null)
         {
             Components = components;
             Transport = transport;
+            Statics = statics != null && statics.Count > 0 ? statics : null;
+            Events = events != null && events.Count > 0 ? events : null;
         }
     }
 
@@ -64,7 +69,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    public sealed class GatherField
+    internal sealed class GatherField
     {
         public string Component { get; }
         public string Key { get; }
@@ -76,6 +81,38 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal static GatherField Of(string component, string key) => new GatherField(component, key);
+    }
+
+    /// <summary>
+    /// A literal key/value pair included in a gather request.
+    /// Replaces the "$static:" magic-string prefix.
+    /// </summary>
+    internal sealed class StaticField
+    {
+        public string Key { get; }
+        public object Value { get; }
+
+        internal StaticField(string key, object value)
+        {
+            Key = key;
+            Value = value;
+        }
+    }
+
+    /// <summary>
+    /// A value read from the triggering event's payload.
+    /// Replaces the "$event:" magic-string prefix.
+    /// </summary>
+    internal sealed class EventField
+    {
+        public string Key { get; }
+        public string EventPath { get; }
+
+        internal EventField(string key, string eventPath)
+        {
+            Key = key;
+            EventPath = eventPath;
+        }
     }
 
     public sealed class ResponseHandler

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Alis.Reactive.PlanModel
@@ -28,7 +29,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static Shape ObjectOf(Dictionary<string, Shape> fields)
         {
-            return new Shape("object") { Fields = fields };
+            return new Shape("object") { Fields = new ReadOnlyDictionary<string, Shape>(fields) };
         }
 
         internal static Shape OpenObject()
@@ -73,7 +74,7 @@ namespace Alis.Reactive.PlanModel
         public string Kind { get; }
         public Shape Item { get; private set; }
         public Shape Inner { get; private set; }
-        public Dictionary<string, Shape> Fields { get; private set; }
+        public IReadOnlyDictionary<string, Shape> Fields { get; private set; }
         public bool? Additional { get; private set; }
 
         internal bool IsNone => Kind == "none";

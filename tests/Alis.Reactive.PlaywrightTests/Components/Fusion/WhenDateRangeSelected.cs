@@ -54,8 +54,8 @@ public class WhenDateRangeSelected : PlaywrightTestBase
             "Plan must contain mutate-element commands");
         Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
             "Plan must contain fusion vendor");
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"value\""),
-            "Plan must contain value readExpr");
+        Assert.That(planJson, Does.Contain("\"member\": \"value\""),
+            "Plan must contain value defaultValue member");
         AssertNoConsoleErrors();
     }
 

@@ -27,11 +27,12 @@ namespace Alis.Reactive
         /// <summary>
         /// Emits a Set reaction on this component.
         /// Called by vendor extension methods.
+        /// Uses the component's actual vendor (not hardcoded "native").
         /// </summary>
         internal ComponentRef<TComponent, TModel> EmitSet(
             string property, ValueProducer value)
         {
-            var componentKey = Pipeline.Context.EnsureElement(TargetId);
+            var componentKey = Pipeline.Context.EnsureComponent(TargetId, Vendor);
             Pipeline.Context.EnsureProperty(componentKey, property, property, Shape.Any, "write");
             Pipeline.Steps.Add(Reaction.Set(
                 ComponentSource.Of(componentKey), property, value));
@@ -41,11 +42,12 @@ namespace Alis.Reactive
         /// <summary>
         /// Emits a Call reaction on this component.
         /// Called by vendor extension methods.
+        /// Uses the component's actual vendor (not hardcoded "native").
         /// </summary>
         internal ComponentRef<TComponent, TModel> EmitCall(
             string method, System.Collections.Generic.List<ValueProducer> args = null)
         {
-            var componentKey = Pipeline.Context.EnsureElement(TargetId);
+            var componentKey = Pipeline.Context.EnsureComponent(TargetId, Vendor);
             Pipeline.Context.EnsureMethod(componentKey, method, method);
             Pipeline.Steps.Add(Reaction.Call(
                 ComponentSource.Of(componentKey), method, args));

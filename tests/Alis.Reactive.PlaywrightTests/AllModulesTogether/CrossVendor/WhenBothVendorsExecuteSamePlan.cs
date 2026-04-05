@@ -44,7 +44,7 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
 
     // ── Scenario 2: Gather reads from both vendors in same POST ──
     // WHY: proves component.ts evalRead works for both vendor roots in a single gather.
-    // Same readExpr "value" resolves to el.value for native and ej2_instances[0].value for fusion.
+    // Same valueMember "value" resolves to el.value for native and ej2_instances[0].value for fusion.
 
     [Test]
     public async Task gather_reads_values_from_both_vendors_in_single_post()
@@ -133,7 +133,7 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
     }
 
     // ── Scenario 6: Cross-vendor gather integrity ──
-    // WHY: proves readExpr "value" resolves differently per vendor root.
+    // WHY: proves valueMember "value" resolves differently per vendor root.
     // Native: el.value. Fusion: ej2_instances[0].value.
     // Each gather must read the correct vendor root independently.
 
@@ -254,7 +254,7 @@ public class WhenBothVendorsExecuteSamePlan : PlaywrightTestBase
     }
 
     // ── Scenario 10: Void method call focuses fusion widget on dom-ready ──
-    // WHY: proves CallMutation with method:"focus" and no args resolves through resolveRoot
+    // WHY: proves Call reaction with method:"focus" and no args resolves through resolveRoot
     // and calls ej2_instances[0].focus(). The TestWidget sets _focused=true and calls
     // input.focus(). If resolveRoot or bracket notation is broken, the input won't be focused.
 

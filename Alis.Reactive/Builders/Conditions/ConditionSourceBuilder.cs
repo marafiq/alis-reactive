@@ -50,52 +50,52 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         // Comparison operators (typed operand)
-        public GuardBuilder<TModel> Eq(TProp operand) => Build("eq", operand);
-        public GuardBuilder<TModel> NotEq(TProp operand) => Build("neq", operand);
-        public GuardBuilder<TModel> Gt(TProp operand) => Build("gt", operand);
-        public GuardBuilder<TModel> Gte(TProp operand) => Build("gte", operand);
-        public GuardBuilder<TModel> Lt(TProp operand) => Build("lt", operand);
-        public GuardBuilder<TModel> Lte(TProp operand) => Build("lte", operand);
+        public GuardBuilder<TModel> Eq(TProp operand) => Build(CompareOp.Eq, operand);
+        public GuardBuilder<TModel> NotEq(TProp operand) => Build(CompareOp.Neq, operand);
+        public GuardBuilder<TModel> Gt(TProp operand) => Build(CompareOp.Gt, operand);
+        public GuardBuilder<TModel> Gte(TProp operand) => Build(CompareOp.Gte, operand);
+        public GuardBuilder<TModel> Lt(TProp operand) => Build(CompareOp.Lt, operand);
+        public GuardBuilder<TModel> Lte(TProp operand) => Build(CompareOp.Lte, operand);
 
         // Presence operators
-        public GuardBuilder<TModel> Truthy() => Build("truthy");
-        public GuardBuilder<TModel> Falsy() => Build("falsy");
-        public GuardBuilder<TModel> IsNull() => Build("is-null");
-        public GuardBuilder<TModel> NotNull() => Build("not-null");
-        public GuardBuilder<TModel> IsEmpty() => Build("is-empty");
-        public GuardBuilder<TModel> NotEmpty() => Build("not-empty");
+        public GuardBuilder<TModel> Truthy() => Build(CompareOp.Truthy);
+        public GuardBuilder<TModel> Falsy() => Build(CompareOp.Falsy);
+        public GuardBuilder<TModel> IsNull() => Build(CompareOp.IsNull);
+        public GuardBuilder<TModel> NotNull() => Build(CompareOp.NotNull);
+        public GuardBuilder<TModel> IsEmpty() => Build(CompareOp.IsEmpty);
+        public GuardBuilder<TModel> NotEmpty() => Build(CompareOp.NotEmpty);
 
         // Membership
-        public GuardBuilder<TModel> In(params TProp[] values) => Build("in", values);
-        public GuardBuilder<TModel> NotIn(params TProp[] values) => Build("not-in", values);
+        public GuardBuilder<TModel> In(params TProp[] values) => BuildArray(CompareOp.In, values);
+        public GuardBuilder<TModel> NotIn(params TProp[] values) => BuildArray(CompareOp.NotIn, values);
 
         // Range
         public GuardBuilder<TModel> Between(TProp low, TProp high) =>
-            Build("between", new object[] { low, high });
+            BuildArray(CompareOp.Between, new object[] { low, high });
 
         // Text operators
-        public GuardBuilder<TModel> Contains(string substring) => Build("contains", substring);
-        public GuardBuilder<TModel> StartsWith(string prefix) => Build("starts-with", prefix);
-        public GuardBuilder<TModel> EndsWith(string suffix) => Build("ends-with", suffix);
-        public GuardBuilder<TModel> Matches(string pattern) => Build("matches", pattern);
-        public GuardBuilder<TModel> MinLength(int length) => Build("min-length", length);
+        public GuardBuilder<TModel> Contains(string substring) => Build(CompareOp.Contains, substring);
+        public GuardBuilder<TModel> StartsWith(string prefix) => Build(CompareOp.StartsWith, prefix);
+        public GuardBuilder<TModel> EndsWith(string suffix) => Build(CompareOp.EndsWith, suffix);
+        public GuardBuilder<TModel> Matches(string pattern) => Build(CompareOp.Matches, pattern);
+        public GuardBuilder<TModel> MinLength(int length) => Build(CompareOp.MinLength, length);
 
         // Array
         public GuardBuilder<TModel> ArrayContains(object item)
         {
             var left = _typedSource.ToValueProducer();
             var right = ValueProducer.LiteralRaw(item, _typedSource.ElementShape);
-            var condition = Condition.Compare(left, "array-contains", right, _shape, _typedSource.ElementShape);
+            var condition = Condition.Compare(left, CompareOp.ArrayContains, right, _shape, _typedSource.ElementShape);
             return ComposeAndWrap(condition);
         }
 
         // Source-vs-source comparison
-        public GuardBuilder<TModel> Eq(TypedSource<TProp> right) => BuildVsSource("eq", right);
-        public GuardBuilder<TModel> NotEq(TypedSource<TProp> right) => BuildVsSource("neq", right);
-        public GuardBuilder<TModel> Gt(TypedSource<TProp> right) => BuildVsSource("gt", right);
-        public GuardBuilder<TModel> Gte(TypedSource<TProp> right) => BuildVsSource("gte", right);
-        public GuardBuilder<TModel> Lt(TypedSource<TProp> right) => BuildVsSource("lt", right);
-        public GuardBuilder<TModel> Lte(TypedSource<TProp> right) => BuildVsSource("lte", right);
+        public GuardBuilder<TModel> Eq(TypedSource<TProp> right) => BuildVsSource(CompareOp.Eq, right);
+        public GuardBuilder<TModel> NotEq(TypedSource<TProp> right) => BuildVsSource(CompareOp.Neq, right);
+        public GuardBuilder<TModel> Gt(TypedSource<TProp> right) => BuildVsSource(CompareOp.Gt, right);
+        public GuardBuilder<TModel> Gte(TypedSource<TProp> right) => BuildVsSource(CompareOp.Gte, right);
+        public GuardBuilder<TModel> Lt(TypedSource<TProp> right) => BuildVsSource(CompareOp.Lt, right);
+        public GuardBuilder<TModel> Lte(TypedSource<TProp> right) => BuildVsSource(CompareOp.Lte, right);
 
         private GuardBuilder<TModel> BuildVsSource(string op, TypedSource<TProp> right)
         {
@@ -112,6 +112,23 @@ namespace Alis.Reactive.Builders.Conditions
             var condition = Condition.Compare(leftProducer, op, rightProducer, _shape);
             return ComposeAndWrap(condition);
         }
+
+        /// <summary>
+        /// Builds a condition where the right-hand side is an array of values.
+        /// Used by In, NotIn, Between — these operators require array operands,
+        /// not scalar literals.
+        /// </summary>
+        private GuardBuilder<TModel> BuildArray(string op, System.Array values)
+        {
+            var leftProducer = _typedSource.ToValueProducer();
+            var items = new System.Collections.Generic.List<ValueProducer>();
+            foreach (var item in values)
+                items.Add(ValueProducer.LiteralRaw(item, _shape));
+            var rightProducer = ValueProducer.Array(items, _shape);
+            var condition = Condition.Compare(leftProducer, op, rightProducer, _shape);
+            return ComposeAndWrap(condition);
+        }
+
 
         private GuardBuilder<TModel> ComposeAndWrap(Condition newCondition)
         {

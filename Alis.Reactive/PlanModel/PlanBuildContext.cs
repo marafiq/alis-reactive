@@ -21,19 +21,39 @@ namespace Alis.Reactive.PlanModel
         internal Plan Plan => _plan;
 
         /// <summary>
-        /// Ensures a DOM element is registered as a component with a JsType.
+        /// Ensures a DOM element is registered as a native component with a JsType.
+        /// Only used by <see cref="Builders.ElementBuilder{TModel}"/> for plain DOM elements.
         /// Returns the component key for use in Source references.
         /// </summary>
         internal string EnsureElement(string elementId)
         {
             var key = elementId;
-            if (!_plan.Components.ContainsKey(key))
+            if (!_plan.MutableComponents.ContainsKey(key))
             {
                 var typeKey = "native.element." + elementId;
-                if (!_plan.Types.ContainsKey(typeKey))
-                    _plan.Types[typeKey] = new JsType();
+                if (!_plan.MutableTypes.ContainsKey(typeKey))
+                    _plan.MutableTypes[typeKey] = new JsType();
 
-                _plan.Components[key] = Component.Create(elementId, "native", typeKey);
+                _plan.MutableComponents[key] = Component.Create(elementId, "native", typeKey);
+            }
+            return key;
+        }
+
+        /// <summary>
+        /// Ensures a component is registered with the correct vendor.
+        /// Used by <see cref="ComponentRef{TComponent,TModel}"/> which knows
+        /// its vendor from the <see cref="IComponent"/> instance.
+        /// </summary>
+        internal string EnsureComponent(string componentId, string vendor)
+        {
+            var key = componentId;
+            if (!_plan.MutableComponents.ContainsKey(key))
+            {
+                var typeKey = vendor + "." + componentId;
+                if (!_plan.MutableTypes.ContainsKey(typeKey))
+                    _plan.MutableTypes[typeKey] = new JsType();
+
+                _plan.MutableComponents[key] = Component.Create(componentId, vendor, typeKey);
             }
             return key;
         }
@@ -45,15 +65,15 @@ namespace Alis.Reactive.PlanModel
         internal string EnsureInputComponent(string componentId, string vendor, string valueMember, Shape shape)
         {
             var key = componentId;
-            if (!_plan.Components.ContainsKey(key))
+            if (!_plan.MutableComponents.ContainsKey(key))
             {
                 var typeKey = vendor + "." + componentId;
                 var jsType = new JsType()
                     .WithProperty(valueMember, Path.Parse(valueMember), shape, "read")
                     .WithDefaultValue(valueMember, shape);
 
-                _plan.Types[typeKey] = jsType;
-                _plan.Components[key] = Component.Create(componentId, vendor, typeKey);
+                _plan.MutableTypes[typeKey] = jsType;
+                _plan.MutableComponents[key] = Component.Create(componentId, vendor, typeKey);
             }
             return key;
         }
@@ -64,8 +84,8 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal void EnsureProperty(string componentKey, string memberName, string pathExpr, Shape shape, string access)
         {
-            var component = _plan.Components[componentKey];
-            var jsType = _plan.Types[component.Type];
+            var component = _plan.MutableComponents[componentKey];
+            var jsType = _plan.MutableTypes[component.Type];
             jsType.WithProperty(memberName, Path.Parse(pathExpr), shape, access);
         }
 
@@ -75,8 +95,8 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal void EnsureMethod(string componentKey, string memberName, string pathExpr, List<Shape> args = null)
         {
-            var component = _plan.Components[componentKey];
-            var jsType = _plan.Types[component.Type];
+            var component = _plan.MutableComponents[componentKey];
+            var jsType = _plan.MutableTypes[component.Type];
             jsType.WithMethod(memberName, Path.Parse(pathExpr), args);
         }
 
@@ -85,8 +105,8 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal void EnsureEvent(string componentKey, string eventName, string channel, string payloadType = null)
         {
-            var component = _plan.Components[componentKey];
-            var jsType = _plan.Types[component.Type];
+            var component = _plan.MutableComponents[componentKey];
+            var jsType = _plan.MutableTypes[component.Type];
             jsType.WithEvent(eventName, channel, payloadType);
         }
 
@@ -105,7 +125,7 @@ namespace Alis.Reactive.PlanModel
 
         internal void AddBehavior(Behavior behavior)
         {
-            _plan.Behaviors.Add(behavior);
+            _plan.MutableBehaviors.Add(behavior);
         }
     }
 }

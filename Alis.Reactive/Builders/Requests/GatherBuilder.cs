@@ -9,13 +9,16 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly PlanBuildContext _context;
         internal List<GatherField> Fields { get; } = new List<GatherField>();
+        internal List<StaticField> StaticFields { get; } = new List<StaticField>();
+        internal List<EventField> EventFields { get; } = new List<EventField>();
+        private bool _includeAll;
 
         internal GatherBuilder(PlanBuildContext context)
         {
             _context = context;
         }
 
-        public GatherBuilder<TModel> AddField(GatherField field)
+        internal GatherBuilder<TModel> AddField(GatherField field)
         {
             Fields.Add(field);
             return this;
@@ -23,16 +26,13 @@ namespace Alis.Reactive.Builders.Requests
 
         public GatherBuilder<TModel> IncludeAll()
         {
-            // At render time, PlanBuildContext resolves all registered input components
-            // and expands this into explicit GatherFields. Marker for now.
-            Fields.Add(GatherField.Of("*", "*"));
+            _includeAll = true;
             return this;
         }
 
         public GatherBuilder<TModel> Static(string param, object value)
         {
-            // Static values become literal fields in the gather
-            Fields.Add(GatherField.Of("$static:" + param, param));
+            StaticFields.Add(new StaticField(param, value));
             return this;
         }
 
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Builders.Requests
             string param)
         {
             var eventPath = ExpressionPathHelper.ToEventPath(path);
-            Fields.Add(GatherField.Of("$event:" + eventPath, param));
+            EventFields.Add(new EventField(param, eventPath));
             return this;
         }
 
@@ -56,5 +56,11 @@ namespace Alis.Reactive.Builders.Requests
             Fields.Add(GatherField.Of(componentId, propertyName));
             return this;
         }
+
+        /// <summary>
+        /// Returns true if IncludeAll() was called.
+        /// Used at build time to expand to all registered components.
+        /// </summary>
+        internal bool IsIncludeAll => _includeAll;
     }
 }

@@ -4,10 +4,10 @@ namespace Alis.Reactive.PlanModel
 {
     internal sealed class JsType
     {
-        public Dictionary<string, JsProperty> Properties { get; set; }
-        public Dictionary<string, JsMethod> Methods { get; set; }
-        public Dictionary<string, JsEvent> Events { get; set; }
-        public DefaultValue DefaultValue { get; set; }
+        public Dictionary<string, JsProperty> Properties { get; internal set; }
+        public Dictionary<string, JsMethod> Methods { get; internal set; }
+        public Dictionary<string, JsEvent> Events { get; internal set; }
+        public DefaultValue DefaultValue { get; internal set; }
 
         internal JsType() { }
 

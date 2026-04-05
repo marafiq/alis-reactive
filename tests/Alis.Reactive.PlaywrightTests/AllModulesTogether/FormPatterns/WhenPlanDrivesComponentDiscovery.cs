@@ -35,7 +35,7 @@ public class WhenPlanDrivesComponentDiscovery : PlaywrightTestBase
         var physician = _plan.FindComponent(m => m.Physician);
         Assert.That(physician, Is.Not.Null);
         Assert.That(physician!.Vendor, Is.EqualTo("fusion"));
-        Assert.That(physician.ReadExpr, Is.EqualTo("value"));
+        Assert.That(physician.TypeKey, Is.EqualTo("value"));
 
         var medication = _plan.FindComponent(m => m.MedicationType);
         Assert.That(medication, Is.Not.Null);

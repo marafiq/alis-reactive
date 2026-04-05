@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive
 {
@@ -75,10 +77,126 @@ namespace Alis.Reactive
         private void ResolveAll()
         {
             _context.RegisterInputComponents();
+            ResolveValidation();
+        }
 
-            // TODO: Validation resolution — extract rules from FluentValidators
-            // and attach to ContainerScope on the appropriate component.
-            // This will be implemented when the validation module is updated.
+        private void ResolveValidation()
+        {
+            // Walk all behaviors to find RequestReaction nodes with a ValidatorType.
+            foreach (var behavior in _context.Plan.Behaviors)
+            {
+                CollectValidationFromReaction(behavior.Reaction);
+            }
+        }
+
+        private void CollectValidationFromReaction(Reaction reaction)
+        {
+            switch (reaction)
+            {
+                case RequestReaction rr:
+                    ResolveRequestValidation(rr.Request);
+                    break;
+                case SequenceReaction seq:
+                    foreach (var step in seq.Steps) CollectValidationFromReaction(step);
+                    break;
+                case ParallelReaction par:
+                    foreach (var step in par.Steps) CollectValidationFromReaction(step);
+                    if (par.OnSettled != null) CollectValidationFromReaction(par.OnSettled);
+                    break;
+                case BranchReaction br:
+                    foreach (var c in br.Cases) CollectValidationFromReaction(c.Reaction);
+                    break;
+            }
+        }
+
+        private void ResolveRequestValidation(Request request)
+        {
+            if (request.ValidatorType == null)
+                return;
+
+            var extractor = ReactivePlanConfig.Extractor
+                ?? throw new InvalidOperationException(
+                    $"Request at '{request.Url}' specifies ValidatorType '{request.ValidatorType.Name}' " +
+                    "but no IValidationExtractor is registered. " +
+                    "Call ReactivePlanConfig.UseValidationExtractor() at app startup.");
+
+            var container = request.Container
+                ?? throw new InvalidOperationException(
+                    $"Request at '{request.Url}' specifies ValidatorType '{request.ValidatorType.Name}' " +
+                    "but no Container (formId) is set. Call .Validate<T>(formId) to specify the form.");
+
+            var fields = extractor.ExtractRules(request.ValidatorType, container);
+
+            // Enrich each field with component registration info
+            var componentValidations = new List<ComponentValidation>();
+            foreach (var field in fields)
+            {
+                // Try to find the matching component in the components map
+                if (_componentsMap.TryGetValue(field.FieldName, out var reg))
+                {
+                    field.FieldId = reg.ComponentId;
+                    field.Vendor = reg.Vendor;
+                    field.ValueMember = reg.ValueMember;
+                    field.Shape = reg.Shape;
+                }
+
+                var planRules = field.Rules.Select(r => ToPlanValidationRule(r, field)).ToList();
+                componentValidations.Add(new ComponentValidation(
+                    field.FieldId ?? field.FieldName, planRules));
+            }
+
+            // Attach to the container component's ContainerScope
+            if (_context.Plan.MutableComponents.TryGetValue(container, out var comp))
+            {
+                comp.Container ??= ContainerScope.Of();
+                comp.Container.ValidationRules = componentValidations;
+            }
+            else
+            {
+                // Create a container component for the form
+                _context.EnsureElement(container);
+                var formComp = _context.Plan.MutableComponents[container];
+                formComp.Container = ContainerScope.Of();
+                formComp.Container.ValidationRules = componentValidations;
+            }
+        }
+
+        private PlanModel.ValidationRule ToPlanValidationRule(
+            Validation.ValidationRule extracted, ValidationField field)
+        {
+            var rule = new PlanModel.ValidationRule(extracted.Rule, extracted.Message);
+
+            if (extracted.Constraint != null)
+                rule.Constraint = ValueProducer.LiteralRaw(extracted.Constraint, extracted.Shape ?? Shape.Any);
+
+            if (extracted.Field != null)
+                rule.OtherComponent = extracted.Field;
+
+            if (extracted.When != null)
+                rule.When = ToCondition(extracted.When);
+
+            if (extracted.Shape != null && !extracted.Shape.IsNone)
+                rule.Shape = extracted.Shape;
+
+            return rule;
+        }
+
+        private Condition ToCondition(ValidationCondition vc)
+        {
+            // Build a read from the condition's field component
+            var fieldComponentId = vc.Field;
+            if (_componentsMap.TryGetValue(vc.Field, out var fieldReg))
+                fieldComponentId = fieldReg.ComponentId;
+
+            var left = ValueProducer.Read(
+                ComponentSource.Of(fieldComponentId),
+                "value");
+
+            ValueProducer right = vc.Value != null
+                ? ValueProducer.LiteralRaw(vc.Value, Shape.Any)
+                : null;
+
+            return Condition.Compare(left, vc.Op, right);
         }
     }
 }

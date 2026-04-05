@@ -7,7 +7,7 @@ namespace Alis.Reactive.PlanModel
         public string Id { get; }
         public string Vendor { get; }
         public string Type { get; }
-        public ContainerScope Container { get; set; }
+        public ContainerScope Container { get; internal set; }
 
         internal Component(string id, string vendor, string type)
         {
@@ -23,7 +23,7 @@ namespace Alis.Reactive.PlanModel
     internal sealed class ContainerScope
     {
         public List<string> Components { get; }
-        public List<ComponentValidation> ValidationRules { get; set; }
+        public List<ComponentValidation> ValidationRules { get; internal set; }
 
         internal ContainerScope(List<string> components)
         {
@@ -50,10 +50,10 @@ namespace Alis.Reactive.PlanModel
     {
         public string Name { get; }
         public string Message { get; }
-        public ValueProducer Constraint { get; set; }
-        public string OtherComponent { get; set; }
-        public Condition When { get; set; }
-        public Shape Shape { get; set; }
+        public ValueProducer Constraint { get; internal set; }
+        public string OtherComponent { get; internal set; }
+        public Condition When { get; internal set; }
+        public Shape Shape { get; internal set; }
 
         internal ValidationRule(string name, string message)
         {

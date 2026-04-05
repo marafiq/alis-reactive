@@ -104,7 +104,7 @@ public class WhenRegisteringComponents
         // Register as textbox
         plan.AddToComponentsMap("Name", new ComponentRegistration("name-id", "native", "Name", "value", "textbox", Alis.Reactive.PlanModel.Shape.String));
 
-        // Re-register same ComponentId + Vendor + ReadExpr + Shape, but different ComponentType
+        // Re-register same ComponentId + Vendor + ValueMember + Shape, but different ComponentType
         var ex = Assert.Throws<InvalidOperationException>(() =>
             plan.AddToComponentsMap("Name", new ComponentRegistration("name-id", "native", "Name", "value", "password", Alis.Reactive.PlanModel.Shape.String)));
 

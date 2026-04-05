@@ -215,16 +215,16 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_checked_readexpr_for_component_source()
+    public async Task plan_carries_checked_value_member_for_component_source()
     {
-        // NativeCheckBox.ReadExpr is "checked" — the plan's ComponentSource must
+        // NativeCheckBox valueMember is "checked" — the plan's ComponentSource must
         // carry this so the runtime reads el.checked (not el.value).
-        // If readExpr changes or is lost, component value reads return wrong data.
+        // If valueMember changes or is lost, component value reads return wrong data.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"checked\""),
-            "Plan must carry readExpr 'checked' for NativeCheckBox component sources — " +
+        Assert.That(planJson, Does.Contain("\"member\": \"checked\""),
+            "Plan must carry defaultValue member 'checked' for NativeCheckBox component sources — " +
             "runtime walks this path to read the checkbox state");
         AssertNoConsoleErrors();
     }

@@ -375,7 +375,7 @@ public class WhenBranchingOnConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ── InvertGuard (NOT) ──
+    // ── Not condition (NOT) ──
 
     [Test]
     public Task Not_inverts_guard()
@@ -391,7 +391,7 @@ public class WhenBranchingOnConditions : PlanTestBase
         return VerifyJson(json);
     }
 
-    // ── ConfirmGuard ──
+    // ── Confirm condition ──
 
     [Test]
     public Task Confirm_guard()

@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 
 /// <summary>
 /// Playwright tests for /Sandbox/Validation/DateRules — verifies date-aware validation
-/// with coerceAs: "date" and cross-property comparisons (discharge > admission).
+/// with shape: "date" and cross-property comparisons (discharge > admission).
 /// Uses FusionDatePicker components.
 /// </summary>
 [TestFixture]

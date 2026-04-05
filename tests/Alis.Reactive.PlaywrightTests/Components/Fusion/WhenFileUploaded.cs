@@ -12,7 +12,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// File injection strategy:
 /// Sets files on the native input via DataTransfer API, then dispatches a change event
 /// so SF processes them into filesData[].rawFile. The gather reads ej2.filesData via
-/// readExpr "filesData", and the Transport extracts .rawFile (File objects) for FormData.
+/// valueMember "filesData", and the Transport extracts .rawFile (File objects) for FormData.
 /// </summary>
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase

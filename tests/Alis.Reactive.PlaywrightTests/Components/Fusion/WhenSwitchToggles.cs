@@ -245,13 +245,13 @@ public class WhenSwitchToggles : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_checked_readexpr_for_component_source()
+    public async Task plan_carries_checked_value_member_for_component_source()
     {
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"checked\""),
-            "Plan must carry readExpr 'checked' for FusionSwitch component sources — " +
+        Assert.That(planJson, Does.Contain("\"member\": \"checked\""),
+            "Plan must carry defaultValue member 'checked' for FusionSwitch component sources — " +
             "runtime walks this path to read the switch state");
         AssertNoConsoleErrors();
     }

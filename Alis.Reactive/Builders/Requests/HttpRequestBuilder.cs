@@ -10,7 +10,7 @@ namespace Alis.Reactive.Builders.Requests
         private readonly PlanBuildContext _context;
         private string _verb = "GET";
         private string _url = "";
-        private List<GatherField> _gather;
+        private GatherBuilder<TModel> _gatherBuilder;
         private string _transport = "json";
         private List<Reaction> _whileLoading;
         private ResponseBuilder<TModel> _response;
@@ -34,7 +34,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var builder = new GatherBuilder<TModel>(_context);
             gather(builder);
-            _gather = builder.Fields;
+            _gatherBuilder = builder;
             return this;
         }
 
@@ -69,8 +69,12 @@ namespace Alis.Reactive.Builders.Requests
         {
             var request = new Request(_verb, _url);
 
-            if (_gather != null && _gather.Count > 0)
-                request.Input = new GatherInput(_gather, _transport);
+            if (_gatherBuilder != null && (_gatherBuilder.Fields.Count > 0 || _gatherBuilder.IsIncludeAll || _gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0))
+            {
+                var statics = _gatherBuilder.StaticFields.Count > 0 ? _gatherBuilder.StaticFields : null;
+                var events = _gatherBuilder.EventFields.Count > 0 ? _gatherBuilder.EventFields : null;
+                request.Input = new GatherInput(_gatherBuilder.Fields, _transport, statics, events);
+            }
 
             if (_container != null)
                 request.Container = _container;

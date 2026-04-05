@@ -602,7 +602,7 @@ public class WhenMixingConditionsWithHttp : PlanTestBase
         Assert.That(json, Does.Contain("full-access"));
         Assert.That(json, Does.Contain("all checks passed"));
         Assert.That(json, Does.Contain("tier-badge"));
-        Assert.That(json, Does.Contain("all"), "Triple-And produces flat AllGuard");
+        Assert.That(json, Does.Contain("all"), "Triple-And produces flat All condition");
         Assert.That(json, Does.Contain("in"));
         return VerifyJson(json);
     }

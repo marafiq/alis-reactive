@@ -7,7 +7,7 @@ namespace Alis.Reactive.Playwright.Extensions;
 /// <summary>
 /// Reads the plan JSON from the page and provides strongly-typed component locators.
 ///
-/// The plan JSON already contains componentId, vendor, readExpr, and bindingPath
+/// The plan JSON already contains componentId, vendor, type, and bindingPath
 /// for every component on the page. TModel is a phantom — it provides compile-time
 /// expression safety without referencing the app.
 ///
@@ -54,7 +54,7 @@ public sealed class PagePlan<TModel> where TModel : class
                 components[bindingPath] = new ComponentEntry(
                     Id: obj.GetProperty("id").GetString()!,
                     Vendor: obj.GetProperty("vendor").GetString()!,
-                    ReadExpr: obj.GetProperty("readExpr").GetString()!,
+                    TypeKey: obj.GetProperty("type").GetString()!,
                     BindingPath: bindingPath,
                     ComponentType: obj.GetProperty("componentType").GetString()!);
             }
@@ -239,6 +239,6 @@ public sealed class PagePlan<TModel> where TModel : class
 public sealed record ComponentEntry(
     string Id,
     string Vendor,
-    string ReadExpr,
+    string TypeKey,
     string BindingPath,
     string ComponentType);

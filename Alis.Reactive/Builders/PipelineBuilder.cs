@@ -38,8 +38,7 @@ namespace Alis.Reactive.Builders
 
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
-            // Serialize payload fields as ValueProducer.Object
-            Steps.Add(Reaction.Dispatch(eventName, ValueProducer.LiteralRaw(payload, Shape.Any)));
+            Steps.Add(Reaction.Dispatch(eventName, ValueProducer.FromPayload(payload)));
             return this;
         }
 
@@ -102,9 +101,16 @@ namespace Alis.Reactive.Builders
             if (_mode == PipelineMode.Http && _httpBuilder != null)
             {
                 var request = _httpBuilder.BuildRequest();
+                var requestReaction = Reaction.Request(request);
                 if (Steps.Count > 0)
-                    request.Before = new List<Reaction>(Steps);
-                _segments.Add(Reaction.Request(request));
+                {
+                    var all = new List<Reaction>(Steps) { requestReaction };
+                    _segments.Add(Reaction.Sequence(all));
+                }
+                else
+                {
+                    _segments.Add(requestReaction);
+                }
                 Steps.Clear();
                 _httpBuilder = null;
             }
@@ -166,9 +172,13 @@ namespace Alis.Reactive.Builders
         private Reaction BuildHttpReaction()
         {
             var request = _httpBuilder!.BuildRequest();
+            var requestReaction = Reaction.Request(request);
             if (Steps.Count > 0)
-                request.Before = new List<Reaction>(Steps);
-            return Reaction.Request(request);
+            {
+                var all = new List<Reaction>(Steps) { requestReaction };
+                return Reaction.Sequence(all);
+            }
+            return requestReaction;
         }
 
         // SetMode and builder accessors for Http/Parallel/Conditions partial classes
