@@ -137,10 +137,11 @@ function executeDispatch(reaction: DispatchReaction, plan: Plan, ctx?: ExecConte
 // ── Inject reaction ────────────────────────────────────────
 
 function executeInject(reaction: InjectReaction, plan: Plan, ctx?: ExecContext): void {
+  // Into() targets a DOM element by ID — may or may not be a registered component
   const comp = plan.components[reaction.component];
-  if (!comp) throw new Error(`[alis] inject target component not found: ${reaction.component}`);
-  const container = document.getElementById(comp.id);
-  if (!container) throw new Error(`[alis] inject target element not found: ${comp.id}`);
+  const elementId = comp?.id ?? reaction.component;
+  const container = document.getElementById(elementId);
+  if (!container) throw new Error(`[alis] inject target element not found: ${elementId}`);
   const value = evaluateValue(reaction.value, plan, ctx);
   if (typeof value === "string") {
     injectHtml(container, value);
