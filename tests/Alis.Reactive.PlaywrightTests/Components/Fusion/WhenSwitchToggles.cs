@@ -50,8 +50,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("mutate-element"),
-            "Plan must contain mutate-element commands");
+        Assert.That(planJson, Does.Contain("\"set\""),
+            "Plan must contain set reactions");
         Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
             "Plan must contain fusion vendor");
         AssertNoConsoleErrors();
@@ -262,8 +262,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"coerce\": \"boolean\""),
-            "Plan must carry coerce 'boolean' for SetChecked — " +
+        Assert.That(planJson, Does.Contain("\"kind\": \"boolean\""),
+            "Plan must carry shape boolean for SetChecked — " +
             "without it, string 'false' is truthy and switch stays checked");
         AssertNoConsoleErrors();
     }
@@ -274,8 +274,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"prop\": \"checked\""),
-            "Plan must carry prop 'checked' for SetChecked mutation — " +
+        Assert.That(planJson, Does.Contain("\"property\": \"checked\""),
+            "Plan must carry property .checked. for SetChecked mutation — " +
             "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();
     }

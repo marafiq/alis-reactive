@@ -178,8 +178,8 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("mutate-element"),
-            "Plan must contain mutate-element commands");
+        Assert.That(planJson, Does.Contain("\"set\""),
+            "Plan must contain set reactions");
         Assert.That(planJson, Does.Contain("\"prop\""),
             "Plan must contain structured prop field for SetValue");
         AssertNoConsoleErrors();
@@ -223,8 +223,8 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"prop\": \"value\""),
-            "Plan must carry prop 'value' for SetValue mutation — " +
+        Assert.That(planJson, Does.Contain("\"property\": \"text\""),
+            "Plan must carry property .text. for SetValue mutation — " +
             "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();
     }

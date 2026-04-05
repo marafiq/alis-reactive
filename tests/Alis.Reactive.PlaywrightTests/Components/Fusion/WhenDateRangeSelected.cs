@@ -50,8 +50,8 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("mutate-element"),
-            "Plan must contain mutate-element commands");
+        Assert.That(planJson, Does.Contain("\"set\""),
+            "Plan must contain set reactions");
         Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
             "Plan must contain fusion vendor");
         Assert.That(planJson, Does.Contain("\"member\": \"value\""),
