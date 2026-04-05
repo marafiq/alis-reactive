@@ -52,7 +52,6 @@ export function wireBehavior(
       log.debug("component-event", { component: trigger.component, event: trigger.event, channel });
 
       (root as EventTarget).addEventListener(channel, (e: any) => {
-        // For native: e is DOM Event (detail or target); for fusion: e is the SF args object
         const eventData = comp.vendor === "native"
           ? ((e as CustomEvent)?.detail ?? e)
           : (e ?? {});
