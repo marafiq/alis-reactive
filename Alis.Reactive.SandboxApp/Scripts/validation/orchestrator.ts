@@ -1,23 +1,20 @@
 // Validation Orchestrator — Fail-Closed, V3 ContainerScope
 //
-// V3: validation rules live on plan.components[key].container.validationRules.
-// Each ComponentValidation maps a component key to its rules.
-// Uses SHARED resolver for reading component values.
+// Uses SHARED resolver for ALL component value reads.
+// This module NEVER touches JsType internals — readDefaultValue handles it.
 
 import type {
-  Plan, Component, ContainerScope, ComponentValidation,
-  ValidationRule, Condition,
+  Plan, ContainerScope, ComponentValidation,
+  ValidationRule,
 } from "../types";
 import type { ExecContext } from "../types";
-import {
-  resolveComponent, getJsType, readProperty, resolveVendorRoot,
-} from "../resolution/resolver";
+import { readDefaultValue } from "../resolution/resolver";
 import { evaluateCondition } from "../conditions/conditions";
 import { scope } from "../core/trace";
-import { toString, toDate, applyShape, shapeToCoercionType } from "../core/coerce";
+import { toString } from "../core/coerce";
 import { ruleFails, type PeerReader } from "./rule-engine";
 import {
-  showInline, clearInline, clearAllInline,
+  showInline, clearInline,
   addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
   showServerErrorInline,
 } from "./error-display";
@@ -26,10 +23,6 @@ const log = scope("validation");
 
 // -- Public API --
 
-/**
- * Validate all components in a container scope. Returns true if all pass.
- * The container key identifies which component holds the ContainerScope.
- */
 export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecContext): boolean {
   const containerComp = plan.components[containerKey];
   if (!containerComp) {
@@ -40,7 +33,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   const containerScope = containerComp.container;
   if (!containerScope) {
     log.warn("validate: component has no container scope", { containerKey });
-    return true; // no validation rules
+    return true;
   }
 
   const containerId = containerComp.id;
@@ -56,14 +49,13 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   const planId = plan.planId;
   const summaryEl = findSummaryElement(planId);
 
-  // Clear all previous errors
   clearContainerErrors(containerScope, plan, containerId, summaryEl);
 
   if (!containerScope.validationRules || containerScope.validationRules.length === 0) {
     return true;
   }
 
-  const peerReader = createPeerReader(plan, containerScope);
+  const peerReader = createPeerReader(plan);
   let valid = true;
   let summaryHasErrors = false;
 
@@ -80,7 +72,6 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   return valid;
 }
 
-/** Show server-side validation errors from a ProblemDetails response. */
 export function showServerErrors(plan: Plan, containerKey: string, data: unknown): void {
   const containerComp = plan.components[containerKey];
   if (!containerComp?.container) return;
@@ -117,7 +108,6 @@ export function showServerErrors(plan: Plan, containerKey: string, data: unknown
   log.debug("showServerErrors", { containerId, fieldCount: Object.keys(errors).length });
 }
 
-/** Clear all validation errors for a container. */
 export function clearContainerValidation(plan: Plan, containerKey: string): void {
   const containerComp = plan.components[containerKey];
   if (!containerComp?.container) return;
@@ -165,28 +155,18 @@ function evaluateComponentRules(
   const errorSpan = document.getElementById(comp.id + "_error");
   const hidden = errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
 
-  // Read the component's default value using the shared resolver
-  const jsType = getJsType(plan, cv.component);
-  const root = resolveVendorRoot(el, comp.vendor);
+  // ONE call to the shared resolver — no JsType internals here
   let value: unknown;
-  if (jsType.defaultValue) {
-    const dv = jsType.defaultValue;
-    if (dv.kind === "property") {
-      const prop = jsType.properties?.[dv.member];
-      value = prop ? readProperty(root, prop) : undefined;
-    } else {
-      const method = jsType.methods?.[dv.member];
-      value = method ? (root as any)[method.path[method.path.length - 1].kind === "property"
-        ? (method.path[method.path.length - 1] as any).name
-        : method.path[method.path.length - 1]]?.() : undefined;
-    }
+  try {
+    value = readDefaultValue(plan, cv.component);
+  } catch {
+    value = undefined;
   }
 
-  // Evaluate rules
   for (const rule of cv.rules) {
     if (rule.when) {
       const condResult = evaluateCondition(rule.when, plan, ctx);
-      if (!condResult) continue; // condition false -> skip rule
+      if (!condResult) continue;
     }
 
     if (ruleFails(rule, value, peerReader)) {
@@ -206,23 +186,11 @@ function evaluateComponentRules(
 
 // -- Helpers --
 
-function createPeerReader(plan: Plan, containerScope: ContainerScope): PeerReader {
+function createPeerReader(plan: Plan): PeerReader {
   return {
     readPeer(componentKey: string): unknown {
-      const comp = plan.components[componentKey];
-      if (!comp) return undefined;
-      const el = document.getElementById(comp.id);
-      if (!el) return undefined;
       try {
-        const root = resolveVendorRoot(el, comp.vendor);
-        const jsType = getJsType(plan, componentKey);
-        if (!jsType.defaultValue) return undefined;
-        const dv = jsType.defaultValue;
-        if (dv.kind === "property") {
-          const prop = jsType.properties?.[dv.member];
-          return prop ? readProperty(root, prop) : undefined;
-        }
-        return undefined;
+        return readDefaultValue(plan, componentKey);
       } catch {
         return undefined;
       }
@@ -233,9 +201,9 @@ function createPeerReader(plan: Plan, containerScope: ContainerScope): PeerReade
 function allRulesConditionallySkipped(rules: ValidationRule[], plan: Plan, ctx?: ExecContext): boolean {
   if (rules.length === 0) return true;
   for (const rule of rules) {
-    if (!rule.when) return false; // unconditional rule -> must block
+    if (!rule.when) return false;
     const result = evaluateCondition(rule.when, plan, ctx);
-    if (result) return false; // condition met -> must block
+    if (result) return false;
   }
   return true;
 }
@@ -249,9 +217,7 @@ function clearContainerErrors(
   if (containerScope.validationRules) {
     for (const cv of containerScope.validationRules) {
       const comp = plan.components[cv.component];
-      if (comp) {
-        clearInline(containerId, comp.id);
-      }
+      if (comp) clearInline(containerId, comp.id);
     }
   }
   if (summaryEl) {
