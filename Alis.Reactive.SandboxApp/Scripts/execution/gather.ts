@@ -1,20 +1,19 @@
-import type { GatherItem, ComponentEntry } from "../types";
-import { evalRead } from "../resolution/component";
-import { walk } from "../core/walk";
+// gather.ts — Gather form values using the SHARED resolver.
+// Reads component default values via plan.types[].defaultValue.
+// Supports GatherInput (component fields) and ValueInput (pre-computed value).
+
+import type { Plan, GatherInput, GatherField, ValueInput, RequestInput, Transport } from "../types";
+import type { ExecContext } from "../types";
+import { readDefaultValue, getJsType } from "../resolution/resolver";
+import { applyShape, toString } from "../core/coerce";
 import { scope } from "../core/trace";
-import { assertNever } from "../core/assert-never";
-import { toString } from "../core/coerce";
+import { evaluateValue } from "./execute";
 
 const log = scope("gather");
 
-/** Unwrap toString Result — returns empty string on Err and logs a warning. */
-function serializeValue(value: unknown, name: string): string {
-  const result = toString(value);
-  if (!result.ok) {
-    log.warn("gather serialize failed, using empty", { name, error: result.error });
-    return "";
-  }
-  return result.value;
+export interface GatherResult {
+  urlParams: string[];
+  body: Record<string, unknown> | FormData;
 }
 
 /** Extracts a File from a value — handles raw File objects and wrapper objects with .rawFile. */
@@ -30,63 +29,66 @@ function hasFiles(items: unknown[]): boolean {
   return items.some(item => toFile(item) != null);
 }
 
-export interface GatherResult {
-  urlParams: string[];
-  body: Record<string, unknown> | FormData;
+/** Unwrap toString Result — returns empty string on Err and logs a warning. */
+function serializeValue(value: unknown, name: string): string {
+  const result = toString(value);
+  if (!result.ok) {
+    log.warn("gather serialize failed, using empty", { name, error: result.error });
+    return "";
+  }
+  return result.value;
 }
 
-/**
- * Transport — the single place that knows how to emit a name/value pair
- * into one of three formats (GET params, FormData, JSON body).
- * Array and scalar values share this path — arrays expand into
- * repeated entries for GET/FormData, and pass through as-is for JSON.
- */
-interface Transport {
+/** Transport strategies for emitting name/value pairs into GET, FormData, or JSON. */
+interface TransportStrategy {
   emitScalar(name: string, value: unknown): void;
   emitArray(name: string, items: unknown[]): void;
 }
 
-function createTransport(
-  urlParams: string[],
-  formData: FormData | null,
-  _body: Record<string, unknown>
-): Transport {
-  if (formData) {
-    return {
-      emitScalar: (name, value) => formData.append(name, serializeValue(value, name)),
-      emitArray: (name, items) => {
-        for (const item of items) {
-          const file = toFile(item);
-          if (file) formData.append(name, file, file.name);
-          else formData.append(name, serializeValue(item, name));
-        }
-      },
-    };
-  }
+function createGetTransport(urlParams: string[]): TransportStrategy {
   return {
     emitScalar: (name, value) => urlParams.push(
       `${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(value, name))}`),
     emitArray: (name, items) => {
-      if (hasFiles(items))
-        throw new Error("[alis] File objects cannot be sent via GET");
+      if (hasFiles(items)) throw new Error("[alis] File objects cannot be sent via GET");
       for (const item of items)
         urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(item, name))}`);
     },
   };
 }
 
-function createJsonTransport(body: Record<string, unknown>): Transport {
+function createFormDataTransport(formData: FormData): TransportStrategy {
+  return {
+    emitScalar: (name, value) => formData.append(name, serializeValue(value, name)),
+    emitArray: (name, items) => {
+      for (const item of items) {
+        const file = toFile(item);
+        if (file) formData.append(name, file, file.name);
+        else formData.append(name, serializeValue(item, name));
+      }
+    },
+  };
+}
+
+function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
   return {
     emitScalar: (name, value) => setNested(body, name, value === "" ? null : value),
     emitArray: (name, items) => {
-      if (hasFiles(items))
-        throw new Error("[alis] File objects require contentType: form-data");
+      if (hasFiles(items)) throw new Error("[alis] File objects require transport: form-data");
       setNested(body, name, items);
     },
   };
 }
 
-function emitValue(name: string, raw: unknown, transport: Transport): void {
+function selectTransport(
+  transport: Transport, method: string, urlParams: string[], formData: FormData | null, body: Record<string, unknown>,
+): TransportStrategy {
+  if (method === "GET") return createGetTransport(urlParams);
+  if (transport === "form-data" && formData) return createFormDataTransport(formData);
+  return createJsonTransport(body);
+}
+
+function emitValue(name: string, raw: unknown, transport: TransportStrategy): void {
   if (typeof FileList !== "undefined" && raw instanceof FileList) {
     transport.emitArray(name, Array.from(raw));
     log.trace("file", { name, count: raw.length });
@@ -97,68 +99,60 @@ function emitValue(name: string, raw: unknown, transport: Transport): void {
   } else {
     transport.emitScalar(name, raw);
   }
-  log.trace("component", { name, value: raw });
+  log.trace("gathered", { name, value: raw });
 }
 
-function selectTransport(
-  verb: string, urlParams: string[], formData: FormData | null, body: Record<string, unknown>
-): Transport {
-  if (verb === "GET") return createTransport(urlParams, null, body);
-  if (formData) return createTransport(urlParams, formData, body);
-  return createJsonTransport(body);
-}
-
-function emitAllComponents(
-  components: Record<string, ComponentEntry>, transport: Transport
-): void {
-  if (Object.keys(components).length === 0) {
-    throw new Error(
-      "[alis] IncludeAll() executed but plan.components is empty. " +
-      "No components registered — check that builders call plan.AddToComponentsMap().");
-  }
-  for (const [bindingPath, comp] of Object.entries(components)) {
-    emitValue(bindingPath, evalRead(comp.id, comp.vendor, comp.readExpr), transport);
-  }
-}
-
+/**
+ * Resolve gather input into GatherResult (urlParams + body/FormData).
+ */
 export function resolveGather(
-  items: GatherItem[],
-  verb: string,
-  components: Record<string, ComponentEntry>,
-  contentType?: string,
-  evt?: Record<string, unknown>
+  input: RequestInput | undefined,
+  method: string,
+  plan: Plan,
+  ctx?: ExecContext,
 ): GatherResult {
   const urlParams: string[] = [];
-  const formData = contentType === "form-data" ? new FormData() : null;
   const body: Record<string, unknown> = {};
-  const transport = selectTransport(verb, urlParams, formData, body);
 
-  for (const g of items) {
-    switch (g.kind) {
-      case "component":
-        emitValue(g.name, evalRead(g.componentId, g.vendor, g.readExpr), transport);
-        break;
+  if (!input) return { urlParams, body };
 
-      case "static":
-        emitValue(g.param, g.value, transport);
-        break;
+  if (input.kind === "value") {
+    // ValueInput — evaluate the value producer directly
+    const value = evaluateValue(input.value, plan, ctx);
+    const formData = input.transport === "form-data" ? new FormData() : null;
+    const transport = selectTransport(input.transport, method, urlParams, formData, body);
 
-      case "event": {
-        const ctx = evt ? { evt } : {};
-        emitValue(g.param, walk(ctx, g.path), transport);
-        break;
+    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+      for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+        emitValue(key, val, transport);
       }
-
-      case "all":
-        emitAllComponents(components, transport);
-        break;
-
-      default:
-        assertNever(g, "gather item kind");
+    } else {
+      // Single value — emit as "value"
+      emitValue("value", value, transport);
     }
+
+    return { urlParams, body: formData ?? body };
+  }
+
+  // GatherInput — read component default values
+  const gatherInput = input as GatherInput;
+  const formData = gatherInput.transport === "form-data" ? new FormData() : null;
+  const transport = selectTransport(gatherInput.transport, method, urlParams, formData, body);
+
+  for (const field of gatherInput.components) {
+    const raw = readDefaultValue(plan, field.component);
+    const defaultShape = getDefaultShape(plan, field.component);
+    const value = applyShape(raw, defaultShape);
+    emitValue(field.key, value, transport);
   }
 
   return { urlParams, body: formData ?? body };
+}
+
+/** Get the default value's shape from the JsType. */
+function getDefaultShape(plan: Plan, componentKey: string): import("../types").Shape | undefined {
+  const jsType = getJsType(plan, componentKey);
+  return jsType.defaultValue?.shape;
 }
 
 function setNested(obj: Record<string, unknown>, key: string, value: unknown): void {

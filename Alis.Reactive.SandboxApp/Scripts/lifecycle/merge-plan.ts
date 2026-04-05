@@ -1,13 +1,14 @@
-import type { ComponentEntry, Entry, Plan } from "../types";
+// merge-plan.ts — Plan registry and merge logic.
+// V3 plans: types, components, behaviors. No old Entry/ComponentEntry types.
 
-type EnrichEntries = (entries: Entry[], components: Record<string, ComponentEntry>) => void;
-type WireEntries = (entries: Entry[], components: Record<string, ComponentEntry>, signal?: AbortSignal) => void;
-type UnwireFields = (fieldIds: string[]) => void;
+import type { Plan, Behavior } from "../types";
+
+type WireBehaviors = (behaviors: Behavior[], plan: Plan, signal?: AbortSignal) => void;
+type WireContainerValidation = (plan: Plan) => void;
 
 export interface MergeHooks {
-  enrichEntries: EnrichEntries;
-  wireEntries: WireEntries;
-  unwireFields: UnwireFields;
+  wireBehaviors: WireBehaviors;
+  wireContainerValidation: WireContainerValidation;
 }
 
 export class PlanRegistry {
@@ -15,8 +16,9 @@ export class PlanRegistry {
   private readonly rootPlanIds = new Set<string>();
   private readonly sourceOwners = new Map<string, string>();
   private readonly abortControllers = new Map<string, AbortController>();
-  private readonly sourceEntries = new Map<string, Entry[]>();
+  private readonly sourceBehaviors = new Map<string, Behavior[]>();
   private readonly sourceComponentKeys = new Map<string, string[]>();
+  private readonly sourceTypeKeys = new Map<string, string[]>();
 
   register(plan: Plan): void {
     this.plans.set(plan.planId, plan);
@@ -24,35 +26,45 @@ export class PlanRegistry {
   }
 
   add(incoming: Plan, hooks: MergeHooks): Plan {
-    const sourceId = incoming.sourceId;
-    const previousPlanId = sourceId ? this.sourceOwners.get(sourceId) : undefined;
+    const partId = incoming.partId;
+    const previousPlanId = partId ? this.sourceOwners.get(partId) : undefined;
 
-    if (sourceId && previousPlanId) {
-      this.removeSource(previousPlanId, sourceId, hooks.unwireFields);
+    if (partId && previousPlanId) {
+      this.removeSource(previousPlanId, partId);
     }
 
     let target = this.plans.get(incoming.planId);
     if (!target) {
-      target = { planId: incoming.planId, components: {}, entries: [] };
+      target = {
+        version: 3,
+        planId: incoming.planId,
+        types: {},
+        components: {},
+        behaviors: [],
+      };
       this.plans.set(incoming.planId, target);
     }
 
+    // Merge types
+    Object.assign(target.types, incoming.types);
+
+    // Merge components
     Object.assign(target.components, incoming.components);
 
-    if (target.entries.length > 0) {
-      hooks.enrichEntries(target.entries, target.components);
-    }
+    // Wire and merge behaviors
+    const abort = partId ? new AbortController() : undefined;
+    hooks.wireBehaviors(incoming.behaviors, target, abort?.signal);
+    target.behaviors.push(...incoming.behaviors);
 
-    const abort = sourceId ? new AbortController() : undefined;
-    hooks.enrichEntries(incoming.entries, target.components);
-    hooks.wireEntries(incoming.entries, target.components, abort?.signal);
-    target.entries.push(...incoming.entries);
+    // Wire container validation for new components
+    hooks.wireContainerValidation(target);
 
-    if (sourceId && abort) {
-      this.sourceOwners.set(sourceId, incoming.planId);
-      this.abortControllers.set(sourceId, abort);
-      this.sourceEntries.set(sourceId, [...incoming.entries]);
-      this.sourceComponentKeys.set(sourceId, Object.keys(incoming.components));
+    if (partId && abort) {
+      this.sourceOwners.set(partId, incoming.planId);
+      this.abortControllers.set(partId, abort);
+      this.sourceBehaviors.set(partId, [...incoming.behaviors]);
+      this.sourceComponentKeys.set(partId, Object.keys(incoming.components));
+      this.sourceTypeKeys.set(partId, Object.keys(incoming.types));
     }
 
     return target;
@@ -68,53 +80,58 @@ export class PlanRegistry {
     this.sourceOwners.clear();
     for (const abort of this.abortControllers.values()) abort.abort();
     this.abortControllers.clear();
-    this.sourceEntries.clear();
+    this.sourceBehaviors.clear();
     this.sourceComponentKeys.clear();
+    this.sourceTypeKeys.clear();
   }
 
-  private removeSource(planId: string, sourceId: string, unwireFields: UnwireFields): void {
+  private removeSource(planId: string, partId: string): void {
     const plan = this.plans.get(planId);
     if (!plan) {
-      this.clearTracking(sourceId);
+      this.clearTracking(partId);
       return;
     }
 
-    this.abortControllers.get(sourceId)?.abort();
+    this.abortControllers.get(partId)?.abort();
 
-    const oldEntries = this.sourceEntries.get(sourceId);
-    if (oldEntries) {
-      for (const entry of oldEntries) {
-        const idx = plan.entries.indexOf(entry);
-        if (idx >= 0) plan.entries.splice(idx, 1);
+    // Remove behaviors from this source
+    const oldBehaviors = this.sourceBehaviors.get(partId);
+    if (oldBehaviors) {
+      for (const behavior of oldBehaviors) {
+        const idx = plan.behaviors.indexOf(behavior);
+        if (idx >= 0) plan.behaviors.splice(idx, 1);
       }
     }
 
-    const oldKeys = this.sourceComponentKeys.get(sourceId);
+    // Remove components from this source
+    const oldKeys = this.sourceComponentKeys.get(partId);
     if (oldKeys) {
-      // Unwire live-clear for components being removed — their element IDs
-      // must be cleared from wiredFields so re-loaded partials get fresh wiring.
-      const fieldIds = oldKeys.map(key => plan.components[key]?.id).filter((id): id is string => !!id);
-      if (fieldIds.length > 0) unwireFields(fieldIds);
-
       for (const key of oldKeys) delete plan.components[key];
     }
 
-    this.clearTracking(sourceId);
+    // Remove types from this source
+    const oldTypeKeys = this.sourceTypeKeys.get(partId);
+    if (oldTypeKeys) {
+      for (const key of oldTypeKeys) delete plan.types[key];
+    }
 
-    if (!this.rootPlanIds.has(planId) && plan.entries.length === 0 && Object.keys(plan.components).length === 0) {
+    this.clearTracking(partId);
+
+    if (!this.rootPlanIds.has(planId) && plan.behaviors.length === 0 && Object.keys(plan.components).length === 0) {
       this.plans.delete(planId);
     }
   }
 
-  private clearTracking(sourceId: string): void {
-    this.sourceOwners.delete(sourceId);
-    this.abortControllers.delete(sourceId);
-    this.sourceEntries.delete(sourceId);
-    this.sourceComponentKeys.delete(sourceId);
+  private clearTracking(partId: string): void {
+    this.sourceOwners.delete(partId);
+    this.abortControllers.delete(partId);
+    this.sourceBehaviors.delete(partId);
+    this.sourceComponentKeys.delete(partId);
+    this.sourceTypeKeys.delete(partId);
   }
 }
 
-// ── Singleton + delegating exports (backward-compatible API) ──
+// -- Singleton + delegating exports --
 
 const registry = new PlanRegistry();
 
@@ -124,14 +141,17 @@ export function composeInitialPlans(plans: Plan[]): Plan[] {
     const existing = byPlanId.get(plan.planId);
     if (!existing) {
       byPlanId.set(plan.planId, {
+        version: 3,
         planId: plan.planId,
+        types: { ...plan.types },
         components: { ...plan.components },
-        entries: [...plan.entries],
+        behaviors: [...plan.behaviors],
       });
       continue;
     }
+    Object.assign(existing.types, plan.types);
     Object.assign(existing.components, plan.components);
-    existing.entries.push(...plan.entries);
+    existing.behaviors.push(...plan.behaviors);
   }
   return Array.from(byPlanId.values());
 }

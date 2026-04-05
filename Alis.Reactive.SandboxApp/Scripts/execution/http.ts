@@ -1,7 +1,12 @@
-import type { RequestDescriptor, StatusHandler, ExecContext } from "../types";
+// http.ts — HTTP request execution using V3 Request type.
+// Uses the SHARED resolver via gather.ts for value gathering.
+// Supports before/success/error/complete handlers and chained requests.
+
+import type { Request, ResponseHandler, Plan, Reaction } from "../types";
+import type { ExecContext } from "../types";
 import { resolveGather, type GatherResult } from "./gather";
-import { executeCommands } from "./commands";
 import { executeReaction } from "./execute";
+import { validateContainer } from "../validation";
 import { scope } from "../core/trace";
 
 const log = scope("http");
@@ -11,16 +16,16 @@ interface ResolvedFetch {
   readonly init: RequestInit;
 }
 
-function buildFetch(req: RequestDescriptor, gatherResult: GatherResult): ResolvedFetch {
+function buildFetch(req: Request, gatherResult: GatherResult): ResolvedFetch {
   let url = req.url;
-  const init: RequestInit = { method: req.verb };
+  const init: RequestInit = { method: req.method };
 
   if (gatherResult.urlParams.length > 0) {
     const sep = url.includes("?") ? "&" : "?";
     url = url + sep + gatherResult.urlParams.join("&");
   }
 
-  if (req.verb !== "GET") {
+  if (req.method !== "GET") {
     if (gatherResult.body instanceof FormData) {
       init.body = gatherResult.body;
     } else if (Object.keys(gatherResult.body).length > 0) {
@@ -32,47 +37,67 @@ function buildFetch(req: RequestDescriptor, gatherResult: GatherResult): Resolve
   return { url, init };
 }
 
-/** Execute a single HTTP request with gather, whileLoading, response routing, and chaining. */
-export async function execRequest(req: RequestDescriptor, ctx?: ExecContext): Promise<void> {
+/** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
+export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
   try {
-    // 1. WhileLoading
-    if (req.whileLoading) {
-      executeCommands(req.whileLoading, ctx);
+    // 1. Validation gate (if container specified)
+    if (req.container) {
+      const valid = validateContainer(plan, req.container, ctx);
+      if (!valid) {
+        log.debug("validation failed, aborting request");
+        return;
+      }
     }
 
-    // 2. Gather → freeze
-    const gatherResult = resolveGather(req.gather ?? [], req.verb, ctx?.components ?? {}, req.contentType, ctx?.evt);
+    // 2. Before reactions
+    if (req.before) {
+      for (const r of req.before) {
+        await executeReaction(r, plan, ctx);
+      }
+    }
+
+    // 3. Gather -> freeze
+    const gatherResult = resolveGather(req.input, req.method, plan, ctx);
     const resolved = buildFetch(req, gatherResult);
 
-    log.debug("fetch", { verb: req.verb, url: resolved.url });
+    log.debug("fetch", { method: req.method, url: resolved.url });
 
-    // 3. Fetch
+    // 4. Fetch
     const response = await fetch(resolved.url, resolved.init);
 
-    // 4. Route response
+    // 5. Route response
     const body = await readResponseBody(response);
     if (response.ok) {
-      const successCtx: ExecContext = body != null ? { ...ctx, responseBody: body } : ctx ?? {};
-      await routeHandlers(req.onSuccess, response.status, successCtx);
+      const successCtx: ExecContext = { ...ctx, response: body ?? undefined };
+      await routeHandlers(req.success, response.status, plan, successCtx);
     } else {
-      const errorCtx: ExecContext = {
-        ...ctx,
-        responseBody: body ?? undefined,
-        validationDesc: req.validation,
-      };
-      await routeHandlers(req.onError, response.status, errorCtx);
+      const errorCtx: ExecContext = { ...ctx, response: body ?? undefined };
+      await routeHandlers(req.error, response.status, plan, errorCtx);
+      runComplete(req, plan, ctx);
       return; // no chained on error
     }
   } catch (err) {
     const status = err instanceof TypeError ? 0 : -1;
     log.error(status === 0 ? "network error" : "client error", { url: req.url, error: String(err) });
-    await routeHandlers(req.onError, status, ctx);
+    await routeHandlers(req.error, status, plan, ctx);
+    runComplete(req, plan, ctx);
     return; // no chained on error
   }
 
-  // 5. Chained — only after success
-  if (req.chained) {
-    await execRequest(req.chained, ctx);
+  // 6. Complete
+  runComplete(req, plan, ctx);
+
+  // 7. Chained — only after success
+  if (req.next) {
+    await executeRequest(req.next, plan, ctx);
+  }
+}
+
+async function runComplete(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
+  if (req.complete) {
+    for (const r of req.complete) {
+      await executeReaction(r, plan, ctx);
+    }
   }
 }
 
@@ -84,29 +109,27 @@ async function readResponseBody(response: Response): Promise<unknown> {
   return null;
 }
 
-export async function routeHandlers(handlers: StatusHandler[] | undefined, status: number, ctx?: ExecContext): Promise<void> {
+export async function routeHandlers(
+  handlers: ResponseHandler[] | undefined,
+  status: number,
+  plan: Plan,
+  ctx?: ExecContext,
+): Promise<void> {
   if (!handlers || handlers.length === 0) return;
 
+  // First pass: exact status match
   for (const h of handlers) {
-    if (h.statusCode != null && h.statusCode === status) {
-      await executeHandler(h, ctx);
+    if (h.status != null && h.status === status) {
+      await executeReaction(h.reaction, plan, ctx);
       return;
     }
   }
 
+  // Second pass: default handler (no status)
   for (const h of handlers) {
-    if (h.statusCode == null) {
-      await executeHandler(h, ctx);
+    if (h.status == null) {
+      await executeReaction(h.reaction, plan, ctx);
       return;
     }
   }
 }
-
-async function executeHandler(h: StatusHandler, ctx?: ExecContext): Promise<void> {
-  if (h.reaction) {
-    await executeReaction(h.reaction, ctx);
-  } else if (h.commands) {
-    executeCommands(h.commands, ctx);
-  }
-}
-

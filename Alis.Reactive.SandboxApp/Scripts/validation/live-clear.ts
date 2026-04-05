@@ -1,66 +1,60 @@
 // Live Validation — Per-field event wiring for interactive validation
-//
-// After the first form submit shows errors:
-//   input  → clear the error (user is typing, positive feedback)
-//   blur   → re-validate this field (user left the field, check if fix is valid)
-//   change → re-validate this field (radio/checkbox/select/SF — selection IS the action)
-//
-// Standard pattern: jQuery Unobtrusive, React Hook Form, Angular Forms.
-// Vendor-agnostic: uses resolveRoot() for both native and fusion components.
-// Tracks wired fields by ID to prevent double-wiring on partial merge.
+// V3: reads from ContainerScope on plan.components[containerKey].container.
+// Uses SHARED resolver for vendor root resolution.
 
-import type { ValidationDescriptor, ValidationField } from "../types";
-import { resolveRoot } from "../resolution/component";
+import type { Plan, Component, ContainerScope } from "../types";
+import { resolveVendorRoot, getJsType } from "../resolution/resolver";
 import { clearInline } from "./error-display";
-import { revalidateField } from "./orchestrator";
 import { scope } from "../core/trace";
 
 const log = scope("live-clear");
 
-/** Set of fieldIds already wired — prevents double-wiring on partial reload. */
+/** Set of componentDomIds already wired — prevents double-wiring on partial reload. */
 const wiredFields = new Set<string>();
 
-export function wireLiveValidation(desc: ValidationDescriptor): void {
-  for (const field of desc.fields) {
-    wireField(desc, field);
+/**
+ * Wire live validation for all components in a container scope.
+ * containerKey identifies the component that holds the ContainerScope.
+ */
+export function wireLiveValidation(plan: Plan, containerKey: string): void {
+  const containerComp = plan.components[containerKey];
+  if (!containerComp?.container) return;
+
+  const containerId = containerComp.id;
+  const containerScope = containerComp.container;
+
+  if (!containerScope.validationRules) return;
+
+  for (const cv of containerScope.validationRules) {
+    const comp = plan.components[cv.component];
+    if (!comp) continue;
+    wireField(plan, containerId, cv.component, comp);
   }
 }
 
-function wireField(desc: ValidationDescriptor, field: ValidationField): void {
-  // Only wire enriched fields — unenriched fields have no component to listen on
-  if (!field.fieldId || !field.vendor) return;
+function wireField(plan: Plan, containerId: string, componentKey: string, comp: Component): void {
+  if (wiredFields.has(comp.id)) return;
 
-  // Already wired — skip (partial reload dedup)
-  if (wiredFields.has(field.fieldId)) return;
+  const el = document.getElementById(comp.id);
+  if (!el) return;
 
-  const el = document.getElementById(field.fieldId);
-  if (!el) return; // Element not in DOM yet — do NOT mark as wired so retry can attach
+  wiredFields.add(comp.id);
 
-  wiredFields.add(field.fieldId);
+  const clearHandler = () => clearInline(containerId, comp.id);
 
-  const clearHandler = () => clearInline(desc.formId, field);
-  const revalidateHandler = () => revalidateField(desc, field);
-
-  if (field.vendor === "native") {
-    // input → clear error (typing feedback)
-    // blur → re-validate (left the field)
-    // change → re-validate (radio/checkbox/select — selection is the action)
+  if (comp.vendor === "native") {
     el.addEventListener("input", clearHandler);
-    el.addEventListener("blur", revalidateHandler);
-    el.addEventListener("change", revalidateHandler);
+    el.addEventListener("blur", clearHandler);
+    el.addEventListener("change", clearHandler);
   } else {
     // Fusion (and future vendors): listen on the vendor root
-    // SF ej2 instances implement addEventListener for their callbacks
-    // SF "change" fires when user makes a selection — equivalent to blur
-    const root = resolveRoot(el, field.vendor);
-    (root as EventTarget).addEventListener("change", revalidateHandler);
+    try {
+      const root = resolveVendorRoot(el, comp.vendor);
+      (root as EventTarget).addEventListener("change", clearHandler);
+    } catch {
+      // Component not yet initialized — skip, will be wired on merge
+    }
   }
-}
-
-/** Remove field IDs from the wired set — called when a source is removed during partial reload. */
-export function unwireFields(fieldIds: string[]): void {
-  for (const id of fieldIds) wiredFields.delete(id);
-  if (fieldIds.length > 0) log.debug("unwired", { count: fieldIds.length, fieldIds });
 }
 
 /** Reset for tests — clears the wired set so tests start clean. */

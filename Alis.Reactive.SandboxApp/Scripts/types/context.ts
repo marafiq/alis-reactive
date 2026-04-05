@@ -1,10 +1,13 @@
-import type { Component } from "./plan";
-
-export type EventPayload = Record<string, unknown>;
+// ExecContext — carries execution-scoped data through the reaction tree.
+// Each payload scope maps to a concrete runtime value.
 
 export interface ExecContext {
-  readonly planId: string;
-  readonly types: import("./plan").Plan["types"];
-  readonly components: Record<string, Component>;
-  readonly payload?: Record<string, unknown>;
+  /** The triggering event payload (component event args, custom event detail, SSE/SignalR message). */
+  readonly event?: unknown;
+  /** The HTTP response body (set by request handler on success/error). */
+  readonly response?: unknown;
+  /** The gathered request body (set before HTTP fetch). */
+  readonly request?: unknown;
+  /** Local scratch data for intermediate computation. */
+  readonly local?: Record<string, unknown>;
 }

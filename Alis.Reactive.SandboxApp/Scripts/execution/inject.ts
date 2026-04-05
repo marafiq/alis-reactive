@@ -1,3 +1,6 @@
+// inject.ts — Inject HTML into a container.
+// Extracts any <script data-reactive-plan> elements and merges them.
+
 import type { Plan } from "../types";
 import { mergePlan } from "../lifecycle/boot";
 
@@ -25,10 +28,10 @@ export function injectHtml(container: HTMLElement, html: string): void {
     container.append(...Array.from(temp.childNodes));
   }
 
-  // Merge extracted plans into booted plans (sourceId = container ID for dedup on reload)
+  // Merge extracted plans into booted plans (partId = container ID for dedup on reload)
   for (const plan of plans) {
     if (container.id) {
-      plan.sourceId = container.id;
+      plan.partId = container.id;
     }
     mergePlan(plan);
   }

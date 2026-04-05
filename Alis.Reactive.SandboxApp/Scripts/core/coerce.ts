@@ -10,6 +10,8 @@
 //
 // Open/Closed: new coercion type = one case + one function. Zero consumer changes.
 
+import type { Shape } from "../types";
+
 export type CoercionType = "string" | "number" | "boolean" | "date" | "raw" | "array";
 
 /** Discriminated union — caller MUST check .ok before using .value. */
@@ -168,4 +170,36 @@ export function toArray(value: unknown): CoerceResult<unknown[]> {
     );
   }
   return ok([value]);
+}
+
+// ── Shape-based coercion ─────────────────────────────────
+
+/**
+ * Map a Shape to a CoercionType for backward compatibility with existing coerce().
+ * Used when the V3 schema specifies shape and we need the coercion behavior.
+ */
+export function shapeToCoercionType(shape: Shape): CoercionType {
+  switch (shape.kind) {
+    case "string":   return "string";
+    case "number":   return "number";
+    case "boolean":  return "boolean";
+    case "date":     return "date";
+    case "raw":      return "raw";
+    case "any":      return "raw";
+    case "array":    return "array";
+    case "object":   return "raw";
+    case "nullable": return shapeToCoercionType(shape.inner);
+  }
+}
+
+/**
+ * Apply a Shape to a raw value — coerces to the shape's target type.
+ * Returns the coerced value or the raw value if no shape is specified.
+ */
+export function applyShape(value: unknown, shape?: Shape): unknown {
+  if (!shape) return value;
+  if (value == null && shape.kind === "nullable") return null;
+  const type = shapeToCoercionType(shape);
+  const result = coerce(value, type);
+  return result.ok ? result.value : value;
 }

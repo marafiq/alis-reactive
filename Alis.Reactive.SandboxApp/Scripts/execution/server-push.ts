@@ -1,6 +1,9 @@
-import type { ServerPushTrigger, Reaction, ComponentEntry } from "../types";
+// server-push.ts — SSE (EventSource) trigger wiring.
+// Uses V3 ServerPushTrigger. No old types.
+
+import type { ServerPushTrigger, Reaction, Plan } from "../types";
 import { executeReaction } from "./execute";
-import { showRetryIndicators, removeRetryIndicators, firstMutationTarget } from "./retry-indicator";
+import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
 import { scope } from "../core/trace";
 
 const log = scope("server-push");
@@ -8,7 +11,7 @@ const log = scope("server-push");
 interface WiredEntry {
   readonly trigger: ServerPushTrigger;
   readonly reaction: Reaction;
-  readonly components?: Record<string, ComponentEntry>;
+  readonly plan: Plan;
 }
 
 interface ManagedSource {
@@ -25,11 +28,8 @@ function retrySSE(url: string, entries: readonly WiredEntry[]): void {
   removeRetryIndicators(url);
   log.info("manual retry", { url });
 
-  // Re-wire all triggers — creates a fresh EventSource and re-registers handlers.
-  // Signal is intentionally omitted — the original abort context is no longer
-  // meaningful for a fresh connection after manual retry.
   for (const entry of entries) {
-    wireServerPush(entry.trigger, entry.reaction, entry.components);
+    wireServerPush(entry.trigger, entry.reaction, entry.plan);
   }
 }
 
@@ -81,30 +81,21 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
 export function wireServerPush(
   trigger: ServerPushTrigger,
   reaction: Reaction,
-  components?: Record<string, ComponentEntry>,
-  signal?: AbortSignal
+  plan: Plan,
+  signal?: AbortSignal,
 ): void {
   const managed = getOrCreate(trigger.url, signal);
 
-  // Track the first target element for retry indicator placement
-  const target = firstMutationTarget(reaction);
-  if (target) managed.targetIds.add(target);
-
-  // Store wiring info for retry re-registration (signal omitted — see retrySSE)
-  managed.wired.push({ trigger, reaction, components });
+  managed.wired.push({ trigger, reaction, plan });
 
   const handler = (e: MessageEvent) => {
-    // Framework only supports JSON payloads — non-JSON is a server-side bug.
-    // Throw immediately so the developer fixes their SSE endpoint.
     const evt: Record<string, unknown> = JSON.parse(e.data);
-    log.debug("message", { url: trigger.url, eventType: trigger.eventType });
-    executeReaction(reaction, { evt, components }).catch(err =>
+    log.debug("message", { url: trigger.url, event: trigger.event });
+    executeReaction(reaction, plan, { event: evt }).catch(err =>
       log.error("reaction failed", { error: String(err) }));
   };
 
-  // Always use addEventListener — onmessage assignment overwrites previous handlers
-  // when multiple triggers share the same URL without an eventType.
-  const eventName = trigger.eventType ?? "message";
+  const eventName = trigger.event ?? "message";
   managed.es.addEventListener(eventName, handler as EventListener);
-  log.debug("listening", { url: trigger.url, eventType: eventName });
+  log.debug("listening", { url: trigger.url, event: eventName });
 }
