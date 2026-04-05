@@ -45,12 +45,11 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            var reaction = pb.BuildReaction();
-            if (!(reaction is SequenceReaction seq))
-                throw new InvalidOperationException(
-                    "WhileLoading only supports plain commands (sequential). " +
-                    "Conditions, HTTP, and parallel pipelines are not valid here.");
-            _whileLoading = seq.Steps;
+            // WhileLoading takes whatever steps the pipeline produced.
+            // Single steps (SetReaction from p.Element("x").Show()) are valid.
+            // Conditions/HTTP/Parallel inside WhileLoading remain rejected by
+            // PipelineBuilder mode validation — you can't nest HTTP inside WhileLoading.
+            _whileLoading = new List<Reaction>(pb.Steps);
             return this;
         }
 

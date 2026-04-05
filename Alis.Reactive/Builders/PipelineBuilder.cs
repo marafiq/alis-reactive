@@ -165,7 +165,7 @@ namespace Alis.Reactive.Builders
                     Steps.Count > 0 ? Steps : null),
                 PipelineMode.Http => BuildHttpReaction(),
                 PipelineMode.Conditional => Reaction.Branch(ConditionalBranches ?? new List<BranchCase>()),
-                _ => Steps.Count == 1 ? Steps[0] : Reaction.Sequence(Steps),
+                _ => Reaction.Sequence(Steps),
             };
         }
 

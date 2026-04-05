@@ -45,7 +45,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static Reaction SequenceOrSingle(List<Reaction> reactions)
         {
-            if (reactions.Count == 1) return reactions[0];
             return Sequence(reactions);
         }
     }
