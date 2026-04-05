@@ -4,12 +4,12 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     [System.Text.Json.Serialization.JsonConverter(typeof(WriteOnlyPolymorphicConverter<Source>))]
-    internal abstract class Source
+    public abstract class Source
     {
         private protected Source() { }
     }
 
-    internal sealed class ComponentSource : Source
+    public sealed class ComponentSource : Source
     {
         public string Kind => "component";
         public string Component { get; }
@@ -22,7 +22,7 @@ namespace Alis.Reactive.PlanModel
         internal static ComponentSource Of(string component) => new ComponentSource(component);
     }
 
-    internal sealed class PayloadSource : Source
+    public sealed class PayloadSource : Source
     {
         public string Kind => "payload";
         public string Scope { get; }

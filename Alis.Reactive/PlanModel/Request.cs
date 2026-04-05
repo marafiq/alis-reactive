@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Alis.Reactive.PlanModel
 {
-    internal sealed class Request
+    public sealed class Request
     {
         public string Method { get; }
         public string Url { get; }
@@ -34,12 +34,12 @@ namespace Alis.Reactive.PlanModel
         internal System.Type ValidatorType { get; set; }
     }
 
-    internal abstract class RequestInput
+    public abstract class RequestInput
     {
         private protected RequestInput() { }
     }
 
-    internal sealed class GatherInput : RequestInput
+    public sealed class GatherInput : RequestInput
     {
         public string Kind => "gather";
         public List<GatherField> Components { get; }
@@ -52,7 +52,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class ValueInput : RequestInput
+    public sealed class ValueInput : RequestInput
     {
         public string Kind => "value";
         public ValueProducer Value { get; }
@@ -65,7 +65,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class GatherField
+    public sealed class GatherField
     {
         public string Component { get; }
         public string Key { get; }
@@ -79,7 +79,7 @@ namespace Alis.Reactive.PlanModel
         internal static GatherField Of(string component, string key) => new GatherField(component, key);
     }
 
-    internal sealed class ResponseHandler
+    public sealed class ResponseHandler
     {
         public int? Status { get; set; }
         public Reaction Reaction { get; }

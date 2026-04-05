@@ -6,7 +6,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     [JsonConverter(typeof(WriteOnlyPolymorphicConverter<Reaction>))]
-    internal abstract class Reaction
+    public abstract class Reaction
     {
         private protected Reaction() { }
 
@@ -50,7 +50,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class SequenceReaction : Reaction
+    public sealed class SequenceReaction : Reaction
     {
         public string Kind => "sequence";
         public List<Reaction> Steps { get; }
@@ -58,7 +58,7 @@ namespace Alis.Reactive.PlanModel
         internal SequenceReaction(List<Reaction> steps) { Steps = steps; }
     }
 
-    internal sealed class ParallelReaction : Reaction
+    public sealed class ParallelReaction : Reaction
     {
         public string Kind => "parallel";
         public List<Reaction> Steps { get; }
@@ -71,7 +71,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class BranchReaction : Reaction
+    public sealed class BranchReaction : Reaction
     {
         public string Kind => "branch";
         public List<BranchCase> Cases { get; }
@@ -79,7 +79,7 @@ namespace Alis.Reactive.PlanModel
         internal BranchReaction(List<BranchCase> cases) { Cases = cases; }
     }
 
-    internal sealed class BranchCase
+    public sealed class BranchCase
     {
         public Condition When { get; }
         public Reaction Reaction { get; }
@@ -94,7 +94,7 @@ namespace Alis.Reactive.PlanModel
         internal static BranchCase Default(Reaction reaction) => new BranchCase(null, reaction);
     }
 
-    internal sealed class SetReaction : Reaction
+    public sealed class SetReaction : Reaction
     {
         public string Kind => "set";
         public Source On { get; }
@@ -109,7 +109,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class CallReaction : Reaction
+    public sealed class CallReaction : Reaction
     {
         public string Kind => "call";
         public Source On { get; }
@@ -124,7 +124,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class RequestReaction : Reaction
+    public sealed class RequestReaction : Reaction
     {
         public string Kind => "request";
         public Request Request { get; }
@@ -132,7 +132,7 @@ namespace Alis.Reactive.PlanModel
         internal RequestReaction(Request request) { Request = request; }
     }
 
-    internal sealed class DispatchReaction : Reaction
+    public sealed class DispatchReaction : Reaction
     {
         public string Kind => "dispatch";
         public string Event { get; }
@@ -147,7 +147,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class InjectReaction : Reaction
+    public sealed class InjectReaction : Reaction
     {
         public string Kind => "inject";
         public string Component { get; }
@@ -160,7 +160,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class ShowValidationErrorsReaction : Reaction
+    public sealed class ShowValidationErrorsReaction : Reaction
     {
         public string Kind => "show-validation-errors";
         public string Container { get; }

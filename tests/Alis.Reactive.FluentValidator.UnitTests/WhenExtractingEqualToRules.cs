@@ -11,7 +11,7 @@ public class WhenExtractingEqualToRules
         var desc = _adapter.ExtractRules(typeof(EqualToValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var field = desc!.Fields.First(f => f.FieldName == "ConfirmEmail");
+        var field = desc.First(f => f.FieldName == "ConfirmEmail");
         var equalRule = field.Rules.First(r => r.Rule == "equalTo");
         Assert.That(equalRule.Field, Is.EqualTo("Email"));
         Assert.That(equalRule.Constraint, Is.Null);
@@ -23,7 +23,7 @@ public class WhenExtractingEqualToRules
         var desc = _adapter.ExtractRules(typeof(EqualToWithCustomMessageValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var field = desc!.Fields.First(f => f.FieldName == "ConfirmEmail");
+        var field = desc.First(f => f.FieldName == "ConfirmEmail");
         var equalRule = field.Rules.First(r => r.Rule == "equalTo");
         Assert.That(equalRule.Message, Is.EqualTo("Emails must match."));
         Assert.That(equalRule.Field, Is.EqualTo("Email"));

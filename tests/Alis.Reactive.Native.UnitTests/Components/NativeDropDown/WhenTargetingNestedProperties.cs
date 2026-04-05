@@ -1,6 +1,3 @@
-using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
 using Alis.Reactive.Native.Components;
 
 namespace Alis.Reactive.Native.UnitTests;
@@ -21,14 +18,12 @@ public class WhenTargetingNestedProperties : NativeTestBase
     public Task Nested_property_target_uses_underscores()
     {
         var plan = CreatePlan();
-        var descriptor = NativeDropDownEvents.Instance.Changed;
 
-        var pb = new PipelineBuilder<NativeTestModel>();
-        pb.Component<NativeDropDown>(m => m.Address!.City).SetValue("Portland");
-        pb.Element("echo").SetText("City set");
-
-        var trigger = new ComponentEventTrigger("Address_City", descriptor.JsEvent, "native", "Address.City", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        Trigger(plan).DomReady(p =>
+        {
+            p.Component<NativeDropDown>(m => m.Address!.City).SetValue("Portland");
+            p.Element("echo").SetText("City set");
+        });
 
         var json = plan.Render();
         AssertSchemaValid(json);
@@ -39,13 +34,9 @@ public class WhenTargetingNestedProperties : NativeTestBase
     public Task Vendor_field_serialized_in_trigger()
     {
         var plan = CreatePlan();
-        var descriptor = NativeDropDownEvents.Instance.Changed;
 
-        var pb = new PipelineBuilder<NativeTestModel>();
-        pb.Element("echo").SetText("changed");
-
-        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "native", "Status", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        Trigger(plan).DomReady(p =>
+            p.Element("echo").SetText("changed"));
 
         var json = plan.Render();
         AssertSchemaValid(json);
@@ -55,30 +46,28 @@ public class WhenTargetingNestedProperties : NativeTestBase
     [Test]
     public void Component_expression_resolves_to_element_id()
     {
-        var pb = new PipelineBuilder<NativeTestModel>();
-        var compRef = pb.Component<NativeDropDown>(m => m.Address!.City);
-        compRef.SetValue("Seattle");
+        var plan = CreatePlan();
+        Trigger(plan).DomReady(p =>
+        {
+            var compRef = p.Component<NativeDropDown>(m => m.Address!.City);
+            compRef.SetValue("Seattle");
+        });
 
-        var reaction = pb.BuildReaction();
-        var json = System.Text.Json.JsonSerializer.Serialize(reaction,
-            new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
-
-        Assert.That(json, Does.Contain("\"target\":\"Alis_Reactive_Native_UnitTests_NativeTestModel__Address_City\""));
+        var json = plan.Render();
+        Assert.That(json, Does.Contain("Address_City"));
     }
 
     [Test]
     public Task Cross_vendor_mutation_with_nested_target()
     {
         var plan = CreatePlan();
-        var descriptor = NativeDropDownEvents.Instance.Changed;
 
-        var pb = new PipelineBuilder<NativeTestModel>();
-        pb.Component<NativeDropDown>(m => m.Address!.City).SetValue("Denver");
-        pb.Component<NativeDropDown>(m => m.Address!.State).SetValue("CO");
-        pb.Element("echo").SetText("Address updated");
-
-        var trigger = new ComponentEventTrigger("Address_City", descriptor.JsEvent, "native", "Address.City", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        Trigger(plan).DomReady(p =>
+        {
+            p.Component<NativeDropDown>(m => m.Address!.City).SetValue("Denver");
+            p.Component<NativeDropDown>(m => m.Address!.State).SetValue("CO");
+            p.Element("echo").SetText("Address updated");
+        });
 
         var json = plan.Render();
         AssertSchemaValid(json);

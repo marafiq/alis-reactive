@@ -38,7 +38,7 @@ public abstract class FusionTestBase
 
     protected static ReactivePlan<FusionTestModel> CreatePlan() => new();
 
-    protected static TriggerBuilder<FusionTestModel> Trigger(ReactivePlan<FusionTestModel> plan) => new(plan);
+    protected static TriggerBuilder<FusionTestModel> Trigger(ReactivePlan<FusionTestModel> plan) => new(plan, plan.Context);
 
     protected static void AssertSchemaValid(string planJson)
     {

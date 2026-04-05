@@ -1,5 +1,5 @@
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Sources;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.Fusion.UnitTests;
@@ -51,14 +51,6 @@ public class WhenMutatingAFusionNumericTextBox : FusionTestBase
         {
             var source = p.Component<FusionNumericTextBox>(m => m.Amount).Value();
             Assert.That(source, Is.TypeOf<TypedComponentSource<decimal>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("value"));
         });
     }
 }

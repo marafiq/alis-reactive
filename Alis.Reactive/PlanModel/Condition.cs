@@ -6,7 +6,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     [JsonConverter(typeof(WriteOnlyPolymorphicConverter<Condition>))]
-    internal abstract class Condition
+    public abstract class Condition
     {
         private protected Condition() { }
 
@@ -26,7 +26,7 @@ namespace Alis.Reactive.PlanModel
             new ConfirmCondition(message);
     }
 
-    internal sealed class CompareCondition : Condition
+    public sealed class CompareCondition : Condition
     {
         public string Kind => "compare";
         public ValueProducer Left { get; }
@@ -45,7 +45,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class AllCondition : Condition
+    public sealed class AllCondition : Condition
     {
         public string Kind => "all";
         public List<Condition> Terms { get; }
@@ -56,7 +56,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class AnyCondition : Condition
+    public sealed class AnyCondition : Condition
     {
         public string Kind => "any";
         public List<Condition> Terms { get; }
@@ -67,7 +67,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class NotCondition : Condition
+    public sealed class NotCondition : Condition
     {
         public string Kind => "not";
         public Condition Term { get; }
@@ -78,7 +78,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class ConfirmCondition : Condition
+    public sealed class ConfirmCondition : Condition
     {
         public string Kind => "confirm";
         public string Message { get; }

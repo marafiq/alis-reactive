@@ -11,7 +11,7 @@ public class WhenExtractingClientConditionalRules
         var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var jobTitle = desc!.Fields.First(f => f.FieldName == "JobTitle");
+        var jobTitle = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitle.Rules, Has.Count.EqualTo(1));
         Assert.That(jobTitle.Rules[0].Rule, Is.EqualTo("required"));
         Assert.That(jobTitle.Rules[0].When, Is.Not.Null);
@@ -25,7 +25,7 @@ public class WhenExtractingClientConditionalRules
         var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var name = desc!.Fields.First(f => f.FieldName == "Name");
+        var name = desc.First(f => f.FieldName == "Name");
         Assert.That(name.Rules[0].Rule, Is.EqualTo("required"));
         Assert.That(name.Rules[0].When, Is.Null);
     }
@@ -37,12 +37,12 @@ public class WhenExtractingClientConditionalRules
 
         Assert.That(desc, Is.Not.Null);
 
-        var jobTitle = desc!.Fields.First(f => f.FieldName == "JobTitle");
+        var jobTitle = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitle.Rules.Count, Is.GreaterThanOrEqualTo(2));
         Assert.That(jobTitle.Rules.All(r => r.When != null), Is.True);
         Assert.That(jobTitle.Rules.All(r => r.When!.Field == "IsEmployed"), Is.True);
 
-        var salary = desc.Fields.First(f => f.FieldName == "Salary");
+        var salary = desc.First(f => f.FieldName == "Salary");
         Assert.That(salary.Rules[0].When, Is.Not.Null);
         Assert.That(salary.Rules[0].When!.Field, Is.EqualTo("IsEmployed"));
     }
@@ -53,7 +53,7 @@ public class WhenExtractingClientConditionalRules
         var desc = _adapter.ExtractRules(typeof(ReactiveEqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var email = desc!.Fields.First(f => f.FieldName == "Email");
+        var email = desc.First(f => f.FieldName == "Email");
         Assert.That(email.Rules[0].When, Is.Not.Null);
         Assert.That(email.Rules[0].When!.Field, Is.EqualTo("Name"));
         Assert.That(email.Rules[0].When.Op, Is.EqualTo("eq"));
@@ -66,7 +66,7 @@ public class WhenExtractingClientConditionalRules
         var desc = _adapter.ExtractRules(typeof(ReactiveMixedValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();
+        var fieldNames = desc.Select(f => f.FieldName).ToList();
 
         // Name (unconditional) and JobTitle (WhenField) should be present
         Assert.That(fieldNames, Does.Contain("Name"));
@@ -85,7 +85,7 @@ public class WhenExtractingClientConditionalRules
         // Verify each rule type has the IsEmployed condition
         void AssertConditionalRule(string fieldName, string expectedRule, string label)
         {
-            var field = desc!.Fields.FirstOrDefault(f => f.FieldName == fieldName);
+            var field = desc.FirstOrDefault(f => f.FieldName == fieldName);
             Assert.That(field, Is.Not.Null, $"{label}: field '{fieldName}' missing");
             var rule = field!.Rules.FirstOrDefault(r => r.Rule == expectedRule);
             Assert.That(rule, Is.Not.Null, $"{label}: rule '{expectedRule}' missing on '{fieldName}'");
@@ -113,7 +113,7 @@ public class WhenExtractingClientConditionalRules
         var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();
+        var fieldNames = desc.Select(f => f.FieldName).ToList();
         // IsEmployed must appear so the runtime can read its value
         Assert.That(fieldNames, Does.Contain("IsEmployed"));
     }

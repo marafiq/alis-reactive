@@ -9,15 +9,15 @@ namespace Alis.Reactive.PlanModel
     /// Shape-to-Shape conversion. One shared type used everywhere: JsType properties,
     /// ValueProducer reads, conditions, validation rules, gather.
     /// </summary>
-    internal sealed class Shape : IEquatable<Shape>
+    public sealed class Shape : IEquatable<Shape>
     {
-        internal static readonly Shape String = new("string");
-        internal static readonly Shape Number = new("number");
-        internal static readonly Shape Boolean = new("boolean");
-        internal static readonly Shape Date = new("date");
-        internal static readonly Shape Raw = new("raw");
-        internal static readonly Shape Any = new("any");
-        internal static readonly Shape None = new("none");
+        internal static readonly Shape String = new Shape("string");
+        internal static readonly Shape Number = new Shape("number");
+        internal static readonly Shape Boolean = new Shape("boolean");
+        internal static readonly Shape Date = new Shape("date");
+        internal static readonly Shape Raw = new Shape("raw");
+        internal static readonly Shape Any = new Shape("any");
+        internal static readonly Shape None = new Shape("none");
 
         internal static Shape ArrayOf(Shape item)
         {

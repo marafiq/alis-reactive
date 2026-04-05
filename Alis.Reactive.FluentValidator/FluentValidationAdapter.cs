@@ -8,6 +8,7 @@ using FluentValidation.Validators;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 using Alis.Reactive.FluentValidator.Validators;
+using ValidationRule = Alis.Reactive.Validation.ValidationRule;
 
 namespace Alis.Reactive.FluentValidator
 {

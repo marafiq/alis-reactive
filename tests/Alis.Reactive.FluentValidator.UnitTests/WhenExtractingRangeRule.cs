@@ -11,7 +11,7 @@ public class WhenExtractingRangeRule
         var desc = _adapter.ExtractRules(typeof(RangeValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var rule = desc!.Fields[0].Rules[0];
+        var rule = desc[0].Rules[0];
         Assert.That(rule.Rule, Is.EqualTo("range"));
 
         var constraint = rule.Constraint as object[];

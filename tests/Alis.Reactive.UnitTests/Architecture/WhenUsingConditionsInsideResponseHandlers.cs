@@ -2,7 +2,7 @@ namespace Alis.Reactive.UnitTests;
 
 /// <summary>
 /// Conditions inside OnSuccess/OnError response handlers use a nested PipelineBuilder.
-/// They produce conditional reactions within the StatusHandler, independent of the
+/// They produce conditional reactions within the ResponseHandler, independent of the
 /// outer pipeline's segmentation. Covers ElseIf chains, compound guards (And/Or),
 /// conditions in both OnSuccess and OnError, and chained HTTP stages.
 /// </summary>

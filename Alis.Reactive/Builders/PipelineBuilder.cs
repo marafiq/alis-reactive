@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
 {
-    public partial class PipelineBuilder<TModel> where TModel : class
+    public partial class PipelineBuilder<TModel> : IReactionEmitter where TModel : class
     {
         private enum PipelineMode { Sequential, Http, Parallel, Conditional }
 
@@ -23,6 +23,12 @@ namespace Alis.Reactive.Builders
         {
             Context = context;
         }
+
+        /// <inheritdoc />
+        void IReactionEmitter.AddStep(Reaction step) => Steps.Add(step);
+
+        /// <inheritdoc />
+        PlanBuildContext IReactionEmitter.BuildContext => Context;
 
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {

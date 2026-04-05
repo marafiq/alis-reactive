@@ -4,20 +4,20 @@ namespace Alis.Reactive.UnitTests;
 public class WhenEnforcingArchitectureRules
 {
     [Test]
-    public void All_descriptor_classes_are_sealed()
+    public void All_plan_model_classes_are_sealed()
     {
         var assembly = typeof(ReactivePlan<>).Assembly;
-        var descriptorNamespace = "Alis.Reactive.Descriptors";
+        var planModelNamespace = "Alis.Reactive.PlanModel";
 
         var unsealed = assembly.GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && !t.IsNested
-                        && t.Namespace != null && t.Namespace.StartsWith(descriptorNamespace))
+                        && t.Namespace != null && t.Namespace.StartsWith(planModelNamespace))
             .Where(t => !t.IsSealed)
             .Select(t => t.FullName)
             .ToList();
 
         Assert.That(unsealed, Is.Empty,
-            $"Unsealed descriptor classes: {string.Join(", ", unsealed)}");
+            $"Unsealed plan model classes: {string.Join(", ", unsealed)}");
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class WhenEnforcingArchitectureRules
         ReactivePlanConfig.Reset();
 
         var plan = new ReactivePlan<TestModel>();
-        var trigger = new Builders.TriggerBuilder<TestModel>(plan);
+        var trigger = new Builders.TriggerBuilder<TestModel>(plan, plan.Context);
         trigger.DomReady(p =>
         {
             p.Post("/api/save")
@@ -58,9 +58,9 @@ public class WhenEnforcingArchitectureRules
 
     private class DummyExtractor : Validation.IValidationExtractor
     {
-        public Validation.ValidationDescriptor? ExtractRules(Type validatorType, string formId)
+        public List<Validation.ValidationField> ExtractRules(Type validatorType, string formId)
         {
-            return null;
+            return new List<Validation.ValidationField>();
         }
     }
 }

@@ -19,7 +19,7 @@ public class WhenTriggeringOnCustomEventWithAllSupportedTypes : PlanTestBase
     public Task Payload_contains_all_primitive_types()
     {
         var plan = new ReactivePlan<CustomEventWithAllSupportedTypes>();
-        var trigger = new Builders.TriggerBuilder<CustomEventWithAllSupportedTypes>(plan);
+        var trigger = new Builders.TriggerBuilder<CustomEventWithAllSupportedTypes>(plan, plan.Context);
 
         trigger.CustomEvent<CustomEventWithAllSupportedTypes>("data-sync", (payload, p) =>
         {

@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    internal sealed class PathSegment
+    public sealed class PathSegment
     {
         public string Kind { get; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -28,7 +28,7 @@ namespace Alis.Reactive.PlanModel
             new PathSegment("index", null, index);
     }
 
-    internal sealed class Path
+    public sealed class Path
     {
         internal static readonly Path None = new Path(Array.Empty<PathSegment>());
 

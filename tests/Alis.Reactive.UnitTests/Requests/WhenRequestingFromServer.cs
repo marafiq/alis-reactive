@@ -77,7 +77,7 @@ public class WhenRequestingFromServer : PlanTestBase
              );
         }).Render());
 
-    // ── Schema validation for all HTTP patterns ──
+    // -- Schema validation for all HTTP patterns --
 
     [Test]
     public void Get_request_conforms_to_schema()
@@ -139,24 +139,13 @@ public class WhenRequestingFromServer : PlanTestBase
         AssertSchemaValid(plan.Render());
     }
 
-    // ── Validation descriptor in plan ──
+    // -- Validation with Validate<TValidator> --
 
     [Test]
-    public Task Post_with_validation_includes_descriptor() =>
+    public Task Post_with_validation_includes_container() =>
         VerifyJson(Build(p =>
             p.Post("/api/save", g => g.Static("name", "test"))
-             .Validate(new Validation.ValidationDescriptor("testForm", new List<Validation.ValidationField>
-             {
-                 new("Name", new List<Validation.ValidationRule>
-                 {
-                     new("required", "Name is required"),
-                 }),
-                 new("Email", new List<Validation.ValidationRule>
-                 {
-                     new("required", "Email is required"),
-                     new("email", "Must be a valid email"),
-                 }),
-             }))
+             .Validate<FakeServerValidator>("testForm")
              .Response(r => r
                 .OnSuccess(s => s.Element("result").SetText("saved"))
                 .OnError(400, e => e.ValidationErrors("testForm")))
@@ -168,18 +157,14 @@ public class WhenRequestingFromServer : PlanTestBase
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
             p.Post("/api/save", g => g.Static("name", "test"))
-             .Validate(new Validation.ValidationDescriptor("testForm", new List<Validation.ValidationField>
-             {
-                 new("Name", new List<Validation.ValidationRule>
-                 {
-                     new("required", "Name is required"),
-                 }),
-             }))
+             .Validate<FakeServerValidator>("testForm")
              .Response(r => r
                 .OnSuccess(s => s.Element("x").SetText("ok"))
                 .OnError(400, e => e.ValidationErrors("testForm"))));
         AssertSchemaValid(plan.Render());
     }
+
+    private class FakeServerValidator { }
 
     private static ReactivePlan<TestModel> Build(Action<Builders.PipelineBuilder<TestModel>> pipeline)
     {

@@ -1,5 +1,5 @@
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors.Reactions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.UnitTests;
 
@@ -22,9 +22,9 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
     // ═══════════════════════════════════════════════════════════
 
     [Test]
-    public void Two_when_blocks_produce_two_conditional_reactions()
+    public void Two_when_blocks_produce_two_reactions()
     {
-        var pb = new PipelineBuilder<TestModel>();
+        var pb = new PipelineBuilder<TestModel>(new PlanBuildContext(Plan.Create("test"), new Dictionary<string, ComponentRegistration>()));
         var payload = new SegmentPayload();
         pb.When(payload, (SegmentPayload x) => x.Name).Eq("a")
             .Then(t => t.Element("r1").SetText("first"));
@@ -33,8 +33,8 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
 
         var reactions = pb.BuildReactions();
         Assert.That(reactions, Has.Count.EqualTo(2));
-        Assert.That(reactions[0], Is.InstanceOf<ConditionalReaction>());
-        Assert.That(reactions[1], Is.InstanceOf<ConditionalReaction>());
+        Assert.That(reactions[0], Is.InstanceOf<BranchReaction>());
+        Assert.That(reactions[1], Is.InstanceOf<BranchReaction>());
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -44,7 +44,7 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
     [Test]
     public void BuildReaction_throws_when_multiple_segments_exist()
     {
-        var pb = new PipelineBuilder<TestModel>();
+        var pb = new PipelineBuilder<TestModel>(new PlanBuildContext(Plan.Create("test"), new Dictionary<string, ComponentRegistration>()));
         var payload = new SegmentPayload();
         pb.When(payload, (SegmentPayload x) => x.Name).Eq("a")
             .Then(t => t.Element("r1").SetText("first"));
@@ -52,35 +52,35 @@ public class WhenEnforcingBuildReactionContract : PlanTestBase
             .Then(t => t.Element("r2").SetText("second"));
 
         var ex = Assert.Throws<InvalidOperationException>(() => pb.BuildReaction());
-        Assert.That(ex!.Message, Does.Contain("BuildReactions()"));
+        Assert.That(ex!.Message, Does.Contain("BuildReaction()"));
         Assert.That(ex.Message, Does.Contain("2"),
             "Error message should include the actual segment count");
     }
 
     [Test]
-    public void Single_conditional_segment_returns_conditional_reaction()
+    public void Single_conditional_segment_returns_branch_reaction()
     {
-        var pb = new PipelineBuilder<TestModel>();
+        var pb = new PipelineBuilder<TestModel>(new PlanBuildContext(Plan.Create("test"), new Dictionary<string, ComponentRegistration>()));
         var payload = new SegmentPayload();
         pb.When(payload, (SegmentPayload x) => x.Name).Eq("a")
             .Then(t => t.Element("r1").SetText("matched"));
 
         var reaction = pb.BuildReaction();
-        Assert.That(reaction, Is.InstanceOf<ConditionalReaction>());
+        Assert.That(reaction, Is.InstanceOf<BranchReaction>());
     }
 
     [Test]
-    public void Sequential_commands_return_sequential_reaction_with_correct_count()
+    public void Sequential_commands_return_sequence_reaction_with_correct_count()
     {
-        var pb = new PipelineBuilder<TestModel>();
+        var pb = new PipelineBuilder<TestModel>(new PlanBuildContext(Plan.Create("test"), new Dictionary<string, ComponentRegistration>()));
         pb.Element("a").SetText("one");
         pb.Element("b").SetText("two");
         pb.Dispatch("done");
 
         var reaction = pb.BuildReaction();
-        Assert.That(reaction, Is.InstanceOf<SequentialReaction>());
-        var seq = (SequentialReaction)reaction;
-        Assert.That(seq.Commands, Has.Count.EqualTo(3));
+        Assert.That(reaction, Is.InstanceOf<SequenceReaction>());
+        var seq = (SequenceReaction)reaction;
+        Assert.That(seq.Steps, Has.Count.EqualTo(3));
     }
 
     // ═══════════════════════════════════════════════════════════

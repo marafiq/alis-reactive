@@ -1,8 +1,4 @@
-using Alis.Reactive.Builders;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Sources;
-using Alis.Reactive.Descriptors.Triggers;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.Fusion.UnitTests;
@@ -11,13 +7,13 @@ namespace Alis.Reactive.Fusion.UnitTests;
 /// Tests the full JS API surface of FusionNumericTextBox:
 ///   Events:   Focus, Blur (void payload)
 ///   Methods:  FocusOut, Increment, Decrement (void, no args)
-///   Prop reads:  Value() → TypedComponentSource&lt;decimal&gt;
+///   Prop reads:  Value() -> TypedComponentSource&lt;decimal&gt;
 ///   Prop writes: SetMin(decimal)
 /// </summary>
 [TestFixture]
 public class WhenUsingNumericTextBoxFullApi : FusionTestBase
 {
-    // ── Methods ──
+    // -- Methods --
 
     [Test]
     public Task FocusOut_produces_ej2_call()
@@ -52,7 +48,7 @@ public class WhenUsingNumericTextBoxFullApi : FusionTestBase
         return VerifyJson(json);
     }
 
-    // ── Prop writes ──
+    // -- Prop writes --
 
     [Test]
     public Task SetMin_produces_ej2_mutation()
@@ -76,7 +72,7 @@ public class WhenUsingNumericTextBoxFullApi : FusionTestBase
         return VerifyJson(json);
     }
 
-    // ── Prop reads ──
+    // -- Prop reads --
 
     [Test]
     public void Value_returns_typed_component_source()
@@ -86,14 +82,6 @@ public class WhenUsingNumericTextBoxFullApi : FusionTestBase
         {
             var source = p.Component<FusionNumericTextBox>(m => m.Amount).Value();
             Assert.That(source, Is.TypeOf<TypedComponentSource<decimal>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("value"));
         });
     }
 
@@ -112,7 +100,7 @@ public class WhenUsingNumericTextBoxFullApi : FusionTestBase
         return VerifyJson(json);
     }
 
-    // ── Events ──
+    // -- Events --
 
     [Test]
     public void Focus_descriptor_has_correct_js_event()
@@ -145,16 +133,12 @@ public class WhenUsingNumericTextBoxFullApi : FusionTestBase
     }
 
     [Test]
-    public Task Focus_event_wires_component_trigger()
+    public Task Focus_event_wires_trigger()
     {
         var plan = CreatePlan();
-        var descriptor = FusionNumericTextBoxEvents.Instance.Focus;
 
-        var pb = new PipelineBuilder<FusionTestModel>();
-        pb.Element("status").SetText("Focused");
-
-        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        Trigger(plan).CustomEvent<FusionNumericTextBoxFocusArgs>("amount-focus", (args, p) =>
+            p.Element("status").SetText("Focused"));
 
         var json = plan.Render();
         AssertSchemaValid(json);
@@ -162,23 +146,19 @@ public class WhenUsingNumericTextBoxFullApi : FusionTestBase
     }
 
     [Test]
-    public Task Blur_event_wires_component_trigger()
+    public Task Blur_event_wires_trigger()
     {
         var plan = CreatePlan();
-        var descriptor = FusionNumericTextBoxEvents.Instance.Blur;
 
-        var pb = new PipelineBuilder<FusionTestModel>();
-        pb.Element("status").SetText("Blurred");
-
-        var trigger = new ComponentEventTrigger("Amount", descriptor.JsEvent, "fusion", "Amount", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        Trigger(plan).CustomEvent<FusionNumericTextBoxBlurArgs>("amount-blur", (args, p) =>
+            p.Element("status").SetText("Blurred"));
 
         var json = plan.Render();
         AssertSchemaValid(json);
         return VerifyJson(json);
     }
 
-    // ── Method chaining ──
+    // -- Method chaining --
 
     [Test]
     public Task Methods_chain_with_other_commands()

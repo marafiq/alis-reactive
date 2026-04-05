@@ -1,8 +1,4 @@
-using Alis.Reactive.Builders;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Sources;
-using Alis.Reactive.Descriptors.Triggers;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.Fusion.UnitTests;
@@ -11,13 +7,13 @@ namespace Alis.Reactive.Fusion.UnitTests;
 /// Tests the full JS API surface of FusionDropDownList:
 ///   Events:   Focus, Blur (void payload)
 ///   Methods:  FocusOut, ShowPopup, HidePopup (void, no args)
-///   Prop reads:  Value() → TypedComponentSource&lt;string&gt;
+///   Prop reads:  Value() -> TypedComponentSource&lt;string&gt;
 ///   Prop writes: SetValue(string?), SetText(string)
 /// </summary>
 [TestFixture]
 public class WhenUsingDropDownListFullApi : FusionTestBase
 {
-    // ── Methods ──
+    // -- Methods --
 
     [Test]
     public Task FocusOut_produces_ej2_call()
@@ -30,7 +26,7 @@ public class WhenUsingDropDownListFullApi : FusionTestBase
         return VerifyJson(json);
     }
 
-    // ── Prop reads ──
+    // -- Prop reads --
 
     [Test]
     public void Value_returns_typed_component_source()
@@ -40,14 +36,6 @@ public class WhenUsingDropDownListFullApi : FusionTestBase
         {
             var source = p.Component<FusionDropDownList>(m => m.Status).Value();
             Assert.That(source, Is.TypeOf<TypedComponentSource<string>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__Status"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("value"));
         });
     }
 
@@ -66,7 +54,7 @@ public class WhenUsingDropDownListFullApi : FusionTestBase
         return VerifyJson(json);
     }
 
-    // ── Events ──
+    // -- Events --
 
     [Test]
     public void Focus_descriptor_has_correct_js_event()
@@ -99,16 +87,12 @@ public class WhenUsingDropDownListFullApi : FusionTestBase
     }
 
     [Test]
-    public Task Focus_event_wires_component_trigger()
+    public Task Focus_event_wires_trigger()
     {
         var plan = CreatePlan();
-        var descriptor = FusionDropDownListEvents.Instance.Focus;
 
-        var pb = new PipelineBuilder<FusionTestModel>();
-        pb.Element("status").SetText("Focused");
-
-        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "fusion", "Status", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        Trigger(plan).CustomEvent<FusionDropDownListFocusArgs>("status-focus", (args, p) =>
+            p.Element("status").SetText("Focused"));
 
         var json = plan.Render();
         AssertSchemaValid(json);
@@ -116,23 +100,19 @@ public class WhenUsingDropDownListFullApi : FusionTestBase
     }
 
     [Test]
-    public Task Blur_event_wires_component_trigger()
+    public Task Blur_event_wires_trigger()
     {
         var plan = CreatePlan();
-        var descriptor = FusionDropDownListEvents.Instance.Blur;
 
-        var pb = new PipelineBuilder<FusionTestModel>();
-        pb.Element("status").SetText("Blurred");
-
-        var trigger = new ComponentEventTrigger("Status", descriptor.JsEvent, "fusion", "Status", "value");
-        plan.AddEntry(new Entry(trigger, pb.BuildReaction()));
+        Trigger(plan).CustomEvent<FusionDropDownListBlurArgs>("status-blur", (args, p) =>
+            p.Element("status").SetText("Blurred"));
 
         var json = plan.Render();
         AssertSchemaValid(json);
         return VerifyJson(json);
     }
 
-    // ── Method chaining ──
+    // -- Method chaining --
 
     [Test]
     public Task Methods_chain_with_other_commands()

@@ -8,7 +8,7 @@ namespace Alis.Reactive.UnitTests;
 public sealed class StubDropDown : IComponent, IInputComponent
 {
     public string Vendor => "fusion";
-    public string ReadExpr => "value";
+    public string ValueMember => "value";
 }
 
 public static class StubDropDownExtensions
@@ -16,7 +16,7 @@ public static class StubDropDownExtensions
     private static readonly StubDropDown _c = new();
     public static TypedComponentSource<string> Value<TModel>(
         this ComponentRef<StubDropDown, TModel> self) where TModel : class
-        => new TypedComponentSource<string>(self.TargetId, _c.Vendor, _c.ReadExpr);
+        => new TypedComponentSource<string>(self.TargetId, _c.Vendor, _c.ValueMember);
 }
 
 public class TwoSourceModel
@@ -67,7 +67,7 @@ public class WhenComparingTwoSources : PlanTestBase
     public Task String_eq()
     {
         var plan = new ReactivePlan<TwoSourceModel>();
-        new Builders.TriggerBuilder<TwoSourceModel>(plan).DomReady(p =>
+        new Builders.TriggerBuilder<TwoSourceModel>(plan, plan.Context).DomReady(p =>
         {
             var a = p.Component<StubDropDown>(m => m.Primary);
             var b = p.Component<StubDropDown>(m => m.Secondary);
@@ -85,7 +85,7 @@ public class WhenComparingTwoSources : PlanTestBase
     public Task Event_vs_component()
     {
         var plan = new ReactivePlan<TwoSourceModel>();
-        new Builders.TriggerBuilder<TwoSourceModel>(plan)
+        new Builders.TriggerBuilder<TwoSourceModel>(plan, plan.Context)
             .CustomEvent<InvoiceArgs>("invoice", (args, p) =>
             {
                 var max = p.Component<StubFusionNumericTextBox>(m => m.Rate);
@@ -103,7 +103,7 @@ public class WhenComparingTwoSources : PlanTestBase
     public Task In_direct_and()
     {
         var plan = new ReactivePlan<TwoSourceModel>();
-        new Builders.TriggerBuilder<TwoSourceModel>(plan).DomReady(p =>
+        new Builders.TriggerBuilder<TwoSourceModel>(plan, plan.Context).DomReady(p =>
         {
             var rate = p.Component<StubFusionNumericTextBox>(m => m.Rate);
             var budget = p.Component<StubFusionNumericTextBox>(m => m.Budget);
@@ -122,7 +122,7 @@ public class WhenComparingTwoSources : PlanTestBase
     public Task In_lambda_and()
     {
         var plan = new ReactivePlan<TwoSourceModel>();
-        new Builders.TriggerBuilder<TwoSourceModel>(plan).DomReady(p =>
+        new Builders.TriggerBuilder<TwoSourceModel>(plan, plan.Context).DomReady(p =>
         {
             var rate = p.Component<StubFusionNumericTextBox>(m => m.Rate);
             var budget = p.Component<StubFusionNumericTextBox>(m => m.Budget);
@@ -141,7 +141,7 @@ public class WhenComparingTwoSources : PlanTestBase
     public Task In_elseif()
     {
         var plan = new ReactivePlan<TwoSourceModel>();
-        new Builders.TriggerBuilder<TwoSourceModel>(plan).DomReady(p =>
+        new Builders.TriggerBuilder<TwoSourceModel>(plan, plan.Context).DomReady(p =>
         {
             var rate = p.Component<StubFusionNumericTextBox>(m => m.Rate);
             var budget = p.Component<StubFusionNumericTextBox>(m => m.Budget);
@@ -161,7 +161,7 @@ public class WhenComparingTwoSources : PlanTestBase
     public Task With_confirm()
     {
         var plan = new ReactivePlan<TwoSourceModel>();
-        new Builders.TriggerBuilder<TwoSourceModel>(plan).DomReady(p =>
+        new Builders.TriggerBuilder<TwoSourceModel>(plan, plan.Context).DomReady(p =>
         {
             var rate = p.Component<StubFusionNumericTextBox>(m => m.Rate);
             var budget = p.Component<StubFusionNumericTextBox>(m => m.Budget);
@@ -182,7 +182,7 @@ public class WhenComparingTwoSources : PlanTestBase
              GuardBuilder<TwoSourceModel>> op)
     {
         var plan = new ReactivePlan<TwoSourceModel>();
-        new Builders.TriggerBuilder<TwoSourceModel>(plan).DomReady(p =>
+        new Builders.TriggerBuilder<TwoSourceModel>(plan, plan.Context).DomReady(p =>
         {
             var rate = p.Component<StubFusionNumericTextBox>(m => m.Rate);
             var budget = p.Component<StubFusionNumericTextBox>(m => m.Budget);

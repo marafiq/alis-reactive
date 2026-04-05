@@ -6,7 +6,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ValueProducer>))]
-    internal abstract class ValueProducer
+    public abstract class ValueProducer
     {
         private protected ValueProducer() { }
 
@@ -47,7 +47,7 @@ namespace Alis.Reactive.PlanModel
             new ArrayProducer(items, shape);
     }
 
-    internal sealed class LiteralProducer : ValueProducer
+    public sealed class LiteralProducer : ValueProducer
     {
         public string Kind => "literal";
         public object Value { get; }
@@ -60,7 +60,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class ReadProducer : ValueProducer
+    public sealed class ReadProducer : ValueProducer
     {
         public string Kind => "read";
         public Source From { get; }
@@ -77,7 +77,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class ObjectProducer : ValueProducer
+    public sealed class ObjectProducer : ValueProducer
     {
         public string Kind => "object";
         public Dictionary<string, ValueProducer> Fields { get; }
@@ -90,7 +90,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class ArrayProducer : ValueProducer
+    public sealed class ArrayProducer : ValueProducer
     {
         public string Kind => "array";
         public List<ValueProducer> Items { get; }

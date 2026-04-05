@@ -22,7 +22,9 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiSelect, TModel> SetValue<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self, string[]? value)
             where TModel : class
-            => self.EmitSet("value", ValueProducer.Literal(value));
+            => self.EmitSet("value", value == null
+                ? ValueProducer.Null()
+                : ValueProducer.LiteralRaw(value, Shape.ArrayOf(Shape.String)));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>

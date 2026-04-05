@@ -11,12 +11,12 @@ public class WhenExtractingRequiredRules
         var desc = _adapter.ExtractRules(typeof(RequiredValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc!.Fields, Has.Count.EqualTo(1));
-        Assert.That(desc.Fields[0].FieldName, Is.EqualTo("Name"));
-        Assert.That(desc.Fields[0].Rules, Has.Count.EqualTo(1));
-        Assert.That(desc.Fields[0].Rules[0].Rule, Is.EqualTo("required"));
-        Assert.That(desc.Fields[0].Rules[0].Message, Is.EqualTo("'Name' is required."));
-        Assert.That(desc.Fields[0].Rules[0].Constraint, Is.Null);
+        Assert.That(desc, Has.Count.EqualTo(1));
+        Assert.That(desc[0].FieldName, Is.EqualTo("Name"));
+        Assert.That(desc[0].Rules, Has.Count.EqualTo(1));
+        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("required"));
+        Assert.That(desc[0].Rules[0].Message, Is.EqualTo("'Name' is required."));
+        Assert.That(desc[0].Rules[0].Constraint, Is.Null);
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class WhenExtractingRequiredRules
         var desc = _adapter.ExtractRules(typeof(NotNullValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc!.Fields[0].Rules[0].Rule, Is.EqualTo("required"));
+        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("required"));
     }
 
     [Test]
@@ -34,6 +34,6 @@ public class WhenExtractingRequiredRules
         var desc = _adapter.ExtractRules(typeof(RequiredWithCustomMessageValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc!.Fields[0].Rules[0].Message, Is.EqualTo("Name cannot be blank."));
+        Assert.That(desc[0].Rules[0].Message, Is.EqualTo("Name cannot be blank."));
     }
 }

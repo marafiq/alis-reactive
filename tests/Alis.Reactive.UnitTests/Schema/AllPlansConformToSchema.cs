@@ -52,7 +52,7 @@ public class AllPlansConformToSchema : PlanTestBase
         AssertSchemaValid(plan.Render());
     }
 
-    // -- MutateElement commands --
+    // -- Set/Call reactions --
 
     [Test]
     public void Element_add_class()

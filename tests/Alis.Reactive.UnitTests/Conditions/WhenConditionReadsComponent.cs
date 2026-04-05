@@ -10,7 +10,7 @@ namespace Alis.Reactive.UnitTests;
 public sealed class StubFusionNumericTextBox : IComponent, IInputComponent
 {
     public string Vendor => "fusion";
-    public string ReadExpr => "value";
+    public string ValueMember => "value";
 }
 
 /// <summary>
@@ -23,7 +23,7 @@ public static class StubFusionNumericTextBoxExtensions
     public static TypedComponentSource<decimal> Value<TModel>(
         this ComponentRef<StubFusionNumericTextBox, TModel> self)
         where TModel : class
-        => new TypedComponentSource<decimal>(self.TargetId, _component.Vendor, _component.ReadExpr);
+        => new TypedComponentSource<decimal>(self.TargetId, _component.Vendor, _component.ValueMember);
 }
 
 public class AmountModel
@@ -38,7 +38,7 @@ public class WhenConditionReadsComponent : PlanTestBase
     public Task Component_source_gt_with_then_else()
     {
         var plan = new ReactivePlan<AmountModel>();
-        var trigger = new Builders.TriggerBuilder<AmountModel>(plan);
+        var trigger = new Builders.TriggerBuilder<AmountModel>(plan, plan.Context);
 
         trigger.DomReady(p =>
         {
@@ -57,7 +57,7 @@ public class WhenConditionReadsComponent : PlanTestBase
     public Task Component_source_eq_string_ref()
     {
         var plan = new ReactivePlan<AmountModel>();
-        var trigger = new Builders.TriggerBuilder<AmountModel>(plan);
+        var trigger = new Builders.TriggerBuilder<AmountModel>(plan, plan.Context);
 
         trigger.DomReady(p =>
         {

@@ -106,7 +106,7 @@ public class WhenSerializingANativeActionLink
             NativeActionLinkSerializer.CreateContract<NativeTestModel>(
                 "/orders/save",
                 p => p.Post("/orders/save")
-                    .Validate(new Alis.Reactive.Validation.ValidationDescriptor("form", new System.Collections.Generic.List<Alis.Reactive.Validation.ValidationField>()))));
+                    .Validate<FakeNalValidator>("form")));
 
         Assert.That(ex!.Message, Does.Contain("validation"));
     }
@@ -123,4 +123,6 @@ public class WhenSerializingANativeActionLink
 
         Assert.That(ex!.Message, Does.Contain("exactly one request"));
     }
+
+    private class FakeNalValidator { }
 }

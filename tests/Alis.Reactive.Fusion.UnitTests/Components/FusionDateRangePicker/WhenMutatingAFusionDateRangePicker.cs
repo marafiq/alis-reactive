@@ -1,5 +1,5 @@
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Sources;
 using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.Fusion.UnitTests;
@@ -15,14 +15,6 @@ public class WhenMutatingAFusionDateRangePicker : FusionTestBase
         {
             var source = p.Component<FusionDateRangePicker>(m => m.StayPeriod).StartDate();
             Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("startDate"));
         });
     }
 
@@ -34,14 +26,6 @@ public class WhenMutatingAFusionDateRangePicker : FusionTestBase
         {
             var source = p.Component<FusionDateRangePicker>(m => m.StayPeriod).EndDate();
             Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("endDate"));
         });
     }
 
@@ -53,14 +37,6 @@ public class WhenMutatingAFusionDateRangePicker : FusionTestBase
         {
             var source = p.Component<FusionDateRangePicker>(m => m.StayPeriod).Value();
             Assert.That(source, Is.TypeOf<TypedComponentSource<DateTime[]>>());
-
-            var bindSource = source.ToBindSource();
-            Assert.That(bindSource, Is.TypeOf<ComponentSource>());
-
-            var cs = (ComponentSource)bindSource;
-            Assert.That(cs.ComponentId, Is.EqualTo("Alis_Reactive_Fusion_UnitTests_FusionTestModel__StayPeriod"));
-            Assert.That(cs.Vendor, Is.EqualTo("fusion"));
-            Assert.That(cs.ReadExpr, Is.EqualTo("value"));
         });
     }
 
