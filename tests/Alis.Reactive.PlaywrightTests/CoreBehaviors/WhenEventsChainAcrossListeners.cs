@@ -103,7 +103,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var dispatches = _consoleMessages
-            .Where(m => m.Contains("[alis:command]") && m.Contains("dispatch"))
+            .Where(m => m.Contains("[alis:execute]") && m.Contains("dispatch"))
             .ToList();
 
         var testIdx = dispatches.FindIndex(m =>
