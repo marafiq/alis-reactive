@@ -108,7 +108,7 @@ function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void 
   const prop = jsType.properties?.[reaction.property];
   if (!prop) throw new Error(`[alis] property "${reaction.property}" not found on type`);
   const value = evaluateValue(reaction.value, plan, ctx);
-  log.trace("set", { property: reaction.property, value });
+  log.trace("set", { target: reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope, property: reaction.property, value });
   setProperty(root, prop, value);
 }
 
@@ -120,7 +120,7 @@ function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): voi
   const method = jsType.methods?.[reaction.method];
   if (!method) throw new Error(`[alis] method "${reaction.method}" not found on type`);
   const args = reaction.args?.map(a => evaluateValue(a, plan, ctx)) ?? [];
-  log.trace("call", { method: reaction.method, args });
+  log.trace("call", { target: reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope, method: reaction.method, args });
   callMethod(root, method, args);
 }
 

@@ -57,7 +57,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
 
         // Find the FIRST dispatch reaction (phase 2 starts when dom-ready executes)
         var firstDispatchIndex = messages.FindIndex(m =>
-            m.Contains("[alis:execute]") && m.Contains("dispatch"));
+            m.Contains("[alis:execute] dispatch {"));
 
         Assert.That(lastWireIndex, Is.GreaterThanOrEqualTo(0),
             "Document-event listener wiring must be traced (phase 1)");
@@ -94,7 +94,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var dispatchMessages = _consoleMessages
-            .Where(m => m.Contains("[alis:execute]") && m.Contains("dispatch"))
+            .Where(m => m.Contains("[alis:execute] dispatch {"))
             .ToList();
 
         Assert.That(dispatchMessages, Has.Count.EqualTo(3),
@@ -121,7 +121,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var mutateMessages = _consoleMessages
-            .Where(m => m.Contains("[alis:execute]") && m.Contains("set") || m.Contains("call"))
+            .Where(m => m.Contains("[alis:execute]") && (m.Contains("set {") || m.Contains("call {")))
             .ToList();
 
         Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-1\"")), Is.True,
