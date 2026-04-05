@@ -194,10 +194,14 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
       if (producer.path) {
         return applyShape(walkPath(root as any, producer.path), producer.shape);
       }
-      // Walk the member as a dot-path, skipping the prefix segment that resolveSource already resolved
+      // Walk the member as a dot-path, skipping the scope prefix that resolveSource already resolved.
+      // If the member IS the scope prefix (single segment like "responseBody"), return the whole payload.
       const dotParts = producer.member.split(".");
-      // The first segment is the scope prefix (evt, responseBody, etc.) — skip it
-      const valueParts = dotParts.length > 1 ? dotParts.slice(1) : dotParts;
+      if (dotParts.length <= 1) {
+        // Single segment = scope prefix only, means "the entire payload"
+        return applyShape(root, producer.shape);
+      }
+      const valueParts = dotParts.slice(1);
       return applyShape(walk(root as any, valueParts.join(".")), producer.shape);
     }
 

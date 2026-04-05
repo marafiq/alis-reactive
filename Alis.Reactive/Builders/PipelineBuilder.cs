@@ -85,7 +85,8 @@ namespace Alis.Reactive.Builders
 
         public PipelineBuilder<TModel> Into(string elementId)
         {
-            Steps.Add(Reaction.Inject(elementId, ValueProducer.Read(PayloadSource.Success(), "body")));
+            // ctx.response IS the body — no member navigation needed
+            Steps.Add(Reaction.Inject(elementId, ValueProducer.Read(PayloadSource.Success(), "responseBody")));
             return this;
         }
 

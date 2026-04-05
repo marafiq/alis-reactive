@@ -65,7 +65,18 @@ namespace Alis.Reactive.PlanModel
         internal string EnsureInputComponent(string componentId, string vendor, string valueMember, Shape shape)
         {
             var key = componentId;
-            if (!_plan.MutableComponents.ContainsKey(key))
+            if (_plan.MutableComponents.ContainsKey(key))
+            {
+                // Component already registered — enrich its JsType with defaultValue if missing
+                var existing = _plan.MutableComponents[key];
+                var jsType = _plan.MutableTypes[existing.Type];
+                if (jsType.DefaultValue == null)
+                {
+                    jsType.WithProperty(valueMember, Path.Parse(valueMember), shape, "read");
+                    jsType.WithDefaultValue(valueMember, shape);
+                }
+            }
+            else
             {
                 var typeKey = vendor + "." + componentId;
                 var jsType = new JsType()
