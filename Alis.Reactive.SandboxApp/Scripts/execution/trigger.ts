@@ -42,7 +42,6 @@ export function wireBehavior(
       const comp = plan.components[trigger.component];
       if (!comp) throw new Error(`[alis] trigger component not found: ${trigger.component}`);
 
-      // Look up event channel from JsType if available, fall back to trigger.event
       const jsType = getJsType(plan, trigger.component);
       const eventDef = jsType.events?.[trigger.event];
       const channel = eventDef?.channel ?? trigger.event;
@@ -51,19 +50,28 @@ export function wireBehavior(
 
       log.debug("component-event", { component: trigger.component, event: trigger.event, channel });
 
-      (root as EventTarget).addEventListener(channel, (e: any) => {
-        // Native: use currentTarget (the element) so conditions can read .checked, .value etc.
-        // Fusion: SF passes the args object directly as the event
-        // CustomEvent (from dispatch): use .detail
-        const eventData = e instanceof CustomEvent
-          ? (e.detail ?? {})
-          : comp.vendor === "native"
-            ? (e.currentTarget ?? e.target ?? e)
-            : (e ?? {});
-        const ctx: ExecContext = { event: eventData };
-        executeReaction(reaction, plan, ctx).catch(err =>
-          log.error("reaction failed", { error: String(err) }));
-      }, opts);
+      // Vendor-specific event wiring:
+      // - Native: standard DOM addEventListener on the element
+      // - Fusion: SF addEventListener on the component instance (NO opts — SF doesn't support AbortSignal)
+      if (comp.vendor === "fusion") {
+        // SF's addEventListener doesn't support DOM options like {signal}.
+        // Pass handler only — SF manages its own event lifecycle.
+        (root as any).addEventListener(channel, (args: any) => {
+          const ctx: ExecContext = { event: args ?? {} };
+          executeReaction(reaction, plan, ctx).catch(err =>
+            log.error("reaction failed", { error: String(err) }));
+        });
+      } else {
+        // Native: standard DOM addEventListener with abort signal support
+        (root as EventTarget).addEventListener(channel, (e: Event) => {
+          const eventData = e instanceof CustomEvent
+            ? (e.detail ?? {})
+            : (e.currentTarget ?? e.target ?? e);
+          const ctx: ExecContext = { event: eventData };
+          executeReaction(reaction, plan, ctx).catch(err =>
+            log.error("reaction failed", { error: String(err) }));
+        }, opts);
+      }
       break;
     }
 
