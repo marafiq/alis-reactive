@@ -244,7 +244,7 @@ function allRulesConditionallySkipped(rules: ValidationRule[], plan: Plan, ctx?:
       const result = evaluateCondition(rule.when, plan, ctx);
       if (result) return false;
     } catch (e: unknown) {
-      if (e instanceof Error && e.message.includes("not found")) {
+      if (e instanceof Error && (e.message.includes("component not found") || e.message.includes("element not found"))) {
         continue; // Component missing from plan — conditionally-rendered field, skip
       }
       throw e; // Rethrow unexpected errors — fail fast
