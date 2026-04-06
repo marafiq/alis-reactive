@@ -48,7 +48,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class AllCondition : Condition
     {
         public string Kind => "all";
-        public List<Condition> Terms { get; }
+        public IReadOnlyList<Condition> Terms { get; }
 
         internal AllCondition(List<Condition> terms)
         {
@@ -59,7 +59,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class AnyCondition : Condition
     {
         public string Kind => "any";
-        public List<Condition> Terms { get; }
+        public IReadOnlyList<Condition> Terms { get; }
 
         internal AnyCondition(List<Condition> terms)
         {

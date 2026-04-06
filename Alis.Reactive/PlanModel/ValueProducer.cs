@@ -86,7 +86,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class ObjectProducer : ValueProducer
     {
         public string Kind => "object";
-        public Dictionary<string, ValueProducer> Fields { get; }
+        public IReadOnlyDictionary<string, ValueProducer> Fields { get; }
         public Shape Shape { get; }
 
         internal ObjectProducer(Dictionary<string, ValueProducer> fields, Shape shape)
@@ -99,7 +99,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class ArrayProducer : ValueProducer
     {
         public string Kind => "array";
-        public List<ValueProducer> Items { get; }
+        public IReadOnlyList<ValueProducer> Items { get; }
         public Shape Shape { get; }
 
         internal ArrayProducer(List<ValueProducer> items, Shape shape)

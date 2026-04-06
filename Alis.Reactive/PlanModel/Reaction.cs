@@ -52,7 +52,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class SequenceReaction : Reaction
     {
         public string Kind => "sequence";
-        public List<Reaction> Steps { get; }
+        public IReadOnlyList<Reaction> Steps { get; }
 
         internal SequenceReaction(List<Reaction> steps) { Steps = steps ?? throw new ArgumentNullException(nameof(steps)); }
     }
@@ -60,7 +60,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class ParallelReaction : Reaction
     {
         public string Kind => "parallel";
-        public List<Reaction> Steps { get; }
+        public IReadOnlyList<Reaction> Steps { get; }
         public Reaction OnSettled { get; }
 
         internal ParallelReaction(List<Reaction> steps, Reaction onSettled)
@@ -73,7 +73,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class BranchReaction : Reaction
     {
         public string Kind => "branch";
-        public List<BranchCase> Cases { get; }
+        public IReadOnlyList<BranchCase> Cases { get; }
 
         internal BranchReaction(List<BranchCase> cases) { Cases = cases ?? throw new ArgumentNullException(nameof(cases)); }
     }
@@ -113,7 +113,7 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "call";
         public Source On { get; }
         public string Method { get; }
-        public List<ValueProducer> Args { get; }
+        public IReadOnlyList<ValueProducer> Args { get; }
 
         internal CallReaction(Source on, string method, List<ValueProducer> args)
         {

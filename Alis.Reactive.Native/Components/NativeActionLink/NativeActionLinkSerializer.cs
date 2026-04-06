@@ -48,7 +48,7 @@ namespace Alis.Reactive.Native.Components
             switch (reaction)
             {
                 case SequenceReaction sequential:
-                    return Reaction.Sequence(sequential.Steps);
+                    return Reaction.Sequence(new List<Reaction>(sequential.Steps));
 
                 case BranchReaction conditional:
                     var projectedCases = new List<BranchCase>();

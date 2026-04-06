@@ -4,31 +4,35 @@ namespace Alis.Reactive.PlanModel
 {
     internal sealed class JsType
     {
-        public Dictionary<string, JsProperty> Properties { get; internal set; }
-        public Dictionary<string, JsMethod> Methods { get; internal set; }
-        public Dictionary<string, JsEvent> Events { get; internal set; }
+        private Dictionary<string, JsProperty> _properties;
+        private Dictionary<string, JsMethod> _methods;
+        private Dictionary<string, JsEvent> _events;
+
+        public IReadOnlyDictionary<string, JsProperty> Properties => _properties;
+        public IReadOnlyDictionary<string, JsMethod> Methods => _methods;
+        public IReadOnlyDictionary<string, JsEvent> Events => _events;
         public DefaultValue DefaultValue { get; internal set; }
 
         internal JsType() { }
 
         internal JsType WithProperty(string name, Path path, Shape shape, string access)
         {
-            Properties ??= new Dictionary<string, JsProperty>();
-            Properties[name] = new JsProperty(path, shape, access);
+            _properties ??= new Dictionary<string, JsProperty>();
+            _properties[name] = new JsProperty(path, shape, access);
             return this;
         }
 
         internal JsType WithMethod(string name, Path path, List<Shape> args = null, Shape returns = null)
         {
-            Methods ??= new Dictionary<string, JsMethod>();
-            Methods[name] = new JsMethod(path, args, returns);
+            _methods ??= new Dictionary<string, JsMethod>();
+            _methods[name] = new JsMethod(path, args, returns);
             return this;
         }
 
         internal JsType WithEvent(string name, string channel, string payloadType = null)
         {
-            Events ??= new Dictionary<string, JsEvent>();
-            Events[name] = new JsEvent(channel, payloadType);
+            _events ??= new Dictionary<string, JsEvent>();
+            _events[name] = new JsEvent(channel, payloadType);
             return this;
         }
 

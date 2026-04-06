@@ -95,7 +95,7 @@
     <div>
         <native-heading level="H1">Architecture Verification</native-heading>
         <native-text color="Secondary">
-            Vendor-agnostic component architecture: same readExpr, same walk, different vendor root.
+            Vendor-agnostic component architecture: same valueMember, same walk, different vendor root.
             Each section tests one interaction type with both native and fusion vendors.
         </native-text>
     </div>
@@ -138,7 +138,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">3. Property Read (Gather)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Both vendors use readExpr <code>"value"</code>. Native reads <code>el.value</code>,
+            Both vendors use the component's value member <code>"value"</code>. Native reads <code>el.value</code>,
             fusion reads <code>ej2_instances[0].value</code>.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -289,9 +289,9 @@
 
     <!-- Section 8: Both Vendors Gathered Together -->
     <native-card><native-card-body>
-        <native-heading level="H2">8. Same ReadExpr Gathers Both Vendors</native-heading>
+        <native-heading level="H2">8. Same Value Member Gathers Both Vendors</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            One button gathers native and fusion values together. Same readExpr <code>"value"</code>,
+            One button gathers native and fusion values together. Same value member <code>"value"</code>,
             different vendor roots.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">

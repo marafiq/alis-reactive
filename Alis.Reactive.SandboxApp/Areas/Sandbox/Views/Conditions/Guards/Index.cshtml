@@ -172,7 +172,7 @@
             .Else(else_ => else_.Element("isempty-result").SetText("Has value"))
     ));
 
-    // ── Section 22: NOT (InvertGuard) ──
+    // ── Section 22: NOT (inverted condition) ──
     Html.On(plan, t => t.CustomEvent<RolePayload>("check-not", (args, p) =>
         p.When(args, x => x.Role).Eq("admin").Not()
             .Then(then => then.Element("not-result").SetText("Not admin"))
@@ -463,7 +463,7 @@
         <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="isempty-result">&mdash;</span></div>
     </native-card-body></native-card>
 
-    <!-- Section 22: NOT (InvertGuard) -->
+    <!-- Section 22: NOT (inverted condition) -->
     <native-card><native-card-body>
         <native-heading level="H2" class="mb-2">NOT — Invert Guard</native-heading>
         <p class="text-xs text-text-secondary mb-3">NOT(Role == "admin") &rarr; "Not admin" &bull; else &rarr; "Is admin"</p>
