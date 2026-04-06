@@ -3,6 +3,9 @@
 
 import type { Plan, Behavior } from "../types";
 import { unwireField } from "../validation/live-clear";
+import { scope } from "../core/trace";
+
+const log = scope("merge");
 
 type WireBehaviors = (behaviors: Behavior[], plan: Plan, signal?: AbortSignal) => void;
 type WireContainerValidation = (plan: Plan) => void;
@@ -20,6 +23,9 @@ export class PlanRegistry {
   private readonly sourceBehaviors = new Map<string, Behavior[]>();
   private readonly sourceComponentKeys = new Map<string, string[]>();
   private readonly sourceTypeKeys = new Map<string, string[]>();
+  // Per-key ownership: tracks which partId owns each component/type key.
+  // Prevents cross-source collisions and ownership-aware unmerge.
+  private readonly keyOwners = new Map<string, string>();
 
   register(plan: Plan): void {
     this.plans.set(plan.planId, plan);
@@ -46,20 +52,32 @@ export class PlanRegistry {
       this.plans.set(incoming.planId, target);
     }
 
-    // Merge types
-    Object.assign(target.types, incoming.types);
+    // Merge types — ownership-aware: block cross-source collisions
+    for (const [key, type] of Object.entries(incoming.types)) {
+      const owner = this.keyOwners.get(`t:${key}`);
+      if (owner && owner !== partId && partId) {
+        log.error("cross-source type collision", { key, owner, incoming: partId });
+        continue;
+      }
+      target.types[key] = type;
+      if (partId) this.keyOwners.set(`t:${key}`, partId);
+    }
 
-    // Merge components — deep-merge ContainerScope.validationRules when both
-    // the existing and incoming component define a container with rules.
+    // Merge components — ownership-aware with deep-merge for validation rules.
     for (const [key, comp] of Object.entries(incoming.components)) {
+      const owner = this.keyOwners.get(`c:${key}`);
+      if (owner && owner !== partId && partId) {
+        log.error("cross-source component collision", { key, owner, incoming: partId });
+        continue;
+      }
       const existing = target.components[key];
       if (existing?.container?.validationRules && comp.container?.validationRules) {
-        // Merge validation rules by component key — incoming replaces per-component, new appends
         const ruleMap = new Map(existing.container.validationRules.map(cv => [cv.component, cv]));
         for (const cv of comp.container.validationRules) ruleMap.set(cv.component, cv);
         comp.container.validationRules = [...ruleMap.values()];
       }
       target.components[key] = comp;
+      if (partId) this.keyOwners.set(`c:${key}`, partId);
     }
 
     // Wire and merge behaviors
@@ -94,6 +112,7 @@ export class PlanRegistry {
     this.sourceBehaviors.clear();
     this.sourceComponentKeys.clear();
     this.sourceTypeKeys.clear();
+    this.keyOwners.clear();
   }
 
   private removeSource(planId: string, partId: string): void {
@@ -114,24 +133,43 @@ export class PlanRegistry {
       }
     }
 
-    // Remove components from this source and clear their live-clear wiring.
-    // Validation rules referencing removed components are left in place —
-    // the orchestrator already handles component-not-found gracefully.
-    // Removing rules here would break partial reload: the parent container's
-    // rules are set at C# build time and not re-merged when the partial reloads.
+    // Remove components owned by this source. Ownership check prevents
+    // deleting keys that were taken over by a different source.
+    const removedComponentKeys = new Set<string>();
     const oldKeys = this.sourceComponentKeys.get(partId);
     if (oldKeys) {
       for (const key of oldKeys) {
+        if (this.keyOwners.get(`c:${key}`) !== partId) continue;
         const comp = plan.components[key];
         if (comp) unwireField(comp.id);
         delete plan.components[key];
+        this.keyOwners.delete(`c:${key}`);
+        removedComponentKeys.add(key);
       }
     }
 
-    // Remove types from this source
+    // Remove orphaned validation rules for deleted components — but ONLY
+    // from containers that this source also owns. If the container belongs
+    // to the root plan, its rules were set at C# build time and the partial
+    // doesn't re-supply them on re-merge.
+    if (removedComponentKeys.size > 0) {
+      for (const [compKey, comp] of Object.entries(plan.components)) {
+        if (!comp.container?.validationRules) continue;
+        const containerOwner = this.keyOwners.get(`c:${compKey}`);
+        if (containerOwner !== partId) continue;  // Not our container — don't touch its rules
+        comp.container.validationRules = comp.container.validationRules
+          .filter(cv => !removedComponentKeys.has(cv.component));
+      }
+    }
+
+    // Remove types owned by this source
     const oldTypeKeys = this.sourceTypeKeys.get(partId);
     if (oldTypeKeys) {
-      for (const key of oldTypeKeys) delete plan.types[key];
+      for (const key of oldTypeKeys) {
+        if (this.keyOwners.get(`t:${key}`) !== partId) continue;
+        delete plan.types[key];
+        this.keyOwners.delete(`t:${key}`);
+      }
     }
 
     this.clearTracking(partId);
