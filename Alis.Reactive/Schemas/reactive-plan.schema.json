@@ -117,6 +117,7 @@
       "required": ["component", "rules"],
       "properties": {
         "component": { "type": "string", "minLength": 1 },
+        "serverFieldName": { "type": "string", "minLength": 1 },
         "rules": {
           "type": "array",
           "items": { "$ref": "#/$defs/ValidationRule" }
@@ -395,7 +396,9 @@
         "transport": {
           "type": "string",
           "enum": ["query", "json", "form-data"]
-        }
+        },
+        "statics": { "$ref": "#/$defs/ValueProducer" },
+        "includeAll": { "type": "boolean" }
       }
     },
     "ValueInput": {
@@ -415,7 +418,9 @@
       "required": ["component", "key"],
       "properties": {
         "component": { "type": "string", "minLength": 1 },
-        "key": { "type": "string", "minLength": 1 }
+        "key": { "type": "string", "minLength": 1 },
+        "bindingPath": { "type": "string", "minLength": 1 },
+        "shape": { "$ref": "#/$defs/Shape" }
       }
     },
     "ResponseHandler": {
@@ -564,7 +569,8 @@
         { "$ref": "#/$defs/ArrayShape" },
         { "$ref": "#/$defs/ObjectShape" },
         { "$ref": "#/$defs/NullableShape" },
-        { "$ref": "#/$defs/AnyShape" }
+        { "$ref": "#/$defs/AnyShape" },
+        { "$ref": "#/$defs/NoneShape" }
       ]
     },
     "StringShape": {
@@ -624,6 +630,11 @@
       "type": "object",
       "required": ["kind"],
       "properties": { "kind": { "const": "any" } }
+    },
+    "NoneShape": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": { "kind": { "const": "none" } }
     },
     "Path": {
       "type": "array",
