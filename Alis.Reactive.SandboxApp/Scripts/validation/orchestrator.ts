@@ -265,7 +265,20 @@ function clearContainerErrors(
 }
 
 function findComponentKeyByName(containerScope: ContainerScope, name: string): string | undefined {
-  return containerScope.validationRules?.find(cv => cv.component === name)?.component;
+  // Direct match (component key === server error field name)
+  const direct = containerScope.validationRules?.find(cv => cv.component === name)?.component;
+  if (direct) return direct;
+  // Suffix match: server returns "Db.Name" but component keys are "Alis_...Model__Db_Name".
+  // Normalize dots to underscores and check if any component key ends with the normalized suffix.
+  const normalized = name.replace(/\./g, "_");
+  // Search both the explicit components list and validation rule component keys.
+  const allKeys = [
+    ...(containerScope.components ?? []),
+    ...(containerScope.validationRules?.map(cv => cv.component) ?? []),
+  ];
+  return allKeys.find(key =>
+    key.endsWith("__" + normalized) || key.endsWith("_" + normalized)
+  ) ?? undefined;
 }
 
 function hasSummaryEntry(summaryEl: HTMLElement | null, componentKey: string): boolean {

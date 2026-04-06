@@ -50,6 +50,8 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
+            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
+            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.Boolean, "read");
             return new TypedComponentSource<bool>(self.TargetId, _component.Vendor, _component.ValueMember);
         }
     }

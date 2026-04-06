@@ -50,6 +50,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime> Value<TModel>(
             this ComponentRef<FusionDatePicker, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, Component.ValueMember); }
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, Component.ValueMember); }
     }
 }

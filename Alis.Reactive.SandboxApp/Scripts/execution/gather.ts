@@ -142,7 +142,12 @@ export function resolveGather(
   for (const field of gatherInput.components) {
     const raw = readDefaultValue(plan, field.component);
     const defaultShape = getDefaultShape(plan, field.component);
-    const value = applyShape(raw, defaultShape);
+    let value = applyShape(raw, defaultShape);
+    // Date shape produces epoch ms (number) for condition comparison,
+    // but HTTP gather needs ISO strings for ASP.NET DateTime deserialization.
+    if (defaultShape?.kind === "date" && typeof value === "number" && !isNaN(value)) {
+      value = new Date(value).toISOString();
+    }
     emitValue(field.key, value, transport);
   }
 

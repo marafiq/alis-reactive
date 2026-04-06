@@ -41,6 +41,8 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeHiddenField, TModel> self)
             where TModel : class
         {
+            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
+            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.String, "read");
             return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember);
         }
     }

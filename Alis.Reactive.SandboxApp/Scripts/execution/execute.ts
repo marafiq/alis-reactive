@@ -212,20 +212,33 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
         if (method) {
           return applyShape(callMethod(root, method, []), producer.shape);
         }
+        // Fallback: validation conditions on partial-owned fields may use "value"
+        // as the member, but the actual JsType uses a different defaultValue member
+        // (e.g. "checked" for NativeCheckBox). Read via defaultValue when available.
+        if (jsType.defaultValue) {
+          const dvProp = jsType.properties?.[jsType.defaultValue.member];
+          if (dvProp) {
+            return applyShape(resolverReadProperty(root, dvProp), producer.shape ?? dvProp.shape);
+          }
+          const dvMethod = jsType.methods?.[jsType.defaultValue.member];
+          if (dvMethod) {
+            return applyShape(callMethod(root, dvMethod, []), producer.shape);
+          }
+        }
         throw new Error(`[alis] member "${producer.member}" not found on type`);
       }
-      // Payload source: walk member as dot-path on resolved payload
+      // Payload source: walk member as dot-path on resolved payload.
+      // Preserve null/undefined from walks through missing intermediates so
+      // presence checks (is-null, not-null) get the correct signal.
       if (producer.path) {
-        
-        return applyShape(walkPath(root as any, producer.path), producer.shape);
+        const walked = walkPath(root as any, producer.path);
+        return walked == null ? walked : applyShape(walked, producer.shape);
       }
-      // Walk the member as a dot-path, skipping the scope prefix
-      const dotParts = producer.member.split(".");
-      if (dotParts.length <= 1) {
-        return applyShape(root, producer.shape);
-      }
-      const valueParts = dotParts.slice(1);
-      return applyShape(walk(root as any, valueParts.join(".")), producer.shape);
+      // Walk the member as a dot-path on the resolved payload.
+      // PayloadSource already resolves to the correct root (event data, response body),
+      // so the member IS the actual path — no prefix stripping needed.
+      const walked = walk(root as any, producer.member);
+      return walked == null ? walked : applyShape(walked, producer.shape);
     }
 
     case "object": {

@@ -2,7 +2,7 @@
 // No DOM, no vendor, no side effects. Takes a value + ValidationRule → pass/fail.
 // Uses Shape for ALL type-aware comparisons via convertByShape from shape-convert.
 
-import { convertByShape, toString } from "../core/shape-convert";
+import { convertByShape, applyShape, toString } from "../core/shape-convert";
 import type { ValidationRule, Shape } from "../types";
 
 export interface PeerReader {
@@ -57,6 +57,18 @@ function failsRangeRule(rule: ValidationRule, value: unknown, empty: boolean): b
   return cmpLo <= 0 || cmpHi >= 0;
 }
 
+/** Shape-aware equality — applies shape to both sides and uses strict equality.
+ *  compareValues is numeric (subtraction) and returns NaN for strings. */
+function shapeEqual(a: unknown, b: unknown, shape?: Shape): boolean {
+  if (shape) {
+    const ca = applyShape(a, shape);
+    const cb = applyShape(b, shape);
+    return ca === cb;
+  }
+  const sa = toString(a); const sb = toString(b);
+  return (sa.ok ? sa.value : "") === (sb.ok ? sb.value : "");
+}
+
 function failsEqualityRule(
   rule: ValidationRule, value: unknown, empty: boolean, peerReader: PeerReader,
 ): boolean {
@@ -65,21 +77,16 @@ function failsEqualityRule(
       if (empty) return false;
       const target = resolveTarget(rule, peerReader);
       if (target === undefined) return true;
-      if (rule.shape) return compareValues(value, target, rule.shape) !== 0;
-      const sv = toString(value); const tv = toString(target);
-      return (sv.ok ? sv.value : "") !== (tv.ok ? tv.value : "");
+      return !shapeEqual(value, target, rule.shape);
     }
     case "notEqual": {
       const constraint = rule.constraint?.kind === "literal" ? rule.constraint.value : undefined;
-      const sv = toString(value); const tv = toString(constraint);
-      return !empty && (sv.ok ? sv.value : "") === (tv.ok ? tv.value : "");
+      return !empty && shapeEqual(value, constraint, rule.shape);
     }
     case "notEqualTo": {
       const target = resolveTarget(rule, peerReader);
       if (target === undefined) return true;
-      if (rule.shape) return !empty && compareValues(value, target, rule.shape) === 0;
-      const sv = toString(value); const tv = toString(target);
-      return !empty && (sv.ok ? sv.value : "") === (tv.ok ? tv.value : "");
+      return !empty && shapeEqual(value, target, rule.shape);
     }
     default: return true;
   }

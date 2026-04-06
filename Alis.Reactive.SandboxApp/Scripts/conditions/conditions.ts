@@ -74,19 +74,27 @@ function evaluateCompare(cond: CompareCondition, plan: Plan, ctx?: ExecContext):
   const left = evalValue(cond.left, plan, ctx);
   const coercedLeft = applyShape(left, cond.shape);
 
-  // Presence operators — no right operand needed
+  // Presence operators — use RAW value for null checks (shape coercion turns
+  // null/undefined into defaults like "" or 0 which defeats null detection).
   switch (cond.op) {
-    case "is-null":   return coercedLeft == null;
-    case "not-null":  return coercedLeft != null;
-    case "is-empty":  return isEmpty(coercedLeft);
-    case "not-empty": return !isEmpty(coercedLeft);
+    case "is-null":   return left == null;
+    case "not-null":  return left != null;
+    case "is-empty":  return isEmpty(left);
+    case "not-empty": return !isEmpty(left);
     case "truthy":    return !!coercedLeft;
     case "falsy":     return !coercedLeft;
   }
 
   // Binary operators — need right operand
   const right = cond.right ? evalValue(cond.right, plan, ctx) : undefined;
-  const coercedRight = cond.right ? applyShape(right, cond.shape) : undefined;
+  // For operators that expect array right operands, coerce each item individually
+  // instead of applying shape to the whole array (which would stringify it).
+  let coercedRight: unknown;
+  if (Array.isArray(right) && (cond.op === "in" || cond.op === "not-in" || cond.op === "between")) {
+    coercedRight = right.map(item => applyShape(item, cond.shape));
+  } else {
+    coercedRight = cond.right ? applyShape(right, cond.shape) : undefined;
+  }
 
   log.trace("eval", { op: cond.op, left: coercedLeft, right: coercedRight });
 

@@ -241,7 +241,16 @@ namespace Alis.Reactive
             else
             {
                 fieldComponentId = IdGenerator.For(typeof(TModel), vc.Field);
+                // Look up the component in the plan (already registered by RegisterInputComponents)
+                // to find the correct valueMember instead of hardcoding "value".
+                // NativeCheckBox uses "checked", not "value".
                 valueMember = "value";
+                if (_context.Plan.MutableComponents.TryGetValue(fieldComponentId, out var comp))
+                {
+                    var jsType = _context.Plan.MutableTypes[comp.Type];
+                    if (jsType.DefaultValue != null)
+                        valueMember = jsType.DefaultValue.Member;
+                }
             }
 
             var left = ValueProducer.Read(

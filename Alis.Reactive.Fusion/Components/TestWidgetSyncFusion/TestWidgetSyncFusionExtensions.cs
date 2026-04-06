@@ -49,7 +49,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<TestWidgetSyncFusion, TModel> self)
-            where TModel : class { self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor); return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember); }
+            where TModel : class { self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.String, "read"); return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember); }
 
         // ── Void Method (no args) ──
 
