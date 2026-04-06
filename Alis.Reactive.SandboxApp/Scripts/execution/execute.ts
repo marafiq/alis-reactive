@@ -107,11 +107,21 @@ export async function executeReaction(
 
 function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void {
   const root = resolveSource(plan, reaction.on, ctx);
+  const value = evaluateValue(reaction.value, plan, ctx);
+  const target = reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope;
+  log.trace("set", { target, property: reaction.property, value });
+
+  if (reaction.on.kind === "payload") {
+    // Payload objects (event args, response bodies) don't have JsTypes.
+    // Set the property directly on the resolved payload root.
+    if (root == null) throw new Error(`[alis] cannot set property on null payload (scope: ${reaction.on.scope})`);
+    (root as Record<string, unknown>)[reaction.property] = value;
+    return;
+  }
+
   const jsType = getJsTypeForSource(plan, reaction.on);
   const prop = jsType.properties?.[reaction.property];
   if (!prop) throw new Error(`[alis] property "${reaction.property}" not found on type`);
-  const value = evaluateValue(reaction.value, plan, ctx);
-  log.trace("set", { target: reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope, property: reaction.property, value });
   setProperty(root, prop, value);
 }
 
@@ -119,11 +129,23 @@ function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void 
 
 function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): void {
   const root = resolveSource(plan, reaction.on, ctx);
+  const args = reaction.args?.map(a => evaluateValue(a, plan, ctx)) ?? [];
+  const target = reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope;
+  log.trace("call", { target, method: reaction.method, args });
+
+  if (reaction.on.kind === "payload") {
+    // Payload objects (event args, response bodies) don't have JsTypes.
+    // Call the method directly on the resolved payload root.
+    if (root == null) throw new Error(`[alis] cannot call method on null payload (scope: ${reaction.on.scope})`);
+    const fn = (root as Record<string, unknown>)[reaction.method];
+    if (typeof fn !== "function") throw new Error(`[alis] "${reaction.method}" is not a function on payload`);
+    fn.apply(root, args);
+    return;
+  }
+
   const jsType = getJsTypeForSource(plan, reaction.on);
   const method = jsType.methods?.[reaction.method];
   if (!method) throw new Error(`[alis] method "${reaction.method}" not found on type`);
-  const args = reaction.args?.map(a => evaluateValue(a, plan, ctx)) ?? [];
-  log.trace("call", { target: reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope, method: reaction.method, args });
   callMethod(root, method, args);
 }
 
@@ -158,8 +180,15 @@ async function showValidationErrors(
   plan: Plan,
   ctx?: ExecContext,
 ): Promise<void> {
-  const { validateContainer } = await import("../validation");
-  validateContainer(plan, reaction.container, ctx);
+  const { validateContainer, showServerErrors } = await import("../validation");
+
+  // When called inside an error handler, ctx.response carries the server's
+  // ProblemDetails body. Route to showServerErrors instead of client-side validation.
+  if (ctx?.response && typeof ctx.response === "object") {
+    showServerErrors(plan, reaction.container, ctx.response);
+  } else {
+    validateContainer(plan, reaction.container, ctx);
+  }
 }
 
 // ── Value evaluation ──────────────────────────────────────

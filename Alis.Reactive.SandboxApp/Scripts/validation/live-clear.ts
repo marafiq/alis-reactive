@@ -1,10 +1,13 @@
 // Live Validation — Per-field event wiring for interactive validation
 // V3: reads from ContainerScope on plan.components[containerKey].container.
 // Uses SHARED resolver for vendor root resolution.
+// On blur/change: re-validates the single field (not just clears).
+// On input: clears only (typing should not show errors mid-keystroke).
 
-import type { Plan, Component, ContainerScope } from "../types";
+import type { Plan, Component } from "../types";
 import { resolveElement, resolveVendorRoot } from "../resolution/resolver";
 import { clearInline } from "./error-display";
+import { revalidateField } from "./orchestrator";
 import { scope } from "../core/trace";
 
 const log = scope("live-clear");
@@ -28,11 +31,11 @@ export function wireLiveValidation(plan: Plan, containerKey: string): void {
   for (const cv of containerScope.validationRules) {
     const comp = plan.components[cv.component];
     if (!comp) continue;
-    wireField(plan, containerId, cv.component, comp);
+    wireField(plan, containerId, containerKey, cv.component, comp);
   }
 }
 
-function wireField(plan: Plan, containerId: string, componentKey: string, comp: Component): void {
+function wireField(plan: Plan, containerId: string, containerKey: string, componentKey: string, comp: Component): void {
   if (wiredFields.has(comp.id)) return;
 
   let el: HTMLElement;
@@ -45,16 +48,17 @@ function wireField(plan: Plan, containerId: string, componentKey: string, comp: 
   wiredFields.add(comp.id);
 
   const clearHandler = () => clearInline(containerId, comp.id);
+  const revalidateHandler = () => revalidateField(plan, containerKey, componentKey);
 
   if (comp.vendor === "native") {
     el.addEventListener("input", clearHandler);
-    el.addEventListener("blur", clearHandler);
-    el.addEventListener("change", clearHandler);
+    el.addEventListener("blur", revalidateHandler);
+    el.addEventListener("change", revalidateHandler);
   } else {
     // Fusion (and future vendors): listen on the vendor root
     try {
       const root = resolveVendorRoot(el, comp.vendor);
-      (root as EventTarget).addEventListener("change", clearHandler);
+      (root as EventTarget).addEventListener("change", revalidateHandler);
     } catch {
       // Component not yet initialized — skip, will be wired on merge
     }

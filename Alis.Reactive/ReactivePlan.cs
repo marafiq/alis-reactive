@@ -156,11 +156,13 @@ namespace Alis.Reactive
 
             var fields = extractor.ExtractRules(request.ValidatorType, container);
 
-            // Enrich each field with component registration info
+            // Enrich each field with component registration info.
+            // Components may be in this plan's _componentsMap, or in a partial plan's map
+            // (partials merge in the browser). For fields not found locally, generate the
+            // expected component ID using the same IdGenerator convention all components use.
             var componentValidations = new List<ComponentValidation>();
             foreach (var field in fields)
             {
-                // Try to find the matching component in the components map
                 if (_componentsMap.TryGetValue(field.FieldName, out var reg))
                 {
                     field.FieldId = reg.ComponentId;
@@ -168,10 +170,17 @@ namespace Alis.Reactive
                     field.ValueMember = reg.ValueMember;
                     field.Shape = reg.Shape;
                 }
+                else
+                {
+                    // Field is not in this plan's map (likely in a partial plan).
+                    // Generate the expected component ID so the browser runtime can
+                    // resolve plan.components[key] after plans merge.
+                    field.FieldId = IdGenerator.For(typeof(TModel), field.FieldName);
+                }
 
                 var planRules = field.Rules.Select(r => ToPlanValidationRule(r, field)).ToList();
                 componentValidations.Add(new ComponentValidation(
-                    field.FieldId ?? field.FieldName, planRules));
+                    field.FieldId, planRules));
             }
 
             // Attach to the container component's ContainerScope
@@ -202,10 +211,11 @@ namespace Alis.Reactive
             {
                 // Map the raw property name to the component ID so the runtime
                 // can resolve plan.components[otherComponent] correctly.
+                // Fall back to IdGenerator for fields in partial plans.
                 if (_componentsMap.TryGetValue(extracted.Field, out var otherReg))
                     rule.OtherComponent = otherReg.ComponentId;
                 else
-                    rule.OtherComponent = extracted.Field;
+                    rule.OtherComponent = IdGenerator.For(typeof(TModel), extracted.Field);
             }
 
             if (extracted.When != null)
@@ -219,12 +229,21 @@ namespace Alis.Reactive
 
         private Condition ToCondition(ValidationCondition vc)
         {
-            // Build a read from the condition's field component
-            var fieldComponentId = vc.Field;
+            // Build a read from the condition's field component.
+            // Try local map first; fall back to IdGenerator for partial-owned fields.
+            string fieldComponentId;
+            string valueMember;
             if (_componentsMap.TryGetValue(vc.Field, out var fieldReg))
+            {
                 fieldComponentId = fieldReg.ComponentId;
+                valueMember = fieldReg.ValueMember ?? "value";
+            }
+            else
+            {
+                fieldComponentId = IdGenerator.For(typeof(TModel), vc.Field);
+                valueMember = "value";
+            }
 
-            var valueMember = fieldReg?.ValueMember ?? "value";
             var left = ValueProducer.Read(
                 ComponentSource.Of(fieldComponentId),
                 valueMember);

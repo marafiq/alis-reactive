@@ -110,6 +110,37 @@ export function showServerErrors(plan: Plan, containerKey: string, data: unknown
   log.debug("showServerErrors", { containerId, fieldCount: Object.keys(errors).length });
 }
 
+/**
+ * Re-validate a single component within its container.
+ * Called on blur/change by live-clear to give immediate field-level feedback.
+ */
+export function revalidateField(plan: Plan, containerKey: string, componentKey: string): void {
+  const containerComp = plan.components[containerKey];
+  if (!containerComp?.container?.validationRules) return;
+
+  const cv = containerComp.container.validationRules.find(r => r.component === componentKey);
+  if (!cv) return;
+
+  const containerId = containerComp.id;
+
+  // Clear existing error for this field
+  const comp = plan.components[componentKey];
+  if (comp) clearInline(containerId, comp.id);
+
+  // Find the container element
+  let container: HTMLElement;
+  try {
+    container = resolveElement(plan, containerKey);
+  } catch {
+    return;
+  }
+
+  const peerReader = createPeerReader(plan);
+  const summaryEl = findSummaryElement(plan.planId);
+
+  evaluateComponentRules(cv, plan, containerId, container, peerReader, summaryEl);
+}
+
 export function clearContainerValidation(plan: Plan, containerKey: string): void {
   const containerComp = plan.components[containerKey];
   if (!containerComp?.container) return;
