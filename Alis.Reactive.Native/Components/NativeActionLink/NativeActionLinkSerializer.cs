@@ -34,8 +34,10 @@ namespace Alis.Reactive.Native.Components
                     "NativeActionLink supports exactly one request in its click reaction tree.");
             }
 
+            // Carry the full plan context so the runtime can resolve
+            // all component references in the reaction tree.
             var payloadJson = JsonSerializer.Serialize(
-                new NativeActionLinkPayload(projectedReaction),
+                new NativeActionLinkPayload(plan, projectedReaction),
                 CompactOptions);
 
             return new NativeActionLinkContract(payloadJson);
@@ -105,7 +107,12 @@ namespace Alis.Reactive.Native.Components
 
     internal sealed class NativeActionLinkPayload
     {
-        public NativeActionLinkPayload(Reaction reaction) { Reaction = reaction; }
+        public NativeActionLinkPayload(Plan plan, Reaction reaction)
+        {
+            Plan = plan;
+            Reaction = reaction;
+        }
+        public Plan Plan { get; }
         public Reaction Reaction { get; }
     }
 }

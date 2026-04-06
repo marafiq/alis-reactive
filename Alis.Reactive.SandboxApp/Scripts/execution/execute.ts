@@ -1,27 +1,29 @@
-// execute.ts — The main reaction executor.
-// Dispatches on Reaction.kind using the V3 reaction tree.
-// Every action uses the SHARED resolver (resolveSource + JsType).
+// execute.ts — Reaction executor. The dumb runtime.
+// Dispatches on reaction.kind. Uses shared resolver for ALL component access.
+// No fallbacks. Every component reference must be in plan.components.
 
 import type {
-  Reaction, SetReaction, CallReaction, DispatchReaction,
-  InjectReaction, ShowValidationErrorsReaction, Plan, ValueProducer,
+  Plan, Reaction, SequenceReaction, ParallelReaction, BranchReaction,
+  SetReaction, CallReaction, RequestReaction, DispatchReaction,
+  InjectReaction, ShowValidationErrorsReaction,
+  ValueProducer, ExecContext, Source,
 } from "../types";
-import type { ExecContext } from "../types";
-import { scope } from "../core/trace";
 import {
-  resolveSource, getJsTypeForSource,
-  setProperty, callMethod, readProperty,
+  resolveSource, getJsTypeForSource, readProperty as resolverReadProperty,
+  setProperty, callMethod,
 } from "../resolution/resolver";
-import { evaluateConditionAsync, setValueEvaluator } from "../conditions/conditions";
+import { evaluateConditionAsync } from "../conditions/conditions";
+import { setValueEvaluator } from "../conditions/conditions";
 import { executeRequest } from "./http";
 import { injectHtml } from "./inject";
 import { assertNever } from "../core/assert-never";
 import { applyShape } from "../core/shape-convert";
-import { walkPath, walk } from "../core/walk";
+import { walk } from "../core/walk";
+import { walkPath } from "../core/walk";
+import { scope } from "../core/trace";
 
 const log = scope("execute");
 
-/** Global plan reference — set by boot, used by executor. */
 let activePlan: Plan | undefined;
 
 export function setActivePlan(plan: Plan): void {
@@ -29,12 +31,13 @@ export function setActivePlan(plan: Plan): void {
 }
 
 function requirePlan(plan?: Plan): Plan {
-  const p = plan ?? activePlan;
-  if (!p) throw new Error("[alis] no active plan — was boot() called?");
-  return p;
+  return plan ?? activePlan ?? (() => { throw new Error("[alis] no active plan"); })();
 }
 
-// ── Main dispatch ──────────────────────────────────────────
+// Wire the value evaluator into conditions (breaks circular dep)
+setValueEvaluator(evaluateValue);
+
+// ── Main executor ─────────────────────────────────────────
 
 export async function executeReaction(
   reaction: Reaction,
@@ -137,11 +140,12 @@ function executeDispatch(reaction: DispatchReaction, plan: Plan, ctx?: ExecConte
 // ── Inject reaction ────────────────────────────────────────
 
 function executeInject(reaction: InjectReaction, plan: Plan, ctx?: ExecContext): void {
-  // Into() targets a DOM element by ID — may or may not be a registered component
+  // Every inject target MUST be registered in plan.components.
+  // The C# Into() builder calls EnsureElement() to register it.
   const comp = plan.components[reaction.component];
-  const elementId = comp?.id ?? reaction.component;
-  const container = document.getElementById(elementId);
-  if (!container) throw new Error(`[alis] inject target element not found: ${elementId}`);
+  if (!comp) throw new Error(`[alis] inject target component not found: ${reaction.component}`);
+  const container = document.getElementById(comp.id);
+  if (!container) throw new Error(`[alis] inject target element not found: ${comp.id}`);
   const value = evaluateValue(reaction.value, plan, ctx);
   if (typeof value === "string") {
     injectHtml(container, value);
@@ -157,18 +161,11 @@ async function showValidationErrors(
   plan: Plan,
   ctx?: ExecContext,
 ): Promise<void> {
-  // Delegates to the validation module
-  // The container key identifies which ContainerScope holds the rules
-  const comp = plan.components[reaction.container];
-  if (!comp) throw new Error(`[alis] container component not found: ${reaction.container}`);
-  if (!comp.container) throw new Error(`[alis] component "${reaction.container}" has no container scope`);
-
-  // Import validation dynamically to avoid circular deps
   const { validateContainer } = await import("../validation");
   validateContainer(plan, reaction.container, ctx);
 }
 
-// ── Value evaluation ───────────────────────────────────────
+// ── Value evaluation ──────────────────────────────────────
 
 export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecContext): unknown {
   switch (producer.kind) {
@@ -177,11 +174,13 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
 
     case "read": {
       const root = resolveSource(plan, producer.from, ctx);
+
+      // Component source: look up member in JsType
       if (producer.from.kind === "component") {
         const jsType = getJsTypeForSource(plan, producer.from);
         const prop = jsType.properties?.[producer.member];
         if (prop) {
-          return applyShape(readProperty(root, prop), producer.shape ?? prop.shape);
+          return applyShape(resolverReadProperty(root, prop), producer.shape ?? prop.shape);
         }
         const method = jsType.methods?.[producer.member];
         if (method) {
@@ -189,17 +188,14 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
         }
         throw new Error(`[alis] member "${producer.member}" not found on type`);
       }
-      // For payload sources: member is a dot-path (e.g. "evt.address.city" or "responseBody.data.name").
-      // The prefix (evt, responseBody, etc.) was already resolved by resolveSource — strip it and walk the rest.
-      // If a structured path exists, prefer it; otherwise walk the member as a dot-path on the payload root.
+      // Payload source: walk member as dot-path on resolved payload
       if (producer.path) {
+        
         return applyShape(walkPath(root as any, producer.path), producer.shape);
       }
-      // Walk the member as a dot-path, skipping the scope prefix that resolveSource already resolved.
-      // If the member IS the scope prefix (single segment like "responseBody"), return the whole payload.
+      // Walk the member as a dot-path, skipping the scope prefix
       const dotParts = producer.member.split(".");
       if (dotParts.length <= 1) {
-        // Single segment = scope prefix only, means "the entire payload"
         return applyShape(root, producer.shape);
       }
       const valueParts = dotParts.slice(1);
@@ -222,5 +218,4 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
   }
 }
 
-// Break circular dependency: inject evaluateValue into conditions module
-setValueEvaluator(evaluateValue);
+// Import helper for property reading

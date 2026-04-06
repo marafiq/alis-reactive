@@ -85,7 +85,9 @@ namespace Alis.Reactive.Builders
 
         public PipelineBuilder<TModel> Into(string elementId)
         {
-            // ctx.response IS the body — no member navigation needed
+            // Register the inject target in the plan — every component reference
+            // must be in the plan. No fallbacks in the runtime.
+            Context.EnsureElement(elementId);
             Steps.Add(Reaction.Inject(elementId, ValueProducer.Read(PayloadSource.Success(), "responseBody")));
             return this;
         }
@@ -102,16 +104,9 @@ namespace Alis.Reactive.Builders
             if (_mode == PipelineMode.Http && _httpBuilder != null)
             {
                 var request = _httpBuilder.BuildRequest();
-                var requestReaction = Reaction.Request(request);
                 if (Steps.Count > 0)
-                {
-                    var all = new List<Reaction>(Steps) { requestReaction };
-                    _segments.Add(Reaction.Sequence(all));
-                }
-                else
-                {
-                    _segments.Add(requestReaction);
-                }
+                    request.Before = new List<Reaction>(Steps);
+                _segments.Add(Reaction.Request(request));
                 Steps.Clear();
                 _httpBuilder = null;
             }
@@ -175,7 +170,6 @@ namespace Alis.Reactive.Builders
             var branch = Reaction.Branch(ConditionalBranches ?? new List<BranchCase>());
             if (Steps.Count > 0)
             {
-                // Pre-conditional steps + branch = sequence
                 var all = new List<Reaction>(Steps) { branch };
                 return Reaction.Sequence(all);
             }
@@ -194,7 +188,6 @@ namespace Alis.Reactive.Builders
             return requestReaction;
         }
 
-        // SetMode and builder accessors for Http/Parallel/Conditions partial classes
         internal void SetHttpMode(HttpRequestBuilder<TModel> builder)
         {
             _mode = PipelineMode.Http;
