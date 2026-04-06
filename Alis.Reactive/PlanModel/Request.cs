@@ -46,6 +46,10 @@ namespace Alis.Reactive.PlanModel
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public ValueProducer Statics { get; }
 
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+        [System.Text.Json.Serialization.JsonInclude]
+        internal bool IncludeAll { get; set; }
+
         internal GatherInput(List<GatherField> components, string transport, ValueProducer statics = null)
         {
             Components = components;
@@ -72,13 +76,24 @@ namespace Alis.Reactive.PlanModel
         public string Component { get; }
         public string Key { get; }
 
-        internal GatherField(string component, string key)
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        [System.Text.Json.Serialization.JsonInclude]
+        internal string BindingPath { get; }
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        [System.Text.Json.Serialization.JsonInclude]
+        internal Shape Shape { get; }
+
+        internal GatherField(string component, string key, string bindingPath = null, Shape shape = null)
         {
             Component = component;
             Key = key;
+            BindingPath = bindingPath;
+            Shape = shape;
         }
 
-        internal static GatherField Of(string component, string key) => new GatherField(component, key);
+        internal static GatherField Of(string component, string key, string bindingPath = null, Shape shape = null)
+            => new GatherField(component, key, bindingPath, shape);
     }
 
     /// <summary>

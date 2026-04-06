@@ -246,6 +246,7 @@ export interface GatherInput {
   components: GatherField[];
   transport: Transport;
   statics?: ValueProducer;
+  includeAll?: boolean;
 }
 
 export interface ValueInput {
@@ -257,6 +258,8 @@ export interface ValueInput {
 export interface GatherField {
   component: string;
   key: string;
+  bindingPath?: string;
+  shape?: Shape;
 }
 
 export interface ResponseHandler {

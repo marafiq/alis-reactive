@@ -77,6 +77,7 @@ namespace Alis.Reactive.Builders.Requests
             if (_gatherBuilder != null)
             {
                 // Expand IncludeAll: add a GatherField for every registered input component
+                // with explicit bindingPath and shape — the plan carries all information.
                 if (_gatherBuilder.IsIncludeAll)
                 {
                     var registered = _context.GetRegisteredComponents();
@@ -84,11 +85,8 @@ namespace Alis.Reactive.Builders.Requests
                     {
                         var reg = kvp.Value;
                         if (!_gatherBuilder.Fields.Exists(f => f.Component == reg.ComponentId))
-                            _gatherBuilder.AddField(GatherField.Of(reg.ComponentId, kvp.Key));
+                            _gatherBuilder.AddField(GatherField.Of(reg.ComponentId, kvp.Key, kvp.Key, reg.Shape));
                     }
-                    // Sentinel: tells the runtime to also gather dynamically-merged
-                    // components from partial plan injection.
-                    _gatherBuilder.AddField(GatherField.Of("__include_all__", "__include_all__"));
                 }
 
                 // Build request input from gather fields + static fields + event fields.
@@ -106,7 +104,9 @@ namespace Alis.Reactive.Builders.Requests
                             fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
                         statics = ValueProducer.Object(fields);
                     }
-                    request.Input = new GatherInput(_gatherBuilder.Fields, _transport, statics);
+                    var gatherInput = new GatherInput(_gatherBuilder.Fields, _transport, statics);
+                    if (_gatherBuilder.IsIncludeAll) gatherInput.IncludeAll = true;
+                    request.Input = gatherInput;
                 }
 
                 // Static and event fields become a ValueInput when no component fields
