@@ -49,8 +49,18 @@ export class PlanRegistry {
     // Merge types
     Object.assign(target.types, incoming.types);
 
-    // Merge components
-    Object.assign(target.components, incoming.components);
+    // Merge components — deep-merge ContainerScope.validationRules when both
+    // the existing and incoming component define a container with rules.
+    for (const [key, comp] of Object.entries(incoming.components)) {
+      const existing = target.components[key];
+      if (existing?.container?.validationRules && comp.container?.validationRules) {
+        // Merge validation rules by component key — incoming replaces per-component, new appends
+        const ruleMap = new Map(existing.container.validationRules.map(cv => [cv.component, cv]));
+        for (const cv of comp.container.validationRules) ruleMap.set(cv.component, cv);
+        comp.container.validationRules = [...ruleMap.values()];
+      }
+      target.components[key] = comp;
+    }
 
     // Wire and merge behaviors
     const abort = partId ? new AbortController() : undefined;
@@ -104,7 +114,11 @@ export class PlanRegistry {
       }
     }
 
-    // Remove components from this source and clear their live-clear wiring
+    // Remove components from this source and clear their live-clear wiring.
+    // Validation rules referencing removed components are left in place —
+    // the orchestrator already handles component-not-found gracefully.
+    // Removing rules here would break partial reload: the parent container's
+    // rules are set at C# build time and not re-merged when the partial reloads.
     const oldKeys = this.sourceComponentKeys.get(partId);
     if (oldKeys) {
       for (const key of oldKeys) {

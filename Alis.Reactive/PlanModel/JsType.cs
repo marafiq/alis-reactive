@@ -18,7 +18,30 @@ namespace Alis.Reactive.PlanModel
         internal JsType WithProperty(string name, Path path, Shape shape, string access)
         {
             _properties ??= new Dictionary<string, JsProperty>();
-            _properties[name] = new JsProperty(path, shape, access);
+            if (_properties.TryGetValue(name, out var existing))
+            {
+                // Keep the more specific shape: typed shape wins over Any/None/Nullable wrapper.
+                // Compatible pairs: Date ↔ Nullable(Date), String ↔ Nullable(String), etc.
+                var keepShape = ShapeCompat.Resolve(existing.Shape, shape);
+                if (keepShape == null)
+                    throw new System.InvalidOperationException(
+                        $"Property '{name}' registered with shape '{existing.Shape.Kind}' " +
+                        $"but re-registered with conflicting shape '{shape.Kind}'.");
+                // Widen access: read + write → readwrite
+                var widenedAccess = (existing.Access, access) switch
+                {
+                    ("readwrite", _) => "readwrite",
+                    (_, "readwrite") => "readwrite",
+                    ("read", "write") => "readwrite",
+                    ("write", "read") => "readwrite",
+                    _ => access,
+                };
+                _properties[name] = new JsProperty(path, keepShape, widenedAccess);
+            }
+            else
+            {
+                _properties[name] = new JsProperty(path, shape, access);
+            }
             return this;
         }
 
@@ -46,6 +69,25 @@ namespace Alis.Reactive.PlanModel
         {
             DefaultValue = new DefaultValue("method", member, shape);
             return this;
+        }
+    }
+
+    /// <summary>
+    /// Picks the most specific compatible shape from two registrations.
+    /// Returns null if incompatible (true conflict).
+    /// </summary>
+    internal static class ShapeCompat
+    {
+        internal static Shape Resolve(Shape a, Shape b)
+        {
+            if (a == b) return a;
+            // Any/None are wildcards — the other wins
+            if (a == Shape.Any || a == Shape.None) return b;
+            if (b == Shape.Any || b == Shape.None) return a;
+            // Nullable wrapping: Date ↔ Nullable(Date) → keep Nullable(Date)
+            if (a.Kind == "nullable" && a.Inner == b) return a;
+            if (b.Kind == "nullable" && b.Inner == a) return b;
+            return null; // incompatible
         }
     }
 

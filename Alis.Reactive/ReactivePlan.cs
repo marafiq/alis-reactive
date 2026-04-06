@@ -183,11 +183,12 @@ namespace Alis.Reactive
                     field.FieldId, planRules));
             }
 
-            // Attach to the container component's ContainerScope
+            // Attach to the container component's ContainerScope.
+            // Merge — multiple requests can target the same container (e.g., save + submit).
             if (_context.Plan.MutableComponents.TryGetValue(container, out var comp))
             {
                 comp.Container ??= ContainerScope.Of();
-                comp.Container.ValidationRules = componentValidations;
+                MergeValidationRules(comp.Container, componentValidations);
             }
             else
             {
@@ -195,8 +196,25 @@ namespace Alis.Reactive
                 _context.EnsureElement(container);
                 var formComp = _context.Plan.MutableComponents[container];
                 formComp.Container = ContainerScope.Of();
-                formComp.Container.ValidationRules = componentValidations;
+                MergeValidationRules(formComp.Container, componentValidations);
             }
+        }
+
+        private static void MergeValidationRules(
+            ContainerScope container, List<ComponentValidation> incoming)
+        {
+            if (container.ValidationRules == null)
+            {
+                container.ValidationRules = incoming;
+                return;
+            }
+            // Merge by component key — incoming rules for the same component replace,
+            // new components are appended. This handles the case where two requests
+            // in the same plan both validate the same container.
+            var existing = container.ValidationRules.ToDictionary(cv => cv.Component);
+            foreach (var cv in incoming)
+                existing[cv.Component] = cv;
+            container.ValidationRules = existing.Values.ToList();
         }
 
         private PlanModel.ValidationRule ToPlanValidationRule(
