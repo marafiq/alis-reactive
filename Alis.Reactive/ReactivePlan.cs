@@ -97,6 +97,7 @@ namespace Alis.Reactive
             {
                 case RequestReaction rr:
                     ResolveRequestValidation(rr.Request);
+                    WalkRequestReactions(rr.Request);
                     break;
                 case SequenceReaction seq:
                     foreach (var step in seq.Steps) CollectValidationFromReaction(step);
@@ -108,6 +109,32 @@ namespace Alis.Reactive
                 case BranchReaction br:
                     foreach (var c in br.Cases) CollectValidationFromReaction(c.Reaction);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Walks all nested reactions inside a Request (Before, Success, Error, Complete, Next).
+        /// </summary>
+        private void WalkRequestReactions(Request request)
+        {
+            if (request.Before != null)
+                foreach (var r in request.Before) CollectValidationFromReaction(r);
+
+            if (request.Success != null)
+                foreach (var h in request.Success)
+                    if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
+
+            if (request.Error != null)
+                foreach (var h in request.Error)
+                    if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
+
+            if (request.Complete != null)
+                foreach (var r in request.Complete) CollectValidationFromReaction(r);
+
+            if (request.Next != null)
+            {
+                ResolveRequestValidation(request.Next);
+                WalkRequestReactions(request.Next);
             }
         }
 
@@ -172,7 +199,14 @@ namespace Alis.Reactive
                 rule.Constraint = ValueProducer.LiteralRaw(extracted.Constraint, extracted.Shape ?? Shape.Any);
 
             if (extracted.Field != null)
-                rule.OtherComponent = extracted.Field;
+            {
+                // Map the raw property name to the component ID so the runtime
+                // can resolve plan.components[otherComponent] correctly.
+                if (_componentsMap.TryGetValue(extracted.Field, out var otherReg))
+                    rule.OtherComponent = otherReg.ComponentId;
+                else
+                    rule.OtherComponent = extracted.Field;
+            }
 
             if (extracted.When != null)
                 rule.When = ToCondition(extracted.When);

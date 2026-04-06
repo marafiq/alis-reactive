@@ -106,6 +106,7 @@ namespace Alis.Reactive.Builders.Conditions
 
             var cases = new List<BranchCase> { branchCase };
             _pipeline.SetConditionalBranches(cases);
+            _pipeline.SetConditionalMode();
             return new BranchBuilder<TModel>(_pipeline, cases);
         }
 

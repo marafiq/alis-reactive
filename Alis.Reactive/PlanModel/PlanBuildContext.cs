@@ -50,12 +50,57 @@ namespace Alis.Reactive.PlanModel
             if (!_plan.MutableComponents.ContainsKey(key))
             {
                 var typeKey = vendor + "." + componentId;
-                if (!_plan.MutableTypes.ContainsKey(typeKey))
+
+                // When the component is a registered input component, create an enriched
+                // JsType with valueMember and defaultValue so that Read(ComponentSource, "value")
+                // can resolve the member even when EnsureInputComponent runs later.
+                if (_components.TryGetValue(key, out var reg)
+                    || TryFindRegistrationById(componentId, out reg))
+                {
+                    var jsType = new JsType()
+                        .WithProperty(reg.ValueMember, Path.Parse(reg.ValueMember), reg.Shape, "read")
+                        .WithDefaultValue(reg.ValueMember, reg.Shape);
+                    _plan.MutableTypes[typeKey] = jsType;
+                }
+                else if (!_plan.MutableTypes.ContainsKey(typeKey))
+                {
                     _plan.MutableTypes[typeKey] = new JsType();
+                }
 
                 _plan.MutableComponents[key] = Component.Create(componentId, vendor, typeKey);
             }
+            else if (_components.TryGetValue(key, out var reg)
+                     || TryFindRegistrationById(componentId, out reg))
+            {
+                // Component already registered — enrich its JsType with defaultValue if missing
+                var existing = _plan.MutableComponents[key];
+                var jsType = _plan.MutableTypes[existing.Type];
+                if (jsType.DefaultValue == null)
+                {
+                    jsType.WithProperty(reg.ValueMember, Path.Parse(reg.ValueMember), reg.Shape, "read");
+                    jsType.WithDefaultValue(reg.ValueMember, reg.Shape);
+                }
+            }
             return key;
+        }
+
+        /// <summary>
+        /// Searches the components map for a registration whose ComponentId matches.
+        /// The map is keyed by binding path (property name), but the componentId is
+        /// the generated HTML id which differs from the binding path.
+        /// </summary>
+        private bool TryFindRegistrationById(string componentId, out ComponentRegistration registration)
+        {
+            foreach (var kvp in _components)
+            {
+                if (kvp.Value.ComponentId == componentId)
+                {
+                    registration = kvp.Value;
+                    return true;
+                }
+            }
+            registration = null;
+            return false;
         }
 
         /// <summary>
