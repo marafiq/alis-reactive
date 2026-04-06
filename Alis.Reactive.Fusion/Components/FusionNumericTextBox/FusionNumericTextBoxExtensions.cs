@@ -71,6 +71,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<decimal> Value<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class
-            => new TypedComponentSource<decimal>(self.TargetId, Component.Vendor, Component.ValueMember);
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); return new TypedComponentSource<decimal>(self.TargetId, Component.Vendor, Component.ValueMember); }
     }
 }

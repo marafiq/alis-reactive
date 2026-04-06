@@ -33,6 +33,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<FusionSwitch, TModel> self)
             where TModel : class
-            => new TypedComponentSource<bool>(self.TargetId, Component.Vendor, Component.ValueMember);
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); return new TypedComponentSource<bool>(self.TargetId, Component.Vendor, Component.ValueMember); }
     }
 }
