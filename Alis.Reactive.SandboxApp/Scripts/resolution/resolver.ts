@@ -17,6 +17,8 @@ import type { ExecContext } from "../types";
 import { walkPath, walkPathParent } from "../core/walk";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
+import { wire as wireNative } from "./event-native";
+import { wire as wireFusion } from "./event-fusion";
 
 const log = scope("resolver");
 
@@ -175,6 +177,27 @@ export function readDefaultValue(plan: Plan, componentKey: string): unknown {
     const method = jsType.methods?.[dv.member];
     if (!method) throw new Error(`[alis] defaultValue method not found: ${dv.member}`);
     return callMethod(root, method, []);
+  }
+}
+
+// ── Event wiring ──────────────────────────────────────────
+
+/** Wire an event listener on a component — dispatches to vendor-specific module. */
+export function wireEvent(
+  plan: Plan,
+  componentKey: string,
+  channel: string,
+  handler: (data: unknown) => void,
+  opts?: AddEventListenerOptions,
+): void {
+  const comp = plan.components[componentKey];
+  if (!comp) throw new Error(`[alis] wireEvent: component not found: ${componentKey}`);
+  const root = resolveComponent(plan, componentKey);
+
+  switch (comp.vendor) {
+    case "native":  wireNative(root, channel, handler, opts); break;
+    case "fusion":  wireFusion(root, channel, handler, opts); break;
+    default: assertNever(comp.vendor, "vendor");
   }
 }
 

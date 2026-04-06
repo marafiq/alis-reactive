@@ -1,5 +1,5 @@
 import type { Plan, Reaction, StartsWhen, ExecContext } from "../types";
-import { resolveComponent, getJsType } from "../resolution/resolver";
+import { resolveComponent, getJsType, wireEvent } from "../resolution/resolver";
 import { executeReaction } from "./execute";
 import { wireServerPush } from "./server-push";
 import { wireSignalR } from "./signalr";
@@ -46,32 +46,13 @@ export function wireBehavior(
       const eventDef = jsType.events?.[trigger.event];
       const channel = eventDef?.channel ?? trigger.event;
 
-      const root = resolveComponent(plan, trigger.component);
-
       log.debug("component-event", { component: trigger.component, event: trigger.event, channel });
 
-      // Vendor-specific event wiring:
-      // - Native: standard DOM addEventListener on the element
-      // - Fusion: SF addEventListener on the component instance (NO opts — SF doesn't support AbortSignal)
-      if (comp.vendor === "fusion") {
-        // SF's addEventListener doesn't support DOM options like {signal}.
-        // Pass handler only — SF manages its own event lifecycle.
-        (root as any).addEventListener(channel, (args: any) => {
-          const ctx: ExecContext = { event: args ?? {} };
-          executeReaction(reaction, plan, ctx).catch(err =>
-            log.error("reaction failed", { error: String(err) }));
-        });
-      } else {
-        // Native: standard DOM addEventListener with abort signal support
-        (root as EventTarget).addEventListener(channel, (e: Event) => {
-          const eventData = e instanceof CustomEvent
-            ? (e.detail ?? {})
-            : (e.currentTarget ?? e.target ?? e);
-          const ctx: ExecContext = { event: eventData };
-          executeReaction(reaction, plan, ctx).catch(err =>
-            log.error("reaction failed", { error: String(err) }));
-        }, opts);
-      }
+      wireEvent(plan, trigger.component, channel, (eventData) => {
+        const ctx: ExecContext = { event: eventData };
+        executeReaction(reaction, plan, ctx).catch(err =>
+          log.error("reaction failed", { error: String(err) }));
+      }, opts);
       break;
     }
 

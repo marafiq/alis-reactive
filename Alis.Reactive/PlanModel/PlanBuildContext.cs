@@ -198,6 +198,14 @@ namespace Alis.Reactive.PlanModel
 
         internal void AddBehavior(Behavior behavior)
         {
+            // Auto-register JsEvent for component-event triggers so the plan
+            // carries event metadata. Covers all 26 Reactive extensions.
+            if (behavior.StartsWhen is ComponentEventTrigger cet
+                && _plan.MutableComponents.ContainsKey(cet.Component))
+            {
+                EnsureEvent(cet.Component, cet.Event, cet.Event);
+            }
+
             _plan.MutableBehaviors.Add(behavior);
         }
     }

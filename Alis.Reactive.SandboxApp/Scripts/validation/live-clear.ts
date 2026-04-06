@@ -5,7 +5,7 @@
 // On input: clears only (typing should not show errors mid-keystroke).
 
 import type { Plan, Component } from "../types";
-import { resolveElement, resolveVendorRoot } from "../resolution/resolver";
+import { resolveElement, wireEvent } from "../resolution/resolver";
 import { clearInline } from "./error-display";
 import { revalidateField } from "./orchestrator";
 import { scope } from "../core/trace";
@@ -50,18 +50,16 @@ function wireField(plan: Plan, containerId: string, containerKey: string, compon
   const clearHandler = () => clearInline(containerId, comp.id);
   const revalidateHandler = () => revalidateField(plan, containerKey, componentKey);
 
-  if (comp.vendor === "native") {
-    el.addEventListener("input", clearHandler);
-    el.addEventListener("blur", revalidateHandler);
-    el.addEventListener("change", revalidateHandler);
-  } else {
-    // Fusion (and future vendors): listen on the vendor root
-    try {
-      const root = resolveVendorRoot(el, comp.vendor);
-      (root as EventTarget).addEventListener("change", revalidateHandler);
-    } catch {
-      // Component not yet initialized — skip, will be wired on merge
-    }
+  // DOM events (input, blur) fire on the underlying element for ALL vendors.
+  // The SF element is a standard <input> — it receives native DOM events.
+  el.addEventListener("input", clearHandler);
+  el.addEventListener("blur", revalidateHandler);
+
+  // Semantic "change" goes through the vendor's event system (DOM or modelObserver).
+  try {
+    wireEvent(plan, componentKey, "change", () => revalidateHandler());
+  } catch {
+    // Component not yet initialized — skip, will be wired on merge
   }
 }
 
