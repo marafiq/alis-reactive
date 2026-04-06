@@ -75,7 +75,8 @@ namespace Alis.Reactive.Native.Extensions
             ReactivePlan<TModel> plan) where TModel : class
         {
             var json = plan.Render();
-            var script = $"<script type=\"application/json\" data-reactive-plan data-trace=\"trace\">{json}</script>";
+            var elementId = plan.PlanId.Replace('.', '-').Replace('+', '-');
+            var script = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
 
             // Validation errors display inline next to each field by default.
             // The summary div is a fallback for errors that cannot be shown inline:

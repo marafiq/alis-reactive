@@ -60,8 +60,11 @@ export async function evaluateConditionAsync(condition: Condition, plan: Plan, c
       return false;
     case "not":
       return !(await evaluateConditionAsync(condition.term, plan, ctx));
-    case "confirm":
-      return (window as any).alis?.confirm?.(condition.message) ?? Promise.resolve(false);
+    case "confirm": {
+      const confirmFn = (window as any).alis?.confirm;
+      if (!confirmFn) throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
+      return confirmFn(condition.message);
+    }
     default:
       assertNever(condition, "condition kind");
   }
