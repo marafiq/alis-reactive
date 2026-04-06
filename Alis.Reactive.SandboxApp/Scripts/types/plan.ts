@@ -64,6 +64,7 @@ export interface ContainerScope {
 
 export interface ComponentValidation {
   component: string;
+  serverFieldName?: string;
   rules: ValidationRule[];
 }
 

@@ -39,10 +39,15 @@ namespace Alis.Reactive.PlanModel
         public string Component { get; }
         public List<ValidationRule> Rules { get; }
 
-        internal ComponentValidation(string component, List<ValidationRule> rules)
+        [System.Text.Json.Serialization.JsonInclude]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        internal string ServerFieldName { get; }
+
+        internal ComponentValidation(string component, List<ValidationRule> rules, string serverFieldName = null)
         {
             Component = component;
             Rules = rules;
+            ServerFieldName = serverFieldName;
         }
     }
 

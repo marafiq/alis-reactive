@@ -180,7 +180,7 @@ namespace Alis.Reactive
 
                 var planRules = field.Rules.Select(r => ToPlanValidationRule(r, field)).ToList();
                 componentValidations.Add(new ComponentValidation(
-                    field.FieldId, planRules));
+                    field.FieldId, planRules, field.FieldName));
             }
 
             // Attach to the container component's ContainerScope.
