@@ -34,15 +34,19 @@ export function resolveSource(plan: Plan, source: Source, ctx?: ExecContext): un
   }
 }
 
-/** Resolve component key -> JS object root (vendor-dispatched). */
-export function resolveComponent(plan: Plan, componentKey: string): unknown {
+/** Resolve a component's raw DOM element (not vendor root). For inject, validation, error display. */
+export function resolveElement(plan: Plan, componentKey: string): HTMLElement {
   const comp = plan.components[componentKey];
   if (!comp) throw new Error(`[alis] component not found: ${componentKey}`);
-
   const el = document.getElementById(comp.id);
   if (!el) throw new Error(`[alis] element not found: ${comp.id}`);
+  return el;
+}
 
-  return resolveVendorRoot(el, comp.vendor);
+/** Resolve component key -> JS object root (vendor-dispatched). */
+export function resolveComponent(plan: Plan, componentKey: string): unknown {
+  const el = resolveElement(plan, componentKey);
+  return resolveVendorRoot(el, plan.components[componentKey]!.vendor);
 }
 
 /** Resolve vendor-specific root from a DOM element. */

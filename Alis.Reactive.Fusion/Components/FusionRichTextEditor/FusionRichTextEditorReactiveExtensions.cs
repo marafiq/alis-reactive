@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
         public static RichTextEditorBuilder Reactive<TModel, TArgs>(
             this RichTextEditorBuilder builder,
             ReactivePlan<TModel> plan,
-            Func<FusionRichTextEditorEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionRichTextEditorEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

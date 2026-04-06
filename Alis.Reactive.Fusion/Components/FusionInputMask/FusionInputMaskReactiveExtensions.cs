@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
         public static MaskedTextBoxBuilder Reactive<TModel, TArgs>(
             this MaskedTextBoxBuilder builder,
             ReactivePlan<TModel> plan,
-            Func<FusionInputMaskEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionInputMaskEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

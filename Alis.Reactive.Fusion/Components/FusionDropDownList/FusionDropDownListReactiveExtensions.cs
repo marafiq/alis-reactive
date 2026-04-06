@@ -40,7 +40,7 @@ namespace Alis.Reactive.Fusion.Components
         public static DropDownListBuilder Reactive<TModel, TArgs>(
             this DropDownListBuilder builder,
             ReactivePlan<TModel> plan,
-            Func<FusionDropDownListEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionDropDownListEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

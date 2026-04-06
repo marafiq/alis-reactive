@@ -11,8 +11,8 @@ namespace Alis.Reactive.Native.Components
         private TestWidgetNativeEvents() { }
 
         /// <summary>Fires when the user changes the input value (DOM "change" event).</summary>
-        public TypedEventDescriptor<TestWidgetNativeChangeArgs> Changed =>
-            new TypedEventDescriptor<TestWidgetNativeChangeArgs>(
+        public TypedEvent<TestWidgetNativeChangeArgs> Changed =>
+            new TypedEvent<TestWidgetNativeChangeArgs>(
                 "change", new TestWidgetNativeChangeArgs());
     }
 }

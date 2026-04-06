@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static FusionTabBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionTabBuilder<TModel> builder,
-            Func<FusionTabEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionTabEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

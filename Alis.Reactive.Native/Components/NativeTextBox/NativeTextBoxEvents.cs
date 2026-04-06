@@ -18,8 +18,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Fires when the user changes the input value and leaves the field.
         /// </summary>
-        public TypedEventDescriptor<NativeTextBoxChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeTextBoxChangeArgs>(
+        public TypedEvent<NativeTextBoxChangeArgs> Changed =>
+            new TypedEvent<NativeTextBoxChangeArgs>(
                 "change", new NativeTextBoxChangeArgs());
     }
 }

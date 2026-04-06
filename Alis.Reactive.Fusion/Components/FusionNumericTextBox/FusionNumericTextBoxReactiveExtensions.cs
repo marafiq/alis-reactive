@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
         public static NumericTextBoxBuilder Reactive<TModel, TArgs>(
             this NumericTextBoxBuilder builder,
             ReactivePlan<TModel> plan,
-            Func<FusionNumericTextBoxEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionNumericTextBoxEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

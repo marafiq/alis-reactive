@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
         public static MultiSelectBuilder Reactive<TModel, TArgs>(
             this MultiSelectBuilder builder,
             ReactivePlan<TModel> plan,
-            Func<FusionMultiSelectEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionMultiSelectEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

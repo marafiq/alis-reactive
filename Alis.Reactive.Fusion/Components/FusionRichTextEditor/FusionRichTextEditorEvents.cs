@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionRichTextEditorEvents() { }
 
         /// <summary>Fires when the rich text content changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionRichTextEditorChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionRichTextEditorChangeArgs>(
+        public TypedEvent<FusionRichTextEditorChangeArgs> Changed =>
+            new TypedEvent<FusionRichTextEditorChangeArgs>(
                 "change", new FusionRichTextEditorChangeArgs());
     }
 }

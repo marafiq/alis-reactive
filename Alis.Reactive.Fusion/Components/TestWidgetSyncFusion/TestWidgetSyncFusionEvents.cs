@@ -5,10 +5,10 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly TestWidgetSyncFusionEvents Instance = new TestWidgetSyncFusionEvents();
         private TestWidgetSyncFusionEvents() { }
 
-        public TypedEventDescriptor<TestWidgetSyncFusionChangeArgs> Changed =>
-            new TypedEventDescriptor<TestWidgetSyncFusionChangeArgs>("change", new TestWidgetSyncFusionChangeArgs());
+        public TypedEvent<TestWidgetSyncFusionChangeArgs> Changed =>
+            new TypedEvent<TestWidgetSyncFusionChangeArgs>("change", new TestWidgetSyncFusionChangeArgs());
 
-        public TypedEventDescriptor<TestWidgetSyncFusionItemsChangedArgs> ItemsChanged =>
-            new TypedEventDescriptor<TestWidgetSyncFusionItemsChangedArgs>("items-changed", new TestWidgetSyncFusionItemsChangedArgs());
+        public TypedEvent<TestWidgetSyncFusionItemsChangedArgs> ItemsChanged =>
+            new TypedEvent<TestWidgetSyncFusionItemsChangedArgs>("items-changed", new TestWidgetSyncFusionItemsChangedArgs());
     }
 }

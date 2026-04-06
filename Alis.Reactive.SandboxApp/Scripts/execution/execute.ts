@@ -9,7 +9,7 @@ import type {
   ValueProducer, ExecContext, Source,
 } from "../types";
 import {
-  resolveSource, getJsTypeForSource, readProperty as resolverReadProperty,
+  resolveSource, resolveElement, getJsTypeForSource, readProperty as resolverReadProperty,
   setProperty, callMethod,
 } from "../resolution/resolver";
 import { evaluateConditionAsync } from "../conditions/conditions";
@@ -142,10 +142,7 @@ function executeDispatch(reaction: DispatchReaction, plan: Plan, ctx?: ExecConte
 function executeInject(reaction: InjectReaction, plan: Plan, ctx?: ExecContext): void {
   // Every inject target MUST be registered in plan.components.
   // The C# Into() builder calls EnsureElement() to register it.
-  const comp = plan.components[reaction.component];
-  if (!comp) throw new Error(`[alis] inject target component not found: ${reaction.component}`);
-  const container = document.getElementById(comp.id);
-  if (!container) throw new Error(`[alis] inject target element not found: ${comp.id}`);
+  const container = resolveElement(plan, reaction.component);
   const value = evaluateValue(reaction.value, plan, ctx);
   if (typeof value === "string") {
     injectHtml(container, value);

@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionSwitchEvents() { }
 
         /// <summary>Fires when the switch state changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionSwitchChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionSwitchChangeArgs>(
+        public TypedEvent<FusionSwitchChangeArgs> Changed =>
+            new TypedEvent<FusionSwitchChangeArgs>(
                 "change", new FusionSwitchChangeArgs());
     }
 }

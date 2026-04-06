@@ -36,7 +36,7 @@ namespace Alis.Reactive.Native.Components
         public static NativeTextAreaBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeTextAreaBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,
-            Func<NativeTextAreaEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<NativeTextAreaEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

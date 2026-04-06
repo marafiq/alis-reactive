@@ -40,7 +40,7 @@ namespace Alis.Reactive.Native.Components
         public static NativeRadioGroupBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeRadioGroupBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,
-            Func<NativeRadioGroupEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<NativeRadioGroupEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

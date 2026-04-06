@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionInputMaskEvents() { }
 
         /// <summary>Fires when the masked value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionInputMaskChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionInputMaskChangeArgs>(
+        public TypedEvent<FusionInputMaskChangeArgs> Changed =>
+            new TypedEvent<FusionInputMaskChangeArgs>(
                 "change", new FusionInputMaskChangeArgs());
     }
 }

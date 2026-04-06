@@ -1,4 +1,9 @@
 // retry-indicator.ts — Visual retry indicators for lost SSE/SignalR connections.
+//
+// getElementById is correct here. targetIds are raw DOM IDs collected during
+// SSE/SignalR behavior wiring — NOT component keys from plan.components.
+// This module has no Plan access and operates as a pure UI overlay for
+// connection-lost indicators. It does not resolve components.
 
 import { scope } from "../core/trace";
 
@@ -10,6 +15,8 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
   const anchored = new Set<HTMLElement>();
 
   for (const id of targetIds) {
+    // getElementById is correct — targetIds are raw DOM IDs, not component keys.
+    // See module header comment for rationale.
     const el = document.getElementById(id);
     if (!el) {
       log.warn("target not found", { key, id });

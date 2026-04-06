@@ -18,8 +18,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Fires when the user selects a different radio option.
         /// </summary>
-        public TypedEventDescriptor<NativeRadioGroupChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeRadioGroupChangeArgs>(
+        public TypedEvent<NativeRadioGroupChangeArgs> Changed =>
+            new TypedEvent<NativeRadioGroupChangeArgs>(
                 "change", new NativeRadioGroupChangeArgs());
     }
 }

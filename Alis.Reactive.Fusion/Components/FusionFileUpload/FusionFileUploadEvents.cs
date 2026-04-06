@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionFileUploadEvents() { }
 
         /// <summary>Fires when files are selected (SF "selected" event).</summary>
-        public TypedEventDescriptor<FusionFileUploadSelectedArgs> Selected =>
-            new TypedEventDescriptor<FusionFileUploadSelectedArgs>(
+        public TypedEvent<FusionFileUploadSelectedArgs> Selected =>
+            new TypedEvent<FusionFileUploadSelectedArgs>(
                 "selected", new FusionFileUploadSelectedArgs());
     }
 }

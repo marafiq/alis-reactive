@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public static FusionAccordionBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionAccordionBuilder<TModel> builder,
-            Func<FusionAccordionEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionAccordionEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

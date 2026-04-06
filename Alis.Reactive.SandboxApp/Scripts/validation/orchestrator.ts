@@ -8,7 +8,7 @@ import type {
   ValidationRule,
 } from "../types";
 import type { ExecContext } from "../types";
-import { readDefaultValue } from "../resolution/resolver";
+import { readDefaultValue, resolveElement } from "../resolution/resolver";
 import { evaluateCondition } from "../conditions/conditions";
 import { scope } from "../core/trace";
 import { toString } from "../core/shape-convert";
@@ -37,8 +37,10 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   }
 
   const containerId = containerComp.id;
-  const container = document.getElementById(containerId);
-  if (!container) {
+  let container: HTMLElement;
+  try {
+    container = resolveElement(plan, containerKey);
+  } catch {
     if ((containerScope.validationRules?.length ?? 0) > 0) {
       log.warn("validate: form container missing, blocking", { containerId });
       return false;
@@ -138,8 +140,10 @@ function evaluateComponentRules(
     return false;
   }
 
-  const el = document.getElementById(comp.id);
-  if (!el) {
+  let el: HTMLElement;
+  try {
+    el = resolveElement(plan, cv.component);
+  } catch {
     if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return true;
     if (cv.rules.length > 0 && summaryEl) {
       addToSummary(summaryEl, cv.component, cv.rules[0].message);
@@ -152,6 +156,9 @@ function evaluateComponentRules(
     return true;
   }
 
+  // Error spans are generated HTML elements ({componentDomId}_error), NOT plan components.
+  // They are created by Html.Field() in C# and follow a predictable ID convention.
+  // getElementById is correct here — error spans are not registered in plan.components.
   const errorSpan = document.getElementById(comp.id + "_error");
   const hidden = errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
 

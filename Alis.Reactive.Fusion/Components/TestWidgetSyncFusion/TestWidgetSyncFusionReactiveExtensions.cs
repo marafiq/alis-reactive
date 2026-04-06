@@ -11,7 +11,7 @@ namespace Alis.Reactive.Fusion.Components
         public static TestWidgetSyncFusionBuilder<TModel> Reactive<TModel, TArgs>(
             this TestWidgetSyncFusionBuilder<TModel> builder,
             ReactivePlan<TModel> plan,
-            Func<TestWidgetSyncFusionEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<TestWidgetSyncFusionEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

@@ -18,8 +18,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Fires when the user changes the textarea value and leaves the field.
         /// </summary>
-        public TypedEventDescriptor<NativeTextAreaChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeTextAreaChangeArgs>(
+        public TypedEvent<NativeTextAreaChangeArgs> Changed =>
+            new TypedEvent<NativeTextAreaChangeArgs>(
                 "change", new NativeTextAreaChangeArgs());
     }
 }

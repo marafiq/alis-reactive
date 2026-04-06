@@ -16,7 +16,7 @@ namespace Alis.Reactive.Native.Components
         public static NativeHiddenFieldBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeHiddenFieldBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,
-            Func<NativeHiddenFieldEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<NativeHiddenFieldEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

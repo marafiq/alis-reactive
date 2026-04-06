@@ -3,7 +3,7 @@
 // Uses SHARED resolver for vendor root resolution.
 
 import type { Plan, Component, ContainerScope } from "../types";
-import { resolveVendorRoot } from "../resolution/resolver";
+import { resolveElement, resolveVendorRoot } from "../resolution/resolver";
 import { clearInline } from "./error-display";
 import { scope } from "../core/trace";
 
@@ -35,8 +35,12 @@ export function wireLiveValidation(plan: Plan, containerKey: string): void {
 function wireField(plan: Plan, containerId: string, componentKey: string, comp: Component): void {
   if (wiredFields.has(comp.id)) return;
 
-  const el = document.getElementById(comp.id);
-  if (!el) return;
+  let el: HTMLElement;
+  try {
+    el = resolveElement(plan, componentKey);
+  } catch {
+    return; // Element not in DOM yet — will be wired on merge
+  }
 
   wiredFields.add(comp.id);
 

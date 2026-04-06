@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
         public static UploaderBuilder Reactive<TModel, TArgs>(
             this UploaderBuilder builder,
             ReactivePlan<TModel> plan,
-            Func<FusionFileUploadEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionFileUploadEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {

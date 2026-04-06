@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
         public static DateRangePickerBuilder Reactive<TModel, TArgs>(
             this DateRangePickerBuilder builder,
             ReactivePlan<TModel> plan,
-            Func<FusionDateRangePickerEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionDateRangePickerEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
