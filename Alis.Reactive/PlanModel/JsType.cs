@@ -27,16 +27,22 @@ namespace Alis.Reactive.PlanModel
                     throw new System.InvalidOperationException(
                         $"Property '{name}' registered with shape '{existing.Shape.Kind}' " +
                         $"but re-registered with conflicting shape '{shape.Kind}'.");
-                // Widen access: read + write → readwrite
+                // Widen access: read + write → readwrite. Explicit cases only.
                 var widenedAccess = (existing.Access, access) switch
                 {
                     ("readwrite", _) => "readwrite",
                     (_, "readwrite") => "readwrite",
                     ("read", "write") => "readwrite",
                     ("write", "read") => "readwrite",
-                    _ => access,
+                    ("read", "read") => "read",
+                    ("write", "write") => "write",
+                    _ => throw new System.InvalidOperationException(
+                        $"Property '{name}' has unknown access pair: '{existing.Access}' + '{access}'."),
                 };
-                _properties[name] = new JsProperty(path, keepShape, widenedAccess);
+                // Keep the existing path — the first registration defines the resolution path.
+                // Later re-registrations (from conditions, mutations) use the same member name
+                // and their paths are expected to match.
+                _properties[name] = new JsProperty(existing.Path, keepShape, widenedAccess);
             }
             else
             {

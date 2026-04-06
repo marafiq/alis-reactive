@@ -169,7 +169,16 @@ export function composeInitialPlans(plans: Plan[]): Plan[] {
       continue;
     }
     Object.assign(existing.types, plan.types);
-    Object.assign(existing.components, plan.components);
+    // Deep-merge components — same logic as PlanRegistry.add()
+    for (const [key, comp] of Object.entries(plan.components)) {
+      const prev = existing.components[key];
+      if (prev?.container?.validationRules && comp.container?.validationRules) {
+        const ruleMap = new Map(prev.container.validationRules.map(cv => [cv.component, cv]));
+        for (const cv of comp.container.validationRules) ruleMap.set(cv.component, cv);
+        comp.container.validationRules = [...ruleMap.values()];
+      }
+      existing.components[key] = comp;
+    }
     existing.behaviors.push(...plan.behaviors);
   }
   return Array.from(byPlanId.values());
