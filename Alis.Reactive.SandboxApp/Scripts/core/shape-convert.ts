@@ -33,6 +33,7 @@ export function applyShape(value: unknown, shape?: Shape): unknown {
     case "raw":      return value;
     case "any":      return value;
     case "object":   return value;
+    case "none":     return value;
     default: {
       const _: never = shape;
       throw new Error(`[alis] unknown shape kind: "${(_ as Shape).kind}"`);
@@ -58,6 +59,7 @@ export function convertByShape(value: unknown, shape: Shape): ConvertResult<unkn
     case "raw":      return ok(value);
     case "any":      return ok(value);
     case "object":   return ok(value);
+    case "none":     return ok(value);
     default: {
       const _: never = shape;
       throw new Error(`[alis] unknown shape kind: "${(_ as Shape).kind}"`);

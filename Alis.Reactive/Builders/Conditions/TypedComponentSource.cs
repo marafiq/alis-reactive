@@ -19,12 +19,12 @@ namespace Alis.Reactive.Builders.Conditions
             _valueMember = valueMember;
         }
 
-        public override ValueProducer ToValueProducer() =>
+        internal override ValueProducer ToValueProducer() =>
             ValueProducer.Read(PlanModel.ComponentSource.Of(_componentId), _valueMember, shape: Shape);
 
-        public override PlanModel.ComponentSource ToComponentSource() =>
+        internal override PlanModel.ComponentSource ToComponentSource() =>
             PlanModel.ComponentSource.Of(_componentId);
 
-        public override string ReadMember => _valueMember;
+        internal override string ReadMember => _valueMember;
     }
 }

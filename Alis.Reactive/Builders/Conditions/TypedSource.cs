@@ -13,29 +13,29 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>
         /// Produces a ValueProducer that reads this source's value.
         /// </summary>
-        public abstract ValueProducer ToValueProducer();
+        internal abstract ValueProducer ToValueProducer();
 
         /// <summary>
         /// Returns the ComponentSource for this typed source (for Set/Call reactions).
         /// Only valid for component sources.
         /// </summary>
-        public virtual ComponentSource ToComponentSource() =>
+        internal virtual ComponentSource ToComponentSource() =>
             throw new InvalidOperationException("Not a component source.");
 
         /// <summary>
         /// The member name to read on the resolved source.
         /// </summary>
-        public virtual string ReadMember => throw new InvalidOperationException("Not a component source.");
+        internal virtual string ReadMember => throw new InvalidOperationException("Not a component source.");
 
         /// <summary>
         /// Shape inferred from TProp.
         /// </summary>
-        public Shape Shape => Shape.FromClrType(typeof(TProp));
+        internal Shape Shape => Shape.FromClrType(typeof(TProp));
 
         /// <summary>
         /// Element shape for array types (e.g., Shape.String for string[]).
         /// </summary>
-        public Shape ElementShape
+        internal Shape ElementShape
         {
             get
             {
@@ -59,7 +59,7 @@ namespace Alis.Reactive.Builders.Conditions
             _expression = expression;
         }
 
-        public override ValueProducer ToValueProducer()
+        internal override ValueProducer ToValueProducer()
         {
             var eventPath = ExpressionPathHelper.ToEventPath(_expression);
             return ValueProducer.Read(PayloadSource.Event(), eventPath, shape: Shape);

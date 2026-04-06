@@ -112,7 +112,7 @@ namespace Alis.Reactive.PlanModel
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Kind, Item, Inner);
+            return HashCode.Combine(Kind, Item, Inner, Fields?.Count ?? 0, Additional);
         }
 
         public static bool operator ==(Shape left, Shape right) => Equals(left, right);

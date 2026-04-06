@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Alis.Reactive.PlanModel
@@ -69,16 +70,27 @@ namespace Alis.Reactive.PlanModel
 
                 _plan.MutableComponents[key] = Component.Create(componentId, vendor, typeKey);
             }
-            else if (_components.TryGetValue(key, out var reg)
-                     || TryFindRegistrationById(componentId, out reg))
+            else
             {
-                // Component already registered — enrich its JsType with defaultValue if missing
+                // Component already registered — validate vendor consistency
                 var existing = _plan.MutableComponents[key];
-                var jsType = _plan.MutableTypes[existing.Type];
-                if (jsType.DefaultValue == null)
+                if (existing.Vendor != vendor)
+                    throw new InvalidOperationException(
+                        $"Component '{componentId}' registered as vendor '{existing.Vendor}' " +
+                        $"but re-referenced as '{vendor}'. A component cannot change vendor.");
+
+                ComponentRegistration reg;
+                if (!_components.TryGetValue(key, out reg))
+                    TryFindRegistrationById(componentId, out reg);
+
+                if (reg != null)
                 {
-                    jsType.WithProperty(reg.ValueMember, Path.Parse(reg.ValueMember), reg.Shape, "read");
-                    jsType.WithDefaultValue(reg.ValueMember, reg.Shape);
+                    var jsType = _plan.MutableTypes[existing.Type];
+                    if (jsType.DefaultValue == null)
+                    {
+                        jsType.WithProperty(reg.ValueMember, Path.Parse(reg.ValueMember), reg.Shape, "read");
+                        jsType.WithDefaultValue(reg.ValueMember, reg.Shape);
+                    }
                 }
             }
             return key;

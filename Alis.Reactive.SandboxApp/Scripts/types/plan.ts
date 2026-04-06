@@ -353,7 +353,8 @@ export type Shape =
   | ArrayShape
   | ObjectShape
   | NullableShape
-  | AnyShape;
+  | AnyShape
+  | NoneShape;
 
 export interface StringShape {
   kind: "string";
@@ -393,6 +394,10 @@ export interface NullableShape {
 
 export interface AnyShape {
   kind: "any";
+}
+
+export interface NoneShape {
+  kind: "none";
 }
 
 // ── Path ──────────────────────────────────────────────────────
