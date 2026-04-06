@@ -49,10 +49,10 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            return self.EmitCall("add",
-                           new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-loader--visible") })
-                       .EmitCall("removeAttribute",
-                           new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
+            EmitClassListCall(self, "classAdd", "classList.add", "alis-loader--visible");
+            self.EmitCall("removeAttribute",
+                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
+            return self;
         }
 
         /// <summary>
@@ -64,10 +64,21 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            return self.EmitCall("remove",
-                           new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-loader--visible") })
-                       .EmitCall("setAttribute",
-                           new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden"), ValueProducer.Literal("true") });
+            EmitClassListCall(self, "classRemove", "classList.remove", "alis-loader--visible");
+            self.EmitCall("setAttribute",
+                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden"), ValueProducer.Literal("true") });
+            return self;
+        }
+
+        private static void EmitClassListCall<TModel>(
+            ComponentRef<NativeLoader, TModel> self, string memberName, string pathExpr, string className)
+            where TModel : class
+        {
+            var componentKey = self.Pipeline.Context.EnsureComponent(self.TargetId, self.Vendor);
+            self.Pipeline.Context.EnsureMethod(componentKey, memberName, pathExpr);
+            self.Pipeline.Steps.Add(
+                Reaction.Call(ComponentSource.Of(componentKey), memberName,
+                    new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(className) }));
         }
 
         /// <summary>

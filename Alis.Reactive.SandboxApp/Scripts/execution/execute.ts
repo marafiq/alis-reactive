@@ -202,15 +202,19 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
       const root = resolveSource(plan, producer.from, ctx);
 
       // Component source: look up member in JsType
+      // Preserve null/undefined so presence checks (is-null, not-null) get the
+      // correct signal — matches the payload read pattern below.
       if (producer.from.kind === "component") {
         const jsType = getJsTypeForSource(plan, producer.from);
         const prop = jsType.properties?.[producer.member];
         if (prop) {
-          return applyShape(resolverReadProperty(root, prop), producer.shape ?? prop.shape);
+          const raw = resolverReadProperty(root, prop);
+          return raw == null ? raw : applyShape(raw, producer.shape ?? prop.shape);
         }
         const method = jsType.methods?.[producer.member];
         if (method) {
-          return applyShape(callMethod(root, method, []), producer.shape);
+          const raw = callMethod(root, method, []);
+          return raw == null ? raw : applyShape(raw, producer.shape);
         }
         // Fallback: validation conditions on partial-owned fields may use "value"
         // as the member, but the actual JsType uses a different defaultValue member
@@ -218,11 +222,13 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
         if (jsType.defaultValue) {
           const dvProp = jsType.properties?.[jsType.defaultValue.member];
           if (dvProp) {
-            return applyShape(resolverReadProperty(root, dvProp), producer.shape ?? dvProp.shape);
+            const raw = resolverReadProperty(root, dvProp);
+            return raw == null ? raw : applyShape(raw, producer.shape ?? dvProp.shape);
           }
           const dvMethod = jsType.methods?.[jsType.defaultValue.member];
           if (dvMethod) {
-            return applyShape(callMethod(root, dvMethod, []), producer.shape);
+            const raw = callMethod(root, dvMethod, []);
+            return raw == null ? raw : applyShape(raw, producer.shape);
           }
         }
         throw new Error(`[alis] member "${producer.member}" not found on type`);
@@ -233,6 +239,11 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
       if (producer.path) {
         const walked = walkPath(root as any, producer.path);
         return walked == null ? walked : applyShape(walked, producer.shape);
+      }
+      // "responseBody" means "the response itself" — the resolved payload IS the value.
+      // This happens for Into() inject and other whole-response reads.
+      if (producer.member === "responseBody") {
+        return root == null ? root : applyShape(root, producer.shape);
       }
       // Walk the member as a dot-path on the resolved payload.
       // PayloadSource already resolves to the correct root (event data, response body),

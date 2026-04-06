@@ -243,6 +243,7 @@ export interface GatherInput {
   kind: "gather";
   components: GatherField[];
   transport: Transport;
+  statics?: ValueProducer;
 }
 
 export interface ValueInput {

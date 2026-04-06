@@ -3,4 +3,4 @@
 // ContainerScope defines which components belong to the form and their rules.
 
 export { validateContainer, showServerErrors, clearContainerValidation, revalidateField } from "./orchestrator";
-export { wireLiveValidation, resetLiveClearForTests } from "./live-clear";
+export { wireLiveValidation, unwireField, resetLiveClearForTests } from "./live-clear";

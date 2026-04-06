@@ -139,25 +139,101 @@ export function resolveGather(
   const formData = gatherInput.transport === "form-data" ? new FormData() : null;
   const transport = selectTransport(gatherInput.transport, method, urlParams, formData, body);
 
+  const gatheredComponents = new Set<string>();
+  let includeAll = false;
   for (const field of gatherInput.components) {
+    // Sentinel field from C# IncludeAll() — signals dynamic inclusion
+    if (field.component === "__include_all__") {
+      includeAll = true;
+      continue;
+    }
+    gatheredComponents.add(field.component);
     const raw = readDefaultValue(plan, field.component);
     const defaultShape = getDefaultShape(plan, field.component);
     let value = applyShape(raw, defaultShape);
     // Date shape produces epoch ms (number) for condition comparison,
     // but HTTP gather needs ISO strings for ASP.NET DateTime deserialization.
-    if (defaultShape?.kind === "date" && typeof value === "number" && !isNaN(value)) {
-      value = new Date(value).toISOString();
-    }
+    // Handle direct date, nullable date, and array-of-date shapes.
+    value = coerceDateForTransport(value, defaultShape);
     emitValue(field.key, value, transport);
   }
 
+  // Emit static/event values merged alongside component fields
+  if (gatherInput.statics) {
+    const staticValues = evaluateValue(gatherInput.statics, plan, ctx);
+    if (typeof staticValues === "object" && staticValues !== null && !Array.isArray(staticValues)) {
+      for (const [key, val] of Object.entries(staticValues as Record<string, unknown>)) {
+        emitValue(key, val, transport);
+      }
+    }
+  }
+
+  // Include dynamically-merged components (from partial plan injection).
+  // Only when IncludeAll was used (sentinel present) — selective gathers
+  // must NOT auto-include extra components.
+  if (includeAll) {
+    for (const [compKey, comp] of Object.entries(plan.components)) {
+      if (gatheredComponents.has(compKey)) continue;
+      const jsType = plan.types[comp.type];
+      if (!jsType?.defaultValue) continue;
+      const bindingPath = deriveBindingPath(compKey);
+      if (!bindingPath) continue;
+      // Skip components whose DOM elements are not present — they may be
+      // conditionally rendered (e.g., diagnosis-specific fields in a wizard).
+      if (!document.getElementById(comp.id)) continue;
+      const raw = readDefaultValue(plan, compKey);
+      const defaultShape = getDefaultShape(plan, compKey);
+      let value = applyShape(raw, defaultShape);
+      value = coerceDateForTransport(value, defaultShape);
+      emitValue(bindingPath, value, transport);
+    }
+  }
+
   return { urlParams, body: formData ?? body };
+}
+
+/** Returns true if the shape (possibly wrapped in nullable) is a date shape. */
+function isDateShape(shape?: import("../types").Shape): boolean {
+  if (!shape) return false;
+  if (shape.kind === "date") return true;
+  if (shape.kind === "nullable" && shape.inner?.kind === "date") return true;
+  return false;
+}
+
+/** Returns true if the shape is an array whose item shape is a date. */
+function isDateArrayShape(shape?: import("../types").Shape): boolean {
+  if (!shape) return false;
+  if (shape.kind === "array" && shape.item?.kind === "date") return true;
+  return false;
+}
+
+/** Convert epoch ms numbers to ISO strings for date-shaped values so ASP.NET can bind them. */
+function coerceDateForTransport(value: unknown, shape?: import("../types").Shape): unknown {
+  if (isDateShape(shape)) {
+    if (typeof value === "number" && !isNaN(value)) return new Date(value).toISOString();
+    return value;
+  }
+  if (isDateArrayShape(shape) && Array.isArray(value)) {
+    return value.map(v => typeof v === "number" && !isNaN(v) ? new Date(v).toISOString() : v);
+  }
+  return value;
 }
 
 /** Get the default value's shape from the JsType. */
 function getDefaultShape(plan: Plan, componentKey: string): import("../types").Shape | undefined {
   const jsType = getJsType(plan, componentKey);
   return jsType.defaultValue?.shape;
+}
+
+/**
+ * Derive the model binding path from a component key (element ID).
+ * Format: {Namespace_Type}__PropertyPath → PropertyPath with _ → .
+ * Returns null if the key doesn't follow the convention.
+ */
+function deriveBindingPath(componentKey: string): string | null {
+  const sep = componentKey.indexOf("__");
+  if (sep < 0) return null;
+  return componentKey.substring(sep + 2).replace(/_/g, ".");
 }
 
 function setNested(obj: Record<string, unknown>, key: string, value: unknown): void {

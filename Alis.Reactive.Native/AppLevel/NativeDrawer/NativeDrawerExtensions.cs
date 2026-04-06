@@ -25,8 +25,7 @@ namespace Alis.Reactive.Native.AppLevel
         {
             // Remove all size classes, then add the requested one
             foreach (var cls in SizeClasses)
-                self = self.EmitCall("remove",
-                    new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(cls) });
+                EmitClassListCall(self, "classRemove", "classList.remove", cls);
 
             var sizeClass = size switch
             {
@@ -35,8 +34,8 @@ namespace Alis.Reactive.Native.AppLevel
                 DrawerSize.Lg => "alis-drawer--lg",
                 _ => "alis-drawer--md"
             };
-            return self.EmitCall("add",
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(sizeClass) });
+            EmitClassListCall(self, "classAdd", "classList.add", sizeClass);
+            return self;
         }
 
         /// <summary>
@@ -48,10 +47,10 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            return self.EmitCall("add",
-                           new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-drawer--visible") })
-                       .EmitCall("removeAttribute",
-                           new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
+            EmitClassListCall(self, "classAdd", "classList.add", "alis-drawer--visible");
+            self.EmitCall("removeAttribute",
+                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
+            return self;
         }
 
         /// <summary>
@@ -63,8 +62,24 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            return self.EmitCall("remove",
-                       new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-drawer--visible") });
+            EmitClassListCall(self, "classRemove", "classList.remove", "alis-drawer--visible");
+            return self;
+        }
+
+        /// <summary>
+        /// Emits a classList call reaction with the correct path (classList.add / classList.remove).
+        /// Mirrors <see cref="Alis.Reactive.Builders.ElementBuilder{TModel}.AddClass"/> to avoid
+        /// the wrong path that EmitCall("add") would produce (el.add vs el.classList.add).
+        /// </summary>
+        private static void EmitClassListCall<TModel>(
+            ComponentRef<NativeDrawer, TModel> self, string memberName, string pathExpr, string className)
+            where TModel : class
+        {
+            var componentKey = self.Pipeline.Context.EnsureComponent(self.TargetId, self.Vendor);
+            self.Pipeline.Context.EnsureMethod(componentKey, memberName, pathExpr);
+            self.Pipeline.Steps.Add(
+                Reaction.Call(ComponentSource.Of(componentKey), memberName,
+                    new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(className) }));
         }
 
         /// <summary>

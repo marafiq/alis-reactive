@@ -45,7 +45,12 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            _whileLoading = new List<Reaction>(pb.Steps);
+            var reaction = pb.BuildReaction();
+            if (!(reaction is SequenceReaction))
+                throw new InvalidOperationException(
+                    "WhileLoading only supports plain commands (sequential). " +
+                    "Conditions, HTTP, and parallel pipelines are not valid here.");
+            _whileLoading = new List<Reaction>(((SequenceReaction)reaction).Steps);
             return this;
         }
 
@@ -81,12 +86,27 @@ namespace Alis.Reactive.Builders.Requests
                         if (!_gatherBuilder.Fields.Exists(f => f.Component == reg.ComponentId))
                             _gatherBuilder.AddField(GatherField.Of(reg.ComponentId, kvp.Key));
                     }
+                    // Sentinel: tells the runtime to also gather dynamically-merged
+                    // components from partial plan injection.
+                    _gatherBuilder.AddField(GatherField.Of("__include_all__", "__include_all__"));
                 }
 
-                // Build request input from gather fields + static fields + event fields
+                // Build request input from gather fields + static fields + event fields.
+                // When both component and static/event fields exist, merge statics into
+                // a ValueInput object that the runtime emits alongside gathered components.
                 if (_gatherBuilder.Fields.Count > 0)
                 {
-                    request.Input = new GatherInput(_gatherBuilder.Fields, _transport);
+                    ValueProducer statics = null;
+                    if (_gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0)
+                    {
+                        var fields = new Dictionary<string, ValueProducer>();
+                        foreach (var sf in _gatherBuilder.StaticFields)
+                            fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.Any);
+                        foreach (var ef in _gatherBuilder.EventFields)
+                            fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
+                        statics = ValueProducer.Object(fields);
+                    }
+                    request.Input = new GatherInput(_gatherBuilder.Fields, _transport, statics);
                 }
 
                 // Static and event fields become a ValueInput when no component fields
@@ -99,8 +119,6 @@ namespace Alis.Reactive.Builders.Requests
                         fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
                     request.Input = new ValueInput(ValueProducer.Object(fields), _transport);
                 }
-                // If we have BOTH component fields AND static/event, merge statics into a separate approach
-                // For now, static fields alongside component gather are not common — tracked as future work
             }
 
             if (_container != null)

@@ -2,6 +2,7 @@
 // Plans: types, components, behaviors. Merge logic for partial plan injection.
 
 import type { Plan, Behavior } from "../types";
+import { unwireField } from "../validation/live-clear";
 
 type WireBehaviors = (behaviors: Behavior[], plan: Plan, signal?: AbortSignal) => void;
 type WireContainerValidation = (plan: Plan) => void;
@@ -103,10 +104,14 @@ export class PlanRegistry {
       }
     }
 
-    // Remove components from this source
+    // Remove components from this source and clear their live-clear wiring
     const oldKeys = this.sourceComponentKeys.get(partId);
     if (oldKeys) {
-      for (const key of oldKeys) delete plan.components[key];
+      for (const key of oldKeys) {
+        const comp = plan.components[key];
+        if (comp) unwireField(comp.id);
+        delete plan.components[key];
+      }
     }
 
     // Remove types from this source

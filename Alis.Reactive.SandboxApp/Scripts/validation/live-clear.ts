@@ -65,6 +65,11 @@ function wireField(plan: Plan, containerId: string, containerKey: string, compon
   }
 }
 
+/** Remove a field's wired status so it can be re-wired after partial reload. */
+export function unwireField(domId: string): void {
+  wiredFields.delete(domId);
+}
+
 /** Reset for tests — clears the wired set so tests start clean. */
 export function resetLiveClearForTests(): void {
   wiredFields.clear();

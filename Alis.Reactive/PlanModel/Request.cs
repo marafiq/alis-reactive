@@ -43,11 +43,14 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "gather";
         public List<GatherField> Components { get; }
         public string Transport { get; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public ValueProducer Statics { get; }
 
-        internal GatherInput(List<GatherField> components, string transport)
+        internal GatherInput(List<GatherField> components, string transport, ValueProducer statics = null)
         {
             Components = components;
             Transport = transport;
+            Statics = statics;
         }
     }
 
