@@ -38,7 +38,6 @@ export interface Method {
 export interface Event {
   channel: string;
   payloadType?: string;
-  payloadExtract?: "detail" | "raw";
 }
 
 export interface DefaultValue {

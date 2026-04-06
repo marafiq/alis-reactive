@@ -58,12 +58,11 @@ namespace Alis.Reactive.PlanModel
             return this;
         }
 
-        internal JsEvent WithEvent(string name, string channel, string payloadType = null)
+        internal JsType WithEvent(string name, string channel, string payloadType = null)
         {
             _events ??= new Dictionary<string, JsEvent>();
-            var evt = new JsEvent(channel, payloadType);
-            _events[name] = evt;
-            return evt;
+            _events[name] = new JsEvent(channel, payloadType);
+            return this;
         }
 
         internal JsType WithDefaultValue(string member, Shape shape)
@@ -130,10 +129,6 @@ namespace Alis.Reactive.PlanModel
     {
         public string Channel { get; }
         public string PayloadType { get; }
-
-        [System.Text.Json.Serialization.JsonInclude]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        internal string PayloadExtract { get; set; }
 
         internal JsEvent(string channel, string payloadType)
         {

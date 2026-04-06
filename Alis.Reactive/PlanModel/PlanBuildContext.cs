@@ -175,8 +175,7 @@ namespace Alis.Reactive.PlanModel
         {
             var component = _plan.MutableComponents[componentKey];
             var jsType = _plan.MutableTypes[component.Type];
-            var evt = jsType.WithEvent(eventName, channel, payloadType);
-            evt.PayloadExtract = component.Vendor == "fusion" ? "raw" : "detail";
+            jsType.WithEvent(eventName, channel, payloadType);
         }
 
         /// <summary>

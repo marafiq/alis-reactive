@@ -48,21 +48,21 @@ export function wireBehavior(
 
       const root = resolveComponent(plan, trigger.component);
 
-      const mode = eventDef?.payloadExtract;
-      if (!mode) throw new Error(`[alis] event "${trigger.event}" on "${trigger.component}" has no payloadExtract — plan must declare it`);
+      log.debug("component-event", { component: trigger.component, event: trigger.event, channel });
 
-      log.debug("component-event", { component: trigger.component, event: trigger.event, channel, mode });
-
-      // Plan-driven event wiring: payloadExtract declares how to read event args.
-      // "raw" = args passed directly (Syncfusion), no AbortSignal support.
-      // "detail" = unwrap CustomEvent.detail or use event target (native DOM).
-      if (mode === "raw") {
+      // Vendor-specific event wiring:
+      // - Native: standard DOM addEventListener on the element
+      // - Fusion: SF addEventListener on the component instance (NO opts — SF doesn't support AbortSignal)
+      if (comp.vendor === "fusion") {
+        // SF's addEventListener doesn't support DOM options like {signal}.
+        // Pass handler only — SF manages its own event lifecycle.
         (root as any).addEventListener(channel, (args: any) => {
           const ctx: ExecContext = { event: args ?? {} };
           executeReaction(reaction, plan, ctx).catch(err =>
             log.error("reaction failed", { error: String(err) }));
         });
       } else {
+        // Native: standard DOM addEventListener with abort signal support
         (root as EventTarget).addEventListener(channel, (e: Event) => {
           const eventData = e instanceof CustomEvent
             ? (e.detail ?? {})
