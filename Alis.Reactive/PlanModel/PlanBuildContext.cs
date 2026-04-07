@@ -91,7 +91,7 @@ namespace Alis.Reactive.PlanModel
                         existing.BindingPath = reg.BindingPath;
 
                     var jsType = _plan.MutableTypes[existing.Type];
-                    if (jsType.DefaultValue == null)
+                    if (jsType.DefaultValue == null || jsType.DefaultValue.Shape == Shape.Any)
                     {
                         jsType.WithProperty(reg.ValueMember, Path.Parse(reg.ValueMember), reg.Shape, "read");
                         jsType.WithDefaultValue(reg.ValueMember, reg.Shape);
@@ -135,7 +135,7 @@ namespace Alis.Reactive.PlanModel
                     existing.BindingPath = bindingPath;
 
                 var jsType = _plan.MutableTypes[existing.Type];
-                if (jsType.DefaultValue == null)
+                if (jsType.DefaultValue == null || jsType.DefaultValue.Shape == Shape.Any)
                 {
                     jsType.WithProperty(valueMember, Path.Parse(valueMember), shape, "read");
                     jsType.WithDefaultValue(valueMember, shape);

@@ -52,10 +52,10 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         public GatherBuilder<TModel> Include(string componentId, string vendor, string propertyName, string valueMember)
         {
-            var shape = Shape.Any;
+            Shape shape = null;
             if (_context.TryFindRegistrationById(componentId, out var reg))
                 shape = reg.Shape;
-            _context.EnsureInputComponent(componentId, vendor, valueMember, shape, propertyName);
+            _context.EnsureInputComponent(componentId, vendor, valueMember, shape ?? Shape.Any, propertyName);
             Fields.Add(GatherField.Of(componentId, propertyName, shape));
             return this;
         }
