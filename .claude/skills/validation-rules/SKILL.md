@@ -86,30 +86,78 @@ These rules are silently dropped by the adapter and only enforced server-side:
 
 ## Conditional Rules
 
+Uses `FieldCondition` — a tree type supporting all CompareOp operators and boolean composition (All/Any/Not). Requires `ReactiveValidator<T>` base class.
+
+### Equality / Presence (original 4)
+
 ```csharp
-public class MyValidator : ReactiveValidator<MyModel>  // NOTE: ReactiveValidator, not AbstractValidator
-{
-    public MyValidator()
-    {
-        WhenField(x => x.IsEmployed, () => {                // truthy
-            RuleFor(x => x.JobTitle).NotEmpty();
-        });
-        WhenFieldNot(x => x.IsEmployed, () => {             // falsy
-            RuleFor(x => x.Salary).IsEmpty();
-        });
-        WhenField(x => x.CareLevel, "Memory Care", () => {  // eq
-            RuleFor(x => x.EmergencyPhone).NotEmpty();
-        });
-        WhenFieldNot(x => x.CareLevel, "Independent", () => { // neq
-            RuleFor(x => x.Physician).NotEmpty();
-        });
-    }
-}
+WhenField(x => x.IsEmployed, () => { ... });                // truthy
+WhenFieldNot(x => x.IsEmployed, () => { ... });             // falsy
+WhenField(x => x.CareLevel, "Memory Care", () => { ... });  // eq
+WhenFieldNot(x => x.CareLevel, "Independent", () => { ... }); // neq
 ```
 
-> **Case sensitivity:** WhenField value comparison is case-sensitive. The condition value must exactly match what the component gathers (e.g., the dropdown's selected value). `"Memory Care"` will not match `"memory care"`.
+### Ordering
 
-> **Date serialization:** WhenField date condition values serialize as Unix milliseconds (via `ToUnixTimeMilliseconds()`), while rule constraint values use ISO `"yyyy-MM-dd"` format. Specify `DateTimeKind.Utc` explicitly to avoid timezone drift between the two formats.
+```csharp
+WhenFieldGt(x => x.Age, 18, () => { ... });          // gt
+WhenFieldGte(x => x.Salary, 50000m, () => { ... });  // gte
+WhenFieldLt(x => x.Age, 18, () => { ... });          // lt
+WhenFieldLte(x => x.Salary, 0m, () => { ... });      // lte
+```
+
+### Presence (null/empty)
+
+```csharp
+WhenFieldNull(x => x.MiddleName, () => { ... });     // is-null
+WhenFieldNotNull(x => x.MiddleName, () => { ... });  // not-null
+WhenFieldEmpty(x => x.Email, () => { ... });          // is-empty
+WhenFieldNotEmpty(x => x.Notes, () => { ... });       // not-empty
+```
+
+### Membership
+
+```csharp
+WhenFieldIn(x => x.CareLevel, new[] { "memory-care", "skilled-nursing" }, () => { ... });  // in
+WhenFieldNotIn(x => x.CareLevel, new[] { "independent", "assisted" }, () => { ... });      // not-in
+WhenFieldBetween(x => x.Age, 18, 65, () => { ... });  // between (inclusive)
+```
+
+### Text
+
+```csharp
+WhenFieldContains(x => x.Notes, "urgent", () => { ... });       // contains
+WhenFieldStartsWith(x => x.Name, "Dr.", () => { ... });         // starts-with
+WhenFieldEndsWith(x => x.Email, "@hospital.org", () => { ... });// ends-with
+```
+
+### Composition (And / Or / Not)
+
+```csharp
+WhenFields(c => c.Field(x => x.IsEmployed).Truthy()
+                  .And(c.Field(x => x.Age).Gte(18)),
+    () => { RuleFor(x => x.JobTitle).NotEmpty(); });
+
+WhenFields(c => c.Field(x => x.CareLevel).Eq("memory-care")
+                  .Or(c.Field(x => x.CareLevel).Eq("skilled-nursing")),
+    () => { RuleFor(x => x.Notes).NotEmpty(); });
+
+WhenFields(c => c.Field(x => x.IsEmployed).Truthy().Not(),
+    () => { RuleFor(x => x.Notes).NotEmpty(); });
+
+// Complex: (employed AND salary > 50k) OR age >= 65
+WhenFields(c =>
+    c.Field(x => x.IsEmployed).Truthy()
+     .And(c.Field(x => x.Salary).Gt(50000m))
+     .Or(c.Field(x => x.Age).Gte(65)),
+    () => { RuleFor(x => x.Email).NotEmpty(); });
+```
+
+> **Dual purpose:** Every WhenField* method registers both a server-side FV `.When()` predicate and a client-side `FieldCondition` for browser evaluation. FV's `.When()` still works for server-only conditions (DB lookups, service calls).
+
+> **Case sensitivity:** WhenField value comparison is case-sensitive. The condition value must exactly match what the component gathers.
+
+> **Date serialization:** WhenField date condition values serialize as Unix milliseconds (via `ToUnixTimeMilliseconds()`), while rule constraint values use ISO `"yyyy-MM-dd"` format. Specify `DateTimeKind.Utc` explicitly to avoid timezone drift.
 
 ## Wiring in View
 

@@ -126,6 +126,31 @@ namespace Alis.Reactive.FluentValidator
                 x => set.Contains(_fieldFunc(x)));
         }
 
+        public FieldGuard<T> NotIn(params TProp[] values)
+        {
+            var serialized = new object[values.Length];
+            for (int i = 0; i < values.Length; i++)
+                serialized[i] = ReactiveValidator<T>.SerializeConditionValue(values[i]);
+
+            var set = new HashSet<TProp>(values);
+            return new FieldGuard<T>(
+                FieldCondition.Compare(_fieldName, "not-in", serialized),
+                x => !set.Contains(_fieldFunc(x)));
+        }
+
+        public FieldGuard<T> Between(TProp low, TProp high)
+        {
+            var serialized = new object[]
+            {
+                ReactiveValidator<T>.SerializeConditionValue(low),
+                ReactiveValidator<T>.SerializeConditionValue(high)
+            };
+            return new FieldGuard<T>(
+                FieldCondition.Compare(_fieldName, "between", serialized),
+                x => Comparer<TProp>.Default.Compare(_fieldFunc(x), low) >= 0 &&
+                     Comparer<TProp>.Default.Compare(_fieldFunc(x), high) <= 0);
+        }
+
         // ── Text ───────────────────────────────────────────────────────────
 
         public FieldGuard<T> Contains(string substring) =>

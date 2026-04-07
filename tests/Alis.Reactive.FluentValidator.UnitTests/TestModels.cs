@@ -32,6 +32,9 @@ public class TestModel
     public bool IsEmployed { get; set; }
     public string? JobTitle { get; set; }
     public string? ConfirmEmail { get; set; }
+    public string? CareLevel { get; set; }
+    public string? Notes { get; set; }
+    public string? MiddleName { get; set; }
 }
 
 public class FullCoverageModel

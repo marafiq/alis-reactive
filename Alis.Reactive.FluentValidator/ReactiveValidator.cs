@@ -251,6 +251,39 @@ namespace Alis.Reactive.FluentValidator
                 defineRules);
         }
 
+        /// <summary>Applies a "not-in" condition — field value is NOT in the given set.</summary>
+        protected void WhenFieldNotIn<TProp>(
+            Expression<Func<T, TProp>> field, TProp[] values, Action defineRules)
+        {
+            var fieldName = ExtractPropertyName(field);
+            var fieldFunc = field.Compile();
+            var serialized = values.Select(v => SerializeConditionValue(v)).ToArray();
+            var condition = FieldCondition.Compare(fieldName, "not-in", serialized);
+
+            var set = new HashSet<TProp>(values);
+            ApplyClientCondition(x => !set.Contains(fieldFunc(x)), condition, defineRules);
+        }
+
+        /// <summary>Applies a "between" condition — field value is between low and high (inclusive).</summary>
+        protected void WhenFieldBetween<TProp>(
+            Expression<Func<T, TProp>> field, TProp low, TProp high, Action defineRules)
+        {
+            var fieldName = ExtractPropertyName(field);
+            var fieldFunc = field.Compile();
+            var serialized = new object[]
+            {
+                SerializeConditionValue(low),
+                SerializeConditionValue(high)
+            };
+            var condition = FieldCondition.Compare(fieldName, "between", serialized);
+
+            ApplyClientCondition(
+                x => Comparer<TProp>.Default.Compare(fieldFunc(x), low) >= 0 &&
+                     Comparer<TProp>.Default.Compare(fieldFunc(x), high) <= 0,
+                condition,
+                defineRules);
+        }
+
         // ── Composition ────────────────────────────────────────────────────────
 
         /// <summary>
