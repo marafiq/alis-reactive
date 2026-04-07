@@ -29,6 +29,18 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
+        public ConditionSourceBuilder<TModel, TProp> ElseIf<TPayload, TProp>(
+            ResponseBody<TPayload> responseBody,
+            Expression<Func<TPayload, TProp>> path)
+            where TPayload : class
+        {
+            if (_elseCalled)
+                throw new InvalidOperationException("Cannot add ElseIf after Else.");
+
+            var source = responseBody.Read(path);
+            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+        }
+
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
         {
             if (_elseCalled)

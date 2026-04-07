@@ -26,11 +26,19 @@ namespace Alis.Reactive.Builders.Requests
 
         public ResponseBuilder<TModel> OnSuccess<TResponse>(
             Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> pipeline)
-            where TResponse : class, new()
+            where TResponse : class
         {
             var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(new ResponseBody<TResponse>(new TResponse()), pb);
+            pipeline(new ResponseBody<TResponse>(PayloadSource.Success()), pb);
             SuccessHandlers.Add(new ResponseHandler(pb.BuildReaction()));
+            return this;
+        }
+
+        public ResponseBuilder<TModel> OnError(Action<PipelineBuilder<TModel>> pipeline)
+        {
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(pb);
+            ErrorHandlers.Add(new ResponseHandler(pb.BuildReaction()));
             return this;
         }
 
@@ -38,6 +46,27 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
+            var handler = new ResponseHandler(pb.BuildReaction()) { Status = statusCode };
+            ErrorHandlers.Add(handler);
+            return this;
+        }
+
+        public ResponseBuilder<TModel> OnError<TError>(
+            Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)
+            where TError : class
+        {
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(new ResponseBody<TError>(PayloadSource.Error()), pb);
+            ErrorHandlers.Add(new ResponseHandler(pb.BuildReaction()));
+            return this;
+        }
+
+        public ResponseBuilder<TModel> OnError<TError>(int statusCode,
+            Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)
+            where TError : class
+        {
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(new ResponseBody<TError>(PayloadSource.Error()), pb);
             var handler = new ResponseHandler(pb.BuildReaction()) { Status = statusCode };
             ErrorHandlers.Add(handler);
             return this;

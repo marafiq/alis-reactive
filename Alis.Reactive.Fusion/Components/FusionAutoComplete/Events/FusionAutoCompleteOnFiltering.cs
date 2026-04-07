@@ -78,7 +78,7 @@ namespace Alis.Reactive.Fusion.Components
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
             pipeline.AddStep(Reaction.Call(PayloadSource.Event(), "updateData",
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Read(PayloadSource.Success(), sourcePath) }));
+                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Read(source.Scope, sourcePath) }));
         }
     }
 }

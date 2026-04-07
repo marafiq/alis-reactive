@@ -70,7 +70,7 @@ namespace Alis.Reactive.Builders
             var responsePath = ExpressionPathHelper.ToResponsePath(path);
             _pipeline.Steps.Add(Reaction.Set(
                 ComponentSource.Of(_componentKey), "text",
-                ValueProducer.Read(PayloadSource.Success(), responsePath)));
+                ValueProducer.Read(source.Scope, responsePath)));
             return _pipeline;
         }
 

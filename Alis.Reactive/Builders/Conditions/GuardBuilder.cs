@@ -37,10 +37,28 @@ namespace Alis.Reactive.Builders.Conditions
                 source, CompositionMode.All, Condition, _pipeline, _branchBuilder);
         }
 
+        public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
+            ResponseBody<TPayload> responseBody, Expression<Func<TPayload, TProp>> path)
+            where TPayload : class
+        {
+            var source = responseBody.Read(path);
+            return new ConditionSourceBuilder<TModel, TProp>(
+                source, CompositionMode.All, Condition, _pipeline, _branchBuilder);
+        }
+
         public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
         {
             var source = new EventArgSource<TPayload, TProp>(path);
+            return new ConditionSourceBuilder<TModel, TProp>(
+                source, CompositionMode.Any, Condition, _pipeline, _branchBuilder);
+        }
+
+        public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
+            ResponseBody<TPayload> responseBody, Expression<Func<TPayload, TProp>> path)
+            where TPayload : class
+        {
+            var source = responseBody.Read(path);
             return new ConditionSourceBuilder<TModel, TProp>(
                 source, CompositionMode.Any, Condition, _pipeline, _branchBuilder);
         }

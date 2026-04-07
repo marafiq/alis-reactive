@@ -49,20 +49,17 @@ namespace Alis.Reactive.Builders.Conditions
 
     /// <summary>
     /// A typed source that reads from the event payload.
+    /// Delegates to <see cref="PayloadTypedSource{TPayload, TProp}"/> with event scope.
     /// </summary>
     public sealed class EventArgSource<TPayload, TProp> : TypedSource<TProp>
     {
-        private readonly Expression<Func<TPayload, TProp>> _expression;
+        private readonly PayloadTypedSource<TPayload, TProp> _inner;
 
-        public EventArgSource(Expression<Func<TPayload, TProp>> expression)
+        internal EventArgSource(Expression<Func<TPayload, TProp>> expression)
         {
-            _expression = expression;
+            _inner = new PayloadTypedSource<TPayload, TProp>(PayloadSource.Event(), expression);
         }
 
-        internal override ValueProducer ToValueProducer()
-        {
-            var eventPath = ExpressionPathHelper.ToEventPath(_expression);
-            return ValueProducer.Read(PayloadSource.Event(), eventPath, shape: Shape);
-        }
+        internal override ValueProducer ToValueProducer() => _inner.ToValueProducer();
     }
 }

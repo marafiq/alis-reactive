@@ -35,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitSet("value", ValueProducer.Read(PayloadSource.Success(), sourcePath));
+            return self.EmitSet("value", ValueProducer.Read(source.Scope, sourcePath));
         }
 
         // ── Property Write (component read) ──
@@ -81,7 +81,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitCall("setItems", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Read(PayloadSource.Success(), sourcePath) });
+            return self.EmitCall("setItems", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Read(source.Scope, sourcePath) });
         }
     }
 }

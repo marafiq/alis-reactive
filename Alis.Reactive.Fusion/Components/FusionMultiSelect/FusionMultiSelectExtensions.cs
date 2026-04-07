@@ -54,7 +54,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitSet("dataSource", ValueProducer.Read(PayloadSource.Success(), sourcePath));
+            return self.EmitSet("dataSource", ValueProducer.Read(source.Scope, sourcePath));
         }
 
         /// <summary>Flushes pending property changes to the component in the browser.</summary>

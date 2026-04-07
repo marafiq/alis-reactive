@@ -16,6 +16,15 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source);
         }
 
+        public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
+            ResponseBody<TPayload> responseBody,
+            Expression<Func<TPayload, TProp>> path)
+            where TPayload : class
+        {
+            var source = responseBody.Read(path);
+            return new ConditionSourceBuilder<TModel, TProp>(source);
+        }
+
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
             return new ConditionSourceBuilder<TModel, TProp>(source);

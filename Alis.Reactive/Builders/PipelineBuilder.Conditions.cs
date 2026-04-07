@@ -20,6 +20,20 @@ namespace Alis.Reactive.Builders
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
+        public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
+            ResponseBody<TPayload> responseBody,
+            Expression<Func<TPayload, TProp>> path)
+            where TPayload : class
+        {
+            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
+                FlushSegment();
+
+            SetMode(PipelineMode.Conditional);
+
+            var source = responseBody.Read(path);
+            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+        }
+
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
             if (ConditionalBranches != null && ConditionalBranches.Count > 0)

@@ -1,0 +1,235 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.ResponseConditions.ResponseConditionsModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.ResponseConditions
+@{
+    ViewData["Title"] = "Response Body Conditions";
+
+    var plan = Html.ReactivePlan<ResponseConditionsModel>();
+    var approveUrl = Url.Action("Approve", "ResponseConditions", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve ResponseConditions.Approve.");
+    var denyUrl = Url.Action("Deny", "ResponseConditions", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve ResponseConditions.Deny.");
+    var pendingUrl = Url.Action("Pending", "ResponseConditions", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve ResponseConditions.Pending.");
+    var failUrl = Url.Action("Fail", "ResponseConditions", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve ResponseConditions.Fail.");
+
+    // ── Section 1: When on success response body ──
+    Html.On(plan, t => t.CustomEvent("s1-when-approved", p =>
+    {
+        p.Post(approveUrl)
+         .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
+         {
+             s.When(json, j => j.Status).Eq("approved")
+              .Then(then =>
+              {
+                  then.Element("s1-badge").Show();
+                  then.Element("s1-result").SetText("approved");
+              })
+              .Else(el => el.Element("s1-result").SetText("not approved"));
+         }));
+    }));
+
+    Html.On(plan, t => t.CustomEvent("s1-when-denied", p =>
+    {
+        p.Post(denyUrl)
+         .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
+         {
+             s.When(json, j => j.Status).Eq("approved")
+              .Then(then =>
+              {
+                  then.Element("s1-badge").Show();
+                  then.Element("s1-result").SetText("approved");
+              })
+              .Else(el =>
+              {
+                  el.Element("s1-badge").Hide();
+                  el.Element("s1-result").SetText("not approved");
+              });
+         }));
+    }));
+
+    // ── Section 2: ElseIf chain on response body ──
+    Html.On(plan, t => t.CustomEvent("s2-elseif-approve", p =>
+    {
+        p.Post(approveUrl)
+         .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
+         {
+             s.When(json, j => j.Status).Eq("approved")
+              .Then(then => then.Element("s2-label").SetText("green"))
+              .ElseIf(json, j => j.Status).Eq("pending")
+              .Then(then => then.Element("s2-label").SetText("yellow"))
+              .Else(el => el.Element("s2-label").SetText("red"));
+         }));
+    }));
+
+    Html.On(plan, t => t.CustomEvent("s2-elseif-pending", p =>
+    {
+        p.Post(pendingUrl)
+         .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
+         {
+             s.When(json, j => j.Status).Eq("approved")
+              .Then(then => then.Element("s2-label").SetText("green"))
+              .ElseIf(json, j => j.Status).Eq("pending")
+              .Then(then => then.Element("s2-label").SetText("yellow"))
+              .Else(el => el.Element("s2-label").SetText("red"));
+         }));
+    }));
+
+    Html.On(plan, t => t.CustomEvent("s2-elseif-deny", p =>
+    {
+        p.Post(denyUrl)
+         .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
+         {
+             s.When(json, j => j.Status).Eq("approved")
+              .Then(then => then.Element("s2-label").SetText("green"))
+              .ElseIf(json, j => j.Status).Eq("pending")
+              .Then(then => then.Element("s2-label").SetText("yellow"))
+              .Else(el => el.Element("s2-label").SetText("red"));
+         }));
+    }));
+
+    // ── Section 3: And composition on response body ──
+    Html.On(plan, t => t.CustomEvent("s3-and-approve", p =>
+    {
+        p.Post(approveUrl)
+         .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
+         {
+             s.When(json, j => j.Status).Eq("approved")
+              .And(json, j => j.Count).Gt(0)
+              .Then(then => then.Element("s3-result").SetText("approved with items"))
+              .Else(el => el.Element("s3-result").SetText("condition not met"));
+         }));
+    }));
+
+    Html.On(plan, t => t.CustomEvent("s3-and-deny", p =>
+    {
+        p.Post(denyUrl)
+         .Response(r => r.OnSuccess<ApprovalResponse>((json, s) =>
+         {
+             s.When(json, j => j.Status).Eq("approved")
+              .And(json, j => j.Count).Gt(0)
+              .Then(then => then.Element("s3-result").SetText("approved with items"))
+              .Else(el => el.Element("s3-result").SetText("condition not met"));
+         }));
+    }));
+
+    // ── Section 4: OnError catch-all ──
+    Html.On(plan, t => t.CustomEvent("s4-error-catchall", p =>
+    {
+        p.Post(failUrl)
+         .Response(r => r
+             .OnSuccess(s => s.Element("s4-result").SetText("success"))
+             .OnError(e => e.Element("s4-result").SetText("error caught")));
+    }));
+
+    // ── Section 5: OnError typed with conditions ──
+    // Generic syntax (OnError<ErrorDetailResponse>) confuses Razor — helper wraps it.
+    Html.On(plan, t => t.CustomEvent("s5-error-typed", p =>
+    {
+        p.Post(failUrl)
+         .Response(r => ResponseConditionsHelper.ConfigureTypedErrorHandler(r));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Response Body Conditions</native-heading>
+    <p class="text-sm text-text-secondary">Verifies that <code>When(json, r =&gt; r.Property)</code> works inside <code>OnSuccess</code> and <code>OnError</code> handlers.</p>
+
+    <!-- Section 1: When on success response body -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">1. When on success response body</native-heading>
+        <p class="text-sm text-text-secondary mb-3">POST Approve &rarr; <code>When(json, r =&gt; r.Status).Eq("approved")</code>. Badge shows only for approved.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s1-btn-approve", "Approve")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s1-when-approved")))
+            @(Html.NativeButton("s1-btn-deny", "Deny")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s1-when-denied")))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Result: <span id="s1-result">&mdash;</span></p>
+            <p id="s1-badge" hidden class="text-green-600 font-semibold">Approved Badge</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 2: ElseIf chain on response body -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">2. ElseIf chain on response body</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Three endpoints: approved &rarr; green, pending &rarr; yellow, denied &rarr; red.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s2-btn-approve", "Approve")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s2-elseif-approve")))
+            @(Html.NativeButton("s2-btn-pending", "Pending")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s2-elseif-pending")))
+            @(Html.NativeButton("s2-btn-deny", "Deny")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s2-elseif-deny")))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Label: <span id="s2-label">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 3: And composition on response body -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">3. And composition on response body</native-heading>
+        <p class="text-sm text-text-secondary mb-3"><code>When(status == approved).And(count &gt; 0)</code>. Approve has count=5, Deny has count=0.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s3-btn-approve", "Approve (count=5)")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s3-and-approve")))
+            @(Html.NativeButton("s3-btn-deny", "Deny (count=0)")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s3-and-deny")))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Result: <span id="s3-result">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 4: OnError catch-all -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">4. OnError catch-all</native-heading>
+        <p class="text-sm text-text-secondary mb-3">POST Fail (422) &rarr; <code>OnError(p =&gt; ...)</code> catch-all handler fires.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s4-btn-fail", "Trigger 422")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s4-error-catchall")))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Result: <span id="s4-result">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 5: OnError typed with conditions -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">5. OnError typed with conditions</native-heading>
+        <p class="text-sm text-text-secondary mb-3">POST Fail (422) &rarr; <code>OnError&lt;ErrorDetailResponse&gt;((err, e) =&gt; e.When(err, x =&gt; x.Code).Eq(422))</code>.</p>
+        <div class="flex gap-2 mb-3">
+            @(Html.NativeButton("s5-btn-fail", "Trigger 422")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s5-error-typed")))
+        </div>
+        <div class="space-y-1 font-mono text-sm text-text-muted">
+            <p>Result: <span id="s5-result">&mdash;</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -34,7 +34,7 @@ namespace Alis.Reactive.Native.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitSet("value", ValueProducer.Read(PayloadSource.Success(), "body", Path.Parse(sourcePath)));
+            return self.EmitSet("value", ValueProducer.Read(source.Scope, "body", Path.Parse(sourcePath)));
         }
 
         public static TypedComponentSource<string> Value<TModel>(
