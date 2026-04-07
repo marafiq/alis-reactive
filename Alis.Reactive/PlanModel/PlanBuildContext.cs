@@ -68,7 +68,9 @@ namespace Alis.Reactive.PlanModel
                     _plan.MutableTypes[typeKey] = new JsType();
                 }
 
-                _plan.MutableComponents[key] = Component.Create(componentId, vendor, typeKey);
+                var comp = Component.Create(componentId, vendor, typeKey);
+                if (reg != null) comp.BindingPath = reg.BindingPath;
+                _plan.MutableComponents[key] = comp;
             }
             else
             {
@@ -85,6 +87,9 @@ namespace Alis.Reactive.PlanModel
 
                 if (reg != null)
                 {
+                    if (existing.BindingPath == null)
+                        existing.BindingPath = reg.BindingPath;
+
                     var jsType = _plan.MutableTypes[existing.Type];
                     if (jsType.DefaultValue == null)
                     {
@@ -119,13 +124,16 @@ namespace Alis.Reactive.PlanModel
         /// Ensures a registered input component exists in the plan with its JsType.
         /// Returns the component key.
         /// </summary>
-        internal string EnsureInputComponent(string componentId, string vendor, string valueMember, Shape shape)
+        internal string EnsureInputComponent(string componentId, string vendor, string valueMember, Shape shape, string bindingPath = null)
         {
             var key = componentId;
             if (_plan.MutableComponents.ContainsKey(key))
             {
                 // Component already registered — enrich its JsType with defaultValue if missing
                 var existing = _plan.MutableComponents[key];
+                if (bindingPath != null && existing.BindingPath == null)
+                    existing.BindingPath = bindingPath;
+
                 var jsType = _plan.MutableTypes[existing.Type];
                 if (jsType.DefaultValue == null)
                 {
@@ -141,7 +149,9 @@ namespace Alis.Reactive.PlanModel
                     .WithDefaultValue(valueMember, shape);
 
                 _plan.MutableTypes[typeKey] = jsType;
-                _plan.MutableComponents[key] = Component.Create(componentId, vendor, typeKey);
+                var comp = Component.Create(componentId, vendor, typeKey);
+                comp.BindingPath = bindingPath;
+                _plan.MutableComponents[key] = comp;
             }
             return key;
         }
@@ -187,7 +197,7 @@ namespace Alis.Reactive.PlanModel
             foreach (var kvp in _components)
             {
                 var reg = kvp.Value;
-                EnsureInputComponent(reg.ComponentId, reg.Vendor, reg.ValueMember, reg.Shape);
+                EnsureInputComponent(reg.ComponentId, reg.Vendor, reg.ValueMember, reg.Shape, kvp.Key);
             }
         }
 

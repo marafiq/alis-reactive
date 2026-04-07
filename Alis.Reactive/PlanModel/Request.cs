@@ -78,22 +78,17 @@ namespace Alis.Reactive.PlanModel
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         [System.Text.Json.Serialization.JsonInclude]
-        internal string BindingPath { get; }
-
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        [System.Text.Json.Serialization.JsonInclude]
         internal Shape Shape { get; }
 
-        internal GatherField(string component, string key, string bindingPath = null, Shape shape = null)
+        internal GatherField(string component, string key, Shape shape = null)
         {
             Component = component;
             Key = key;
-            BindingPath = bindingPath;
             Shape = shape;
         }
 
-        internal static GatherField Of(string component, string key, string bindingPath = null, Shape shape = null)
-            => new GatherField(component, key, bindingPath, shape);
+        internal static GatherField Of(string component, string key, Shape shape = null)
+            => new GatherField(component, key, shape);
     }
 
     /// <summary>

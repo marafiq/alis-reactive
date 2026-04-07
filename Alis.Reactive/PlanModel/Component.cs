@@ -7,6 +7,11 @@ namespace Alis.Reactive.PlanModel
         public string Id { get; }
         public string Vendor { get; }
         public string Type { get; }
+
+        [System.Text.Json.Serialization.JsonInclude]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        internal string BindingPath { get; set; }
+
         public ContainerScope Container { get; internal set; }
 
         internal Component(string id, string vendor, string type)

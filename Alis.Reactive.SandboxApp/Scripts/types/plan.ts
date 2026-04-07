@@ -54,6 +54,7 @@ export interface Component {
   id: string;
   vendor: Vendor;
   type: string;
+  bindingPath?: string;
   container?: ContainerScope;
 }
 
@@ -257,7 +258,6 @@ export interface ValueInput {
 export interface GatherField {
   component: string;
   key: string;
-  bindingPath?: string;
   shape?: Shape;
 }
 

@@ -139,7 +139,7 @@ export function resolveGather(
   const formData = gatherInput.transport === "form-data" ? new FormData() : null;
   const transport = selectTransport(gatherInput.transport, method, urlParams, formData, body);
 
-  // Gather explicit component fields — each carries shape and bindingPath from the plan.
+  // Gather explicit component fields — each carries shape from the plan.
   const gatheredComponents = new Set<string>();
   for (const field of gatherInput.components) {
     gatheredComponents.add(field.component);
@@ -173,11 +173,8 @@ export function resolveGather(
       const shape = jsType.defaultValue.shape;
       let value = applyShape(raw, shape);
       value = coerceForTransport(value, shape);
-      // Dynamically-merged components: derive binding path from component key.
-      // The component key format is {Scope}__{PropertyPath} where _ = dot separator.
-      const sep = compKey.indexOf("__");
-      const bindingPath = sep >= 0 ? compKey.substring(sep + 2).replace(/_/g, ".") : compKey;
-      emitValue(bindingPath, value, transport);
+      if (!comp.bindingPath) continue;
+      emitValue(comp.bindingPath, value, transport);
     }
   }
 

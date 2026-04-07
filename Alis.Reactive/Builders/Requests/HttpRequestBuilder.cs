@@ -85,7 +85,7 @@ namespace Alis.Reactive.Builders.Requests
                     {
                         var reg = kvp.Value;
                         if (!_gatherBuilder.Fields.Exists(f => f.Component == reg.ComponentId))
-                            _gatherBuilder.AddField(GatherField.Of(reg.ComponentId, kvp.Key, kvp.Key, reg.Shape));
+                            _gatherBuilder.AddField(GatherField.Of(reg.ComponentId, kvp.Key, reg.Shape));
                     }
                 }
 

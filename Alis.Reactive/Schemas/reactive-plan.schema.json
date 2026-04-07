@@ -88,6 +88,7 @@
     "Component": {
       "type": "object",
       "required": ["id", "vendor", "type"],
+      "additionalProperties": false,
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "vendor": {
@@ -95,6 +96,7 @@
           "enum": ["native", "fusion"]
         },
         "type": { "type": "string", "minLength": 1 },
+        "bindingPath": { "type": "string" },
         "container": { "$ref": "#/$defs/ContainerScope" }
       }
     },
@@ -419,7 +421,6 @@
       "properties": {
         "component": { "type": "string", "minLength": 1 },
         "key": { "type": "string", "minLength": 1 },
-        "bindingPath": { "type": "string", "minLength": 1 },
         "shape": { "$ref": "#/$defs/Shape" }
       }
     },
