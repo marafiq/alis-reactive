@@ -245,20 +245,30 @@ namespace Alis.Reactive
             return rule;
         }
 
-        private Condition ToCondition(ValidationCondition vc)
+        private Condition ToCondition(FieldCondition fc) => fc switch
+        {
+            FieldCompare cmp => ResolveCompare(cmp),
+            FieldAll all => Condition.All(all.Terms.Select(ToCondition).ToArray()),
+            FieldAny any => Condition.Any(any.Terms.Select(ToCondition).ToArray()),
+            FieldNot not => Condition.Not(ToCondition(not.Term)),
+            _ => throw new InvalidOperationException($"Unknown FieldCondition type: {fc.GetType().Name}")
+        };
+
+        private Condition ResolveCompare(FieldCompare cmp)
         {
             // Build a read from the condition's field component.
             // Try local map first; fall back to IdGenerator for partial-owned fields.
             string fieldComponentId;
             string valueMember;
-            if (_componentsMap.TryGetValue(vc.Field, out var fieldReg))
+            ComponentRegistration fieldReg = null;
+            if (_componentsMap.TryGetValue(cmp.Field, out fieldReg))
             {
                 fieldComponentId = fieldReg.ComponentId;
                 valueMember = fieldReg.ValueMember ?? "value";
             }
             else
             {
-                fieldComponentId = IdGenerator.For(typeof(TModel), vc.Field);
+                fieldComponentId = IdGenerator.For(typeof(TModel), cmp.Field);
                 // Look up the component in the plan (already registered by RegisterInputComponents)
                 // to find the correct valueMember instead of hardcoding "value".
                 // NativeCheckBox uses "checked", not "value".
@@ -276,11 +286,11 @@ namespace Alis.Reactive
                 valueMember);
 
             var conditionShape = fieldReg?.Shape ?? Shape.Any;
-            ValueProducer right = vc.Value != null
-                ? ValueProducer.LiteralRaw(vc.Value, conditionShape)
+            ValueProducer right = cmp.Value != null
+                ? ValueProducer.LiteralRaw(cmp.Value, conditionShape)
                 : null;
 
-            return Condition.Compare(left, vc.Op, right, conditionShape);
+            return Condition.Compare(left, cmp.Op, right, conditionShape);
         }
     }
 }

@@ -1,3 +1,5 @@
+using Alis.Reactive.Validation;
+
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
@@ -243,8 +245,9 @@ public class WhenExtractingFullCoverageRules
             foreach (var rule in field.Rules)
             {
                 Assert.That(rule.When, Is.Not.Null, $"Rule '{rule.Rule}' on '{field.FieldName}' missing condition");
-                Assert.That(rule.When!.Field, Is.EqualTo("IsEmployed"), $"Rule '{rule.Rule}' on '{field.FieldName}' wrong condition field");
-                Assert.That(rule.When.Op, Is.EqualTo("truthy"), $"Rule '{rule.Rule}' on '{field.FieldName}' wrong condition op");
+                var ruleWhen = (FieldCompare)rule.When!;
+                Assert.That(ruleWhen.Field, Is.EqualTo("IsEmployed"), $"Rule '{rule.Rule}' on '{field.FieldName}' wrong condition field");
+                Assert.That(ruleWhen.Op, Is.EqualTo("truthy"), $"Rule '{rule.Rule}' on '{field.FieldName}' wrong condition op");
             }
         }
 

@@ -1,3 +1,5 @@
+using Alis.Reactive.Validation;
+
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
@@ -30,7 +32,8 @@ public class WhenExtractingConditionalRules
         Assert.That(jobTitleField.Rules, Has.Count.EqualTo(1));
         Assert.That(jobTitleField.Rules[0].Rule, Is.EqualTo("required"));
         Assert.That(jobTitleField.Rules[0].When, Is.Not.Null);
-        Assert.That(jobTitleField.Rules[0].When!.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(jobTitleField.Rules[0].When.Op, Is.EqualTo("truthy"));
+        var when = (FieldCompare)jobTitleField.Rules[0].When!;
+        Assert.That(when.Field, Is.EqualTo("IsEmployed"));
+        Assert.That(when.Op, Is.EqualTo("truthy"));
     }
 }

@@ -32,7 +32,7 @@
 
 ## What to Keep
 - 11 rule types: required, minLength, maxLength, email, regex, url, range, min, max, equalTo, atLeastOne
-- ValidationCondition: 4 ops (truthy, falsy, eq, neq) — field-level, NOT pipeline conditions
+- FieldCondition: 20 ops + All/Any/Not composition — field-level, NOT pipeline conditions
 - readValue() vendor pattern (native vs fusion + readExpr)
 - isHidden() check (skip hidden fields)
 

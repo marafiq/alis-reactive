@@ -1,3 +1,5 @@
+using Alis.Reactive.Validation;
+
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
@@ -16,9 +18,10 @@ public class WhenExtractingFalsyAndNeqConditions
         Assert.That(jobTitle.Rules[0].Rule, Is.EqualTo("required"));
         Assert.That(jobTitle.Rules[0].Message, Is.EqualTo("Explain why not employed"));
         Assert.That(jobTitle.Rules[0].When, Is.Not.Null);
-        Assert.That(jobTitle.Rules[0].When!.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(jobTitle.Rules[0].When.Op, Is.EqualTo("falsy"));
-        Assert.That(jobTitle.Rules[0].When.Value, Is.Null);
+        var when = (FieldCompare)jobTitle.Rules[0].When!;
+        Assert.That(when.Field, Is.EqualTo("IsEmployed"));
+        Assert.That(when.Op, Is.EqualTo("falsy"));
+        Assert.That(when.Value, Is.Null);
     }
 
     [Test]
@@ -30,9 +33,10 @@ public class WhenExtractingFalsyAndNeqConditions
         var email = desc.First(f => f.FieldName == "Email");
         Assert.That(email.Rules[0].Rule, Is.EqualTo("required"));
         Assert.That(email.Rules[0].When, Is.Not.Null);
-        Assert.That(email.Rules[0].When!.Field, Is.EqualTo("Name"));
-        Assert.That(email.Rules[0].When.Op, Is.EqualTo("neq"));
-        Assert.That(email.Rules[0].When.Value, Is.EqualTo("Independent"));
+        var neqWhen = (FieldCompare)email.Rules[0].When!;
+        Assert.That(neqWhen.Field, Is.EqualTo("Name"));
+        Assert.That(neqWhen.Op, Is.EqualTo("neq"));
+        Assert.That(neqWhen.Value, Is.EqualTo("Independent"));
     }
 
     [Test]

@@ -762,16 +762,58 @@ Walks the reaction tree and resolves validation rules from an IValidationExtract
 Extracts client-side validation rules from a validator type.
             Implemented by FluentValidationAdapter.
 
-### ValidationCondition
+### FieldCondition
 
-A simple condition for conditional validation rules.
-            Operators: "truthy", "falsy", "eq", "neq".
+A symbolic condition tree for conditional validation rules.
+            Built at extraction time using field names, resolved to PlanModel.Condition at render time.
+            Supports all 20 CompareOp operators and boolean composition (All/Any/Not).
+
+**Subtypes:**
 
 ```csharp
-// Properties
+// FieldCompare — single field comparison
 Field { get; }  // Property name to check (e.g. "IsEmployed").
-Op { get; }  // Operator: "truthy", "falsy", "eq", "neq".
-Value { get; }  // Comparison value for "eq" and "neq" operators.
+Op { get; }     // Operator from CompareOp (truthy, falsy, eq, neq, gt, gte, lt, lte, etc.).
+Value { get; }  // Comparison value (null for unary operators).
+
+// FieldAll — logical AND over multiple conditions
+Terms { get; }  // IReadOnlyList<FieldCondition>
+
+// FieldAny — logical OR over multiple conditions
+Terms { get; }  // IReadOnlyList<FieldCondition>
+
+// FieldNot — logical NOT of a condition
+Term { get; }   // FieldCondition
+```
+
+**ReactiveValidator API:**
+
+```csharp
+// Equality/presence (unchanged signatures)
+WhenField(x => x.IsEmployed, () => { ... })           // truthy
+WhenFieldNot(x => x.IsEmployed, () => { ... })        // falsy
+WhenField(x => x.Status, "Active", () => { ... })     // eq
+WhenFieldNot(x => x.Status, "Inactive", () => { ... })// neq
+
+// Ordering
+WhenFieldGte(x => x.Age, 18, () => { ... })           // gte
+WhenFieldLt(x => x.Score, 50, () => { ... })          // lt
+
+// Presence
+WhenFieldNull(x => x.MiddleName, () => { ... })       // is-null
+WhenFieldNotEmpty(x => x.Notes, () => { ... })        // not-empty
+
+// Membership
+WhenFieldIn(x => x.CareLevel, new[] { "memory-care", "skilled-nursing" }, () => { ... })
+
+// Text
+WhenFieldContains(x => x.Notes, "urgent", () => { ... })
+WhenFieldStartsWith(x => x.Code, "RES-", () => { ... })
+
+// Composition
+WhenFields(c => c.Field(x => x.IsEmployed).Truthy()
+                  .And(c.Field(x => x.Age).Gte(18)),
+    () => { RuleFor(x => x.JobTitle).NotEmpty(); })
 ```
 
 ### ValidationDescriptor

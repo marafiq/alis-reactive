@@ -1,3 +1,5 @@
+using Alis.Reactive.Validation;
+
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
@@ -15,8 +17,9 @@ public class WhenExtractingClientConditionalRules
         Assert.That(jobTitle.Rules, Has.Count.EqualTo(1));
         Assert.That(jobTitle.Rules[0].Rule, Is.EqualTo("required"));
         Assert.That(jobTitle.Rules[0].When, Is.Not.Null);
-        Assert.That(jobTitle.Rules[0].When!.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(jobTitle.Rules[0].When.Op, Is.EqualTo("truthy"));
+        var when = (FieldCompare)jobTitle.Rules[0].When!;
+        Assert.That(when.Field, Is.EqualTo("IsEmployed"));
+        Assert.That(when.Op, Is.EqualTo("truthy"));
     }
 
     [Test]
@@ -40,11 +43,12 @@ public class WhenExtractingClientConditionalRules
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitle.Rules.Count, Is.GreaterThanOrEqualTo(2));
         Assert.That(jobTitle.Rules.All(r => r.When != null), Is.True);
-        Assert.That(jobTitle.Rules.All(r => r.When!.Field == "IsEmployed"), Is.True);
+        Assert.That(jobTitle.Rules.All(r => r.When is FieldCompare fc && fc.Field == "IsEmployed"), Is.True);
 
         var salary = desc.First(f => f.FieldName == "Salary");
         Assert.That(salary.Rules[0].When, Is.Not.Null);
-        Assert.That(salary.Rules[0].When!.Field, Is.EqualTo("IsEmployed"));
+        var salaryWhen = (FieldCompare)salary.Rules[0].When!;
+        Assert.That(salaryWhen.Field, Is.EqualTo("IsEmployed"));
     }
 
     [Test]
@@ -55,9 +59,10 @@ public class WhenExtractingClientConditionalRules
         Assert.That(desc, Is.Not.Null);
         var email = desc.First(f => f.FieldName == "Email");
         Assert.That(email.Rules[0].When, Is.Not.Null);
-        Assert.That(email.Rules[0].When!.Field, Is.EqualTo("Name"));
-        Assert.That(email.Rules[0].When.Op, Is.EqualTo("eq"));
-        Assert.That(email.Rules[0].When.Value, Is.EqualTo("Admin"));
+        var eqWhen = (FieldCompare)email.Rules[0].When!;
+        Assert.That(eqWhen.Field, Is.EqualTo("Name"));
+        Assert.That(eqWhen.Op, Is.EqualTo("eq"));
+        Assert.That(eqWhen.Value, Is.EqualTo("Admin"));
     }
 
     [Test]
@@ -90,8 +95,9 @@ public class WhenExtractingClientConditionalRules
             var rule = field!.Rules.FirstOrDefault(r => r.Rule == expectedRule);
             Assert.That(rule, Is.Not.Null, $"{label}: rule '{expectedRule}' missing on '{fieldName}'");
             Assert.That(rule!.When, Is.Not.Null, $"{label}: condition missing");
-            Assert.That(rule.When!.Field, Is.EqualTo("IsEmployed"), $"{label}: wrong condition field");
-            Assert.That(rule.When.Op, Is.EqualTo("truthy"), $"{label}: wrong condition op");
+            var ruleWhen = (FieldCompare)rule.When!;
+            Assert.That(ruleWhen.Field, Is.EqualTo("IsEmployed"), $"{label}: wrong condition field");
+            Assert.That(ruleWhen.Op, Is.EqualTo("truthy"), $"{label}: wrong condition op");
         }
 
         AssertConditionalRule("Name", "required", "NotEmpty");

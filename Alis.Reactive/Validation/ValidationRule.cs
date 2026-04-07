@@ -12,10 +12,10 @@ namespace Alis.Reactive.Validation
         public object Constraint { get; }
         public string Field { get; }
         public Shape Shape { get; }
-        public ValidationCondition When { get; }
+        public FieldCondition When { get; }
 
         internal ValidationRule(string rule, string message, object constraint = null,
-            ValidationCondition when = null, string field = null, Shape shape = null)
+            FieldCondition when = null, string field = null, Shape shape = null)
         {
             Rule = rule;
             Message = message;
