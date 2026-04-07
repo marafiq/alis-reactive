@@ -99,7 +99,7 @@ namespace Alis.Reactive.Builders.Requests
                     {
                         var fields = new Dictionary<string, ValueProducer>();
                         foreach (var sf in _gatherBuilder.StaticFields)
-                            fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.Any);
+                            fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.FromClrType(sf.Value?.GetType()));
                         foreach (var ef in _gatherBuilder.EventFields)
                             fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
                         statics = ValueProducer.Object(fields);
@@ -114,7 +114,7 @@ namespace Alis.Reactive.Builders.Requests
                 {
                     var fields = new Dictionary<string, ValueProducer>();
                     foreach (var sf in _gatherBuilder.StaticFields)
-                        fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.Any);
+                        fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.FromClrType(sf.Value?.GetType()));
                     foreach (var ef in _gatherBuilder.EventFields)
                         fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
                     request.Input = new ValueInput(ValueProducer.Object(fields), _transport);

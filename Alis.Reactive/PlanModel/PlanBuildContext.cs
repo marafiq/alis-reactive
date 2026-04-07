@@ -101,7 +101,7 @@ namespace Alis.Reactive.PlanModel
         /// The map is keyed by binding path (property name), but the componentId is
         /// the generated HTML id which differs from the binding path.
         /// </summary>
-        private bool TryFindRegistrationById(string componentId, out ComponentRegistration registration)
+        internal bool TryFindRegistrationById(string componentId, out ComponentRegistration registration)
         {
             foreach (var kvp in _components)
             {

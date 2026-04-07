@@ -223,7 +223,7 @@ namespace Alis.Reactive
             var rule = new PlanModel.ValidationRule(extracted.Rule, extracted.Message);
 
             if (extracted.Constraint != null)
-                rule.Constraint = ValueProducer.LiteralRaw(extracted.Constraint, extracted.Shape ?? Shape.Any);
+                rule.Constraint = ValueProducer.LiteralRaw(extracted.Constraint, extracted.Shape);
 
             if (extracted.Field != null)
             {
@@ -275,11 +275,12 @@ namespace Alis.Reactive
                 ComponentSource.Of(fieldComponentId),
                 valueMember);
 
+            var conditionShape = fieldReg?.Shape ?? Shape.Any;
             ValueProducer right = vc.Value != null
-                ? ValueProducer.LiteralRaw(vc.Value, Shape.Any)
+                ? ValueProducer.LiteralRaw(vc.Value, conditionShape)
                 : null;
 
-            return Condition.Compare(left, vc.Op, right);
+            return Condition.Compare(left, vc.Op, right, conditionShape);
         }
     }
 }
