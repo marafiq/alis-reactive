@@ -101,7 +101,7 @@ namespace Alis.Reactive.FluentValidator
                     ? rule.PropertyName
                     : prefix + "." + rule.PropertyName;
 
-                ProcessComponents(rule, fullPath, rule.PropertyName, fieldRules, factory, ruleCondition, parentCondition);
+                ProcessComponents(rule, fullPath, rule.PropertyName, prefix, fieldRules, factory, ruleCondition, parentCondition);
             }
         }
 
@@ -195,6 +195,7 @@ namespace Alis.Reactive.FluentValidator
             IValidationRule rule,
             string fullPath,
             string propertyName,
+            string prefix,
             Dictionary<string, List<ExtractedRule>> fieldRules,
             Func<Type, IValidator?> factory,
             FieldCondition? ruleCondition,
@@ -212,7 +213,13 @@ namespace Alis.Reactive.FluentValidator
                     continue;
                 }
 
-                var extracted = MapComponent(component, propertyName, ruleCondition ?? parentCondition);
+                // Compose parent + rule conditions: if both exist, both must be true (All).
+                FieldCondition? effectiveCondition;
+                if (ruleCondition != null && parentCondition != null)
+                    effectiveCondition = FieldCondition.All(parentCondition, ruleCondition);
+                else
+                    effectiveCondition = ruleCondition ?? parentCondition;
+                var extracted = MapComponent(component, propertyName, prefix, effectiveCondition);
                 if (extracted.Count > 0)
                 {
                     if (!fieldRules.TryGetValue(fullPath, out var list))
@@ -250,7 +257,7 @@ namespace Alis.Reactive.FluentValidator
         }
 
         private static List<ExtractedRule> MapComponent(
-            IRuleComponent component, string propertyName, FieldCondition? ruleCondition = null)
+            IRuleComponent component, string propertyName, string prefix, FieldCondition? ruleCondition = null)
         {
             var result = new List<ExtractedRule>();
             var validator = component.Validator;
@@ -322,7 +329,7 @@ namespace Alis.Reactive.FluentValidator
 
                 case IComparisonValidator cv:
                 {
-                    var comparisonRule = MapComparisonValidator(cv, propertyName, displayName, customMsg, ruleCondition);
+                    var comparisonRule = MapComparisonValidator(cv, propertyName, prefix, displayName, customMsg, ruleCondition);
                     result.Add(comparisonRule);
                     break;
                 }
@@ -364,10 +371,13 @@ namespace Alis.Reactive.FluentValidator
         }
 
         private static ExtractedRule MapComparisonValidator(
-            IComparisonValidator cv, string propertyName, string displayName,
+            IComparisonValidator cv, string propertyName, string prefix, string displayName,
             string? customMsg, FieldCondition? ruleCondition)
         {
             var (field, constraint, propertyType) = ResolveComparisonOperands(cv);
+            // Apply prefix to peer field for nested validators (e.g., "City" → "Address.City")
+            if (field != null && !string.IsNullOrEmpty(prefix))
+                field = prefix + "." + field;
             var shape = Shape.FromClrType(propertyType);
             if (shape == Shape.Date && constraint != null)
                 constraint = SerializeDateConstraint(constraint);
