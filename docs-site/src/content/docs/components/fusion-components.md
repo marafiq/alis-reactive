@@ -270,7 +270,7 @@ A picker for selecting a start and end date. Unique among components because the
 |----------|-------|
 | ReadExpr | `"value"` — returns `[Date, Date]` from ej2 instance |
 | Model type | `DateTime[]?` — array matches the Syncfusion value shape |
-| CoerceAs | `"array"` (inferred from `DateTime[]`) with element type `"date"` |
+| Shape | `{ kind: "array", item: { kind: "date" } }` (inferred from `DateTime[]`) |
 | Events | `Changed` |
 | Typed Sources | `StartDate()` / `EndDate()` → `TypedComponentSource<DateTime>` (individual dates), `Value()` → `TypedComponentSource<DateTime[]>` (full array) |
 

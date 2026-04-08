@@ -20,12 +20,12 @@ namespace YourApp.Models
         public string? Phone { get; set; }
 
         // Numeric fields — the type determines how comparisons work in the browser
-        public int Age { get; set; }           // coerceAs: "number" (automatic)
-        public decimal MonthlyRate { get; set; } // coerceAs: "number" (automatic)
+        public int Age { get; set; }           // shape.kind: "number" (automatic)
+        public decimal MonthlyRate { get; set; } // shape.kind: "number" (automatic)
 
         // Date fields — compared as timestamps in the browser
-        public DateTime AdmissionDate { get; set; }   // coerceAs: "date" (automatic)
-        public DateTime DischargeDate { get; set; }    // coerceAs: "date" (automatic)
+        public DateTime AdmissionDate { get; set; }   // shape.kind: "date" (automatic)
+        public DateTime DischargeDate { get; set; }    // shape.kind: "date" (automatic)
 
         // Boolean fields — used as condition sources (WhenField)
         public bool IsEmployed { get; set; }
@@ -108,7 +108,7 @@ public class ResidentValidator : AbstractValidator<ResidentModel>
 
 
         // ── Numeric rules ─────────────────────────────────────
-        // coerceAs: "number" is set AUTOMATICALLY because Age is int, Salary is decimal, etc.
+        // shape.kind: "number" is set AUTOMATICALLY because Age is int, Salary is decimal, etc.
 
         // InclusiveBetween: value must be >= lo AND <= hi (boundaries included, skips empty)
         RuleFor(x => x.Age).InclusiveBetween(0, 120)
@@ -137,7 +137,7 @@ public class ResidentValidator : AbstractValidator<ResidentModel>
 
 
         // ── Date rules ────────────────────────────────────────
-        // coerceAs: "date" is set AUTOMATICALLY because AdmissionDate is DateTime.
+        // shape.kind: "date" is set AUTOMATICALLY because AdmissionDate is DateTime.
         // DateTime constraints serialize as ISO strings: DateTime(2020,1,1) → "2020-01-01"
 
         // GreaterThanOrEqualTo(date): admission must be on or after Jan 1, 2020
@@ -352,21 +352,21 @@ Html.InputField(plan, m => m.Name, o => o.Label("Name"))
     .NativeTextBox(b => b.Placeholder("Name"));
 ```
 
-### DO NOT build manual ValidationDescriptors without coerceAs
+### DO NOT build manual ValidationDescriptors without Shape
 
 ```csharp
-// WRONG — comparison rules without coerceAs throw at runtime
+// WRONG — comparison rules without Shape throw at runtime
 new ValidationRule("min", "Too low", constraint: 0)
 
-// CORRECT — always specify coerceAs for comparison rules
-new ValidationRule("min", "Too low", constraint: 0, coerceAs: "number")
+// CORRECT — always specify shape for comparison rules
+new ValidationRule("min", "Too low", constraint: 0, shape: Shape.Number)
 ```
 
 ---
 
 ## Rule Type Reference — Complete
 
-### Text Rules (no coerceAs needed)
+### Text Rules (shape: "string", automatic)
 
 | Rule | C# DSL | When empty |
 |------|--------|-----------|
@@ -379,7 +379,7 @@ new ValidationRule("min", "Too low", constraint: 0, coerceAs: "number")
 | `creditCard` | `.CreditCard()` | Skips |
 | `notEqual` | `.NotEqual("value")` | Skips |
 
-### Comparison Rules (coerceAs set automatically from property type)
+### Comparison Rules (shape set automatically from property type)
 
 | Rule | C# DSL (fixed value) | C# DSL (cross-property) | When empty |
 |------|---------------------|------------------------|-----------|
@@ -390,7 +390,7 @@ new ValidationRule("min", "Too low", constraint: 0, coerceAs: "number")
 | `equalTo` | `.Equal(val)` | `.Equal(x => x.Prop)` | Skips |
 | `notEqualTo` | — | `.NotEqual(x => x.Prop)` | Skips |
 
-### Range Rules (coerceAs set automatically)
+### Range Rules (shape set automatically)
 
 | Rule | C# DSL | When empty |
 |------|--------|-----------|
@@ -408,12 +408,12 @@ For `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)`:
   "rule": "gt",
   "message": "Discharge must be after admission date.",
   "field": "AdmissionDate",
-  "coerceAs": "date"
+  "shape": { "kind": "date" }
 }
 ```
 
 - `field` = model property name of the peer field (NOT the DOM element ID)
-- `coerceAs` = derived from `AdmissionDate`'s `DateTime` type → `"date"`
+- `shape` = derived from `AdmissionDate`'s `DateTime` type → `{ kind: "date" }`
 - `constraint` is absent — `field` and `constraint` are mutually exclusive
 - The adapter auto-includes `"AdmissionDate"` in the descriptor
 
@@ -424,7 +424,7 @@ For `RuleFor(x => x.Age).InclusiveBetween(0, 120)`:
   "rule": "range",
   "message": "Age must be between 0 and 120.",
   "constraint": [0, 120],
-  "coerceAs": "number"
+  "shape": { "kind": "number" }
 }
 ```
 
@@ -435,7 +435,7 @@ For `RuleFor(x => x.Age).InclusiveBetween(0, 120)`:
 | What goes wrong | What happens |
 |----------------|-------------|
 | Unknown rule type in plan | Form blocked |
-| Comparison rule without `coerceAs` | Runtime throws |
+| Comparison rule without `shape` | Runtime throws |
 | Peer field not registered in form | Form blocked |
 | Condition source field not in form | Rule applies (assumes condition is true) |
 | Invalid regex pattern | Form blocked |

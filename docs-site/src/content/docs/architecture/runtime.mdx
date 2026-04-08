@@ -67,7 +67,7 @@ wire: "wireEntries()\nTwo-phase trigger wiring" {
 enrich -> validation -> wire
 ```
 
-**Enrichment** walks validation descriptors and fills in `fieldId`, `vendor`, `readExpr`, and `coerceAs` on each field from the ComponentsMap. The `coerceAs` field carries the type inferred from `typeof(TProp)` at C# registration time — used by the condition reader for typed comparison (e.g., Unix ms for dates). This is the only runtime enrichment — gather placeholders and component trigger refs are already resolved at C# render time.
+**Enrichment** walks validation descriptors and fills in `fieldId`, `vendor`, `readExpr`, and `shape` on each field from the ComponentsMap. The `shape` carries the type contract inferred from `typeof(TProp)` via `Shape.FromClrType()` at C# registration time — used by the condition reader for typed comparison (e.g., Unix ms for dates). This is the only runtime enrichment — gather placeholders and component trigger refs are already resolved at C# render time.
 
 **Two-phase boot** guarantees event chains work regardless of declaration order. Phase 1 wires all CustomEvent and component-event listeners. Phase 2 runs DomReady reactions — which may dispatch events that Phase 1 listeners catch. Without this, a DomReady dispatch would fire before the listener exists and vanish silently.
 
@@ -247,7 +247,7 @@ Supported coercion types (inferred from C# `typeof(TProp)` via `CoercionTypes.In
 | `"array"` | `T[]`, `List<T>`, ... | identity | JSON.stringify |
 | `"raw"` | everything else | pass-through | Err (plain objects) |
 
-The plan carries `coerceAs` on `ComponentEntry` (from `typeof(TProp)`), `ValueGuard` (from conditions), `SetPropMutation` (from mutations), and `ValidationRule` (from FluentValidation). The runtime never infers or guesses a coercion type — it reads the plan.
+The plan carries `shape` on `ComponentEntry` (from `typeof(TProp)`), `ValueGuard` (from conditions), `SetPropMutation` (from mutations), and `ValidationRule` (from FluentValidation). The runtime never infers or guesses a type — it reads the shape from the plan.
 
 ## Condition evaluation — `conditions.ts`
 

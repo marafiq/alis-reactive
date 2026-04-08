@@ -39,7 +39,9 @@ namespace Alis.Reactive
             _context = new PlanBuildContext(plan, _componentsMap);
         }
 
+        /// <summary>Gets the unique plan identifier, derived from the model type's full name.</summary>
         public string PlanId { get; } = typeof(TModel).FullName!;
+        /// <summary>Gets whether this plan represents a partial view that merges into a parent plan.</summary>
         public bool IsPartial { get; }
         internal IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
         internal PlanBuildContext Context => _context;
@@ -64,12 +66,14 @@ namespace Alis.Reactive
             _componentsMap[bindingPath] = entry;
         }
 
+        /// <summary>Registers all components and resolves validation, then serializes the plan as compact JSON.</summary>
         public string Render()
         {
             ResolveAll();
             return JsonSerializer.Serialize(_context.Plan, CompactOptions);
         }
 
+        /// <summary>Registers all components and resolves validation, then serializes the plan as indented JSON for debugging.</summary>
         public string RenderFormatted()
         {
             ResolveAll();

@@ -1,6 +1,6 @@
 ---
 name: validation-rules-alis-reactive
-description: Guides writing FluentValidation rules on TModel that extract to client-side validation in Alis.Reactive — 16 extractable rule types, coerceAs, cross-property, dates, WhenField conditions. Use this skill when adding or modifying validators, validation views, or validation tests.
+description: Guides writing FluentValidation rules on TModel that extract to client-side validation in Alis.Reactive — 16 extractable rule types, Shape type inference, cross-property, dates, WhenField conditions. Use this skill when adding or modifying validators, validation views, or validation tests.
 ---
 
 # Validation Rules for Alis.Reactive
@@ -25,7 +25,7 @@ Use when:
 
 > 16 rule types are extractable via FluentValidation. Two additional types (`url` and `atLeastOne`) exist in the schema and TS runtime but have no FluentValidation extraction path yet.
 
-### Text (no coerceAs)
+### Text (shape: "string", automatic)
 
 ```csharp
 RuleFor(x => x.Name).NotEmpty();                          // required — fails when empty
@@ -38,7 +38,7 @@ RuleFor(x => x.Nickname).IsEmpty();                       // empty — passes wh
 RuleFor(x => x.Status).NotEqual("deleted");               // notEqual — skips empty
 ```
 
-### Numeric (coerceAs: "number" automatic from int/decimal/etc.)
+### Numeric (shape.kind: "number", automatic from int/decimal/etc.)
 
 ```csharp
 RuleFor(x => x.Age).InclusiveBetween(0, 120);             // range — boundaries included
@@ -53,7 +53,7 @@ RuleFor(x => x.Age).NotEmpty()                              // required — fail
                     .InclusiveBetween(18, 120);              // range — only reached if not empty
 ```
 
-### Date (coerceAs: "date" automatic from DateTime/DateOnly/DateTimeOffset)
+### Date (shape.kind: "date", automatic from DateTime/DateOnly/DateTimeOffset)
 
 ```csharp
 RuleFor(x => x.Admission).GreaterThanOrEqualTo(new DateTime(2020, 1, 1)); // min date
@@ -196,7 +196,7 @@ WhenFields(c =>
 | `RuleFor(x).Empty()` | `RuleFor(x).IsEmpty()` | FV's Empty has no interface |
 | `RuleFor(x).ExclusiveBetween(a,b)` | `RuleFor(x).IsExclusiveBetween(a,b)` | FV can't distinguish from inclusive |
 | `.When(x => x.Bool)` | `WhenField(x => x.Bool, () => {})` | `.When()` is server-only |
-| Manual `min` rule without `coerceAs` | Let adapter set it | Runtime throws without coerceAs |
+| Manual `min` rule without shape | Let adapter set it | Runtime throws without shape |
 | `p.Element("input-id")` for inputs | `Html.InputField(plan, m => m.Prop)` | Element() is for display, not input |
 
 ## Empty Behavior
@@ -212,7 +212,7 @@ WhenFields(c =>
 
 ## Fail-Closed
 
-Nothing silently passes. Unknown rules block. Missing coerceAs throws. Unresolvable peers block. Unenriched fields go to summary.
+Nothing silently passes. Unknown rules block. Missing shape throws. Unresolvable peers block. Unenriched fields go to summary.
 
 ## Verification
 
@@ -223,7 +223,7 @@ After adding or modifying validation rules:
 3. **Browser**: Open the form, submit invalid data, confirm rules fire client-side
 4. **Playwright**: Run `dotnet test tests/Alis.Reactive.PlaywrightTests` — confirm BDD tests pass for validation behavior
 
-If a rule does not fire in the browser but passes C# tests, check: (a) coerceAs is set for numeric/date fields, (b) the form element has the correct `data-reactive-validation-summary` attribute, (c) the input was created with `Html.InputField()` not raw HTML.
+If a rule does not fire in the browser but passes C# tests, check: (a) shape is set for numeric/date fields, (b) the form element has the correct `data-reactive-validation-summary` attribute, (c) the input was created with `Html.InputField()` not raw HTML.
 
 ## Full Guide
 

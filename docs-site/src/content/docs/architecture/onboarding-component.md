@@ -330,17 +330,17 @@ public static class FusionXxxHtmlExtensions
 | `bindingPath` | `setup.BindingPath` | Model property name — key in `ComponentsMap` |
 | `readExpr` | `Component.ReadExpr` | Property path for reading value |
 | `componentType` | Literal string | Descriptive label (e.g., `"autocomplete"`, `"datepicker"`) |
-| `coerceAs` | `CoercionTypes.InferFromType(typeof(TProp))` | Auto-inferred from model property type |
+| `shape` | `Shape.FromClrType(typeof(TProp))` | Type contract auto-inferred from model property type |
 
-**Coercion inference:** `InferFromType` maps C# types to runtime coercion:
+**Shape inference:** `Shape.FromClrType()` maps C# types to the plan's type contract:
 
-| C# type | Inferred coerceAs |
-|---------|-------------------|
+| C# type | shape.kind |
+|---------|------------|
 | `string` | `"string"` |
 | `int`, `decimal`, `double`, `long` | `"number"` |
 | `bool` | `"boolean"` |
 | `DateTime`, `DateTimeOffset`, `DateOnly` | `"date"` |
-| `string[]`, `List<string>` | `"array"` |
+| `string[]`, `List<string>` | `"array"` (with element shape) |
 
 ### Typed Fields helper (for list components)
 

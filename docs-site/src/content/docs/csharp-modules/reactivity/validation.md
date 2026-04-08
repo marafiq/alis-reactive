@@ -1,6 +1,6 @@
 ---
 title: Validation
-description: Client-side validation with FluentValidation extraction — 16 rule types, conditional rules, cross-property comparisons, and fail-closed orchestration.
+description: Client-side validation with FluentValidation extraction — 16 rule types, 21 conditional operators, condition composition, cross-property comparisons, and fail-closed orchestration.
 sidebar:
   order: 6
 ---
@@ -199,6 +199,162 @@ At runtime, the condition is evaluated against the form's current values before 
 
 > **Server vs client conditions:** `WhenField()` extracts to both client and server. FluentValidation's standard `.When()` method only runs on the server — it is skipped during client extraction because it may depend on data not available in the browser (database lookups, service calls).
 
+## What operators are available for conditional rules?
+
+Beyond the truthy, equality, falsy, and inequality checks shown above, `WhenField*` methods cover 17 additional operators for a total of 21 — the same full set used by [runtime conditions](../conditions/). Each method takes a field expression, a threshold value (where applicable), and an `Action` that defines the conditional rules.
+
+### Comparison operators
+
+| Method | Condition |
+|--------|-----------|
+| `WhenFieldGt<TProp>(field, value, rules)` | Field > value |
+| `WhenFieldGte<TProp>(field, value, rules)` | Field >= value |
+| `WhenFieldLt<TProp>(field, value, rules)` | Field < value |
+| `WhenFieldLte<TProp>(field, value, rules)` | Field <= value |
+
+```csharp
+WhenFieldGte(x => x.Age, 65, () =>
+{
+    RuleFor(x => x.MedicareId).NotEmpty();
+});
+```
+
+### Presence operators
+
+| Method | Condition |
+|--------|-----------|
+| `WhenFieldNull<TProp>(field, rules)` | Field is null |
+| `WhenFieldNotNull<TProp>(field, rules)` | Field is not null |
+| `WhenFieldEmpty(field, rules)` | Field is null or empty string |
+| `WhenFieldNotEmpty(field, rules)` | Field is not null and not empty string |
+
+`WhenFieldEmpty` and `WhenFieldNotEmpty` accept `Expression<Func<T, string>>` — they apply only to string properties.
+
+```csharp
+WhenFieldNotNull(x => x.DischargeDate, () =>
+{
+    RuleFor(x => x.DischargeReason).NotEmpty();
+});
+```
+
+### Membership operators
+
+| Method | Condition |
+|--------|-----------|
+| `WhenFieldIn<TProp>(field, values, rules)` | Field is one of the values |
+| `WhenFieldNotIn<TProp>(field, values, rules)` | Field is none of the values |
+| `WhenFieldBetween<TProp>(field, low, high, rules)` | Field is in [low, high] |
+
+```csharp
+WhenFieldIn(x => x.CareLevel, new[] { "Memory Care", "Skilled Nursing" }, () =>
+{
+    RuleFor(x => x.NursingLicense).NotEmpty();
+});
+```
+
+### Text operators
+
+All text operators accept `Expression<Func<T, string>>` — they apply only to string properties.
+
+| Method | Condition |
+|--------|-----------|
+| `WhenFieldContains(field, substring, rules)` | Field contains substring |
+| `WhenFieldStartsWith(field, prefix, rules)` | Field starts with prefix |
+| `WhenFieldEndsWith(field, suffix, rules)` | Field ends with suffix |
+| `WhenFieldMatches(field, pattern, rules)` | Field matches regex |
+| `WhenFieldMinLength(field, length, rules)` | Field has at least N characters |
+
+```csharp
+WhenFieldStartsWith(x => x.RoomNumber, "MC-", () =>
+{
+    RuleFor(x => x.MemoryCareConsent).NotEmpty();
+});
+```
+
+### Array operator
+
+| Method | Condition |
+|--------|-----------|
+| `WhenFieldArrayContains<TProp>(field, value, rules)` | Array field contains the element |
+
+```csharp
+WhenFieldArrayContains(x => x.SelectedServices, "PhysicalTherapy", () =>
+{
+    RuleFor(x => x.TherapistName).NotEmpty();
+});
+```
+
+## How do I compose multiple conditions?
+
+Use `WhenFields()` to combine conditions with And, Or, and Not. The lambda receives a `FieldConditionBuilder<T>` — start with `.Field(x => x.Prop)`, pick an operator, then chain `.And()`, `.Or()`, or `.Not()`:
+
+```csharp
+WhenFields(c => c.Field(x => x.CareLevel).Eq("Memory Care")
+                  .And(c.Field(x => x.Age).Gte(65)), () =>
+{
+    RuleFor(x => x.CognitiveScore).NotEmpty().InclusiveBetween(0, 30);
+});
+```
+
+Both conditions must be true for the rules to apply. The composed condition extracts to the JSON plan as a nested `all`/`any`/`not` tree and evaluates in the browser the same way individual `WhenField` conditions do.
+
+### Or — either condition
+
+```csharp
+WhenFields(c => c.Field(x => x.CareLevel).Eq("Memory Care")
+                  .Or(c.Field(x => x.CareLevel).Eq("Skilled Nursing")), () =>
+{
+    RuleFor(x => x.NursingLicense).NotEmpty();
+});
+```
+
+### Not — invert a condition
+
+```csharp
+WhenFields(c => c.Field(x => x.Status).Eq("Discharged").Not(), () =>
+{
+    RuleFor(x => x.RoomNumber).NotEmpty();
+});
+```
+
+> **Relationship to runtime conditions:** `WhenField` and `WhenFields` conditions use the same operator set as [runtime conditions](../conditions/). The difference is scope: runtime conditions branch pipeline actions, while validation conditions guard which rules apply to a form submission.
+
+## How do nested validators handle conditions?
+
+When a validator uses `SetValidator()` for a nested property, conditions compose automatically:
+
+```csharp
+public class ResidentIntakeValidator : ReactiveValidator<ResidentIntakeModel>
+{
+    public ResidentIntakeValidator()
+    {
+        WhenField(x => x.HasInsurance, () =>
+        {
+            RuleFor(x => x.Insurance).SetValidator(new InsuranceValidator());
+        });
+    }
+}
+
+public class InsuranceValidator : ReactiveValidator<InsuranceInfo>
+{
+    public InsuranceValidator()
+    {
+        RuleFor(x => x.Provider).NotEmpty();
+
+        WhenField(x => x.IsMedicare, () =>
+        {
+            RuleFor(x => x.MedicareId).NotEmpty();
+        });
+    }
+}
+```
+
+The extracted rules behave as follows:
+
+- **Condition composition:** The `Insurance.Provider` rule gets the parent's condition (`HasInsurance` is truthy). The `Insurance.MedicareId` rule gets both conditions composed with AND: `HasInsurance` is truthy AND `Insurance.IsMedicare` is truthy.
+- **Prefix carrying:** Peer field references inside the nested validator are automatically prefixed. `IsMedicare` in the nested validator becomes `Insurance.IsMedicare` in the plan, so the browser reads the correct field.
+- **Include rules:** When using `Include()` to pull in a shared validator, the parent's condition passes through to the included rules the same way.
+
 ## How do cross-property rules work?
 
 When a comparison rule references another property instead of a literal value, it becomes a cross-property rule:
@@ -215,17 +371,19 @@ The plan carries a `field` property pointing to the peer field name. At runtime,
 
 Cross-property comparisons support all comparison operators: `Equal`, `NotEqual`, `GreaterThan`, `GreaterThanOrEqualTo`, `LessThan`, `LessThanOrEqualTo`.
 
-## How does coercion work?
+## How does type inference work?
 
-Comparison rules automatically infer a `coerceAs` type from the C# property type. This ensures numeric and date comparisons work correctly in the browser:
+Comparison rules automatically infer a `shape` from the C# property type via `Shape.FromClrType()`. This ensures numeric and date comparisons work correctly in the browser:
 
-| C# property type | coerceAs | Runtime behavior |
-|------------------|----------|-----------------|
+| C# property type | shape.kind | Runtime behavior |
+|------------------|------------|-----------------|
+| `string` | `"string"` | Direct string comparison |
 | `int`, `decimal`, `double`, `long`, `float`, `byte`, `short`, `uint`, `ushort`, `ulong` | `"number"` | Both values parsed as numbers before comparison |
-| `DateTime`, `DateTimeOffset`, `DateOnly` | `"date"` | Both values compared as ISO 8601 strings |
-| `string` | omitted | Direct string comparison |
+| `bool` | `"boolean"` | Boolean comparison |
+| `DateTime`, `DateTimeOffset`, `DateOnly` | `"date"` | Both values compared as dates |
+| `string[]`, `List<string>` | `"array"` | Array with element shape |
 
-You never specify coercion manually — it is derived from the C# type at extraction time.
+In the JSON plan, shape is a nested object (e.g., `{ "kind": "number" }`) rather than a flat string. You never specify shape manually — it is derived from the C# type at extraction time.
 
 ## What happens when validation fails?
 

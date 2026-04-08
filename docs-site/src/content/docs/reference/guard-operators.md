@@ -142,7 +142,7 @@ p.When(args, x => x.Value).Matches(@"^\(\d{3}\) \d{3}-\d{4}$")
 |-----------|-----------|-------------|
 | `.ArrayContains(item)` | `array-contains` | Source array contains the specified element |
 
-The plan carries an `elementCoerceAs` field for element-level coercion.
+The plan carries a nested `shape` with element-level type information for array operators.
 
 ```csharp
 var allergies = p.Component<NativeCheckList>(m => m.Allergies);

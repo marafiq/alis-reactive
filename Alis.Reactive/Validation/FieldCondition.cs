@@ -50,6 +50,7 @@ namespace Alis.Reactive.Validation
     /// <summary>Logical AND — all terms must be true.</summary>
     public sealed class FieldAll : FieldCondition
     {
+        /// <summary>Gets the child conditions that must all be true.</summary>
         public IReadOnlyList<FieldCondition> Terms { get; }
 
         internal FieldAll(FieldCondition[] terms)
@@ -61,6 +62,7 @@ namespace Alis.Reactive.Validation
     /// <summary>Logical OR — any term must be true.</summary>
     public sealed class FieldAny : FieldCondition
     {
+        /// <summary>Gets the child conditions where at least one must be true.</summary>
         public IReadOnlyList<FieldCondition> Terms { get; }
 
         internal FieldAny(FieldCondition[] terms)
@@ -72,6 +74,7 @@ namespace Alis.Reactive.Validation
     /// <summary>Logical NOT — inverts the inner term.</summary>
     public sealed class FieldNot : FieldCondition
     {
+        /// <summary>Gets the inner condition to negate.</summary>
         public FieldCondition Term { get; }
 
         internal FieldNot(FieldCondition term)
