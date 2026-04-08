@@ -1,0 +1,37 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs.ParentChildModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
+@{
+    ViewData["Title"] = "Nested Bug — Claim 2: Parent + Child Condition Composition";
+    var plan = Html.ReactivePlan<ParentChildModel>();
+}
+
+<h1>Claim 2 — Parent + Child Condition Composition</h1>
+
+<form id="parent-child-form" class="space-y-4 p-4">
+    @{ Html.InputField(plan, m => m.ParentFlag, o => o.Label("Parent Flag"))
+       .NativeCheckBox(b => b.CssClass("mr-2")); }
+
+    <h2>Child Section</h2>
+
+    @{ Html.InputField(plan, m => m.Child.ChildFlag, o => o.Label("Child Flag"))
+       .NativeCheckBox(b => b.CssClass("mr-2")); }
+
+    @{ Html.InputField(plan, m => m.Child.ChildName, o => o.Label("Child Name"))
+       .NativeTextBox(b => b.Placeholder("Child name").CssClass("border px-2 py-1")); }
+
+    @(Html.NativeButton("submit-btn", "Submit")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post("/Sandbox/Validation/NestedBugs/SubmitParentChild", g => g.IncludeAll())
+             .Validate<ParentChildBugValidator>("parent-child-form")
+             .Response(r => r
+                .OnSuccess(s => s.Element("result").SetText("Saved"))
+                .OnError(400, e => e.ValidationErrors("parent-child-form")));
+        }))
+
+    <div id="result" class="mt-2 text-green-600"></div>
+</form>
+
+@Html.RenderPlan(plan)
