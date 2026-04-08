@@ -290,6 +290,50 @@ namespace Alis.Reactive.FluentValidator
                 defineRules);
         }
 
+        /// <summary>Applies a "matches" condition — string field matches regex pattern.</summary>
+        protected void WhenFieldMatches(
+            Expression<Func<T, string>> field, string pattern, Action defineRules)
+        {
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
+            var fieldFunc = field.Compile();
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Matches, pattern);
+            var regex = new System.Text.RegularExpressions.Regex(pattern);
+
+            ApplyClientCondition(
+                x => fieldFunc(x) != null && regex.IsMatch(fieldFunc(x)!),
+                condition,
+                defineRules);
+        }
+
+        /// <summary>Applies a "min-length" condition — string field length >= minimum.</summary>
+        protected void WhenFieldMinLength(
+            Expression<Func<T, string>> field, int minLength, Action defineRules)
+        {
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
+            var fieldFunc = field.Compile();
+            var condition = FieldCondition.Compare(fieldName, CompareOp.MinLength, minLength);
+
+            ApplyClientCondition(
+                x => fieldFunc(x) != null && fieldFunc(x)!.Length >= minLength,
+                condition,
+                defineRules);
+        }
+
+        /// <summary>Applies an "array-contains" condition — array field contains the given element.</summary>
+        protected void WhenFieldArrayContains<TProp>(
+            Expression<Func<T, IEnumerable<TProp>>> field, TProp value, Action defineRules)
+        {
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
+            var fieldFunc = field.Compile();
+            var condition = FieldCondition.Compare(fieldName, CompareOp.ArrayContains,
+                FieldConditionHelpers.SerializeConditionValue(value));
+
+            ApplyClientCondition(
+                x => fieldFunc(x)?.Contains(value) == true,
+                condition,
+                defineRules);
+        }
+
         // ── Composition ────────────────────────────────────────────────────────
 
         /// <summary>

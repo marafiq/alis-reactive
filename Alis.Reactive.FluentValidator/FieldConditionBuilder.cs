@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
@@ -172,6 +174,28 @@ namespace Alis.Reactive.FluentValidator
             new FieldGuard<T>(
                 FieldCondition.Compare(_fieldName, CompareOp.EndsWith, suffix),
                 x => (_fieldFunc(x) as string)?.EndsWith(suffix) == true);
+
+        public FieldGuard<T> Matches(string pattern)
+        {
+            var regex = new System.Text.RegularExpressions.Regex(pattern);
+            return new FieldGuard<T>(
+                FieldCondition.Compare(_fieldName, CompareOp.Matches, pattern),
+                x => (_fieldFunc(x) as string) is { } s && regex.IsMatch(s));
+        }
+
+        public FieldGuard<T> MinLength(int minLength) =>
+            new FieldGuard<T>(
+                FieldCondition.Compare(_fieldName, CompareOp.MinLength, minLength),
+                x => (_fieldFunc(x) as string) is { } s && s.Length >= minLength);
+
+        // ── Array ──────────────────────────────────────────────────────────
+
+        public FieldGuard<T> ArrayContains(TProp value) =>
+            new FieldGuard<T>(
+                FieldCondition.Compare(_fieldName, CompareOp.ArrayContains,
+                    FieldConditionHelpers.SerializeConditionValue(value)),
+                x => _fieldFunc(x) is System.Collections.IEnumerable enumerable &&
+                     enumerable.Cast<object>().Contains(value));
     }
 
     /// <summary>

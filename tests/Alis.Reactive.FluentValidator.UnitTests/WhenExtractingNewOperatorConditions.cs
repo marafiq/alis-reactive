@@ -219,5 +219,46 @@ public class WhenExtractingNewOperatorConditions
         AssertSourceField(typeof(WhenFieldContainsValidator), "Notes");
         AssertSourceField(typeof(WhenFieldStartsWithValidator), "Name");
         AssertSourceField(typeof(WhenFieldEndsWithValidator), "Email");
+        AssertSourceField(typeof(WhenFieldMatchesValidator), "Phone");
+        AssertSourceField(typeof(WhenFieldMinLengthValidator), "Notes");
+        AssertSourceField(typeof(WhenFieldArrayContainsValidator), "Tags");
+    }
+
+    // ── Matches / MinLength / ArrayContains operators ──────────────────
+
+    [Test]
+    public void WhenFieldMatches_extracts_matches_condition()
+    {
+        var fields = _adapter.ExtractRules(typeof(WhenFieldMatchesValidator), "form");
+        var name = fields.First(f => f.FieldName == "Name");
+        var when = (FieldCompare)name.Rules[0].When!;
+
+        Assert.That(when.Field, Is.EqualTo("Phone"));
+        Assert.That(when.Op, Is.EqualTo("matches"));
+        Assert.That(when.Value, Is.EqualTo(@"^\d{3}-"));
+    }
+
+    [Test]
+    public void WhenFieldMinLength_extracts_min_length_condition()
+    {
+        var fields = _adapter.ExtractRules(typeof(WhenFieldMinLengthValidator), "form");
+        var email = fields.First(f => f.FieldName == "Email");
+        var when = (FieldCompare)email.Rules[0].When!;
+
+        Assert.That(when.Field, Is.EqualTo("Notes"));
+        Assert.That(when.Op, Is.EqualTo("min-length"));
+        Assert.That(when.Value, Is.EqualTo(10));
+    }
+
+    [Test]
+    public void WhenFieldArrayContains_extracts_array_contains_condition()
+    {
+        var fields = _adapter.ExtractRules(typeof(WhenFieldArrayContainsValidator), "form");
+        var phone = fields.First(f => f.FieldName == "Phone");
+        var when = (FieldCompare)phone.Rules[0].When!;
+
+        Assert.That(when.Field, Is.EqualTo("Tags"));
+        Assert.That(when.Op, Is.EqualTo("array-contains"));
+        Assert.That(when.Value, Is.EqualTo("urgent"));
     }
 }

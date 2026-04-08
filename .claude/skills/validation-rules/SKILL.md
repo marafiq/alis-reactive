@@ -129,6 +129,14 @@ WhenFieldBetween(x => x.Age, 18, 65, () => { ... });  // between (inclusive)
 WhenFieldContains(x => x.Notes, "urgent", () => { ... });       // contains
 WhenFieldStartsWith(x => x.Name, "Dr.", () => { ... });         // starts-with
 WhenFieldEndsWith(x => x.Email, "@hospital.org", () => { ... });// ends-with
+WhenFieldMatches(x => x.Phone, @"^\d{3}-", () => { ... });      // matches (regex)
+WhenFieldMinLength(x => x.Notes, 10, () => { ... });            // min-length
+```
+
+### Array
+
+```csharp
+WhenFieldArrayContains(x => x.Tags, "urgent", () => { ... });   // array-contains
 ```
 
 ### Composition (And / Or / Not)

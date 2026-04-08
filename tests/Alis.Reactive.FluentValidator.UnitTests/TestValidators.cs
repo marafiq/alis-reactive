@@ -652,3 +652,38 @@ public class WhenFieldsComplexValidator : ReactiveValidator<TestModel>
             });
     }
 }
+
+// --- Remaining CompareOp operators ---
+
+public class WhenFieldMatchesValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldMatchesValidator()
+    {
+        WhenFieldMatches(x => x.Phone, @"^\d{3}-", () =>
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name required for valid phone format");
+        });
+    }
+}
+
+public class WhenFieldMinLengthValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldMinLengthValidator()
+    {
+        WhenFieldMinLength(x => x.Notes, 10, () =>
+        {
+            RuleFor(x => x.Email).NotEmpty().WithMessage("Email required when notes are substantial");
+        });
+    }
+}
+
+public class WhenFieldArrayContainsValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldArrayContainsValidator()
+    {
+        WhenFieldArrayContains(x => x.Tags, "urgent", () =>
+        {
+            RuleFor(x => x.Phone).NotEmpty().WithMessage("Phone required when tagged urgent");
+        });
+    }
+}

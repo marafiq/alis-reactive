@@ -35,6 +35,7 @@ public class TestModel
     public string? CareLevel { get; set; }
     public string? Notes { get; set; }
     public string? MiddleName { get; set; }
+    public string[]? Tags { get; set; }
 }
 
 public class FullCoverageModel
