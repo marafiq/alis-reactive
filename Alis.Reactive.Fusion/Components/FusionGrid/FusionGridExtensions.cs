@@ -56,6 +56,24 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitSet("dataSource", ValueProducer.Read(source.Scope, "responseBody"));
 
         /// <summary>
+        /// Replaces the grid data source with items from an event payload.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TSource">The event payload type containing the items.</typeparam>
+        /// <param name="self">The grid component reference.</param>
+        /// <param name="source">The event payload instance.</param>
+        /// <param name="path">Expression selecting the items collection from the payload.</param>
+        /// <returns>The component reference for method chaining.</returns>
+        public static ComponentRef<FusionGrid, TModel> SetDataSource<TModel, TSource>(
+            this ComponentRef<FusionGrid, TModel> self,
+            TSource source, Expression<Func<TSource, object?>> path)
+            where TModel : class
+        {
+            var sourcePath = ExpressionPathHelper.ToEventPath(path);
+            return self.EmitSet("dataSource", ValueProducer.Read(PayloadSource.Event(), sourcePath));
+        }
+
+        /// <summary>
         /// Triggers a grid refresh. Call after <see cref="SetDataSource{TModel, TResponse}"/>
         /// to re-render with the new data.
         /// </summary>

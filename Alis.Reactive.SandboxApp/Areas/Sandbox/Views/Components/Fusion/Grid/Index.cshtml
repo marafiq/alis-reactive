@@ -80,22 +80,28 @@
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>
             {
-                p.Element("evt-skip").SetText(args, x => x.Skip);
-                p.Element("evt-take").SetText(args, x => x.Take);
-                p.Element("evt-action-type").SetText(args, x => x.Action.RequestType);
-                p.Element("evt-action-page").SetText(args, x => x.Action.CurrentPage);
-                p.Post("/Sandbox/Components/Grid/Data")
-                 .Gather(g => g
-                     .FromEvent(args, x => x.Skip, "skip")
-                     .FromEvent(args, x => x.Take, "take")
-                     .FromEvent(args, x => x.Sorted, "sorted")
-                     .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
-                 .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
-                 {
-                     s.Component<FusionGrid>("residents-grid")
-                         .SetDataSource(json);
-                     s.Element("action-status").SetText("data refreshed");
-                 }));
+                p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
+                    .Then(t =>
+                    {
+                        t.Element("evt-skip").SetText(args, x => x.Skip);
+                        t.Element("evt-take").SetText(args, x => x.Take);
+                        t.Element("evt-action-type").SetText(args, x => x.Action.RequestType);
+                        t.Element("evt-action-column").SetText(args, x => x.Action.ColumnName);
+                        t.Element("evt-action-direction").SetText(args, x => x.Action.Direction);
+                        t.Element("evt-action-page").SetText(args, x => x.Action.CurrentPage);
+                        t.Post("/Sandbox/Components/Grid/Data")
+                         .Gather(g => g
+                             .FromEvent(args, x => x.Skip, "skip")
+                             .FromEvent(args, x => x.Take, "take")
+                             .FromEvent(args, x => x.Sorted, "sorted")
+                             .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
+                         .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
+                         {
+                             s.Component<FusionGrid>("residents-grid")
+                                 .SetDataSource(json);
+                             s.Element("action-status").SetText("data refreshed");
+                         }));
+                    });
             }))
 
         <div class="font-mono text-sm mt-4 space-y-1">
@@ -105,6 +111,8 @@
             <p>Event skip: <span id="evt-skip" class="text-text-muted">&mdash;</span></p>
             <p>Event take: <span id="evt-take" class="text-text-muted">&mdash;</span></p>
             <p>Event action.requestType: <span id="evt-action-type" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.columnName: <span id="evt-action-column" class="text-text-muted">&mdash;</span></p>
+            <p>Event action.direction: <span id="evt-action-direction" class="text-text-muted">&mdash;</span></p>
             <p>Event action.currentPage: <span id="evt-action-page" class="text-text-muted">&mdash;</span></p>
         </div>
     </section>

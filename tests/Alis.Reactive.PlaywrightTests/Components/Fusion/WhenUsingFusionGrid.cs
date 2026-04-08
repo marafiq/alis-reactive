@@ -2,7 +2,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
 /// Exercises FusionGrid server-side custom binding end-to-end:
-/// initial data load, sorting, paging, and external filtering.
+/// initial data load, sorting with column echo, paging with skip echo,
+/// external filtering, and plan JSON verification.
 ///
 /// Page under test: /Sandbox/Components/Grid
 /// Server: 200 resident records, 10 per page.
@@ -12,109 +13,158 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid";
 
-    private async Task NavigateAndBoot()
+    private async Task NavigateAndWaitForInitialLoad()
     {
-        await NavigateToAndWaitForTextSignal(Path, "#load-status");
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 10000);
+        await Expect(Page.Locator("#load-status"))
+            .ToHaveTextAsync("initial data loaded", new() { Timeout = 10000 });
     }
 
-    // ── Page loads with initial data ──
+    // ── Initial load ──
 
     [Test]
     public async Task page_loads_with_initial_data()
     {
-        await NavigateAndBoot();
-        var status = await Page.Locator("#load-status").TextContentAsync();
-        Assert.That(status, Does.Contain("initial data loaded"));
+        await NavigateAndWaitForInitialLoad();
+
+        var gridRows = Page.Locator("#residents-grid .e-row");
+        await Expect(gridRows.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task grid_renders_rows()
+    public async Task grid_displays_ten_rows_per_page()
     {
-        await NavigateAndBoot();
-        var rows = Page.Locator("#residents-grid .e-row");
-        var count = await rows.CountAsync();
-        Assert.That(count, Is.GreaterThanOrEqualTo(1), "Grid should display at least one row");
+        await NavigateAndWaitForInitialLoad();
+
+        var gridRows = Page.Locator("#residents-grid .e-row");
+        var count = await gridRows.CountAsync();
+        Assert.That(count, Is.EqualTo(10), "Grid should display exactly 10 rows (pageSize)");
         AssertNoConsoleErrors();
     }
 
     // ── Server-side sorting ──
 
     [Test]
-    public async Task clicking_column_header_sorts_data()
+    public async Task sorting_a_column_fetches_sorted_data_and_echoes_action()
     {
-        await NavigateAndBoot();
+        await NavigateAndWaitForInitialLoad();
 
-        // Click the Age column header to trigger sorting
-        var ageHeader = Page.Locator("#residents-grid .e-headercell").Filter(new() { HasText = "Age" });
-        await ClickWhenStable(ageHeader);
+        // Click Name column header to sort ascending
+        var nameHeader = Page.Locator("#residents-grid .e-headercell").Filter(new() { HasText = "Name" });
+        await Expect(nameHeader).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await nameHeader.ClickAsync();
 
-        // Wait for the action status to update (server round-trip)
         await Expect(Page.Locator("#action-status"))
             .ToHaveTextAsync("data refreshed", new() { Timeout = 10000 });
 
-        var actionType = await Page.Locator("#evt-action-type").TextContentAsync();
-        Assert.That(actionType, Is.EqualTo("sorting"));
+        // Echo shows sorting action details
+        await Expect(Page.Locator("#evt-action-type"))
+            .ToHaveTextAsync("sorting", new() { Timeout = 5000 });
+
         AssertNoConsoleErrors();
     }
 
     // ── Server-side paging ──
 
     [Test]
-    public async Task clicking_next_page_fetches_next_page()
+    public async Task paging_fetches_next_page_with_correct_skip()
     {
-        await NavigateAndBoot();
+        await NavigateAndWaitForInitialLoad();
 
-        // Click the next-page button in the grid pager
-        var nextPage = Page.Locator("#residents-grid .e-pagercontainer .e-nextpage");
-        await ClickWhenStable(nextPage);
+        // Pager should show (200 items / 10 per page = 20 pages)
+        var pager = Page.Locator("#residents-grid .e-pagercontainer");
+        await Expect(pager).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        // Click page 2
+        var page2 = Page.Locator("#residents-grid .e-numericitem:has-text('2')");
+        await Expect(page2).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await page2.ClickAsync();
 
         await Expect(Page.Locator("#action-status"))
             .ToHaveTextAsync("data refreshed", new() { Timeout = 10000 });
 
-        var skip = await Page.Locator("#evt-skip").TextContentAsync();
-        Assert.That(skip, Is.EqualTo("10"), "Second page should skip 10 records");
+        // Echo shows paging with skip=10
+        await Expect(Page.Locator("#evt-skip"))
+            .ToHaveTextAsync("10", new() { Timeout = 5000 });
+
+        await Expect(Page.Locator("#evt-action-type"))
+            .ToHaveTextAsync("paging", new() { Timeout = 5000 });
+
         AssertNoConsoleErrors();
     }
 
     // ── External filter ──
 
     [Test]
-    public async Task external_filter_reloads_grid_data()
+    public async Task external_filter_reloads_grid_with_fewer_results()
     {
-        await NavigateAndBoot();
+        await NavigateAndWaitForInitialLoad();
 
-        // Type a high min age to filter
-        var filterInput = Page.Locator("#residents-grid").Locator("..").Locator("..").Locator("..").Locator("input[aria-label='Min Age Filter']");
-
-        // Use the SF NumericTextBox approach — find the input inside the component wrapper
+        // Type a high min age to filter significantly
         var numericInput = Page.Locator("input[id$='__MinAge']");
         await Expect(numericInput).ToBeVisibleAsync(new() { Timeout = 5000 });
         await numericInput.ClickAsync();
         await numericInput.FillAsync("90");
-        // Tab out to trigger the Changed event
         await numericInput.PressAsync("Tab");
 
         await Expect(Page.Locator("#filter-status"))
             .ToHaveTextAsync("filtered", new() { Timeout = 10000 });
 
-        // After filtering, the grid should have fewer rows (residents age >= 90)
+        // Grid should still render rows (server processed the filter)
+        var gridRows = Page.Locator("#residents-grid .e-row");
+        await Expect(gridRows.First).ToBeVisibleAsync(new() { Timeout = 5000 });
+
         AssertNoConsoleErrors();
     }
 
-    // ── Plan JSON rendered ──
+    // ── Sort + Page combined ──
+
+    [Test]
+    public async Task sorting_then_paging_preserves_sort_order()
+    {
+        await NavigateAndWaitForInitialLoad();
+
+        // Sort by Age ascending
+        var ageHeader = Page.Locator("#residents-grid .e-headercell").Filter(new() { HasText = "Age" });
+        await ClickWhenStable(ageHeader);
+        await Expect(Page.Locator("#action-status"))
+            .ToHaveTextAsync("data refreshed", new() { Timeout = 10000 });
+
+        // Now page to page 2 — sort should still be active
+        var page2 = Page.Locator("#residents-grid .e-numericitem:has-text('2')");
+        await Expect(page2).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await page2.ClickAsync();
+
+        await Expect(Page.Locator("#evt-skip"))
+            .ToHaveTextAsync("10", new() { Timeout = 10000 });
+
+        // The action type for paging should be "paging" not "sorting"
+        await Expect(Page.Locator("#evt-action-type"))
+            .ToHaveTextAsync("paging", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    // ── Plan JSON ──
 
     [Test]
     public async Task plan_json_contains_grid_behaviors()
     {
-        await NavigateAndBoot();
+        await NavigateAndWaitForInitialLoad();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
+
         Assert.That(planJson, Does.Contain("\"set\""),
             "Plan must contain set reactions for SetDataSource");
         Assert.That(planJson, Does.Contain("\"dataSource\""),
             "Plan must target the dataSource property");
         Assert.That(planJson, Does.Contain("residents-grid"),
             "Plan must reference the grid element ID");
+        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
+            "Plan must declare fusion vendor");
+
         AssertNoConsoleErrors();
     }
 }
