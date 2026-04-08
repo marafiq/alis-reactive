@@ -195,4 +195,60 @@ public class WhenProvingCodexBugClaims
         Assert.That(rule.Field, Is.EqualTo("Address.City"),
             "Peer field in cross-property comparison must carry the full nested path");
     }
+
+    // --- Claim 4: Include() inside WhenField() drops condition ---
+
+    /// <summary>
+    /// Claim 4: When Include(shared) is inside WhenField(flag),
+    /// the included rules should carry the flag condition.
+    /// Server: flag=false skips the Include block.
+    /// Client must match.
+    /// </summary>
+    [Test]
+    public void Claim4_include_inside_WhenField_should_carry_condition()
+    {
+        var fields = _adapter.ExtractRules(typeof(IncludeConditionalValidator), "form");
+
+        var name = fields.FirstOrDefault(f => f.FieldName == "Name");
+        Assert.That(name, Is.Not.Null, "Name field should be extracted");
+        Assert.That(name!.Rules, Has.Count.GreaterThan(0));
+
+        var rule = name.Rules[0];
+        Assert.That(rule.Rule, Is.EqualTo("required"));
+
+        // BUG CLAIM: When is null — condition dropped by ProcessIncludeRule
+        Assert.That(rule.When, Is.Not.Null,
+            "Included rules inside WhenField must carry the condition");
+
+        var when = (FieldCompare)rule.When!;
+        Assert.That(when.Field, Is.EqualTo("IsEmployed"));
+        Assert.That(when.Op, Is.EqualTo("truthy"));
+
+        // Verify server behavior matches
+        var validator = new IncludeConditionalValidator();
+        var result = validator.Validate(new TestModel { IsEmployed = false, Name = null });
+        Assert.That(result.IsValid, Is.True,
+            "Server: IsEmployed=false should skip included rules");
+    }
+}
+
+// --- Validators for Claim 4 ---
+
+public class SharedSectionValidator : AbstractValidator<TestModel>
+{
+    public SharedSectionValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Name required");
+    }
+}
+
+public class IncludeConditionalValidator : ReactiveValidator<TestModel>
+{
+    public IncludeConditionalValidator()
+    {
+        WhenField(x => x.IsEmployed, () =>
+        {
+            Include(new SharedSectionValidator());
+        });
+    }
 }

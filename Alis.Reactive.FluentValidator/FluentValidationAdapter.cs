@@ -93,7 +93,7 @@ namespace Alis.Reactive.FluentValidator
 
                 if (string.IsNullOrEmpty(rule.PropertyName))
                 {
-                    ProcessIncludeRule(rule, prefix, fieldRules, factory);
+                    ProcessIncludeRule(rule, prefix, fieldRules, factory, ruleCondition ?? parentCondition);
                     continue;
                 }
 
@@ -175,7 +175,8 @@ namespace Alis.Reactive.FluentValidator
             IValidationRule rule,
             string prefix,
             Dictionary<string, List<ExtractedRule>> fieldRules,
-            Func<Type, IValidator?> factory)
+            Func<Type, IValidator?> factory,
+            FieldCondition? parentCondition = null)
         {
             foreach (IRuleComponent component in rule.Components)
             {
@@ -183,7 +184,7 @@ namespace Alis.Reactive.FluentValidator
                 {
                     var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
                     var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
-                    ExtractFromValidator(nested, prefix, fieldRules, factory, nestedConditions);
+                    ExtractFromValidator(nested, prefix, fieldRules, factory, nestedConditions, parentCondition);
                 }
             }
         }
