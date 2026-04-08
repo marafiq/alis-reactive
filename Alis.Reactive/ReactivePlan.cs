@@ -286,9 +286,22 @@ namespace Alis.Reactive
                 valueMember);
 
             var conditionShape = fieldReg?.Shape ?? Shape.Any;
-            ValueProducer right = cmp.Value != null
-                ? ValueProducer.LiteralRaw(cmp.Value, conditionShape)
-                : null;
+            ValueProducer right;
+            if (cmp.Value is object[] arr)
+            {
+                // in/not-in/between: value is an array — produce ArrayProducer so TS
+                // receives Array.isArray(right) === true at runtime.
+                var items = arr.Select(v => ValueProducer.LiteralRaw(v, conditionShape)).ToList();
+                right = ValueProducer.Array(items, conditionShape);
+            }
+            else if (cmp.Value != null)
+            {
+                right = ValueProducer.LiteralRaw(cmp.Value, conditionShape);
+            }
+            else
+            {
+                right = null;
+            }
 
             return Condition.Compare(left, cmp.Op, right, conditionShape);
         }

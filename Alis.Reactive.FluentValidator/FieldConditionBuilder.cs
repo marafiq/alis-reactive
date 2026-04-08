@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
@@ -29,20 +30,24 @@ namespace Alis.Reactive.FluentValidator
 
         internal FieldStart(Expression<Func<T, TProp>> field)
         {
-            _fieldName = ReactiveValidator<T>.ExtractPropertyName(field);
+            _fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             _fieldFunc = field.Compile();
         }
 
         // ── Equality ───────────────────────────────────────────────────────
 
+        /// <summary>
+        /// Generic truthy check -- treats null, false, 0 (all numeric types), and empty string as falsy.
+        /// For bool-specific overload, use <c>WhenField(Expression&lt;Func&lt;T, bool&gt;&gt;)</c> directly.
+        /// </summary>
         public FieldGuard<T> Truthy() =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "truthy"),
+                FieldCondition.Compare(_fieldName, CompareOp.Truthy),
                 x => !IsFalsy(_fieldFunc(x)));
 
         public FieldGuard<T> Falsy() =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "falsy"),
+                FieldCondition.Compare(_fieldName, CompareOp.Falsy),
                 x => IsFalsy(_fieldFunc(x)));
 
         private static bool IsFalsy(TProp value) => value switch
@@ -60,56 +65,56 @@ namespace Alis.Reactive.FluentValidator
 
         public FieldGuard<T> Eq(TProp value) =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "eq", ReactiveValidator<T>.SerializeConditionValue(value)),
+                FieldCondition.Compare(_fieldName, CompareOp.Eq, FieldConditionHelpers.SerializeConditionValue(value)),
                 x => Equals(_fieldFunc(x), value));
 
         public FieldGuard<T> Neq(TProp value) =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "neq", ReactiveValidator<T>.SerializeConditionValue(value)),
+                FieldCondition.Compare(_fieldName, CompareOp.Neq, FieldConditionHelpers.SerializeConditionValue(value)),
                 x => !Equals(_fieldFunc(x), value));
 
         // ── Ordering ───────────────────────────────────────────────────────
 
         public FieldGuard<T> Gt(TProp value) =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "gt", ReactiveValidator<T>.SerializeConditionValue(value)),
+                FieldCondition.Compare(_fieldName, CompareOp.Gt, FieldConditionHelpers.SerializeConditionValue(value)),
                 x => Comparer<TProp>.Default.Compare(_fieldFunc(x), value) > 0);
 
         public FieldGuard<T> Gte(TProp value) =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "gte", ReactiveValidator<T>.SerializeConditionValue(value)),
+                FieldCondition.Compare(_fieldName, CompareOp.Gte, FieldConditionHelpers.SerializeConditionValue(value)),
                 x => Comparer<TProp>.Default.Compare(_fieldFunc(x), value) >= 0);
 
         public FieldGuard<T> Lt(TProp value) =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "lt", ReactiveValidator<T>.SerializeConditionValue(value)),
+                FieldCondition.Compare(_fieldName, CompareOp.Lt, FieldConditionHelpers.SerializeConditionValue(value)),
                 x => Comparer<TProp>.Default.Compare(_fieldFunc(x), value) < 0);
 
         public FieldGuard<T> Lte(TProp value) =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "lte", ReactiveValidator<T>.SerializeConditionValue(value)),
+                FieldCondition.Compare(_fieldName, CompareOp.Lte, FieldConditionHelpers.SerializeConditionValue(value)),
                 x => Comparer<TProp>.Default.Compare(_fieldFunc(x), value) <= 0);
 
         // ── Presence ───────────────────────────────────────────────────────
 
         public FieldGuard<T> IsNull() =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "is-null"),
+                FieldCondition.Compare(_fieldName, CompareOp.IsNull),
                 x => _fieldFunc(x) == null);
 
         public FieldGuard<T> NotNull() =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "not-null"),
+                FieldCondition.Compare(_fieldName, CompareOp.NotNull),
                 x => _fieldFunc(x) != null);
 
         public FieldGuard<T> IsEmpty() =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "is-empty"),
+                FieldCondition.Compare(_fieldName, CompareOp.IsEmpty),
                 x => _fieldFunc(x) is string s ? string.IsNullOrEmpty(s) : _fieldFunc(x) == null);
 
         public FieldGuard<T> NotEmpty() =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "not-empty"),
+                FieldCondition.Compare(_fieldName, CompareOp.NotEmpty),
                 x => _fieldFunc(x) is string s ? !string.IsNullOrEmpty(s) : _fieldFunc(x) != null);
 
         // ── Membership ─────────────────────────────────────────────────────
@@ -118,11 +123,11 @@ namespace Alis.Reactive.FluentValidator
         {
             var serialized = new object[values.Length];
             for (int i = 0; i < values.Length; i++)
-                serialized[i] = ReactiveValidator<T>.SerializeConditionValue(values[i]);
+                serialized[i] = FieldConditionHelpers.SerializeConditionValue(values[i]);
 
             var set = new HashSet<TProp>(values);
             return new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "in", serialized),
+                FieldCondition.Compare(_fieldName, CompareOp.In, serialized),
                 x => set.Contains(_fieldFunc(x)));
         }
 
@@ -130,11 +135,11 @@ namespace Alis.Reactive.FluentValidator
         {
             var serialized = new object[values.Length];
             for (int i = 0; i < values.Length; i++)
-                serialized[i] = ReactiveValidator<T>.SerializeConditionValue(values[i]);
+                serialized[i] = FieldConditionHelpers.SerializeConditionValue(values[i]);
 
             var set = new HashSet<TProp>(values);
             return new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "not-in", serialized),
+                FieldCondition.Compare(_fieldName, CompareOp.NotIn, serialized),
                 x => !set.Contains(_fieldFunc(x)));
         }
 
@@ -142,11 +147,11 @@ namespace Alis.Reactive.FluentValidator
         {
             var serialized = new object[]
             {
-                ReactiveValidator<T>.SerializeConditionValue(low),
-                ReactiveValidator<T>.SerializeConditionValue(high)
+                FieldConditionHelpers.SerializeConditionValue(low),
+                FieldConditionHelpers.SerializeConditionValue(high)
             };
             return new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "between", serialized),
+                FieldCondition.Compare(_fieldName, CompareOp.Between, serialized),
                 x => Comparer<TProp>.Default.Compare(_fieldFunc(x), low) >= 0 &&
                      Comparer<TProp>.Default.Compare(_fieldFunc(x), high) <= 0);
         }
@@ -155,17 +160,17 @@ namespace Alis.Reactive.FluentValidator
 
         public FieldGuard<T> Contains(string substring) =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "contains", substring),
+                FieldCondition.Compare(_fieldName, CompareOp.Contains, substring),
                 x => (_fieldFunc(x) as string)?.Contains(substring) == true);
 
         public FieldGuard<T> StartsWith(string prefix) =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "starts-with", prefix),
+                FieldCondition.Compare(_fieldName, CompareOp.StartsWith, prefix),
                 x => (_fieldFunc(x) as string)?.StartsWith(prefix) == true);
 
         public FieldGuard<T> EndsWith(string suffix) =>
             new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, "ends-with", suffix),
+                FieldCondition.Compare(_fieldName, CompareOp.EndsWith, suffix),
                 x => (_fieldFunc(x) as string)?.EndsWith(suffix) == true);
     }
 

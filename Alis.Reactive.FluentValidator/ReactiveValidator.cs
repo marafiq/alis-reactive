@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using FluentValidation;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
@@ -29,11 +29,17 @@ namespace Alis.Reactive.FluentValidator
         /// Server: FV's When() runs the condition at validation time.
         /// Client: Adapter extracts rules with FieldCondition.Compare(field, "truthy").
         /// </summary>
+        /// <remarks>
+        /// For bool fields. Server predicate evaluates the bool expression directly.
+        /// For generic-typed truthy conditions via the composition API, use
+        /// <c>WhenFields</c> with <c>FieldStart.Truthy()</c> which checks all falsy
+        /// values (null, false, 0, empty string).
+        /// </remarks>
         protected void WhenField(Expression<Func<T, bool>> conditionField, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(conditionField);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(conditionField);
             var compiled = conditionField.Compile();
-            var condition = FieldCondition.Compare(fieldName, "truthy");
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Truthy);
 
             ApplyClientCondition(compiled, condition, defineRules);
         }
@@ -46,9 +52,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenField<TProp>(
             Expression<Func<T, TProp>> field, TProp value, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "eq", SerializeConditionValue(value));
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Eq, FieldConditionHelpers.SerializeConditionValue(value));
 
             ApplyClientCondition(
                 x => Equals(fieldFunc(x), value),
@@ -63,9 +69,9 @@ namespace Alis.Reactive.FluentValidator
         /// </summary>
         protected void WhenFieldNot(Expression<Func<T, bool>> conditionField, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(conditionField);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(conditionField);
             var compiled = conditionField.Compile();
-            var condition = FieldCondition.Compare(fieldName, "falsy");
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Falsy);
 
             ApplyClientCondition(x => !compiled(x), condition, defineRules);
         }
@@ -78,9 +84,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldNot<TProp>(
             Expression<Func<T, TProp>> field, TProp value, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "neq", SerializeConditionValue(value));
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Neq, FieldConditionHelpers.SerializeConditionValue(value));
 
             ApplyClientCondition(
                 x => !Equals(fieldFunc(x), value),
@@ -94,9 +100,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldGt<TProp>(
             Expression<Func<T, TProp>> field, TProp value, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "gt", SerializeConditionValue(value));
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Gt, FieldConditionHelpers.SerializeConditionValue(value));
 
             ApplyClientCondition(
                 x => Comparer<TProp>.Default.Compare(fieldFunc(x), value) > 0,
@@ -108,9 +114,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldGte<TProp>(
             Expression<Func<T, TProp>> field, TProp value, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "gte", SerializeConditionValue(value));
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Gte, FieldConditionHelpers.SerializeConditionValue(value));
 
             ApplyClientCondition(
                 x => Comparer<TProp>.Default.Compare(fieldFunc(x), value) >= 0,
@@ -122,9 +128,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldLt<TProp>(
             Expression<Func<T, TProp>> field, TProp value, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "lt", SerializeConditionValue(value));
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Lt, FieldConditionHelpers.SerializeConditionValue(value));
 
             ApplyClientCondition(
                 x => Comparer<TProp>.Default.Compare(fieldFunc(x), value) < 0,
@@ -136,9 +142,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldLte<TProp>(
             Expression<Func<T, TProp>> field, TProp value, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "lte", SerializeConditionValue(value));
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Lte, FieldConditionHelpers.SerializeConditionValue(value));
 
             ApplyClientCondition(
                 x => Comparer<TProp>.Default.Compare(fieldFunc(x), value) <= 0,
@@ -152,9 +158,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldNull<TProp>(
             Expression<Func<T, TProp>> field, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "is-null");
+            var condition = FieldCondition.Compare(fieldName, CompareOp.IsNull);
 
             ApplyClientCondition(x => fieldFunc(x) == null, condition, defineRules);
         }
@@ -163,9 +169,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldNotNull<TProp>(
             Expression<Func<T, TProp>> field, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "not-null");
+            var condition = FieldCondition.Compare(fieldName, CompareOp.NotNull);
 
             ApplyClientCondition(x => fieldFunc(x) != null, condition, defineRules);
         }
@@ -174,9 +180,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldEmpty(
             Expression<Func<T, string>> field, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "is-empty");
+            var condition = FieldCondition.Compare(fieldName, CompareOp.IsEmpty);
 
             ApplyClientCondition(x => string.IsNullOrEmpty(fieldFunc(x)), condition, defineRules);
         }
@@ -185,9 +191,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldNotEmpty(
             Expression<Func<T, string>> field, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "not-empty");
+            var condition = FieldCondition.Compare(fieldName, CompareOp.NotEmpty);
 
             ApplyClientCondition(x => !string.IsNullOrEmpty(fieldFunc(x)), condition, defineRules);
         }
@@ -198,10 +204,10 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldIn<TProp>(
             Expression<Func<T, TProp>> field, TProp[] values, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var serialized = values.Select(v => SerializeConditionValue(v)).ToArray();
-            var condition = FieldCondition.Compare(fieldName, "in", serialized);
+            var serialized = values.Select(v => FieldConditionHelpers.SerializeConditionValue(v)).ToArray();
+            var condition = FieldCondition.Compare(fieldName, CompareOp.In, serialized);
 
             var set = new HashSet<TProp>(values);
             ApplyClientCondition(x => set.Contains(fieldFunc(x)), condition, defineRules);
@@ -213,9 +219,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldContains(
             Expression<Func<T, string>> field, string substring, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "contains", substring);
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Contains, substring);
 
             ApplyClientCondition(
                 x => fieldFunc(x)?.Contains(substring) == true,
@@ -227,9 +233,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldStartsWith(
             Expression<Func<T, string>> field, string prefix, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "starts-with", prefix);
+            var condition = FieldCondition.Compare(fieldName, CompareOp.StartsWith, prefix);
 
             ApplyClientCondition(
                 x => fieldFunc(x)?.StartsWith(prefix) == true,
@@ -241,9 +247,9 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldEndsWith(
             Expression<Func<T, string>> field, string suffix, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, "ends-with", suffix);
+            var condition = FieldCondition.Compare(fieldName, CompareOp.EndsWith, suffix);
 
             ApplyClientCondition(
                 x => fieldFunc(x)?.EndsWith(suffix) == true,
@@ -255,10 +261,10 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldNotIn<TProp>(
             Expression<Func<T, TProp>> field, TProp[] values, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
-            var serialized = values.Select(v => SerializeConditionValue(v)).ToArray();
-            var condition = FieldCondition.Compare(fieldName, "not-in", serialized);
+            var serialized = values.Select(v => FieldConditionHelpers.SerializeConditionValue(v)).ToArray();
+            var condition = FieldCondition.Compare(fieldName, CompareOp.NotIn, serialized);
 
             var set = new HashSet<TProp>(values);
             ApplyClientCondition(x => !set.Contains(fieldFunc(x)), condition, defineRules);
@@ -268,14 +274,14 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldBetween<TProp>(
             Expression<Func<T, TProp>> field, TProp low, TProp high, Action defineRules)
         {
-            var fieldName = ExtractPropertyName(field);
+            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
             var fieldFunc = field.Compile();
             var serialized = new object[]
             {
-                SerializeConditionValue(low),
-                SerializeConditionValue(high)
+                FieldConditionHelpers.SerializeConditionValue(low),
+                FieldConditionHelpers.SerializeConditionValue(high)
             };
-            var condition = FieldCondition.Compare(fieldName, "between", serialized);
+            var condition = FieldCondition.Compare(fieldName, CompareOp.Between, serialized);
 
             ApplyClientCondition(
                 x => Comparer<TProp>.Default.Compare(fieldFunc(x), low) >= 0 &&
@@ -321,33 +327,5 @@ namespace Alis.Reactive.FluentValidator
             }
         }
 
-        /// <summary>
-        /// Serializes a condition value for plan JSON.
-        /// DateTime/DateTimeOffset/DateOnly -> Unix ms (long) via ToUnixTimeMilliseconds.
-        /// All other types pass through as-is.
-        /// Developer controls timezone by passing DateTime with the intended Kind.
-        /// TimeSpan.Zero forces UTC interpretation for DateTime without explicit Kind.
-        /// </summary>
-        internal static object? SerializeConditionValue<TProp>(TProp value) => value switch
-        {
-            DateTime dt => new DateTimeOffset(dt, TimeSpan.Zero).ToUnixTimeMilliseconds(),
-            DateTimeOffset dto => dto.ToUnixTimeMilliseconds(),
-            DateOnly d => new DateTimeOffset(d.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero).ToUnixTimeMilliseconds(),
-            _ => value
-        };
-
-        internal static string ExtractPropertyName<TResult>(Expression<Func<T, TResult>> expression)
-        {
-            var body = expression.Body;
-            if (body is UnaryExpression unary)
-                body = unary.Operand;
-
-            if (body is MemberExpression member && member.Member is PropertyInfo)
-                return member.Member.Name;
-
-            throw new ArgumentException(
-                $"WhenField() requires a simple property access expression (e.g. x => x.IsEmployed). " +
-                $"Got: {expression}");
-        }
     }
 }

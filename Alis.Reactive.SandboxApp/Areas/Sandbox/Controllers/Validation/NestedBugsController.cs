@@ -54,5 +54,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
                     .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
             return Ok(new { message = "Saved" });
         }
+
+        [HttpGet("OperatorConditions")]
+        public IActionResult OperatorConditions() =>
+            View("~/Areas/Sandbox/Views/Validation/NestedBugs/OperatorConditions.cshtml",
+                new OperatorConditionModel());
+
+        [HttpPost("SubmitOperatorConditions")]
+        public IActionResult SubmitOperatorConditions([FromBody] OperatorConditionModel? model)
+        {
+            if (model == null) return BadRequest(new { errors = new { Age = new[] { "Request body required." } } });
+            var result = new OperatorConditionValidator().Validate(model);
+            if (!result.IsValid)
+                return BadRequest(new { errors = result.Errors.GroupBy(e => e.PropertyName)
+                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
+            return Ok(new { message = "Saved" });
+        }
     }
 }
