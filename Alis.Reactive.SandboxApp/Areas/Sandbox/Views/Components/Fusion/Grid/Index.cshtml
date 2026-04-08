@@ -56,7 +56,7 @@
                              .Gather(g => g
                                  .Static("skip", 0)
                                  .Static("take", 10)
-                                 .Include(m => m.MinAge))
+                                 .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
                              .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
                              {
                                  s.Component<FusionGrid>("residents-grid")
@@ -89,7 +89,7 @@
                      .FromEvent(args, x => x.Skip, "skip")
                      .FromEvent(args, x => x.Take, "take")
                      .FromEvent(args, x => x.Sorted, "sorted")
-                     .Include(m => m.MinAge))
+                     .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
                  .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
                  {
                      s.Component<FusionGrid>("residents-grid")
