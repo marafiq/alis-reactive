@@ -129,8 +129,10 @@ export function wireSignalR(
 
     const evt = args[0] as Record<string, unknown>;
     log.debug("method", { hubUrl: trigger.hubUrl, method: trigger.method });
-    executeReaction(reaction, plan, { event: evt }).catch(err =>
-      log.error("reaction failed", { error: String(err) }));
+    const result = executeReaction(reaction, plan, { event: evt });
+    if (result instanceof Promise) {
+      result.catch(err => log.error("reaction failed", { error: String(err) }));
+    }
   });
 
   log.debug("listening", { hubUrl: trigger.hubUrl, method: trigger.method });

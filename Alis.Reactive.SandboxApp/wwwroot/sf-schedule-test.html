@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Schedule — Event Explorer (Senior Living Domain)</title>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/material.css" />
+    <script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui; margin: 0; padding: 20px; background: #f5f5f5; }
+        h1 { margin: 0 0 4px; font-size: 1.4rem; }
+        h1 small { font-weight: normal; color: #666; font-size: 0.75rem; }
+        .layout { display: flex; gap: 16px; height: calc(100vh - 100px); }
+        .schedule-panel { flex: 1; background: white; border-radius: 8px; overflow: hidden; }
+        .log-panel { width: 380px; background: #1e1e1e; color: #d4d4d4; border-radius: 8px;
+                     overflow-y: auto; padding: 12px; font-family: monospace; font-size: 11px; }
+        .log-entry { margin-bottom: 6px; border-bottom: 1px solid #333; padding-bottom: 6px; }
+        .log-event { color: #569cd6; font-weight: bold; }
+        .log-time { color: #808080; font-size: 10px; }
+        .log-data { color: #ce9178; white-space: pre-wrap; max-height: 120px; overflow-y: auto; }
+        .controls { margin-bottom: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .controls button { padding: 4px 10px; border: 1px solid #ccc; border-radius: 4px;
+                          background: white; cursor: pointer; font-size: 12px; }
+        #clear-btn { background: #ff4444; color: white; border-color: #ff4444; }
+        .filter-bar { margin-bottom: 8px; display: flex; gap: 12px; align-items: center;
+                      background: white; padding: 8px 16px; border-radius: 8px; }
+        .filter-bar label { font-size: 13px; font-weight: 600; }
+        .filter-bar select { padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; }
+
+        /* Unassigned event styling */
+        .e-schedule .e-appointment.unassigned { background-color: #dc3545 !important; border-color: #c82333 !important; }
+
+        /* Custom tooltip template */
+        .schedule-tooltip { padding: 8px 0; }
+        .schedule-tooltip .tt-subject { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+        .schedule-tooltip .tt-time { color: #555; font-size: 12px; }
+        .schedule-tooltip .tt-detail { font-size: 12px; color: #333; margin-top: 4px; }
+        .schedule-tooltip .tt-badge { display: inline-block; padding: 2px 8px; border-radius: 10px;
+                                     font-size: 11px; font-weight: 600; margin-top: 4px; }
+        .schedule-tooltip .tt-badge.unassigned { background: #fee2e2; color: #dc3545; }
+        .schedule-tooltip .tt-badge.assigned { background: #d1fae5; color: #059669; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h1>SF Schedule — Senior Living Shift Schedule <small>Event Explorer</small></h1>
+        <button id="clear-btn" onclick="clearLog()">Clear</button>
+        <button onclick="callMethod('addEvent')">+ Assignment</button>
+        <button onclick="callMethod('deleteEvent')">Delete First</button>
+        <button onclick="callMethod('getEvents')">Get All</button>
+        <button onclick="callMethod('getCurrentViewEvents')">Current View</button>
+        <button onclick="callMethod('print')">Print</button>
+        <button onclick="callMethod('openEditor')">Open Editor</button>
+        <button onclick="callMethod('navigateNext')">Next Week</button>
+        <button onclick="callMethod('navigatePrev')">Prev Week</button>
+    </div>
+
+    <div class="filter-bar">
+        <label>Facility:</label>
+        <select id="facility-filter" onchange="onFacilityChange()">
+            <option value="all">All Facilities</option>
+            <option value="mystery-manor" selected>Mystery Manor</option>
+            <option value="sunrise-gardens">Sunrise Gardens</option>
+        </select>
+        <label>Shift:</label>
+        <select id="shift-filter" onchange="onShiftFilter()">
+            <option value="all">All Shifts</option>
+            <option value="1">AM Shift</option>
+            <option value="2">PM Shift</option>
+            <option value="3">Night Shift</option>
+        </select>
+        <label>Staff:</label>
+        <select id="staff-filter" onchange="onStaffFilter()">
+            <option value="all">All Staff</option>
+            <option value="assigned">Assigned Only</option>
+            <option value="unassigned">Unassigned Only</option>
+        </select>
+    </div>
+
+    <div class="layout">
+        <div class="schedule-panel">
+            <div id="schedule"></div>
+        </div>
+        <div class="log-panel" id="log"></div>
+    </div>
+
+    <!-- Tooltip template -->
+    <script id="tooltipTemplate" type="text/x-template">
+        <div class="schedule-tooltip">
+            <div class="tt-subject">${Subject}</div>
+            <div class="tt-time">${StartTime.toLocaleString()} — ${EndTime.toLocaleString()}</div>
+            <div class="tt-detail">${Description}</div>
+            <div class="tt-badge ${IsUnassigned ? 'unassigned' : 'assigned'}">
+                ${IsUnassigned ? 'NEEDS ASSIGNMENT' : 'Assigned'}
+            </div>
+        </div>
+    </script>
+
+    <script>
+        var logEl = document.getElementById('log');
+        var eventCounter = 100;
+
+        function log(eventName, data) {
+            var entry = document.createElement('div');
+            entry.className = 'log-entry';
+            var time = new Date().toLocaleTimeString();
+            var clean = {};
+            if (data) {
+                ['name', 'type', 'requestType', 'cancel', 'data', 'event',
+                 'element', 'startTime', 'endTime', 'groupIndex', 'resource',
+                 'currentView', 'previousView', 'action', 'addedRecords',
+                 'changedRecords', 'deletedRecords', 'items', 'result',
+                 'cellData', 'subject', 'isAllDay', 'currentDate', 'previousDate',
+                 'view', 'activeViewIndex'
+                ].forEach(function(key) {
+                    if (data[key] !== undefined) {
+                        try {
+                            if (key === 'element' || key === 'event') {
+                                clean[key] = '[DOM]';
+                            } else if (key === 'data' && data[key]) {
+                                if (Array.isArray(data[key])) {
+                                    clean[key] = data[key].map(function(d) {
+                                        return { Id: d.Id, Subject: d.Subject, StaffName: d.StaffName, ShiftId: d.ShiftId, IsUnassigned: d.IsUnassigned };
+                                    });
+                                } else {
+                                    clean[key] = { Id: data[key].Id, Subject: data[key].Subject, StaffName: data[key].StaffName, ShiftId: data[key].ShiftId, IsUnassigned: data[key].IsUnassigned };
+                                }
+                            } else {
+                                clean[key] = data[key];
+                            }
+                        } catch(e) { clean[key] = '[error]'; }
+                    }
+                });
+            }
+            entry.innerHTML = '<div class="log-time">' + time + '</div>' +
+                '<div class="log-event">' + eventName + '</div>' +
+                '<div class="log-data">' + JSON.stringify(clean, null, 2) + '</div>';
+            logEl.insertBefore(entry, logEl.firstChild);
+        }
+
+        function clearLog() { logEl.innerHTML = ''; }
+
+        // === SENIOR LIVING DOMAIN DATA ===
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = today.getMonth();
+        var day = today.getDate();
+        var dow = today.getDay();
+        var weekStart = new Date(year, month, day - dow);
+
+        function d(dayOffset, hour) {
+            return new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + dayOffset, hour, 0);
+        }
+
+        // Shift resources
+        var shiftData = [
+            { text: 'AM Shift (6:00 AM - 2:00 PM)', id: 1, color: '#1aaa55' },
+            { text: 'PM Shift (2:00 PM - 10:00 PM)', id: 2, color: '#357cd2' },
+            { text: 'Night Shift (10:00 PM - 6:00 AM)', id: 3, color: '#7fa900' }
+        ];
+
+        // Staff assignments — realistic senior living data
+        var scheduleData = [
+            // Monday AM
+            { Id: 1, Subject: 'Jane Blonde — AM Care', StaffName: 'Jane Blonde', Role: 'CNA',
+              StartTime: d(1, 6), EndTime: d(1, 14), ShiftId: 1, IsUnassigned: false,
+              Description: '6 care items | 1 hr 25 min | Residents: Adams, Baker, Clark',
+              FacilityId: 'mystery-manor', CareItems: 6, EstimatedMinutes: 85 },
+            // Tuesday AM
+            { Id: 2, Subject: 'Mike Ross — AM Care', StaffName: 'Mike Ross', Role: 'RN',
+              StartTime: d(2, 6), EndTime: d(2, 14), ShiftId: 1, IsUnassigned: false,
+              Description: '4 care items | 55 min | Residents: Davis, Evans',
+              FacilityId: 'mystery-manor', CareItems: 4, EstimatedMinutes: 55 },
+            // Wednesday AM — UNASSIGNED
+            { Id: 3, Subject: 'UNASSIGNED — AM Care', StaffName: null, Role: null,
+              StartTime: d(3, 6), EndTime: d(3, 14), ShiftId: 1, IsUnassigned: true,
+              Description: '6 care items | 1 hr 25 min | Needs coverage!',
+              FacilityId: 'mystery-manor', CareItems: 6, EstimatedMinutes: 85, CategoryColor: '#dc3545' },
+            // Thursday AM
+            { Id: 4, Subject: 'Tom Hardy — AM Care', StaffName: 'Tom Hardy', Role: 'LPN',
+              StartTime: d(4, 6), EndTime: d(4, 14), ShiftId: 1, IsUnassigned: false,
+              Description: '7 care items | 1 hr 40 min | Residents: Foster, Grant, Hall',
+              FacilityId: 'mystery-manor', CareItems: 7, EstimatedMinutes: 100 },
+            // Monday PM
+            { Id: 5, Subject: 'Sarah Connor — PM Care', StaffName: 'Sarah Connor', Role: 'CNA',
+              StartTime: d(1, 14), EndTime: d(1, 22), ShiftId: 2, IsUnassigned: false,
+              Description: '5 care items | 1 hr 10 min | Residents: Adams, Irving, King',
+              FacilityId: 'mystery-manor', CareItems: 5, EstimatedMinutes: 70 },
+            // Tuesday PM — UNASSIGNED
+            { Id: 6, Subject: 'UNASSIGNED — PM Care', StaffName: null, Role: null,
+              StartTime: d(2, 14), EndTime: d(2, 22), ShiftId: 2, IsUnassigned: true,
+              Description: '4 care items | 50 min | Needs coverage!',
+              FacilityId: 'mystery-manor', CareItems: 4, EstimatedMinutes: 50, CategoryColor: '#dc3545' },
+            // Wednesday PM
+            { Id: 7, Subject: 'Lisa Chen — PM Care', StaffName: 'Lisa Chen', Role: 'RN',
+              StartTime: d(3, 14), EndTime: d(3, 22), ShiftId: 2, IsUnassigned: false,
+              Description: '3 care items | 45 min | Residents: Lewis, Moore',
+              FacilityId: 'mystery-manor', CareItems: 3, EstimatedMinutes: 45 },
+            // Thursday Night
+            { Id: 8, Subject: 'Night Watch — Night', StaffName: 'Pat Night', Role: 'CNA',
+              StartTime: d(4, 22), EndTime: d(5, 6), ShiftId: 3, IsUnassigned: false,
+              Description: '2 care items | 30 min | Overnight rounds',
+              FacilityId: 'mystery-manor', CareItems: 2, EstimatedMinutes: 30 },
+            // Friday Night — UNASSIGNED
+            { Id: 9, Subject: 'UNASSIGNED — Night', StaffName: null, Role: null,
+              StartTime: d(5, 22), EndTime: d(6, 6), ShiftId: 3, IsUnassigned: true,
+              Description: '2 care items | 30 min | Needs coverage!',
+              FacilityId: 'mystery-manor', CareItems: 2, EstimatedMinutes: 30, CategoryColor: '#dc3545' },
+        ];
+
+        // === SCHEDULE INSTANCE ===
+        var scheduleObj = new ej.schedule.Schedule({
+            width: '100%',
+            height: '100%',
+            selectedDate: today,
+            currentView: 'Week',
+            views: [
+                { option: 'Day' },
+                { option: 'Week' },
+                { option: 'WorkWeek' },
+                { option: 'Month' },
+                { option: 'Agenda' },
+                { option: 'TimelineDay' },
+                { option: 'TimelineWeek' }
+            ],
+            group: { resources: ['Shifts'] },
+            resources: [{
+                field: 'ShiftId',
+                title: 'Shift',
+                name: 'Shifts',
+                dataSource: shiftData,
+                textField: 'text',
+                idField: 'id',
+                colorField: 'color'
+            }],
+            eventSettings: {
+                dataSource: scheduleData,
+                fields: {
+                    id: 'Id',
+                    subject: { name: 'Subject' },
+                    startTime: { name: 'StartTime' },
+                    endTime: { name: 'EndTime' },
+                    description: { name: 'Description' }
+                },
+                enableTooltip: true,
+                tooltipTemplate: '#tooltipTemplate'
+            },
+            workHours: { highlight: true, start: '06:00', end: '22:00' },
+            startHour: '05:00',
+            endHour: '23:00',
+            timeScale: { enable: true, interval: 60, slotCount: 1 },
+            showHeaderBar: true,
+            showTimeIndicator: true,
+            allowDragAndDrop: true,
+
+            // === ALL EVENTS ===
+            cellClick: function(args) { log('cellClick', args); },
+            cellDoubleClick: function(args) { log('cellDoubleClick', args); },
+            eventClick: function(args) { log('eventClick', args); },
+            eventDoubleClick: function(args) { log('eventDoubleClick', args); },
+            actionBegin: function(args) { log('actionBegin', args); },
+            actionComplete: function(args) { log('actionComplete', args); },
+            actionFailure: function(args) { log('actionFailure', args); },
+            navigating: function(args) { log('navigating', args); },
+            created: function() { log('created', {}); },
+            dataBound: function(args) { log('dataBound', args); },
+            popupOpen: function(args) { log('popupOpen', args); },
+            popupClose: function(args) { log('popupClose', args); },
+            select: function(args) { log('select', args); },
+            dragStart: function(args) { log('dragStart', args); },
+            dragStop: function(args) { log('dragStop', args); },
+            resizeStart: function(args) { log('resizeStart', args); },
+            resizeStop: function(args) { log('resizeStop', args); },
+
+            // Color unassigned events red
+            eventRendered: function(args) {
+                if (args.data && args.data.IsUnassigned) {
+                    args.element.classList.add('unassigned');
+                }
+                // Don't log eventRendered to reduce noise — uncomment to debug:
+                // log('eventRendered', args);
+            },
+        });
+        scheduleObj.appendTo('#schedule');
+
+        // === FILTER HANDLERS ===
+        function onFacilityChange() {
+            var facility = document.getElementById('facility-filter').value;
+            log('FILTER: facility', { value: facility });
+            // In real app: HTTP call to load new data, then scheduleObj.eventSettings.dataSource = newData;
+        }
+
+        function onShiftFilter() {
+            var shift = document.getElementById('shift-filter').value;
+            log('FILTER: shift', { value: shift });
+            if (shift === 'all') {
+                scheduleObj.resources[0].dataSource = shiftData;
+            } else {
+                scheduleObj.resources[0].dataSource = shiftData.filter(function(s) { return s.id === parseInt(shift); });
+            }
+            scheduleObj.dataBind();
+        }
+
+        function onStaffFilter() {
+            var filter = document.getElementById('staff-filter').value;
+            log('FILTER: staff', { value: filter });
+            var filtered = scheduleData;
+            if (filter === 'assigned') {
+                filtered = scheduleData.filter(function(e) { return !e.IsUnassigned; });
+            } else if (filter === 'unassigned') {
+                filtered = scheduleData.filter(function(e) { return e.IsUnassigned; });
+            }
+            scheduleObj.eventSettings.dataSource = filtered;
+            scheduleObj.dataBind();
+        }
+
+        // === METHOD CALLS ===
+        function callMethod(method) {
+            log('METHOD: ' + method, {});
+            switch(method) {
+                case 'addEvent':
+                    eventCounter++;
+                    scheduleObj.addEvent({
+                        Id: eventCounter,
+                        Subject: 'New Assignment #' + eventCounter,
+                        StaffName: 'TBD',
+                        StartTime: d(4, 10),
+                        EndTime: d(4, 12),
+                        ShiftId: 1,
+                        IsUnassigned: true,
+                        Description: 'Newly created — needs staff assignment',
+                        FacilityId: 'mystery-manor',
+                        CareItems: 0,
+                        EstimatedMinutes: 0
+                    });
+                    break;
+                case 'deleteEvent':
+                    var events = scheduleObj.getEvents();
+                    if (events.length > 0) {
+                        log('Deleting event', { Id: events[0].Id, Subject: events[0].Subject });
+                        scheduleObj.deleteEvent(events[0].Id);
+                    }
+                    break;
+                case 'getEvents':
+                    var all = scheduleObj.getEvents();
+                    log('getEvents result', { count: all.length, events: all.map(function(e) {
+                        return { Id: e.Id, Subject: e.Subject, IsUnassigned: e.IsUnassigned };
+                    })});
+                    break;
+                case 'getCurrentViewEvents':
+                    var current = scheduleObj.getCurrentViewEvents();
+                    log('getCurrentViewEvents', { count: current.length });
+                    break;
+                case 'print':
+                    scheduleObj.print();
+                    break;
+                case 'openEditor':
+                    scheduleObj.openEditor(scheduleData[0], 'Save');
+                    break;
+                case 'navigateNext':
+                    scheduleObj.changeDate(scheduleObj.activeView.getNextPreviousDate('next'));
+                    break;
+                case 'navigatePrev':
+                    scheduleObj.changeDate(scheduleObj.activeView.getNextPreviousDate('previous'));
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

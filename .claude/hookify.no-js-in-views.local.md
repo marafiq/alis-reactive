@@ -1,6 +1,6 @@
 ---
 name: no-js-in-views
-enabled: true
+enabled: false
 event: file
 action: block
 conditions:

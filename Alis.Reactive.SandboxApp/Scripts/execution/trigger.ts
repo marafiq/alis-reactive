@@ -8,6 +8,24 @@ import { scope } from "../core/trace";
 
 const log = scope("trigger");
 
+/**
+ * Execute a reaction and handle errors for both sync and async paths.
+ * The callback is synchronous. For pure sync reactions (set, call, branch
+ * with compare conditions), execution completes before this returns —
+ * in the same tick as the SF event callback. SF checks args.cancel AFTER
+ * this returns, so the mutation is visible.
+ */
+function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext): void {
+  try {
+    const result = executeReaction(reaction, plan, ctx);
+    if (result instanceof Promise) {
+      result.catch(err => log.error("reaction failed", { error: String(err) }));
+    }
+  } catch (err) {
+    log.error("reaction failed (sync)", { error: String(err) });
+  }
+}
+
 export function wireBehavior(
   trigger: StartsWhen,
   reaction: Reaction,
@@ -20,12 +38,10 @@ export function wireBehavior(
     case "page-ready":
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
-          executeReaction(reaction, plan, {}).catch(err =>
-            log.error("reaction failed", { error: String(err) }));
+          runReaction(reaction, plan, {});
         }, opts);
       } else {
-        executeReaction(reaction, plan, {}).catch(err =>
-          log.error("reaction failed", { error: String(err) }));
+        runReaction(reaction, plan, {});
       }
       break;
 
@@ -33,8 +49,7 @@ export function wireBehavior(
       log.debug("document-event: listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
         const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e };
-        executeReaction(reaction, plan, ctx).catch(err =>
-          log.error("reaction failed", { error: String(err) }));
+        runReaction(reaction, plan, ctx);
       }, opts);
       break;
 
@@ -50,8 +65,7 @@ export function wireBehavior(
 
       wireEvent(plan, trigger.component, channel, (eventData) => {
         const ctx: ExecContext = { event: eventData };
-        executeReaction(reaction, plan, ctx).catch(err =>
-          log.error("reaction failed", { error: String(err) }));
+        runReaction(reaction, plan, ctx);
       }, opts);
       break;
     }

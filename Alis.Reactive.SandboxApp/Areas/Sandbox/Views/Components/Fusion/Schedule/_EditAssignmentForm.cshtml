@@ -1,0 +1,67 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.EditAssignmentModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@using Alis.Reactive.Fusion.Components
+@{
+    var plan = Html.ReactivePlan<EditAssignmentModel>();
+    var staffList = FakeScheduleData.Staff.Select(s => new StaffOption
+    {
+        Text = $"{s.Name} ({s.Role})",
+        Value = s.Id
+    }).ToList();
+}
+
+<div class="p-4 space-y-4">
+    <h3 class="text-lg font-semibold">Edit Shift Assignment</h3>
+    <p class="text-sm text-text-secondary">Assignment #@Model.AssignmentId</p>
+
+    <form id="assignment-form" class="space-y-3">
+    @Html.HiddenFieldFor(plan, m => m.AssignmentId)
+
+    <div class="space-y-3">
+        @{ Html.InputField(plan, m => m.StaffId, o => o.Required().Label("Staff Member"))
+            .FusionDropDownList(b => b
+                .Placeholder("Select staff member")
+                .DataSource(staffList)
+                .Fields<StaffOption>(t => t.Text, v => v.Value)); }
+
+        @{ Html.InputField(plan, m => m.Notes, o => o.Label("Care Notes"))
+            .NativeTextArea(b => b.Rows(3).Placeholder("Care instructions, special requirements...")); }
+    </div>
+
+    <div class="flex gap-3 pt-2">
+        @(Html.NativeButton("btn-save-assignment", "Save Assignment")
+            .CssClass("px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/api/schedule/assign", g => g
+                     .Include<NativeHiddenField, EditAssignmentModel>(m => m.AssignmentId)
+                     .Include<FusionDropDownList, EditAssignmentModel>(m => m.StaffId))
+                 .Validate<EditAssignmentValidator>("assignment-form")
+                 .Response(r => r
+                     .OnSuccess(s =>
+                     {
+                         s.Element("edit-status").SetText("Saved successfully");
+                         s.Component<NativeDrawer>().Close();
+                         // Dispatch custom event — parent plan listens and refreshes schedule
+                         s.Dispatch("schedule:assignment-saved");
+                     })
+                     .OnError(400, e => e.ValidationErrors("assignment-form")));
+            }))
+
+        @(Html.NativeButton("btn-cancel-assignment", "Cancel")
+            .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Component<NativeDrawer>().Close();
+            }))
+    </div>
+
+    <p id="edit-status" class="text-sm text-text-muted"></p>
+    </form>
+</div>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Schedule — QuickInfo Template Test</title>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/material.css" />
+    <script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui; margin: 20px; }
+        #status { margin: 10px 0; font-family: monospace; white-space: pre-wrap; max-height: 200px; overflow-y: auto; background: #1e1e1e; color: #d4d4d4; padding: 10px; border-radius: 4px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h2>SF Schedule — QuickInfo Template with EventButtons</h2>
+    <p>Click an event to see custom QuickInfo. Click buttons to dispatch events.</p>
+    <div id="status">Waiting...</div>
+    <div id="schedule"></div>
+
+    <!-- QuickInfo Content Template — includes info + action buttons -->
+    <script id="quickInfoContent" type="text/x-template">
+        <div style="padding:8px">
+            <div style="font-weight:bold;font-size:14px">${subject}</div>
+            <div style="color:#666;font-size:12px;margin-top:4px">${description}</div>
+            ${if(isUnassigned)}
+                <span style="background:#fee2e2;color:#dc3545;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold;margin-top:6px;display:inline-block">NEEDS COVERAGE</span>
+            ${else}
+                <div style="font-size:11px;color:#888;margin-top:4px">${staffRole} | ${staffPhone}</div>
+            ${/if}
+            <div style="margin-top:8px;padding-top:8px;border-top:1px solid #eee;display:flex;gap:8px">
+                ${if(isUnassigned)}
+                    <button class="e-btn e-primary e-small" onclick="document.dispatchEvent(new CustomEvent(&quot;schedule:edit&quot;,{detail:{id:${id}}}))">Assign Staff</button>
+                ${else}
+                    <button class="e-btn e-small" onclick="document.dispatchEvent(new CustomEvent(&quot;schedule:edit&quot;,{detail:{id:${id}}}))">Edit</button>
+                    <button class="e-btn e-small" onclick="document.dispatchEvent(new CustomEvent(&quot;schedule:reassign&quot;,{detail:{id:${id}}}))">Reassign</button>
+                ${/if}
+            </div>
+        </div>
+    </script>
+
+    <script>
+        var statusEl = document.getElementById('status');
+        function log(msg) { statusEl.textContent = msg + '\n' + statusEl.textContent; }
+
+        // Delegated handler for data-dispatch buttons
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('[data-dispatch]');
+            if (!btn) return;
+            var eventName = btn.getAttribute('data-dispatch');
+            var id = btn.getAttribute('data-id');
+            document.dispatchEvent(new CustomEvent(eventName, { detail: { id: Number(id) || id } }));
+        });
+
+        // Listen for dispatched events
+        document.addEventListener('schedule:edit', function(e) {
+            log('EVENT schedule:edit — id: ' + e.detail.id);
+        });
+        document.addEventListener('schedule:reassign', function(e) {
+            log('EVENT schedule:reassign — id: ' + e.detail.id);
+        });
+
+        var shiftData = [
+            { text: 'AM Shift', id: 1, color: '#1aaa55' },
+            { text: 'PM Shift', id: 2, color: '#357cd2' },
+            { text: 'Night Shift', id: 3, color: '#7fa900' }
+        ];
+
+        var scheduleObj = new ej.schedule.Schedule({
+            width: '100%', height: '600px',
+            selectedDate: new Date(),
+            currentView: 'Week',
+            views: [{ option: 'Week' }],
+            group: { resources: ['Shifts'] },
+            resources: [{
+                field: 'shiftId', title: 'Shift', name: 'Shifts',
+                dataSource: shiftData, textField: 'text', idField: 'id', colorField: 'color'
+            }],
+            eventSettings: {
+                fields: {
+                    id: 'id',
+                    subject: { name: 'subject' },
+                    startTime: { name: 'startTime' },
+                    endTime: { name: 'endTime' },
+                    description: { name: 'description' },
+                    isAllDay: { name: 'isAllDay' }
+                }
+            },
+            quickInfoTemplates: {
+                content: '#quickInfoContent'
+            },
+            startHour: '05:00', endHour: '23:00',
+            dataBound: function() { log('dataBound — events: ' + scheduleObj.getEvents().length); },
+            actionFailure: function(args) { log('ACTION FAILURE: ' + JSON.stringify(args)); },
+        });
+        scheduleObj.appendTo('#schedule');
+
+        // Load from API
+        fetch('/api/schedule/assignments?selectedFacilityId=mystery-manor')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                scheduleObj.eventSettings.dataSource = data.assignments;
+                scheduleObj.dataBind();
+                log('Loaded ' + data.assignments.length + ' events');
+            });
+    </script>
+</body>
+</html>

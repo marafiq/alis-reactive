@@ -6,14 +6,15 @@ import type {
   Plan, Reaction, SequenceReaction, ParallelReaction, BranchReaction,
   SetReaction, CallReaction, RequestReaction, DispatchReaction,
   InjectReaction, ShowValidationErrorsReaction,
-  ValueProducer, ExecContext, Source,
+  ValueProducer, ExecContext, Source, Condition,
 } from "../types";
 import {
   resolveSource, resolveElement, getJsTypeForSource, readProperty as resolverReadProperty,
   setProperty, callMethod,
 } from "../resolution/resolver";
-import { evaluateConditionAsync } from "../conditions/conditions";
+import { evaluateCondition, evaluateConditionAsync } from "../conditions/conditions";
 import { setValueEvaluator } from "../conditions/conditions";
+import { validateContainer, showServerErrors } from "../validation";
 import { executeRequest } from "./http";
 import { injectHtml } from "./inject";
 import { assertNever } from "../core/assert-never";
@@ -38,52 +39,31 @@ function requirePlan(plan?: Plan): Plan {
 setValueEvaluator(evaluateValue);
 
 // ── Main executor ─────────────────────────────────────────
+//
+// Returns void for sync reaction kinds (set, call, dispatch, inject,
+// show-validation-errors, branch with non-confirm conditions).
+// Returns Promise<void> for async kinds (request, parallel) and
+// sequences/branches that contain async steps.
+//
+// This sync-first design ensures SF event arg mutations (args.cancel,
+// args.preventDefaultAction) execute in the same tick as the event
+// callback — before SF checks them synchronously.
 
-export async function executeReaction(
+export function executeReaction(
   reaction: Reaction,
   plan?: Plan,
   ctx?: ExecContext,
-): Promise<void> {
+): void | Promise<void> {
   const p = requirePlan(plan);
 
   switch (reaction.kind) {
-    case "sequence":
-      for (const step of reaction.steps) {
-        await executeReaction(step, p, ctx);
-      }
-      return;
-
-    case "parallel": {
-      const results = await Promise.allSettled(reaction.steps.map(s => executeReaction(s, p, ctx)));
-      for (const r of results) {
-        if (r.status === "rejected") log.error("parallel step failed", { error: String(r.reason) });
-      }
-      if (reaction.onSettled) {
-        await executeReaction(reaction.onSettled, p, ctx);
-      }
-      return;
-    }
-
-    case "branch":
-      for (const c of reaction.cases) {
-        if (!c.when || await evaluateConditionAsync(c.when, p, ctx)) {
-          await executeReaction(c.reaction, p, ctx);
-          return;
-        }
-      }
-      log.trace("no-branch-taken");
-      return;
-
+    // ── Sync kinds: return void ──────────────────────────
     case "set":
       executeSet(reaction, p, ctx);
       return;
 
     case "call":
       executeCall(reaction, p, ctx);
-      return;
-
-    case "request":
-      await executeRequest(reaction.request, p, ctx);
       return;
 
     case "dispatch":
@@ -95,11 +75,122 @@ export async function executeReaction(
       return;
 
     case "show-validation-errors":
-      await showValidationErrors(reaction, p, ctx);
+      executeShowValidationErrors(reaction, p, ctx);
       return;
+
+    // ── Mixed kinds: void or Promise ─────────────────────
+    case "sequence":
+      return executeSequence(reaction, p, ctx);
+
+    case "branch":
+      return executeBranch(reaction, p, ctx);
+
+    // ── Async kinds: return Promise ──────────────────────
+    case "request":
+      return executeRequest(reaction.request, p, ctx);
+
+    case "parallel":
+      return executeParallel(reaction, p, ctx);
 
     default:
       assertNever(reaction, "reaction kind");
+  }
+}
+
+// ── Sequence executor ─────────────────────────────────────
+//
+// Runs steps synchronously until hitting an async step.
+// Sync steps (set, call, dispatch, inject, branch) execute in the
+// same tick. When an async step is encountered, returns a Promise
+// that awaits it and continues the remaining steps.
+
+function executeSequence(
+  reaction: SequenceReaction,
+  plan: Plan,
+  ctx?: ExecContext,
+): void | Promise<void> {
+  for (let i = 0; i < reaction.steps.length; i++) {
+    const result = executeReaction(reaction.steps[i], plan, ctx);
+    if (result instanceof Promise) {
+      // Sync prefix done. Return Promise for async step + remaining.
+      const remaining = reaction.steps.slice(i + 1);
+      return result.then(async () => {
+        for (const step of remaining) {
+          const r = executeReaction(step, plan, ctx);
+          if (r instanceof Promise) await r;
+        }
+      });
+    }
+  }
+  // All steps were sync — return void
+}
+
+// ── Branch executor ───────────────────────────────────────
+//
+// Evaluates conditions synchronously (compare, all, any, not).
+// Falls back to async only when a condition contains ConfirmCondition.
+
+function executeBranch(
+  reaction: BranchReaction,
+  plan: Plan,
+  ctx?: ExecContext,
+): void | Promise<void> {
+  for (const c of reaction.cases) {
+    // Confirm conditions require async — delegate entire branch
+    if (c.when && hasConfirm(c.when)) {
+      return executeBranchAsync(reaction, plan, ctx);
+    }
+    // Sync condition evaluation
+    if (!c.when || evaluateCondition(c.when, plan, ctx)) {
+      return executeReaction(c.reaction, plan, ctx);
+    }
+  }
+  log.trace("no-branch-taken");
+}
+
+function hasConfirm(condition: Condition): boolean {
+  switch (condition.kind) {
+    case "confirm": return true;
+    case "all": case "any": return condition.terms.some(hasConfirm);
+    case "not": return hasConfirm(condition.term);
+    default: return false;
+  }
+}
+
+async function executeBranchAsync(
+  reaction: BranchReaction,
+  plan: Plan,
+  ctx?: ExecContext,
+): Promise<void> {
+  for (const c of reaction.cases) {
+    if (!c.when || await evaluateConditionAsync(c.when, plan, ctx)) {
+      const r = executeReaction(c.reaction, plan, ctx);
+      if (r instanceof Promise) await r;
+      return;
+    }
+  }
+  log.trace("no-branch-taken");
+}
+
+// ── Parallel executor ─────────────────────────────────────
+
+async function executeParallel(
+  reaction: ParallelReaction,
+  plan: Plan,
+  ctx?: ExecContext,
+): Promise<void> {
+  const results = await Promise.allSettled(
+    reaction.steps.map(s => {
+      const r = executeReaction(s, plan, ctx);
+      return r instanceof Promise ? r : Promise.resolve();
+    })
+  );
+  for (const r of results) {
+    if (r.status === "rejected") log.error("parallel step failed", { error: String(r.reason) });
+  }
+  if (reaction.onSettled) {
+    const r = executeReaction(reaction.onSettled, plan, ctx);
+    if (r instanceof Promise) await r;
   }
 }
 
@@ -175,13 +266,13 @@ function executeInject(reaction: InjectReaction, plan: Plan, ctx?: ExecContext):
 
 // ── Show validation errors reaction ────────────────────────
 
-async function showValidationErrors(
+function executeShowValidationErrors(
   reaction: ShowValidationErrorsReaction,
   plan: Plan,
   ctx?: ExecContext,
-): Promise<void> {
-  const { validateContainer, showServerErrors } = await import("../validation");
-
+): void {
+  // validateContainer and showServerErrors are statically imported at the top.
+  // The validation module is already loaded eagerly by boot.ts.
   // When called inside an error handler, ctx.response carries the server's
   // ProblemDetails body. Route to showServerErrors instead of client-side validation.
   if (ctx?.response && typeof ctx.response === "object") {

@@ -91,8 +91,10 @@ export function wireServerPush(
   const handler = (e: MessageEvent) => {
     const evt: Record<string, unknown> = JSON.parse(e.data);
     log.debug("message", { url: trigger.url, event: trigger.event });
-    executeReaction(reaction, plan, { event: evt }).catch(err =>
-      log.error("reaction failed", { error: String(err) }));
+    const result = executeReaction(reaction, plan, { event: evt });
+    if (result instanceof Promise) {
+      result.catch(err => log.error("reaction failed", { error: String(err) }));
+    }
   };
 
   const eventName = trigger.event ?? "message";
