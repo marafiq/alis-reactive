@@ -17,6 +17,8 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionGridReactiveExtensions
     {
+        private static readonly FusionGrid Component = new FusionGrid();
+
         /// <summary>
         /// Wires a FusionGrid event to a reactive pipeline that executes in the browser.
         /// </summary>
@@ -36,7 +38,7 @@ namespace Alis.Reactive.Fusion.Components
             var pb = new PipelineBuilder<TModel>(builder.Plan.Context);
             pipeline(descriptor.Args, pb);
 
-            builder.Plan.Context.EnsureComponent(builder.ElementId, "fusion");
+            builder.Plan.Context.EnsureComponent(builder.ElementId, Component.Vendor);
             var trigger = StartsWhen.ComponentEvent(builder.ElementId, descriptor.JsEvent);
 
             foreach (var reaction in pb.BuildReactions())
