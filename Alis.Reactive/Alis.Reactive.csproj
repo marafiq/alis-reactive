@@ -9,7 +9,7 @@
         <PackageId>AlisReactive</PackageId>
         <IsPackable>true</IsPackable>
         <PackageDescription>Core reactive framework for building plan-driven browser UIs with C# fluent builders and JSON-serialized reactive plans.</PackageDescription>
-        <PackageTags>reactive;blazor;aspnetcore;fluent-api;plan-driven</PackageTags>
+        <PackageTags>reactive;aspnetcore;mvc;fluent-api;plan-driven</PackageTags>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
@@ -25,8 +25,8 @@
     <ItemGroup>
         <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="buildTransitive\assets\js\" />
         <None Include="assets\css\design-system.css" Pack="true" PackagePath="buildTransitive\assets\css\" />
-        <None Include="build\Alis.Reactive.targets" Pack="true" PackagePath="buildTransitive\" />
-        <None Include="build\Alis.Reactive.targets" Pack="true" PackagePath="build\" />
+        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="buildTransitive\" />
+        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="build\" />
     </ItemGroup>
 
     <ItemGroup>
