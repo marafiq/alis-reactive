@@ -1,17 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageId>AlisReactive.Native</PackageId>
         <IsPackable>true</IsPackable>
         <PackageDescription>Native HTML components for Alis.Reactive — textboxes, checkboxes, dropdowns, and more with zero vendor dependencies.</PackageDescription>
         <PackageTags>reactive;aspnetcore;native-components;html</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+        <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+        <Reference Include="System.Web" />
     </ItemGroup>
 
     <ItemGroup>

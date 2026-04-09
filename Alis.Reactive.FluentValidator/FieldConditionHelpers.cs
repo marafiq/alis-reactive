@@ -22,8 +22,10 @@ namespace Alis.Reactive.FluentValidator
         {
             DateTime dt => new DateTimeOffset(dt, TimeSpan.Zero).ToUnixTimeMilliseconds(),
             DateTimeOffset dto => dto.ToUnixTimeMilliseconds(),
+#if NET6_0_OR_GREATER
             DateOnly d => new DateTimeOffset(d.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero)
                 .ToUnixTimeMilliseconds(),
+#endif
             _ => value
         };
 

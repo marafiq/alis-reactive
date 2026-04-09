@@ -1,5 +1,9 @@
 using System;
+#if NET48
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Grids;
 
@@ -22,7 +26,11 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="build">Callback to configure columns, paging, sorting, etc.</param>
         /// <returns>A builder for chaining <c>.Reactive()</c>.</returns>
         public static FusionGridBuilder<TModel> FusionGrid<TModel>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             string elementId,
             Action<GridBuilder<object>> build)

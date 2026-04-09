@@ -1,15 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageId>AlisReactive</PackageId>
         <IsPackable>true</IsPackable>
         <PackageDescription>Core reactive framework for building plan-driven browser UIs with C# fluent builders and JSON-serialized reactive plans.</PackageDescription>
         <PackageTags>reactive;blazor;aspnetcore;fluent-api;plan-driven</PackageTags>
     </PropertyGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+        <PackageReference Include="System.Text.Json" Version="9.*" />
+    </ItemGroup>
 
     <ItemGroup>
         <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />

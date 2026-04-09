@@ -1,8 +1,8 @@
 <Project>
   <PropertyGroup>
-    <AlisReactivePatch Condition="'$(AlisReactivePatch)' == ''">0</AlisReactivePatch>
-    <VersionPrefix>0.0.$(AlisReactivePatch)</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
+    <!-- Versioning: CI sets VersionSuffix on release/* branches (preview.N), omits on main (stable) -->
+    <!-- Bump VersionPrefix here when preparing a new release -->
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>Alis Solutions</Authors>
     <Company>Alis Solutions</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -10,5 +10,9 @@
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/marafiq/alis-reactive</PackageProjectUrl>
     <Copyright>Copyright (c) Alis Solutions 2026</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>

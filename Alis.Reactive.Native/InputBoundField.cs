@@ -3,8 +3,13 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
 using Alis.Reactive.InputField;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native
 {
@@ -21,7 +26,11 @@ namespace Alis.Reactive.Native
     /// <typeparam name="TModel">The view model type.</typeparam>
     /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
     public class InputBoundField<TModel, TProp>
+#if NET48
+        : InputBoundFieldBase<HtmlHelper<TModel>, TModel, TProp>
+#else
         : InputBoundFieldBase<IHtmlHelper<TModel>, TModel, TProp>
+#endif
         where TModel : class
     {
         /// <summary>
@@ -29,7 +38,11 @@ namespace Alis.Reactive.Native
         /// — a public constructor would bypass plan registration and break validation and gather.
         /// </summary>
         internal InputBoundField(
+#if NET48
+            HtmlHelper<TModel> html,
+#else
             IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             InputFieldOptions options,
@@ -45,9 +58,16 @@ namespace Alis.Reactive.Native
         /// field wrapper — exposing it lets devs bypass the component pipeline entirely.
         /// </summary>
         /// <param name="content">The component markup to render inside the field wrapper.</param>
+#if NET48
+        internal void Render(IHtmlString content)
+        {
+            Render(() => Writer.Write(content.ToHtmlString()));
+        }
+#else
         internal void Render(IHtmlContent content)
         {
             Render(() => content.WriteTo(Writer, HtmlEncoder.Default));
         }
+#endif
     }
 }

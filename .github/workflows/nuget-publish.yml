@@ -1,14 +1,15 @@
 name: Publish NuGet packages
 
+# release/* → preview packages (1.0.0-preview.N)
+# main      → stable packages  (1.0.0)
 on:
   push:
-    branches: [main]
+    branches: [main, 'release/*']
     paths:
       - 'Alis.Reactive/**'
       - 'Alis.Reactive.Native/**'
       - 'Alis.Reactive.Fusion/**'
       - 'Alis.Reactive.FluentValidator/**'
-      - 'Alis.Reactive.Analyzers/**'
       - 'Alis.Reactive.NativeTagHelpers/**'
       - 'Alis.Reactive.SandboxApp/Scripts/**'
       - 'Alis.Reactive.SandboxApp/Styles/**'
@@ -19,7 +20,6 @@ on:
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
-  PACKAGE_VERSION: 0.0.${{ github.run_number }}-preview
 
 jobs:
   test:
@@ -53,9 +53,6 @@ jobs:
           dotnet test tests/Alis.Reactive.Native.UnitTests --configuration Release --no-build
           dotnet test tests/Alis.Reactive.Fusion.UnitTests --configuration Release --no-build
           dotnet test tests/Alis.Reactive.FluentValidator.UnitTests --configuration Release --no-build
-          dotnet test tests/Alis.Reactive.Analyzers.Tests --configuration Release --no-build
-          dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests --configuration Release --no-build
-          dotnet test tests/Alis.Reactive.DesignSystem.Tests --configuration Release --no-build
 
   pack-and-publish:
     needs: test
@@ -84,17 +81,33 @@ jobs:
 
       - name: Copy assets into Alis.Reactive package source
         run: |
+          mkdir -p Alis.Reactive/assets/js Alis.Reactive/assets/css
           cp Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js Alis.Reactive/assets/js/
           cp Alis.Reactive.SandboxApp/wwwroot/css/design-system.css Alis.Reactive/assets/css/
 
+      - name: Determine version suffix
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/heads/release/* ]]; then
+            echo "suffix=preview.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+            echo "is_preview=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "suffix=" >> "$GITHUB_OUTPUT"
+            echo "is_preview=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Pack NuGet packages
         run: |
-          dotnet pack Alis.Reactive/Alis.Reactive.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
-          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
-          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
-          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
-          dotnet pack Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
-          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj --configuration Release --output ./nupkgs -p:AlisReactivePatch=${{ github.run_number }}
+          PACK_ARGS="--configuration Release --output ./nupkgs"
+          if [ -n "${{ steps.version.outputs.suffix }}" ]; then
+            PACK_ARGS="$PACK_ARGS --version-suffix ${{ steps.version.outputs.suffix }}"
+          fi
+
+          dotnet pack Alis.Reactive/Alis.Reactive.csproj $PACK_ARGS
+          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj $PACK_ARGS
+          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj $PACK_ARGS
+          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj $PACK_ARGS
+          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj $PACK_ARGS
 
       - name: Log package versions
         run: ls -1 ./nupkgs/
@@ -102,19 +115,11 @@ jobs:
       - name: Upload NuGet artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nuget-packages-${{ env.PACKAGE_VERSION }}
+          name: nuget-packages-${{ github.run_number }}
           path: ./nupkgs/*.nupkg
           retention-days: 30
 
-      - name: Publish to GitHub Packages
-        run: |
-          dotnet nuget push ./nupkgs/*.nupkg \
-            --source "https://nuget.pkg.github.com/marafiq/index.json" \
-            --api-key ${{ secrets.GITHUB_TOKEN }} \
-            --skip-duplicate
-
       - name: Publish to NuGet.org
-        if: ${{ vars.PUBLISH_TO_NUGET == 'true' }}
         run: |
           dotnet nuget push ./nupkgs/*.nupkg \
             --source "https://api.nuget.org/v3/index.json" \

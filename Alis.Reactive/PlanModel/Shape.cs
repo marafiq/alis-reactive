@@ -54,7 +54,11 @@ namespace Alis.Reactive.PlanModel
 
             if (type == typeof(string)) return String;
             if (type == typeof(bool)) return Boolean;
-            if (type == typeof(DateTime) || type == typeof(DateTimeOffset) || type == typeof(DateOnly)) return Date;
+            if (type == typeof(DateTime) || type == typeof(DateTimeOffset)
+#if NET6_0_OR_GREATER
+                || type == typeof(DateOnly)
+#endif
+                ) return Date;
             if (type == typeof(byte) || type == typeof(sbyte) ||
                 type == typeof(short) || type == typeof(ushort) ||
                 type == typeof(int) || type == typeof(uint) ||
@@ -62,7 +66,11 @@ namespace Alis.Reactive.PlanModel
                 type == typeof(float) || type == typeof(double) || type == typeof(decimal))
                 return Number;
 
-            if (type == typeof(Guid) || type == typeof(TimeSpan) || type == typeof(TimeOnly))
+            if (type == typeof(Guid) || type == typeof(TimeSpan)
+#if NET6_0_OR_GREATER
+                || type == typeof(TimeOnly)
+#endif
+                )
                 return String;
             if (type.IsEnum)
                 return String;
@@ -112,7 +120,20 @@ namespace Alis.Reactive.PlanModel
 
         public override int GetHashCode()
         {
+#if NET6_0_OR_GREATER
             return HashCode.Combine(Kind, Item, Inner, Fields?.Count ?? 0, Additional);
+#else
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (Kind != null ? Kind.GetHashCode() : 0);
+                hash = hash * 31 + (Item != null ? Item.GetHashCode() : 0);
+                hash = hash * 31 + (Inner != null ? Inner.GetHashCode() : 0);
+                hash = hash * 31 + (Fields?.Count ?? 0);
+                hash = hash * 31 + (Additional.HasValue ? Additional.Value.GetHashCode() : 0);
+                return hash;
+            }
+#endif
         }
 
         public static bool operator ==(Shape left, Shape right) => Equals(left, right);
