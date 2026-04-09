@@ -46,11 +46,8 @@ namespace Alis.Reactive.Native.Components
             pipeline(descriptor.Args, pb);
 
             // Single entry on the hidden input -- checklist.ts dispatches change after sync
-            plan.Context.EnsureComponent(builder.ElementId, "native");
-            var trigger = StartsWhen.ComponentEvent(builder.ElementId, descriptor.JsEvent);
+            plan.Context.WireComponentEvent(builder.ElementId, "native", descriptor.JsEvent, pb.BuildReactions());
 
-            foreach (var reaction in pb.BuildReactions())
-                plan.Context.AddBehavior(Behavior.On(trigger, reaction));
 
             return builder;
         }

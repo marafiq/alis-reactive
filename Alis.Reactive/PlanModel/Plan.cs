@@ -6,7 +6,7 @@ namespace Alis.Reactive.PlanModel
     {
         public int Version => 3;
         public string PlanId { get; }
-        public string PartId { get; internal set; }
+        public string? PartId { get; internal set; }
 
         // Mutable backing fields — accessed by PlanBuildContext during construction
         internal Dictionary<string, JsType> MutableTypes { get; }
@@ -26,7 +26,7 @@ namespace Alis.Reactive.PlanModel
             MutableBehaviors = new List<Behavior>();
         }
 
-        internal static Plan Create(string planId, string partId = null)
+        internal static Plan Create(string planId, string? partId = null)
         {
             return new Plan(planId) { PartId = partId };
         }

@@ -48,10 +48,7 @@ namespace Alis.Reactive.Native.Components
             var pb = new PipelineBuilder<TModel>(plan.Context);
             pipeline(descriptor.Args, pb);
 
-            plan.Context.EnsureComponent(builder.ElementId, "native");
-            var trigger = StartsWhen.ComponentEvent(builder.ElementId, descriptor.JsEvent);
-            foreach (var reaction in pb.BuildReactions())
-                plan.Context.AddBehavior(Behavior.On(trigger, reaction));
+            plan.Context.WireComponentEvent(builder.ElementId, "native", descriptor.JsEvent, pb.BuildReactions());
 
             return builder;
         }

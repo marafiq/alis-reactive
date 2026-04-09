@@ -52,11 +52,7 @@ namespace Alis.Reactive.Native.Components
                 pipeline(descriptor.Args, pb);
 
                 var radioId = $"{builder.ElementId}_r{i}";
-                plan.Context.EnsureComponent(radioId, "native");
-                var trigger = StartsWhen.ComponentEvent(radioId, descriptor.JsEvent);
-
-                foreach (var reaction in pb.BuildReactions())
-                    plan.Context.AddBehavior(Behavior.On(trigger, reaction));
+                plan.Context.WireComponentEvent(radioId, "native", descriptor.JsEvent, pb.BuildReactions());
             }
 
             return builder;

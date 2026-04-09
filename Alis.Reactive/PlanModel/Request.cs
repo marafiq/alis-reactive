@@ -8,13 +8,13 @@ namespace Alis.Reactive.PlanModel
     {
         public string Method { get; }
         public string Url { get; }
-        public string Container { get; internal set; }
-        public RequestInput Input { get; internal set; }
-        public List<Reaction> Before { get; internal set; }
-        public List<ResponseHandler> Success { get; internal set; }
-        public List<ResponseHandler> Error { get; internal set; }
-        public List<Reaction> Complete { get; internal set; }
-        public Request Next { get; internal set; }
+        public string? Container { get; internal set; }
+        public RequestInput? Input { get; internal set; }
+        public List<Reaction>? Before { get; internal set; }
+        public List<ResponseHandler>? Success { get; internal set; }
+        public List<ResponseHandler>? Error { get; internal set; }
+        public List<Reaction>? Complete { get; internal set; }
+        public Request? Next { get; internal set; }
 
         internal Request(string method, string url)
         {
@@ -44,13 +44,13 @@ namespace Alis.Reactive.PlanModel
         public List<GatherField> Components { get; }
         public string Transport { get; }
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public ValueProducer Statics { get; }
+        public ValueProducer? Statics { get; }
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
         [System.Text.Json.Serialization.JsonInclude]
         internal bool IncludeAll { get; set; }
 
-        internal GatherInput(List<GatherField> components, string transport, ValueProducer statics = null)
+        internal GatherInput(List<GatherField> components, string transport, ValueProducer? statics = null)
         {
             Components = components;
             Transport = transport;
@@ -78,16 +78,16 @@ namespace Alis.Reactive.PlanModel
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         [System.Text.Json.Serialization.JsonInclude]
-        internal Shape Shape { get; }
+        internal Shape? Shape { get; }
 
-        internal GatherField(string component, string key, Shape shape = null)
+        internal GatherField(string component, string key, Shape? shape = null)
         {
             Component = component;
             Key = key;
             Shape = shape;
         }
 
-        internal static GatherField Of(string component, string key, Shape shape = null)
+        internal static GatherField Of(string component, string key, Shape? shape = null)
             => new GatherField(component, key, shape);
     }
 

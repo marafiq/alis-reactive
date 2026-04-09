@@ -51,14 +51,14 @@ namespace Alis.Reactive.PlanModel
             return this;
         }
 
-        internal JsType WithMethod(string name, Path path, List<Shape> args = null, Shape returns = null)
+        internal JsType WithMethod(string name, Path path, List<Shape>? args = null, Shape? returns = null)
         {
             _methods ??= new Dictionary<string, JsMethod>();
             _methods[name] = new JsMethod(path, args, returns);
             return this;
         }
 
-        internal JsType WithEvent(string name, string channel, string payloadType = null)
+        internal JsType WithEvent(string name, string channel, string? payloadType = null)
         {
             _events ??= new Dictionary<string, JsEvent>();
             _events[name] = new JsEvent(channel, payloadType);
@@ -114,10 +114,10 @@ namespace Alis.Reactive.PlanModel
     internal sealed class JsMethod
     {
         public Path Path { get; }
-        public List<Shape> Args { get; }
-        public Shape Returns { get; }
+        public List<Shape>? Args { get; }
+        public Shape? Returns { get; }
 
-        internal JsMethod(Path path, List<Shape> args, Shape returns)
+        internal JsMethod(Path path, List<Shape>? args, Shape? returns)
         {
             Path = path;
             Args = args != null && args.Count > 0 ? args : null;
@@ -128,9 +128,9 @@ namespace Alis.Reactive.PlanModel
     internal sealed class JsEvent
     {
         public string Channel { get; }
-        public string PayloadType { get; }
+        public string? PayloadType { get; }
 
-        internal JsEvent(string channel, string payloadType)
+        internal JsEvent(string channel, string? payloadType)
         {
             Channel = channel;
             PayloadType = payloadType;

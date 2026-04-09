@@ -105,7 +105,7 @@ namespace Alis.Reactive.Builders.Conditions
             return ComposeAndWrap(condition);
         }
 
-        private GuardBuilder<TModel> Build(string op, object operand = null)
+        private GuardBuilder<TModel> Build(string op, object? operand = null)
         {
             var leftProducer = _typedSource.ToValueProducer();
             var rightProducer = operand != null ? ValueProducer.LiteralRaw(operand, _shape) : null;

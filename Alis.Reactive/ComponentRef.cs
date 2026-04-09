@@ -45,7 +45,7 @@ namespace Alis.Reactive
         /// Uses the component's actual vendor (not hardcoded "native").
         /// </summary>
         internal ComponentRef<TComponent, TModel> EmitCall(
-            string method, System.Collections.Generic.List<ValueProducer> args = null)
+            string method, System.Collections.Generic.List<ValueProducer>? args = null)
         {
             var componentKey = Pipeline.Context.EnsureComponent(TargetId, Vendor);
             Pipeline.Context.EnsureMethod(componentKey, method, method);

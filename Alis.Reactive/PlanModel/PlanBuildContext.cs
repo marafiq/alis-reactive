@@ -28,16 +28,15 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal string EnsureElement(string elementId)
         {
-            var key = elementId;
-            if (!_plan.MutableComponents.ContainsKey(key))
-            {
-                var typeKey = "native.element." + elementId;
-                if (!_plan.MutableTypes.ContainsKey(typeKey))
-                    _plan.MutableTypes[typeKey] = new JsType();
+            if (_plan.MutableComponents.ContainsKey(elementId))
+                return elementId;
 
-                _plan.MutableComponents[key] = Component.Create(elementId, "native", typeKey);
-            }
-            return key;
+            var typeKey = "native.element." + elementId;
+            if (!_plan.MutableTypes.ContainsKey(typeKey))
+                _plan.MutableTypes[typeKey] = new JsType();
+
+            _plan.MutableComponents[elementId] = Component.Create(elementId, "native", typeKey);
+            return elementId;
         }
 
         /// <summary>
@@ -48,111 +47,99 @@ namespace Alis.Reactive.PlanModel
         internal string EnsureComponent(string componentId, string vendor)
         {
             var key = componentId;
-            if (!_plan.MutableComponents.ContainsKey(key))
+
+            if (_plan.MutableComponents.TryGetValue(key, out var existing))
             {
-                var typeKey = vendor + "." + componentId;
-
-                // When the component is a registered input component, create an enriched
-                // JsType with valueMember and defaultValue so that Read(ComponentSource, "value")
-                // can resolve the member even when EnsureInputComponent runs later.
-                if (_components.TryGetValue(key, out var reg)
-                    || TryFindRegistrationById(componentId, out reg))
-                {
-                    var jsType = new JsType()
-                        .WithProperty(reg.ValueMember, Path.Parse(reg.ValueMember), reg.Shape, "read")
-                        .WithDefaultValue(reg.ValueMember, reg.Shape);
-                    _plan.MutableTypes[typeKey] = jsType;
-                }
-                else if (!_plan.MutableTypes.ContainsKey(typeKey))
-                {
-                    _plan.MutableTypes[typeKey] = new JsType();
-                }
-
-                var comp = Component.Create(componentId, vendor, typeKey);
-                if (reg != null) comp.BindingPath = reg.BindingPath;
-                _plan.MutableComponents[key] = comp;
+                ValidateVendor(existing, componentId, vendor);
+                EnrichExistingComponent(existing, key, componentId);
+                return key;
             }
-            else
+
+            var typeKey = vendor + "." + componentId;
+            var reg = FindRegistration(key, componentId);
+
+            if (reg != null)
             {
-                // Component already registered — validate vendor consistency
-                var existing = _plan.MutableComponents[key];
-                if (existing.Vendor != vendor)
-                    throw new InvalidOperationException(
-                        $"Component '{componentId}' registered as vendor '{existing.Vendor}' " +
-                        $"but re-referenced as '{vendor}'. A component cannot change vendor.");
-
-                ComponentRegistration reg;
-                if (!_components.TryGetValue(key, out reg))
-                    TryFindRegistrationById(componentId, out reg);
-
-                if (reg != null)
-                {
-                    if (existing.BindingPath == null)
-                        existing.BindingPath = reg.BindingPath;
-
-                    var jsType = _plan.MutableTypes[existing.Type];
-                    if (jsType.DefaultValue == null || jsType.DefaultValue.Shape == Shape.Any)
-                    {
-                        jsType.WithProperty(reg.ValueMember, Path.Parse(reg.ValueMember), reg.Shape, "read");
-                        jsType.WithDefaultValue(reg.ValueMember, reg.Shape);
-                    }
-                }
+                _plan.MutableTypes[typeKey] = CreateEnrichedType(reg.ValueMember, reg.Shape);
             }
+            else if (!_plan.MutableTypes.ContainsKey(typeKey))
+            {
+                _plan.MutableTypes[typeKey] = new JsType();
+            }
+
+            var comp = Component.Create(componentId, vendor, typeKey);
+            if (reg != null) comp.BindingPath = reg.BindingPath;
+            _plan.MutableComponents[key] = comp;
             return key;
+        }
+
+        private static void ValidateVendor(Component existing, string componentId, string vendor)
+        {
+            if (existing.Vendor != vendor)
+                throw new InvalidOperationException(
+                    $"Component '{componentId}' registered as vendor '{existing.Vendor}' " +
+                    $"but re-referenced as '{vendor}'. A component cannot change vendor.");
+        }
+
+        private void EnrichExistingComponent(Component existing, string key, string componentId)
+        {
+            var reg = FindRegistration(key, componentId);
+            if (reg == null) return;
+
+            if (existing.BindingPath == null)
+                existing.BindingPath = reg.BindingPath;
+
+            var jsType = _plan.MutableTypes[existing.Type];
+            EnrichTypeIfNeeded(jsType, reg.ValueMember, reg.Shape);
         }
 
         /// <summary>
         /// Searches the components map for a registration whose ComponentId matches.
-        /// The map is keyed by binding path (property name), but the componentId is
-        /// the generated HTML id which differs from the binding path.
+        /// The map is keyed by binding path, but componentId is the generated HTML id.
         /// </summary>
-        internal bool TryFindRegistrationById(string componentId, out ComponentRegistration registration)
+        internal bool TryFindRegistrationById(string componentId, out ComponentRegistration? registration)
         {
+            registration = FindRegistration(componentId, componentId);
+            return registration != null;
+        }
+
+        private ComponentRegistration? FindRegistration(string key, string componentId)
+        {
+            if (_components.TryGetValue(key, out var reg))
+                return reg;
+
             foreach (var kvp in _components)
             {
                 if (kvp.Value.ComponentId == componentId)
-                {
-                    registration = kvp.Value;
-                    return true;
-                }
+                    return kvp.Value;
             }
-            registration = null;
-            return false;
+
+            return null;
         }
 
         /// <summary>
         /// Ensures a registered input component exists in the plan with its JsType.
         /// Returns the component key.
         /// </summary>
-        internal string EnsureInputComponent(string componentId, string vendor, string valueMember, Shape shape, string bindingPath = null)
+        internal string EnsureInputComponent(string componentId, string vendor, string valueMember, Shape shape, string? bindingPath = null)
         {
             var key = componentId;
-            if (_plan.MutableComponents.ContainsKey(key))
+
+            if (_plan.MutableComponents.TryGetValue(key, out var existing))
             {
-                // Component already registered — enrich its JsType with defaultValue if missing
-                var existing = _plan.MutableComponents[key];
                 if (bindingPath != null && existing.BindingPath == null)
                     existing.BindingPath = bindingPath;
 
-                var jsType = _plan.MutableTypes[existing.Type];
-                if (jsType.DefaultValue == null || jsType.DefaultValue.Shape == Shape.Any)
-                {
-                    jsType.WithProperty(valueMember, Path.Parse(valueMember), shape, "read");
-                    jsType.WithDefaultValue(valueMember, shape);
-                }
+                EnrichTypeIfNeeded(_plan.MutableTypes[existing.Type], valueMember, shape);
+                return key;
             }
-            else
-            {
-                var typeKey = vendor + "." + componentId;
-                var jsType = new JsType()
-                    .WithProperty(valueMember, Path.Parse(valueMember), shape, "read")
-                    .WithDefaultValue(valueMember, shape);
 
-                _plan.MutableTypes[typeKey] = jsType;
-                var comp = Component.Create(componentId, vendor, typeKey);
-                comp.BindingPath = bindingPath;
-                _plan.MutableComponents[key] = comp;
-            }
+            var typeKey = vendor + "." + componentId;
+            _plan.MutableTypes[typeKey] = CreateEnrichedType(valueMember, shape);
+
+            var comp = Component.Create(componentId, vendor, typeKey);
+            comp.BindingPath = bindingPath;
+            _plan.MutableComponents[key] = comp;
             return key;
         }
 
@@ -162,8 +149,7 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal void EnsureProperty(string componentKey, string memberName, string pathExpr, Shape shape, string access)
         {
-            var component = _plan.MutableComponents[componentKey];
-            var jsType = _plan.MutableTypes[component.Type];
+            var jsType = GetJsType(componentKey);
             jsType.WithProperty(memberName, Path.Parse(pathExpr), shape, access);
         }
 
@@ -171,21 +157,41 @@ namespace Alis.Reactive.PlanModel
         /// Ensures a method member exists on a component's JsType.
         /// Used by ElementBuilder for classList.add/remove/toggle, setAttribute, removeAttribute.
         /// </summary>
-        internal void EnsureMethod(string componentKey, string memberName, string pathExpr, List<Shape> args = null)
+        internal void EnsureMethod(string componentKey, string memberName, string pathExpr, List<Shape>? args = null)
         {
-            var component = _plan.MutableComponents[componentKey];
-            var jsType = _plan.MutableTypes[component.Type];
+            var jsType = GetJsType(componentKey);
             jsType.WithMethod(memberName, Path.Parse(pathExpr), args);
         }
 
         /// <summary>
         /// Ensures an event exists on a component's JsType.
         /// </summary>
-        internal void EnsureEvent(string componentKey, string eventName, string channel, string payloadType = null)
+        internal void EnsureEvent(string componentKey, string eventName, string channel, string? payloadType = null)
+        {
+            var jsType = GetJsType(componentKey);
+            jsType.WithEvent(eventName, channel, payloadType);
+        }
+
+        private JsType GetJsType(string componentKey)
         {
             var component = _plan.MutableComponents[componentKey];
-            var jsType = _plan.MutableTypes[component.Type];
-            jsType.WithEvent(eventName, channel, payloadType);
+            return _plan.MutableTypes[component.Type];
+        }
+
+        private static JsType CreateEnrichedType(string valueMember, Shape shape)
+        {
+            return new JsType()
+                .WithProperty(valueMember, Path.Parse(valueMember), shape, "read")
+                .WithDefaultValue(valueMember, shape);
+        }
+
+        private static void EnrichTypeIfNeeded(JsType jsType, string valueMember, Shape shape)
+        {
+            if (jsType.DefaultValue != null && jsType.DefaultValue.Shape != Shape.Any)
+                return;
+
+            jsType.WithProperty(valueMember, Path.Parse(valueMember), shape, "read");
+            jsType.WithDefaultValue(valueMember, shape);
         }
 
         /// <summary>
@@ -205,6 +211,18 @@ namespace Alis.Reactive.PlanModel
         /// Returns all registered input components for IncludeAll expansion at build time.
         /// </summary>
         internal IReadOnlyDictionary<string, ComponentRegistration> GetRegisteredComponents() => _components;
+
+        /// <summary>
+        /// Wires a component event to a set of reactive behaviors.
+        /// Ensures the component is registered, creates the trigger, and adds one behavior per reaction.
+        /// </summary>
+        internal void WireComponentEvent(string componentId, string vendor, string eventName, List<Reaction> reactions)
+        {
+            EnsureComponent(componentId, vendor);
+            var trigger = StartsWhen.ComponentEvent(componentId, eventName);
+            foreach (var reaction in reactions)
+                AddBehavior(Behavior.On(trigger, reaction));
+        }
 
         internal void AddBehavior(Behavior behavior)
         {

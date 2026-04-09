@@ -16,7 +16,7 @@ namespace Alis.Reactive.PlanModel
         internal static Reaction Sequence(List<Reaction> steps) =>
             new SequenceReaction(steps);
 
-        internal static Reaction Parallel(List<Reaction> steps, Reaction onSettled = null) =>
+        internal static Reaction Parallel(List<Reaction> steps, Reaction? onSettled = null) =>
             new ParallelReaction(steps, onSettled);
 
         internal static Reaction Branch(params BranchCase[] cases) =>
@@ -28,13 +28,13 @@ namespace Alis.Reactive.PlanModel
         internal static Reaction Set(Source on, string property, ValueProducer value) =>
             new SetReaction(on, property, value);
 
-        internal static Reaction Call(Source on, string method, List<ValueProducer> args = null) =>
+        internal static Reaction Call(Source on, string method, List<ValueProducer>? args = null) =>
             new CallReaction(on, method, args);
 
         internal static Reaction Request(Request request) =>
             new RequestReaction(request);
 
-        internal static Reaction Dispatch(string eventName, ValueProducer data = null, string payloadType = null) =>
+        internal static Reaction Dispatch(string eventName, ValueProducer? data = null, string? payloadType = null) =>
             new DispatchReaction(eventName, data, payloadType);
 
         internal static Reaction Inject(string component, ValueProducer value) =>
@@ -61,9 +61,9 @@ namespace Alis.Reactive.PlanModel
     {
         public string Kind => "parallel";
         public IReadOnlyList<Reaction> Steps { get; }
-        public Reaction OnSettled { get; }
+        public Reaction? OnSettled { get; }
 
-        internal ParallelReaction(List<Reaction> steps, Reaction onSettled)
+        internal ParallelReaction(List<Reaction> steps, Reaction? onSettled)
         {
             Steps = steps ?? throw new ArgumentNullException(nameof(steps));
             OnSettled = onSettled;
@@ -80,10 +80,10 @@ namespace Alis.Reactive.PlanModel
 
     public sealed class BranchCase
     {
-        public Condition When { get; }
+        public Condition? When { get; }
         public Reaction Reaction { get; }
 
-        internal BranchCase(Condition when, Reaction reaction)
+        internal BranchCase(Condition? when, Reaction reaction)
         {
             When = when;
             Reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
@@ -113,9 +113,9 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "call";
         public Source On { get; }
         public string Method { get; }
-        public IReadOnlyList<ValueProducer> Args { get; }
+        public IReadOnlyList<ValueProducer>? Args { get; }
 
-        internal CallReaction(Source on, string method, List<ValueProducer> args)
+        internal CallReaction(Source on, string method, List<ValueProducer>? args)
         {
             On = on ?? throw new ArgumentNullException(nameof(on));
             Method = method ?? throw new ArgumentNullException(nameof(method));
@@ -126,7 +126,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class RequestReaction : Reaction
     {
         public string Kind => "request";
-        public Request Request { get; }
+        public new Request Request { get; }
 
         internal RequestReaction(Request request) { Request = request ?? throw new ArgumentNullException(nameof(request)); }
     }
@@ -135,10 +135,10 @@ namespace Alis.Reactive.PlanModel
     {
         public string Kind => "dispatch";
         public string Event { get; }
-        public ValueProducer Data { get; }
-        public string PayloadType { get; }
+        public ValueProducer? Data { get; }
+        public string? PayloadType { get; }
 
-        internal DispatchReaction(string eventName, ValueProducer data, string payloadType)
+        internal DispatchReaction(string eventName, ValueProducer? data, string? payloadType)
         {
             Event = eventName ?? throw new ArgumentNullException(nameof(eventName));
             Data = data;

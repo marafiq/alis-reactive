@@ -38,11 +38,8 @@ namespace Alis.Reactive.Fusion.Components
             var pb = new PipelineBuilder<TModel>(builder.Plan.Context);
             pipeline(descriptor.Args, pb);
 
-            builder.Plan.Context.EnsureComponent(builder.ElementId, Component.Vendor);
-            var trigger = StartsWhen.ComponentEvent(builder.ElementId, descriptor.JsEvent);
+            builder.Plan.Context.WireComponentEvent(builder.ElementId, Component.Vendor, descriptor.JsEvent, pb.BuildReactions());
 
-            foreach (var reaction in pb.BuildReactions())
-                builder.Plan.Context.AddBehavior(Behavior.On(trigger, reaction));
 
             return builder;
         }

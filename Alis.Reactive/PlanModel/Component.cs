@@ -10,9 +10,10 @@ namespace Alis.Reactive.PlanModel
 
         [System.Text.Json.Serialization.JsonInclude]
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        internal string BindingPath { get; set; }
+        internal string? BindingPath { get; set; }
 
-        public ContainerScope Container { get; internal set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public ContainerScope? Container { get; internal set; }
 
         internal Component(string id, string vendor, string type)
         {
@@ -28,7 +29,7 @@ namespace Alis.Reactive.PlanModel
     internal sealed class ContainerScope
     {
         public List<string> Components { get; }
-        public List<ComponentValidation> ValidationRules { get; internal set; }
+        public List<ComponentValidation>? ValidationRules { get; internal set; }
 
         internal ContainerScope(List<string> components)
         {
@@ -46,9 +47,9 @@ namespace Alis.Reactive.PlanModel
 
         [System.Text.Json.Serialization.JsonInclude]
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        internal string ServerFieldName { get; }
+        internal string? ServerFieldName { get; }
 
-        internal ComponentValidation(string component, List<ValidationRule> rules, string serverFieldName = null)
+        internal ComponentValidation(string component, List<ValidationRule> rules, string? serverFieldName = null)
         {
             Component = component;
             Rules = rules;
@@ -60,10 +61,17 @@ namespace Alis.Reactive.PlanModel
     {
         public string Name { get; }
         public string Message { get; }
-        public ValueProducer Constraint { get; internal set; }
-        public string OtherComponent { get; internal set; }
-        public Condition When { get; internal set; }
-        public Shape Shape { get; internal set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public ValueProducer? Constraint { get; internal set; }
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public string? OtherComponent { get; internal set; }
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public Condition? When { get; internal set; }
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public Shape? Shape { get; internal set; }
 
         internal ValidationRule(string name, string message)
         {
