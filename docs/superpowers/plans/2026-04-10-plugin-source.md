@@ -68,22 +68,22 @@ p.Plugin("analytics", "track").Arg("pageView")
 ### Builder .Arg() Overloads
 
 ```csharp
-// Typed source — any TypedSource<T> (component read, URL param, plugin read)
+// Typed source — component read, URL param, another plugin read
 .Arg<TArg>(TypedSource<TArg> source)
 
-// Event arg — expression path on event payload
+// Response body — from OnSuccess<T>/OnError<T> handler (carries scope)
+.Arg<TResponse, TProp>(ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
+
+// Event arg — from event handler args
 .Arg<TArgs, TProp>(TArgs args, Expression<Func<TArgs, TProp>> path)
 
-// Response body — expression path on HTTP response
-.Arg<TResponse, TProp>(TResponse json, Expression<Func<TResponse, TProp>> path)
-
-// Literals — string, int, bool, long, decimal
+// Literals
 .Arg(string value)
 .Arg(int value)
 .Arg(bool value)
 ```
 
-All overloads create `ValueProducer` internally. No internal types leak.
+Response body overload accepts `ResponseBody<T>` (not raw type) — carries the correct payload scope (success/error). Matches `ElementBuilder.SetText` pattern (ElementBuilder.cs:66-74). All overloads create `ValueProducer` internally. No internal types leak.
 
 ### In Every Context
 
@@ -241,15 +241,24 @@ public sealed class PluginReadBuilder<TReturn, TModel> where TModel : class
     public PluginReadBuilder<TReturn, TModel> Arg<TArg>(TypedSource<TArg> source)
     { _args.Add(source.ToValueProducer()); return this; }
 
-    // Event/response arg via expression
-    public PluginReadBuilder<TReturn, TModel> Arg<TPayload, TProp>(
-        TPayload payload, Expression<Func<TPayload, TProp>> path)
+    // Response body — carries scope from OnSuccess/OnError handler
+    public PluginReadBuilder<TReturn, TModel> Arg<TResponse, TProp>(
+        ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
+        where TResponse : class
+    {
+        var responsePath = ExpressionPathHelper.ToResponsePath(path);
+        var shape = Shape.FromClrType(typeof(TProp));
+        _args.Add(ValueProducer.Read(body.Scope, responsePath, shape: shape));
+        return this;
+    }
+
+    // Event arg — uses PayloadSource.Event()
+    public PluginReadBuilder<TReturn, TModel> Arg<TArgs, TProp>(
+        TArgs args, Expression<Func<TArgs, TProp>> path)
     {
         var eventPath = ExpressionPathHelper.ToEventPath(path);
         var shape = Shape.FromClrType(typeof(TProp));
-        // Determine scope from context — event args use "event", response uses "success"
-        // This follows the existing pattern in ElementBuilder.SetText<T>(json, x => x.Prop)
-        _args.Add(ValueProducer.Read(PayloadSource.Success(), eventPath, shape: shape));
+        _args.Add(ValueProducer.Read(PayloadSource.Event(), eventPath, shape: shape));
         return this;
     }
 
