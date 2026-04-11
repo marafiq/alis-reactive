@@ -207,6 +207,7 @@ namespace Alis.Reactive.Builders.Requests
             if (string.IsNullOrWhiteSpace(paramName))
                 throw new System.ArgumentException(
                     "URL param name must not be null or whitespace.", nameof(paramName));
+            RequireScalarShape<T>(paramName, "URL param");
             var shape = Shape.FromClrType(typeof(T));
             var value = ValueProducer.ReadUrl(paramName, shape);
             Fields.Add(GatherField.Of(paramName, value));
@@ -224,6 +225,7 @@ namespace Alis.Reactive.Builders.Requests
             if (string.IsNullOrWhiteSpace(asParam))
                 throw new System.ArgumentException(
                     "HTTP parameter name must not be null or whitespace.", nameof(asParam));
+            RequireScalarShape<T>(paramName, "URL param");
             var shape = Shape.FromClrType(typeof(T));
             var value = ValueProducer.ReadUrl(paramName, shape);
             Fields.Add(GatherField.Of(asParam, value));

@@ -403,4 +403,36 @@ public class WhenReadingUrlParams : PlanTestBase
         });
         Assert.That(ex!.Message, Does.Contain("not supported"));
     }
+
+    [Test]
+    public void array_type_throws_in_gather_from_url()
+    {
+        var plan = CreatePlan();
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Get("/api/data")
+                 .Gather(g => g.FromUrl<string[]>("tags"))
+                 .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+        Assert.That(ex!.Message, Does.Contain("scalar"));
+    }
+
+    [Test]
+    public void object_type_throws_in_gather_from_url()
+    {
+        var plan = CreatePlan();
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Get("/api/data")
+                 .Gather(g => g.FromUrl<MyDto>("data"))
+                 .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+        Assert.That(ex!.Message, Does.Contain("scalar"));
+    }
 }
