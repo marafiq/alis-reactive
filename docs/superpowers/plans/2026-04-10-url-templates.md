@@ -330,8 +330,8 @@ Export `resolveRouteParams` for testing (can be a named export used only by test
 |---|---|
 | `replaces single {param} with evaluated literal value` | Basic replacement works |
 | `replaces multiple {params} in same URL` | All placeholders resolved |
-| `unresolved placeholder keeps original {param} text` | Missing producer → visible failure, not silent |
-| `null value produces empty string` | Null handling documented behavior |
+| `unresolved placeholder throws Error` | Missing producer → throw, not silent fallback |
+| `null value throws Error` | Null route param → throw, not empty string |
 | `URI-encodes special characters in values` | `encodeURIComponent("John Doe")` → `"John%20Doe"` |
 | `date value formatted as ISO string via formatForWire` | Shape.Date → `formatForWire` → ISO string in URL |
 
@@ -567,8 +567,8 @@ Navigate to `/Sandbox/HttpPipeline/Http`, wait for boot + DomReady GET.
 - [ ] URL template `{param}` replaced correctly at runtime
 - [ ] Route param values are URI-encoded
 - [ ] Date route params become ISO strings (via formatForWire — shape MUST be present)
-- [ ] Unresolved `{param}` (no matching routeParam) logs warning, keeps placeholder
-- [ ] Null route param value logs warning, produces empty string
+- [ ] Unresolved `{param}` (no matching routeParam) throws Error at runtime
+- [ ] Null route param value throws Error at runtime
 - [ ] Route params compose with body/query gather (both work simultaneously)
 - [ ] Route params compose with custom headers (all three features on one request)
 - [ ] Non-scalar TypedSource (e.g., string[]) throws at build time with clear message
