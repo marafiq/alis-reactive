@@ -314,7 +314,15 @@ g.Plugin(p.Plugin<int>("array", "count").Arg(json, x => x.Items), "count")
 
 The `p.Plugin<T>(...)` builder implicitly converts to `TypedPluginSource<T>` which carries the args. `GatherBuilder.Plugin` calls `.ToValueProducer()`. Shape, args, everything flows through. Args can be component reads, URL params, other plugin reads, literals — same as headers and route params.
 
-### Task 8: Schema + TS Types
+### Task 8: Schema + TS Types (HARD PREREQUISITE for Tasks 10-12)
+
+**Do Task 8 FIRST.** After widening the TS `Source` union, run `npm run typecheck`. Every `assertNever` exhaustiveness error is a callsite that needs a decision (handle or reject). Known callsites:
+- `resolver.ts:37` — `resolveSource` default → add `case "plugin"`
+- `resolver.ts:103` — `getJsTypeForSource` guard → add `case "plugin"`
+- `evaluate.ts:23` — `if (component)` → widen to `component || plugin`
+- `execute.ts:199` — `executeSet` guard → unchanged (rejects plugin)
+- `execute.ts:224` — `executeCall` guard → add `"plugin"` to allowed
+- `gather.ts:163` — `field.value.from.kind === "component"` dedup → unchanged (plugins are not components, skip is correct)
 
 PluginSource: `{ kind: "plugin", name: string }`, `additionalProperties: false`, `pattern: "^\S+$"`.
 
