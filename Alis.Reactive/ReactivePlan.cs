@@ -46,6 +46,16 @@ namespace Alis.Reactive
         internal IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
         internal PlanBuildContext Context => _context;
 
+        /// <summary>Registers a plugin's type metadata in the plan. Must be called before any p.Plugin() reference.</summary>
+        public void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName))
+                throw new ArgumentException("Plugin name required.", nameof(pluginName));
+            if (configure == null)
+                throw new ArgumentNullException(nameof(configure));
+            _context.RegisterPlugin(pluginName, configure);
+        }
+
         internal void AddToComponentsMap(string bindingPath, ComponentRegistration entry)
         {
             if (_componentsMap.TryGetValue(bindingPath, out var existing))

@@ -181,6 +181,18 @@ namespace Alis.Reactive.PlanModel
             jsType.WithEvent(eventName, channel, payloadType);
         }
 
+        private readonly HashSet<string> _registeredPlugins = new HashSet<string>();
+
+        /// <summary>Registers a plugin's JsType. Throws on duplicate registration.</summary>
+        internal void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
+        {
+            if (!_registeredPlugins.Add(pluginName))
+                throw new InvalidOperationException($"Plugin '{pluginName}' is already registered.");
+            var typeKey = "plugin." + pluginName;
+            _plan.MutableTypes[typeKey] = new JsType();
+            configure(new Builders.PluginTypeBuilder(_plan, typeKey));
+        }
+
         /// <summary>Ensures a plugin method exists in the plan's JsType registry.
         /// Auto-creates the JsType on first use. Methods only.</summary>
         internal void EnsurePluginMethod(string pluginName, string member, Shape returns = null)
