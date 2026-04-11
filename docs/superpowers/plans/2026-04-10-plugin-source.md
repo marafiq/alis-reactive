@@ -38,84 +38,59 @@ plan.RegisterPlugin("auth", p => {
 });
 ```
 
-**TS side (runtime):** Plugins are written as TypeScript modules. The framework exports `registerPlugin` as a hook — devs import it and register their plugin objects. No inline JS, no globals, no magic. Standard TS module imports.
+**TS side (runtime) — Push-Array Pattern:**
+
+Plugins bundle SEPARATELY from the framework. They register via a passive push-array on `window.__alisPlugins` — no framework API needed, no load-order dependency.
 
 ```typescript
-// plugins/auth-plugin.ts (developer's own TS file)
-import { registerPlugin } from "../alis-reactive";
-
-registerPlugin("auth", {
-  getToken: () => localStorage.getItem("auth_token"),
-  getUserId: () => JSON.parse(localStorage.getItem("user")!).id,
-  theme: "dark"
+// plugins/auth-plugin.ts (developer's own TS file, bundled separately)
+((window as any).__alisPlugins ??= []).push({
+  name: "auth",
+  instance: {
+    getToken: () => localStorage.getItem("auth_token"),
+    getUserId: () => JSON.parse(localStorage.getItem("user")!).id,
+    theme: "dark"
+  }
 });
 ```
 
-Plugins bundle SEPARATELY from the framework. Two scripts — plugins load first:
+```typescript
+// plugins/user-prefs-plugin.ts
+((window as any).__alisPlugins ??= []).push({
+  name: "userPrefs",
+  instance: { theme: "dark", locale: "en-US" }
+});
+```
 
+**Script order in HTML — ANY order works:**
 ```html
-<!-- Plugins bundle — registers all plugins before framework boots -->
+<!-- Either order is fine — the array is a passive queue -->
 <script type="module" src="~/js/plugins.js"></script>
-<!-- Framework bundle — boots and reads plan + registered plugins -->
 <script type="module" src="~/js/alis-reactive.js"></script>
 @Html.RenderPlan(plan)
 ```
 
-The framework exposes a global registration hook on `window.alisReactive.registerPlugin`. The plugin bundle uses the hook — it does NOT import from the framework bundle (separate bundles can't share module imports):
-
+**Framework drains the queue at boot** (`root.ts`):
 ```typescript
-// plugins/auth-plugin.ts (developer's TS, builds to plugins.js separately)
-const register = (window as any).alisReactive?.registerPlugin;
-if (!register) throw new Error("alis-reactive framework not loaded — load framework script first");
-
-register("auth", {
-  getToken: () => localStorage.getItem("auth_token"),
-  getUserId: () => JSON.parse(localStorage.getItem("user")!).id,
-});
-```
-
-**Boot-order guarantee: defer boot to DOMContentLoaded.**
-
-Current `root.ts` boots at module-level (lines 17-35 execute immediately when the module runs). This means boot happens BEFORE any subsequent module scripts. Plugins loaded after the framework would register too late.
-
-**Fix:** Move boot logic from module-level to a `DOMContentLoaded` listener. The registration hook is set up at module-level (synchronous), boot happens on DOMContentLoaded (after all module scripts have executed):
-
-```typescript
-// root.ts — CHANGED: hook at module-level, boot deferred
+// root.ts — at the TOP of boot, before plan parsing
 import { registerPlugin } from "./core/plugin-registry";
-import { boot, trace } from "./lifecycle/boot";
-// ... other imports
 
-// Hook available immediately at module parse time
-(window as any).alisReactive = { registerPlugin };
-
-// Deferred boot — runs AFTER all module scripts have executed
-document.addEventListener("DOMContentLoaded", () => {
-  initConfirm();
-  initNativeActionLinks();
-
-  const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
-  // ... parse plans and boot (existing logic, moved into listener)
-});
+// Drain the passive queue — plugins pushed here by separate bundles
+const pending = (window as any).__alisPlugins ?? [];
+for (const entry of pending) {
+  registerPlugin(entry.name, entry.instance);
+}
+delete (window as any).__alisPlugins; // clean up — queue no longer needed
 ```
 
-**Script order in HTML:**
-```html
-<!-- Framework — sets up hook synchronously, defers boot to DOMContentLoaded -->
-<script type="module" src="~/js/alis-reactive.js"></script>
-<!-- Plugins — registers via hook (runs before DOMContentLoaded) -->
-<script type="module" src="~/js/plugins.js"></script>
-@Html.RenderPlan(plan)
-```
+**Why push-array:**
+1. **No load-order dependency** — plugins can load before OR after framework
+2. **No framework API needed before boot** — the array is vanilla JS, no imports
+3. **Zero permanent globals** — the array is drained and deleted at boot
+4. **Battle-tested pattern** — Google Analytics, GTM, Segment all use this
+5. **No boot timing change** — root.ts keeps its current immediate boot. It just drains the queue first.
 
-**Execution order:**
-1. `alis-reactive.js` module executes → sets `window.alisReactive.registerPlugin` (sync)
-2. `plugins.js` module executes → calls `window.alisReactive.registerPlugin("auth", {...})` (sync)
-3. DOMContentLoaded fires → boot reads plans, resolves plugins from registry → all plugins available
-
-**Impact:** This changes boot from immediate (module-level) to deferred (DOMContentLoaded). For pages WITHOUT plugins, behavior is identical — module scripts are already deferred, and DOMContentLoaded fires immediately after. For pages WITH plugins, this guarantees plugins register before boot.
-
-This is a breaking change to `root.ts` that must be tested across ALL existing Playwright tests to verify no regression.
+**What this means for root.ts:** The ONLY change is adding ~5 lines at the top to drain `__alisPlugins`. Boot timing is UNCHANGED — no DOMContentLoaded deferral needed. All existing Playwright tests continue to work because the array is empty for pages without plugins.
 
 **Why two parts?** The plan is the contract (Rule 1). The plan declares WHAT the plugin has (JsType metadata). The TS module provides the actual object. If the JS object doesn't match the declared JsType, the runtime fails fast (member not found → throw).
 
@@ -500,7 +475,7 @@ Add definition:
   "additionalProperties": false,
   "properties": {
     "kind": { "const": "plugin" },
-    "name": { "type": "string", "minLength": 1 }
+    "name": { "type": "string", "minLength": 1, "pattern": "^\\S+$" }
   }
 },
 ```
@@ -600,15 +575,26 @@ throw new Error(`[alis] member "${producer.member}" not found on ${producer.from
 
 Import `PluginSource` from types. This is the ONLY evaluate.ts change beyond the `if` condition widening.
 
-### Task 14: TS Runtime — Export registerPlugin from root.ts
+### Task 14: TS Runtime — Drain plugin queue in root.ts
 
 **File:** `Alis.Reactive.SandboxApp/Scripts/root.ts`
 
+Add at the TOP of root.ts, before `initConfirm()` and plan parsing:
+
 ```typescript
-export { registerPlugin } from "./core/plugin-registry";
+import { registerPlugin } from "./core/plugin-registry";
+
+// Drain passive plugin queue — plugins push here from separate bundles
+const pendingPlugins = (window as any).__alisPlugins as Array<{ name: string; instance: unknown }> | undefined;
+if (pendingPlugins) {
+  for (const entry of pendingPlugins) {
+    registerPlugin(entry.name, entry.instance);
+  }
+  delete (window as any).__alisPlugins;
+}
 ```
 
-Devs import this in their own module. NO `window.alisPlugins` global. NO inline script.
+This runs at module-level, BEFORE boot. No timing change — the queue is drained synchronously before plan parsing. Pages without plugins have an empty/undefined queue — zero cost.
 
 ### Task 15: Sandbox — Controller + DTOs
 
@@ -635,7 +621,32 @@ public class PluginEchoResponse
 
 ### Task 15b: Sandbox View — Sections 23-25
 
-**Note:** The sandbox page must include a plugin registration script via module import — same as production. Create `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js` that registers test plugins. Load it before `alis-reactive.js`. NO inline JS, not even in sandbox.
+**Sandbox plugin registration:** Create `Alis.Reactive.SandboxApp/Scripts/sandbox-plugins.ts` → builds to `wwwroot/js/sandbox-plugins.js`. Uses the push-array pattern — NO inline JS, NO framework imports:
+
+```typescript
+// Scripts/sandbox-plugins.ts
+((window as any).__alisPlugins ??= []).push({
+  name: "userPrefs",
+  instance: { theme: "dark", locale: "en-US" }
+});
+
+((window as any).__alisPlugins ??= []).push({
+  name: "auth",
+  instance: {
+    getToken: () => "sandbox-token-abc123",
+    getUserId: () => 42,
+    isAdmin: () => true
+  }
+});
+```
+
+Add to `_Layout.cshtml` BEFORE `alis-reactive.js`:
+```html
+<script type="module" src="~/js/sandbox-plugins.js"></script>
+<script type="module" src="~/js/alis-reactive.js"></script>
+```
+
+Add esbuild entry point for sandbox-plugins in `package.json` scripts.
 
 #### Section 23: Plugin Read in SetText + Condition
 
@@ -712,7 +723,7 @@ Html.On(plan, t => t.DomReady(p =>
 | Test | What It Proves |
 |---|---|
 | `register_plugin_creates_jstype_in_plan` | RegisterPlugin → plan.types["plugin.auth"] exists + AssertSchemaValid |
-| `plugin_property_produces_read_with_url_source_kind` | `p.Plugin<string>("prefs", "theme")` → `{ kind: "read", from: { kind: "plugin", name: "prefs" }, member: "theme" }` |
+| `plugin_property_produces_read_with_plugin_source` | `p.Plugin<string>("prefs", "theme")` → `{ kind: "read", from: { kind: "plugin", name: "prefs" }, member: "theme" }` |
 | `plugin_method_produces_read_with_shape` | `p.Plugin<string>("auth", "getToken")` → shape: { kind: "string" } |
 | `plugin_typed_int_carries_number_shape` | `p.Plugin<int>("auth", "getUserId")` → shape: { kind: "number" } |
 | `plugin_typed_bool_carries_boolean_shape` | `p.Plugin<bool>("auth", "isAdmin")` → shape: { kind: "boolean" } |
@@ -731,6 +742,8 @@ Html.On(plan, t => t.DomReady(p =>
 | `empty_gather_param_name_throws` | g.Plugin("auth", "getToken", "") → ArgumentException |
 | `incompatible_shape_throws_at_build_time` | RegisterPlugin declares Method("getToken", Shape.String), then Plugin<int>("auth", "getToken") → InvalidOperationException (string vs number) |
 | `null_configure_delegate_throws` | RegisterPlugin("auth", null) → ArgumentNullException |
+| `plugin_null_return_propagates` | Plugin method returns null → evaluateValue returns null → condition .IsNull() works |
+| `gather_plugin_unregistered_throws` | g.Plugin("unknown", "member", "key") → InvalidOperationException (build-time) |
 
 ### Task 17: Playwright Tests (6 tests) — `WhenPluginsProvideValues.cs`
 
@@ -755,6 +768,8 @@ Navigate to `/Sandbox/HttpPipeline/Http` (sandbox must include plugin registrati
 | `duplicate registration throws` | Second call with same name → Error |
 | `null instance throws` | registerPlugin("x", null) → Error |
 | `whitespace name throws` | registerPlugin("  ", obj) → Error |
+| `non-object instance throws` | registerPlugin("x", 42) → Error "must be an object" |
+| `missing plugin resolution throws` | resolvePlugin("unknown") → Error "plugin not found" |
 
 **File:** `Scripts/__tests__/core/evaluate-plugin.test.ts` (4 tests):
 
@@ -784,7 +799,7 @@ Navigate to `/Sandbox/HttpPipeline/Http` (sandbox must include plugin registrati
 - [ ] Shape flows from JsType through plan JSON through TS runtime
 - [ ] No inline JavaScript in views (module import only)
 - [ ] execute.ts Set/Call guards reject PluginSource (from URL Query Source)
-- [ ] All 20 C# unit tests pass (Task 16)
-- [ ] All 8 vitest tests pass (Task 18: 4 registry + 4 evaluate/resolver)
+- [ ] All 22 C# unit tests pass (Task 16)
+- [ ] All 10 vitest tests pass (Task 18: 6 registry + 4 evaluate/resolver)
 - [ ] All 6 Playwright tests pass (Task 17)
 - [ ] All existing 808+ Playwright tests pass (no regressions)
