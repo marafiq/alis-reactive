@@ -1,32 +1,25 @@
 # Plugin Source
 
-**Goal:** User-defined JS objects as value sources and call targets. One DSL name: `Plugin`. `<T>` for reads, no `<T>` for void. Methods only. Enables native JS operations (array, math, string, date) that would be impossible to express declaratively in the plan model, plus domain-specific plugins (auth, permissions, business rules).
+**Goal:** User-defined JS objects as value sources and call targets. One DSL name: `Plugin`. `<T>` for reads, no `<T>` for void. Methods only. Plugin return values flow as typed payloads — when `<T>` is a known type, existing DSL expressions walk into the result.
 
-**Prerequisite:** ReadProducer.args (`cfdefa66`), URL Query Source (3-kind Source union).
+**Prerequisite:** ReadProducer.args (`cfdefa66`), URL Query Source (3-kind Source union), `ExpressionPathHelper.ToResponsePath<TSource, TProp>` typed overload (must add — only `object?` overload exists today at line 82).
 
 ---
 
 ## Registration
 
-Plugins are TS modules bundled separately. Push-array, load before framework:
+Push-array. Plugins load before framework:
 
 ```typescript
-// plugins/array.ts
 ((window as any).__alisPlugins ??= []).push({
   name: "array",
   instance: {
     count:    (arr: any[]) => arr.length,
     first:    (arr: any[]) => arr[0],
-    last:     (arr: any[]) => arr[arr.length - 1],
-    includes: (arr: any[], item: any) => arr.includes(item),
-    find:     (arr: any[], key: string, val: any) => arr.find(i => i[key] === val),
     filter:   (arr: any[], key: string, val: any) => arr.filter(i => i[key] === val),
     sum:      (arr: any[], key: string) => arr.reduce((s, i) => s + (Number(i[key]) || 0), 0),
-    sort:     (arr: any[], key: string) => [...arr].sort((a, b) => a[key] > b[key] ? 1 : -1),
     some:     (arr: any[], key: string, val: any) => arr.some(i => i[key] === val),
-    every:    (arr: any[], key: string, val: any) => arr.every(i => i[key] === val),
-    join:     (arr: any[], sep: string) => arr.join(sep),
-    map:      (arr: any[], key: string) => arr.map(i => i[key]),
+    pluck:    (arr: any[], index: number, key: string) => arr[index]?.[key],
   }
 });
 ```
@@ -36,7 +29,7 @@ Plugins are TS modules bundled separately. Push-array, load before framework:
 <script type="module" src="~/js/alis-reactive.js"></script>
 ```
 
-Framework drains at top of `root.ts` before boot. 5 lines. Zero timing change.
+Framework drains `window.__alisPlugins` at top of `root.ts` before boot.
 
 ---
 
@@ -45,108 +38,53 @@ Framework drains at top of `root.ts` before boot. 5 lines. Zero timing change.
 One name. `<T>` = read. No `<T>` = void.
 
 ```csharp
-// Read — zero args
+// Read — zero args, scalar result
 p.Plugin<int>("array", "count")
 
-// Read — with typed source args
+// Read — with args, scalar result
 p.Plugin<int>("array", "count").Arg(json, x => x.Items)
 
-// Read — with literal args
+// Read — returns typed object (walked by existing DSL)
+p.Plugin<Resident>("array", "first").Arg(json, x => x.Items)
+// The result is a Resident — existing DSL walks it:
+s.Element("name").SetText(result, x => x.Name)
+
+// Read — nested (filter returns array, count takes it)
 p.Plugin<int>("array", "count")
  .Arg(p.Plugin<object>("array", "filter")
-      .Arg(json, x => x.Items)
-      .Arg("status")
-      .Arg("active"))
+      .Arg(json, x => x.Items).Arg("status").Arg("active"))
 
 // Void — zero args
-p.Plugin("logger", "flush")
+p.Plugin("logger", "flush").Fire()
 
 // Void — with args
-p.Plugin("analytics", "track").Arg("pageView")
+p.Plugin("analytics", "track").Arg("pageView").Fire()
 ```
 
-### Builder .Arg() Overloads
+### .Arg() Overloads
+
+Two separate overloads for response body vs event args — matching `ElementBuilder.SetText` pattern:
 
 ```csharp
-// Typed source — component read, URL param, another plugin read
-.Arg<TArg>(TypedSource<TArg> source)
-
-// Response body — from OnSuccess<T>/OnError<T> handler (carries scope)
+// Response body — ResponseBody<T> carries scope (success/error)
 .Arg<TResponse, TProp>(ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
+// Uses ExpressionPathHelper.ToResponsePath + body.Scope
 
-// Event arg — from event handler args
+// Event arg — uses PayloadSource.Event()
 .Arg<TArgs, TProp>(TArgs args, Expression<Func<TArgs, TProp>> path)
+// Uses ExpressionPathHelper.ToEventPath + PayloadSource.Event()
+
+// Typed source — component read, URL param, other plugin read
+.Arg<TArg>(TypedSource<TArg> source)
 
 // Literals
 .Arg(string value)
 .Arg(int value)
 .Arg(bool value)
+.Arg(long value)
 ```
 
-Response body overload accepts `ResponseBody<T>` (not raw type) — carries the correct payload scope (success/error). Matches `ElementBuilder.SetText` pattern (ElementBuilder.cs:66-74). All overloads create `ValueProducer` internally. No internal types leak.
-
-### In Every Context
-
-```csharp
-// ── DomReady: read → SetText + Condition ────────────────
-Html.On(plan, t => t.DomReady(p =>
-{
-    p.Element("theme").SetText(p.Plugin<string>("prefs", "getTheme"));
-
-    p.When(p.Plugin<bool>("auth", "isAdmin")).Truthy()
-     .Then(t => t.Element("admin-panel").Show());
-}));
-
-// ── .Reactive: HTTP with plugin gather + header ─────────
-Html.NativeButton("save-btn", "Save")
-    .Reactive(plan, evt => evt.Click, (args, p) =>
-    {
-        p.Post("/api/save")
-         .Gather(g => g
-             .Header("Authorization", p.Plugin<string>("auth", "getToken"))
-             .Plugin<string>("auth", "getSessionId", "session")
-             .Include<FusionTextBox, Model>(m => m.Name))
-         .Response(r => r.OnSuccess(s =>
-         {
-             s.Element("status").SetText("Saved");
-             s.Plugin("analytics", "track").Arg("save-success");
-         }));
-    });
-
-// ── Route param from plugin ─────────────────────────────
-g.RouteParam("tenantId", p.Plugin<int>("auth", "getTenantId"))
-
-// ── Array operations on HTTP response ───────────────────
-p.Get("/api/residents")
- .Response(r => r.OnSuccess<ResidentsResponse>((json, s) =>
- {
-     // count
-     s.Element("total").SetText(
-         p.Plugin<int>("array", "count").Arg(json, x => x.Items));
-
-     // filter + count (nested plugin reads)
-     s.Element("active-count").SetText(
-         p.Plugin<int>("array", "count")
-          .Arg(p.Plugin<object>("array", "filter")
-               .Arg(json, x => x.Items)
-               .Arg("status")
-               .Arg("active")));
-
-     // some → condition
-     s.When(p.Plugin<bool>("array", "some")
-            .Arg(json, x => x.Items)
-            .Arg("status")
-            .Arg("critical"))
-      .Truthy()
-      .Then(t => t.Element("alert").Show());
-
-     // sum
-     s.Element("total-age").SetText(
-         p.Plugin<int>("array", "sum")
-          .Arg(json, x => x.Items)
-          .Arg("age"));
- }));
-```
+C# overload resolution: `ResponseBody<T>` overload matches first for response payloads (has `where TResponse : class` constraint). Generic `TArgs` overload matches for event args. No ambiguity.
 
 ### Plan Model Mapping
 
@@ -154,18 +92,31 @@ p.Get("/api/residents")
 |---|---|---|
 | `p.Plugin<T>(name, member)` | ReadProducer | ✓ |
 | `p.Plugin<T>(name, member).Arg(...)` | ReadProducer + args | ✓ (cfdefa66) |
-| `p.Plugin(name, member)` | CallReaction | ✓ |
-| `p.Plugin(name, member).Arg(...)` | CallReaction + args | ✓ |
-
-Zero new plan model kinds. Zero new ValueProducer kinds.
+| `p.Plugin(name, member).Fire()` | CallReaction | ✓ |
+| `p.Plugin(name, member).Arg(...).Fire()` | CallReaction + args | ✓ |
 
 ---
 
 ## Implementation
 
+### Task 0: ExpressionPathHelper.ToResponsePath typed overload
+
+**File:** `ExpressionPathHelper.cs` — add after line 82:
+
+```csharp
+public static string ToResponsePath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
+{
+    // Same implementation as ToEventPath<TSource, TProp> but for response paths
+    return ToResponsePath((Expression<Func<TSource, object?>>)
+        Expression.Lambda(Expression.Convert(expression.Body, typeof(object)), expression.Parameters));
+}
+```
+
+Matches `ToEventPath<TSource, TProp>` at line 70. Required for `.Arg(json, x => x.Count)` where `Count` is a value type.
+
 ### Task 1: PluginSource
 
-**File:** `Source.cs` — after UrlSource:
+**File:** `Source.cs`:
 
 ```csharp
 public sealed class PluginSource : Source
@@ -179,8 +130,6 @@ public sealed class PluginSource : Source
     internal static PluginSource Of(string name) => new PluginSource(name);
 }
 ```
-
-Polymorphic serialization via `WriteOnlyPolymorphicConverter<Source>` — zero changes.
 
 ### Task 2: PlanBuildContext.EnsurePluginMethod
 
@@ -200,7 +149,7 @@ internal void EnsurePluginMethod(string pluginName, string member, Shape returns
 }
 ```
 
-Methods only. Auto-creates JsType on first use.
+Methods only. Auto-creates JsType. `WithMethod` at JsType.cs:53 replaces on re-registration (last-write-wins for same member).
 
 ### Task 3: TypedPluginSource<T>
 
@@ -237,32 +186,30 @@ public sealed class PluginReadBuilder<TReturn, TModel> where TModel : class
     internal PluginReadBuilder(string pluginName, string member)
     { _pluginName = pluginName; _member = member; }
 
-    // Typed source arg
-    public PluginReadBuilder<TReturn, TModel> Arg<TArg>(TypedSource<TArg> source)
-    { _args.Add(source.ToValueProducer()); return this; }
-
-    // Response body — carries scope from OnSuccess/OnError handler
+    // Response body — carries scope from OnSuccess/OnError
     public PluginReadBuilder<TReturn, TModel> Arg<TResponse, TProp>(
         ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
         where TResponse : class
     {
         var responsePath = ExpressionPathHelper.ToResponsePath(path);
-        var shape = Shape.FromClrType(typeof(TProp));
-        _args.Add(ValueProducer.Read(body.Scope, responsePath, shape: shape));
+        _args.Add(ValueProducer.Read(body.Scope, responsePath, shape: Shape.FromClrType(typeof(TProp))));
         return this;
     }
 
-    // Event arg — uses PayloadSource.Event()
+    // Event arg — PayloadSource.Event()
     public PluginReadBuilder<TReturn, TModel> Arg<TArgs, TProp>(
         TArgs args, Expression<Func<TArgs, TProp>> path)
     {
         var eventPath = ExpressionPathHelper.ToEventPath(path);
-        var shape = Shape.FromClrType(typeof(TProp));
-        _args.Add(ValueProducer.Read(PayloadSource.Event(), eventPath, shape: shape));
+        _args.Add(ValueProducer.Read(PayloadSource.Event(), eventPath, shape: Shape.FromClrType(typeof(TProp))));
         return this;
     }
 
-    // Literal overloads
+    // Typed source
+    public PluginReadBuilder<TReturn, TModel> Arg<TArg>(TypedSource<TArg> source)
+    { _args.Add(source.ToValueProducer()); return this; }
+
+    // Literals
     public PluginReadBuilder<TReturn, TModel> Arg(string value)
     { _args.Add(ValueProducer.Literal(value)); return this; }
     public PluginReadBuilder<TReturn, TModel> Arg(int value)
@@ -283,9 +230,33 @@ public sealed class PluginReadBuilder<TReturn, TModel> where TModel : class
 
 **File:** `Builders/PluginCallBuilder.cs`:
 
-Same `.Arg()` overloads as PluginReadBuilder. Emits `CallReaction` via `IReactionEmitter.AddStep()`. The void `Plugin(name, member)` method on PipelineBuilder returns the builder. For zero-arg calls, the builder is created AND the reaction is emitted when the next pipeline statement starts (tracked by PipelineBuilder).
+Same `.Arg()` overloads. `.Fire()` emits the CallReaction:
 
-### Task 6: PipelineBuilder.Plugin overloads
+```csharp
+public sealed class PluginCallBuilder<TModel> where TModel : class
+{
+    private readonly string _pluginName;
+    private readonly string _method;
+    private readonly IReactionEmitter _emitter;
+    private readonly List<ValueProducer> _args = new List<ValueProducer>();
+
+    internal PluginCallBuilder(string pluginName, string method, IReactionEmitter emitter)
+    { _pluginName = pluginName; _method = method; _emitter = emitter; }
+
+    // Same .Arg() overloads as PluginReadBuilder (response, event, typed, literals)
+
+    public void Fire()
+    {
+        _emitter.AddStep(Reaction.Call(
+            PluginSource.Of(_pluginName), _method,
+            _args.Count > 0 ? _args : null));
+    }
+}
+```
+
+`.Fire()` is explicit — matches how HTTP chains end with `.Response()`. No deferred emission, no hidden state.
+
+### Task 6: PipelineBuilder.Plugin
 
 **File:** `PipelineBuilder.cs`:
 
@@ -307,250 +278,101 @@ public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
 }
 ```
 
-### Task 7: GatherBuilder.Plugin<T>
+### Task 7: GatherBuilder.Plugin
 
 **File:** `GatherBuilder.cs`:
 
+Accepts `TypedPluginSource<T>` (which may carry args from a builder):
+
 ```csharp
-public GatherBuilder<TModel> Plugin<T>(string pluginName, string member, string paramName)
+public GatherBuilder<TModel> Plugin<T>(TypedPluginSource<T> source, string paramName)
 {
-    if (string.IsNullOrWhiteSpace(pluginName)) throw new ArgumentException("Plugin name required.");
-    if (string.IsNullOrWhiteSpace(member)) throw new ArgumentException("Member name required.");
+    if (source == null) throw new ArgumentNullException(nameof(source));
     if (string.IsNullOrWhiteSpace(paramName)) throw new ArgumentException("HTTP param name required.");
-    var shape = Shape.FromClrType(typeof(T));
-    _context.EnsurePluginMethod(pluginName, member, returns: shape);
-    Fields.Add(GatherField.Of(paramName, ValueProducer.Read(PluginSource.Of(pluginName), member, shape: shape)));
+    Fields.Add(GatherField.Of(paramName, source.ToValueProducer()));
     return this;
 }
 ```
 
-Generic `<T>`. Shape carried. No `Shape.Any`.
+DSL usage:
+```csharp
+g.Plugin(p.Plugin<int>("array", "count").Arg(json, x => x.Items), "count")
+```
+
+The `p.Plugin<int>(...)` builder implicitly converts to `TypedPluginSource<int>` which carries the args. GatherBuilder just calls `.ToValueProducer()`. Shape, args, everything flows through.
 
 ### Task 8: Schema + TS Types
 
-PluginSource in Source oneOf. `additionalProperties: false`, name pattern `^\S+$`. TS `PluginSource { kind: "plugin"; name: string; }`.
+PluginSource: `{ kind: "plugin", name: string }`, `additionalProperties: false`, `pattern: "^\S+$"`.
+
+Source union: 4 members. TS: `Source = ComponentSource | PayloadSource | UrlSource | PluginSource`.
 
 ### Task 9: TS — plugin-registry.ts
 
-`registerPlugin(name, instance)` with validation (non-empty, non-null, object, no duplicates). `resolvePlugin(name)` with fail-fast.
+`registerPlugin(name, instance)` with validation. `resolvePlugin(name)` with fail-fast.
 
-### Task 10: TS — resolver.ts + evaluate.ts + execute.ts
+### Task 10: TS — resolver.ts
 
-- resolver: `case "plugin": resolvePlugin(source.name)` + `getJsTypeForSource` for "plugin"
-- evaluate: widen component branch to include "plugin", fix error message
-- execute: Call allows plugin, Set rejects, fix trace target
+`resolveSource`: add `case "plugin": return resolvePlugin(source.name);`
 
-### Task 11: TS — root.ts drain
-
-5 lines at top: drain `window.__alisPlugins`, delete after.
-
-### Task 12: Vertical Slice — `/Sandbox/Plugins/ArrayManager`
-
-**OWN page.** Own controller, own view, own model, own DTOs, own index entry. Not shared.
-
-#### Plugin TS (already in sandbox-plugins.ts)
-
-Methods return scalars OR objects/arrays — objects flow as payloads (same as event args and HTTP responses). The framework's `evaluateValue` handles recursive evaluation:
-
+`getJsTypeForSource`: add `case "plugin"`:
 ```typescript
-// In sandbox-plugins.ts — array utility methods
-// Scalars — for display and conditions
-count:    (arr: any[]) => arr.length,
-pluck:    (arr: any[], index: number, key: string) => arr[index]?.[key],
-sum:      (arr: any[], key: string) => arr.reduce((s, i) => s + (Number(i[key]) || 0), 0),
-some:     (arr: any[], key: string, val: any) => arr.some(i => i[key] === val),
-every:    (arr: any[], key: string, val: any) => arr.every(i => i[key] === val),
-includes: (arr: any[], item: any) => arr.includes(item),
-join:     (arr: any[], sep: string) => arr.join(sep),
-
-// Objects/arrays — for chaining between plugin calls
-first:    (arr: any[]) => arr[0],
-filter:   (arr: any[], key: string, val: any) => arr.filter(i => i[key] === val),
-sort:     (arr: any[], key: string) => [...arr].sort((a, b) => a[key] > b[key] ? 1 : -1),
-map:      (arr: any[], key: string) => arr.map(i => i[key]),
-```
-
-#### Model + DTOs
-
-**File:** `Areas/Sandbox/Models/Plugins/ArrayManagerModel.cs`:
-
-```csharp
-public class ArrayManagerModel { }
-
-public class ResidentsListResponse
-{
-    public object[] Items { get; set; } = Array.Empty<object>();
-}
-
-public class PluginEchoResponse
-{
-    public int? ReceivedCount { get; set; }
-    public string? ReceivedHeader { get; set; }
+case "plugin": {
+  const typeKey = "plugin." + source.name;
+  const jsType = plan.types[typeKey];
+  if (!jsType) throw new Error(`[alis] type not found for plugin: "${source.name}"`);
+  return jsType;
 }
 ```
 
-#### Controller
+### Task 11: TS — evaluate.ts
 
-**File:** `Areas/Sandbox/Controllers/Plugins/ArrayManagerController.cs`:
+Widen: `if (producer.from.kind === "component" || producer.from.kind === "plugin")`.
 
-```csharp
-[Area("Sandbox")]
-[Route("Sandbox/Plugins/ArrayManager")]
-public class ArrayManagerController : Controller
-{
-    [HttpGet("")]
-    public IActionResult Index() =>
-        View("~/Areas/Sandbox/Views/Plugins/ArrayManager/Index.cshtml", new ArrayManagerModel());
+ReadProducer.args already handled by `cfdefa66` — `evaluateValue` passes args to `callMethod`.
 
-    [HttpGet("Residents")]
-    public IActionResult Residents() => Json(new {
-        items = new[] {
-            new { id = 1, name = "John Doe", status = "active", age = 82 },
-            new { id = 2, name = "Jane Smith", status = "active", age = 75 },
-            new { id = 3, name = "Bob Johnson", status = "discharged", age = 68 },
-            new { id = 4, name = "Alice Brown", status = "active", age = 91 },
-            new { id = 5, name = "Charlie Wilson", status = "pending", age = 77 },
-        }
-    });
+Fix error message: use `source.name` for plugin kind.
 
-    [HttpGet("PluginEcho")]
-    public IActionResult PluginEcho(int? count) => Json(new {
-        receivedCount = count,
-        receivedHeader = Request.Headers["X-Array-Count"].FirstOrDefault() ?? "(none)"
-    });
-}
+### Task 12: TS — execute.ts
+
+`executeCall` guard: allow `"plugin"` alongside `"component"` and `"payload"`.
+
+After guard, plugin follows the component path:
+```typescript
+const jsType = getJsTypeForSource(plan, reaction.on);
+const method = jsType.methods?.[reaction.method];
+if (!method) throw new Error(`...`);
+callMethod(root, method, args);
 ```
 
-#### View
+`getJsTypeForSource` already handles `"plugin"` (Task 10). `callMethod` already works. Zero new code in the call body — just the guard change.
 
-**File:** `Areas/Sandbox/Views/Plugins/ArrayManager/Index.cshtml`:
+`executeSet`: unchanged — rejects plugin (not component or payload).
 
-```html
-@model ArrayManagerModel
-@using Alis.Reactive
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.Native.Components
-@{
-    ViewData["Title"] = "Array Plugin";
-    var plan = Html.ReactivePlan<ArrayManagerModel>();
+Trace target: `reaction.on.kind === "plugin" ? (reaction.on as PluginSource).name : ...`
 
-    // DomReady → GET residents → use array plugin on response
-    Html.On(plan, t => t.DomReady(p =>
-        p.Get("/Sandbox/Plugins/ArrayManager/Residents")
-         .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
-         {
-             // array.count → scalar int
-             s.Element("arr-total").SetText(
-                 p.Plugin<int>("array", "count").Arg(json, x => x.Items));
+### Task 13: TS — root.ts drain
 
-             // array.pluck(items, 0, "name") → scalar string
-             s.Element("arr-first-name").SetText(
-                 p.Plugin<string>("array", "pluck")
-                  .Arg(json, x => x.Items)
-                  .Arg(0)
-                  .Arg("name"));
+5 lines at top. Drain `window.__alisPlugins`. Delete after.
 
-             // array.filter + count (NESTED plugin reads)
-             s.Element("arr-active-count").SetText(
-                 p.Plugin<int>("array", "count")
-                  .Arg(p.Plugin<object>("array", "filter")
-                       .Arg(json, x => x.Items)
-                       .Arg("status")
-                       .Arg("active")));
+### Task 14: Vertical Slice — `/Sandbox/Plugins/ArrayManager`
 
-             // array.sum → scalar int
-             s.Element("arr-total-age").SetText(
-                 p.Plugin<int>("array", "sum")
-                  .Arg(json, x => x.Items)
-                  .Arg("age"));
+Own page. Own controller. Own model. Own DTOs. Own index entry.
 
-             // array.some → condition
-             s.When(p.Plugin<bool>("array", "some")
-                    .Arg(json, x => x.Items)
-                    .Arg("status")
-                    .Arg("critical"))
-              .Truthy()
-              .Then(t => t.Element("arr-has-critical").Show())
-              .Else(e => e.Element("arr-no-critical").Show());
+**sandbox-plugins.ts**: Array utility plugin + analytics void plugin.
 
-             s.Element("arr-results").AddClass("text-green-600");
-         }))));
+**Controller**: GET `/Residents` returns 5 residents. GET `/PluginEcho` echoes count + header.
 
-    // Button → GET with plugin values in gather + header
-    Html.NativeButton("arr-send-btn", "Send to Server")
-        .Reactive(plan, evt => evt.Click, (args, p) =>
-        {
-            p.Get("/Sandbox/Plugins/ArrayManager/PluginEcho")
-             .Gather(g => g
-                 .Header("X-Array-Count", p.Plugin<int>("array", "count"))
-                 .Plugin<int>("array", "count", "count"))
-             .Response(r => r
-                .OnSuccess<PluginEchoResponse>((json, s) =>
-                {
-                    s.Element("arr-echo-count").SetText(json, x => x.ReceivedCount);
-                    s.Element("arr-echo-header").SetText(json, x => x.ReceivedHeader);
-                    s.Element("arr-echo-result").AddClass("text-green-600");
-                    // Case 1: void call after HTTP success
-                    s.Plugin("analytics", "track").Arg("array-sent");
-                }));
-        });
-}
+**View**: DomReady loads residents via GET, then:
+- `array.count(items)` → `#arr-total` → "5"
+- `array.pluck(items, 0, "name")` → `#arr-first-name` → "John Doe"
+- `array.count(array.filter(items, "status", "active"))` → `#arr-active-count` → "3"
+- `array.sum(items, "age")` → `#arr-total-age` → "393"
+- `array.some(items, "status", "critical")` → condition → `#arr-no-critical` visible
+- Button: gather + header with plugin values → server echoes
+- Void call after HTTP success
 
-<native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Array Plugin</native-heading>
-        <native-text color="Secondary">
-            Native JS array methods exposed to the DSL via plugin.
-        </native-text>
-    </div>
-
-    <native-card>
-    <native-card-body>
-        <native-heading level="H2">DomReady: Array Operations on Server Data</native-heading>
-        <div id="arr-results" class="space-y-2 font-mono text-sm text-text-muted">
-            <p>Total: <span id="arr-total">—</span></p>
-            <p>First Name: <span id="arr-first-name">—</span></p>
-            <p>Active Count: <span id="arr-active-count">—</span></p>
-            <p>Total Age: <span id="arr-total-age">—</span></p>
-            <p id="arr-has-critical" hidden class="text-red-600">Critical residents found!</p>
-            <p id="arr-no-critical" hidden class="text-green-600">No critical residents ✓</p>
-        </div>
-    </native-card-body>
-    </native-card>
-
-    <native-card>
-    <native-card-body>
-        <native-heading level="H2">HTTP: Plugin Values in Gather + Header</native-heading>
-        @(Html.NativeButton("arr-send-btn", "Send to Server")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white"))
-        <div id="arr-echo-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
-            <p>Count: <span id="arr-echo-count">—</span></p>
-            <p>Header: <span id="arr-echo-header">—</span></p>
-        </div>
-    </native-card-body>
-    </native-card>
-</native-vstack>
-
-@Html.RenderPlan(plan)
-```
-
-#### Element Expectations
-
-| Element | Expected Value | What It Proves |
-|---|---|---|
-| `#arr-total` | "5" | `array.count` — zero-arg on response array |
-| `#arr-first-name` | "John Doe" | `array.pluck(items, 0, "name")` — index + key args |
-| `#arr-active-count` | "3" | Nested: `array.count(array.filter(items, "status", "active"))` |
-| `#arr-total-age` | "393" | `array.sum` — with literal key arg "age" |
-| `#arr-no-critical` | visible | `array.some` → condition → Else branch (no critical status) |
-| `#arr-results` | class `text-green-600` | DomReady success |
-| `#arr-echo-count` | "5" | Plugin read → HTTP gather param |
-| `#arr-echo-header` | "5" | Plugin read → HTTP header |
-| `#arr-echo-result` | class `text-green-600` | HTTP success |
-
-#### Sandbox Index Update
-
-Add link to `/Sandbox/Plugins/ArrayManager` in `Areas/Sandbox/Views/Index.cshtml`.
+**HTML**: Exact element IDs, `@Html.RenderPlan(plan)` at bottom.
 
 ---
 
@@ -560,43 +382,41 @@ Add link to `/Sandbox/Plugins/ArrayManager` in `Areas/Sandbox/Views/Index.cshtml
 
 | Test | What It Proves |
 |---|---|
-| `plugin_read_produces_plugin_source` | from: { kind: "plugin" } + AssertSchemaValid |
-| `plugin_string_carries_shape` | shape: { kind: "string" } |
-| `plugin_int_carries_shape` | shape: { kind: "number" } |
-| `plugin_bool_carries_shape` | shape: { kind: "boolean" } |
+| `plugin_read_produces_plugin_source` | `from: { kind: "plugin" }` + AssertSchemaValid |
+| `plugin_string_carries_shape` | `shape: { kind: "string" }` |
+| `plugin_int_carries_shape` | `shape: { kind: "number" }` |
+| `plugin_bool_carries_shape` | `shape: { kind: "boolean" }` |
 | `plugin_in_condition` | CompareCondition with plugin read |
 | `plugin_in_set_text` | SetReaction with plugin read |
 | `plugin_in_header` | headers value is plugin read |
 | `plugin_in_route_param` | route param is plugin read |
 | `plugin_read_with_typed_source_arg` | ReadProducer.args from TypedSource |
-| `plugin_read_with_literal_string_arg` | ReadProducer.args with literal "status" |
-| `plugin_read_with_literal_int_arg` | ReadProducer.args with literal 42 |
-| `plugin_void_call` | CallReaction with PluginSource |
-| `plugin_void_call_with_literal_arg` | CallReaction.args with literal |
-| `plugin_gather_carries_shape` | GatherField shape from `<T>` |
-| `plugin_auto_registers_jstype` | plan.types["plugin.array"] created |
+| `plugin_read_with_literal_string_arg` | ReadProducer.args with literal |
+| `plugin_read_with_literal_int_arg` | ReadProducer.args with literal int |
+| `plugin_void_call_fire` | CallReaction with PluginSource |
+| `plugin_void_call_with_arg_fire` | CallReaction.args with literal |
+| `plugin_gather_from_typed_source` | GatherField via TypedPluginSource |
+| `plugin_auto_registers_jstype` | plan.types["plugin.array"] |
 | `plan_without_plugins_clean` | no "plugin" in JSON |
 | `empty_plugin_name_throws` | ArgumentException |
 | `empty_member_throws` | ArgumentException |
 
-### Playwright Tests (8) — `WhenArrayPluginManipulates.cs`
+### Playwright Tests (8) — `Plugins/WhenArrayPluginManipulates.cs`
 
-**File:** `tests/Alis.Reactive.PlaywrightTests/Plugins/WhenArrayPluginManipulates.cs`
-
-Navigate to `/Sandbox/Plugins/ArrayManager`. Wait for `#arr-total` to not be "—" (DomReady GET completes).
+Navigate to `/Sandbox/Plugins/ArrayManager`. Wait for `#arr-total` ≠ "—".
 
 | Test | Action | Assert |
 |---|---|---|
 | `array_count_on_load` | DomReady | `#arr-total` → "5" |
 | `array_pluck_first_name` | DomReady | `#arr-first-name` → "John Doe" |
 | `array_nested_filter_count` | DomReady | `#arr-active-count` → "3" |
-| `array_sum_total_age` | DomReady | `#arr-total-age` → "393" |
-| `array_some_condition_no_critical` | DomReady | `#arr-no-critical` visible, `#arr-has-critical` hidden |
-| `array_results_success_class` | DomReady | `#arr-results` has class `text-green-600` |
-| `plugin_gather_sends_count` | Click "Send to Server" | `#arr-echo-count` → "5" |
-| `plugin_header_sends_count` | Click "Send to Server" | `#arr-echo-header` → "5" |
+| `array_sum_age` | DomReady | `#arr-total-age` → "393" |
+| `array_some_no_critical` | DomReady | `#arr-no-critical` visible |
+| `array_results_class` | DomReady | `#arr-results` has `text-green-600` |
+| `plugin_gather_echoes` | Click "Send to Server" | `#arr-echo-count` → "5" |
+| `plugin_header_echoes` | Click "Send to Server" | `#arr-echo-header` → "5" |
 
-### vitest Tests (8) — `plugin-registry.test.ts` + `evaluate-plugin.test.ts`
+### vitest Tests (8)
 
 | Test | What It Proves |
 |---|---|
@@ -605,8 +425,8 @@ Navigate to `/Sandbox/Plugins/ArrayManager`. Wait for `#arr-total` to not be "�
 | `null instance throws` | Error |
 | `whitespace name throws` | Error |
 | `method zero-arg read` | evaluateValue → callMethod(root, method, []) |
-| `method with args` | evaluateValue → callMethod(root, method, [evaluated args]) |
-| `missing member throws` | Error from JsType lookup |
+| `method with args` | evaluateValue → callMethod(root, method, evaluatedArgs) |
+| `missing member throws` | Error |
 | `getJsTypeForSource finds plugin` | plan.types["plugin.name"] |
 
 ---
@@ -616,24 +436,25 @@ Navigate to `/Sandbox/Plugins/ArrayManager`. Wait for `#arr-total` to not be "�
 - [ ] `dotnet build` — 0 errors
 - [ ] `npm run typecheck` — clean
 - [ ] `npm run build` — both bundles
+- [ ] `ToResponsePath<TSource, TProp>` overload added
 - [ ] Schema validates PluginSource
-- [ ] JsType auto-created (methods only)
-- [ ] `p.Plugin<T>()` read in conditions, SetText, headers, gather, route params
-- [ ] `p.Plugin<T>().Arg(source)` typed source args
+- [ ] JsType auto-created (methods only, WithMethod)
+- [ ] `p.Plugin<T>()` read in conditions, SetText, headers, route params
+- [ ] `p.Plugin<T>().Arg(json, x => x.Items)` response body args (ResponseBody scope)
+- [ ] `p.Plugin<T>().Arg(args, a => a.Id)` event args (Event scope)
 - [ ] `p.Plugin<T>().Arg("literal")` literal args
-- [ ] `p.Plugin<T>().Arg(json, x => x.Items)` response body args
-- [ ] Nested plugin reads: `Plugin<int>("array","count").Arg(Plugin<object>("array","filter").Arg(...))`
-- [ ] `p.Plugin()` void call
-- [ ] `p.Plugin().Arg()` void with args
-- [ ] `g.Plugin<T>()` gather with shape
-- [ ] Plugin + URL source in same request
-- [ ] Plugin + header in same request
-- [ ] Plugin + route param composition
-- [ ] execute.ts Set rejects, Call allows
+- [ ] `p.Plugin<T>().Arg(source)` typed source args
+- [ ] Nested: `Plugin<int>("array","count").Arg(Plugin<object>("array","filter").Arg(...))`
+- [ ] Object return: `Plugin<Resident>("array","first")` → typed payload, DSL walks it
+- [ ] `p.Plugin().Fire()` void call emits CallReaction
+- [ ] `p.Plugin().Arg().Fire()` void with args
+- [ ] `g.Plugin(typedPluginSource, "paramName")` gather with plugin source
+- [ ] `executeCall` allows plugin, resolves via getJsTypeForSource
+- [ ] `executeSet` rejects plugin
 - [ ] Shape/ValueProducer stay internal
+- [ ] `.Fire()` explicit — no deferred emission
 - [ ] No inline JS
-- [ ] Vertical slice on own page (`/Sandbox/Plugins/ArrayManager`)
-- [ ] Sandbox index updated
+- [ ] Vertical slice on own page
 - [ ] All 18 C# tests pass
 - [ ] All 8 vitest tests pass
 - [ ] All 8 Playwright tests pass
