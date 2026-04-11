@@ -167,6 +167,69 @@ namespace Alis.Reactive.Builders.Requests
                     $"Route param '{paramName}' is already defined. Each route param can only be set once.");
         }
 
+        // ── URL Query Params ──────────────────────────────────
+
+        /// <summary>
+        /// Includes a URL query parameter value in the gather.
+        /// The parameter name is used as both the URL param to read and the HTTP request key.
+        /// </summary>
+        public GatherBuilder<TModel> FromUrl(string paramName)
+        {
+            if (string.IsNullOrWhiteSpace(paramName))
+                throw new System.ArgumentException(
+                    "URL param name must not be null or whitespace.", nameof(paramName));
+            var value = ValueProducer.ReadUrl(paramName);
+            Fields.Add(GatherField.Of(paramName, value));
+            return this;
+        }
+
+        /// <summary>
+        /// Includes a URL query parameter with an explicit HTTP request parameter name.
+        /// </summary>
+        public GatherBuilder<TModel> FromUrl(string paramName, string asParam)
+        {
+            if (string.IsNullOrWhiteSpace(paramName))
+                throw new System.ArgumentException(
+                    "URL param name must not be null or whitespace.", nameof(paramName));
+            if (string.IsNullOrWhiteSpace(asParam))
+                throw new System.ArgumentException(
+                    "HTTP parameter name must not be null or whitespace.", nameof(asParam));
+            var value = ValueProducer.ReadUrl(paramName);
+            Fields.Add(GatherField.Of(asParam, value));
+            return this;
+        }
+
+        /// <summary>
+        /// Includes a typed URL query parameter in the gather with shape conversion.
+        /// </summary>
+        public GatherBuilder<TModel> FromUrl<T>(string paramName)
+        {
+            if (string.IsNullOrWhiteSpace(paramName))
+                throw new System.ArgumentException(
+                    "URL param name must not be null or whitespace.", nameof(paramName));
+            var shape = Shape.FromClrType(typeof(T));
+            var value = ValueProducer.ReadUrl(paramName, shape);
+            Fields.Add(GatherField.Of(paramName, value));
+            return this;
+        }
+
+        /// <summary>
+        /// Includes a typed URL query parameter with an explicit HTTP request parameter name.
+        /// </summary>
+        public GatherBuilder<TModel> FromUrl<T>(string paramName, string asParam)
+        {
+            if (string.IsNullOrWhiteSpace(paramName))
+                throw new System.ArgumentException(
+                    "URL param name must not be null or whitespace.", nameof(paramName));
+            if (string.IsNullOrWhiteSpace(asParam))
+                throw new System.ArgumentException(
+                    "HTTP parameter name must not be null or whitespace.", nameof(asParam));
+            var shape = Shape.FromClrType(typeof(T));
+            var value = ValueProducer.ReadUrl(paramName, shape);
+            Fields.Add(GatherField.Of(asParam, value));
+            return this;
+        }
+
         /// <summary>
         /// Includes a specific component's value in the gather.
         /// Used by vendor extension methods (Fusion, Native).

@@ -31,6 +31,8 @@ export function resolveSource(plan: Plan, source: Source, ctx?: ExecContext): un
       return resolveComponent(plan, source.component);
     case "payload":
       return resolvePayload(source, ctx);
+    case "url":
+      return new URLSearchParams(window.location.search);
     default:
       assertNever(source, "source kind");
   }

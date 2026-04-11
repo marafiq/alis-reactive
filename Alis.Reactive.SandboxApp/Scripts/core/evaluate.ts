@@ -34,6 +34,12 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
         }
         throw new Error(`[alis] member "${producer.member}" not found on component "${producer.from.component}"`);
       }
+      // URL source: read query parameter by name
+      if (producer.from.kind === "url") {
+        const params = root as URLSearchParams;
+        const raw = params.get(producer.member);
+        return raw == null ? raw : applyShape(raw, producer.shape);
+      }
       // Payload source: walk member as dot-path on resolved payload.
       if (producer.path) {
         const walked = walkPath(root as any, producer.path);

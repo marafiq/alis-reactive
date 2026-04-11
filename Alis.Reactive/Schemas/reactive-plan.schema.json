@@ -141,12 +141,14 @@
     "Source": {
       "oneOf": [
         { "$ref": "#/$defs/ComponentSource" },
-        { "$ref": "#/$defs/PayloadSource" }
+        { "$ref": "#/$defs/PayloadSource" },
+        { "$ref": "#/$defs/UrlSource" }
       ]
     },
     "ComponentSource": {
       "type": "object",
       "required": ["kind", "component"],
+      "additionalProperties": false,
       "properties": {
         "kind": { "const": "component" },
         "component": { "type": "string", "minLength": 1 }
@@ -155,6 +157,7 @@
     "PayloadSource": {
       "type": "object",
       "required": ["kind", "scope"],
+      "additionalProperties": false,
       "properties": {
         "kind": { "const": "payload" },
         "scope": {
@@ -162,6 +165,14 @@
           "enum": ["event", "success", "error", "request", "dispatch", "local"]
         },
         "type": { "type": "string", "minLength": 1 }
+      }
+    },
+    "UrlSource": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "url" }
       }
     },
     "Behavior": {

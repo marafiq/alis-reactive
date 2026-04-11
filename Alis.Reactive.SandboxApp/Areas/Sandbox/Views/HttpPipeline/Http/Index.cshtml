@@ -27,6 +27,25 @@
         p.Get("/Sandbox/HttpPipeline/Http/NativeActionLinkGrid")
          .Response(r => r.OnSuccess(s => s.Into("native-action-link-grid")))
     ));
+
+    // Section 20: DomReady → FromUrl conditions (show/hide based on URL params)
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.When(p.FromUrl("tab")).Eq("medications")
+         .Then(then => then.Element("url-cond-meds").Show())
+         .Else(els => els.Element("url-cond-meds").Hide());
+
+        p.When(p.FromUrl<int>("page")).Gt(1)
+         .Then(then => then.Element("url-cond-prev").Show())
+         .Else(els => els.Element("url-cond-prev").Hide());
+    }));
+
+    // Section 21: DomReady → FromUrl SetText (display URL params)
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Element("url-display-tab").SetText(p.FromUrl("tab"));
+        p.Element("url-display-facility").SetText(p.FromUrl("facilityId"));
+    }));
 }
 
 <native-vstack gap="Lg">
@@ -404,6 +423,91 @@
         <div class="mt-3 space-y-2 font-mono text-sm">
             <p id="standalone-native-action-link-status" class="text-text-muted">Standalone link has not run yet</p>
             <div id="standalone-native-action-link-result" class="text-text-muted">No standalone response yet</div>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 19: FromUrl in Gather -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">19. FromUrl in Gather &rarr; Send URL Params</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Reads ?tab and ?facilityId from the browser URL and sends them as HTTP request params.</p>
+        @(Html.NativeButton("url-gather-btn", "Send URL Params")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/HttpPipeline/Http/UrlParamEcho")
+                 .Gather(g => g
+                     .FromUrl("tab")
+                     .FromUrl("facilityId"))
+                 .Response(r => r
+                    .OnSuccess<UrlParamEchoResponse>((json, s) =>
+                    {
+                        s.Element("url-gather-tab").SetText(json, x => x.Tab);
+                        s.Element("url-gather-facility").SetText(json, x => x.FacilityId);
+                        s.Element("url-gather-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="url-gather-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p>Tab: <span id="url-gather-tab">—</span></p>
+            <p>Facility ID: <span id="url-gather-facility">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 20: FromUrl in Conditions -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">20. FromUrl in Conditions &rarr; DomReady Branch</native-heading>
+        <p class="text-sm text-text-secondary mb-3">On page load, branches based on ?tab and ?page URL params. Navigate with ?tab=medications&amp;page=3 to see results.</p>
+        <div class="space-y-2 font-mono text-sm">
+            <p id="url-cond-meds" hidden class="text-green-600">Medications panel visible (tab=medications)</p>
+            <p id="url-cond-prev" hidden class="text-blue-600">Previous button visible (page &gt; 1)</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 21: FromUrl in SetText -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">21. FromUrl in SetText &rarr; Display URL Params</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Displays ?tab and ?facilityId values directly in the DOM on page load.</p>
+        <div class="space-y-2 font-mono text-sm text-text-muted">
+            <p>Tab: <span id="url-display-tab"></span></p>
+            <p>Facility: <span id="url-display-facility"></span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 22: FromUrl Composed with Route Params + Headers -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">22. FromUrl Composed &rarr; Route Param + Header + Gather</native-heading>
+        <p class="text-sm text-text-secondary mb-3">One request composes three value sources: literal route param, URL param as header, URL param as gather field.</p>
+        @(Html.NativeButton("url-compose-btn", "Compose All Sources")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
+                 .Gather(g => g
+                     .RouteParam("id", 42)
+                     .Header("X-Tab", p.FromUrl("tab"))
+                     .FromUrl("facilityId", "facility"))
+                 .Response(r => r
+                    .OnSuccess<ComposeEchoResponse>((json, s) =>
+                    {
+                        s.Element("url-compose-name").SetText(json, x => x.Name);
+                        s.Element("url-compose-tab").SetText(json, x => x.ReceivedTab);
+                        s.Element("url-compose-facility").SetText(json, x => x.ReceivedFacility);
+                        s.Element("url-compose-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="url-compose-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p>Name: <span id="url-compose-name">—</span></p>
+            <p>Tab Header: <span id="url-compose-tab">—</span></p>
+            <p>Facility Gather: <span id="url-compose-facility">—</span></p>
         </div>
     </native-card-body>
     </native-card>

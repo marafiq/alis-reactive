@@ -41,4 +41,13 @@ namespace Alis.Reactive.PlanModel
         internal static PayloadSource Dispatch(string type = null) => new PayloadSource("dispatch", type);
         internal static PayloadSource Local() => new PayloadSource("local");
     }
+
+    /// <summary>Reads a value from the browser's current URL query string.
+    /// Singleton — no per-instance state. The query param name is the member on ReadProducer.</summary>
+    public sealed class UrlSource : Source
+    {
+        public string Kind => "url";
+        private UrlSource() { }
+        internal static UrlSource Instance { get; } = new UrlSource();
+    }
 }

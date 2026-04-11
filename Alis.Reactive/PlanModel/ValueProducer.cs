@@ -42,6 +42,11 @@ namespace Alis.Reactive.PlanModel
         internal static ValueProducer LiteralRaw(object value, Shape shape) =>
             new LiteralProducer(value, shape);
 
+        /// <summary>Creates a ReadProducer that reads a URL query parameter by name.
+        /// Default shape is String because URL params are inherently strings.</summary>
+        internal static ValueProducer ReadUrl(string paramName, Shape shape = null) =>
+            Read(UrlSource.Instance, paramName, shape: shape ?? Shape.String);
+
         internal static ValueProducer Read(Source from, string member, Path path = null, Shape shape = null) =>
             new ReadProducer(from, member, path, shape);
 

@@ -77,6 +77,23 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(comp.DefaultId, this);
         }
 
+        /// <summary>
+        /// Reads a query parameter from the browser's current URL as a string.
+        /// </summary>
+        public Conditions.TypedUrlSource<string> FromUrl(string paramName)
+        {
+            return new Conditions.TypedUrlSource<string>(paramName);
+        }
+
+        /// <summary>
+        /// Reads a query parameter with typed shape conversion.
+        /// Use <c>FromUrl&lt;int&gt;("page")</c> for numeric comparison.
+        /// </summary>
+        public Conditions.TypedUrlSource<T> FromUrl<T>(string paramName)
+        {
+            return new Conditions.TypedUrlSource<T>(paramName);
+        }
+
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
             Steps.Add(Reaction.ShowValidationErrors(formId));

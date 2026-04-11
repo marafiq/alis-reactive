@@ -196,7 +196,22 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             }
         }
 
-        // ── Section 15-18: Route Params ────────────────────────
+        // ── Section 19-22: URL Query Params ─────────────────────
+
+        [HttpGet("UrlParamEcho")]
+        public IActionResult UrlParamEcho(string? tab, string? facilityId, string? page) =>
+            Json(new { tab, facilityId, page });
+
+        [HttpGet("ComposeEcho/{id:int}")]
+        public IActionResult ComposeEcho(int id, string? facility) =>
+            Json(new {
+                residentId = id,
+                name = $"Resident #{id}",
+                receivedTab = Request.Headers["X-Tab"].FirstOrDefault() ?? "(none)",
+                receivedFacility = facility ?? "(none)"
+            });
+
+        // ── Section 15-18: Route Params ────────────────────��───
 
         [HttpGet("Residents/{id:int}")]
         public IActionResult ResidentById(int id) =>

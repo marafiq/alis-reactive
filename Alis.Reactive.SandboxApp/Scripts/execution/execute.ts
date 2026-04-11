@@ -196,6 +196,9 @@ async function executeParallel(
 // ── Set reaction ───────────────────────────────────────────
 
 function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void {
+  if (reaction.on.kind !== "component" && reaction.on.kind !== "payload") {
+    throw new Error(`[alis] Set reaction does not support source kind "${reaction.on.kind}". Only component and payload sources can be mutation targets.`);
+  }
   const root = resolveSource(plan, reaction.on, ctx);
   const value = evaluateValue(reaction.value, plan, ctx);
   const target = reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope;
@@ -218,6 +221,9 @@ function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void 
 // ── Call reaction ──────────────────────────────────────────
 
 function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): void {
+  if (reaction.on.kind !== "component" && reaction.on.kind !== "payload") {
+    throw new Error(`[alis] Call reaction does not support source kind "${reaction.on.kind}". Only component and payload sources can be mutation targets.`);
+  }
   const root = resolveSource(plan, reaction.on, ctx);
   const args = reaction.args?.map(a => evaluateValue(a, plan, ctx)) ?? [];
   const target = reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope;
