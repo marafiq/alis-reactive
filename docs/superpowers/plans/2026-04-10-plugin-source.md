@@ -40,7 +40,7 @@ plan.RegisterPlugin("auth", p => {
 
 **TS side (runtime) — Push-Array Pattern:**
 
-Plugins bundle SEPARATELY from the framework. They register via a passive push-array on `window.__alisPlugins` — no framework API needed, no load-order dependency.
+Plugins bundle SEPARATELY from the framework. They register via a passive push-array on `window.__alisPlugins` — no framework API needed. Plugin scripts MUST load before the framework script (module execution order).
 
 ```typescript
 // plugins/auth-plugin.ts (developer's own TS file, bundled separately)
@@ -89,7 +89,7 @@ delete (window as any).__alisPlugins; // clean up — queue no longer needed
 ```
 
 **Why push-array:**
-1. **No load-order dependency** — plugins can load before OR after framework
+1. **No framework import needed** — plugins use vanilla `window.__alisPlugins.push()`, no TS import from framework
 2. **No framework API needed before boot** — the array is vanilla JS, no imports
 3. **Zero permanent globals** — the array is drained and deleted at boot
 4. **Battle-tested pattern** — Google Analytics, GTM, Segment all use this
@@ -118,9 +118,25 @@ const raw = callMethod(root, method, []);
 
 Plugin methods are zero-arg getters: `getToken()`, `getUserId()`, `isAdmin()`. No arg-bearing methods. This matches the evaluateValue contract. The `PluginTypeBuilder.Method` overload accepts only `(name, returns)` — no args parameter.
 
-### Plugins Are NOT Mutation Targets
+### Plugin Mutation Rules
 
-`execute.ts` already guards Set/Call reactions against non-component/non-payload sources (from URL Query Source work). `PluginSource` is rejected with an explicit throw. Plugins are read-only value sources.
+Plugins support two operations via existing framework primitives:
+
+1. **Read** (evaluateValue) — zero-arg method call or property read → returns value. Used in conditions, gather, headers, SetText, route params. This is the primary use case.
+
+2. **Call** (CallReaction) — method call with args → side effect. Used for fire-and-forget actions like analytics tracking. `execute.ts` Call guard is updated to ALLOW PluginSource alongside component and payload.
+
+3. **Set** (SetReaction) — property write. NOT supported for plugins. Setting properties on a user-registered object from the reactive plan is architecturally wrong — plugins provide values, they don't receive them. `execute.ts` Set guard REJECTS PluginSource.
+
+```csharp
+// Call a plugin method with args (fire and forget)
+p.Plugin("analytics").Call("trackEvent", ValueProducer.Literal("form-submit"));
+
+// Read a plugin method return value (zero-arg)
+p.Header("Authorization", p.Plugin<string>("auth", "getToken"));
+```
+
+The `CallReaction` already supports `on: Source` with `method` and `args`. Plugins use the SAME path — `resolveSource` returns the plugin root, `getJsTypeForSource` finds the method, `callMethod` calls it with evaluated args. Zero new primitives needed.
 
 ### Null Semantics
 
@@ -325,8 +341,8 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Declares a zero-arg method on the plugin. The method is called with no arguments
-        /// and its return value is used as the read result.</summary>
+        /// <summary>Declares a zero-arg method on the plugin (getter pattern).
+        /// Called with no args via evaluateValue — return value used as read result.</summary>
         public PluginTypeBuilder Method(string name, Shape returns)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -336,11 +352,26 @@ namespace Alis.Reactive.Builders
                 .WithMethod(name, Path.Parse(name), returns: returns);
             return this;
         }
+
+        /// <summary>Declares a method with args on the plugin (action pattern).
+        /// Called with args via CallReaction — for fire-and-forget side effects.</summary>
+        public PluginTypeBuilder Method(string name, List<Shape> args)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new System.ArgumentException("Plugin method name must not be null or whitespace.", nameof(name));
+            _context.Plan.MutableTypes[_typeKey]
+                .WithMethod(name, Path.Parse(name), args: args);
+            return this;
+        }
     }
 }
 ```
 
-**No args overload.** Zero-arg methods only — matches evaluateValue contract.
+Two method patterns:
+- **Getter** `Method(name, returns)` — zero-arg, has return shape. Used by evaluateValue for reads.
+- **Action** `Method(name, args)` — has arg shapes, no return. Used by CallReaction for side effects.
+
+Both use the existing `JsType.WithMethod` which already accepts optional `args` and `returns` (JsType.cs:53).
 
 ### Task 5: C# Builder — TypedPluginSource<T>
 
@@ -587,6 +618,29 @@ throw new Error(`[alis] member "${producer.member}" not found on ${producer.from
 
 Import `PluginSource` from types. This is the ONLY evaluate.ts change beyond the `if` condition widening.
 
+### Task 13b: TS Runtime — execute.ts allows Call on plugins
+
+**File:** `Alis.Reactive.SandboxApp/Scripts/execution/execute.ts`
+
+The URL Query Source work added guards that reject non-component/non-payload sources for BOTH Set and Call. For plugins, **Call is allowed** (fire-and-forget methods) but **Set is rejected** (plugins don't receive values).
+
+Update `executeCall` guard:
+```typescript
+// BEFORE (from URL Query Source):
+if (reaction.on.kind !== "component" && reaction.on.kind !== "payload") {
+  throw new Error(`[alis] Call reaction does not support source kind "${reaction.on.kind}".`);
+}
+
+// AFTER (allow plugin):
+if (reaction.on.kind !== "component" && reaction.on.kind !== "payload" && reaction.on.kind !== "plugin") {
+  throw new Error(`[alis] Call reaction does not support source kind "${reaction.on.kind}".`);
+}
+```
+
+The `executeSet` guard remains unchanged — plugins are NOT valid Set targets.
+
+After the guard, the existing call path works: `resolveSource` returns plugin root, `getJsTypeForSource` finds the method, `callMethod` calls with evaluated args. Zero new code needed in the call body.
+
 ### Task 14: TS Runtime — Drain plugin queue in root.ts
 
 **File:** `Alis.Reactive.SandboxApp/Scripts/root.ts`
@@ -772,7 +826,7 @@ Navigate to `/Sandbox/HttpPipeline/Http` (sandbox must include plugin registrati
 
 ### Task 18: vitest Tests (10 tests)
 
-**File:** `Scripts/__tests__/core/plugin-registry.test.ts` (4 tests):
+**File:** `Scripts/__tests__/core/plugin-registry.test.ts` (6 tests):
 
 | Test | What It Proves |
 |---|---|
