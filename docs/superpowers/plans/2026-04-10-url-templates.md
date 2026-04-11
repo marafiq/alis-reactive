@@ -153,7 +153,7 @@ public GatherBuilder<TModel> RouteParam<TArgs, TProp>(
 }
 
 private static readonly System.Text.RegularExpressions.Regex RouteParamNameRe =
-    new System.Text.RegularExpressions.Regex(@"^\w+$", System.Text.RegularExpressions.RegexOptions.Compiled);
+    new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9_]+$", System.Text.RegularExpressions.RegexOptions.Compiled);
 
 private static void ValidateRouteParamName(string paramName)
 {
@@ -162,7 +162,7 @@ private static void ValidateRouteParamName(string paramName)
     if (!RouteParamNameRe.IsMatch(paramName))
         throw new System.ArgumentException(
             $"Route param name '{paramName}' contains invalid characters. " +
-            "Names must match [a-zA-Z0-9_] to align with the runtime {{placeholder}} regex.",
+            "Names must match [a-zA-Z0-9_] (ASCII only) to align with the runtime {{placeholder}} regex.",
             nameof(paramName));
 }
 ```
@@ -189,7 +189,9 @@ After headers wiring (after line 148), before `return request;`:
 ```csharp
 if (_gatherBuilder != null && _gatherBuilder.RouteParamFields.Count > 0)
 {
-    // Validate route param names match URL placeholders — catches typos at build time
+    var placeholderRe = new System.Text.RegularExpressions.Regex(@"\{(\w+)\}");
+
+    // Forward validation: every RouteParam must match a URL placeholder
     foreach (var paramName in _gatherBuilder.RouteParamFields.Keys)
     {
         if (!_url.Contains("{" + paramName + "}"))
@@ -197,11 +199,25 @@ if (_gatherBuilder != null && _gatherBuilder.RouteParamFields.Count > 0)
                 $"Route param '{paramName}' does not match any placeholder in URL '{_url}'. " +
                 $"Expected '{{" + paramName + "}}' in the URL template.");
     }
+
+    // Reverse validation: every URL placeholder must have a matching RouteParam
+    foreach (System.Text.RegularExpressions.Match match in placeholderRe.Matches(_url))
+    {
+        var placeholder = match.Groups[1].Value;
+        if (!_gatherBuilder.RouteParamFields.ContainsKey(placeholder))
+            throw new InvalidOperationException(
+                $"URL template '{_url}' has placeholder '{{{placeholder}}}' " +
+                $"but no matching .RouteParam(\"{placeholder}\", ...) was provided.");
+    }
+
     request.RouteParams = new Dictionary<string, ValueProducer>(_gatherBuilder.RouteParamFields);
 }
 ```
 
-**Design note:** This validation catches the single most likely developer mistake — a typo between `.RouteParam("residentId", ...)` and `"/residents/{residnetId}/..."`. Without this, the typo silently produces a URL with the unreplaced `{residnetId}` placeholder, which the server returns 404 for. With this, the developer gets a clear exception at plan construction time.
+**Design notes:**
+- **Forward validation** catches typos: `.RouteParam("residentId")` with URL `{residnetId}` → clear exception at build time.
+- **Reverse validation** catches missing params: URL `{id}` with no `.RouteParam("id")` → clear exception at build time instead of silent `{id}` in the URL at runtime.
+- Both validations together guarantee: every route param has a placeholder, and every placeholder has a route param. The plan is complete at build time — the runtime throws only for malformed plan JSON (defense-in-depth).
 
 ### Task 4: JSON Schema — Request gains routeParams
 
@@ -235,12 +251,23 @@ Add import (toString not yet imported from headers work):
 import { toString } from "../core/shape-convert";
 ```
 
-Add function before `buildFetch`:
+**New file:** `Alis.Reactive.SandboxApp/Scripts/core/url-template.ts`
+
+Extract `resolveRouteParams` to its own module — URL template resolution is a pure function with no HTTP dependency. This follows SRP, makes it naturally testable, and avoids exporting test-only functions from `http.ts`.
 
 ```typescript
+// url-template.ts — URL template parameter resolution.
+// Pure function: resolves {param} placeholders using ValueProducers.
+
+import type { Plan, ValueProducer, ExecContext } from "../types";
+import { evaluateValue } from "./evaluate";
+import { formatForWire } from "./wire-format";
+import { toString } from "./shape-convert";
+
 const ROUTE_PARAM_RE = /\{(\w+)\}/g;
 
-function resolveRouteParams(
+/** Resolve {param} placeholders in a URL template using evaluated ValueProducers. */
+export function resolveRouteParams(
   urlTemplate: string,
   routeParams: Record<string, ValueProducer>,
   plan: Plan,
@@ -249,19 +276,34 @@ function resolveRouteParams(
   return urlTemplate.replace(ROUTE_PARAM_RE, (match, paramName: string) => {
     const producer = routeParams[paramName];
     if (!producer) {
-      log.warn("unresolved route param", { param: paramName });
-      return match; // keep placeholder — fail visible, not silent
+      // Build-time validation (C#) ensures every RouteParam matches a placeholder.
+      // If we get here, the plan JSON is malformed — fail fast.
+      throw new Error(`[alis] unresolved route param: "${paramName}" in URL template "${urlTemplate}"`);
     }
     const raw = evaluateValue(producer, plan, ctx);
     if (raw == null) {
-      log.warn("route param evaluated to null", { param: paramName });
-      return "";
+      // Null means a component hasn't been selected or an event arg is missing.
+      // An empty path segment corrupts the URL silently — fail fast instead.
+      throw new Error(`[alis] route param "${paramName}" evaluated to null — cannot build URL`);
     }
     const wire = formatForWire(raw, producer.shape);
     const result = toString(wire);
-    return encodeURIComponent(result.ok ? result.value : String(wire));
+    if (!result.ok) {
+      throw new Error(`[alis] route param "${paramName}" could not be stringified: ${result.error}`);
+    }
+    return encodeURIComponent(result.value);
   });
 }
+```
+
+**Design rationale (CLAUDE.md Rule 3 — fail fast, no fallbacks):**
+- Unresolved placeholder: throws. Build-time validation already catches typos. If this fires, the plan JSON is malformed.
+- Null value: throws. An empty path segment (`/residents//meds`) is silent URL corruption. The developer needs to handle the null case with a condition (`When(...).NotNull().Then(...)`) before triggering the request.
+- toString failure: throws. The scalar guard at build time ensures only scalar types reach here. If toString fails, the framework has a bug.
+
+**Import in http.ts:**
+```typescript
+import { resolveRouteParams } from "../core/url-template";
 ```
 
 **Imports already present from headers:** `evaluateValue` from `../core/evaluate`, `formatForWire` from `../core/wire-format`.
@@ -278,7 +320,7 @@ This replaces `let url = req.url;` at the start of buildFetch. The rest of build
 
 ### Task 6b: TS Unit Tests (vitest) — resolveRouteParams
 
-**New file:** `Alis.Reactive.SandboxApp/Scripts/__tests__/execution/resolveRouteParams.test.ts`
+**New file:** `Alis.Reactive.SandboxApp/Scripts/__tests__/core/url-template.test.ts`
 
 The process pipeline requires vitest coverage for new TS runtime functions. `resolveRouteParams` has non-trivial logic (regex, null handling, URI encoding, shape formatting) that must be unit-tested independently of the browser.
 
@@ -467,7 +509,8 @@ Every overload has a dedicated test. Every guard path has a test. Every composit
 | `array_route_param_throws_at_build_time` | scalar guard rejects string[] |
 | `null_string_route_param_throws_at_build_time` | null literal string rejected |
 | `empty_param_name_throws_at_build_time` | name validation rejects empty |
-| `mismatched_param_name_throws_at_build_time` | placeholder validation in BuildRequest — param "residentId" with URL containing `{residnetId}` (typo) throws |
+| `mismatched_param_name_throws_at_build_time` | forward validation — param "residentId" with URL containing `{residnetId}` (typo) throws |
+| `orphaned_placeholder_throws_at_build_time` | reverse validation — URL has `{id}` but no .RouteParam("id") provided → throws |
 | `nullable_int_route_param_accepted` | Nullable<int> passes scalar guard |
 | `whitespace_param_name_throws_at_build_time` | name validation rejects whitespace |
 | `hyphenated_param_name_throws_at_build_time` | name validation rejects `resident-id` — grammar must match runtime `\w+` regex |
@@ -536,7 +579,7 @@ Navigate to `/Sandbox/HttpPipeline/Http`, wait for boot + DomReady GET.
 - [ ] Param name not matching URL placeholder throws at build time
 - [ ] Route params compose with Include<> body fields in same Gather
 - [ ] Gather() required — no Gather = no route params (natural DSL enforcement)
-- [ ] All 19 C# unit tests pass (Task 8: per-overload + guards + composition)
+- [ ] All 20 C# unit tests pass (Task 8: per-overload + guards + composition + reverse validation)
 - [ ] All 6 vitest tests pass (Task 6b: resolveRouteParams)
 - [ ] All 10 Playwright tests pass (Task 9: 4 sections)
 - [ ] All existing 789+ Playwright tests pass (no regressions)
