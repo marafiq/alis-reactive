@@ -1,6 +1,6 @@
 # Plugin Source
 
-**Goal:** User-defined JS objects as value sources and call targets. One DSL name: `Plugin`. `<T>` for reads, no `<T>` for void. Methods only. Plugin return values flow as typed payloads — when `<T>` is a known type, existing DSL expressions walk into the result.
+**Goal:** User-defined JS objects as value sources and call targets. One DSL name: `Plugin`. `<T>` for reads, no `<T>` for void. Methods only. Scalar returns display directly. Object returns chain as args to other plugin calls — not directly walkable by DSL.
 
 **Prerequisite:** ReadProducer.args (`cfdefa66`), URL Query Source (3-kind Source union), `ExpressionPathHelper.ToResponsePath<TSource, TProp>` typed overload (must add — only `object?` overload exists today at line 82).
 
