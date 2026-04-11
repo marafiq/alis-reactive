@@ -1,188 +1,113 @@
-# Plugin Source — User-Defined JS Objects as Value Sources
+# Plugin Source
 
 > **For agentic workers:** Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Allow devs to register arbitrary JavaScript objects as value sources and call targets in the plan. A plugin is a resolved root — same as a component. Four operations: read property, call zero-arg method (get return), call method with args (get return), call method with args (void). All use existing framework primitives.
+**Goal:** User-defined JS objects as value sources and call targets. One DSL name: `Plugin`. Generic `<T>` for reads, non-generic for void calls. Methods only — no property reads. All four JS method patterns supported via existing plan primitives.
 
-**Prerequisite:** ReadProducer.args must be landed (commit `cfdefa66`). URL Query Source must be landed (Source union at 3 kinds, execute.ts guards).
+**Prerequisite:** ReadProducer.args (`cfdefa66`), URL Query Source (3-kind Source union, execute.ts guards).
 
 ---
 
-## Registration (TS Infrastructure — Not DSL)
+## Registration
 
-Plugin TS bundles load BEFORE the framework. Push-array pattern — no framework imports, no load-order dependency between plugin scripts:
+Plugin TS bundles load before framework. Push-array:
 
 ```typescript
-// plugins/auth.ts → bundled to plugins.js
 ((window as any).__alisPlugins ??= []).push({
   name: "auth",
   instance: {
-    getToken: () => localStorage.getItem("auth_token"),
+    getToken: () => localStorage.getItem("token"),
     getUserId: () => 42,
     isAdmin: () => true,
-    flush: () => navigator.sendBeacon("/log", ""),
-    trackEvent: (name: string) => console.log("track:", name),
+    getSessionId: () => crypto.randomUUID(),
+    track: (event: string) => navigator.sendBeacon("/analytics", event),
     format: (first: string, last: string) => `${last}, ${first}`
   }
 });
 ```
 
 ```html
-<!-- _Layout.cshtml -->
 <script type="module" src="~/js/plugins.js"></script>
 <script type="module" src="~/js/alis-reactive.js"></script>
 ```
 
-Framework drains the queue in `root.ts` at module-level before boot:
-
-```typescript
-import { registerPlugin } from "./core/plugin-registry";
-const pending = (window as any).__alisPlugins as Array<{ name: string; instance: unknown }> | undefined;
-if (pending) {
-  for (const entry of pending) registerPlugin(entry.name, entry.instance);
-  delete (window as any).__alisPlugins;
-}
-```
+Framework drains at top of `root.ts` before boot — 5 lines, zero timing change.
 
 ---
 
-## DSL — Four Cases
+## DSL
 
-Every case maps to an existing plan model primitive. Zero new kinds.
-
-### Case 4: Returns value, no args → ReadProducer
+One name. `<T>` means read. No `<T>` means void.
 
 ```csharp
+// READ — zero args
 p.Plugin<string>("auth", "getToken")
-// Plan: { kind: "read", from: { kind: "plugin", name: "auth" }, member: "getToken", shape: { kind: "string" } }
+
+// READ — with args
+p.Plugin<string>("auth", "format").Arg(firstNameSource).Arg(lastNameSource)
+
+// VOID — zero args
+p.Plugin("logger", "flush")
+
+// VOID — with args
+p.Plugin("analytics", "track").Arg(source)
 ```
 
-Used in: conditions, SetText, headers, gather, route params — anywhere `TypedSource<T>` is accepted.
-
-### Case 3: Returns value, with args → ReadProducer + args
+### In Every Context
 
 ```csharp
-p.PluginRead<string>("auth", "format")
- .Arg(p.Component<FusionTextBox>(m => m.FirstName).Value())
- .Arg(p.Component<FusionTextBox>(m => m.LastName).Value())
-// Plan: { kind: "read", from: { kind: "plugin" }, member: "format", shape: { kind: "string" },
-//         args: [{ kind: "read", from: { kind: "component" }, member: "value" }, ...] }
-```
+// DomReady — SetText + Condition
+Html.On(plan, t => t.DomReady(p =>
+{
+    p.Element("theme").SetText(p.Plugin<string>("prefs", "getTheme"));
+    p.When(p.Plugin<bool>("auth", "isAdmin")).Truthy()
+     .Then(t => t.Element("admin-panel").Show());
+    p.Plugin("analytics", "pageView");
+}));
 
-Uses ReadProducer.args (landed in `cfdefa66`). Builder collects args via `.Arg<T>(TypedSource<T>)` — each independently generic, calls `.ToValueProducer()` internally. Implicit conversion to `TypedSource<TReturn>`.
+// .Reactive event — Header + Gather + void in success
+Html.NativeButton("save-btn", "Save")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post("/api/save")
+         .Gather(g => g
+             .Header("Authorization", p.Plugin<string>("auth", "getToken"))
+             .Plugin("auth", "getSessionId", "session")
+             .Include<FusionTextBox, Model>(m => m.Name))
+         .Response(r => r.OnSuccess(s =>
+         {
+             s.Element("status").SetText("Saved");
+             s.Plugin("analytics", "track").Arg(p.Plugin<string>("auth", "getUserId"));
+         }));
+    });
 
-### Case 1: No return, no args → CallReaction
+// Route params
+g.RouteParam("tenantId", p.Plugin<int>("auth", "getTenantId"))
 
-```csharp
-p.PluginCall("logger", "flush")
-// Plan: { kind: "call", on: { kind: "plugin", name: "logger" }, method: "flush" }
-```
-
-### Case 2: No return, with args → CallReaction + args
-
-```csharp
-p.PluginCall("analytics", "trackEvent")
- .Arg(p.Plugin<string>("auth", "getUserId"))
-// Plan: { kind: "call", on: { kind: "plugin" }, method: "trackEvent",
-//         args: [{ kind: "read", from: { kind: "plugin" }, member: "getUserId" }] }
+// Conditions with args
+p.When(p.Plugin<bool>("permissions", "canAccess").Arg(args, a => a.ResourceId))
+ .Truthy()
+ .Then(t => t.Element("panel").Show());
 ```
 
 ### Plan Model Mapping
 
-| Case | Returns | Args | Plan Primitive | Existing? |
-|---|---|---|---|---|
-| 4 | Yes | No | ReadProducer | ✓ |
-| 3 | Yes | Yes | ReadProducer + args | ✓ (cfdefa66) |
-| 1 | No | No | CallReaction | ✓ |
-| 2 | No | Yes | CallReaction + args | ✓ |
+| DSL | Plan Primitive | Existing? |
+|---|---|---|
+| `p.Plugin<T>(name, member)` | ReadProducer (zero args) | ✓ |
+| `p.Plugin<T>(name, member).Arg(...)` | ReadProducer + args | ✓ (cfdefa66) |
+| `p.Plugin(name, member)` | CallReaction (zero args) | ✓ |
+| `p.Plugin(name, member).Arg(...)` | CallReaction + args | ✓ |
+
+Zero new plan model kinds.
 
 ---
 
-## DSL In Every Context
+## Implementation
 
-```csharp
-// CONDITIONS
-p.When(p.Plugin<bool>("auth", "isAdmin")).Truthy()
- .Then(t => t.Element("admin-panel").Show());
+### Task 1: PluginSource
 
-// SETTEXT
-p.Element("theme").SetText(p.Plugin<string>("userPrefs", "theme"));
-
-// HEADERS
-p.Header("Authorization", p.Plugin<string>("auth", "getToken"))
-
-// GATHER
-g.Plugin("auth", "getToken", "token")
-
-// ROUTE PARAMS
-g.RouteParam("tenantId", p.Plugin<int>("auth", "getTenantId"))
-
-// READ WITH ARGS
-p.Element("name").SetText(
-    p.PluginRead<string>("auth", "format")
-     .Arg(firstNameTextBox.Value())
-     .Arg(lastNameTextBox.Value()));
-
-// VOID CALL
-p.PluginCall("logger", "flush");
-p.PluginCall("analytics", "trackEvent")
- .Arg(p.Plugin<string>("auth", "getUserId"));
-
-// COMPOSITION — all sources in one request
-p.Get("/api/facilities/{id}/residents")
- .Gather(g => g
-     .RouteParam("id", p.Plugin<int>("auth", "getTenantId"))
-     .Header("Authorization", p.Plugin<string>("auth", "getToken"))
-     .FromUrl("status")
-     .Include<FusionDropDownList, Model>(m => m.Filter));
-```
-
----
-
-## Architecture
-
-### Source Resolution
-
-| Source | Resolution | Member Access | JsType? |
-|---|---|---|---|
-| ComponentSource | DOM → vendor root | JsType walkPath | Yes |
-| PayloadSource | ExecContext scope | walk() dot-path | No |
-| UrlSource | URLSearchParams | params.get(member) | No |
-| **PluginSource** | **Registry lookup** | **JsType walkPath** | **Yes** |
-
-### JsType Auto-Registration
-
-`p.Plugin<T>("auth", "getToken")` auto-registers the member on `plan.types["plugin.auth"]`. Shape from `<T>` via `Shape.FromClrType(typeof(T))` — internal. No separate `RegisterPlugin` call needed. The DSL usage IS the type declaration.
-
-First call creates the JsType. Subsequent calls for the same plugin add members. Shape conflicts detected via `ShapeCompat.Resolve` (JsType.cs:73).
-
-### Encapsulation
-
-- `PluginSource`: public sealed class, private constructor, internal factory `Of(name)`
-- `TypedPluginSource<T>`: public sealed, extends `TypedSource<T>`, internal constructor
-- `PluginReadBuilder<T>`: public, `.Arg<TArg>(TypedSource<TArg>)` calls internal `.ToValueProducer()`
-- `PluginCallBuilder`: public, `.Arg<TArg>(TypedSource<TArg>)` calls internal `.ToValueProducer()`
-- Shape: stays internal — `<T>` generics carry type info
-- ValueProducer: stays internal — builders create them
-- Plugin registry: internal module, `registerPlugin` internal function
-
-### Mutation Rules
-
-- **Read** (evaluateValue): property read or method call (zero-arg or with-args via ReadProducer.args) → returns value
-- **Call** (executeCall): method with args → void. `execute.ts` Call guard ALLOWS PluginSource
-- **Set** (executeSet): NOT supported. `execute.ts` Set guard REJECTS PluginSource
-
-### Polymorphic Serialization
-
-`WriteOnlyPolymorphicConverter<Source>` dispatches on `value.GetType()`. Zero converter changes for PluginSource.
-
----
-
-## Step-by-Step Implementation
-
-### Task 1: C# — PluginSource
-
-**File:** `Alis.Reactive/PlanModel/Source.cs` — after UrlSource:
+**File:** `Alis.Reactive/PlanModel/Source.cs`
 
 ```csharp
 public sealed class PluginSource : Source
@@ -197,229 +122,181 @@ public sealed class PluginSource : Source
 }
 ```
 
-### Task 2: C# — PlanBuildContext.EnsurePluginMember
+Polymorphic serialization via `WriteOnlyPolymorphicConverter<Source>` — zero changes.
 
-**File:** `Alis.Reactive/PlanModel/PlanBuildContext.cs`:
+### Task 2: PlanBuildContext.EnsurePluginMethod
+
+**File:** `Alis.Reactive/PlanModel/PlanBuildContext.cs`
 
 ```csharp
-internal string EnsurePluginMember(string pluginName, string member, Shape shape, bool isMethod)
+internal void EnsurePluginMethod(string pluginName, string member, Shape returns = null)
+{
+    if (string.IsNullOrWhiteSpace(pluginName))
+        throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+    if (string.IsNullOrWhiteSpace(member))
+        throw new System.ArgumentException("Method name required.", nameof(member));
+    var typeKey = "plugin." + pluginName;
+    if (!_plan.MutableTypes.ContainsKey(typeKey))
+        _plan.MutableTypes[typeKey] = new JsType();
+    _plan.MutableTypes[typeKey].WithMethod(member, Path.Parse(member), returns: returns);
+}
+```
+
+Methods only. `returns` is null for void calls. JsType auto-created on first use. `WithMethod` (JsType.cs:53) handles re-registration.
+
+### Task 3: TypedPluginSource<T>
+
+**File:** `Alis.Reactive/Builders/Conditions/TypedPluginSource.cs`
+
+```csharp
+public sealed class TypedPluginSource<TProp> : TypedSource<TProp>
+{
+    private readonly string _pluginName;
+    private readonly string _member;
+    private readonly List<ValueProducer> _args;
+
+    internal TypedPluginSource(string pluginName, string member, List<ValueProducer> args = null)
+    {
+        _pluginName = pluginName;
+        _member = member;
+        _args = args;
+    }
+
+    internal override ValueProducer ToValueProducer() =>
+        ValueProducer.Read(PluginSource.Of(_pluginName), _member, shape: Shape, args: _args);
+}
+```
+
+Extends `TypedSource<T>` — plugs into conditions, SetText, headers, route params. Args from ReadProducer.args (cfdefa66).
+
+### Task 4: PluginReadBuilder<T> (for .Arg on reads)
+
+**File:** `Alis.Reactive/Builders/PluginReadBuilder.cs`
+
+```csharp
+public sealed class PluginReadBuilder<TReturn, TModel> where TModel : class
+{
+    private readonly string _pluginName;
+    private readonly string _member;
+    private readonly List<ValueProducer> _args = new List<ValueProducer>();
+
+    internal PluginReadBuilder(string pluginName, string member)
+    {
+        _pluginName = pluginName;
+        _member = member;
+    }
+
+    public PluginReadBuilder<TReturn, TModel> Arg<TArg>(TypedSource<TArg> source)
+    {
+        if (source == null) throw new System.ArgumentNullException(nameof(source));
+        _args.Add(source.ToValueProducer());
+        return this;
+    }
+
+    public static implicit operator TypedPluginSource<TReturn>(
+        PluginReadBuilder<TReturn, TModel> b) =>
+        new TypedPluginSource<TReturn>(b._pluginName, b._member, b._args);
+}
+```
+
+Implicit conversion — no `.Build()` needed. Each `.Arg<T>()` independently generic, calls internal `.ToValueProducer()`.
+
+### Task 5: PluginCallBuilder (for void calls)
+
+**File:** `Alis.Reactive/Builders/PluginCallBuilder.cs`
+
+```csharp
+public sealed class PluginCallBuilder<TModel> where TModel : class
+{
+    private readonly string _pluginName;
+    private readonly string _method;
+    private readonly IReactionEmitter _emitter;
+    private readonly List<ValueProducer> _args = new List<ValueProducer>();
+    private bool _emitted;
+
+    internal PluginCallBuilder(string pluginName, string method, IReactionEmitter emitter)
+    {
+        _pluginName = pluginName;
+        _method = method;
+        _emitter = emitter;
+    }
+
+    public PluginCallBuilder<TModel> Arg<TArg>(TypedSource<TArg> source)
+    {
+        if (source == null) throw new System.ArgumentNullException(nameof(source));
+        _args.Add(source.ToValueProducer());
+        return this;
+    }
+
+    internal void Emit()
+    {
+        if (_emitted) return;
+        _emitted = true;
+        _emitter.AddStep(Reaction.Call(
+            PluginSource.Of(_pluginName), _method,
+            _args.Count > 0 ? _args : null));
+    }
+}
+```
+
+`PipelineBuilder.Plugin(name, member)` creates the builder AND calls `Emit()` for zero-arg case. For `.Arg()` chains, `PipelineBuilder` defers emit — the builder is tracked and emitted when the next pipeline step starts or at build time.
+
+### Task 6: PipelineBuilder.Plugin overloads
+
+**File:** `Alis.Reactive/Builders/PipelineBuilder.cs`
+
+```csharp
+/// <summary>Reads a plugin method return value. Use .Arg() for args.</summary>
+public PluginReadBuilder<T, TModel> Plugin<T>(string pluginName, string member)
 {
     if (string.IsNullOrWhiteSpace(pluginName))
         throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
     if (string.IsNullOrWhiteSpace(member))
         throw new System.ArgumentException("Member name required.", nameof(member));
-
-    var typeKey = "plugin." + pluginName;
-    if (!_plan.MutableTypes.ContainsKey(typeKey))
-        _plan.MutableTypes[typeKey] = new JsType();
-
-    var jsType = _plan.MutableTypes[typeKey];
-    if (isMethod)
-        jsType.WithMethod(member, Path.Parse(member), returns: shape);
-    else
-        jsType.WithProperty(member, Path.Parse(member), shape, "read");
-
-    return typeKey;
-}
-
-internal void EnsurePluginMethod(string pluginName, string method)
-{
-    if (string.IsNullOrWhiteSpace(pluginName))
-        throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-    if (string.IsNullOrWhiteSpace(method))
-        throw new System.ArgumentException("Method name required.", nameof(method));
-
-    var typeKey = "plugin." + pluginName;
-    if (!_plan.MutableTypes.ContainsKey(typeKey))
-        _plan.MutableTypes[typeKey] = new JsType();
-
-    // Void method — no returns shape, path only
-    _plan.MutableTypes[typeKey].WithMethod(method, Path.Parse(method));
-}
-```
-
-Auto-creates JsType on first use. `ShapeCompat.Resolve` in `JsType.WithProperty/WithMethod` handles re-registration with compatible shapes.
-
-### Task 3: C# — TypedPluginSource<T>
-
-**New file:** `Alis.Reactive/Builders/Conditions/TypedPluginSource.cs`:
-
-```csharp
-using System.Collections.Generic;
-using Alis.Reactive.PlanModel;
-
-namespace Alis.Reactive.Builders.Conditions
-{
-    public sealed class TypedPluginSource<TProp> : TypedSource<TProp>
-    {
-        private readonly string _pluginName;
-        private readonly string _member;
-        private readonly List<ValueProducer> _args;
-
-        internal TypedPluginSource(string pluginName, string member, List<ValueProducer> args = null)
-        {
-            _pluginName = pluginName;
-            _member = member;
-            _args = args;
-        }
-
-        internal override ValueProducer ToValueProducer() =>
-            ValueProducer.Read(PluginSource.Of(_pluginName), _member, shape: Shape, args: _args);
-    }
-}
-```
-
-### Task 4: C# — PluginReadBuilder<T> and PluginCallBuilder
-
-**New file:** `Alis.Reactive/Builders/PluginReadBuilder.cs`:
-
-```csharp
-using System.Collections.Generic;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.PlanModel;
-
-namespace Alis.Reactive.Builders
-{
-    public sealed class PluginReadBuilder<TReturn, TModel> where TModel : class
-    {
-        private readonly string _pluginName;
-        private readonly string _member;
-        private readonly List<ValueProducer> _args = new List<ValueProducer>();
-
-        internal PluginReadBuilder(string pluginName, string member)
-        {
-            _pluginName = pluginName;
-            _member = member;
-        }
-
-        public PluginReadBuilder<TReturn, TModel> Arg<TArg>(TypedSource<TArg> source)
-        {
-            if (source == null) throw new System.ArgumentNullException(nameof(source));
-            _args.Add(source.ToValueProducer());
-            return this;
-        }
-
-        public static implicit operator TypedPluginSource<TReturn>(PluginReadBuilder<TReturn, TModel> builder) =>
-            new TypedPluginSource<TReturn>(builder._pluginName, builder._member, builder._args);
-    }
-}
-```
-
-**New file:** `Alis.Reactive/Builders/PluginCallBuilder.cs`:
-
-```csharp
-using System.Collections.Generic;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.PlanModel;
-
-namespace Alis.Reactive.Builders
-{
-    public sealed class PluginCallBuilder<TModel> where TModel : class
-    {
-        private readonly string _pluginName;
-        private readonly string _method;
-        private readonly IReactionEmitter _emitter;
-        private readonly List<ValueProducer> _args = new List<ValueProducer>();
-
-        internal PluginCallBuilder(string pluginName, string method, IReactionEmitter emitter)
-        {
-            _pluginName = pluginName;
-            _method = method;
-            _emitter = emitter;
-        }
-
-        public PluginCallBuilder<TModel> Arg<TArg>(TypedSource<TArg> source)
-        {
-            if (source == null) throw new System.ArgumentNullException(nameof(source));
-            _args.Add(source.ToValueProducer());
-            return this;
-        }
-
-        /// <summary>Emits the CallReaction. Called automatically when chaining ends.</summary>
-        internal void Emit()
-        {
-            _emitter.AddStep(Reaction.Call(
-                PluginSource.Of(_pluginName), _method,
-                _args.Count > 0 ? _args : null));
-        }
-    }
-}
-```
-
-Note: `PluginCallBuilder.Emit()` needs to be called. Options: (a) explicit `.Fire()`, (b) called by PipelineBuilder after the builder chain. Simplest: the `PluginCall` method on PipelineBuilder returns the builder AND emits immediately for zero-arg case, or the caller chains `.Arg()` then builder emits on dispose/finalize. **For clarity, use explicit `.Fire()`:**
-
-```csharp
-p.PluginCall("analytics", "trackEvent").Arg(source).Fire();
-p.PluginCall("logger", "flush").Fire();
-```
-
-Update PluginCallBuilder:
-```csharp
-public void Fire()
-{
-    _emitter.AddStep(Reaction.Call(
-        PluginSource.Of(_pluginName), _method,
-        _args.Count > 0 ? _args : null));
-}
-```
-
-### Task 5: C# — PipelineBuilder.Plugin / PluginRead / PluginCall
-
-**File:** `Alis.Reactive/Builders/PipelineBuilder.cs`:
-
-```csharp
-/// <summary>Reads a plugin member value. Zero-arg method or property.</summary>
-public Conditions.TypedPluginSource<T> Plugin<T>(string pluginName, string member)
-{
     var shape = PlanModel.Shape.FromClrType(typeof(T));
-    Context.EnsurePluginMember(pluginName, member, shape, isMethod: true);
-    return new Conditions.TypedPluginSource<T>(pluginName, member);
-}
-
-/// <summary>Reads a plugin method with args. Use .Arg() to pass values.</summary>
-public PluginReadBuilder<T, TModel> PluginRead<T>(string pluginName, string member)
-{
-    var shape = PlanModel.Shape.FromClrType(typeof(T));
-    Context.EnsurePluginMember(pluginName, member, shape, isMethod: true);
+    Context.EnsurePluginMethod(pluginName, member, returns: shape);
     return new PluginReadBuilder<T, TModel>(pluginName, member);
 }
 
-/// <summary>Calls a plugin method (void). Use .Arg() then .Fire().</summary>
-public PluginCallBuilder<TModel> PluginCall(string pluginName, string method)
+/// <summary>Calls a plugin method (void). Use .Arg() for args.</summary>
+public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
 {
-    Context.EnsurePluginMethod(pluginName, method);
-    return new PluginCallBuilder<TModel>(pluginName, method, this);
+    if (string.IsNullOrWhiteSpace(pluginName))
+        throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+    if (string.IsNullOrWhiteSpace(member))
+        throw new System.ArgumentException("Member name required.", nameof(member));
+    Context.EnsurePluginMethod(pluginName, member);
+    return new PluginCallBuilder<TModel>(pluginName, member, this);
 }
 ```
 
-### Task 6: C# — GatherBuilder.Plugin
+### Task 7: GatherBuilder.Plugin
 
-**File:** `Alis.Reactive/Builders/Requests/GatherBuilder.cs`:
+**File:** `Alis.Reactive/Builders/Requests/GatherBuilder.cs`
 
 ```csharp
-public GatherBuilder<TModel> Plugin(string pluginName, string member, string paramName)
+public GatherBuilder<TModel> Plugin<T>(string pluginName, string member, string paramName)
 {
+    if (string.IsNullOrWhiteSpace(pluginName))
+        throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+    if (string.IsNullOrWhiteSpace(member))
+        throw new System.ArgumentException("Member name required.", nameof(member));
     if (string.IsNullOrWhiteSpace(paramName))
         throw new System.ArgumentException("HTTP parameter name required.", nameof(paramName));
-    _context.EnsurePluginMember(pluginName, member, Shape.Any, isMethod: true);
-    var value = ValueProducer.Read(PluginSource.Of(pluginName), member);
+    var shape = Shape.FromClrType(typeof(T));
+    _context.EnsurePluginMethod(pluginName, member, returns: shape);
+    var value = ValueProducer.Read(PluginSource.Of(pluginName), member, shape: shape);
     Fields.Add(GatherField.Of(paramName, value));
     return this;
 }
 ```
 
-Note: `Shape.Any` here because gather serializes via `evaluateValue` → `formatForWire` using the JsType's shape. The gather field doesn't need its own shape.
+Generic `<T>` — shape carried. No `Shape.Any`.
 
-### Task 7: Schema — PluginSource
+### Task 8: Schema — PluginSource
 
-**File:** `Alis.Reactive/Schemas/reactive-plan.schema.json`:
+Add to Source oneOf + definition:
 
-Add to Source oneOf:
-```json
-{ "$ref": "#/$defs/PluginSource" }
-```
-
-Add definition:
 ```json
 "PluginSource": {
   "type": "object",
@@ -432,29 +309,23 @@ Add definition:
 }
 ```
 
-### Task 8: TS Types — PluginSource
-
-**File:** `Scripts/types/plan.ts`:
+### Task 9: TS Types — PluginSource
 
 ```typescript
 export type Source = ComponentSource | PayloadSource | UrlSource | PluginSource;
-
-export interface PluginSource {
-  kind: "plugin";
-  name: string;
-}
+export interface PluginSource { kind: "plugin"; name: string; }
 ```
 
-### Task 9: TS Runtime — Plugin registry
+### Task 10: TS — Plugin registry
 
-**New file:** `Scripts/core/plugin-registry.ts`:
+**New file:** `Scripts/core/plugin-registry.ts`
 
 ```typescript
 const plugins = new Map<string, unknown>();
 
 export function registerPlugin(name: string, instance: unknown): void {
   if (!name || !name.trim()) throw new Error("[alis] plugin name required");
-  if (instance == null) throw new Error(`[alis] plugin "${name}" instance must not be null`);
+  if (instance == null) throw new Error(`[alis] plugin "${name}" must not be null`);
   if (typeof instance !== "object") throw new Error(`[alis] plugin "${name}" must be an object`);
   if (plugins.has(name)) throw new Error(`[alis] plugin "${name}" already registered`);
   plugins.set(name, instance);
@@ -467,41 +338,38 @@ export function resolvePlugin(name: string): unknown {
 }
 ```
 
-### Task 10: TS Runtime — resolver.ts
+### Task 11: TS — resolver.ts
 
 Add `case "plugin": return resolvePlugin(source.name);` to resolveSource.
 
-Update getJsTypeForSource:
-```typescript
-case "plugin": {
-  const typeKey = "plugin." + source.name;
-  const jsType = plan.types[typeKey];
-  if (!jsType) throw new Error(`[alis] type not found for plugin: "${source.name}"`);
-  return jsType;
-}
-```
+Update getJsTypeForSource for `"plugin"` kind: `plan.types["plugin." + source.name]`.
 
-### Task 11: TS Runtime — evaluate.ts
+### Task 12: TS — evaluate.ts
 
-Widen component branch: `if (producer.from.kind === "component" || producer.from.kind === "plugin")`.
+Widen: `if (producer.from.kind === "component" || producer.from.kind === "plugin")`.
 
-Fix error message for plugin source kind.
+Fix error message for plugin source kind. ReadProducer.args already handled by `cfdefa66`.
 
-Note: ReadProducer.args already handled by `cfdefa66` — evaluateValue passes `producer.args` to callMethod.
+### Task 13: TS — execute.ts
 
-### Task 12: TS Runtime — execute.ts
-
-Update `executeCall` guard to allow `"plugin"`. `executeSet` remains unchanged — rejects plugins.
+`executeCall` guard allows `"plugin"`. `executeSet` unchanged — rejects plugin.
 
 Fix trace target for plugin source kind.
 
-### Task 13: TS Runtime — root.ts queue drain
+### Task 14: TS — root.ts drain
 
-Add ~5 lines at top of root.ts to drain `window.__alisPlugins`.
+```typescript
+import { registerPlugin } from "./core/plugin-registry";
+const pending = (window as any).__alisPlugins as Array<{ name: string; instance: unknown }> | undefined;
+if (pending) {
+  for (const entry of pending) registerPlugin(entry.name, entry.instance);
+  delete (window as any).__alisPlugins;
+}
+```
 
-### Task 14: Sandbox
+### Task 15: Sandbox
 
-**sandbox-plugins.ts** → builds to `wwwroot/js/sandbox-plugins.js`:
+**sandbox-plugins.ts** → `wwwroot/js/sandbox-plugins.js`:
 
 ```typescript
 ((window as any).__alisPlugins ??= []).push({
@@ -510,87 +378,82 @@ Add ~5 lines at top of root.ts to drain `window.__alisPlugins`.
 });
 ((window as any).__alisPlugins ??= []).push({
   name: "userPrefs",
-  instance: { theme: "dark", locale: "en-US" }
+  instance: { getTheme: () => "dark" }
 });
 ```
 
-**View sections 23-25** use `p.Plugin<T>()`, `p.PluginCall()`, conditions, SetText, gather+header.
-
-**Controller** echoes plugin values back for Playwright verification.
+**Sections 23-25:** Read in SetText/condition, read in gather+header, void call.
 
 ---
 
 ## Tests
 
-### C# Unit Tests (20) — `WhenUsingPlugins.cs`
+### C# Unit Tests (18) — `WhenUsingPlugins.cs`
 
 | Test | What It Proves |
 |---|---|
-| `plugin_read_produces_read_with_plugin_source` | from: { kind: "plugin" } + AssertSchemaValid |
-| `plugin_string_carries_string_shape` | shape: { kind: "string" } |
-| `plugin_int_carries_number_shape` | shape: { kind: "number" } |
-| `plugin_bool_carries_boolean_shape` | shape: { kind: "boolean" } |
-| `plugin_in_condition_produces_compare` | CompareCondition with plugin read |
-| `plugin_in_set_text_produces_set_reaction` | SetReaction with plugin read |
-| `plugin_in_header_produces_header_value` | headers value is plugin read |
-| `plugin_in_gather_produces_gather_field` | GatherField with plugin source |
-| `plugin_in_route_param_composes` | route param value is plugin read |
-| `plugin_read_with_args_includes_args` | ReadProducer.args has ValueProducers |
-| `plugin_call_produces_call_reaction` | CallReaction with plugin source |
-| `plugin_call_with_args_includes_args` | CallReaction.args has ValueProducers |
+| `plugin_read_produces_plugin_source` | from: { kind: "plugin" } + AssertSchemaValid |
+| `plugin_string_read_carries_shape` | shape: { kind: "string" } |
+| `plugin_int_read_carries_shape` | shape: { kind: "number" } |
+| `plugin_bool_read_carries_shape` | shape: { kind: "boolean" } |
+| `plugin_read_in_condition` | CompareCondition with plugin read |
+| `plugin_read_in_set_text` | SetReaction with plugin read |
+| `plugin_read_in_header` | headers value is plugin read |
+| `plugin_read_in_route_param` | route param is plugin read |
+| `plugin_read_with_args` | ReadProducer.args present |
+| `plugin_void_call_produces_call_reaction` | CallReaction with PluginSource |
+| `plugin_void_call_with_args` | CallReaction.args present |
+| `plugin_gather_carries_shape` | GatherField with shape from `<T>` |
 | `plugin_auto_registers_jstype` | plan.types["plugin.auth"] created |
-| `plugin_second_member_adds_to_jstype` | same JsType gets two members |
-| `plan_without_plugins_has_no_plugin_kind` | JSON does NOT contain "plugin" |
+| `plan_without_plugins_clean` | no "plugin" in JSON |
 | `empty_plugin_name_throws` | ArgumentException |
-| `empty_member_name_throws` | ArgumentException |
-| `null_arg_source_throws` | ArgumentNullException |
+| `empty_member_throws` | ArgumentException |
+| `null_arg_throws` | ArgumentNullException |
 | `empty_gather_param_throws` | ArgumentException |
-| `plugin_read_composes_with_all_sources` | route param + header + gather + plugin in one request |
 
 ### Playwright Tests (6) — `WhenPluginsProvideValues.cs`
 
 | Test | Assert |
 |---|---|
-| `plugin_property_displayed_in_element` | `#plugin-theme` → "dark" |
+| `plugin_read_displayed_in_element` | `#plugin-theme` → "dark" |
 | `plugin_condition_shows_admin_panel` | `#plugin-admin-panel` visible |
-| `plugin_gather_sends_token_to_server` | `#plugin-echo-token` has value |
-| `plugin_header_reaches_server` | `#plugin-echo-theme` → "dark" |
-| `plugin_call_fires_without_error` | No console errors after void call |
-| `plugin_gather_applies_success_class` | `#plugin-echo-result` green |
+| `plugin_gather_sends_token` | `#plugin-echo-token` has value |
+| `plugin_header_reaches_server` | `#plugin-echo-header` → value |
+| `plugin_void_call_no_errors` | no console errors |
+| `plugin_gather_success_class` | `#plugin-result` green |
 
 ### vitest Tests (8) — `plugin-registry.test.ts` + `evaluate-plugin.test.ts`
 
 | Test | What It Proves |
 |---|---|
-| `registerPlugin stores and resolvePlugin retrieves` | Round-trip |
-| `duplicate registration throws` | Error |
+| `registerPlugin round-trip` | store + resolve |
+| `duplicate throws` | Error |
 | `null instance throws` | Error |
 | `whitespace name throws` | Error |
-| `plugin property read via JsType walkPath` | evaluateValue reads root.theme |
-| `plugin method read calls zero-arg function` | evaluateValue calls root.getToken() |
-| `plugin method read with args passes evaluated args` | evaluateValue passes args to callMethod |
+| `plugin method zero-arg read` | evaluateValue calls method, returns value |
+| `plugin method with args` | evaluateValue passes args to callMethod |
 | `plugin missing member throws` | Error |
+| `getJsTypeForSource finds plugin type` | plan.types["plugin.name"] |
 
 ---
 
-## Verification Checklist
+## Checklist
 
 - [ ] `dotnet build` — 0 errors
 - [ ] `npm run typecheck` — clean
 - [ ] `npm run build` — bundle builds
-- [ ] Schema validates PluginSource (`additionalProperties: false`, name pattern `^\S+$`)
-- [ ] JsType auto-created by `p.Plugin<T>()` usage
-- [ ] Plugin property read works (conditions, SetText, gather, headers, route params)
-- [ ] Plugin zero-arg method read works
-- [ ] Plugin read with args passes args to callMethod
-- [ ] Plugin void call works (CallReaction)
-- [ ] Plugin void call with args works
-- [ ] Missing plugin throws at runtime (fail-fast)
-- [ ] Shape flows from `<T>` through plan JSON through TS runtime
-- [ ] No inline JavaScript in views
-- [ ] No internal leaks (Shape, ValueProducer stay internal)
-- [ ] execute.ts Set guard rejects PluginSource; Call guard allows PluginSource
-- [ ] All 20 C# unit tests pass
+- [ ] Schema validates PluginSource
+- [ ] JsType auto-created by DSL usage (methods only)
+- [ ] `p.Plugin<T>()` read works in conditions, SetText, headers, gather, route params
+- [ ] `p.Plugin<T>().Arg()` passes args via ReadProducer.args
+- [ ] `p.Plugin()` void call emits CallReaction
+- [ ] `p.Plugin().Arg()` void call with args
+- [ ] `g.Plugin<T>()` gather carries shape from `<T>`
+- [ ] Missing plugin throws at runtime
+- [ ] Shape stays internal, ValueProducer stays internal
+- [ ] execute.ts Set rejects plugin; Call allows plugin
+- [ ] No inline JS in views
+- [ ] All 18 C# unit tests pass
 - [ ] All 8 vitest tests pass
 - [ ] All 6 Playwright tests pass
-- [ ] All existing 808+ Playwright tests pass (no regressions)
+- [ ] All existing 808+ Playwright tests pass
