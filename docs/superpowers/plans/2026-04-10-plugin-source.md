@@ -62,13 +62,16 @@ Plugins bundle SEPARATELY from the framework. They register via a passive push-a
 });
 ```
 
-**Script order in HTML — ANY order works:**
+**Script order in HTML — plugins BEFORE framework (recommended):**
 ```html
-<!-- Either order is fine — the array is a passive queue -->
+<!-- Plugins push to the passive queue first -->
 <script type="module" src="~/js/plugins.js"></script>
+<!-- Framework drains the queue at module-level, then boots -->
 <script type="module" src="~/js/alis-reactive.js"></script>
 @Html.RenderPlan(plan)
 ```
+
+Module scripts execute in document order. Plugins push first, framework drains second. While the push-array technically tolerates any order (the array exists regardless), the recommended order ensures plugins are registered before boot with no timing ambiguity.
 
 **Framework drains the queue at boot** (`root.ts`):
 ```typescript
@@ -410,11 +413,18 @@ public Conditions.TypedPluginSource<string> Plugin(string pluginName, string mem
 public Conditions.TypedPluginSource<T> Plugin<T>(string pluginName, string member)
 {
     Context.ValidatePluginMember(pluginName, member);
+    // Validate shape compatibility — T must match declared JsType shape
+    var declaredShape = Context.GetPluginMemberShape(pluginName, member);
+    var requestedShape = PlanModel.Shape.FromClrType(typeof(T));
+    if (PlanModel.ShapeCompat.Resolve(declaredShape, requestedShape) == null)
+        throw new System.InvalidOperationException(
+            $"Plugin '{pluginName}' member '{member}' is declared as shape '{declaredShape.Kind}' " +
+            $"but Plugin<{typeof(T).Name}>() requests shape '{requestedShape.Kind}'. Types must be compatible.");
     return new Conditions.TypedPluginSource<T>(pluginName, member);
 }
 ```
 
-**Build-time validation:** `ValidatePluginMember` checks the JsType exists AND the member is declared. Missing plugin → throw. Missing member → throw.
+**Build-time validation:** `ValidatePluginMember` checks the JsType exists AND the member is declared. `ShapeCompat.Resolve` validates `T` matches the declared shape. Missing plugin → throw. Missing member → throw. Incompatible shape → throw.
 
 ### Task 7: C# Builder — GatherBuilder.Plugin()
 
