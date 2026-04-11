@@ -86,7 +86,7 @@ Two separate overloads for response body vs event args — matching `ElementBuil
 .Arg(long value)
 ```
 
-C# overload resolution: `ResponseBody<T>` overload matches first for response payloads (has `where TResponse : class` constraint). Generic `TArgs` overload matches for event args. No ambiguity.
+C# overload resolution: `ResponseBody<TResponse>` is more specific than bare `TArgs` — the compiler prefers the more specific parameter type, not the constraint. Generic `TArgs` overload matches for event args (non-ResponseBody types). Same pattern as `ElementBuilder.SetText` overloads at lines 56/66.
 
 ### Plan Model Mapping
 
@@ -108,13 +108,12 @@ C# overload resolution: `ResponseBody<T>` overload matches first for response pa
 ```csharp
 public static string ToResponsePath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
 {
-    // Same implementation as ToEventPath<TSource, TProp> but for response paths
-    return ToResponsePath((Expression<Func<TSource, object?>>)
-        Expression.Lambda(Expression.Convert(expression.Body, typeof(object)), expression.Parameters));
+    var members = ExtractMemberChain(expression.Body);
+    return string.Join(".", members);
 }
 ```
 
-Matches `ToEventPath<TSource, TProp>` at line 70. Required for `.Arg(json, x => x.Count)` where `Count` is a value type.
+Same pattern as `ToEventPath<TSource, TProp>` at line 70-73. `ExtractMemberChain` already handles `Convert` unwrapping. Required for `.Arg(json, x => x.Count)` where `Count` is a value type.
 
 ### Task 1: PluginSource
 
@@ -232,7 +231,7 @@ public sealed class PluginReadBuilder<TReturn, TModel> where TModel : class
 
 **File:** `Builders/PluginCallBuilder.cs`:
 
-Same `.Arg()` overloads. `.Fire()` emits the CallReaction:
+`.Arg()` overloads return `PluginCallBuilder<TModel>` (NOT `PluginReadBuilder`). `.Fire()` emits the CallReaction. All new public types require `/// <summary>` XML docs (CS1591 is enabled).
 
 ```csharp
 public sealed class PluginCallBuilder<TModel> where TModel : class
@@ -463,7 +462,7 @@ Navigate to `/Sandbox/Plugins/ArrayManager`. Wait for `#arr-total` ≠ "—".
 - [ ] `p.Plugin().Fire()` void call emits CallReaction
 - [ ] `p.Plugin().Arg().Fire()` void with args
 - [ ] `g.Plugin(typedPluginSource, "paramName")` gather with plugin source
-- [ ] `executeCall` allows plugin, resolves via getJsTypeForSource
+- [ ] `executeCall` allows plugin — payload branch (line 232) unchanged, plugins fall through to JsType path (line 242)
 - [ ] `executeSet` rejects plugin
 - [ ] Shape/ValueProducer stay internal
 - [ ] `.Fire()` explicit — no deferred emission
