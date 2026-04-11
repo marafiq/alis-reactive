@@ -62,16 +62,18 @@ Plugins bundle SEPARATELY from the framework. They register via a passive push-a
 });
 ```
 
-**Script order in HTML — plugins BEFORE framework (recommended):**
+**Script order in HTML — plugins MUST load BEFORE framework:**
 ```html
-<!-- Plugins push to the passive queue first -->
+<!-- Plugins push to the passive queue FIRST -->
 <script type="module" src="~/js/plugins.js"></script>
 <!-- Framework drains the queue at module-level, then boots -->
 <script type="module" src="~/js/alis-reactive.js"></script>
 @Html.RenderPlan(plan)
 ```
 
-Module scripts execute in document order. Plugins push first, framework drains second. While the push-array technically tolerates any order (the array exists regardless), the recommended order ensures plugins are registered before boot with no timing ambiguity.
+**This order is REQUIRED, not optional.** Module scripts execute in document order. `root.ts` drains `window.__alisPlugins` at module-level (before `initConfirm()`, before plan parsing, before `boot()`). If plugins.js loads AFTER alis-reactive.js, the queue is empty when drained — plugins register after boot and DomReady behaviors can't resolve them.
+
+The push-array pattern makes the queue ORDER-TOLERANT for pushes (multiple plugin scripts can load in any order relative to each other), but the framework drain MUST happen after all pushes. This is guaranteed by placing plugins.js before alis-reactive.js in the HTML.
 
 **Framework drains the queue at boot** (`root.ts`):
 ```typescript
@@ -261,8 +263,8 @@ internal void ValidatePluginMember(string pluginName, string member)
     if (!_plan.MutableTypes.TryGetValue(typeKey, out var jsType))
         throw new InvalidOperationException(
             $"Plugin '{pluginName}' is not registered. Call plan.RegisterPlugin(\"{pluginName}\", ...) first.");
-    var hasProp = jsType.Properties?.ContainsKey(member) == true;
-    var hasMethod = jsType.Methods?.ContainsKey(member) == true;
+    var hasProp = jsType.Properties != null && jsType.Properties.ContainsKey(member);
+    var hasMethod = jsType.Methods != null && jsType.Methods.ContainsKey(member);
     if (!hasProp && !hasMethod)
         throw new InvalidOperationException(
             $"Member '{member}' is not declared on plugin '{pluginName}'. " +
@@ -276,12 +278,12 @@ internal Shape GetPluginMemberShape(string pluginName, string member)
     ValidatePluginMember(pluginName, member);
     var typeKey = "plugin." + pluginName;
     var jsType = _plan.MutableTypes[typeKey];
-    var prop = jsType.Properties?.GetValueOrDefault(member);
-    if (prop != null) return prop.Shape;
-    var method = jsType.Methods?.GetValueOrDefault(member);
-    if (method?.Returns != null) return method.Returns;
+    if (jsType.Properties != null && jsType.Properties.TryGetValue(member, out var prop))
+        return prop.Shape;
+    if (jsType.Methods != null && jsType.Methods.TryGetValue(member, out var method) && method.Returns != null)
+        return method.Returns;
     // ValidatePluginMember guarantees member exists — this is unreachable
-    throw new InvalidOperationException($"[alis] Plugin '{pluginName}' member '{member}' has no shape — this should be unreachable.");
+    throw new InvalidOperationException($"[alis] Plugin '{pluginName}' member '{member}' has no shape �� this should be unreachable.");
 }
 ```
 
