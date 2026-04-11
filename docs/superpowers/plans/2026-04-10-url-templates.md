@@ -472,8 +472,9 @@ Every overload has a dedicated test. Every guard path has a test. Every composit
 | `whitespace_param_name_throws_at_build_time` | name validation rejects whitespace |
 | `hyphenated_param_name_throws_at_build_time` | name validation rejects `resident-id` — grammar must match runtime `\w+` regex |
 | `datetime_typed_source_carries_date_shape` | TypedComponentSource<DateTime> → shape: { kind: "date" } — proves formatForWire will produce ISO |
+| `null_typed_source_throws_at_build_time` | null TypedSource → ArgumentNullException |
 
-### Task 9: Playwright tests — `WhenRouteParamsResolve.cs`
+### Task 9: Playwright tests (10 tests) — `WhenRouteParamsResolve.cs`
 
 **File:** `tests/Alis.Reactive.PlaywrightTests/HttpPipeline/WhenRouteParamsResolve.cs`
 
@@ -535,6 +536,7 @@ Navigate to `/Sandbox/HttpPipeline/Http`, wait for boot + DomReady GET.
 - [ ] Param name not matching URL placeholder throws at build time
 - [ ] Route params compose with Include<> body fields in same Gather
 - [ ] Gather() required — no Gather = no route params (natural DSL enforcement)
-- [ ] All C# unit tests pass (15 per-overload + guard + composition tests)
-- [ ] All Playwright tests pass (4 end-to-end scenarios)
+- [ ] All 19 C# unit tests pass (Task 8: per-overload + guards + composition)
+- [ ] All 6 vitest tests pass (Task 6b: resolveRouteParams)
+- [ ] All 10 Playwright tests pass (Task 9: 4 sections)
 - [ ] All existing 789+ Playwright tests pass (no regressions)
