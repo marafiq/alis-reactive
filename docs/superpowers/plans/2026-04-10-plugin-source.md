@@ -94,7 +94,7 @@ delete (window as any).__alisPlugins; // clean up — queue no longer needed
 
 **Why two parts?** The plan is the contract (Rule 1). The plan declares WHAT the plugin has (JsType metadata). The TS module provides the actual object. If the JS object doesn't match the declared JsType, the runtime fails fast (member not found → throw).
 
-**Framework hook:** `registerPlugin` is the ONLY API the framework provides for plugin registration. It's exported from `root.ts`. The dev calls it in their own TS code. The framework doesn't scan, discover, or auto-load plugins — the dev explicitly registers them. This is the same pattern as `ej2_instances` — the dev loads Syncfusion, the framework reads the instances.
+**Framework contract:** The dev pushes to `window.__alisPlugins` from their own TS bundle. The framework drains this queue at the top of `root.ts` via `registerPlugin` (internal). The dev never calls `registerPlugin` directly — they only push to the array. The framework doesn't scan, discover, or auto-load plugins — the dev explicitly pushes them.
 
 ### RegisterPlugin Is Mandatory
 
@@ -718,7 +718,7 @@ Html.On(plan, t => t.DomReady(p =>
 **Element IDs:**
 - `plugin-admin-panel` — visible if isAdmin returns true, hidden otherwise
 
-### Task 16: C# Unit Tests (18 tests) — `WhenUsingPlugins.cs`
+### Task 16: C# Unit Tests (22 tests) — `WhenUsingPlugins.cs`
 
 | Test | What It Proves |
 |---|---|
@@ -758,7 +758,7 @@ Navigate to `/Sandbox/HttpPipeline/Http` (sandbox must include plugin registrati
 | `plugin_boolean_condition_shows_admin_panel` | `#plugin-admin-panel` is visible (sandbox plugin has isAdmin=true) |
 | `plugin_header_reaches_server` | Click "Send with Plugin Values" → `#plugin-echo-theme` → "dark" (proves header path) |
 
-### Task 18: vitest Tests (8 tests)
+### Task 18: vitest Tests (10 tests)
 
 **File:** `Scripts/__tests__/core/plugin-registry.test.ts` (4 tests):
 
