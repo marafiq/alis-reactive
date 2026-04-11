@@ -92,9 +92,9 @@ public GatherBuilder<TModel> RouteParam<TArgs, TProp>(
     return this;
 }
 
-/// <summary>Adds a route param from a typed component source.</summary>
+/// <summary>Adds a route param from any typed source (component, URL, plugin).</summary>
 public GatherBuilder<TModel> RouteParam<TProp>(
-    string paramName, TypedComponentSource<TProp> source)
+    string paramName, TypedSource<TProp> source)
 {
     RouteParamFields[paramName] = source.ToValueProducer();
     return this;
@@ -191,10 +191,15 @@ function resolveRouteParams(
       log.warn("route param evaluated to null", { param: paramName });
       return "";
     }
-    const result = toString(raw);
-    return encodeURIComponent(result.ok ? result.value : String(raw));
+    // Shape-aware: dates → ISO, same formatForWire as gather/headers
+    const wire = formatForWire(raw, producer.shape);
+    const result = toString(wire);
+    return encodeURIComponent(result.ok ? result.value : String(wire));
   });
 }
+```
+
+**Note:** `formatForWire` must be in a shared module (`core/wire-format.ts`), not duplicated. Import alongside `toString` from shape-convert.
 ```
 
 Update `buildFetch` to resolve route params:

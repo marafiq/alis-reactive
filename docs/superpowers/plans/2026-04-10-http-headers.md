@@ -84,8 +84,8 @@ public GatherBuilder<TModel> Header(string name, string value)
     return this;
 }
 
-/// <summary>Adds a header from a typed component source (e.g., ddl.Value()).</summary>
-public GatherBuilder<TModel> Header<TProp>(string name, TypedComponentSource<TProp> source)
+/// <summary>Adds a header from any typed source (component, URL, plugin).</summary>
+public GatherBuilder<TModel> Header<TProp>(string name, TypedSource<TProp> source)
 {
     HeaderFields[name] = source.ToValueProducer();
     return this;
@@ -158,12 +158,16 @@ if (req.headers) {
   for (const [name, producer] of Object.entries(req.headers)) {
     const value = evaluateValue(producer, plan, ctx);
     if (value != null) {
-      existing[name] = String(value);
+      // Shape-aware wire formatting: dates → ISO strings, same as gather
+      const wire = formatForWire(value, producer.shape);
+      existing[name] = String(wire);
     }
   }
   init.headers = existing;
 }
 ```
+
+**Note:** `formatForWire` must be extracted from gather.ts into a shared module (e.g., `core/wire-format.ts`) so headers, route params, and gather all use the same date→ISO conversion. `applyShape` with date returns numeric timestamp — `formatForWire` converts to ISO string for the wire.
 
 Update the `buildFetch` call site to pass `plan` and `ctx`.
 
