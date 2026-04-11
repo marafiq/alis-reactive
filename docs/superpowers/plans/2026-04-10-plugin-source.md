@@ -367,22 +367,262 @@ if (pending) {
 }
 ```
 
-### Task 15: Sandbox
+### Task 15: Vertical Slice — Array Manager Plugin
 
-**sandbox-plugins.ts** → `wwwroot/js/sandbox-plugins.js`:
+The sandbox proves ALL 4 DSL cases mixed with HTTP, conditions, SetText, gather, headers, route params, URL source, and component args. One plugin that does array manipulation, exercised through every framework feature.
+
+#### Plugin TS
+
+**File:** `Scripts/sandbox-plugins.ts` → builds to `wwwroot/js/sandbox-plugins.js`:
 
 ```typescript
+interface Resident { id: number; name: string; status: string; }
+
+const residents: Resident[] = [
+  { id: 1, name: "John Doe", status: "active" },
+  { id: 2, name: "Jane Smith", status: "active" },
+  { id: 3, name: "Bob Johnson", status: "discharged" },
+  { id: 4, name: "Alice Brown", status: "active" },
+  { id: 5, name: "Charlie Wilson", status: "pending" },
+];
+
 ((window as any).__alisPlugins ??= []).push({
-  name: "auth",
-  instance: { getToken: () => "sandbox-token", getUserId: () => 42, isAdmin: () => true }
-});
-((window as any).__alisPlugins ??= []).push({
-  name: "userPrefs",
-  instance: { getTheme: () => "dark" }
+  name: "arrayManager",
+  instance: {
+    // Case 4: returns value, no args
+    getCount: () => residents.length,
+    hasActive: () => residents.some(r => r.status === "active"),
+    getFirstName: () => residents[0]?.name ?? "(empty)",
+
+    // Case 3: returns value, with args
+    getCountByStatus: (status: string) => residents.filter(r => r.status === status).length,
+    getNameById: (id: number) => residents.find(r => r.id === id)?.name ?? "(not found)",
+    contains: (name: string) => residents.some(r => r.name.includes(name)),
+
+    // Case 1: void, no args
+    shuffle: () => {
+      for (let i = residents.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [residents[i], residents[j]] = [residents[j], residents[i]];
+      }
+    },
+
+    // Case 2: void, with args
+    addResident: (name: string) => { residents.push({ id: Date.now(), name, status: "active" }); },
+  }
 });
 ```
 
-**Sections 23-25:** Read in SetText/condition, read in gather+header, void call.
+Load order in `_Layout.cshtml`:
+```html
+<script type="module" src="~/js/sandbox-plugins.js"></script>
+<script type="module" src="~/js/alis-reactive.js"></script>
+```
+
+Add esbuild entry for sandbox-plugins in `package.json`.
+
+#### Controller
+
+**File:** `HttpController.cs` — add:
+
+```csharp
+[HttpGet("PluginArrayEcho")]
+public IActionResult PluginArrayEcho(string? firstName, int? count, string? status) =>
+    Json(new {
+        receivedFirstName = firstName ?? "(none)",
+        receivedCount = count,
+        receivedStatus = status ?? "(none)",
+        receivedHeader = Request.Headers["X-Array-Count"].FirstOrDefault() ?? "(none)"
+    });
+
+[HttpPost("PluginArrayAdd")]
+public IActionResult PluginArrayAdd([FromBody] PluginAddRequest? req) =>
+    Json(new { added = req?.Name ?? "(none)" });
+```
+
+**DTOs:**
+```csharp
+public class PluginArrayEchoResponse
+{
+    public string? ReceivedFirstName { get; set; }
+    public int? ReceivedCount { get; set; }
+    public string? ReceivedStatus { get; set; }
+    public string? ReceivedHeader { get; set; }
+}
+
+public class PluginAddResponse { public string? Added { get; set; } }
+public class PluginAddRequest { public string? Name { get; set; } }
+```
+
+#### View — Section 26: Plugin Array Vertical Slice
+
+**Page URL:** `/Sandbox/HttpPipeline/Http?filterStatus=active&searchName=John`
+
+```csharp
+@{
+    // ── DomReady: zero-arg reads → SetText + Conditions ──────
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        // Case 4: zero-arg read → SetText
+        p.Element("arr-count").SetText(p.Plugin<int>("arrayManager", "getCount"));
+        p.Element("arr-first").SetText(p.Plugin<string>("arrayManager", "getFirstName"));
+
+        // Case 4: zero-arg read → Condition
+        p.When(p.Plugin<bool>("arrayManager", "hasActive")).Truthy()
+         .Then(t => t.Element("arr-has-active").Show());
+
+        // Case 3: read with URL arg → SetText
+        p.Element("arr-status-count").SetText(
+            p.Plugin<int>("arrayManager", "getCountByStatus")
+             .Arg(p.FromUrl("filterStatus")));
+
+        // Case 3: read with URL arg → Condition
+        p.When(p.Plugin<bool>("arrayManager", "contains")
+             .Arg(p.FromUrl("searchName")))
+         .Truthy()
+         .Then(t => t.Element("arr-search-found").Show())
+         .Else(e => e.Element("arr-search-not-found").Show());
+    }));
+}
+
+<!-- Section 26a: DomReady Results -->
+<native-card>
+<native-card-body>
+    <native-heading level="H2">26a. Plugin Reads on DomReady</native-heading>
+    <div class="space-y-2 font-mono text-sm">
+        <p>Count: <span id="arr-count">—</span></p>
+        <p>First: <span id="arr-first">—</span></p>
+        <p id="arr-has-active" hidden class="text-green-600">Has active residents ✓</p>
+        <p>Active count: <span id="arr-status-count">—</span></p>
+        <p id="arr-search-found" hidden class="text-green-600">Search name found ✓</p>
+        <p id="arr-search-not-found" hidden class="text-amber-600">Not found</p>
+    </div>
+</native-card-body>
+</native-card>
+```
+
+```csharp
+@{
+    // ── Button: GET with plugin → gather + header + URL ──────
+    Html.NativeButton("arr-send-btn", "Send Array Data")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Get("/Sandbox/HttpPipeline/Http/PluginArrayEcho")
+             .Gather(g => g
+                 .Plugin<string>("arrayManager", "getFirstName", "firstName")
+                 .Plugin<int>("arrayManager", "getCount", "count")
+                 .Header("X-Array-Count", p.Plugin<int>("arrayManager", "getCount"))
+                 .FromUrl("filterStatus", "status"))
+             .Response(r => r
+                .OnSuccess<PluginArrayEchoResponse>((json, s) =>
+                {
+                    s.Element("arr-echo-first").SetText(json, x => x.ReceivedFirstName);
+                    s.Element("arr-echo-count").SetText(json, x => x.ReceivedCount);
+                    s.Element("arr-echo-header").SetText(json, x => x.ReceivedHeader);
+                    s.Element("arr-echo-status").SetText(json, x => x.ReceivedStatus);
+                    s.Element("arr-echo-result").AddClass("text-green-600");
+                    // Case 1: void call after success
+                    s.Plugin("arrayManager", "shuffle");
+                }));
+        });
+}
+
+<!-- Section 26b: HTTP with Plugin Gather + Header + URL -->
+<native-card>
+<native-card-body>
+    <native-heading level="H2">26b. Plugin → HTTP Gather + Header + URL</native-heading>
+    @(Html.NativeButton("arr-send-btn", "Send Array Data")
+        .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white"))
+    <div id="arr-echo-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+        <p>First: <span id="arr-echo-first">—</span></p>
+        <p>Count: <span id="arr-echo-count">—</span></p>
+        <p>Header: <span id="arr-echo-header">—</span></p>
+        <p>URL Status: <span id="arr-echo-status">—</span></p>
+    </div>
+</native-card-body>
+</native-card>
+```
+
+```csharp
+@{
+    // ── Button: Plugin → Route Param ─────────────────────────
+    Html.NativeButton("arr-route-btn", "Load Resident by Plugin Count")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
+             .Gather(g => g.RouteParam("id", p.Plugin<int>("arrayManager", "getCount")))
+             .Response(r => r
+                .OnSuccess<ResidentByIdResponse>((json, s) =>
+                {
+                    s.Element("arr-route-name").SetText(json, x => x.Name);
+                    s.Element("arr-route-result").AddClass("text-green-600");
+                }));
+        });
+}
+
+<!-- Section 26c: Plugin → Route Param -->
+<native-card>
+<native-card-body>
+    <native-heading level="H2">26c. Plugin → Route Param</native-heading>
+    @(Html.NativeButton("arr-route-btn", "Load Resident by Plugin Count")
+        .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white"))
+    <div id="arr-route-result" class="mt-3 font-mono text-sm text-text-muted">
+        <p>Name: <span id="arr-route-name">—</span></p>
+    </div>
+</native-card-body>
+</native-card>
+```
+
+```csharp
+@{
+    // ── Button: POST with void call + component arg ──────────
+    Html.NativeButton("arr-add-btn", "Add Resident")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post("/Sandbox/HttpPipeline/Http/PluginArrayAdd")
+             .Gather(g => g.Static("name", "New Resident"))
+             .Response(r => r
+                .OnSuccess<PluginAddResponse>((json, s) =>
+                {
+                    s.Element("arr-add-result").SetText(json, x => x.Added);
+                    s.Element("arr-add-section").AddClass("text-green-600");
+                    // Case 2: void call with arg after HTTP success
+                    s.Plugin("arrayManager", "addResident")
+                     .Arg(p.Plugin<string>("arrayManager", "getFirstName"));
+                }));
+        });
+}
+
+<!-- Section 26d: POST + Void Call with Arg -->
+<native-card>
+<native-card-body>
+    <native-heading level="H2">26d. HTTP POST + Void Plugin Call</native-heading>
+    @(Html.NativeButton("arr-add-btn", "Add Resident")
+        .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white"))
+    <div id="arr-add-section" class="mt-3 font-mono text-sm text-text-muted">
+        <p>Added: <span id="arr-add-result">—</span></p>
+    </div>
+</native-card-body>
+</native-card>
+```
+
+#### What This Proves
+
+| Feature | Section | Element | Expected |
+|---|---|---|---|
+| Plugin zero-arg read → SetText | 26a | `#arr-count` | "5" |
+| Plugin zero-arg read → SetText | 26a | `#arr-first` | "John Doe" |
+| Plugin zero-arg read → Condition | 26a | `#arr-has-active` | visible |
+| Plugin read + URL arg → SetText | 26a | `#arr-status-count` | "3" (active) |
+| Plugin read + URL arg → Condition | 26a | `#arr-search-found` | visible |
+| Plugin read → HTTP Gather param | 26b | `#arr-echo-first` | "John Doe" |
+| Plugin read → HTTP Gather param | 26b | `#arr-echo-count` | "5" |
+| Plugin read → HTTP Header | 26b | `#arr-echo-header` | "5" |
+| URL source in same HTTP request | 26b | `#arr-echo-status` | "active" |
+| Plugin void call (shuffle) | 26b | no errors | — |
+| Plugin read → Route param | 26c | `#arr-route-name` | "Resident #5" |
+| HTTP POST + void call with arg | 26d | `#arr-add-result` | "New Resident" |
+| All 4 DSL cases | All | — | ✓ |
 
 ---
 
@@ -404,23 +644,29 @@ if (pending) {
 | `plugin_void_call_produces_call_reaction` | CallReaction with PluginSource |
 | `plugin_void_call_with_args` | CallReaction.args present |
 | `plugin_gather_carries_shape` | GatherField with shape from `<T>` |
-| `plugin_auto_registers_jstype` | plan.types["plugin.auth"] created |
+| `plugin_auto_registers_jstype` | plan.types["plugin.x"] created |
 | `plan_without_plugins_clean` | no "plugin" in JSON |
 | `empty_plugin_name_throws` | ArgumentException |
 | `empty_member_throws` | ArgumentException |
 | `null_arg_throws` | ArgumentNullException |
 | `empty_gather_param_throws` | ArgumentException |
 
-### Playwright Tests (6) — `WhenPluginsProvideValues.cs`
+### Playwright Tests (10) — `WhenPluginArrayManipulates.cs`
+
+Navigate to `/Sandbox/HttpPipeline/Http?filterStatus=active&searchName=John`.
 
 | Test | Assert |
 |---|---|
-| `plugin_read_displayed_in_element` | `#plugin-theme` → "dark" |
-| `plugin_condition_shows_admin_panel` | `#plugin-admin-panel` visible |
-| `plugin_gather_sends_token` | `#plugin-echo-token` has value |
-| `plugin_header_reaches_server` | `#plugin-echo-header` → value |
-| `plugin_void_call_no_errors` | no console errors |
-| `plugin_gather_success_class` | `#plugin-result` green |
+| `plugin_count_on_load` | `#arr-count` → "5" |
+| `plugin_first_name_on_load` | `#arr-first` → "John Doe" |
+| `plugin_has_active_condition` | `#arr-has-active` visible |
+| `plugin_url_arg_status_count` | `#arr-status-count` → "3" |
+| `plugin_url_arg_search_found` | `#arr-search-found` visible |
+| `plugin_http_gather_echoes` | Click "Send Array Data" → `#arr-echo-first` → "John Doe", `#arr-echo-count` → "5" |
+| `plugin_http_header_echoes` | Click "Send Array Data" → `#arr-echo-header` → "5" |
+| `plugin_http_url_composes` | Click "Send Array Data" → `#arr-echo-status` → "active" |
+| `plugin_route_param_resolves` | Click "Load Resident" → `#arr-route-name` → "Resident #5" |
+| `plugin_post_then_void_call` | Click "Add Resident" → `#arr-add-result` → "New Resident" |
 
 ### vitest Tests (8) — `plugin-registry.test.ts` + `evaluate-plugin.test.ts`
 
@@ -441,19 +687,25 @@ if (pending) {
 
 - [ ] `dotnet build` — 0 errors
 - [ ] `npm run typecheck` — clean
-- [ ] `npm run build` — bundle builds
+- [ ] `npm run build` — bundle builds (both alis-reactive.js and sandbox-plugins.js)
 - [ ] Schema validates PluginSource
-- [ ] JsType auto-created by DSL usage (methods only)
+- [ ] JsType auto-created by DSL usage (methods only, WithMethod)
 - [ ] `p.Plugin<T>()` read works in conditions, SetText, headers, gather, route params
 - [ ] `p.Plugin<T>().Arg()` passes args via ReadProducer.args
 - [ ] `p.Plugin()` void call emits CallReaction
 - [ ] `p.Plugin().Arg()` void call with args
 - [ ] `g.Plugin<T>()` gather carries shape from `<T>`
+- [ ] Plugin read → HTTP gather → server echoes value
+- [ ] Plugin read → HTTP header → server echoes value
+- [ ] Plugin read → Route param → URL resolves
+- [ ] Plugin read + URL source in same HTTP request
+- [ ] Plugin void call fires after HTTP success
+- [ ] Plugin void call with plugin-read arg
 - [ ] Missing plugin throws at runtime
 - [ ] Shape stays internal, ValueProducer stays internal
 - [ ] execute.ts Set rejects plugin; Call allows plugin
 - [ ] No inline JS in views
 - [ ] All 18 C# unit tests pass
 - [ ] All 8 vitest tests pass
-- [ ] All 6 Playwright tests pass
+- [ ] All 10 Playwright tests pass
 - [ ] All existing 808+ Playwright tests pass
