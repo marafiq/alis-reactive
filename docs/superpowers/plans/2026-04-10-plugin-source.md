@@ -38,11 +38,11 @@ plan.RegisterPlugin("auth", p => {
 });
 ```
 
-**JS side (runtime):** Registers the actual JS object with functions. This CANNOT be in plan JSON (functions aren't serializable). Devs create their own module — NO inline JS, NO globals.
+**TS side (runtime):** Plugins are written as TypeScript modules. The framework exports `registerPlugin` as a hook — devs import it and register their plugin objects. No inline JS, no globals, no magic. Standard TS module imports.
 
 ```typescript
-// site-plugins.ts (developer's own file — NOT inline, NOT in views)
-import { registerPlugin } from "./alis-reactive";
+// plugins/auth-plugin.ts (developer's own TS file)
+import { registerPlugin } from "../alis-reactive";
 
 registerPlugin("auth", {
   getToken: () => localStorage.getItem("auth_token"),
@@ -51,14 +51,56 @@ registerPlugin("auth", {
 });
 ```
 
+Plugins bundle SEPARATELY from the framework. Two scripts — plugins load first:
+
 ```html
-<!-- In _Layout.cshtml or the view — NO inline JavaScript -->
-<script type="module" src="~/js/site-plugins.js"></script>
+<!-- Plugins bundle — registers all plugins before framework boots -->
+<script type="module" src="~/js/plugins.js"></script>
+<!-- Framework bundle — boots and reads plan + registered plugins -->
 <script type="module" src="~/js/alis-reactive.js"></script>
 @Html.RenderPlan(plan)
 ```
 
-**Why two parts?** The plan is the contract (Rule 1). The plan declares WHAT the plugin has (JsType metadata). The runtime provides the actual object. If the JS object doesn't match the declared JsType, the runtime fails fast (member not found → throw).
+The framework exposes a global registration hook on `window.alisReactive.registerPlugin`. The plugin bundle uses the hook — it does NOT import from the framework bundle (separate bundles can't share module imports):
+
+```typescript
+// plugins/auth-plugin.ts (developer's TS, builds to plugins.js separately)
+const register = (window as any).alisReactive?.registerPlugin;
+if (!register) throw new Error("alis-reactive framework not loaded — load framework script first");
+
+register("auth", {
+  getToken: () => localStorage.getItem("auth_token"),
+  getUserId: () => JSON.parse(localStorage.getItem("user")!).id,
+});
+```
+
+**Framework hook setup** (in `root.ts`, BEFORE boot):
+```typescript
+// root.ts — expose registration hook before boot
+import { registerPlugin } from "./core/plugin-registry";
+
+(window as any).alisReactive = { registerPlugin };
+// ... then boot
+```
+
+**Script order:**
+```html
+<!-- Framework — sets up window.alisReactive.registerPlugin -->
+<script type="module" src="~/js/alis-reactive.js"></script>
+<!-- Plugins — calls the hook to register -->
+<script type="module" src="~/js/plugins.js"></script>
+@Html.RenderPlan(plan)
+```
+
+Wait — modules load in parallel. The framework must set up the hook BEFORE plugins call it. With `type="module"`, execution order follows script order in HTML. Framework first, plugins second. This works.
+
+But there's a subtlety: `type="module"` scripts are deferred. Both load in parallel but execute in document order. So framework sets up the hook, then plugins call it, then boot fires on DOMContentLoaded. This is correct.
+
+This keeps plugins isolated, testable, and independently deployable. No cross-bundle imports.
+
+**Why two parts?** The plan is the contract (Rule 1). The plan declares WHAT the plugin has (JsType metadata). The TS module provides the actual object. If the JS object doesn't match the declared JsType, the runtime fails fast (member not found → throw).
+
+**Framework hook:** `registerPlugin` is the ONLY API the framework provides for plugin registration. It's exported from `root.ts`. The dev calls it in their own TS code. The framework doesn't scan, discover, or auto-load plugins — the dev explicitly registers them. This is the same pattern as `ej2_instances` — the dev loads Syncfusion, the framework reads the instances.
 
 ### RegisterPlugin Is Mandatory
 
@@ -230,16 +272,19 @@ internal void ValidatePluginMember(string pluginName, string member)
             $"Register it via .Property(\"{member}\", shape) or .Method(\"{member}\", shape) in RegisterPlugin.");
 }
 
-/// <summary>Gets the shape of a plugin member from its JsType.</summary>
+/// <summary>Gets the shape of a plugin member from its JsType.
+/// Throws if member is not found — ValidatePluginMember must be called first.</summary>
 internal Shape GetPluginMemberShape(string pluginName, string member)
 {
+    ValidatePluginMember(pluginName, member);
     var typeKey = "plugin." + pluginName;
     var jsType = _plan.MutableTypes[typeKey];
     var prop = jsType.Properties?.GetValueOrDefault(member);
     if (prop != null) return prop.Shape;
     var method = jsType.Methods?.GetValueOrDefault(member);
     if (method?.Returns != null) return method.Returns;
-    return Shape.Any;
+    // ValidatePluginMember guarantees member exists — this is unreachable
+    throw new InvalidOperationException($"[alis] Plugin '{pluginName}' member '{member}' has no shape — this should be unreachable.");
 }
 ```
 
@@ -361,12 +406,13 @@ public Conditions.TypedPluginSource<T> Plugin<T>(string pluginName, string membe
 **File:** `Alis.Reactive/Builders/Requests/GatherBuilder.cs`
 
 ```csharp
-/// <summary>Includes a plugin value in the gather. Shape comes from JsType registration.</summary>
+/// <summary>Includes a plugin value in the gather. Shape comes from JsType registration.
+/// Validates plugin and member exist at build time.</summary>
 public GatherBuilder<TModel> Plugin(string pluginName, string member, string paramName)
 {
     if (string.IsNullOrWhiteSpace(paramName))
         throw new System.ArgumentException("HTTP parameter name must not be null or whitespace.", nameof(paramName));
-    // Shape from JsType — not dropped, not guessed
+    _context.ValidatePluginMember(pluginName, member);
     var shape = _context.GetPluginMemberShape(pluginName, member);
     var value = ValueProducer.ReadPlugin(pluginName, member, shape);
     Fields.Add(GatherField.Of(paramName, value));
@@ -391,6 +437,8 @@ public void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder>
 {
     if (string.IsNullOrWhiteSpace(pluginName))
         throw new ArgumentException("Plugin name must not be null or whitespace.", nameof(pluginName));
+    if (configure == null)
+        throw new ArgumentNullException(nameof(configure));
     _context.RegisterPlugin(pluginName, configure);
 }
 ```
@@ -442,7 +490,7 @@ export interface PluginSource {
 const plugins = new Map<string, unknown>();
 
 export function registerPlugin(name: string, instance: unknown): void {
-  if (!name) throw new Error("[alis] plugin name must not be empty");
+  if (!name || !name.trim()) throw new Error("[alis] plugin name must not be empty or whitespace");
   if (instance == null) throw new Error(`[alis] plugin "${name}" instance must not be null`);
   if (typeof instance !== "object") throw new Error(`[alis] plugin "${name}" must be an object, got ${typeof instance}`);
   if (plugins.has(name)) throw new Error(`[alis] plugin "${name}" already registered`);
@@ -517,9 +565,14 @@ Devs import this in their own module. NO `window.alisPlugins` global. NO inline 
 **File:** `HttpController.cs` — add:
 ```csharp
 [HttpGet("PluginEcho")]
-public IActionResult PluginEcho(string? token, string? theme) =>
-    Json(new { receivedToken = token ?? "(none)", receivedTheme = theme ?? "(none)" });
+public IActionResult PluginEcho(string? token) =>
+    Json(new {
+        receivedToken = token ?? "(none)",
+        receivedTheme = Request.Headers["X-Plugin-Theme"].FirstOrDefault() ?? "(none)"
+    });
 ```
+
+The controller reads the token from the query param AND the theme from the `X-Plugin-Theme` header. This proves BOTH the gather path (token) and the header path (theme) reach the server.
 
 **File:** `HttpShowcaseModel.cs` — add:
 ```csharp
@@ -532,7 +585,7 @@ public class PluginEchoResponse
 
 ### Task 15b: Sandbox View — Sections 23-25
 
-**Note:** The sandbox page must include a plugin registration script. Since this is a SANDBOX (testing tool, not production), a small inline bootstrap is acceptable for demonstration. Production apps use a separate module.
+**Note:** The sandbox page must include a plugin registration script via module import — same as production. Create `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js` that registers test plugins. Load it before `alis-reactive.js`. NO inline JS, not even in sandbox.
 
 #### Section 23: Plugin Read in SetText + Condition
 
@@ -576,8 +629,14 @@ p.Get("/Sandbox/HttpPipeline/Http/PluginEcho")
 ```
 
 **Element IDs:**
-- `plugin-echo-token` — expect: the token value from the plugin
+- `plugin-echo-token` — expect: the token value from the plugin (proves gather path)
+- `plugin-echo-theme` — expect: "dark" (proves header path — controller reads X-Plugin-Theme header)
 - `plugin-echo-result` — success class
+
+Add to Section 24 DSL response handler:
+```csharp
+s.Element("plugin-echo-theme").SetText(json, x => x.ReceivedTheme);
+```
 
 #### Section 25: Plugin in Condition (auth gate)
 
@@ -631,17 +690,28 @@ Navigate to `/Sandbox/HttpPipeline/Http` (sandbox must include plugin registrati
 | `plugin_condition_shows_panel_for_dark_theme` | `#plugin-dark-mode` is visible |
 | `plugin_gather_sends_token_to_server` | Click "Send with Plugin Values" → `#plugin-echo-token` has value |
 | `plugin_gather_applies_success_class` | `#plugin-echo-result` has class `text-green-600` |
-| `plugin_boolean_condition_shows_admin_panel` | `#plugin-admin-panel` is visible (if isAdmin=true) |
-| `plugin_boolean_condition_hides_when_false` | Navigate with isAdmin=false plugin → `#plugin-admin-panel` hidden |
+| `plugin_boolean_condition_shows_admin_panel` | `#plugin-admin-panel` is visible (sandbox plugin has isAdmin=true) |
+| `plugin_header_reaches_server` | Click "Send with Plugin Values" → `#plugin-echo-theme` → "dark" (proves header path) |
 
-### Task 18: vitest Tests (4 tests) — `core/plugin-registry.test.ts`
+### Task 18: vitest Tests (8 tests)
+
+**File:** `Scripts/__tests__/core/plugin-registry.test.ts` (4 tests):
 
 | Test | What It Proves |
 |---|---|
 | `registerPlugin stores and resolvePlugin retrieves` | Basic round-trip |
 | `duplicate registration throws` | Second call with same name → Error |
 | `null instance throws` | registerPlugin("x", null) → Error |
-| `missing plugin throws` | resolvePlugin("unknown") → Error |
+| `whitespace name throws` | registerPlugin("  ", obj) → Error |
+
+**File:** `Scripts/__tests__/core/evaluate-plugin.test.ts` (4 tests):
+
+| Test | What It Proves |
+|---|---|
+| `plugin property read returns value via JsType walkPath` | evaluateValue with plugin ReadProducer reads root.theme |
+| `plugin method read calls zero-arg function` | evaluateValue with plugin method calls root.getToken() |
+| `plugin missing member throws` | JsType has no member → Error |
+| `getJsTypeForSource returns plugin JsType` | resolveSource dispatches to registry, getJsTypeForSource finds plan.types["plugin.name"] |
 
 ---
 
@@ -663,6 +733,6 @@ Navigate to `/Sandbox/HttpPipeline/Http` (sandbox must include plugin registrati
 - [ ] No inline JavaScript in views (module import only)
 - [ ] execute.ts Set/Call guards reject PluginSource (from URL Query Source)
 - [ ] All 18 C# unit tests pass (Task 16)
-- [ ] All 4 vitest tests pass (Task 18)
+- [ ] All 8 vitest tests pass (Task 18: 4 registry + 4 evaluate/resolver)
 - [ ] All 6 Playwright tests pass (Task 17)
 - [ ] All existing 808+ Playwright tests pass (no regressions)
