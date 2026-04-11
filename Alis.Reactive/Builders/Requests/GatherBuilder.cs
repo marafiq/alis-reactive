@@ -153,7 +153,7 @@ namespace Alis.Reactive.Builders.Requests
         private static readonly System.Text.RegularExpressions.Regex RouteParamNameRe =
             new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9_]+$", System.Text.RegularExpressions.RegexOptions.Compiled);
 
-        private static void ValidateRouteParamName(string paramName)
+        private void ValidateRouteParamName(string paramName)
         {
             if (string.IsNullOrWhiteSpace(paramName))
                 throw new System.ArgumentException("Route param name must not be null or whitespace.", nameof(paramName));
@@ -162,6 +162,9 @@ namespace Alis.Reactive.Builders.Requests
                     $"Route param name '{paramName}' contains invalid characters. " +
                     "Names must match [a-zA-Z0-9_] (ASCII only) to align with the runtime {{placeholder}} regex.",
                     nameof(paramName));
+            if (RouteParamFields.ContainsKey(paramName))
+                throw new System.InvalidOperationException(
+                    $"Route param '{paramName}' is already defined. Each route param can only be set once.");
         }
 
         /// <summary>

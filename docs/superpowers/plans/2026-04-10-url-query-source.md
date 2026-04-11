@@ -235,6 +235,38 @@ public GatherBuilder<TModel> FromUrl(string paramName, string asParam)
     Fields.Add(GatherField.Of(asParam, value));
     return this;
 }
+
+/// <summary>
+/// Includes a typed URL query parameter in the gather with shape coercion.
+/// Use for numeric or date URL params that need shape-aware wire formatting.
+/// </summary>
+public GatherBuilder<TModel> FromUrl<T>(string paramName)
+{
+    if (string.IsNullOrWhiteSpace(paramName))
+        throw new System.ArgumentException(
+            "URL param name must not be null or whitespace.", nameof(paramName));
+    var shape = Shape.FromClrType(typeof(T));
+    var value = ValueProducer.ReadUrl(paramName, shape);
+    Fields.Add(GatherField.Of(paramName, value));
+    return this;
+}
+
+/// <summary>
+/// Includes a typed URL query parameter with an explicit HTTP request parameter name.
+/// </summary>
+public GatherBuilder<TModel> FromUrl<T>(string paramName, string asParam)
+{
+    if (string.IsNullOrWhiteSpace(paramName))
+        throw new System.ArgumentException(
+            "URL param name must not be null or whitespace.", nameof(paramName));
+    if (string.IsNullOrWhiteSpace(asParam))
+        throw new System.ArgumentException(
+            "HTTP parameter name must not be null or whitespace.", nameof(asParam));
+    var shape = Shape.FromClrType(typeof(T));
+    var value = ValueProducer.ReadUrl(paramName, shape);
+    Fields.Add(GatherField.Of(asParam, value));
+    return this;
+}
 ```
 
 **Verified references:**
@@ -503,6 +535,8 @@ public IActionResult ComposeEcho(int id, string? requestedPage) =>
 | `from_url_composes_with_route_params_and_headers` | Same request: RouteParam + Header + FromUrl → all three in JSON |
 | `from_url_as_route_param_value` | `RouteParam("facilityId", p.FromUrl<int>("facilityId"))` → routeParams value is url-source read |
 | `from_url_as_header_value` | `Header("X-Tab", p.FromUrl("tab"))` → headers value is url-source read |
+| `from_url_typed_int_gather_carries_number_shape` | `.FromUrl<int>("page")` in Gather → shape: { kind: "number" } + AssertSchemaValid |
+| `from_url_typed_gather_with_alias` | `.FromUrl<int>("page", "pageNum")` → key "pageNum", shape number |
 | `empty_param_name_throws_in_pipeline` | `p.FromUrl("")` → ArgumentException |
 | `whitespace_param_name_throws_in_pipeline` | `p.FromUrl("  ")` → ArgumentException |
 | `empty_param_name_throws_in_gather` | `.FromUrl("")` → ArgumentException |
@@ -589,7 +623,7 @@ Navigate to `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`.
 - [ ] Composes with Headers (`Header("X-Tab", p.FromUrl("tab"))`)
 - [ ] Composes with Route Params (`RouteParam("id", p.FromUrl<int>("id"))`)
 - [ ] Empty param name throws ArgumentException in both PipelineBuilder and GatherBuilder
-- [ ] All 18 C# unit tests pass (Task 11)
+- [ ] All 20 C# unit tests pass (Task 11)
 - [ ] All 6 vitest tests pass (Task 12)
 - [ ] All 10 Playwright tests pass (Task 13)
 - [ ] All existing 799+ Playwright tests pass (no regressions)

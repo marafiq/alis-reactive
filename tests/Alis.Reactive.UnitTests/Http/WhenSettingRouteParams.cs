@@ -405,4 +405,23 @@ public class WhenSettingRouteParams : PlanTestBase
             });
         });
     }
+
+    [Test]
+    public void duplicate_route_param_name_throws_at_build_time()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Get("/api/data/{id}")
+                 .Gather(g => g
+                     .RouteParam("id", 42)
+                     .RouteParam("id", 99))  // duplicate!
+                 .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+        Assert.That(ex!.Message, Does.Contain("already defined"));
+    }
 }
