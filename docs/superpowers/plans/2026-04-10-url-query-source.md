@@ -571,19 +571,11 @@ p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
 - `url-compose-facility` — expect: "7" (proves FromUrl → gather field reached server)
 
 **Design note — FromUrl → RouteParam composition risk:**
-URL params flow through the shared ValueProducer concept — they compose with headers, route params, gather, and conditions by design. However, `FromUrl<int>` → RouteParam carries a pre-existing `shape-convert.ts` risk: malformed input (`?facilityId=abc`) silently converts to `0` via `toNumber`, producing `/residents/0` instead of failing. This section uses a literal route param to demonstrate safe composition. The `FromUrl → RouteParam` path IS supported and tested (C# unit test `from_url_as_route_param_value`), but production use should validate URL params via conditions (`When(p.FromUrl("facilityId")).NotNull()`) before feeding them to route params. A `shape-convert.ts` strict mode is a separate future improvement tracked outside this plan.
+URL params flow through the shared ValueProducer concept — they compose with headers, route params, gather, and conditions by design. However, `FromUrl<int>` → RouteParam carries a pre-existing `shape-convert.ts` risk: malformed input (`?facilityId=abc`) silently converts to `0` via `toNumber`, producing `/residents/0` instead of failing. This is a **known CLAUDE.md Rule 3 violation** in `shape-convert.ts` — `toNumber` returns `0` for invalid input instead of throwing. This affects ALL value reads, not just URL source. Fixing it requires a separate cross-cutting plan for strict shape conversion. This plan documents and tests the behavior but does not fix it.
 
-**Controller update:** `ComposeEcho` needs to accept the gather field:
-```csharp
-[HttpGet("ComposeEcho/{id:int}")]
-public IActionResult ComposeEcho(int id, string? requestedPage) =>
-    Json(new {
-        residentId = id,
-        name = $"Resident #{id}",
-        receivedTab = Request.Headers["X-Tab"].FirstOrDefault() ?? "(none)",
-        receivedFacility = requestedPage ?? "(none)"
-    });
-```
+Production guidance: validate URL params via conditions (`When(p.FromUrl("facilityId")).NotNull()`) before feeding them to route params.
+
+**Note:** The ComposeEcho controller definition at the top of Task 10 already accepts the `facility` query param. No duplicate controller definition needed — the DSL sends `FromUrl("facilityId", "facility")` which maps to the `facility` parameter.
 
 ### Task 11: C# Unit Tests — `WhenReadingUrlParams.cs`
 
@@ -663,9 +655,9 @@ Navigate to `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`.
 
 | Test | Click | Assert |
 |---|---|---|
-| `url_param_composes_route_param_resolves` | "Compose All Sources" | `#url-compose-name` → "Resident #7" (FromUrl<int>("facilityId") → RouteParam) |
+| `url_param_composes_route_param_resolves` | "Compose All Sources" | `#url-compose-name` → "Resident #42" (literal RouteParam resolved) |
 | `url_param_composes_header_reaches_server` | "Compose All Sources" | `#url-compose-tab` → "medications" (FromUrl("tab") → Header) |
-| `url_param_composes_gather_field_reaches_server` | "Compose All Sources" | `#url-compose-facility` → "3" (FromUrl("page") → gather "requestedPage") |
+| `url_param_composes_gather_field_reaches_server` | "Compose All Sources" | `#url-compose-facility` → "7" (FromUrl("facilityId", "facility") → gather field) |
 
 **Missing param test:**
 
