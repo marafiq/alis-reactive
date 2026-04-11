@@ -335,7 +335,7 @@ Export `resolveRouteParams` for testing (can be a named export used only by test
 | `URI-encodes special characters in values` | `encodeURIComponent("John Doe")` → `"John%20Doe"` |
 | `date value formatted as ISO string via formatForWire` | Shape.Date → `formatForWire` → ISO string in URL |
 
-Note: These tests require mocking `evaluateValue` and `log` since they depend on plan resolution. Use vitest's `vi.mock` for the imports.
+Note: These tests require mocking `evaluateValue`, `formatForWire`, and `toString` since they depend on plan resolution. Use vitest's `vi.mock` for the imports.
 
 ### Design Notes
 
