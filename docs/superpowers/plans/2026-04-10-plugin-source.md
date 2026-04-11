@@ -73,7 +73,7 @@ Plugins bundle SEPARATELY from the framework. They register via a passive push-a
 
 **This order is REQUIRED, not optional.** Module scripts execute in document order. `root.ts` drains `window.__alisPlugins` at module-level (before `initConfirm()`, before plan parsing, before `boot()`). If plugins.js loads AFTER alis-reactive.js, the queue is empty when drained — plugins register after boot and DomReady behaviors can't resolve them.
 
-The push-array pattern makes the queue ORDER-TOLERANT for pushes (multiple plugin scripts can load in any order relative to each other), but the framework drain MUST happen after all pushes. This is guaranteed by placing plugins.js before alis-reactive.js in the HTML.
+All plugin scripts MUST load before the framework script. Multiple plugin scripts can be in any order relative to each other — only the framework drain order matters (framework last).
 
 **Framework drains the queue at boot** (`root.ts`):
 ```typescript
@@ -109,14 +109,15 @@ delete (window as any).__alisPlugins; // clean up — queue no longer needed
 
 This follows the framework's principle: the plan carries ALL information. No runtime discovery.
 
-### Zero-Arg Methods Only
+### Two Method Patterns
 
-`evaluateValue` calls methods with `[]` (zero args):
-```typescript
-const raw = callMethod(root, method, []);
-```
+Plugins support two method patterns using existing framework primitives:
 
-Plugin methods are zero-arg getters: `getToken()`, `getUserId()`, `isAdmin()`. No arg-bearing methods. This matches the evaluateValue contract. The `PluginTypeBuilder.Method` overload accepts only `(name, returns)` — no args parameter.
+1. **Getter** — zero-arg read via `evaluateValue`: `callMethod(root, method, [])`. Declared as `Method(name, Shape returns)`. Returns a value used in conditions, gather, headers, SetText.
+
+2. **Action** — with-args call via `CallReaction`: `callMethod(root, method, evaluatedArgs)`. Declared as `Method(name, List<Shape> args)`. Fire-and-forget side effects (analytics, logging).
+
+Both use the existing `JsType.WithMethod` (JsType.cs:53) and `callMethod` (resolver.ts:125). Zero new primitives.
 
 ### Plugin Mutation Rules
 
@@ -866,7 +867,7 @@ Navigate to `/Sandbox/HttpPipeline/Http` (sandbox must include plugin registrati
 - [ ] Null/empty plugin name/member throws
 - [ ] Shape flows from JsType through plan JSON through TS runtime
 - [ ] No inline JavaScript in views (module import only)
-- [ ] execute.ts Set/Call guards reject PluginSource (from URL Query Source)
+- [ ] execute.ts Set guard rejects PluginSource; Call guard allows PluginSource
 - [ ] All 22 C# unit tests pass (Task 16)
 - [ ] All 10 vitest tests pass (Task 18: 6 registry + 4 evaluate/resolver)
 - [ ] All 6 Playwright tests pass (Task 17)
