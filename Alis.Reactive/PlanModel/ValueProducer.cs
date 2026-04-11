@@ -47,8 +47,8 @@ namespace Alis.Reactive.PlanModel
         internal static ValueProducer ReadUrl(string paramName, Shape shape = null) =>
             Read(UrlSource.Instance, paramName, shape: shape ?? Shape.String);
 
-        internal static ValueProducer Read(Source from, string member, Path path = null, Shape shape = null) =>
-            new ReadProducer(from, member, path, shape);
+        internal static ValueProducer Read(Source from, string member, Path path = null, Shape shape = null, List<ValueProducer> args = null) =>
+            new ReadProducer(from, member, path, shape, args);
 
         internal static ValueProducer Object(Dictionary<string, ValueProducer> fields, Shape shape = null) =>
             new ObjectProducer(fields, shape);
@@ -78,13 +78,15 @@ namespace Alis.Reactive.PlanModel
         public string Member { get; }
         public Path Path { get; }
         public Shape Shape { get; }
+        public IReadOnlyList<ValueProducer> Args { get; }
 
-        internal ReadProducer(Source from, string member, Path path, Shape shape)
+        internal ReadProducer(Source from, string member, Path path, Shape shape, List<ValueProducer> args = null)
         {
             From = from ?? throw new ArgumentNullException(nameof(from));
             Member = member ?? throw new ArgumentNullException(nameof(member));
             Path = path == null || path.IsNone ? null : path;
             Shape = shape == null || shape.IsNone ? null : shape;
+            Args = args != null && args.Count > 0 ? args : null;
         }
     }
 

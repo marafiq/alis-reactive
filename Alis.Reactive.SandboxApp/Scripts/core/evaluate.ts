@@ -29,7 +29,8 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
         }
         const method = jsType.methods?.[producer.member];
         if (method) {
-          const raw = callMethod(root, method, []);
+          const evaluatedArgs = producer.args ? producer.args.map(a => evaluateValue(a, plan, ctx)) : [];
+          const raw = callMethod(root, method, evaluatedArgs);
           return raw == null ? raw : applyShape(raw, producer.shape ?? method.returns);
         }
         throw new Error(`[alis] member "${producer.member}" not found on component "${producer.from.component}"`);

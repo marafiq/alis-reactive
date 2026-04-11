@@ -287,6 +287,7 @@ export interface ReadProducer {
   member: string;
   path?: Path;
   shape?: Shape;
+  args?: ValueProducer[];
 }
 
 export interface ObjectProducer {

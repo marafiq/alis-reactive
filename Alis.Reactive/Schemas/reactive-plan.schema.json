@@ -472,7 +472,11 @@
         "from": { "$ref": "#/$defs/Source" },
         "member": { "type": "string", "minLength": 1 },
         "path": { "$ref": "#/$defs/Path" },
-        "shape": { "$ref": "#/$defs/Shape" }
+        "shape": { "$ref": "#/$defs/Shape" },
+        "args": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValueProducer" }
+        }
       }
     },
     "ObjectProducer": {
