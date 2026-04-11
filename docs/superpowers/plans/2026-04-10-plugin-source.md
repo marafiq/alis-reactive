@@ -74,29 +74,48 @@ register("auth", {
 });
 ```
 
-**Framework hook setup** (in `root.ts`, BEFORE boot):
-```typescript
-// root.ts — expose registration hook before boot
-import { registerPlugin } from "./core/plugin-registry";
+**Boot-order guarantee: defer boot to DOMContentLoaded.**
 
+Current `root.ts` boots at module-level (lines 17-35 execute immediately when the module runs). This means boot happens BEFORE any subsequent module scripts. Plugins loaded after the framework would register too late.
+
+**Fix:** Move boot logic from module-level to a `DOMContentLoaded` listener. The registration hook is set up at module-level (synchronous), boot happens on DOMContentLoaded (after all module scripts have executed):
+
+```typescript
+// root.ts — CHANGED: hook at module-level, boot deferred
+import { registerPlugin } from "./core/plugin-registry";
+import { boot, trace } from "./lifecycle/boot";
+// ... other imports
+
+// Hook available immediately at module parse time
 (window as any).alisReactive = { registerPlugin };
-// ... then boot
+
+// Deferred boot — runs AFTER all module scripts have executed
+document.addEventListener("DOMContentLoaded", () => {
+  initConfirm();
+  initNativeActionLinks();
+
+  const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
+  // ... parse plans and boot (existing logic, moved into listener)
+});
 ```
 
-**Script order:**
+**Script order in HTML:**
 ```html
-<!-- Framework — sets up window.alisReactive.registerPlugin -->
+<!-- Framework — sets up hook synchronously, defers boot to DOMContentLoaded -->
 <script type="module" src="~/js/alis-reactive.js"></script>
-<!-- Plugins — calls the hook to register -->
+<!-- Plugins — registers via hook (runs before DOMContentLoaded) -->
 <script type="module" src="~/js/plugins.js"></script>
 @Html.RenderPlan(plan)
 ```
 
-Wait — modules load in parallel. The framework must set up the hook BEFORE plugins call it. With `type="module"`, execution order follows script order in HTML. Framework first, plugins second. This works.
+**Execution order:**
+1. `alis-reactive.js` module executes → sets `window.alisReactive.registerPlugin` (sync)
+2. `plugins.js` module executes → calls `window.alisReactive.registerPlugin("auth", {...})` (sync)
+3. DOMContentLoaded fires → boot reads plans, resolves plugins from registry → all plugins available
 
-But there's a subtlety: `type="module"` scripts are deferred. Both load in parallel but execute in document order. So framework sets up the hook, then plugins call it, then boot fires on DOMContentLoaded. This is correct.
+**Impact:** This changes boot from immediate (module-level) to deferred (DOMContentLoaded). For pages WITHOUT plugins, behavior is identical — module scripts are already deferred, and DOMContentLoaded fires immediately after. For pages WITH plugins, this guarantees plugins register before boot.
 
-This keeps plugins isolated, testable, and independently deployable. No cross-bundle imports.
+This is a breaking change to `root.ts` that must be tested across ALL existing Playwright tests to verify no regression.
 
 **Why two parts?** The plan is the contract (Rule 1). The plan declares WHAT the plugin has (JsType metadata). The TS module provides the actual object. If the JS object doesn't match the declared JsType, the runtime fails fast (member not found → throw).
 
@@ -370,6 +389,27 @@ namespace Alis.Reactive.Builders.Conditions
         internal override ValueProducer ToValueProducer() =>
             ValueProducer.Read(PluginSource.Of(_pluginName), _member, shape: Shape);
     }
+```
+
+**Shape reconciliation:** `TypedPluginSource<T>` emits `Shape.FromClrType(typeof(T))` via `TypedSource.Shape`. At runtime, `evaluateValue` uses `producer.shape ?? prop.shape` — the producer shape wins. If `T` doesn't match the declared JsType shape, the plan carries the wrong shape.
+
+**Fix in PipelineBuilder.Plugin<T>():** Validate that `Shape.FromClrType(typeof(T))` is compatible with the JsType-declared shape:
+```csharp
+public Conditions.TypedPluginSource<T> Plugin<T>(string pluginName, string member)
+{
+    Context.ValidatePluginMember(pluginName, member);
+    // Validate shape compatibility — T must match declared shape
+    var declaredShape = Context.GetPluginMemberShape(pluginName, member);
+    var requestedShape = Shape.FromClrType(typeof(T));
+    if (ShapeCompat.Resolve(declaredShape, requestedShape) == null)
+        throw new InvalidOperationException(
+            $"Plugin '{pluginName}' member '{member}' is declared as shape '{declaredShape.Kind}' " +
+            $"but Plugin<{typeof(T).Name}>() requests shape '{requestedShape.Kind}'. Types must be compatible.");
+    return new Conditions.TypedPluginSource<T>(pluginName, member);
+}
+```
+
+`ShapeCompat.Resolve` (JsType.cs) already handles compatible pairs: Date ↔ Nullable(Date), Any ↔ specific, etc. Incompatible pairs (e.g., String declared, int requested) return null → throw.
 }
 ```
 
@@ -548,7 +588,17 @@ if (producer.from.kind === "component" || producer.from.kind === "plugin") {
 }
 ```
 
-The plugin root IS a resolved JS object. Same walkPath, same callMethod. JsType metadata declares which members are properties vs methods. Zero change to the read logic.
+The plugin root IS a resolved JS object. Same walkPath, same callMethod. JsType metadata declares which members are properties vs methods.
+
+**Error message fix:** The existing error at evaluate.ts:35 references `producer.from.component` which doesn't exist on PluginSource. Update:
+```typescript
+const sourceName = producer.from.kind === "component"
+  ? producer.from.component
+  : (producer.from as PluginSource).name;
+throw new Error(`[alis] member "${producer.member}" not found on ${producer.from.kind} "${sourceName}"`);
+```
+
+Import `PluginSource` from types. This is the ONLY evaluate.ts change beyond the `if` condition widening.
 
 ### Task 14: TS Runtime — Export registerPlugin from root.ts
 
@@ -679,6 +729,8 @@ Html.On(plan, t => t.DomReady(p =>
 | `empty_member_name_throws` | p.Method("", Shape.String) → ArgumentException |
 | `null_shape_throws` | p.Method("getToken", null) → ArgumentNullException |
 | `empty_gather_param_name_throws` | g.Plugin("auth", "getToken", "") → ArgumentException |
+| `incompatible_shape_throws_at_build_time` | RegisterPlugin declares Method("getToken", Shape.String), then Plugin<int>("auth", "getToken") → InvalidOperationException (string vs number) |
+| `null_configure_delegate_throws` | RegisterPlugin("auth", null) → ArgumentNullException |
 
 ### Task 17: Playwright Tests (6 tests) — `WhenPluginsProvideValues.cs`
 
@@ -732,7 +784,7 @@ Navigate to `/Sandbox/HttpPipeline/Http` (sandbox must include plugin registrati
 - [ ] Shape flows from JsType through plan JSON through TS runtime
 - [ ] No inline JavaScript in views (module import only)
 - [ ] execute.ts Set/Call guards reject PluginSource (from URL Query Source)
-- [ ] All 18 C# unit tests pass (Task 16)
+- [ ] All 20 C# unit tests pass (Task 16)
 - [ ] All 8 vitest tests pass (Task 18: 4 registry + 4 evaluate/resolver)
 - [ ] All 6 Playwright tests pass (Task 17)
 - [ ] All existing 808+ Playwright tests pass (no regressions)
