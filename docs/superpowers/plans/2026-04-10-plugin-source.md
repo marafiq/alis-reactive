@@ -301,12 +301,20 @@ namespace Alis.Reactive.Builders.Conditions
 ```csharp
 public Conditions.TypedPluginSource<string> Plugin(string pluginName, string member)
 {
+    if (string.IsNullOrWhiteSpace(pluginName))
+        throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+    if (string.IsNullOrWhiteSpace(member))
+        throw new System.ArgumentException("Member name required.", nameof(member));
     Context.ValidatePluginMember(pluginName, member);
     return new Conditions.TypedPluginSource<string>(pluginName, member);
 }
 
 public Conditions.TypedPluginSource<T> Plugin<T>(string pluginName, string member)
 {
+    if (string.IsNullOrWhiteSpace(pluginName))
+        throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+    if (string.IsNullOrWhiteSpace(member))
+        throw new System.ArgumentException("Member name required.", nameof(member));
     Context.ValidatePluginMember(pluginName, member);
     var declaredShape = Context.GetPluginMemberShape(pluginName, member);
     var requestedShape = PlanModel.Shape.FromClrType(typeof(T));
@@ -350,6 +358,8 @@ namespace Alis.Reactive.Builders
 
         public void Call(string method, params ValueProducer[] args)
         {
+            if (string.IsNullOrWhiteSpace(method))
+                throw new System.ArgumentException("Method name required.", nameof(method));
             _emitter.BuildContext.ValidatePluginMember(_pluginName, method);
             _emitter.AddStep(Reaction.Call(
                 PlanModel.PluginSource.Of(_pluginName), method,
@@ -371,6 +381,10 @@ p.PluginRef("analytics").Call("trackEvent", ValueProducer.Literal("form-submit")
 ```csharp
 public GatherBuilder<TModel> Plugin(string pluginName, string member, string paramName)
 {
+    if (string.IsNullOrWhiteSpace(pluginName))
+        throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+    if (string.IsNullOrWhiteSpace(member))
+        throw new System.ArgumentException("Member name required.", nameof(member));
     if (string.IsNullOrWhiteSpace(paramName))
         throw new System.ArgumentException("HTTP parameter name required.", nameof(paramName));
     _context.ValidatePluginMember(pluginName, member);
