@@ -13,6 +13,7 @@ namespace Alis.Reactive.Builders.Requests
         internal List<StaticField> StaticFields { get; } = new List<StaticField>();
         internal List<EventField> EventFields { get; } = new List<EventField>();
         internal Dictionary<string, ValueProducer> HeaderFields { get; } = new Dictionary<string, ValueProducer>();
+        internal Dictionary<string, ValueProducer> RouteParamFields { get; } = new Dictionary<string, ValueProducer>();
         private bool _includeAll;
 
         internal GatherBuilder(PlanBuildContext context)
@@ -95,6 +96,72 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new System.ArgumentException("Header name must not be null or whitespace.", nameof(name));
+        }
+
+        // ── Route Params ─────────────────────────────────────
+
+        /// <summary>Adds a route param from a static int.</summary>
+        public GatherBuilder<TModel> RouteParam(string paramName, int value)
+        {
+            ValidateRouteParamName(paramName);
+            RouteParamFields[paramName] = ValueProducer.Literal(value);
+            return this;
+        }
+
+        /// <summary>Adds a route param from a static string. Value must not be null.</summary>
+        public GatherBuilder<TModel> RouteParam(string paramName, string value)
+        {
+            ValidateRouteParamName(paramName);
+            if (value == null)
+                throw new System.ArgumentNullException(nameof(value),
+                    $"Route param '{paramName}' value must not be null. Literal route params require a concrete value. " +
+                    "Use the TypedSource<T> or event-arg overload for dynamic/nullable values.");
+            RouteParamFields[paramName] = ValueProducer.Literal(value);
+            return this;
+        }
+
+        /// <summary>Adds a route param from a static long.</summary>
+        public GatherBuilder<TModel> RouteParam(string paramName, long value)
+        {
+            ValidateRouteParamName(paramName);
+            RouteParamFields[paramName] = ValueProducer.Literal(value);
+            return this;
+        }
+
+        /// <summary>Adds a route param from a typed source. Route params are scalar — arrays and objects are rejected at build time.</summary>
+        public GatherBuilder<TModel> RouteParam<TProp>(string paramName, TypedSource<TProp> source)
+        {
+            ValidateRouteParamName(paramName);
+            if (source == null) throw new System.ArgumentNullException(nameof(source));
+            RequireScalarShape<TProp>(paramName, "route param");
+            RouteParamFields[paramName] = source.ToValueProducer();
+            return this;
+        }
+
+        /// <summary>Adds a route param from an event arg expression. Route params are scalar — arrays and objects are rejected at build time.</summary>
+        public GatherBuilder<TModel> RouteParam<TArgs, TProp>(
+            string paramName, TArgs args, Expression<Func<TArgs, TProp>> path)
+        {
+            ValidateRouteParamName(paramName);
+            RequireScalarShape<TProp>(paramName, "route param");
+            var eventPath = ExpressionPathHelper.ToEventPath(path);
+            var shape = Shape.FromClrType(typeof(TProp));
+            RouteParamFields[paramName] = ValueProducer.Read(PayloadSource.Event(), eventPath, shape: shape);
+            return this;
+        }
+
+        private static readonly System.Text.RegularExpressions.Regex RouteParamNameRe =
+            new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9_]+$", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        private static void ValidateRouteParamName(string paramName)
+        {
+            if (string.IsNullOrWhiteSpace(paramName))
+                throw new System.ArgumentException("Route param name must not be null or whitespace.", nameof(paramName));
+            if (!RouteParamNameRe.IsMatch(paramName))
+                throw new System.ArgumentException(
+                    $"Route param name '{paramName}' contains invalid characters. " +
+                    "Names must match [a-zA-Z0-9_] (ASCII only) to align with the runtime {{placeholder}} regex.",
+                    nameof(paramName));
         }
 
         /// <summary>

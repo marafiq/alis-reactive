@@ -225,6 +225,7 @@ export interface Request {
   method: HttpMethod;
   url: string;
   headers?: Record<string, ValueProducer>;
+  routeParams?: Record<string, ValueProducer>;
   container?: string;
   input?: RequestInput;
   before?: Reaction[];

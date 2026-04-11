@@ -147,6 +147,32 @@ namespace Alis.Reactive.Builders.Requests
             if (_gatherBuilder != null && _gatherBuilder.HeaderFields.Count > 0)
                 request.Headers = new Dictionary<string, ValueProducer>(_gatherBuilder.HeaderFields);
 
+            if (_gatherBuilder != null && _gatherBuilder.RouteParamFields.Count > 0)
+            {
+                var placeholderRe = new System.Text.RegularExpressions.Regex(@"\{(\w+)\}");
+
+                // Forward: every RouteParam must match a URL placeholder
+                foreach (var paramName in _gatherBuilder.RouteParamFields.Keys)
+                {
+                    if (!_url.Contains("{" + paramName + "}"))
+                        throw new InvalidOperationException(
+                            $"Route param '{paramName}' does not match any placeholder in URL '{_url}'. " +
+                            $"Expected '{{{paramName}}}' in the URL template.");
+                }
+
+                // Reverse: every URL placeholder must have a matching RouteParam
+                foreach (System.Text.RegularExpressions.Match match in placeholderRe.Matches(_url))
+                {
+                    var placeholder = match.Groups[1].Value;
+                    if (!_gatherBuilder.RouteParamFields.ContainsKey(placeholder))
+                        throw new InvalidOperationException(
+                            $"URL template '{_url}' has placeholder '{{{placeholder}}}' " +
+                            $"but no matching .RouteParam(\"{placeholder}\", ...) was provided.");
+                }
+
+                request.RouteParams = new Dictionary<string, ValueProducer>(_gatherBuilder.RouteParamFields);
+            }
+
             return request;
         }
     }

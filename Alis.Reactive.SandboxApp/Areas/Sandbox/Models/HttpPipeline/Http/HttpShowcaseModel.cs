@@ -63,6 +63,24 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int Count { get; set; }
     }
 
+    public class ResidentByIdResponse
+    {
+        public int ResidentId { get; set; }
+        public string? Name { get; set; }
+    }
+
+    public class FacilityResidentResponse
+    {
+        public int FacilityId { get; set; }
+        public int ResidentId { get; set; }
+        public string? Name { get; set; }
+    }
+
+    public class ResidentByNameResponse
+    {
+        public string? ReceivedName { get; set; }
+    }
+
     public class EchoHeadersResponse
     {
         public string? ApiVersion { get; set; }

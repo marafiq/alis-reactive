@@ -408,6 +408,144 @@
     </native-card-body>
     </native-card>
 
+    <!-- Section 15: Single Route Param -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">15. GET with Single Route Param</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Route param {id} resolved to 42 before fetch. Server echoes the received ID.</p>
+        @(Html.NativeButton("route-single-btn", "Load Resident #42")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
+                 .Gather(g => g.RouteParam("id", 42))
+                 .WhileLoading(l => l.Element("route-single-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess<ResidentByIdResponse>((json, s) =>
+                    {
+                        s.Element("route-single-spinner").Hide();
+                        s.Element("route-single-id").SetText(json, x => x.ResidentId);
+                        s.Element("route-single-name").SetText(json, x => x.Name);
+                        s.Element("route-single-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="route-single-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p id="route-single-spinner" hidden class="text-amber-600">Loading...</p>
+            <p>Resident ID: <span id="route-single-id">—</span></p>
+            <p>Name: <span id="route-single-name">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 16: Multiple Route Params -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">16. GET with Multiple Route Params</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Two route params {facilityId} and {residentId} resolved in one URL template.</p>
+        @(Html.NativeButton("route-multi-btn", "Load Facility Resident")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/HttpPipeline/Http/Facilities/{facilityId}/Residents/{residentId}")
+                 .Gather(g => g
+                     .RouteParam("facilityId", 7)
+                     .RouteParam("residentId", 99))
+                 .WhileLoading(l => l.Element("route-multi-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess<FacilityResidentResponse>((json, s) =>
+                    {
+                        s.Element("route-multi-spinner").Hide();
+                        s.Element("route-multi-facility").SetText(json, x => x.FacilityId);
+                        s.Element("route-multi-resident").SetText(json, x => x.ResidentId);
+                        s.Element("route-multi-name").SetText(json, x => x.Name);
+                        s.Element("route-multi-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="route-multi-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p id="route-multi-spinner" hidden class="text-amber-600">Loading...</p>
+            <p>Facility ID: <span id="route-multi-facility">—</span></p>
+            <p>Resident ID: <span id="route-multi-resident">—</span></p>
+            <p>Name: <span id="route-multi-name">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 17: Chained with Route Params + Headers -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">17. Chained with Route Params + Headers</native-heading>
+        <p class="text-sm text-text-secondary mb-3">First request resolves {id}=42, chained resolves {facilityId}=3 and {residentId}=77. Both carry custom headers.</p>
+        @(Html.NativeButton("route-chain-btn", "Chain with Route Params")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
+                 .Gather(g => g
+                     .RouteParam("id", 42)
+                     .Header("X-Step", "first"))
+                 .WhileLoading(l => l.Element("route-chain-spinner").Show())
+                 .Response(r => r
+                    .OnSuccess<ResidentByIdResponse>((json, s) =>
+                    {
+                        s.Element("route-chain-first-id").SetText(json, x => x.ResidentId);
+                        s.Element("route-chain-first").AddClass("text-green-600");
+                    })
+                    .Chained(c => c
+                        .Get("/Sandbox/HttpPipeline/Http/Facilities/{facilityId}/Residents/{residentId}")
+                        .Gather(g2 => g2
+                            .RouteParam("facilityId", 3)
+                            .RouteParam("residentId", 77)
+                            .Header("X-Step", "second"))
+                        .Response(r2 => r2
+                            .OnSuccess<FacilityResidentResponse>((json2, s2) =>
+                            {
+                                s2.Element("route-chain-spinner").Hide();
+                                s2.Element("route-chain-second-name").SetText(json2, x => x.Name);
+                                s2.Element("route-chain-second").AddClass("text-green-600");
+                            })
+                        )
+                    )
+                 );
+            }))
+        <div class="mt-3 space-y-2 font-mono text-sm">
+            <p id="route-chain-spinner" hidden class="text-amber-600">Loading chain...</p>
+            <div id="route-chain-first" class="text-text-muted">
+                <p>1st Resident ID: <span id="route-chain-first-id">—</span></p>
+            </div>
+            <div id="route-chain-second" class="text-text-muted">
+                <p>2nd Name: <span id="route-chain-second-name">—</span></p>
+            </div>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section 18: URI-Encoded Route Param -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">18. URI-Encoded Route Param</native-heading>
+        <p class="text-sm text-text-secondary mb-3">Route param &quot;John Doe&quot; is URI-encoded to &quot;John%20Doe&quot; in the URL path. Server URL-decodes it.</p>
+        @(Html.NativeButton("route-encoded-btn", "Load Resident by Name")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/HttpPipeline/Http/ResidentByName/{name}")
+                 .Gather(g => g.RouteParam("name", "John Doe"))
+                 .Response(r => r
+                    .OnSuccess<ResidentByNameResponse>((json, s) =>
+                    {
+                        s.Element("route-encoded-name").SetText(json, x => x.ReceivedName);
+                        s.Element("route-encoded-result").AddClass("text-green-600");
+                    })
+                 );
+            }))
+        <div id="route-encoded-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p>Received Name: <span id="route-encoded-name">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
     <!-- Section 12: Custom Headers (literal) -->
     <native-card>
     <native-card-body>

@@ -18,6 +18,9 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Custom HTTP headers to send with this request. Each value is a ValueProducer
         /// evaluated at request time — supports literals, component reads, and event args.</summary>
         public Dictionary<string, ValueProducer>? Headers { get; internal set; }
+        /// <summary>URL template parameters. Each value is a ValueProducer evaluated at request time.
+        /// Placeholders like {id} in the URL are replaced with the evaluated, URI-encoded values.</summary>
+        public Dictionary<string, ValueProducer>? RouteParams { get; internal set; }
 
         internal Request(string method, string url)
         {

@@ -352,6 +352,10 @@
           "type": "object",
           "additionalProperties": { "$ref": "#/$defs/ValueProducer" }
         },
+        "routeParams": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/ValueProducer" }
+        },
         "container": { "type": "string", "minLength": 1 },
         "input": { "$ref": "#/$defs/RequestInput" },
         "before": {

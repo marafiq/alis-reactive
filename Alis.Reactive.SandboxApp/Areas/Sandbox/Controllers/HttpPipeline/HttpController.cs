@@ -196,6 +196,20 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             }
         }
 
+        // ── Section 15-18: Route Params ────────────────────────
+
+        [HttpGet("Residents/{id:int}")]
+        public IActionResult ResidentById(int id) =>
+            Json(new { residentId = id, name = $"Resident #{id}" });
+
+        [HttpGet("Facilities/{facilityId:int}/Residents/{residentId:int}")]
+        public IActionResult FacilityResident(int facilityId, int residentId) =>
+            Json(new { facilityId, residentId, name = $"Resident #{residentId} at Facility #{facilityId}" });
+
+        [HttpGet("ResidentByName/{name}")]
+        public IActionResult ResidentByName(string name) =>
+            Json(new { receivedName = name });
+
         // ── Section 12: Custom Headers ─────────────────────────
 
         [HttpGet("EchoHeaders")]

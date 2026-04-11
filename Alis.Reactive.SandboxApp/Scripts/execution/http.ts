@@ -8,6 +8,7 @@ import { executeReaction } from "./execute";
 import { validateContainer } from "../validation";
 import { evaluateValue } from "../core/evaluate";
 import { formatForWire } from "../core/wire-format";
+import { resolveRouteParams } from "../core/url-template";
 import { scope } from "../core/trace";
 
 const log = scope("http");
@@ -18,7 +19,9 @@ interface ResolvedFetch {
 }
 
 function buildFetch(req: Request, gatherResult: GatherResult, plan: Plan, ctx?: ExecContext): ResolvedFetch {
-  let url = req.url;
+  let url = req.routeParams
+    ? resolveRouteParams(req.url, req.routeParams, plan, ctx)
+    : req.url;
   const init: RequestInit = { method: req.method };
 
   if (gatherResult.urlParams.length > 0) {
