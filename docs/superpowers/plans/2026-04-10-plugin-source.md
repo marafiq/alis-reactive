@@ -346,9 +346,52 @@ PluginSource in Source oneOf. `additionalProperties: false`, name pattern `^\S+$
 
 ### Task 12: Vertical Slice — `/Sandbox/Plugins/ArrayManager`
 
-**OWN page.** Not shared with HTTP pipeline. Own controller, own view, own index entry.
+**OWN page.** Own controller, own view, own model, own DTOs, own index entry. Not shared.
 
-**Controller:** `Areas/Sandbox/Controllers/Plugins/ArrayManagerController.cs`
+#### Plugin TS (already in sandbox-plugins.ts)
+
+Methods return scalars OR objects/arrays — objects flow as payloads (same as event args and HTTP responses). The framework's `evaluateValue` handles recursive evaluation:
+
+```typescript
+// In sandbox-plugins.ts — array utility methods
+// Scalars — for display and conditions
+count:    (arr: any[]) => arr.length,
+pluck:    (arr: any[], index: number, key: string) => arr[index]?.[key],
+sum:      (arr: any[], key: string) => arr.reduce((s, i) => s + (Number(i[key]) || 0), 0),
+some:     (arr: any[], key: string, val: any) => arr.some(i => i[key] === val),
+every:    (arr: any[], key: string, val: any) => arr.every(i => i[key] === val),
+includes: (arr: any[], item: any) => arr.includes(item),
+join:     (arr: any[], sep: string) => arr.join(sep),
+
+// Objects/arrays — for chaining between plugin calls
+first:    (arr: any[]) => arr[0],
+filter:   (arr: any[], key: string, val: any) => arr.filter(i => i[key] === val),
+sort:     (arr: any[], key: string) => [...arr].sort((a, b) => a[key] > b[key] ? 1 : -1),
+map:      (arr: any[], key: string) => arr.map(i => i[key]),
+```
+
+#### Model + DTOs
+
+**File:** `Areas/Sandbox/Models/Plugins/ArrayManagerModel.cs`:
+
+```csharp
+public class ArrayManagerModel { }
+
+public class ResidentsListResponse
+{
+    public object[] Items { get; set; } = Array.Empty<object>();
+}
+
+public class PluginEchoResponse
+{
+    public int? ReceivedCount { get; set; }
+    public string? ReceivedHeader { get; set; }
+}
+```
+
+#### Controller
+
+**File:** `Areas/Sandbox/Controllers/Plugins/ArrayManagerController.cs`:
 
 ```csharp
 [Area("Sandbox")]
@@ -356,7 +399,8 @@ PluginSource in Source oneOf. `additionalProperties: false`, name pattern `^\S+$
 public class ArrayManagerController : Controller
 {
     [HttpGet("")]
-    public IActionResult Index() => View("~/Areas/Sandbox/Views/Plugins/ArrayManager/Index.cshtml", new ArrayManagerModel());
+    public IActionResult Index() =>
+        View("~/Areas/Sandbox/Views/Plugins/ArrayManager/Index.cshtml", new ArrayManagerModel());
 
     [HttpGet("Residents")]
     public IActionResult Residents() => Json(new {
@@ -370,44 +414,52 @@ public class ArrayManagerController : Controller
     });
 
     [HttpGet("PluginEcho")]
-    public IActionResult PluginEcho(int? count, string? firstName, string? status) => Json(new {
+    public IActionResult PluginEcho(int? count) => Json(new {
         receivedCount = count,
-        receivedFirstName = firstName ?? "(none)",
-        receivedStatus = status ?? "(none)",
         receivedHeader = Request.Headers["X-Array-Count"].FirstOrDefault() ?? "(none)"
     });
 }
 ```
 
-**View:** DomReady loads residents via GET, then uses array plugin on the response:
+#### View
 
-```csharp
+**File:** `Areas/Sandbox/Views/Plugins/ArrayManager/Index.cshtml`:
+
+```html
+@model ArrayManagerModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
 @{
+    ViewData["Title"] = "Array Plugin";
     var plan = Html.ReactivePlan<ArrayManagerModel>();
 
-    // Load residents, then use array plugin on the response data
+    // DomReady → GET residents → use array plugin on response
     Html.On(plan, t => t.DomReady(p =>
         p.Get("/Sandbox/Plugins/ArrayManager/Residents")
          .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
          {
-             // array.count
-             s.Element("total").SetText(
+             // array.count → scalar int
+             s.Element("arr-total").SetText(
                  p.Plugin<int>("array", "count").Arg(json, x => x.Items));
 
-             // array.first
-             s.Element("first-name").SetText(
-                 p.Plugin<string>("array", "first").Arg(json, x => x.Items));
+             // array.pluck(items, 0, "name") → scalar string
+             s.Element("arr-first-name").SetText(
+                 p.Plugin<string>("array", "pluck")
+                  .Arg(json, x => x.Items)
+                  .Arg(0)
+                  .Arg("name"));
 
-             // array.filter + count (nested)
-             s.Element("active-count").SetText(
+             // array.filter + count (NESTED plugin reads)
+             s.Element("arr-active-count").SetText(
                  p.Plugin<int>("array", "count")
                   .Arg(p.Plugin<object>("array", "filter")
                        .Arg(json, x => x.Items)
                        .Arg("status")
                        .Arg("active")));
 
-             // array.sum
-             s.Element("total-age").SetText(
+             // array.sum → scalar int
+             s.Element("arr-total-age").SetText(
                  p.Plugin<int>("array", "sum")
                   .Arg(json, x => x.Items)
                   .Arg("age"));
@@ -415,41 +467,90 @@ public class ArrayManagerController : Controller
              // array.some → condition
              s.When(p.Plugin<bool>("array", "some")
                     .Arg(json, x => x.Items)
-                    .Arg("status").Arg("critical"))
+                    .Arg("status")
+                    .Arg("critical"))
               .Truthy()
-              .Then(t => t.Element("has-critical").Show())
-              .Else(e => e.Element("no-critical").Show());
+              .Then(t => t.Element("arr-has-critical").Show())
+              .Else(e => e.Element("arr-no-critical").Show());
 
-             s.Element("results").AddClass("text-green-600");
+             s.Element("arr-results").AddClass("text-green-600");
          }))));
 
-    // Button: send plugin-computed values to server
-    Html.On(plan, t => t.CustomEvent("send-plugin-data", p =>
-        p.Get("/Sandbox/Plugins/ArrayManager/PluginEcho")
-         .Gather(g => g
-             .Plugin<int>("array", "count", "count")  // ← can't chain .Arg here
-             // For gather with args, need to use Header or rethink
-             .Header("X-Array-Count", p.Plugin<int>("array", "count"))
-             .FromUrl("status"))
-         .Response(r => r.OnSuccess<PluginEchoResponse>((json, s) =>
-         {
-             s.Element("echo-count").SetText(json, x => x.ReceivedCount);
-             s.Element("echo-header").SetText(json, x => x.ReceivedHeader);
-             s.Element("echo-status").SetText(json, x => x.ReceivedStatus);
-             s.Element("echo-result").AddClass("text-green-600");
-         }))));
+    // Button → GET with plugin values in gather + header
+    Html.NativeButton("arr-send-btn", "Send to Server")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Get("/Sandbox/Plugins/ArrayManager/PluginEcho")
+             .Gather(g => g
+                 .Header("X-Array-Count", p.Plugin<int>("array", "count"))
+                 .Plugin<int>("array", "count", "count"))
+             .Response(r => r
+                .OnSuccess<PluginEchoResponse>((json, s) =>
+                {
+                    s.Element("arr-echo-count").SetText(json, x => x.ReceivedCount);
+                    s.Element("arr-echo-header").SetText(json, x => x.ReceivedHeader);
+                    s.Element("arr-echo-result").AddClass("text-green-600");
+                    // Case 1: void call after HTTP success
+                    s.Plugin("analytics", "track").Arg("array-sent");
+                }));
+        });
 }
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Array Plugin</native-heading>
+        <native-text color="Secondary">
+            Native JS array methods exposed to the DSL via plugin.
+        </native-text>
+    </div>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">DomReady: Array Operations on Server Data</native-heading>
+        <div id="arr-results" class="space-y-2 font-mono text-sm text-text-muted">
+            <p>Total: <span id="arr-total">—</span></p>
+            <p>First Name: <span id="arr-first-name">—</span></p>
+            <p>Active Count: <span id="arr-active-count">—</span></p>
+            <p>Total Age: <span id="arr-total-age">—</span></p>
+            <p id="arr-has-critical" hidden class="text-red-600">Critical residents found!</p>
+            <p id="arr-no-critical" hidden class="text-green-600">No critical residents ✓</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">HTTP: Plugin Values in Gather + Header</native-heading>
+        @(Html.NativeButton("arr-send-btn", "Send to Server")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white"))
+        <div id="arr-echo-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p>Count: <span id="arr-echo-count">—</span></p>
+            <p>Header: <span id="arr-echo-header">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
 ```
 
-**Element IDs:**
-- `#total` → "5"
-- `#first-name` → first resident object (or its name)
-- `#active-count` → "3" (3 active)
-- `#total-age` → "393" (82+75+68+91+77)
-- `#has-critical` / `#no-critical` → no-critical visible (no critical status)
-- `#echo-count`, `#echo-header`, `#echo-status` → server echoes
+#### Element Expectations
 
-**Update sandbox index** at `/Sandbox/Index.cshtml` to include link to `/Sandbox/Plugins/ArrayManager`.
+| Element | Expected Value | What It Proves |
+|---|---|---|
+| `#arr-total` | "5" | `array.count` — zero-arg on response array |
+| `#arr-first-name` | "John Doe" | `array.pluck(items, 0, "name")` — index + key args |
+| `#arr-active-count` | "3" | Nested: `array.count(array.filter(items, "status", "active"))` |
+| `#arr-total-age` | "393" | `array.sum` — with literal key arg "age" |
+| `#arr-no-critical` | visible | `array.some` → condition → Else branch (no critical status) |
+| `#arr-results` | class `text-green-600` | DomReady success |
+| `#arr-echo-count` | "5" | Plugin read → HTTP gather param |
+| `#arr-echo-header` | "5" | Plugin read → HTTP header |
+| `#arr-echo-result` | class `text-green-600` | HTTP success |
+
+#### Sandbox Index Update
+
+Add link to `/Sandbox/Plugins/ArrayManager` in `Areas/Sandbox/Views/Index.cshtml`.
 
 ---
 
@@ -480,18 +581,20 @@ public class ArrayManagerController : Controller
 
 ### Playwright Tests (8) — `WhenArrayPluginManipulates.cs`
 
-Navigate to `/Sandbox/Plugins/ArrayManager`.
+**File:** `tests/Alis.Reactive.PlaywrightTests/Plugins/WhenArrayPluginManipulates.cs`
 
-| Test | Assert |
-|---|---|
-| `array_count_displayed` | `#total` → "5" |
-| `array_filter_count_displayed` | `#active-count` → "3" |
-| `array_sum_displayed` | `#total-age` → "393" |
-| `array_some_condition_evaluates` | `#no-critical` visible |
-| `array_results_success_class` | `#results` green |
-| `plugin_echo_count_from_server` | Click send → `#echo-count` has value |
-| `plugin_echo_header_from_server` | Click send → `#echo-header` has value |
-| `plugin_echo_url_composes` | Click send → `#echo-status` has value |
+Navigate to `/Sandbox/Plugins/ArrayManager`. Wait for `#arr-total` to not be "—" (DomReady GET completes).
+
+| Test | Action | Assert |
+|---|---|---|
+| `array_count_on_load` | DomReady | `#arr-total` → "5" |
+| `array_pluck_first_name` | DomReady | `#arr-first-name` → "John Doe" |
+| `array_nested_filter_count` | DomReady | `#arr-active-count` → "3" |
+| `array_sum_total_age` | DomReady | `#arr-total-age` → "393" |
+| `array_some_condition_no_critical` | DomReady | `#arr-no-critical` visible, `#arr-has-critical` hidden |
+| `array_results_success_class` | DomReady | `#arr-results` has class `text-green-600` |
+| `plugin_gather_sends_count` | Click "Send to Server" | `#arr-echo-count` → "5" |
+| `plugin_header_sends_count` | Click "Send to Server" | `#arr-echo-header` → "5" |
 
 ### vitest Tests (8) — `plugin-registry.test.ts` + `evaluate-plugin.test.ts`
 
