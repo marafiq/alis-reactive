@@ -15,6 +15,7 @@ import type {
 } from "../types";
 import type { ExecContext } from "../types";
 import { walkPath, walkPathParent } from "../core/walk";
+import { resolvePlugin } from "../core/plugin-registry";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
 import { wire as wireNative } from "./event-native";
@@ -33,6 +34,8 @@ export function resolveSource(plan: Plan, source: Source, ctx?: ExecContext): un
       return resolvePayload(source, ctx);
     case "url":
       return new URLSearchParams(window.location.search);
+    case "plugin":
+      return resolvePlugin(source.name);
     default:
       assertNever(source, "source kind");
   }
@@ -99,12 +102,20 @@ export function getJsType(plan: Plan, componentKey: string): JsType {
   return jsType;
 }
 
-/** Get JsType for a Source (component sources only). */
+/** Get JsType for a Source (component and plugin sources). */
 export function getJsTypeForSource(plan: Plan, source: Source): JsType {
-  if (source.kind !== "component") {
-    throw new Error("[alis] getJsTypeForSource only supports component sources");
+  switch (source.kind) {
+    case "component":
+      return getJsType(plan, source.component);
+    case "plugin": {
+      const typeKey = "plugin." + source.name;
+      const jsType = plan.types[typeKey];
+      if (!jsType) throw new Error(`[alis] type not found for plugin: "${source.name}"`);
+      return jsType;
+    }
+    default:
+      throw new Error(`[alis] getJsTypeForSource does not support source kind "${(source as any).kind}"`);
   }
-  return getJsType(plan, source.component);
 }
 
 // ── Property operations ────────────────────────────────────

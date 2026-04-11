@@ -142,7 +142,8 @@
       "oneOf": [
         { "$ref": "#/$defs/ComponentSource" },
         { "$ref": "#/$defs/PayloadSource" },
-        { "$ref": "#/$defs/UrlSource" }
+        { "$ref": "#/$defs/UrlSource" },
+        { "$ref": "#/$defs/PluginSource" }
       ]
     },
     "ComponentSource": {
@@ -173,6 +174,15 @@
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "url" }
+      }
+    },
+    "PluginSource": {
+      "type": "object",
+      "required": ["kind", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "plugin" },
+        "name": { "type": "string", "minLength": 1, "pattern": "^\\S+$" }
       }
     },
     "Behavior": {

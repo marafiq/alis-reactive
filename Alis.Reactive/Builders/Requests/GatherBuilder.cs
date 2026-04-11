@@ -232,6 +232,18 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
+        // ── Plugin ────────────────────────────────────────────
+
+        /// <summary>Includes a plugin method result in the gather. Accepts TypedPluginSource which may carry args.</summary>
+        public GatherBuilder<TModel> Plugin<T>(Conditions.TypedPluginSource<T> source, string paramName)
+        {
+            if (source == null) throw new System.ArgumentNullException(nameof(source));
+            if (string.IsNullOrWhiteSpace(paramName))
+                throw new System.ArgumentException("HTTP param name required.", nameof(paramName));
+            Fields.Add(GatherField.Of(paramName, source.ToValueProducer()));
+            return this;
+        }
+
         /// <summary>
         /// Includes a specific component's value in the gather.
         /// Used by vendor extension methods (Fusion, Native).

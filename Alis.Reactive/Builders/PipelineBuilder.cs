@@ -94,6 +94,24 @@ namespace Alis.Reactive.Builders
             return new Conditions.TypedUrlSource<T>(paramName);
         }
 
+        /// <summary>Reads a plugin method return value. Use .Arg() for args.</summary>
+        public PluginReadBuilder<T, TModel> Plugin<T>(string pluginName, string member)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
+            Context.EnsurePluginMethod(pluginName, member, returns: PlanModel.Shape.FromClrType(typeof(T)));
+            return new PluginReadBuilder<T, TModel>(pluginName, member);
+        }
+
+        /// <summary>Calls a plugin method (void). Use .Arg() then .Fire().</summary>
+        public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
+            Context.EnsurePluginMethod(pluginName, member);
+            return new PluginCallBuilder<TModel>(pluginName, member, this);
+        }
+
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
             Steps.Add(Reaction.ShowValidationErrors(formId));

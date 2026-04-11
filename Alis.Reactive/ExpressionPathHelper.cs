@@ -85,6 +85,15 @@ namespace Alis.Reactive
             return string.Join(".", members);
         }
 
+        /// <summary>
+        /// Converts a typed expression to an HTTP response body dot-path, preserving type safety for value types.
+        /// </summary>
+        public static string ToResponsePath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join(".", members);
+        }
+
         private static List<string> ExtractMemberChain(Expression expr)
         {
             var members = new List<string>();

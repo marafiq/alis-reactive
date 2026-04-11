@@ -221,12 +221,14 @@ function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void 
 // ── Call reaction ──────────────────────────────────────────
 
 function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): void {
-  if (reaction.on.kind !== "component" && reaction.on.kind !== "payload") {
-    throw new Error(`[alis] Call reaction does not support source kind "${reaction.on.kind}". Only component and payload sources can be mutation targets.`);
+  if (reaction.on.kind !== "component" && reaction.on.kind !== "payload" && reaction.on.kind !== "plugin") {
+    throw new Error(`[alis] Call reaction does not support source kind "${reaction.on.kind}". Only component, payload, and plugin sources can be call targets.`);
   }
   const root = resolveSource(plan, reaction.on, ctx);
   const args = reaction.args?.map(a => evaluateValue(a, plan, ctx)) ?? [];
-  const target = reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope;
+  const target = reaction.on.kind === "component" ? reaction.on.component
+    : reaction.on.kind === "plugin" ? (reaction.on as import("../types").PluginSource).name
+    : reaction.on.scope;
   log.trace("call", { target, method: reaction.method, args });
 
   if (reaction.on.kind === "payload") {

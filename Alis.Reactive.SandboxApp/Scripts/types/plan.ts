@@ -85,7 +85,7 @@ export interface ValidationRule {
 
 // ── Source ─────────────────────────────────────────────────────
 
-export type Source = ComponentSource | PayloadSource | UrlSource;
+export type Source = ComponentSource | PayloadSource | UrlSource | PluginSource;
 
 export interface ComponentSource {
   kind: "component";
@@ -94,6 +94,11 @@ export interface ComponentSource {
 
 export interface UrlSource {
   kind: "url";
+}
+
+export interface PluginSource {
+  kind: "plugin";
+  name: string;
 }
 
 export type PayloadScope = "event" | "success" | "error" | "request" | "dispatch" | "local";

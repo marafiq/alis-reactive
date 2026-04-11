@@ -10,6 +10,14 @@ import "./components/native/loader";  // side-effect: handles target positioning
 import { composeInitialPlans } from "./lifecycle/merge-plan";
 import type { Plan } from "./types";
 import type { TraceLevel } from "./core/trace";
+import { registerPlugin } from "./core/plugin-registry";
+
+// Drain passive plugin queue — plugins push here from separate bundles before framework loads
+const pendingPlugins = (window as any).__alisPlugins as Array<{ name: string; instance: unknown }> | undefined;
+if (pendingPlugins) {
+  for (const entry of pendingPlugins) registerPlugin(entry.name, entry.instance);
+  delete (window as any).__alisPlugins;
+}
 
 initConfirm();
 initNativeActionLinks();

@@ -19,8 +19,8 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
     case "read": {
       const root = resolveSource(plan, producer.from, ctx);
 
-      // Component source: look up member in JsType
-      if (producer.from.kind === "component") {
+      // Component or Plugin source: look up member in JsType
+      if (producer.from.kind === "component" || producer.from.kind === "plugin") {
         const jsType = getJsTypeForSource(plan, producer.from);
         const prop = jsType.properties?.[producer.member];
         if (prop) {
@@ -33,7 +33,10 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
           const raw = callMethod(root, method, evaluatedArgs);
           return raw == null ? raw : applyShape(raw, producer.shape ?? method.returns);
         }
-        throw new Error(`[alis] member "${producer.member}" not found on component "${producer.from.component}"`);
+        const sourceName = producer.from.kind === "component"
+          ? producer.from.component
+          : (producer.from as import("../types").PluginSource).name;
+        throw new Error(`[alis] member "${producer.member}" not found on ${producer.from.kind} "${sourceName}"`);
       }
       // URL source: read query parameter by name
       if (producer.from.kind === "url") {

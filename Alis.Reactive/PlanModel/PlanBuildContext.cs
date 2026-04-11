@@ -181,6 +181,20 @@ namespace Alis.Reactive.PlanModel
             jsType.WithEvent(eventName, channel, payloadType);
         }
 
+        /// <summary>Ensures a plugin method exists in the plan's JsType registry.
+        /// Auto-creates the JsType on first use. Methods only.</summary>
+        internal void EnsurePluginMethod(string pluginName, string member, Shape returns = null)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName))
+                throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+            if (string.IsNullOrWhiteSpace(member))
+                throw new System.ArgumentException("Method name required.", nameof(member));
+            var typeKey = "plugin." + pluginName;
+            if (!_plan.MutableTypes.ContainsKey(typeKey))
+                _plan.MutableTypes[typeKey] = new JsType();
+            _plan.MutableTypes[typeKey].WithMethod(member, Path.Parse(member), returns: returns);
+        }
+
         private JsType GetJsType(string componentKey)
         {
             var component = _plan.MutableComponents[componentKey];
