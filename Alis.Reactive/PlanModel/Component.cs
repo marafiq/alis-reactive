@@ -12,6 +12,13 @@ namespace Alis.Reactive.PlanModel
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         internal string? BindingPath { get; set; }
 
+        /// <summary>Which member (property or method) on this component reads its form value.
+        /// For input components: "value", "checked", etc. from IInputComponent.ValueMember.
+        /// Used by IncludeAll to know which property to gather at runtime.</summary>
+        [System.Text.Json.Serialization.JsonInclude]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        internal string? ValueMember { get; set; }
+
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public ContainerScope? Container { get; internal set; }
 
@@ -40,18 +47,24 @@ namespace Alis.Reactive.PlanModel
             new ContainerScope(new List<string>(components));
     }
 
+    /// <summary>Validation rules for a single component within a container scope.
+    /// The Value producer reads the component's current value via the shared evaluateValue path.</summary>
     internal sealed class ComponentValidation
     {
+        /// <summary>Component ID — used for DOM error display and serverFieldName mapping.</summary>
         public string Component { get; }
+        /// <summary>How to read this component's value for validation. Evaluated via evaluateValue().</summary>
+        public ValueProducer Value { get; }
         public List<ValidationRule> Rules { get; }
 
         [System.Text.Json.Serialization.JsonInclude]
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         internal string? ServerFieldName { get; }
 
-        internal ComponentValidation(string component, List<ValidationRule> rules, string? serverFieldName = null)
+        internal ComponentValidation(string component, ValueProducer value, List<ValidationRule> rules, string? serverFieldName = null)
         {
             Component = component;
+            Value = value;
             Rules = rules;
             ServerFieldName = serverFieldName;
         }
@@ -64,8 +77,10 @@ namespace Alis.Reactive.PlanModel
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public ValueProducer? Constraint { get; internal set; }
 
+        /// <summary>For peer-comparison rules (equalTo, notEqualTo, min/max with cross-field).
+        /// Pre-resolved by the orchestrator before passing to the pure rule engine.</summary>
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public string? OtherComponent { get; internal set; }
+        public ValueProducer? OtherValue { get; internal set; }
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public Condition? When { get; internal set; }

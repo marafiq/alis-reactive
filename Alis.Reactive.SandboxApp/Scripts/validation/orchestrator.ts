@@ -1,18 +1,19 @@
 // Validation Orchestrator — Fail-Closed, V3 ContainerScope
 //
-// Uses SHARED resolver for ALL component value reads.
-// This module NEVER touches JsType internals — readDefaultValue handles it.
+// Uses SHARED evaluateValue for ALL component value reads.
+// No parallel read path — same concept as pipeline and gather.
 
 import type {
   Plan, ContainerScope, ComponentValidation,
   ValidationRule,
 } from "../types";
 import type { ExecContext } from "../types";
-import { readDefaultValue, resolveElement } from "../resolution/resolver";
+import { resolveElement } from "../resolution/resolver";
 import { evaluateCondition } from "../conditions/conditions";
+import { evaluateValue } from "../core/evaluate";
 import { scope } from "../core/trace";
 import { toString } from "../core/shape-convert";
-import { ruleFails, type PeerReader } from "./rule-engine";
+import { ruleFails } from "./rule-engine";
 import {
   showInline, clearInline,
   addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
@@ -40,7 +41,8 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   let container: HTMLElement;
   try {
     container = resolveElement(plan, containerKey);
-  } catch {
+  } catch (e) {
+    if (!isResolutionError(e)) throw e;
     if ((containerScope.validationRules?.length ?? 0) > 0) {
       log.warn("validate: form container missing, blocking", { containerId });
       return false;
@@ -57,12 +59,11 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
     return true;
   }
 
-  const peerReader = createPeerReader(plan);
   let valid = true;
   let summaryHasErrors = false;
 
   for (const cv of containerScope.validationRules) {
-    if (!evaluateComponentRules(cv, plan, containerId, container, peerReader, summaryEl, ctx)) {
+    if (!evaluateComponentRules(cv, plan, containerId, container, summaryEl, ctx)) {
       valid = false;
       summaryHasErrors = summaryHasErrors || hasSummaryEntry(summaryEl, cv.component);
     }
@@ -131,14 +132,14 @@ export function revalidateField(plan: Plan, containerKey: string, componentKey: 
   let container: HTMLElement;
   try {
     container = resolveElement(plan, containerKey);
-  } catch {
+  } catch (e) {
+    if (!isResolutionError(e)) throw e;
     return;
   }
 
-  const peerReader = createPeerReader(plan);
   const summaryEl = findSummaryElement(plan.planId);
 
-  evaluateComponentRules(cv, plan, containerId, container, peerReader, summaryEl);
+  evaluateComponentRules(cv, plan, containerId, container, summaryEl);
 }
 
 export function clearContainerValidation(plan: Plan, containerKey: string): void {
@@ -157,7 +158,6 @@ function evaluateComponentRules(
   plan: Plan,
   containerId: string,
   container: HTMLElement,
-  peerReader: PeerReader,
   summaryEl: HTMLElement | null,
   ctx?: ExecContext,
 ): boolean {
@@ -174,7 +174,8 @@ function evaluateComponentRules(
   let el: HTMLElement;
   try {
     el = resolveElement(plan, cv.component);
-  } catch {
+  } catch (e) {
+    if (!isResolutionError(e)) throw e;
     if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return true;
     if (cv.rules.length > 0 && summaryEl) {
       addToSummary(summaryEl, cv.component, cv.rules[0].message);
@@ -193,21 +194,36 @@ function evaluateComponentRules(
   const errorSpan = document.getElementById(comp.id + "_error");
   const hidden = errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
 
-  // ONE call to the shared resolver — no JsType internals here
+  // Read value via the shared evaluateValue — same concept as pipeline and gather.
+  // Component may not be resolved yet (partial not merged) — suppress resolution errors only.
   let value: unknown;
   try {
-    value = readDefaultValue(plan, cv.component);
-  } catch {
-    value = undefined;
+    value = evaluateValue(cv.value, plan);
+  } catch (e) {
+    if (isResolutionError(e)) { value = undefined; }
+    else throw e;
   }
 
   for (const rule of cv.rules) {
+    // Condition may reference components not yet merged — skip rule if unresolvable
     if (rule.when) {
-      const condResult = evaluateCondition(rule.when, plan, ctx);
-      if (!condResult) continue;
+      try {
+        const condResult = evaluateCondition(rule.when, plan, ctx);
+        if (!condResult) continue;
+      } catch (e) {
+        if (isResolutionError(e)) continue;
+        throw e;
+      }
     }
 
-    if (ruleFails(rule, value, peerReader)) {
+    // Pre-resolve otherValue if present — keeps rule-engine pure (no DOM)
+    let otherValue: unknown;
+    if (rule.otherValue) {
+      try { otherValue = evaluateValue(rule.otherValue, plan); }
+      catch (e) { if (isResolutionError(e)) otherValue = undefined; else throw e; }
+    }
+
+    if (ruleFails(rule, value, otherValue)) {
       log.trace("rule-fail", { component: cv.component, rule: rule.name, value, message: rule.message });
       if (hidden) {
         if (summaryEl) addToSummary(summaryEl, cv.component, rule.message);
@@ -222,19 +238,15 @@ function evaluateComponentRules(
   return true;
 }
 
+/** Only suppress errors from component/element resolution — not contract bugs. */
+function isResolutionError(e: unknown): boolean {
+  if (!(e instanceof Error)) return false;
+  const msg = e.message;
+  return msg.includes("component not found") || msg.includes("element not found");
+}
+
 // -- Helpers --
 
-function createPeerReader(plan: Plan): PeerReader {
-  return {
-    readPeer(componentKey: string): unknown {
-      try {
-        return readDefaultValue(plan, componentKey);
-      } catch {
-        return undefined;
-      }
-    },
-  };
-}
 
 function allRulesConditionallySkipped(rules: ValidationRule[], plan: Plan, ctx?: ExecContext): boolean {
   if (rules.length === 0) return true;
@@ -243,11 +255,9 @@ function allRulesConditionallySkipped(rules: ValidationRule[], plan: Plan, ctx?:
     try {
       const result = evaluateCondition(rule.when, plan, ctx);
       if (result) return false;
-    } catch (e: unknown) {
-      if (e instanceof Error && (e.message.includes("component not found") || e.message.includes("element not found"))) {
-        continue; // Component missing from plan — conditionally-rendered field, skip
-      }
-      throw e; // Rethrow unexpected errors — fail fast
+    } catch (e) {
+      if (isResolutionError(e)) continue;
+      throw e;
     }
   }
   return true;

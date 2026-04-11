@@ -1,13 +1,10 @@
 // Rule Engine — Pure validation rule evaluation
 // No DOM, no vendor, no side effects. Takes a value + ValidationRule → pass/fail.
 // Uses Shape for ALL type-aware comparisons via convertByShape from shape-convert.
+// otherValue (for peer comparisons) is pre-resolved by the orchestrator.
 
 import { convertByShape, applyShape, toString } from "../core/shape-convert";
 import type { ValidationRule, Shape } from "../types";
-
-export interface PeerReader {
-  readPeer(componentKey: string): unknown;
-}
 
 function compareValues(a: unknown, b: unknown, shape: Shape): number {
   const ra = convertByShape(a, shape);
@@ -19,20 +16,18 @@ function compareValues(a: unknown, b: unknown, shape: Shape): number {
   return ca - cb;
 }
 
-function resolveTarget(rule: ValidationRule, peerReader: PeerReader): unknown {
-  if (rule.otherComponent) {
-    return peerReader.readPeer(rule.otherComponent) ?? undefined;
-  }
+function resolveTarget(rule: ValidationRule, otherValue?: unknown): unknown {
+  if (otherValue !== undefined) return otherValue;
   if (rule.constraint?.kind === "literal") return rule.constraint.value;
   return undefined;
 }
 
 function failsComparisonRule(
-  rule: ValidationRule, value: unknown, empty: boolean, peerReader: PeerReader,
+  rule: ValidationRule, value: unknown, empty: boolean, otherValue?: unknown,
 ): boolean {
-  const target = resolveTarget(rule, peerReader);
+  const target = resolveTarget(rule, otherValue);
   if (target === undefined) return true;
-  if (!rule.shape) return true; // comparison requires shape
+  if (!rule.shape) return true;
   const cmp = compareValues(value, target, rule.shape);
   switch (rule.name) {
     case "min": return !empty && (Number.isNaN(cmp) || cmp < 0);
@@ -57,8 +52,7 @@ function failsRangeRule(rule: ValidationRule, value: unknown, empty: boolean): b
   return cmpLo <= 0 || cmpHi >= 0;
 }
 
-/** Shape-aware equality — applies shape to both sides and uses strict equality.
- *  compareValues is numeric (subtraction) and returns NaN for strings. */
+/** Shape-aware equality — applies shape to both sides and uses strict equality. */
 function shapeEqual(a: unknown, b: unknown, shape?: Shape): boolean {
   if (shape) {
     const ca = applyShape(a, shape);
@@ -70,12 +64,12 @@ function shapeEqual(a: unknown, b: unknown, shape?: Shape): boolean {
 }
 
 function failsEqualityRule(
-  rule: ValidationRule, value: unknown, empty: boolean, peerReader: PeerReader,
+  rule: ValidationRule, value: unknown, empty: boolean, otherValue?: unknown,
 ): boolean {
   switch (rule.name) {
     case "equalTo": {
       if (empty) return false;
-      const target = resolveTarget(rule, peerReader);
+      const target = resolveTarget(rule, otherValue);
       if (target === undefined) return true;
       return !shapeEqual(value, target, rule.shape);
     }
@@ -84,7 +78,7 @@ function failsEqualityRule(
       return !empty && shapeEqual(value, constraint, rule.shape);
     }
     case "notEqualTo": {
-      const target = resolveTarget(rule, peerReader);
+      const target = resolveTarget(rule, otherValue);
       if (target === undefined) return true;
       return !empty && shapeEqual(value, target, rule.shape);
     }
@@ -95,7 +89,7 @@ function failsEqualityRule(
 export function ruleFails(
   rule: ValidationRule,
   value: unknown,
-  peerReader: PeerReader,
+  otherValue?: unknown,
 ): boolean {
   const strResult = toString(value);
   const str = strResult.ok ? strResult.value : "";
@@ -117,11 +111,11 @@ export function ruleFails(
     case "url":         return !empty && !/^https?:\/\/.+/.test(str);
     case "creditCard":  return !empty && !luhn(str.replace(/\D/g, ""));
     case "min": case "max": case "gt": case "lt":
-      return failsComparisonRule(rule, value, empty, peerReader);
+      return failsComparisonRule(rule, value, empty, otherValue);
     case "range": case "exclusiveRange":
       return failsRangeRule(rule, value, empty);
     case "equalTo": case "notEqual": case "notEqualTo":
-      return failsEqualityRule(rule, value, empty, peerReader);
+      return failsEqualityRule(rule, value, empty, otherValue);
     case "atLeastOne":  return Array.isArray(value) ? value.length === 0 : empty;
     default:            return true;
   }

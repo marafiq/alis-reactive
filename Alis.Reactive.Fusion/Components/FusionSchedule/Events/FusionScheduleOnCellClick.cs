@@ -5,7 +5,6 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Payload for FusionSchedule.CellClicked (SF "cellClick" event).
     /// Fires when a time cell is clicked. Contains the time slot and resource group.
-    /// Verified: sf-schedule-test.html — startTime/endTime are ISO dates, groupIndex is int.
     /// </summary>
     public class FusionScheduleCellClickArgs
     {

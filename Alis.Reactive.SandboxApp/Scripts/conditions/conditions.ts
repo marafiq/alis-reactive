@@ -75,86 +75,86 @@ export async function evaluateConditionAsync(condition: Condition, plan: Plan, c
 function evaluateCompare(cond: CompareCondition, plan: Plan, ctx?: ExecContext): boolean {
   const evalValue = getEvaluateValue();
   const left = evalValue(cond.left, plan, ctx);
-  const coercedLeft = applyShape(left, cond.shape);
+  const shapedLeft = applyShape(left, cond.shape);
 
-  // Presence operators — use RAW value for null checks (shape coercion turns
+  // Presence operators — use RAW value for null checks (shape conversion turns
   // null/undefined into defaults like "" or 0 which defeats null detection).
   switch (cond.op) {
     case "is-null":   return left == null;
     case "not-null":  return left != null;
     case "is-empty":  return isEmpty(left);
     case "not-empty": return !isEmpty(left);
-    case "truthy":    return !!coercedLeft;
-    case "falsy":     return !coercedLeft;
+    case "truthy":    return !!shapedLeft;
+    case "falsy":     return !shapedLeft;
   }
 
   // Binary operators — need right operand
   const right = cond.right ? evalValue(cond.right, plan, ctx) : undefined;
-  // For operators that expect array right operands, coerce each item individually
+  // For operators that expect array right operands, apply shape to each item individually
   // instead of applying shape to the whole array (which would stringify it).
-  let coercedRight: unknown;
+  let shapedRight: unknown;
   if (Array.isArray(right) && (cond.op === "in" || cond.op === "not-in" || cond.op === "between")) {
-    coercedRight = right.map(item => applyShape(item, cond.shape));
+    shapedRight = right.map(item => applyShape(item, cond.shape));
   } else {
-    coercedRight = cond.right ? applyShape(right, cond.shape) : undefined;
+    shapedRight = cond.right ? applyShape(right, cond.shape) : undefined;
   }
 
-  log.trace("eval", { op: cond.op, left: coercedLeft, right: coercedRight });
+  log.trace("eval", { op: cond.op, left: shapedLeft, right: shapedRight });
 
   switch (cond.op) {
-    case "eq":  return coercedLeft === coercedRight;
-    case "neq": return coercedLeft !== coercedRight;
-    case "gt":  return (coercedLeft as number) > (coercedRight as number);
-    case "gte": return (coercedLeft as number) >= (coercedRight as number);
-    case "lt":  return (coercedLeft as number) < (coercedRight as number);
-    case "lte": return (coercedLeft as number) <= (coercedRight as number);
+    case "eq":  return shapedLeft === shapedRight;
+    case "neq": return shapedLeft !== shapedRight;
+    case "gt":  return (shapedLeft as number) > (shapedRight as number);
+    case "gte": return (shapedLeft as number) >= (shapedRight as number);
+    case "lt":  return (shapedLeft as number) < (shapedRight as number);
+    case "lte": return (shapedLeft as number) <= (shapedRight as number);
 
     case "in":
-      return Array.isArray(coercedRight) && coercedRight.includes(coercedLeft);
+      return Array.isArray(shapedRight) && shapedRight.includes(shapedLeft);
     case "not-in":
-      return !Array.isArray(coercedRight) || !coercedRight.includes(coercedLeft);
+      return !Array.isArray(shapedRight) || !shapedRight.includes(shapedLeft);
 
     case "between":
-      return Array.isArray(coercedRight)
-        && (coercedLeft as number) >= coercedRight[0]
-        && (coercedLeft as number) <= coercedRight[1];
+      return Array.isArray(shapedRight)
+        && (shapedLeft as number) >= shapedRight[0]
+        && (shapedLeft as number) <= shapedRight[1];
 
     case "array-contains": {
-      const items = cond.itemShape && Array.isArray(coercedLeft)
-        ? (coercedLeft as unknown[]).map(item => applyShape(item, cond.itemShape))
-        : coercedLeft;
-      return Array.isArray(items) && items.includes(coercedRight);
+      const items = cond.itemShape && Array.isArray(shapedLeft)
+        ? (shapedLeft as unknown[]).map(item => applyShape(item, cond.itemShape))
+        : shapedLeft;
+      return Array.isArray(items) && items.includes(shapedRight);
     }
 
     case "contains": {
-      const str = asString(coercedLeft);
-      const op = asString(coercedRight);
+      const str = asString(shapedLeft);
+      const op = asString(shapedRight);
       return str != null && op != null && str.includes(op);
     }
     case "starts-with": {
-      const str = asString(coercedLeft);
-      const op = asString(coercedRight);
+      const str = asString(shapedLeft);
+      const op = asString(shapedRight);
       return str != null && op != null && str.startsWith(op);
     }
     case "ends-with": {
-      const str = asString(coercedLeft);
-      const op = asString(coercedRight);
+      const str = asString(shapedLeft);
+      const op = asString(shapedRight);
       return str != null && op != null && str.endsWith(op);
     }
     case "matches": {
-      const str = asString(coercedLeft);
-      const op = asString(coercedRight);
+      const str = asString(shapedLeft);
+      const op = asString(shapedRight);
       if (str == null || op == null) return false;
       try {
         return new RegExp(op).test(str);
       } catch {
-        log.warn("invalid condition regex", { operand: coercedRight });
+        log.warn("invalid condition regex", { operand: shapedRight });
         return false;
       }
     }
     case "min-length": {
-      const str = asString(coercedLeft);
-      return str != null && str.length >= Number(coercedRight);
+      const str = asString(shapedLeft);
+      return str != null && str.length >= Number(shapedRight);
     }
 
     default:

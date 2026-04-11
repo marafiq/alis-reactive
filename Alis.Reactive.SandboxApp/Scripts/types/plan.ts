@@ -20,7 +20,6 @@ export interface JsType {
   properties?: Record<string, Property>;
   methods?: Record<string, Method>;
   events?: Record<string, Event>;
-  defaultValue?: DefaultValue;
 }
 
 export interface Property {
@@ -40,11 +39,6 @@ export interface Event {
   payloadType?: string;
 }
 
-export interface DefaultValue {
-  kind: "property" | "method";
-  member: string;
-  shape: Shape;
-}
 
 // ── Component ─────────────────────────────────────────────────
 
@@ -55,6 +49,7 @@ export interface Component {
   vendor: Vendor;
   type: string;
   bindingPath?: string;
+  valueMember?: string;
   container?: ContainerScope;
 }
 
@@ -65,6 +60,7 @@ export interface ContainerScope {
 
 export interface ComponentValidation {
   component: string;
+  value: ValueProducer;
   serverFieldName?: string;
   rules: ValidationRule[];
 }
@@ -82,7 +78,7 @@ export interface ValidationRule {
   name: ValidationRuleName;
   message: string;
   constraint?: ValueProducer;
-  otherComponent?: string;
+  otherValue?: ValueProducer;
   when?: Condition;
   shape?: Shape;
 }
@@ -256,9 +252,8 @@ export interface ValueInput {
 }
 
 export interface GatherField {
-  component: string;
   key: string;
-  shape?: Shape;
+  value: ValueProducer;
 }
 
 export interface ResponseHandler {

@@ -68,7 +68,11 @@ namespace Alis.Reactive.PlanModel
             }
 
             var comp = Component.Create(componentId, vendor, typeKey);
-            if (reg != null) comp.BindingPath = reg.BindingPath;
+            if (reg != null)
+            {
+                comp.BindingPath = reg.BindingPath;
+                comp.ValueMember = reg.ValueMember;
+            }
             _plan.MutableComponents[key] = comp;
             return key;
         }
@@ -88,6 +92,8 @@ namespace Alis.Reactive.PlanModel
 
             if (existing.BindingPath == null)
                 existing.BindingPath = reg.BindingPath;
+            if (existing.ValueMember == null)
+                existing.ValueMember = reg.ValueMember;
 
             var jsType = _plan.MutableTypes[existing.Type];
             EnrichTypeIfNeeded(jsType, reg.ValueMember, reg.Shape);
@@ -129,6 +135,8 @@ namespace Alis.Reactive.PlanModel
             {
                 if (bindingPath != null && existing.BindingPath == null)
                     existing.BindingPath = bindingPath;
+                if (existing.ValueMember == null)
+                    existing.ValueMember = valueMember;
 
                 EnrichTypeIfNeeded(_plan.MutableTypes[existing.Type], valueMember, shape);
                 return key;
@@ -139,6 +147,7 @@ namespace Alis.Reactive.PlanModel
 
             var comp = Component.Create(componentId, vendor, typeKey);
             comp.BindingPath = bindingPath;
+            comp.ValueMember = valueMember;
             _plan.MutableComponents[key] = comp;
             return key;
         }
@@ -157,10 +166,10 @@ namespace Alis.Reactive.PlanModel
         /// Ensures a method member exists on a component's JsType.
         /// Used by ElementBuilder for classList.add/remove/toggle, setAttribute, removeAttribute.
         /// </summary>
-        internal void EnsureMethod(string componentKey, string memberName, string pathExpr, List<Shape>? args = null)
+        internal void EnsureMethod(string componentKey, string memberName, string pathExpr, List<Shape>? args = null, Shape? returns = null)
         {
             var jsType = GetJsType(componentKey);
-            jsType.WithMethod(memberName, Path.Parse(pathExpr), args);
+            jsType.WithMethod(memberName, Path.Parse(pathExpr), args, returns);
         }
 
         /// <summary>
@@ -180,18 +189,21 @@ namespace Alis.Reactive.PlanModel
 
         private static JsType CreateEnrichedType(string valueMember, Shape shape)
         {
-            return new JsType()
-                .WithProperty(valueMember, Path.Parse(valueMember), shape, "read")
-                .WithDefaultValue(valueMember, shape);
+            var jsType = new JsType()
+                .WithProperty(valueMember, Path.Parse(valueMember), shape, "read");
+            // Always register "value" as an alias so parent validators can read any
+            // input component uniformly via member:"value" — even checkbox ("checked")
+            // or switch ("checked"). The alias points to the same path with the same shape.
+            if (valueMember != "value")
+                jsType.WithProperty("value", Path.Parse(valueMember), shape, "read");
+            return jsType;
         }
 
         private static void EnrichTypeIfNeeded(JsType jsType, string valueMember, Shape shape)
         {
-            if (jsType.DefaultValue != null && jsType.DefaultValue.Shape != Shape.Any)
-                return;
-
             jsType.WithProperty(valueMember, Path.Parse(valueMember), shape, "read");
-            jsType.WithDefaultValue(valueMember, shape);
+            if (valueMember != "value")
+                jsType.WithProperty("value", Path.Parse(valueMember), shape, "read");
         }
 
         /// <summary>

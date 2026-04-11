@@ -5,6 +5,7 @@
 @using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Schedule
+@using Syncfusion.EJ2.Popups
 @using Alis.Reactive.Fusion.Templates
 @{
     ViewData["Title"] = "Point-in-Time Schedule";
@@ -40,7 +41,9 @@
         p.Element("status").SetText("Refreshing after save...");
         p.Get("/api/schedule/assignments")
          .Gather(g => g
-             .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
+             .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
+             .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
+             .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
          {
              s.Component<FusionSchedule>("shift-schedule")
@@ -110,7 +113,9 @@
                             p.Element("status").SetText("Loading...");
                             p.Get("/api/schedule/assignments")
                              .Gather(g => g
-                                 .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
+                                 .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
+                                 .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
+                                 .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
                              .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                              {
                                  s.Component<FusionSchedule>("shift-schedule")
@@ -187,16 +192,29 @@
                 // Trace: show which cell was clicked
                 p.Element("event-trace").SetText(args, x => x.StartTime);
                 p.Element("event-shift").SetText(args, x => x.GroupIndex);
+
+                // Load new assignment form into dialog via Into(), then show
+                p.Get("/Sandbox/Components/Schedule/NewAssignmentForm")
+                 .Gather(g => g
+                     .FromEvent(args, x => x.StartTime, "startTime")
+                     .FromEvent(args, x => x.EndTime, "endTime")
+                     .FromEvent(args, x => x.GroupIndex, "shiftId")
+                     .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
+                 .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
+                p.Component<FusionDialog>("new-assignment-dialog").Show();
             })
             .Reactive(evt => evt.PopupOpen, (args, p) =>
             {
-                // Trace the actual type value to the DOM
-                p.Element("event-trace").SetText(args, x => x.Type);
+                // Cancel QuickInfo on empty cells — we use FusionDialog for new assignments.
+                // Event QuickInfo (with data.id > 0) still shows our custom template.
+                p.When(args, x => x.Type).Eq("QuickInfo")
+                 .And(args, x => x.Data.Id).Eq(0)
+                 .Then(t => { args.PreventDefault(t); });
 
+                // Cancel Editor — we use Drawer for editing
                 p.When(args, x => x.Type).Eq("Editor")
                  .Then(t =>
                  {
-                     t.Element("event-shift").SetText("MATCHED Editor");
                      args.PreventDefault(t);
                      t.Element("alis-drawer-title").SetText("Edit Shift Assignment");
                      t.Component<NativeDrawer>().SetSize(DrawerSize.Md);
@@ -228,7 +246,9 @@
                      t.Element("status").SetText("Saved — reloading...");
                      t.Get("/api/schedule/assignments")
                       .Gather(g => g
-                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
+                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
+                          .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
+                          .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
                       .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
                       {
                           s.Component<FusionSchedule>("shift-schedule")
@@ -240,25 +260,63 @@
             })
             .Reactive(evt => evt.Navigating, (args, p) =>
             {
-                // Date navigation: reload data from server for the new week
                 p.Element("status").SetText("Navigating...");
-                p.Get("/api/schedule/assignments")
-                 .Gather(g => g
-                     .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                     .FromEvent(args, x => x.CurrentDate, "currentDate"))
-                 .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
+
+                // View switch: args carry the NEW currentView
+                p.When(args, x => x.Action).Eq("view")
+                 .Then(t =>
                  {
-                     s.Component<FusionSchedule>("shift-schedule")
-                         .SetDataSource(json, j => j.Assignments);
-                     s.Element("status").SetText("Week loaded");
-                     s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-                 }));
+                     t.Get("/api/schedule/assignments")
+                      .Gather(g => g
+                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
+                          .FromEvent(args, x => x.CurrentDate, "currentDate")
+                          .FromEvent(args, x => x.CurrentView, "currentView"))
+                      .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
+                      {
+                          s.Component<FusionSchedule>("shift-schedule")
+                              .SetDataSource(json, j => j.Assignments);
+                          s.Element("status").SetText("View loaded");
+                          s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+                      }));
+                 })
+                 // Date navigation: view hasn't changed, read from component
+                 .Else(e =>
+                 {
+                     e.Get("/api/schedule/assignments")
+                      .Gather(g => g
+                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
+                          .FromEvent(args, x => x.CurrentDate, "currentDate")
+                          .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView()))
+                      .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
+                      {
+                          s.Component<FusionSchedule>("shift-schedule")
+                              .SetDataSource(json, j => j.Assignments);
+                          s.Element("status").SetText("Date loaded");
+                          s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+                      }));
+                 });
             })
             .Reactive(evt => evt.DataBound, (args, p) =>
             {
                 p.Element("status").SetText("Ready");
             }))
     </section>
+
+    <!-- New Assignment Dialog (SF Modal) -->
+    @(Html.FusionDialog(plan, "new-assignment-dialog", b =>
+    {
+        b.Header("New Assignment");
+        b.Width("480px");
+        b.IsModal(true);
+        b.ShowCloseIcon(true);
+        b.CloseOnEscape(true);
+        b.Visible(false);
+        b.Content("<div id='new-assignment-content'></div>");
+    })
+    .Reactive(evt => evt.OverlayClick, (args, p) =>
+    {
+        p.Component<FusionDialog>("new-assignment-dialog").Hide();
+    }))
 
     <!-- Event Trace -->
     <section class="rounded-lg border border-border bg-white p-4 shadow-sm">

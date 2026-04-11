@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
@@ -19,6 +20,35 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionScheduleExtensions
     {
+        private static readonly FusionSchedule Component = new FusionSchedule();
+
+        /// <summary>
+        /// Reads the active view ("Day", "Week", "WorkWeek", "Month", "Agenda").
+        /// Use in conditions or gather to send the current view type to the server.
+        /// Runtime: reads ej2.currentView
+        /// </summary>
+        public static TypedComponentSource<string> CurrentView<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self)
+            where TModel : class
+        {
+            self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
+            self.Pipeline.Context.EnsureProperty(self.TargetId, "currentView", "currentView", Shape.String, "read");
+            return new TypedComponentSource<string>(self.TargetId, Component.Vendor, "currentView");
+        }
+
+        /// <summary>
+        /// Reads the currently selected date.
+        /// Runtime: reads ej2.selectedDate
+        /// </summary>
+        public static TypedComponentSource<DateTime> SelectedDate<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self)
+            where TModel : class
+        {
+            self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
+            self.Pipeline.Context.EnsureProperty(self.TargetId, "selectedDate", "selectedDate", Shape.Date, "read");
+            return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "selectedDate");
+        }
+
         /// <summary>
         /// Replaces the schedule event data from an HTTP response body with a path selector.
         /// Runtime: ej2.eventSettings.dataSource = responseBody.path; ej2.dataBind()

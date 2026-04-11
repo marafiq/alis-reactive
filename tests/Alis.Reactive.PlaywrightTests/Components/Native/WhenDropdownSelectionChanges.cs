@@ -210,8 +210,8 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"member\": \"value\""),
-            "Plan must carry defaultValue member 'value' for NativeDropDown component sources — " +
-            "runtime walks this path to read the selected value");
+            "Plan must carry property member 'value' for NativeDropDown component sources — " +
+            "runtime reads this property to get the selected value");
         AssertNoConsoleErrors();
     }
 

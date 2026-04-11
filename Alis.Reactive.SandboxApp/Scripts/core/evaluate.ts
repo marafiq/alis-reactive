@@ -1,0 +1,63 @@
+// core/evaluate.ts — Unified value evaluation.
+// The ONE way to read a value from any source: component, event, response, literal.
+// Every module that needs a value calls evaluateValue(). No parallel paths.
+
+import type { Plan, ValueProducer, ExecContext } from "../types";
+import {
+  resolveSource, getJsTypeForSource, readProperty as resolverReadProperty,
+  callMethod,
+} from "../resolution/resolver";
+import { applyShape } from "./shape-convert";
+import { walk, walkPath } from "./walk";
+import { assertNever } from "./assert-never";
+
+export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecContext): unknown {
+  switch (producer.kind) {
+    case "literal":
+      return applyShape(producer.value, producer.shape);
+
+    case "read": {
+      const root = resolveSource(plan, producer.from, ctx);
+
+      // Component source: look up member in JsType
+      if (producer.from.kind === "component") {
+        const jsType = getJsTypeForSource(plan, producer.from);
+        const prop = jsType.properties?.[producer.member];
+        if (prop) {
+          const raw = resolverReadProperty(root, prop);
+          return raw == null ? raw : applyShape(raw, producer.shape ?? prop.shape);
+        }
+        const method = jsType.methods?.[producer.member];
+        if (method) {
+          const raw = callMethod(root, method, []);
+          return raw == null ? raw : applyShape(raw, producer.shape ?? method.returns);
+        }
+        throw new Error(`[alis] member "${producer.member}" not found on component "${producer.from.component}"`);
+      }
+      // Payload source: walk member as dot-path on resolved payload.
+      if (producer.path) {
+        const walked = walkPath(root as any, producer.path);
+        return walked == null ? walked : applyShape(walked, producer.shape);
+      }
+      if (producer.member === "responseBody") {
+        return root == null ? root : applyShape(root, producer.shape);
+      }
+      const walked = walk(root as any, producer.member);
+      return walked == null ? walked : applyShape(walked, producer.shape);
+    }
+
+    case "object": {
+      const result: Record<string, unknown> = {};
+      for (const [key, val] of Object.entries(producer.fields)) {
+        result[key] = evaluateValue(val, plan, ctx);
+      }
+      return result;
+    }
+
+    case "array":
+      return producer.items.map(i => evaluateValue(i, plan, ctx));
+
+    default:
+      assertNever(producer, "value producer kind");
+  }
+}

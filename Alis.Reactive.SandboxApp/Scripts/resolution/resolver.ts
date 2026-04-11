@@ -157,28 +157,6 @@ function resolveCallable(root: unknown, path: Path): { fn: Function; owner: unkn
   return { fn, owner };
 }
 
-// ── Default value ──────────────────────────────────────────
-
-/** Read the component's default value using its JsType's defaultValue definition. */
-export function readDefaultValue(plan: Plan, componentKey: string): unknown {
-  const jsType = getJsType(plan, componentKey);
-  if (!jsType.defaultValue) {
-    throw new Error(`[alis] no defaultValue on type for ${componentKey}`);
-  }
-
-  const root = resolveComponent(plan, componentKey);
-  const dv = jsType.defaultValue;
-
-  if (dv.kind === "property") {
-    const prop = jsType.properties?.[dv.member];
-    if (!prop) throw new Error(`[alis] defaultValue property not found: ${dv.member}`);
-    return readProperty(root, prop);
-  } else {
-    const method = jsType.methods?.[dv.member];
-    if (!method) throw new Error(`[alis] defaultValue method not found: ${dv.member}`);
-    return callMethod(root, method, []);
-  }
-}
 
 // ── Event wiring ──────────────────────────────────────────
 

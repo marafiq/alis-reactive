@@ -108,4 +108,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int? StaffId { get; set; }
         public string? Notes { get; set; }
     }
+
+    /// <summary>
+    /// Model for the new assignment form loaded into FusionDialog via Into().
+    /// CellClicked provides startTime/endTime/groupIndex — controller maps groupIndex to shiftId.
+    /// </summary>
+    public class NewAssignmentModel
+    {
+        public string? StartTime { get; set; }
+        public string? EndTime { get; set; }
+        public int ShiftId { get; set; }
+        public string? FacilityId { get; set; }
+        public int? StaffId { get; set; }
+        public string? Notes { get; set; }
+    }
 }

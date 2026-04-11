@@ -11,7 +11,6 @@ namespace Alis.Reactive.PlanModel
         public IReadOnlyDictionary<string, JsProperty> Properties => _properties;
         public IReadOnlyDictionary<string, JsMethod> Methods => _methods;
         public IReadOnlyDictionary<string, JsEvent> Events => _events;
-        public DefaultValue DefaultValue { get; internal set; }
 
         internal JsType() { }
 
@@ -65,17 +64,6 @@ namespace Alis.Reactive.PlanModel
             return this;
         }
 
-        internal JsType WithDefaultValue(string member, Shape shape)
-        {
-            DefaultValue = new DefaultValue("property", member, shape);
-            return this;
-        }
-
-        internal JsType WithDefaultMethod(string member, Shape shape)
-        {
-            DefaultValue = new DefaultValue("method", member, shape);
-            return this;
-        }
     }
 
     /// <summary>
@@ -137,17 +125,4 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class DefaultValue
-    {
-        public string Kind { get; }
-        public string Member { get; }
-        public Shape Shape { get; }
-
-        internal DefaultValue(string kind, string member, Shape shape)
-        {
-            Kind = kind;
-            Member = member;
-            Shape = shape;
-        }
-    }
 }

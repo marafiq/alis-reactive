@@ -25,6 +25,8 @@ namespace Alis.Reactive.Builders.Conditions
         internal override PlanModel.ComponentSource ToComponentSource() =>
             PlanModel.ComponentSource.Of(_componentId);
 
+        internal string ComponentId => _componentId;
+        internal string Vendor => _vendor;
         internal override string ReadMember => _valueMember;
     }
 }

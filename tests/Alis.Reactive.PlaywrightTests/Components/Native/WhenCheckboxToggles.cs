@@ -224,8 +224,8 @@ public class WhenCheckboxToggles : PlaywrightTestBase
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"member\": \"checked\""),
-            "Plan must carry defaultValue member 'checked' for NativeCheckBox component sources — " +
-            "runtime walks this path to read the checkbox state");
+            "Plan must carry property member 'checked' for NativeCheckBox component sources — " +
+            "runtime reads this property to get the checkbox state");
         AssertNoConsoleErrors();
     }
 

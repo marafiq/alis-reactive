@@ -53,16 +53,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         private static readonly ConcurrentDictionary<string, List<ShiftAssignment>> Store = new();
 
         /// <summary>
-        /// Gets (or generates) shift assignments for a facility and week.
-        /// Returned list is the LIVE mutable reference — mutations via Assign/Unassign
-        /// are visible on the next GET call.
+        /// Gets (or generates) shift assignments for a facility within a date range.
+        /// Spans multiple generated weeks if needed (e.g., Month view covers 6 weeks).
+        /// Returned data is filtered to the requested range.
         /// </summary>
-        public static ScheduleDataResponse GetAssignments(string facilityId, DateTime weekStart)
+        public static ScheduleDataResponse GetAssignments(string facilityId, DateTime rangeStart, DateTime rangeEnd)
         {
-            var sunday = weekStart.AddDays(-(int)weekStart.DayOfWeek);
-            var key = $"{facilityId}|{sunday:yyyy-MM-dd}";
+            var assignments = new List<ShiftAssignment>();
 
-            var assignments = Store.GetOrAdd(key, _ => GenerateWeek(facilityId, sunday));
+            // Walk through each week that overlaps the range
+            var current = rangeStart.AddDays(-(int)rangeStart.DayOfWeek);
+            while (current < rangeEnd)
+            {
+                var key = $"{facilityId}|{current:yyyy-MM-dd}";
+                var weekData = Store.GetOrAdd(key, _ => GenerateWeek(facilityId, current));
+                assignments.AddRange(weekData.Where(a => a.StartTime >= rangeStart && a.StartTime < rangeEnd));
+                current = current.AddDays(7);
+            }
 
             return new ScheduleDataResponse
             {
@@ -137,6 +144,43 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Creates a new shift assignment in the correct facility+week bucket.
+        /// Used when user clicks an empty cell and assigns staff via the dialog.
+        /// </summary>
+        public static ShiftAssignment? CreateAssignment(string facilityId, DateTime startTime, DateTime endTime, int shiftId, int staffId)
+        {
+            var staff = Staff.FirstOrDefault(s => s.Id == staffId);
+            if (staff == null) return null;
+
+            var sunday = startTime.AddDays(-(int)startTime.DayOfWeek);
+            var key = $"{facilityId}|{sunday:yyyy-MM-dd}";
+
+            var assignments = Store.GetOrAdd(key, _ => GenerateWeek(facilityId, sunday));
+            var nextId = assignments.Count > 0 ? assignments.Max(a => a.Id) + 1 : 1;
+            var shiftLabel = Shifts.FirstOrDefault(s => s.Id == shiftId)?.Text?.Split(' ')[0] ?? "Shift";
+
+            var assignment = new ShiftAssignment
+            {
+                Id = nextId,
+                Subject = $"{staff.Name} ({staff.Role})",
+                StartTime = startTime,
+                EndTime = endTime,
+                ShiftId = shiftId,
+                StaffName = staff.Name,
+                StaffRole = staff.Role,
+                StaffPhone = staff.Phone,
+                IsUnassigned = false,
+                CareItems = 0,
+                EstimatedMinutes = 0,
+                ResidentNames = "",
+                Description = $"New assignment | {staff.Name} ({staff.Role})",
+            };
+
+            assignments.Add(assignment);
+            return assignment;
         }
 
         private static List<ShiftAssignment> GenerateWeek(string facilityId, DateTime sunday)

@@ -170,21 +170,24 @@ namespace Alis.Reactive
                 if (_componentsMap.TryGetValue(field.FieldName, out var reg))
                 {
                     field.FieldId = reg.ComponentId;
-                    field.Vendor = reg.Vendor;
-                    field.ValueMember = reg.ValueMember;
                     field.Shape = reg.Shape;
                 }
                 else
                 {
-                    // Field is not in this plan's map (likely in a partial plan).
-                    // Generate the expected component ID so the browser runtime can
-                    // resolve plan.components[key] after plans merge.
                     field.FieldId = IdGenerator.For(typeof(TModel), field.FieldName);
                 }
 
+                // Every input component registers "value" as a readable property via CreateEnrichedType.
+                // For components where valueMember differs (e.g. "checked"), "value" is an alias
+                // pointing to the same path with the same shape. Always safe to use.
+                var fieldValueMember = "value";
+                var fieldShape = field.Shape;
+                var fieldValue = ValueProducer.Read(
+                    ComponentSource.Of(field.FieldId), fieldValueMember, shape: fieldShape);
+
                 var planRules = field.Rules.Select(r => ToPlanValidationRule(r, field)).ToList();
                 componentValidations.Add(new ComponentValidation(
-                    field.FieldId, planRules, field.FieldName));
+                    field.FieldId, fieldValue, planRules, field.FieldName));
             }
 
             // Attach to the container component's ContainerScope.
@@ -231,13 +234,21 @@ namespace Alis.Reactive
 
             if (extracted.Field != null)
             {
-                // Map the raw property name to the component ID so the runtime
-                // can resolve plan.components[otherComponent] correctly.
-                // Fall back to IdGenerator for fields in partial plans.
+                string otherComponentId;
+                Shape otherShape = null;
+
                 if (_componentsMap.TryGetValue(extracted.Field, out var otherReg))
-                    rule.OtherComponent = otherReg.ComponentId;
+                {
+                    otherComponentId = otherReg.ComponentId;
+                    otherShape = otherReg.Shape;
+                }
                 else
-                    rule.OtherComponent = IdGenerator.For(typeof(TModel), extracted.Field);
+                {
+                    otherComponentId = IdGenerator.For(typeof(TModel), extracted.Field);
+                }
+
+                rule.OtherValue = ValueProducer.Read(
+                    ComponentSource.Of(otherComponentId), "value", shape: otherShape);
             }
 
             if (extracted.When != null)
@@ -263,33 +274,21 @@ namespace Alis.Reactive
             // Build a read from the condition's field component.
             // Try local map first; fall back to IdGenerator for partial-owned fields.
             string fieldComponentId;
-            string valueMember;
             ComponentRegistration fieldReg = null;
             if (_componentsMap.TryGetValue(cmp.Field, out fieldReg))
             {
                 fieldComponentId = fieldReg.ComponentId;
-                valueMember = fieldReg.ValueMember ?? "value";
             }
             else
             {
                 fieldComponentId = IdGenerator.For(typeof(TModel), cmp.Field);
-                // Look up the component in the plan (already registered by RegisterInputComponents)
-                // to find the correct valueMember instead of hardcoding "value".
-                // NativeCheckBox uses "checked", not "value".
-                valueMember = "value";
-                if (_context.Plan.MutableComponents.TryGetValue(fieldComponentId, out var comp))
-                {
-                    var jsType = _context.Plan.MutableTypes[comp.Type];
-                    if (jsType.DefaultValue != null)
-                        valueMember = jsType.DefaultValue.Member;
-                }
             }
 
             var left = ValueProducer.Read(
                 ComponentSource.Of(fieldComponentId),
-                valueMember);
+                "value");
 
-            var conditionShape = fieldReg?.Shape ?? Shape.Any;
+            var conditionShape = fieldReg?.Shape;
             ValueProducer right;
             if (cmp.Value is object[] arr)
             {

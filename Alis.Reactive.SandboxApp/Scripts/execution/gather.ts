@@ -1,13 +1,13 @@
-// gather.ts — Gather form values using the SHARED resolver.
-// Reads component default values via plan.types[].defaultValue.
-// Supports GatherInput (component fields) and ValueInput (pre-computed value).
+// gather.ts — Gather values for HTTP requests using the SHARED value concept.
+// Every field carries a ValueProducer — evaluated via evaluateValue().
+// No parallel read path. Shape flows from plan → transport for wire formatting.
 
-import type { Plan, GatherInput, RequestInput, Transport } from "../types";
+import type { Plan, GatherInput, RequestInput, Transport, Shape } from "../types";
 import type { ExecContext } from "../types";
-import { readDefaultValue, getJsType } from "../resolution/resolver";
+import { resolveComponent, readProperty } from "../resolution/resolver";
 import { applyShape, toString } from "../core/shape-convert";
 import { scope } from "../core/trace";
-import { evaluateValue } from "./execute";
+import { evaluateValue } from "../core/evaluate";
 
 const log = scope("gather");
 
@@ -39,32 +39,52 @@ function serializeValue(value: unknown, name: string): string {
   return result.value;
 }
 
+/** Shape-aware wire formatting. Date timestamps → ISO strings for HTTP. */
+function formatForWire(value: unknown, shape?: Shape): unknown {
+  if (!shape) return value;
+  if (shape.kind === "date" && typeof value === "number" && !isNaN(value))
+    return new Date(value).toISOString();
+  if (shape.kind === "nullable" && shape.inner?.kind === "date" && typeof value === "number" && !isNaN(value))
+    return new Date(value).toISOString();
+  return value;
+}
+
 /** Transport strategies for emitting name/value pairs into GET, FormData, or JSON. */
 interface TransportStrategy {
-  emitScalar(name: string, value: unknown): void;
-  emitArray(name: string, items: unknown[]): void;
+  emitScalar(name: string, value: unknown, shape?: Shape): void;
+  emitArray(name: string, items: unknown[], itemShape?: Shape): void;
 }
 
 function createGetTransport(urlParams: string[]): TransportStrategy {
   return {
-    emitScalar: (name, value) => urlParams.push(
-      `${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(value, name))}`),
-    emitArray: (name, items) => {
+    emitScalar: (name, value, shape) => {
+      const wire = formatForWire(value, shape);
+      urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(wire, name))}`);
+    },
+    emitArray: (name, items, itemShape) => {
       if (hasFiles(items)) throw new Error("[alis] File objects cannot be sent via GET");
-      for (const item of items)
-        urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(item, name))}`);
+      for (const item of items) {
+        const wire = formatForWire(item, itemShape);
+        urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(wire, name))}`);
+      }
     },
   };
 }
 
 function createFormDataTransport(formData: FormData): TransportStrategy {
   return {
-    emitScalar: (name, value) => formData.append(name, serializeValue(value, name)),
-    emitArray: (name, items) => {
+    emitScalar: (name, value, shape) => {
+      const wire = formatForWire(value, shape);
+      formData.append(name, serializeValue(wire, name));
+    },
+    emitArray: (name, items, itemShape) => {
       for (const item of items) {
         const file = toFile(item);
         if (file) formData.append(name, file, file.name);
-        else formData.append(name, serializeValue(item, name));
+        else {
+          const wire = formatForWire(item, itemShape);
+          formData.append(name, serializeValue(wire, name));
+        }
       }
     },
   };
@@ -72,10 +92,16 @@ function createFormDataTransport(formData: FormData): TransportStrategy {
 
 function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
   return {
-    emitScalar: (name, value) => setNested(body, name, value === "" ? null : value),
-    emitArray: (name, items) => {
+    emitScalar: (name, value, shape) => {
+      const wire = formatForWire(value, shape);
+      setNested(body, name, wire === "" ? null : wire);
+    },
+    emitArray: (name, items, itemShape) => {
       if (hasFiles(items)) throw new Error("[alis] File objects require transport: form-data");
-      setNested(body, name, items);
+      const wireItems = itemShape
+        ? items.map(v => formatForWire(v, itemShape))
+        : items;
+      setNested(body, name, wireItems);
     },
   };
 }
@@ -88,16 +114,17 @@ function selectTransport(
   return createJsonTransport(body);
 }
 
-function emitValue(name: string, raw: unknown, transport: TransportStrategy): void {
+function emitValue(name: string, raw: unknown, shape: Shape | undefined, transport: TransportStrategy): void {
   if (typeof FileList !== "undefined" && raw instanceof FileList) {
-    transport.emitArray(name, Array.from(raw));
+    transport.emitArray(name, Array.from(raw), shape);
     log.trace("file", { name, count: raw.length });
     return;
   }
   if (Array.isArray(raw)) {
-    transport.emitArray(name, raw);
+    const itemShape = shape?.kind === "array" ? shape.item : undefined;
+    transport.emitArray(name, raw, itemShape);
   } else {
-    transport.emitScalar(name, raw);
+    transport.emitScalar(name, raw, shape);
   }
   log.trace("gathered", { name, value: raw });
 }
@@ -124,30 +151,29 @@ export function resolveGather(
 
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
-        emitValue(key, val, transport);
+        emitValue(key, val, undefined, transport);
       }
     } else {
-      // Single value — emit as "value"
-      emitValue("value", value, transport);
+      emitValue("value", value, undefined, transport);
     }
 
     return { urlParams, body: formData ?? body };
   }
 
-  // GatherInput — read component default values
+  // GatherInput — each field carries a ValueProducer
   const gatherInput = input as GatherInput;
   const formData = gatherInput.transport === "form-data" ? new FormData() : null;
   const transport = selectTransport(gatherInput.transport, method, urlParams, formData, body);
 
-  // Gather explicit component fields — each carries shape from the plan.
+  // Gather explicit component fields — each carries a ValueProducer with shape
   const gatheredComponents = new Set<string>();
   for (const field of gatherInput.components) {
-    gatheredComponents.add(field.component);
-    const raw = readDefaultValue(plan, field.component);
-    const shape = field.shape ?? getDefaultShape(plan, field.component);
-    let value = applyShape(raw, shape);
-    value = coerceForTransport(value, shape);
-    emitValue(field.key, value, transport);
+    // Track component for includeAll dedup
+    if (field.value.kind === "read" && field.value.from.kind === "component") {
+      gatheredComponents.add(field.value.from.component);
+    }
+    const raw = evaluateValue(field.value, plan, ctx);
+    emitValue(field.key, raw, field.value.shape, transport);
   }
 
   // Emit static/event values merged alongside component fields
@@ -155,7 +181,7 @@ export function resolveGather(
     const staticValues = evaluateValue(gatherInput.statics, plan, ctx);
     if (typeof staticValues === "object" && staticValues !== null && !Array.isArray(staticValues)) {
       for (const [key, val] of Object.entries(staticValues as Record<string, unknown>)) {
-        emitValue(key, val, transport);
+        emitValue(key, val, undefined, transport);
       }
     }
   }
@@ -166,37 +192,20 @@ export function resolveGather(
   if (gatherInput.includeAll) {
     for (const [compKey, comp] of Object.entries(plan.components)) {
       if (gatheredComponents.has(compKey)) continue;
-      const jsType = plan.types[comp.type];
-      if (!jsType?.defaultValue) continue;
+      if (!comp.valueMember) continue;
       if (!document.getElementById(comp.id)) continue;
-      const raw = readDefaultValue(plan, compKey);
-      const shape = jsType.defaultValue.shape;
-      let value = applyShape(raw, shape);
-      value = coerceForTransport(value, shape);
       if (!comp.bindingPath) continue;
-      emitValue(comp.bindingPath, value, transport);
+      const jsType = plan.types[comp.type];
+      const prop = jsType?.properties?.[comp.valueMember];
+      if (!prop) continue;
+      const root = resolveComponent(plan, compKey);
+      const raw = readProperty(root, prop);
+      const value = applyShape(raw, prop.shape);
+      emitValue(comp.bindingPath, value, prop.shape, transport);
     }
   }
 
   return { urlParams, body: formData ?? body };
-}
-
-/** Shape-driven transport coercion: date shapes → ISO strings for HTTP serialization. */
-function coerceForTransport(value: unknown, shape?: import("../types").Shape): unknown {
-  if (!shape) return value;
-  if (shape.kind === "date" && typeof value === "number" && !isNaN(value))
-    return new Date(value).toISOString();
-  if (shape.kind === "nullable" && shape.inner?.kind === "date" && typeof value === "number" && !isNaN(value))
-    return new Date(value).toISOString();
-  if (shape.kind === "array" && shape.item?.kind === "date" && Array.isArray(value))
-    return value.map(v => typeof v === "number" && !isNaN(v) ? new Date(v).toISOString() : v);
-  return value;
-}
-
-/** Get the default value's shape from the JsType. */
-function getDefaultShape(plan: Plan, componentKey: string): import("../types").Shape | undefined {
-  const jsType = getJsType(plan, componentKey);
-  return jsType.defaultValue?.shape;
 }
 
 function setNested(obj: Record<string, unknown>, key: string, value: unknown): void {

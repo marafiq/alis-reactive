@@ -27,17 +27,53 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         /// Include and FromEvent gather in the reactive plan.
         /// </summary>
         [HttpGet("~/api/schedule/assignments")]
-        public IActionResult GetAssignments(string? selectedFacilityId, string? currentDate)
+        public IActionResult GetAssignments(string? selectedFacilityId, string? currentDate, string? currentView)
         {
             var facilityId = selectedFacilityId ?? "mystery-manor";
-            DateTime weekStart;
+            DateTime anchor;
             if (!string.IsNullOrEmpty(currentDate) && DateTime.TryParse(currentDate, out var parsed))
-                weekStart = parsed;
+                anchor = parsed;
             else
-                weekStart = DateTime.Today;
+                anchor = DateTime.Today;
 
-            var data = FakeScheduleData.GetAssignments(facilityId, weekStart);
+            var (rangeStart, rangeEnd) = CalculateDateRange(anchor, currentView ?? "Week");
+            var data = FakeScheduleData.GetAssignments(facilityId, rangeStart, rangeEnd);
             return Ok(data);
+        }
+
+        private static (DateTime start, DateTime end) CalculateDateRange(DateTime anchor, string view)
+        {
+            return view switch
+            {
+                "Day" => (anchor.Date, anchor.Date.AddDays(1)),
+                "WorkWeek" => WorkWeekRange(anchor),
+                "Month" => MonthRange(anchor),
+                "Agenda" => (anchor.Date, anchor.Date.AddDays(30)),
+                _ => WeekRange(anchor), // "Week" and default
+            };
+        }
+
+        private static (DateTime start, DateTime end) WeekRange(DateTime anchor)
+        {
+            var sunday = anchor.Date.AddDays(-(int)anchor.DayOfWeek);
+            return (sunday, sunday.AddDays(7));
+        }
+
+        private static (DateTime start, DateTime end) WorkWeekRange(DateTime anchor)
+        {
+            var monday = anchor.Date.AddDays(-(int)anchor.DayOfWeek + 1);
+            if (anchor.DayOfWeek == DayOfWeek.Sunday) monday = monday.AddDays(-7);
+            return (monday, monday.AddDays(5));
+        }
+
+        private static (DateTime start, DateTime end) MonthRange(DateTime anchor)
+        {
+            var firstOfMonth = new DateTime(anchor.Year, anchor.Month, 1);
+            var lastOfMonth = firstOfMonth.AddMonths(1).AddDays(-1);
+            // SF Month view shows full weeks — pad to surrounding Sundays
+            var rangeStart = firstOfMonth.AddDays(-(int)firstOfMonth.DayOfWeek);
+            var rangeEnd = lastOfMonth.AddDays(6 - (int)lastOfMonth.DayOfWeek + 1);
+            return (rangeStart, rangeEnd);
         }
 
         /// <summary>
@@ -103,6 +139,56 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return PartialView(
                 "~/Areas/Sandbox/Views/Components/Fusion/Schedule/_EditAssignmentForm.cshtml",
                 model);
+        }
+
+        /// <summary>
+        /// Returns the new assignment form partial.
+        /// Loaded into FusionDialog when user clicks an empty cell on the schedule.
+        /// GroupIndex (0-based) is mapped to ShiftId (1-based).
+        /// </summary>
+        [HttpGet("NewAssignmentForm")]
+        public IActionResult NewAssignmentForm(string startTime, string endTime, int shiftId, string? selectedFacilityId)
+        {
+            var model = new NewAssignmentModel
+            {
+                StartTime = startTime,
+                EndTime = endTime,
+                ShiftId = shiftId + 1, // GroupIndex 0-based → ShiftId 1-based
+                FacilityId = selectedFacilityId ?? "mystery-manor",
+            };
+            return PartialView(
+                "~/Areas/Sandbox/Views/Components/Fusion/Schedule/_NewAssignmentForm.cshtml",
+                model);
+        }
+
+        /// <summary>
+        /// Creates a new shift assignment. Called from the new assignment dialog form.
+        /// </summary>
+        [HttpPost("~/api/schedule/create-assignment")]
+        public IActionResult CreateAssignment([FromBody] NewAssignmentModel? model)
+        {
+            if (model == null || model.StaffId == null)
+                return BadRequest(new { errors = new { StaffId = new[] { "Staff member is required." } } });
+
+            if (string.IsNullOrEmpty(model.StartTime) || string.IsNullOrEmpty(model.EndTime))
+                return BadRequest(new { error = "Start and end time are required." });
+
+            var assignment = FakeScheduleData.CreateAssignment(
+                model.FacilityId ?? "mystery-manor",
+                DateTime.Parse(model.StartTime),
+                DateTime.Parse(model.EndTime),
+                model.ShiftId,
+                model.StaffId.Value);
+
+            if (assignment == null)
+                return BadRequest(new { error = "Could not create assignment. Staff not found." });
+
+            return Ok(new
+            {
+                success = true,
+                message = $"{assignment.StaffName} ({assignment.StaffRole}) assigned.",
+                assignment,
+            });
         }
 
         /// <summary>

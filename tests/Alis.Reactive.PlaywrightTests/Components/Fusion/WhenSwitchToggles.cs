@@ -251,8 +251,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"member\": \"checked\""),
-            "Plan must carry defaultValue member 'checked' for FusionSwitch component sources — " +
-            "runtime walks this path to read the switch state");
+            "Plan must carry property member 'checked' for FusionSwitch component sources — " +
+            "runtime reads this property to get the switch state");
         AssertNoConsoleErrors();
     }
 

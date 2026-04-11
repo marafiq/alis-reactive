@@ -56,7 +56,8 @@ namespace Alis.Reactive.Builders.Requests
             if (_context.TryFindRegistrationById(componentId, out var reg))
                 shape = reg.Shape;
             _context.EnsureInputComponent(componentId, vendor, valueMember, shape ?? Shape.Any, propertyName);
-            Fields.Add(GatherField.Of(componentId, propertyName, shape));
+            var value = ValueProducer.Read(ComponentSource.Of(componentId), valueMember, shape: shape ?? Shape.Any);
+            Fields.Add(GatherField.Of(propertyName, value));
             return this;
         }
 

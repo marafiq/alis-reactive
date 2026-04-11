@@ -71,24 +71,23 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>Maps an HTTP parameter name to a ValueProducer that reads the value at request time.
+    /// Uses the shared evaluateValue path — same concept as pipeline reads and validation.</summary>
     internal sealed class GatherField
     {
-        public string Component { get; }
+        /// <summary>HTTP parameter name (from model binding path or explicit override).</summary>
         public string Key { get; }
+        /// <summary>How to read the value. Carries source, member, and shape.</summary>
+        public ValueProducer Value { get; }
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        [System.Text.Json.Serialization.JsonInclude]
-        internal Shape? Shape { get; }
-
-        internal GatherField(string component, string key, Shape? shape = null)
+        internal GatherField(string key, ValueProducer value)
         {
-            Component = component;
             Key = key;
-            Shape = shape;
+            Value = value;
         }
 
-        internal static GatherField Of(string component, string key, Shape? shape = null)
-            => new GatherField(component, key, shape);
+        internal static GatherField Of(string key, ValueProducer value)
+            => new GatherField(key, value);
     }
 
     /// <summary>

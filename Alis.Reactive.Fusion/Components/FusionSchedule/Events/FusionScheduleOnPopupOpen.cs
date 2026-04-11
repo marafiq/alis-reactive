@@ -6,8 +6,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Payload for FusionSchedule.PopupOpen (SF "popupOpen" event).
     /// Fires before any popup opens. Set cancel to prevent.
-    /// Verified: sf-schedule-test.html — type values:
-    /// "QuickInfo" (click tooltip), "Editor" (full edit modal), "DeleteAlert" (confirmation).
+    /// type: "QuickInfo" (click tooltip), "Editor" (full edit modal), "DeleteAlert" (confirmation).
     /// </summary>
     public class FusionSchedulePopupOpenArgs
     {

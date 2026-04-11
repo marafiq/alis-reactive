@@ -4,23 +4,22 @@
 
 import type {
   Plan, Reaction, SequenceReaction, ParallelReaction, BranchReaction,
-  SetReaction, CallReaction, RequestReaction, DispatchReaction,
+  SetReaction, CallReaction, DispatchReaction,
   InjectReaction, ShowValidationErrorsReaction,
-  ValueProducer, ExecContext, Source, Condition,
+  ExecContext, Condition,
 } from "../types";
 import {
-  resolveSource, resolveElement, getJsTypeForSource, readProperty as resolverReadProperty,
+  resolveSource, resolveElement, getJsTypeForSource,
   setProperty, callMethod,
 } from "../resolution/resolver";
+import { evaluateValue } from "../core/evaluate";
+export { evaluateValue };
 import { evaluateCondition, evaluateConditionAsync } from "../conditions/conditions";
 import { setValueEvaluator } from "../conditions/conditions";
 import { validateContainer, showServerErrors } from "../validation";
 import { executeRequest } from "./http";
 import { injectHtml } from "./inject";
 import { assertNever } from "../core/assert-never";
-import { applyShape } from "../core/shape-convert";
-import { walk } from "../core/walk";
-import { walkPath } from "../core/walk";
 import { scope } from "../core/trace";
 
 const log = scope("execute");
@@ -281,82 +280,3 @@ function executeShowValidationErrors(
     validateContainer(plan, reaction.container, ctx);
   }
 }
-
-// ── Value evaluation ──────────────────────────────────────
-
-export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecContext): unknown {
-  switch (producer.kind) {
-    case "literal":
-      return applyShape(producer.value, producer.shape);
-
-    case "read": {
-      const root = resolveSource(plan, producer.from, ctx);
-
-      // Component source: look up member in JsType
-      // Preserve null/undefined so presence checks (is-null, not-null) get the
-      // correct signal — matches the payload read pattern below.
-      if (producer.from.kind === "component") {
-        const jsType = getJsTypeForSource(plan, producer.from);
-        const prop = jsType.properties?.[producer.member];
-        if (prop) {
-          const raw = resolverReadProperty(root, prop);
-          return raw == null ? raw : applyShape(raw, producer.shape ?? prop.shape);
-        }
-        const method = jsType.methods?.[producer.member];
-        if (method) {
-          const raw = callMethod(root, method, []);
-          return raw == null ? raw : applyShape(raw, producer.shape);
-        }
-        // Fallback: validation conditions on partial-owned fields may use "value"
-        // as the member, but the actual JsType uses a different defaultValue member
-        // (e.g. "checked" for NativeCheckBox). Read via defaultValue when available.
-        if (jsType.defaultValue) {
-          const dvProp = jsType.properties?.[jsType.defaultValue.member];
-          if (dvProp) {
-            const raw = resolverReadProperty(root, dvProp);
-            return raw == null ? raw : applyShape(raw, producer.shape ?? dvProp.shape);
-          }
-          const dvMethod = jsType.methods?.[jsType.defaultValue.member];
-          if (dvMethod) {
-            const raw = callMethod(root, dvMethod, []);
-            return raw == null ? raw : applyShape(raw, producer.shape);
-          }
-        }
-        throw new Error(`[alis] member "${producer.member}" not found on type`);
-      }
-      // Payload source: walk member as dot-path on resolved payload.
-      // Preserve null/undefined from walks through missing intermediates so
-      // presence checks (is-null, not-null) get the correct signal.
-      if (producer.path) {
-        const walked = walkPath(root as any, producer.path);
-        return walked == null ? walked : applyShape(walked, producer.shape);
-      }
-      // "responseBody" means "the response itself" — the resolved payload IS the value.
-      // This happens for Into() inject and other whole-response reads.
-      if (producer.member === "responseBody") {
-        return root == null ? root : applyShape(root, producer.shape);
-      }
-      // Walk the member as a dot-path on the resolved payload.
-      // PayloadSource already resolves to the correct root (event data, response body),
-      // so the member IS the actual path — no prefix stripping needed.
-      const walked = walk(root as any, producer.member);
-      return walked == null ? walked : applyShape(walked, producer.shape);
-    }
-
-    case "object": {
-      const result: Record<string, unknown> = {};
-      for (const [key, val] of Object.entries(producer.fields)) {
-        result[key] = evaluateValue(val, plan, ctx);
-      }
-      return result;
-    }
-
-    case "array":
-      return producer.items.map(i => evaluateValue(i, plan, ctx));
-
-    default:
-      assertNever(producer, "value producer kind");
-  }
-}
-
-// Import helper for property reading
