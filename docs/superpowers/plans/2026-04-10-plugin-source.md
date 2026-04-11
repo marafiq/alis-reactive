@@ -294,12 +294,24 @@ public GatherBuilder<TModel> Plugin<T>(TypedPluginSource<T> source, string param
 }
 ```
 
-DSL usage:
+DSL usage — args from any source available at request time:
 ```csharp
+// Plugin read with component arg → gather param
+g.Plugin(p.Plugin<int>("array", "count")
+          .Arg(p.Component<FusionGrid>(m => m.Data).Value()), "itemCount")
+
+// Plugin read with URL arg → gather param
+g.Plugin(p.Plugin<int>("array", "getCountByStatus")
+          .Arg(p.FromUrl("status")), "statusCount")
+
+// Zero-arg plugin read → gather param
+g.Plugin(p.Plugin<string>("auth", "getToken"), "token")
+
+// In response handler — response body as arg
 g.Plugin(p.Plugin<int>("array", "count").Arg(json, x => x.Items), "count")
 ```
 
-The `p.Plugin<int>(...)` builder implicitly converts to `TypedPluginSource<int>` which carries the args. GatherBuilder just calls `.ToValueProducer()`. Shape, args, everything flows through.
+The `p.Plugin<T>(...)` builder implicitly converts to `TypedPluginSource<T>` which carries the args. `GatherBuilder.Plugin` calls `.ToValueProducer()`. Shape, args, everything flows through. Args can be component reads, URL params, other plugin reads, literals — same as headers and route params.
 
 ### Task 8: Schema + TS Types
 
