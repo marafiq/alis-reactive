@@ -44,10 +44,12 @@ p.Plugin<int>("array", "count")
 // Read — with args, scalar result
 p.Plugin<int>("array", "count").Arg(json, x => x.Items)
 
-// Read — returns typed object (walked by existing DSL)
-p.Plugin<Resident>("array", "first").Arg(json, x => x.Items)
-// The result is a Resident — existing DSL walks it:
-s.Element("name").SetText(result, x => x.Name)
+// Read — returns object (for chaining between plugin calls)
+p.Plugin<object>("array", "first").Arg(json, x => x.Items)
+// Object results flow as args to other plugin calls:
+p.Plugin<string>("array", "pluck").Arg(p.Plugin<object>("array", "first").Arg(json, x => x.Items)).Arg("name")
+// For direct display, use a plugin method that returns the scalar:
+p.Plugin<string>("array", "pluck").Arg(json, x => x.Items).Arg(0).Arg("name")
 
 // Read — nested (filter returns array, count takes it)
 p.Plugin<int>("array", "count")
@@ -457,7 +459,7 @@ Navigate to `/Sandbox/Plugins/ArrayManager`. Wait for `#arr-total` ≠ "—".
 - [ ] `p.Plugin<T>().Arg("literal")` literal args
 - [ ] `p.Plugin<T>().Arg(source)` typed source args
 - [ ] Nested: `Plugin<int>("array","count").Arg(Plugin<object>("array","filter").Arg(...))`
-- [ ] Object return: `Plugin<Resident>("array","first")` → typed payload, DSL walks it
+- [ ] Object return: flows as arg to other plugin calls (chaining), not directly walkable by DSL
 - [ ] `p.Plugin().Fire()` void call emits CallReaction
 - [ ] `p.Plugin().Arg().Fire()` void with args
 - [ ] `g.Plugin(typedPluginSource, "paramName")` gather with plugin source
