@@ -108,8 +108,10 @@ Add after the `Read` factory:
 /// <summary>Creates a ReadProducer that reads a URL query parameter by name.
 /// Default shape is String because URL params are inherently strings.</summary>
 internal static ValueProducer ReadUrl(string paramName, Shape shape = null) =>
-    new ReadProducer(UrlSource.Instance, paramName, shape: shape ?? Shape.String);
+    Read(UrlSource.Instance, paramName, shape: shape ?? Shape.String);
 ```
+
+Uses the existing `Read` factory (ValueProducer.cs:45) which has default `path: null`. Does NOT call the `ReadProducer` constructor directly (it requires all 4 params with no defaults).
 
 Default shape `Shape.String` — callers override for typed reads (`FromUrl<int>` → `Shape.Number`).
 
@@ -242,7 +244,34 @@ Add to Source oneOf:
 },
 ```
 
-Add new definition (after PayloadSource definition):
+**Also add `additionalProperties: false` to ComponentSource and PayloadSource** — they currently lack it, which is inconsistent with the quality bar. Since we're touching the Source union, close this gap now:
+
+```json
+"ComponentSource": {
+  "type": "object",
+  "required": ["kind", "component"],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "const": "component" },
+    "component": { "type": "string", "minLength": 1 }
+  }
+},
+"PayloadSource": {
+  "type": "object",
+  "required": ["kind", "scope"],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "const": "payload" },
+    "scope": {
+      "type": "string",
+      "enum": ["event", "success", "error", "request", "dispatch", "local"]
+    },
+    "type": { "type": "string", "minLength": 1 }
+  }
+},
+```
+
+Add new UrlSource definition:
 
 ```json
 "UrlSource": {
@@ -255,7 +284,7 @@ Add new definition (after PayloadSource definition):
 },
 ```
 
-**Note:** `additionalProperties: false` — UrlSource has ONLY `kind`, no extra properties.
+**All three Source kinds now have `additionalProperties: false`.** Consistent quality bar across the union.
 
 ### Task 7: TS Types — Source union + UrlSource
 
@@ -292,7 +321,9 @@ The returned `URLSearchParams` object is the "root." The `member` on ReadProduce
 
 **File:** `Alis.Reactive.SandboxApp/Scripts/core/evaluate.ts`
 
-In the `"read"` case, add URL source branch between component and payload handling:
+In the `"read"` case, add URL source branch **after the component block's closing `}` (after the throw for missing member) and BEFORE the payload walk logic**. This is critical — the payload path is a fallthrough (no `if (producer.from.kind === "payload")` guard). If the URL branch is placed after the payload walk, it will never execute.
+
+Insert after the line `throw new Error(\`[alis] member "${producer.member}" not found on component...\`)` closing block, before `if (producer.path) {`:
 
 ```typescript
 // URL source: read query parameter by name
@@ -319,13 +350,31 @@ public class UrlParamEchoResponse
     public string? FacilityId { get; set; }
     public string? Page { get; set; }
 }
+
+public class ComposeEchoResponse
+{
+    public int ResidentId { get; set; }
+    public string? Name { get; set; }
+    public string? ReceivedTab { get; set; }
+    public string? ReceivedFacility { get; set; }
+}
 ```
 
-**Controller endpoint** (`HttpController.cs`):
+**Controller endpoints** (`HttpController.cs`):
 ```csharp
 [HttpGet("UrlParamEcho")]
 public IActionResult UrlParamEcho(string? tab, string? facilityId, string? page) =>
     Json(new { tab, facilityId, page });
+
+// Composition echo — returns route param result + received headers + query fields
+[HttpGet("ComposeEcho/{id:int}")]
+public IActionResult ComposeEcho(int id, string? facility) =>
+    Json(new {
+        residentId = id,
+        name = $"Resident #{id}",
+        receivedTab = Request.Headers["X-Tab"].FirstOrDefault() ?? "(none)",
+        receivedFacility = facility ?? "(none)"
+    });
 ```
 
 **Page URL:** `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`
@@ -389,20 +438,24 @@ p.Element("url-display-facility").SetText(p.FromUrl("facilityId"));
 **Button:** "Compose All Sources"
 **DSL:**
 ```csharp
-p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
+p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
  .Gather(g => g
      .RouteParam("id", 42)
      .Header("X-Tab", p.FromUrl("tab"))
      .FromUrl("facilityId", "facility"))
- .Response(r => r.OnSuccess<ResidentByIdResponse>((json, s) =>
+ .Response(r => r.OnSuccess<ComposeEchoResponse>((json, s) =>
  {
      s.Element("url-compose-name").SetText(json, x => x.Name);
+     s.Element("url-compose-tab").SetText(json, x => x.ReceivedTab);
+     s.Element("url-compose-facility").SetText(json, x => x.ReceivedFacility);
      s.Element("url-compose-result").AddClass("text-green-600");
  }))
 ```
 
 **Element IDs:**
-- `url-compose-name` — expect: "Resident #42"
+- `url-compose-name` — expect: "Resident #42" (proves route param resolved)
+- `url-compose-tab` — expect: "medications" (proves FromUrl → Header reached server)
+- `url-compose-facility` — expect: "7" (proves FromUrl → gather field reached server)
 
 ### Task 11: C# Unit Tests (16 tests) — `WhenReadingUrlParams.cs`
 
@@ -427,7 +480,7 @@ p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
 | `empty_param_name_throws_in_gather` | `.FromUrl("")` → ArgumentException |
 | `empty_alias_throws_in_gather` | `.FromUrl("tab", "")` → ArgumentException |
 
-### Task 12: vitest Tests (4 tests) — `core/evaluate-url.test.ts`
+### Task 12: vitest Tests (6 tests) — `core/evaluate-url.test.ts`
 
 **File:** `Alis.Reactive.SandboxApp/Scripts/__tests__/core/evaluate-url.test.ts`
 
@@ -437,10 +490,12 @@ p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
 | `url source returns null for absent param` | Missing param → null propagation |
 | `url source applies number shape to string value` | `applyShape("42", numberShape)` → 42 |
 | `url source applies boolean shape to string value` | `applyShape("true", boolShape)` → true |
+| `resolveSource returns URLSearchParams for url kind` | Unit test of resolver.ts — `resolveSource(plan, { kind: "url" })` returns URLSearchParams |
+| `url source null value does not call applyShape` | Absent param → null returned, applyShape NOT called |
 
-Note: Mock `resolveSource` to return a pre-built `URLSearchParams`. Mock `applyShape` to verify it's called with correct shape.
+Note: Mock `resolveSource` to return a pre-built `URLSearchParams` for evaluate tests. Test `resolveSource` directly for the resolver test (requires mocking `window.location`). Verify `applyShape` mock call counts for null test.
 
-### Task 13: Playwright Tests (8 tests) — `WhenUrlParamsRead.cs`
+### Task 13: Playwright Tests (11 tests) — `WhenUrlParamsRead.cs`
 
 **File:** `tests/Alis.Reactive.PlaywrightTests/HttpPipeline/WhenUrlParamsRead.cs`
 
@@ -470,14 +525,18 @@ Navigate to `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`.
 
 | Test | Click | Assert |
 |---|---|---|
-| `url_param_composes_with_route_param_and_header` | "Compose All Sources" | `#url-compose-name` → "Resident #42" |
-| `url_compose_applies_success_class` | "Compose All Sources" | `#url-compose-result` has class `text-green-600` |
+| `url_param_composes_route_param_resolves` | "Compose All Sources" | `#url-compose-name` → "Resident #42" (route param) |
+| `url_param_composes_header_reaches_server` | "Compose All Sources" | `#url-compose-tab` → "medications" (FromUrl → Header) |
+| `url_param_composes_gather_field_reaches_server` | "Compose All Sources" | `#url-compose-facility` → "7" (FromUrl → gather) |
 
 **Missing param test:**
 
 | Test | Navigate to | Assert |
 |---|---|---|
-| `missing_url_param_returns_null` | `/Sandbox/HttpPipeline/Http` (NO query params) | `#url-cond-meds` is hidden, `#url-display-tab` → "—" (placeholder stays) |
+| `missing_url_param_returns_null_condition_hides_panel` | `/Sandbox/HttpPipeline/Http` (NO query params) | `#url-cond-meds` is hidden (condition evaluates to false for null) |
+| `missing_url_param_returns_null_text_becomes_empty` | `/Sandbox/HttpPipeline/Http` (NO query params) | `#url-display-tab` has empty text (SetText(null) → textContent = null → browser renders "") |
+
+**Design note on null + SetText:** `evaluateValue` returns `null` for absent URL params. `SetReaction` calls `setProperty(root, prop, null)` which sets `textContent = null`. Browsers render this as `""`. This is correct behavior — the element becomes empty, not stuck at a placeholder. If the developer wants a fallback display, they should use a `When(p.FromUrl("tab")).NotNull()` guard.
 
 ---
 
@@ -500,6 +559,6 @@ Navigate to `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`.
 - [ ] Composes with Route Params (`RouteParam("id", p.FromUrl<int>("id"))`)
 - [ ] Empty param name throws ArgumentException in both PipelineBuilder and GatherBuilder
 - [ ] All 16 C# unit tests pass (Task 11)
-- [ ] All 4 vitest tests pass (Task 12)
-- [ ] All 8 Playwright tests pass (Task 13)
+- [ ] All 6 vitest tests pass (Task 12)
+- [ ] All 11 Playwright tests pass (Task 13)
 - [ ] All existing 799+ Playwright tests pass (no regressions)
