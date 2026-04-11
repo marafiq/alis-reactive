@@ -29,6 +29,26 @@ With shape:
 
 `URLSearchParams.get(name)` returns `null` for absent params. This is NOT an error — it's a normal condition (the URL might not have `?page=2`). The null flows through the existing `raw == null ? raw : applyShape(...)` pattern in evaluateValue. Conditions like `.IsNull()` and `.NotNull()` work correctly. This is different from route params where null is always a bug (route params are required path segments).
 
+### Malformed Typed URL Params (Pre-Existing Behavior)
+
+URL params are user-controlled strings. `?page=abc` with `FromUrl<int>("page")` flows through `applyShape("abc", numberShape)` which calls `toNumber("abc")` in `shape-convert.ts:85-87`:
+
+```typescript
+const n = Number("abc");  // NaN
+return ok(Number.isNaN(n) ? 0 : n);  // returns 0 — SILENT
+```
+
+Current behavior for malformed input:
+- `toNumber("abc")` → `0` (NaN becomes 0)
+- `toDate("garbage")` → `NaN` (invalid Date timestamp)
+- `toBoolean("anything")` → `true` (any non-empty, non-"false", non-"0" string)
+
+This is a **pre-existing behavior** in `shape-convert.ts` that affects ALL value reads (component reads, event args, URL params). It is NOT introduced by this plan. However, URL params have higher exposure because users control the URL directly.
+
+**Decision:** This plan documents and tests the current behavior but does NOT change `shape-convert.ts`. Fixing silent conversion is a cross-cutting concern that must be addressed separately for all value reads, not just URL source. The tests make the behavior explicit so it's visible, not hidden.
+
+**Tests added:** `malformed_int_url_param_evaluates_to_zero` and `malformed_date_url_param_evaluates_to_nan` in the vitest table.
+
 ### Source Union Widening + execute.ts Impact
 
 Adding UrlSource to the Source union means `SetReaction.on` and `CallReaction.on` could theoretically target a URL. The C# builders won't generate this, but the runtime trace code at `execute.ts:201,223` accesses `reaction.on.scope` which doesn't exist on UrlSource (only on PayloadSource). The runtime DOES fail-fast via `getJsTypeForSource` at line 212/236, but the trace log would show `target: undefined`.
@@ -189,7 +209,7 @@ public TypedUrlSource<string> FromUrl(string paramName)
 }
 
 /// <summary>
-/// Reads a query parameter with typed shape coercion.
+/// Reads a query parameter with typed shape conversion.
 /// Use <c>FromUrl&lt;int&gt;("page")</c> for numeric comparison,
 /// <c>FromUrl&lt;bool&gt;("active")</c> for boolean checks.
 /// </summary>
@@ -237,7 +257,7 @@ public GatherBuilder<TModel> FromUrl(string paramName, string asParam)
 }
 
 /// <summary>
-/// Includes a typed URL query parameter in the gather with shape coercion.
+/// Includes a typed URL query parameter in the gather with shape conversion.
 /// Use for numeric or date URL params that need shape-aware wire formatting.
 /// </summary>
 public GatherBuilder<TModel> FromUrl<T>(string paramName)
@@ -516,7 +536,7 @@ public IActionResult ComposeEcho(int id, string? requestedPage) =>
     });
 ```
 
-### Task 11: C# Unit Tests (16 tests) — `WhenReadingUrlParams.cs`
+### Task 11: C# Unit Tests — `WhenReadingUrlParams.cs`
 
 **File:** `tests/Alis.Reactive.UnitTests/Http/WhenReadingUrlParams.cs`
 
@@ -543,7 +563,7 @@ public IActionResult ComposeEcho(int id, string? requestedPage) =>
 | `whitespace_param_name_throws_in_gather` | `.FromUrl("  ")` → ArgumentException |
 | `empty_alias_throws_in_gather` | `.FromUrl("tab", "")` → ArgumentException |
 
-### Task 12: vitest Tests (6 tests) — `core/evaluate-url.test.ts`
+### Task 12: vitest Tests (8 tests) — `core/evaluate-url.test.ts`
 
 **File:** `Alis.Reactive.SandboxApp/Scripts/__tests__/core/evaluate-url.test.ts`
 
@@ -555,6 +575,8 @@ public IActionResult ComposeEcho(int id, string? requestedPage) =>
 | `url source applies boolean shape to string value` | `applyShape("true", boolShape)` → true |
 | `resolveSource returns URLSearchParams for url kind` | Unit test of resolver.ts — `resolveSource(plan, { kind: "url" })` returns URLSearchParams |
 | `url source null value does not call applyShape` | Absent param → null returned, applyShape NOT called |
+| `malformed int url param evaluates to zero` | `toNumber("abc")` → 0 (pre-existing silent conversion documented) |
+| `malformed date url param evaluates to nan` | `toDate("garbage")` → NaN (pre-existing behavior documented) |
 
 Note: Mock `resolveSource` to return a pre-built `URLSearchParams` for evaluate tests. Test `resolveSource` directly for the resolver test (requires mocking `window.location`). Verify `applyShape` mock call counts for null test.
 
@@ -624,6 +646,6 @@ Navigate to `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`.
 - [ ] Composes with Route Params (`RouteParam("id", p.FromUrl<int>("id"))`)
 - [ ] Empty param name throws ArgumentException in both PipelineBuilder and GatherBuilder
 - [ ] All 20 C# unit tests pass (Task 11)
-- [ ] All 6 vitest tests pass (Task 12)
+- [ ] All 8 vitest tests pass (Task 12)
 - [ ] All 10 Playwright tests pass (Task 13)
 - [ ] All existing 799+ Playwright tests pass (no regressions)

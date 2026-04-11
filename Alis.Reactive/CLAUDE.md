@@ -182,12 +182,36 @@ gap the plan should have caught, the reviewer who signed off missed it.
 4. Full Playwright suite passes (789+ tests, --logger detailed, no filters).
 5. Transient network flakes (ERR_NETWORK_CHANGED) are noted, not counted as failures.
 
-### Reviewer Accountability
+### Reviewer Accountability — No Passengers
 
-- Every SIGN-OFF prompt includes: "Your SIGN-OFF means you OWN the outcome."
-- Reviewers must cite file:line evidence for every PASS and every BLOCK.
-- Test counts must be verified: table rows = heading count = checklist count.
-- Stale descriptions from previous rounds must be caught (not inherited).
+This framework serves senior living communities. Residents depend on software built
+with it. Every reviewer is the last line of defense — not a rubber stamp.
+
+**The standard for every reviewer (not just Codex xhigh):**
+
+- Your SIGN-OFF means you OWN the outcome. If the implementation breaks,
+  YOUR review failed. You are not a secondary checker — you are a co-owner.
+- A SIGN-OFF with zero findings is suspicious. If you found nothing, you
+  probably didn't look hard enough. The codebase has patterns that repeat —
+  if a prior review found shape drops, null corruption, or trace bugs, those
+  same patterns WILL appear in new code. Hunt for them.
+- Do NOT just confirm what the plan says. Read the ACTUAL CODE the plan
+  references. Run grep. Trace the flow. Find what the plan MISSED.
+- Every PASS must have evidence that proves correctness, not absence of failure.
+  "I checked and it looks right" is not evidence. "File:line shows X which
+  matches Y in the schema" is evidence.
+- Every BLOCK must have a concrete consequence: "If not fixed, X will happen
+  at runtime." Theoretical concerns without consequences are DEFER, not BLOCK.
+- If another reviewer already found 5 issues and you found 0, something is wrong
+  with YOUR review, not with the code.
+
+**Stakes reminder (include in every prompt):**
+
+> This framework serves senior living communities. Residents — real people in
+> care facilities — depend on software built with it. A silent bug in value
+> resolution means wrong medication schedules displayed. A fallback that hides
+> an error means a care alert that never fires. Quality is not optional.
+> Your SIGN-OFF is your professional commitment that this code is correct.
 
 ### Architectural Checks (every review MUST verify these)
 
