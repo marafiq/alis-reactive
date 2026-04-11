@@ -49,22 +49,61 @@ This is a **pre-existing behavior** in `shape-convert.ts` that affects ALL value
 
 **Tests added:** `malformed_int_url_param_evaluates_to_zero` and `malformed_date_url_param_evaluates_to_nan` in the vitest table.
 
+### Null Semantics Per Destination
+
+Null URL params (absent from URL) flow differently depending on destination:
+
+| Destination | Null Behavior | Evidence |
+|---|---|---|
+| Condition (.Eq, .Gt, etc.) | null compared — `.IsNull()` returns true | evaluateValue returns null |
+| SetText | `textContent = null` → browser renders `""` | setProperty(root, prop, null) |
+| Header | Suppressed — header not sent | `if (value != null)` in http.ts |
+| Route param | Throws — route params require values | `throw` in url-template.ts |
+| Gather field | Serialized as empty — `name=` in query string | `toString(null)` → `""` |
+
+Developers should use `When(p.FromUrl("param")).NotNull()` guards when null URL params would cause wrong behavior.
+
+### Security Note — URL Source and HTML Sinks
+
+`SetHtml(p.FromUrl("html"))` would inject URL-bar content directly into the DOM. This is a cross-cutting XSS concern for `SetHtml` with ANY untrusted value source — not specific to URL source. `SetText` is safe (uses `textContent`, not `innerHTML`). This plan does not add new HTML sinks. The existing `SetHtml` risk should be addressed separately with a content sanitization strategy.
+
 ### Source Union Widening + execute.ts Impact
 
-Adding UrlSource to the Source union means `SetReaction.on` and `CallReaction.on` could theoretically target a URL. The C# builders won't generate this, but the runtime trace code at `execute.ts:201,223` accesses `reaction.on.scope` which doesn't exist on UrlSource (only on PayloadSource). The runtime DOES fail-fast via `getJsTypeForSource` at line 212/236, but the trace log would show `target: undefined`.
+Adding UrlSource to the Source union means `SetReaction.on` and `CallReaction.on` could theoretically accept `{ "kind": "url" }` in plan JSON (schema-valid). The C# builders won't generate this, but malformed JSON could.
 
-**Fix in execute.ts (Task 8b):** Guard the trace target resolution:
+**Fix in execute.ts (Task 8b) — explicit reject, not just trace fix:**
 
 ```typescript
-// In executeSet (line 201) and executeCall (line 223):
+// At the TOP of executeSet and executeCall, BEFORE resolveSource:
+function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void {
+  if (reaction.on.kind !== "component" && reaction.on.kind !== "payload") {
+    throw new Error(`[alis] Set reaction does not support source kind "${reaction.on.kind}". Only component and payload sources can be mutation targets.`);
+  }
+  // ... existing code
+}
+
+function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): void {
+  if (reaction.on.kind !== "component" && reaction.on.kind !== "payload") {
+    throw new Error(`[alis] Call reaction does not support source kind "${reaction.on.kind}". Only component and payload sources can be mutation targets.`);
+  }
+  // ... existing code
+}
+```
+
+Also fix the trace target (same functions):
+```typescript
 const target = reaction.on.kind === "component"
   ? reaction.on.component
   : reaction.on.kind === "payload"
     ? reaction.on.scope
-    : reaction.on.kind;  // "url", "plugin", etc. — just use the kind as trace label
+    : reaction.on.kind;
 ```
 
-This is a 2-line change in execute.ts that makes the trace correct for any Source kind without changing behavior. The fail-fast path through `getJsTypeForSource` remains unchanged.
+This provides two layers of defense:
+1. **Build time:** No C# builder creates Set/Call with UrlSource (no factory method exists)
+2. **Runtime:** Explicit throw with clear message before any resolution attempt
+
+The schema remains shared (splitting Source into ReadSource/MutationSource is a large refactor better done separately). The runtime guard ensures fail-fast for malformed plan JSON.
 
 ### DSL — Five Usage Contexts
 
@@ -171,6 +210,13 @@ namespace Alis.Reactive.Builders.Conditions
             if (string.IsNullOrWhiteSpace(paramName))
                 throw new System.ArgumentException(
                     "URL param name must not be null or whitespace.", nameof(paramName));
+            // URL params are single strings from URLSearchParams.get().
+            // Reject non-scalar types — arrays, objects, complex types are not supported.
+            var shape = Shape.FromClrType(typeof(TProp));
+            if (!shape.IsScalar)
+                throw new System.InvalidOperationException(
+                    $"FromUrl<{typeof(TProp).Name}>(\"{paramName}\") is not supported. " +
+                    "URL query parameters are single strings — use scalar types (string, int, bool, DateTime).");
             _paramName = paramName;
         }
 
@@ -507,9 +553,9 @@ p.Element("url-display-facility").SetText(p.FromUrl("facilityId"));
 ```csharp
 p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
  .Gather(g => g
-     .RouteParam("id", p.FromUrl<int>("facilityId"))   // URL param → route param (THE key composition)
+     .RouteParam("id", 42)                              // literal route param (safe — no user input)
      .Header("X-Tab", p.FromUrl("tab"))                 // URL param → header
-     .FromUrl("page", "requestedPage"))                 // URL param → gather field
+     .FromUrl("facilityId", "facility"))                // URL param → gather field
  .Response(r => r.OnSuccess<ComposeEchoResponse>((json, s) =>
  {
      s.Element("url-compose-name").SetText(json, x => x.Name);
@@ -520,9 +566,12 @@ p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
 ```
 
 **Element IDs:**
-- `url-compose-name` — expect: "Resident #7" (proves FromUrl<int> → RouteParam resolved — facilityId=7 from URL)
+- `url-compose-name` — expect: "Resident #42" (proves route param resolved)
 - `url-compose-tab` — expect: "medications" (proves FromUrl → Header reached server)
-- `url-compose-facility` — expect: "3" (proves FromUrl("page") → gather field "requestedPage" reached server)
+- `url-compose-facility` — expect: "7" (proves FromUrl → gather field reached server)
+
+**Design note — FromUrl → RouteParam composition risk:**
+URL params flow through the shared ValueProducer concept — they compose with headers, route params, gather, and conditions by design. However, `FromUrl<int>` → RouteParam carries a pre-existing `shape-convert.ts` risk: malformed input (`?facilityId=abc`) silently converts to `0` via `toNumber`, producing `/residents/0` instead of failing. This section uses a literal route param to demonstrate safe composition. The `FromUrl → RouteParam` path IS supported and tested (C# unit test `from_url_as_route_param_value`), but production use should validate URL params via conditions (`When(p.FromUrl("facilityId")).NotNull()`) before feeding them to route params. A `shape-convert.ts` strict mode is a separate future improvement tracked outside this plan.
 
 **Controller update:** `ComposeEcho` needs to accept the gather field:
 ```csharp
@@ -562,6 +611,8 @@ public IActionResult ComposeEcho(int id, string? requestedPage) =>
 | `empty_param_name_throws_in_gather` | `.FromUrl("")` → ArgumentException |
 | `whitespace_param_name_throws_in_gather` | `.FromUrl("  ")` → ArgumentException |
 | `empty_alias_throws_in_gather` | `.FromUrl("tab", "")` → ArgumentException |
+| `array_type_throws_in_from_url` | `p.FromUrl<string[]>("tags")` → InvalidOperationException "not supported" |
+| `object_type_throws_in_from_url` | `p.FromUrl<MyDto>("data")` → InvalidOperationException "not supported" |
 
 ### Task 12: vitest Tests (8 tests) — `core/evaluate-url.test.ts`
 
@@ -645,7 +696,7 @@ Navigate to `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`.
 - [ ] Composes with Headers (`Header("X-Tab", p.FromUrl("tab"))`)
 - [ ] Composes with Route Params (`RouteParam("id", p.FromUrl<int>("id"))`)
 - [ ] Empty param name throws ArgumentException in both PipelineBuilder and GatherBuilder
-- [ ] All 20 C# unit tests pass (Task 11)
+- [ ] All 22 C# unit tests pass (Task 11)
 - [ ] All 8 vitest tests pass (Task 12)
 - [ ] All 10 Playwright tests pass (Task 13)
 - [ ] All existing 799+ Playwright tests pass (no regressions)
