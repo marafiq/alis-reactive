@@ -8,6 +8,7 @@ import { resolveComponent, readProperty } from "../resolution/resolver";
 import { applyShape, toString } from "../core/shape-convert";
 import { scope } from "../core/trace";
 import { evaluateValue } from "../core/evaluate";
+import { formatForWire } from "../core/wire-format";
 
 const log = scope("gather");
 
@@ -37,16 +38,6 @@ function serializeValue(value: unknown, name: string): string {
     return "";
   }
   return result.value;
-}
-
-/** Shape-aware wire formatting. Date timestamps → ISO strings for HTTP. */
-function formatForWire(value: unknown, shape?: Shape): unknown {
-  if (!shape) return value;
-  if (shape.kind === "date" && typeof value === "number" && !isNaN(value))
-    return new Date(value).toISOString();
-  if (shape.kind === "nullable" && shape.inner?.kind === "date" && typeof value === "number" && !isNaN(value))
-    return new Date(value).toISOString();
-  return value;
 }
 
 /** Transport strategies for emitting name/value pairs into GET, FormData, or JSON. */

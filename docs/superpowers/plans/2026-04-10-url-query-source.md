@@ -6,6 +6,8 @@
 
 **Tech Stack:** C# plan model + Source union, JSON schema, TypeScript types + runtime resolver
 
+**Prerequisite:** None. This plan is self-contained but should land BEFORE Plugin Source (which also widens the Source union — doing URL first validates the pattern on a simpler case).
+
 ---
 
 ## Architecture
@@ -14,7 +16,7 @@ A new `UrlSource` kind is added to the `Source` union (alongside `ComponentSourc
 
 Shape is critical: URL query params are inherently strings. Without shape, `"42" > "1"` is string comparison (wrong). With `Shape.Number`, `applyShape("42", Shape.Number)` converts to `42`, enabling correct numeric comparison.
 
-### DSL — Three Usage Contexts
+### DSL — Four Usage Contexts
 
 ```csharp
 // 1. GATHER: pass URL param as HTTP request param
@@ -48,13 +50,18 @@ p.When(p.FromUrl<int>("page")).Gt(1).Then(t => {
 
 ### Key Design Decisions
 
-1. **UrlSource is a singleton** — no per-instance state. Unlike ComponentSource (carries component ID) or PayloadSource (carries scope), the URL source is always `window.location.search`. The query param name is the `member` on ReadProducer.
+1. **UrlSource is a singleton** — no per-instance state. Unlike ComponentSource (carries component ID via `Component` property — Source.cs:15) or PayloadSource (carries `Scope` and `Type` — Source.cs:28-29), the URL source is always `window.location.search`. The query param name is the `member` on ReadProducer (ValueProducer.cs:73).
 
-2. **TypedUrlSource<T> extends TypedSource<T>** — plugs into ALL existing typed infrastructure with ZERO changes: conditions (`When<T>(TypedSource<T>)`), guards (`And/Or<T>(TypedSource<T>)`), branches (`ElseIf<T>(TypedSource<T>)`), element operations (`SetText<T>(TypedSource<T>)`).
+2. **TypedUrlSource<T> extends TypedSource<T>** — plugs into ALL existing typed infrastructure with ZERO changes to downstream consumers:
+   - `ConditionSourceBuilder` via `When<TProp>(TypedSource<TProp>)` — PipelineBuilder already has this
+   - `ElementBuilder.SetText<TProp>(TypedSource<TProp>)` — ElementBuilder already has this
+   - Guards (And/Or) and branches (ElseIf) — all accept TypedSource<T>
 
-3. **FromUrl<int>("page")** uses `Shape.FromClrType(typeof(int))` = `Shape.Number` — applyShape converts the URL string "42" to number 42 at runtime.
+3. **FromUrl<int>("page")** uses `Shape.FromClrType(typeof(int))` = `Shape.Number` (Shape.cs:63) — `applyShape` converts the URL string "42" to number 42 at runtime (core/shape-convert.ts).
 
-4. **Null semantics** — `URLSearchParams.get(name)` returns `null` for absent params. This flows through the existing `raw == null ? raw : applyShape(...)` pattern in evaluateValue. Conditions like `.IsNull()` and `.NotNull()` work correctly.
+4. **Null semantics** — `URLSearchParams.get(name)` returns `null` for absent params. This flows through the existing `raw == null ? raw : applyShape(...)` pattern in evaluateValue (core/evaluate.ts:28,33,42,46). Conditions like `.IsNull()` and `.NotNull()` work correctly.
+
+5. **Source union widening** — Adding UrlSource to the Source union means `SetReaction.on` and `CallReaction.on` could theoretically target a URL. This is semantically invalid but harmless: the C# builders won't generate it, and the runtime would throw (fail-fast). No special guard needed.
 
 ---
 
@@ -64,7 +71,7 @@ p.When(p.FromUrl<int>("page")).Gt(1).Then(t => {
 
 **File:** `Alis.Reactive/PlanModel/Source.cs`
 
-After `PayloadSource` class, add:
+After `PayloadSource` class (after line 43), add:
 
 ```csharp
 public sealed class UrlSource : Source
@@ -75,7 +82,7 @@ public sealed class UrlSource : Source
 }
 ```
 
-Singleton — one instance, no state. The `WriteOnlyPolymorphicConverter<Source>` handles serialization automatically (dispatches on runtime type).
+Singleton — one instance, no state. The `WriteOnlyPolymorphicConverter<Source>` (Serialization/WriteOnlyPolymorphicConverter.cs:9-10) dispatches on `value.GetType()` — handles new subclass automatically, zero converter changes.
 
 **Verification:** `dotnet build`. Serialize a UrlSource — produces `{ "kind": "url" }`.
 
@@ -83,14 +90,14 @@ Singleton — one instance, no state. The `WriteOnlyPolymorphicConverter<Source>
 
 **File:** `Alis.Reactive/PlanModel/ValueProducer.cs`
 
-Add after the `Read` factory:
+Add after the `Read` factory (after line 46):
 
 ```csharp
 internal static ValueProducer ReadUrl(string paramName, Shape shape = null) =>
     new ReadProducer(UrlSource.Instance, paramName, shape: shape ?? Shape.String);
 ```
 
-Default shape is `Shape.String` because URL params are inherently strings. Callers override for typed reads.
+Default shape is `Shape.String` because URL params are inherently strings. Callers override for typed reads (e.g., `FromUrl<int>` → `Shape.Number`).
 
 ### Task 3: C# Builder — TypedUrlSource<T> class
 
@@ -103,6 +110,7 @@ namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
     /// A typed source that reads a URL query parameter from the browser's current location.
+    /// Returned by <c>PipelineBuilder.FromUrl()</c> and <c>PipelineBuilder.FromUrl&lt;T&gt;()</c>.
     /// </summary>
     public sealed class TypedUrlSource<TProp> : TypedSource<TProp>
     {
@@ -114,30 +122,29 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         internal override ValueProducer ToValueProducer() =>
-            ValueProducer.Read(UrlSource.Instance, _paramName, shape: Shape);
-
-        internal string ParamName => _paramName;
+            ValueProducer.ReadUrl(_paramName, shape: Shape);
     }
 }
 ```
 
-Extends `TypedSource<TProp>` — automatically plugs into:
-- `ConditionSourceBuilder` via `When<TProp>(TypedSource<TProp>)`
-- `ElementBuilder.SetText<TProp>(TypedSource<TProp>)`
-- `GuardBuilder.And/Or<TProp>(TypedSource<TProp>)`
-- `BranchBuilder.ElseIf<TProp>(TypedSource<TProp>)`
+Extends `TypedSource<TProp>` (TypedSource.cs:11) — automatically plugs into all typed infrastructure. The `Shape` property on TypedSource (TypedSource.cs:33) returns `Shape.FromClrType(typeof(TProp))`.
 
-**Zero changes needed** in any of these files.
+`ToComponentSource()` and `ReadMember` are NOT overridden — they throw (TypedSource.cs:22,28). This is correct: UrlSource is not a component source.
 
 ### Task 4: C# Builder — PipelineBuilder.FromUrl()
 
 **File:** `Alis.Reactive/Builders/PipelineBuilder.cs`
 
-Add after `Component<T>()` overloads:
+Add using:
+```csharp
+using Alis.Reactive.Builders.Conditions;
+```
+
+Add after `Component<TComponent>()` overloads (after line 78):
 
 ```csharp
 /// <summary>
-/// Reads a query parameter from the browser's current URL.
+/// Reads a query parameter from the browser's current URL as a string.
 /// </summary>
 public TypedUrlSource<string> FromUrl(string paramName)
 {
@@ -146,7 +153,7 @@ public TypedUrlSource<string> FromUrl(string paramName)
 
 /// <summary>
 /// Reads a query parameter with typed shape coercion.
-/// Use FromUrl&lt;int&gt;("page") for numeric comparison.
+/// Use <c>FromUrl&lt;int&gt;("page")</c> for numeric comparison.
 /// </summary>
 public TypedUrlSource<T> FromUrl<T>(string paramName)
 {
@@ -154,13 +161,11 @@ public TypedUrlSource<T> FromUrl<T>(string paramName)
 }
 ```
 
-Add `using Alis.Reactive.Builders.Conditions;`.
-
 ### Task 5: C# Builder — GatherBuilder.FromUrl()
 
 **File:** `Alis.Reactive/Builders/Requests/GatherBuilder.cs`
 
-Add after existing methods:
+Add after existing methods (after RouteParam overloads if those landed, or after FromEvent):
 
 ```csharp
 /// <summary>
@@ -185,17 +190,27 @@ public GatherBuilder<TModel> FromUrl(string paramName, string asParam)
 }
 ```
 
+**Verified references:**
+- `ValueProducer.ReadUrl(string)` — added in Task 2
+- `GatherField.Of(string, ValueProducer)` — Request.cs:89-90
+
 ### Task 6: JSON Schema — Source union gains UrlSource
 
 **File:** `Alis.Reactive/Schemas/reactive-plan.schema.json`
 
-Add to Source oneOf:
+Add to Source oneOf (line 141-146):
 
 ```json
-{ "$ref": "#/$defs/UrlSource" }
+"Source": {
+  "oneOf": [
+    { "$ref": "#/$defs/ComponentSource" },
+    { "$ref": "#/$defs/PayloadSource" },
+    { "$ref": "#/$defs/UrlSource" }
+  ]
+},
 ```
 
-Add new definition:
+Add new definition (after PayloadSource definition, after line 166):
 
 ```json
 "UrlSource": {
@@ -205,20 +220,22 @@ Add new definition:
   "properties": {
     "kind": { "const": "url" }
   }
-}
+},
 ```
+
+**Note:** `additionalProperties: false` as per quality bar. UrlSource has ONLY `kind`.
 
 ### Task 7: TS Types — Source union + UrlSource
 
-**File:** `Scripts/types/plan.ts`
+**File:** `Alis.Reactive.SandboxApp/Scripts/types/plan.ts`
 
-Expand Source union:
+Expand Source union (line 88):
 
 ```typescript
 export type Source = ComponentSource | PayloadSource | UrlSource;
 ```
 
-Add interface:
+Add interface (after PayloadSource interface, after line 101):
 
 ```typescript
 export interface UrlSource {
@@ -228,22 +245,34 @@ export interface UrlSource {
 
 ### Task 8: TS Runtime — resolver.ts handles "url" kind
 
-**File:** `Scripts/resolution/resolver.ts`
+**File:** `Alis.Reactive.SandboxApp/Scripts/resolution/resolver.ts`
 
-Add `"url"` case to `resolveSource` switch:
+Add `"url"` case to `resolveSource` switch (line 29-37):
 
 ```typescript
-case "url":
-  return new URLSearchParams(window.location.search);
+export function resolveSource(plan: Plan, source: Source, ctx?: ExecContext): unknown {
+  switch (source.kind) {
+    case "component":
+      return resolveComponent(plan, source.component);
+    case "payload":
+      return resolvePayload(source, ctx);
+    case "url":
+      return new URLSearchParams(window.location.search);
+    default:
+      assertNever(source, "source kind");
+  }
+}
 ```
 
-The returned `URLSearchParams` object is the "root" — same concept as component root (ej2 instance) or payload root (event data). The `member` navigates to the specific value.
+The returned `URLSearchParams` object is the "root" — same concept as a component root (ej2 instance) or payload root (event data). The `member` on ReadProducer navigates to the specific value.
+
+**Note:** The `assertNever` at line 35 currently catches the default. Adding "url" keeps exhaustiveness — `assertNever` fires for truly unknown kinds.
 
 ### Task 9: TS Runtime — evaluate.ts handles URL source reads
 
-**File:** `Scripts/core/evaluate.ts`
+**File:** `Alis.Reactive.SandboxApp/Scripts/core/evaluate.ts`
 
-Add URL source branch between component and payload handling:
+In the `"read"` case (line 19), add URL source branch between component and payload handling. After the component block (after line 35), before the payload walk:
 
 ```typescript
 // URL source: read query parameter by name
@@ -254,13 +283,17 @@ if (producer.from.kind === "url") {
 }
 ```
 
-`URLSearchParams.get(name)` returns `string | null`. Null propagation matches the existing pattern. `applyShape` converts the string to the target type (number, boolean, date) based on shape.
+`URLSearchParams.get(name)` returns `string | null`. Null propagation matches the existing pattern (line 28: `raw == null ? raw : applyShape(...)`). `applyShape` converts the string to the target type based on shape:
+- `Shape.Number` → `Number("42")` = 42
+- `Shape.Boolean` → `"true"` → true
+- `Shape.Date` → ISO string → Date → timestamp
+- `Shape.String` (default) → passthrough
 
 ### Task 10: Playwright test
 
 Test: navigate to `/Sandbox/Test?tab=meds&page=2`. Verify:
 - `FromUrl("tab")` reads "meds"
-- `FromUrl<int>("page").Gt(1)` evaluates to true
+- `FromUrl<int>("page").Gt(1)` evaluates to true (numeric comparison)
 - `FromUrl("missing")` returns null — `.IsNull()` is true
 
 ---

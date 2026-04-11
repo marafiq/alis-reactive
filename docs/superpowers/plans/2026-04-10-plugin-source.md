@@ -2,9 +2,11 @@
 
 > **For agentic workers:** Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Allow devs to register arbitrary JavaScript objects/functions as value sources in the plan. A plugin is a resolved root — just like a component (ej2 instance), an element (DOM node), or the URL (URLSearchParams). Once resolved, the same shared operations apply: read property, call method, walk path. The runtime doesn't care WHERE the root came from — it just resolves it and operates on it.
+**Goal:** Allow devs to register arbitrary JavaScript objects as value sources in the plan. A plugin is a resolved root — just like a component (ej2 instance or DOM element) or a payload (event data). Once resolved, the same shared operations apply: read property, call method. The runtime doesn't care WHERE the root came from — it just resolves it and operates on it via JsType metadata.
 
 **Tech Stack:** C# plan model + Source union, JSON schema, TypeScript types + runtime resolver + registry
+
+**Prerequisite:** URL Query Source plan must land first (it validates the Source union widening pattern). `formatForWire` extraction (from Headers plan Task 0) must also be done.
 
 ---
 
@@ -12,15 +14,17 @@
 
 ### The Insight
 
-The runtime has THREE resolution paths today:
+The runtime has TWO resolution paths today (Source.cs:7, resolver.ts:28-37):
 - `ComponentSource` → `resolveComponent()` → DOM element → vendor root (ej2 instance or native element)
 - `PayloadSource` → `resolvePayload()` → event data / response body / request payload
-- `UrlSource` → `resolveUrl()` → URLSearchParams
+
+After URL Query Source lands, there's a third:
+- `UrlSource` → `new URLSearchParams(window.location.search)`
 
 A plugin is just ANOTHER resolution path:
 - `PluginSource` → `resolvePlugin()` → user-registered JS object
 
-Once resolved, the returned object is treated like any other root. `evaluateValue` reads properties via `jsType.properties[member]`, calls methods via `jsType.methods[member]`, applies shape. No special handling, no walking, no auto-detection. The plugin IS a component without DOM — same JsType, same resolution path, different source.
+Once resolved, the returned object is treated like a component root. `evaluateValue` (core/evaluate.ts:14) reads properties via JsType `properties[member]`, calls methods via JsType `methods[member]`, applies shape. Same as component reads. The only difference is HOW the root is resolved (registry instead of DOM).
 
 ### What a Plugin Can Be
 
@@ -32,25 +36,74 @@ window.alisPlugins.register("userPrefs", {
   timezone: "America/New_York"
 });
 
-// 2. Object with methods (with or without args)
-window.alisPlugins.register("analytics", {
-  getSessionId: () => crypto.randomUUID(),
-  getPageLoadTime: () => performance.now(),
-  trackEvent: (name, data) => { /* fire and forget */ }
-});
-
-// 3. Factory that returns a value
+// 2. Object with methods (zero-arg getters)
 window.alisPlugins.register("auth", {
   getToken: () => localStorage.getItem("auth_token"),
   getUserId: () => JSON.parse(localStorage.getItem("user")).id,
   isAdmin: () => JSON.parse(localStorage.getItem("user")).role === "admin"
 });
 
-// 4. No-arg, no-return (side effect only)
+// 3. Side-effect only methods
 window.alisPlugins.register("logger", {
   flush: () => navigator.sendBeacon("/logs", JSON.stringify(pendingLogs))
 });
 ```
+
+### Key Design Decisions
+
+**1. Plugin = Named Root, Not a New Value Kind**
+
+A plugin is NOT a new ValueProducer kind. It's a new SOURCE kind. `ValueProducer.Read(PluginSource.Of("auth"), "getToken")` uses the SAME ReadProducer (ValueProducer.cs:69-84) that component reads and URL reads use. The only difference is how the root is resolved.
+
+**2. Plugins are NOT in plan.components**
+
+Plugins don't have DOM elements. They're not native or fusion components. They should NOT pollute `plan.components` or widen the `Vendor` enum. Instead:
+- Plugin JsTypes go directly into `plan.types` with key `"plugin." + pluginName`
+- `getJsTypeForSource` (resolver.ts:101) is updated to look up `plan.types["plugin." + name]` for plugin sources
+- Plugin resolution goes to the TS registry, not the DOM
+
+This keeps components clean (DOM-only) and avoids widening the vendor enum.
+
+**3. Plugin Registry — Global, Named, Immutable**
+
+```typescript
+// Scripts/core/plugin-registry.ts
+const plugins = new Map<string, unknown>();
+
+export function registerPlugin(name: string, instance: unknown): void {
+  if (plugins.has(name)) throw new Error(`[alis] plugin "${name}" already registered`);
+  plugins.set(name, instance);
+}
+
+export function resolvePlugin(name: string): unknown {
+  const instance = plugins.get(name);
+  if (!instance) throw new Error(`[alis] plugin not found: "${name}"`);
+  return instance;
+}
+```
+
+Plugins are registered BEFORE boot (in a `<script>` tag). The plan references them by name. Immutable after registration prevents mid-lifecycle confusion.
+
+**4. Properties vs Methods — Same as Components**
+
+Plugin JsType has the same structure as component JsTypes (JsType.cs:6):
+- **Properties** — `root.theme` → `readProperty(root, prop)` via `walkPath(root, prop.path)`
+- **Methods (no args)** — `root.getToken()` → `callMethod(root, method, [])` via `resolveCallable(root, method.path)`
+
+The runtime doesn't distinguish at the source level. `evaluateValue` dispatches on the member type (property vs method) found in the JsType. For plugins, the JsType is registered at C# build time via `PlanBuildContext.EnsureProperty/EnsureMethod`.
+
+**5. C# Registration — PlanBuildContext.EnsurePluginType()**
+
+```csharp
+// In view code:
+plan.RegisterPlugin("auth", p => {
+    p.Method("getToken", Shape.String);
+    p.Method("getUserId", Shape.Number);
+    p.Method("isAdmin", Shape.Boolean);
+});
+```
+
+This registers a JsType at `plan.types["plugin.auth"]` with methods declared. No Component entry. No vendor. Just type metadata.
 
 ### DSL — Same Shared Concept Everywhere
 
@@ -76,9 +129,6 @@ p.When(p.Plugin<bool>("auth", "isAdmin")).Truthy()
 // PIPELINE: display plugin value
 p.Element("timezone-display").SetText(p.Plugin("userPrefs", "timezone"))
 
-// PIPELINE: call plugin method (fire and forget, no return)
-p.Plugin("analytics").Call("trackEvent", ValueProducer.Literal("form-submit"))
-
 // URL TEMPLATE: plugin value in route
 p.Get("/tenants/{tenantId}/residents")
  .Gather(g => g
@@ -96,75 +146,7 @@ p.Get("/tenants/{tenantId}/residents")
 }
 ```
 
-The `PluginSource` carries only the plugin `name`. The `member` on ReadProducer is the property or method to access on the resolved root. Shape flows as always.
-
-For method calls with arguments:
-
-```json
-{
-  "kind": "call",
-  "on": { "kind": "plugin", "name": "analytics" },
-  "method": "trackEvent",
-  "args": [{ "kind": "literal", "value": "form-submit" }]
-}
-```
-
-This uses the existing `CallReaction` shape — same as component method calls. The only change is the source kind.
-
----
-
-## Key Design Decisions
-
-### 1. Plugin = Named Root, Not a New Value Kind
-
-A plugin is NOT a new ValueProducer kind. It's a new SOURCE kind. `ValueProducer.Read(PluginSource.Of("auth"), "getToken")` uses the SAME ReadProducer that component reads and URL reads use. The only difference is how the root is resolved.
-
-### 2. Plugin Registry — Global, Named, Immutable After Registration
-
-```typescript
-// Runtime registry
-const plugins = new Map<string, unknown>();
-
-export function registerPlugin(name: string, instance: unknown): void {
-  if (plugins.has(name)) throw new Error(`[alis] plugin "${name}" already registered`);
-  plugins.set(name, instance);
-}
-
-export function resolvePlugin(name: string): unknown {
-  const instance = plugins.get(name);
-  if (!instance) throw new Error(`[alis] plugin not found: ${name}`);
-  return instance;
-}
-```
-
-Plugins are registered BEFORE boot (in a `<script>` tag or module). The plan references them by name. The runtime resolves them from the registry. Immutable after registration prevents mid-lifecycle confusion.
-
-### 3. Properties AND Methods — Same as Components
-
-A plugin root is a JS object. It can have:
-- **Properties** — `root.theme` → read via `walk(root, "theme")`
-- **Methods (no args)** — `root.getToken()` → call via `callMethod(root, method, [])`
-- **Methods (with args)** — `root.trackEvent("click", data)` → call via `callMethod(root, method, args)`
-- **Nested objects** — `root.config.api.baseUrl` → walk via path segments
-
-The runtime doesn't distinguish. `evaluateValue` dispatches on the member type (property vs method) found on the JsType. For plugins, the JsType is registered at C# build time via `EnsureProperty` / `EnsureMethod`.
-
-### 4. JsType Registration for Plugins
-
-```csharp
-// C# DSL — register plugin's readable properties and callable methods
-Html.Plugin<AuthPlugin>("auth", plugin => {
-    plugin.Property("getToken", Shape.String);      // method that returns string
-    plugin.Property("getUserId", Shape.Number);      // method that returns number
-    plugin.Property("isAdmin", Shape.Boolean);       // method that returns boolean
-});
-```
-
-This registers the plugin's JsType in the plan — same as component onboarding. The plan carries the type metadata. The runtime uses it to resolve properties and methods.
-
-### 5. No Vendor — Plugins Are Vendor-Agnostic
-
-Plugins don't have a vendor ("native" or "fusion"). They're pure JS objects. The resolver dispatches on `source.kind === "plugin"` and returns the registered object directly — no vendor root resolution.
+The `PluginSource` carries only the plugin `name`. The `member` on ReadProducer (ValueProducer.cs:73) is the property or method to access on the resolved root. Shape flows as always.
 
 ---
 
@@ -174,7 +156,7 @@ Plugins don't have a vendor ("native" or "fusion"). They're pure JS objects. The
 
 **File:** `Alis.Reactive/PlanModel/Source.cs`
 
-After `UrlSource`, add:
+After `UrlSource` (or after `PayloadSource` if URL hasn't landed), add:
 
 ```csharp
 public sealed class PluginSource : Source
@@ -191,18 +173,69 @@ public sealed class PluginSource : Source
 }
 ```
 
-Unlike UrlSource (singleton), PluginSource carries a `name` — the plugin registry key.
+Unlike UrlSource (singleton), PluginSource carries a `name` — the plugin registry key. `WriteOnlyPolymorphicConverter<Source>` (Serialization/WriteOnlyPolymorphicConverter.cs:9) dispatches on runtime type — zero converter changes.
+
+**Verification:** `dotnet build`. Serialize → `{ "kind": "plugin", "name": "auth" }`.
 
 ### Task 2: C# Plan Model — ValueProducer.ReadPlugin factory
 
 **File:** `Alis.Reactive/PlanModel/ValueProducer.cs`
+
+Add after `ReadUrl` (or after `Read` at line 46):
 
 ```csharp
 internal static ValueProducer ReadPlugin(string pluginName, string member, Shape shape = null) =>
     new ReadProducer(PluginSource.Of(pluginName), member, shape: shape);
 ```
 
-### Task 3: C# Builder — TypedPluginSource<T>
+### Task 3: C# Builder — PlanBuildContext.EnsurePluginType()
+
+**File:** `Alis.Reactive/PlanModel/PlanBuildContext.cs`
+
+Add after `EnsureEvent` (after line 182):
+
+```csharp
+/// <summary>
+/// Ensures a plugin's JsType exists in the plan.
+/// Plugin types are keyed as "plugin.{name}" in plan.types.
+/// Unlike components, plugins have no DOM element and no entry in plan.components.
+/// </summary>
+internal string EnsurePluginType(string pluginName)
+{
+    var typeKey = "plugin." + pluginName;
+    if (!_plan.MutableTypes.ContainsKey(typeKey))
+        _plan.MutableTypes[typeKey] = new JsType();
+    return typeKey;
+}
+
+/// <summary>
+/// Registers a readable property on a plugin's JsType.
+/// </summary>
+internal void EnsurePluginProperty(string pluginName, string memberName, Shape shape)
+{
+    EnsurePluginType(pluginName);
+    var typeKey = "plugin." + pluginName;
+    _plan.MutableTypes[typeKey].WithProperty(memberName, Path.Parse(memberName), shape, "read");
+}
+
+/// <summary>
+/// Registers a callable method on a plugin's JsType.
+/// </summary>
+internal void EnsurePluginMethod(string pluginName, string memberName, Shape? returns = null, List<Shape>? args = null)
+{
+    EnsurePluginType(pluginName);
+    var typeKey = "plugin." + pluginName;
+    _plan.MutableTypes[typeKey].WithMethod(memberName, Path.Parse(memberName), args, returns);
+}
+```
+
+**Verified references:**
+- `_plan.MutableTypes` — PlanBuildContext.cs:36 (used in EnsureElement, EnsureComponent)
+- `JsType.WithProperty(name, path, shape, access)` — JsType.cs:17
+- `JsType.WithMethod(name, path, args, returns)` — JsType.cs:53
+- `Path.Parse(string)` — used at PlanBuildContext.cs:162
+
+### Task 4: C# Builder — TypedPluginSource<T>
 
 **New file:** `Alis.Reactive/Builders/Conditions/TypedPluginSource.cs`
 
@@ -211,6 +244,10 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
+    /// <summary>
+    /// A typed source that reads a member from a registered plugin.
+    /// Returned by <c>PipelineBuilder.Plugin()</c> and <c>PipelineBuilder.Plugin&lt;T&gt;()</c>.
+    /// </summary>
     public sealed class TypedPluginSource<TProp> : TypedSource<TProp>
     {
         private readonly string _pluginName;
@@ -228,18 +265,26 @@ namespace Alis.Reactive.Builders.Conditions
 }
 ```
 
-Extends `TypedSource<TProp>` — plugs into conditions, gather, pipeline with ZERO changes.
+Extends `TypedSource<TProp>` (TypedSource.cs:11) — plugs into conditions, gather, pipeline, headers, route params with ZERO changes. The `Shape` property (TypedSource.cs:33) returns `Shape.FromClrType(typeof(TProp))`.
 
-### Task 4: C# Builder — PipelineBuilder.Plugin()
+### Task 5: C# Builder — PipelineBuilder.Plugin()
 
 **File:** `Alis.Reactive/Builders/PipelineBuilder.cs`
 
+Add using (if not already present):
+```csharp
+using Alis.Reactive.Builders.Conditions;
+```
+
+Add after `FromUrl` methods (or after `Component` overloads at line 78):
+
 ```csharp
 /// <summary>
-/// Reads a named member from a registered plugin.
+/// Reads a named member from a registered plugin as a string.
 /// </summary>
 public TypedPluginSource<string> Plugin(string pluginName, string member)
 {
+    Context.EnsurePluginType(pluginName);
     return new TypedPluginSource<string>(pluginName, member);
 }
 
@@ -248,13 +293,18 @@ public TypedPluginSource<string> Plugin(string pluginName, string member)
 /// </summary>
 public TypedPluginSource<T> Plugin<T>(string pluginName, string member)
 {
+    Context.EnsurePluginType(pluginName);
     return new TypedPluginSource<T>(pluginName, member);
 }
 ```
 
-### Task 5: C# Builder — GatherBuilder.Plugin()
+Note: `Context` is accessible on PipelineBuilder (PipelineBuilder.cs:16 — `internal PlanBuildContext Context { get; }`). The `EnsurePluginType` call guarantees the JsType key `"plugin.{name}"` exists in `plan.types` even if no explicit `RegisterPlugin()` was called — the JsType starts empty and gets populated as members are used.
+
+### Task 6: C# Builder — GatherBuilder.Plugin()
 
 **File:** `Alis.Reactive/Builders/Requests/GatherBuilder.cs`
+
+Add after `FromUrl` methods (or after existing methods):
 
 ```csharp
 /// <summary>
@@ -268,17 +318,102 @@ public GatherBuilder<TModel> Plugin(string pluginName, string member, string par
 }
 ```
 
-### Task 6: JSON Schema — Source union gains PluginSource
+**Verified references:**
+- `ValueProducer.ReadPlugin(string, string)` — added in Task 2
+- `GatherField.Of(string, ValueProducer)` — Request.cs:89-90
+- `Fields` — GatherBuilder.cs:11
+
+### Task 7: C# Builder — ReactivePlan.RegisterPlugin()
+
+**File:** `Alis.Reactive/ReactivePlan.cs`
+
+Add a public method for explicit plugin type registration:
+
+```csharp
+/// <summary>
+/// Registers a plugin's type metadata in the plan.
+/// Plugin members (properties and methods) are declared here so the runtime
+/// knows how to read/call them via JsType member lookup.
+/// </summary>
+public void RegisterPlugin(string pluginName, Action<PluginTypeBuilder> configure)
+{
+    _context.EnsurePluginType(pluginName);
+    var builder = new PluginTypeBuilder(_context, pluginName);
+    configure(builder);
+}
+```
+
+**New file:** `Alis.Reactive/Builders/PluginTypeBuilder.cs`
+
+```csharp
+using System.Collections.Generic;
+using Alis.Reactive.PlanModel;
+
+namespace Alis.Reactive.Builders
+{
+    /// <summary>
+    /// Configures a plugin's JsType members during plan construction.
+    /// Used by <c>plan.RegisterPlugin("name", p => p.Property/Method(...))</c>.
+    /// </summary>
+    public sealed class PluginTypeBuilder
+    {
+        private readonly PlanBuildContext _context;
+        private readonly string _pluginName;
+
+        internal PluginTypeBuilder(PlanBuildContext context, string pluginName)
+        {
+            _context = context;
+            _pluginName = pluginName;
+        }
+
+        /// <summary>
+        /// Registers a readable property on the plugin.
+        /// </summary>
+        public PluginTypeBuilder Property(string name, Shape shape)
+        {
+            _context.EnsurePluginProperty(_pluginName, name, shape);
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a callable method on the plugin.
+        /// </summary>
+        public PluginTypeBuilder Method(string name, Shape returns)
+        {
+            _context.EnsurePluginMethod(_pluginName, name, returns);
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a callable method with arguments on the plugin.
+        /// </summary>
+        public PluginTypeBuilder Method(string name, Shape returns, List<Shape> args)
+        {
+            _context.EnsurePluginMethod(_pluginName, name, returns, args);
+            return this;
+        }
+    }
+}
+```
+
+### Task 8: JSON Schema — Source union gains PluginSource
 
 **File:** `Alis.Reactive/Schemas/reactive-plan.schema.json`
 
-Add to Source oneOf:
+Add to Source oneOf (line 141-146, after UrlSource if it landed):
 
 ```json
-{ "$ref": "#/$defs/PluginSource" }
+"Source": {
+  "oneOf": [
+    { "$ref": "#/$defs/ComponentSource" },
+    { "$ref": "#/$defs/PayloadSource" },
+    { "$ref": "#/$defs/UrlSource" },
+    { "$ref": "#/$defs/PluginSource" }
+  ]
+},
 ```
 
-Add definition:
+Add definition (after UrlSource definition):
 
 ```json
 "PluginSource": {
@@ -289,25 +424,31 @@ Add definition:
     "kind": { "const": "plugin" },
     "name": { "type": "string", "minLength": 1 }
   }
-}
+},
 ```
 
-### Task 7: TS Types — Source union + PluginSource
+### Task 9: TS Types — Source union + PluginSource
 
-**File:** `Scripts/types/plan.ts`
+**File:** `Alis.Reactive.SandboxApp/Scripts/types/plan.ts`
+
+Expand Source union (line 88, after UrlSource if it landed):
 
 ```typescript
 export type Source = ComponentSource | PayloadSource | UrlSource | PluginSource;
+```
 
+Add interface (after UrlSource interface):
+
+```typescript
 export interface PluginSource {
   kind: "plugin";
   name: string;
 }
 ```
 
-### Task 8: TS Runtime — Plugin registry
+### Task 10: TS Runtime — Plugin registry
 
-**New file:** `Scripts/core/plugin-registry.ts`
+**New file:** `Alis.Reactive.SandboxApp/Scripts/core/plugin-registry.ts`
 
 ```typescript
 const plugins = new Map<string, unknown>();
@@ -326,33 +467,54 @@ export function resolvePlugin(name: string): unknown {
 }
 ```
 
-Export `registerPlugin` from root.ts so devs can call `window.alisPlugins.register()` or import it.
+### Task 11: TS Runtime — resolver.ts handles "plugin" kind
 
-### Task 9: TS Runtime — resolver.ts handles "plugin" kind
+**File:** `Alis.Reactive.SandboxApp/Scripts/resolution/resolver.ts`
 
-**File:** `Scripts/resolution/resolver.ts`
+Add import:
+```typescript
+import { resolvePlugin } from "../core/plugin-registry";
+```
 
-Add to `resolveSource` switch:
+Add to `resolveSource` switch (line 29-37):
 
 ```typescript
 case "plugin":
   return resolvePlugin(source.name);
 ```
 
-Import `resolvePlugin` from `../core/plugin-registry`.
-
-### Task 10: TS Runtime — evaluate.ts handles plugin reads
-
-**File:** `Scripts/core/evaluate.ts`
-
-**NO new evaluate path needed.** A plugin is a component without DOM. After `resolveSource` returns the plugin object, the EXISTING component read path handles everything:
+Update `getJsTypeForSource` (line 101-106) to handle plugin sources:
 
 ```typescript
+export function getJsTypeForSource(plan: Plan, source: Source): JsType {
+  switch (source.kind) {
+    case "component":
+      return getJsType(plan, source.component);
+    case "plugin": {
+      const typeKey = "plugin." + source.name;
+      const jsType = plan.types[typeKey];
+      if (!jsType) throw new Error(`[alis] type not found for plugin: "${source.name}"`);
+      return jsType;
+    }
+    default:
+      throw new Error(`[alis] getJsTypeForSource only supports component and plugin sources`);
+  }
+}
+```
+
+### Task 12: TS Runtime — evaluate.ts handles plugin reads
+
+**File:** `Alis.Reactive.SandboxApp/Scripts/core/evaluate.ts`
+
+In the `"read"` case (line 19), extend the component branch to include plugin. Change line 23:
+
+```typescript
+// Component or Plugin source: look up member in JsType
 if (producer.from.kind === "component" || producer.from.kind === "plugin") {
   const jsType = getJsTypeForSource(plan, producer.from);
   const prop = jsType.properties?.[producer.member];
   if (prop) {
-    const raw = readProperty(root, prop);
+    const raw = resolverReadProperty(root, prop);
     return raw == null ? raw : applyShape(raw, producer.shape ?? prop.shape);
   }
   const method = jsType.methods?.[producer.member];
@@ -360,17 +522,25 @@ if (producer.from.kind === "component" || producer.from.kind === "plugin") {
     const raw = callMethod(root, method, []);
     return raw == null ? raw : applyShape(raw, producer.shape ?? method.returns);
   }
-  throw new Error(`[alis] member "${producer.member}" not found on ${producer.from.kind} "${(producer.from as any).name ?? (producer.from as any).component}"`);
+  const sourceName = producer.from.kind === "component"
+    ? producer.from.component
+    : (producer.from as PluginSource).name;
+  throw new Error(`[alis] member "${producer.member}" not found on ${producer.from.kind} "${sourceName}"`);
 }
 ```
 
-The plugin root IS the resolved object. `readProperty(root, prop)` reads its properties. `callMethod(root, method, args)` calls its methods. JsType metadata (registered at C# build time) declares which members are properties vs methods, with paths and shapes. Same as components. No walking, no auto-detection, no guessing.
+Add PluginSource to imports:
+```typescript
+import type { Plan, ValueProducer, ExecContext, PluginSource } from "../types";
+```
 
-**`getJsTypeForSource` needs updating** to handle plugin sources — look up the JsType by `"plugin." + source.name` (same pattern as `vendor + "." + componentId` for components).
+**NO new evaluate path needed.** The plugin root IS a resolved JS object. `readProperty(root, prop)` reads its properties via `walkPath(root, prop.path)` (resolver.ts:112). `callMethod(root, method, args)` calls its methods via `resolveCallable(root, method.path)` (resolver.ts:125). JsType metadata (registered at C# build time) declares which members are properties vs methods, with paths and shapes. Same as components.
 
-### Task 11: Public API — expose registerPlugin
+### Task 13: Public API — expose registerPlugin
 
-**File:** `Scripts/root.ts`
+**File:** `Alis.Reactive.SandboxApp/Scripts/root.ts`
+
+Add import and expose:
 
 ```typescript
 import { registerPlugin } from "./core/plugin-registry";
@@ -425,25 +595,8 @@ p.When(p.Plugin<bool>("auth", "isAdmin")).Truthy()
      t.Element("admin-badge").SetText("Administrator");
  })
  .Else(e => {
-     e.Element("admin-section").Hide();
+     t.Element("admin-section").Hide();
  });
-```
-
-### Plugin as Event Side Effect
-
-```csharp
-// After form save, track analytics
-p.Post("/api/save", g => g.IncludeAll())
- .Response(r => r.OnSuccess(s => {
-     s.Element("status").SetText("Saved");
-     s.Dispatch("form-saved");
- }));
-
-// Listen for save event, call analytics plugin
-Html.On(plan, t => t.CustomEvent("form-saved", p => {
-    p.Plugin("analytics").Call("trackEvent",
-        ValueProducer.Literal("form-saved"));
-}));
 ```
 
 ---
@@ -456,11 +609,10 @@ Html.On(plan, t => t.CustomEvent("form-saved", p => {
 - [ ] Schema validates plans with PluginSource
 - [ ] Plugin registration before boot works (`window.alisPlugins.register`)
 - [ ] Plugin property read works in gather, conditions, pipeline
-- [ ] Plugin no-arg method call works (auto-detected as function)
-- [ ] Plugin method with args works via CallReaction
+- [ ] Plugin no-arg method call works (JsType method with path)
 - [ ] Missing plugin throws clear error (`plugin not found: "name"`)
 - [ ] Duplicate registration throws (`plugin "name" already registered`)
 - [ ] Plugin composes with headers, URL templates, URL query source
-- [ ] Shape flows correctly (plugin returning date → ISO conversion)
-- [ ] Null return from plugin method propagates correctly (null check works)
+- [ ] Shape flows correctly (plugin returning date → ISO conversion via formatForWire)
+- [ ] Null return from plugin method propagates correctly
 - [ ] All unit + Playwright tests pass

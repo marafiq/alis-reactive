@@ -6,6 +6,8 @@
 
 **Tech Stack:** C# plan model, JSON schema, TypeScript types + runtime
 
+**Prerequisite:** Task 0 (extract `formatForWire` to shared module) must land first.
+
 ---
 
 ## Architecture
@@ -13,9 +15,9 @@
 Headers are `Dictionary<string, ValueProducer>` on the `Request` model (not GatherInput) because headers apply to any request regardless of input type. The GatherBuilder collects them via `.Header()` overloads. At runtime, each header's ValueProducer is evaluated via `evaluateValue()`, the result is stringified with shape awareness (dates become ISO strings), and set on the fetch `RequestInit.headers`.
 
 Shape flows from C# → plan JSON → TS runtime:
-- `TypedComponentSource<DateTime>.ToValueProducer()` carries `Shape.Date`
-- `evaluateValue()` applies shape via `applyShape()`
-- Header value stringified via `String(value)` — dates already ISO from applyShape + toDate
+- `TypedComponentSource<DateTime>.ToValueProducer()` carries `Shape.Date` (via `Shape.FromClrType(typeof(DateTime))`)
+- `evaluateValue()` applies shape via `applyShape()` (core/shape-convert.ts)
+- Header value is stringified via `String(value)` — dates already ISO from `formatForWire`
 
 ### DSL
 
@@ -24,7 +26,7 @@ p.Post("/api/orders")
  .Gather(g => g
      .Include<FusionTextBox, Model>(m => m.Name)
      .Header("X-Api-Version", "2024-01-15")                    // literal
-     .Header("X-Tenant-Id", tenantDDL.Value())                 // component read
+     .Header("X-Tenant-Id", tenantDDL.Value())                 // component read (TypedSource<T>)
      .Header("X-Correlation-Id", args, a => a.CorrelationId))  // event arg
  .Response(r => r.OnSuccess(...))
 ```
@@ -48,33 +50,63 @@ p.Post("/api/orders")
 
 ## Step-by-Step Implementation
 
+### Task 0: Extract formatForWire to shared module (PREREQUISITE)
+
+**Current:** `formatForWire` is local to `Alis.Reactive.SandboxApp/Scripts/execution/gather.ts:43-49`.
+
+**New file:** `Alis.Reactive.SandboxApp/Scripts/core/wire-format.ts`
+
+```typescript
+import type { Shape } from "../types";
+
+/** Shape-aware wire formatting. Date timestamps -> ISO strings for HTTP transport. */
+export function formatForWire(value: unknown, shape?: Shape): unknown {
+  if (!shape) return value;
+  if (shape.kind === "date" && typeof value === "number" && !isNaN(value))
+    return new Date(value).toISOString();
+  if (shape.kind === "nullable" && shape.inner?.kind === "date" && typeof value === "number" && !isNaN(value))
+    return new Date(value).toISOString();
+  return value;
+}
+```
+
+**Update gather.ts:43-49:** Delete local `formatForWire`. Add import:
+```typescript
+import { formatForWire } from "../core/wire-format";
+```
+
+**Verification:** `npm run typecheck` + `npm run build`. All 779 Playwright tests still pass (no behavior change).
+
 ### Task 1: C# Plan Model — Add Headers to Request
 
 **File:** `Alis.Reactive/PlanModel/Request.cs`
 
-Add after line 17 (after `Next` property):
+Add after `Next` property (after line 17):
 
 ```csharp
+[System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
 public Dictionary<string, ValueProducer>? Headers { get; internal set; }
 ```
 
-No serialization attributes needed — global `CamelCase` policy serializes as `"headers"`, `WhenWritingNull` omits when null. `ValueProducer` already has `WriteOnlyPolymorphicConverter`.
+Note: `WhenWritingNull` ensures plans without headers omit the field. The global `CamelCase` policy serializes as `"headers"`. `ValueProducer` already has `WriteOnlyPolymorphicConverter`.
 
-**Verification:** `dotnet build` — 0 errors. Render a plan with no headers — JSON should NOT contain `"headers"`.
+**Verification:** `dotnet build`. Render a plan with no headers — JSON should NOT contain `"headers"`.
 
 ### Task 2: C# Builder — GatherBuilder.Header() overloads
 
 **File:** `Alis.Reactive/Builders/Requests/GatherBuilder.cs`
 
-Add field after line 13:
+Add using at top (line 4):
+```csharp
+using Alis.Reactive.Builders.Conditions;
+```
 
+Add field after `EventFields` (after line 13):
 ```csharp
 internal Dictionary<string, ValueProducer> HeaderFields { get; } = new Dictionary<string, ValueProducer>();
 ```
 
-Add `using Alis.Reactive.Builders.Conditions;` at top.
-
-Add 3 overloads after the `FromEvent` method:
+Add 3 overloads after `FromEvent` method (after line 47):
 
 ```csharp
 /// <summary>Adds a literal string header.</summary>
@@ -100,18 +132,26 @@ public GatherBuilder<TModel> Header<TArgs, TProp>(string name, TArgs args, Expre
 }
 ```
 
-**Verification:** `dotnet build`. Write a test that calls `.Header("X-Test", "value")` and verify plan JSON contains `"headers": { "X-Test": { "kind": "literal" } }`.
+**Verified references:**
+- `ValueProducer.Literal(string)` — ValueProducer.cs:16
+- `TypedSource<TProp>.ToValueProducer()` — TypedSource.cs:16
+- `ExpressionPathHelper.ToEventPath<TArgs,TProp>` — ExpressionPathHelper.cs:70
+- `PayloadSource.Event()` — Source.cs:37
+
+**Verification:** `dotnet build`. Test: `.Header("X-Test", "value")` produces plan JSON with `"headers": { "X-Test": { "kind": "literal" } }`.
 
 ### Task 3: C# Builder — HttpRequestBuilder wires headers to Request
 
 **File:** `Alis.Reactive/Builders/Requests/HttpRequestBuilder.cs`
 
-After the validator wiring (before `return request;`), add:
+In `BuildRequest()` method, after validator wiring (after line 145 `request.ValidatorType = _validatorType;`), before the implicit `return request;` at end of method — add:
 
 ```csharp
 if (_gatherBuilder != null && _gatherBuilder.HeaderFields.Count > 0)
     request.Headers = new Dictionary<string, ValueProducer>(_gatherBuilder.HeaderFields);
 ```
+
+Add `using System.Collections.Generic;` if not already present (it IS present at line 2).
 
 **Verification:** Full build + unit test with header → plan JSON shows headers on Request.
 
@@ -119,22 +159,22 @@ if (_gatherBuilder != null && _gatherBuilder.HeaderFields.Count > 0)
 
 **File:** `Alis.Reactive/Schemas/reactive-plan.schema.json`
 
-In the Request definition properties, add:
+In the Request definition (line 342-371), add after `"url"` property (after line 350):
 
 ```json
 "headers": {
   "type": "object",
   "additionalProperties": { "$ref": "#/$defs/ValueProducer" }
-}
+},
 ```
 
-**Verification:** `AssertSchemaValid` passes with headers in plan JSON.
+**Verification:** `AssertSchemaValid` passes with headers in plan JSON. Plans without headers still validate.
 
 ### Task 5: TS Types — Request gains headers
 
-**File:** `Scripts/types/plan.ts`
+**File:** `Alis.Reactive.SandboxApp/Scripts/types/plan.ts`
 
-Add to Request interface:
+Add to Request interface (after `url: string;` at line 226):
 
 ```typescript
 headers?: Record<string, ValueProducer>;
@@ -144,21 +184,34 @@ headers?: Record<string, ValueProducer>;
 
 ### Task 6: TS Runtime — http.ts evaluates headers
 
-**File:** `Scripts/execution/http.ts`
+**File:** `Alis.Reactive.SandboxApp/Scripts/execution/http.ts`
 
-Import `evaluateValue` from `../core/evaluate`.
+Add imports (at top, after existing imports):
+```typescript
+import { evaluateValue } from "../core/evaluate";
+import { formatForWire } from "../core/wire-format";
+```
 
-Update `buildFetch` signature to accept `plan` and `ctx`.
-
-After the Content-Type header setup, add:
+Change `buildFetch` signature (line 19) to accept `plan` and `ctx`:
 
 ```typescript
+function buildFetch(req: Request, gatherResult: GatherResult, plan: Plan, ctx?: ExecContext): ResolvedFetch {
+```
+
+Add type imports:
+```typescript
+import type { Request, ResponseHandler, Plan, ExecContext } from "../types";
+```
+
+After the Content-Type/body setup block (after line 35 `}`), before the `return`:
+
+```typescript
+// Evaluate and set custom headers from plan
 if (req.headers) {
   const existing = (init.headers as Record<string, string>) ?? {};
   for (const [name, producer] of Object.entries(req.headers)) {
     const value = evaluateValue(producer, plan, ctx);
     if (value != null) {
-      // Shape-aware wire formatting: dates → ISO strings, same as gather
       const wire = formatForWire(value, producer.shape);
       existing[name] = String(wire);
     }
@@ -167,15 +220,17 @@ if (req.headers) {
 }
 ```
 
-**Note:** `formatForWire` must be extracted from gather.ts into a shared module (e.g., `core/wire-format.ts`) so headers, route params, and gather all use the same date→ISO conversion. `applyShape` with date returns numeric timestamp — `formatForWire` converts to ISO string for the wire.
+Update `buildFetch` call site in `executeRequest` (line 61):
 
-Update the `buildFetch` call site to pass `plan` and `ctx`.
+```typescript
+const resolved = buildFetch(req, gatherResult, plan, ctx);
+```
 
 **Verification:** `npm run typecheck` + `npm run build`. Sandbox test: add a header, verify in browser DevTools Network tab.
 
 ### Task 7: Playwright test
 
-Write a test that sends a request with custom headers and verifies the server receives them.
+Test: POST with `.Header("X-Custom", "test-value")` → verify server receives the header.
 
 ---
 
@@ -186,9 +241,9 @@ Write a test that sends a request with custom headers and verifies the server re
 - [ ] `npm run build` — bundle builds
 - [ ] Plan JSON with headers validates against schema
 - [ ] Plan JSON without headers omits the field
-- [ ] All 258 C# unit tests pass
-- [ ] All 779 Playwright tests pass
+- [ ] All C# unit tests pass
+- [ ] All Playwright tests pass
 - [ ] Browser: header visible in Network tab
 - [ ] Literal, component read, and event arg headers all work
 - [ ] Null header value is suppressed (not sent)
-- [ ] User header overrides auto-set Content-Type when specified
+- [ ] User headers merge with auto-set Content-Type. Explicit Content-Type header overrides the default.

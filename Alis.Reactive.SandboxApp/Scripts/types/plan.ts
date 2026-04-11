@@ -224,6 +224,7 @@ export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 export interface Request {
   method: HttpMethod;
   url: string;
+  headers?: Record<string, ValueProducer>;
   container?: string;
   input?: RequestInput;
   before?: Reaction[];

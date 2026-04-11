@@ -348,6 +348,10 @@
           "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
         },
         "url": { "type": "string" },
+        "headers": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/ValueProducer" }
+        },
         "container": { "type": "string", "minLength": 1 },
         "input": { "$ref": "#/$defs/RequestInput" },
         "before": {

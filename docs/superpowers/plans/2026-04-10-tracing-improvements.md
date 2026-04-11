@@ -2,7 +2,9 @@
 
 > Codex xhigh audit findings — practical improvements with file:line evidence.
 
-**Current state:** 21 log points across 6 files. evaluateValue, resolver, event firing, branch matching, validation passes are all silent. No correlation IDs. No runtime activation without redeploy.
+**Current state:** ~66 log points across 14 files (Codex audit count). evaluateValue, event firing callbacks, branch matching, and validation passes are all silent. Trigger registration IS logged (trigger.ts:49) but actual event dispatch is not. No correlation IDs. No runtime activation without redeploy.
+
+**Dependency:** Priority 1 (correlation headers) should land AFTER the HTTP Headers plan, which adds `Request.headers` support. Correlation IDs then ride the same mechanism via `.Header("traceparent", ...)` or automatic injection in http.ts.
 
 ---
 

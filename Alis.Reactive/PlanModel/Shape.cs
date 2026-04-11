@@ -92,6 +92,31 @@ namespace Alis.Reactive.PlanModel
 
         internal bool IsNone => Kind == "none";
 
+        /// <summary>
+        /// Returns true if this shape represents a value that can be meaningfully serialized
+        /// to a single string — suitable for HTTP headers, route params, and query strings.
+        /// Scalars: string, number, boolean, date. Nullable wrapping a scalar is also scalar.
+        /// Non-scalars: array, object, raw, any, none.
+        /// </summary>
+        internal bool IsScalar
+        {
+            get
+            {
+                switch (Kind)
+                {
+                    case "string":
+                    case "number":
+                    case "boolean":
+                    case "date":
+                        return true;
+                    case "nullable":
+                        return Inner?.IsScalar == true;
+                    default:
+                        return false;
+                }
+            }
+        }
+
         private Shape(string kind)
         {
             Kind = kind;

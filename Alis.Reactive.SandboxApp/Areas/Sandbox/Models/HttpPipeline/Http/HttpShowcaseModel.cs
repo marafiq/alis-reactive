@@ -63,4 +63,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public int Count { get; set; }
     }
 
+    public class EchoHeadersResponse
+    {
+        public string? ApiVersion { get; set; }
+        public string? RequestId { get; set; }
+        public string? TenantId { get; set; }
+    }
+
 }

@@ -2,11 +2,12 @@
 // Uses the SHARED resolver via gather.ts for value gathering.
 // Supports before/success/error/complete handlers and chained requests.
 
-import type { Request, ResponseHandler, Plan } from "../types";
-import type { ExecContext } from "../types";
+import type { Request, ResponseHandler, Plan, ExecContext } from "../types";
 import { resolveGather, type GatherResult } from "./gather";
 import { executeReaction } from "./execute";
 import { validateContainer } from "../validation";
+import { evaluateValue } from "../core/evaluate";
+import { formatForWire } from "../core/wire-format";
 import { scope } from "../core/trace";
 
 const log = scope("http");
@@ -16,7 +17,7 @@ interface ResolvedFetch {
   readonly init: RequestInit;
 }
 
-function buildFetch(req: Request, gatherResult: GatherResult): ResolvedFetch {
+function buildFetch(req: Request, gatherResult: GatherResult, plan: Plan, ctx?: ExecContext): ResolvedFetch {
   let url = req.url;
   const init: RequestInit = { method: req.method };
 
@@ -32,6 +33,20 @@ function buildFetch(req: Request, gatherResult: GatherResult): ResolvedFetch {
       init.headers = { "Content-Type": "application/json" };
       init.body = JSON.stringify(gatherResult.body);
     }
+  }
+
+  // Evaluate and set custom headers from plan ValueProducers.
+  // Applied AFTER Content-Type — user headers can override if needed.
+  if (req.headers) {
+    const existing = (init.headers as Record<string, string>) ?? {};
+    for (const [name, producer] of Object.entries(req.headers)) {
+      const value = evaluateValue(producer, plan, ctx);
+      if (value != null) {
+        const wire = formatForWire(value, producer.shape);
+        existing[name] = String(wire);
+      }
+    }
+    init.headers = existing;
   }
 
   return { url, init };
@@ -58,7 +73,7 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
 
     // 3. Gather -> freeze
     const gatherResult = resolveGather(req.input, req.method, plan, ctx);
-    const resolved = buildFetch(req, gatherResult);
+    const resolved = buildFetch(req, gatherResult, plan, ctx);
 
     // Write gathered payload to ctx so PayloadSource(scope: "request") resolves correctly
     const requestPayload = gatherResult.body instanceof FormData ? {} : gatherResult.body;

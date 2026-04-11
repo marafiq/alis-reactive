@@ -144,6 +144,9 @@ namespace Alis.Reactive.Builders.Requests
             if (_validatorType != null)
                 request.ValidatorType = _validatorType;
 
+            if (_gatherBuilder != null && _gatherBuilder.HeaderFields.Count > 0)
+                request.Headers = new Dictionary<string, ValueProducer>(_gatherBuilder.HeaderFields);
+
             return request;
         }
     }

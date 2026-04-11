@@ -15,6 +15,9 @@ namespace Alis.Reactive.PlanModel
         public List<ResponseHandler>? Error { get; internal set; }
         public List<Reaction>? Complete { get; internal set; }
         public Request? Next { get; internal set; }
+        /// <summary>Custom HTTP headers to send with this request. Each value is a ValueProducer
+        /// evaluated at request time — supports literals, component reads, and event args.</summary>
+        public Dictionary<string, ValueProducer>? Headers { get; internal set; }
 
         internal Request(string method, string url)
         {

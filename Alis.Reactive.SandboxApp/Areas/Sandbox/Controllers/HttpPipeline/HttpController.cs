@@ -196,6 +196,26 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             }
         }
 
+        // ── Section 12: Custom Headers ─────────────────────────
+
+        [HttpGet("EchoHeaders")]
+        public IActionResult EchoHeaders()
+        {
+            var apiVersion = Request.Headers["X-Api-Version"].FirstOrDefault() ?? "(none)";
+            var requestId = Request.Headers["X-Request-Id"].FirstOrDefault() ?? "(none)";
+            var tenantId = Request.Headers["X-Tenant-Id"].FirstOrDefault() ?? "(none)";
+            return Json(new { apiVersion, requestId, tenantId });
+        }
+
+        [HttpPost("EchoHeaders")]
+        public IActionResult EchoHeadersPost([FromBody] object? body)
+        {
+            var apiVersion = Request.Headers["X-Api-Version"].FirstOrDefault() ?? "(none)";
+            var requestId = Request.Headers["X-Request-Id"].FirstOrDefault() ?? "(none)";
+            var tenantId = Request.Headers["X-Tenant-Id"].FirstOrDefault() ?? "(none)";
+            return Json(new { apiVersion, requestId, tenantId });
+        }
+
         // ── DTOs ─────────────────────────────────────────────
 
         public class SaveRequest
