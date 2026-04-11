@@ -241,6 +241,8 @@ public sealed class PluginSource : Source
 
 Unlike UrlSource (singleton), PluginSource carries a `name` — the registry key.
 
+**Polymorphic serialization:** `WriteOnlyPolymorphicConverter<Source>` at `Serialization/WriteOnlyPolymorphicConverter.cs:10` dispatches on `value.GetType()`. New Source subclasses are serialized automatically — zero converter registration needed. Verified: ComponentSource, PayloadSource, and UrlSource all work this way.
+
 ### Task 2: C# Plan Model — ValueProducer.ReadPlugin factory
 
 **File:** `Alis.Reactive/PlanModel/ValueProducer.cs`
@@ -769,13 +771,13 @@ s.Element("plugin-echo-theme").SetText(json, x => x.ReceivedTheme);
 
 **DomReady:**
 ```csharp
-plan.RegisterPlugin("authGate", p => {
+plan.RegisterPlugin("auth", p => {
     p.Method("isAdmin", Shape.Boolean);
 });
 
 Html.On(plan, t => t.DomReady(p =>
 {
-    p.When(p.Plugin<bool>("authGate", "isAdmin")).Truthy()
+    p.When(p.Plugin<bool>("auth", "isAdmin")).Truthy()
      .Then(then => then.Element("plugin-admin-panel").Show())
      .Else(els => els.Element("plugin-admin-panel").Hide());
 }));
