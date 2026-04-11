@@ -29,9 +29,22 @@ With shape:
 
 `URLSearchParams.get(name)` returns `null` for absent params. This is NOT an error — it's a normal condition (the URL might not have `?page=2`). The null flows through the existing `raw == null ? raw : applyShape(...)` pattern in evaluateValue. Conditions like `.IsNull()` and `.NotNull()` work correctly. This is different from route params where null is always a bug (route params are required path segments).
 
-### Source Union Widening
+### Source Union Widening + execute.ts Impact
 
-Adding UrlSource to the Source union means `SetReaction.on` and `CallReaction.on` could theoretically target a URL. This is semantically invalid but harmless: the C# builders won't generate it (no builder method creates Set/Call with UrlSource), and the runtime would throw via getJsTypeForSource which rejects non-component/non-plugin sources.
+Adding UrlSource to the Source union means `SetReaction.on` and `CallReaction.on` could theoretically target a URL. The C# builders won't generate this, but the runtime trace code at `execute.ts:201,223` accesses `reaction.on.scope` which doesn't exist on UrlSource (only on PayloadSource). The runtime DOES fail-fast via `getJsTypeForSource` at line 212/236, but the trace log would show `target: undefined`.
+
+**Fix in execute.ts (Task 8b):** Guard the trace target resolution:
+
+```typescript
+// In executeSet (line 201) and executeCall (line 223):
+const target = reaction.on.kind === "component"
+  ? reaction.on.component
+  : reaction.on.kind === "payload"
+    ? reaction.on.scope
+    : reaction.on.kind;  // "url", "plugin", etc. — just use the kind as trace label
+```
+
+This is a 2-line change in execute.ts that makes the trace correct for any Source kind without changing behavior. The fail-fast path through `getJsTypeForSource` remains unchanged.
 
 ### DSL — Five Usage Contexts
 
@@ -435,14 +448,16 @@ p.Element("url-display-facility").SetText(p.FromUrl("facilityId"));
 
 #### Section 22: FromUrl Composed with Route Params + Headers
 
+**Page URL:** `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`
+
 **Button:** "Compose All Sources"
 **DSL:**
 ```csharp
 p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
  .Gather(g => g
-     .RouteParam("id", 42)
-     .Header("X-Tab", p.FromUrl("tab"))
-     .FromUrl("facilityId", "facility"))
+     .RouteParam("id", p.FromUrl<int>("facilityId"))   // URL param → route param (THE key composition)
+     .Header("X-Tab", p.FromUrl("tab"))                 // URL param → header
+     .FromUrl("page", "requestedPage"))                 // URL param → gather field
  .Response(r => r.OnSuccess<ComposeEchoResponse>((json, s) =>
  {
      s.Element("url-compose-name").SetText(json, x => x.Name);
@@ -453,9 +468,21 @@ p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
 ```
 
 **Element IDs:**
-- `url-compose-name` — expect: "Resident #42" (proves route param resolved)
+- `url-compose-name` — expect: "Resident #7" (proves FromUrl<int> → RouteParam resolved — facilityId=7 from URL)
 - `url-compose-tab` — expect: "medications" (proves FromUrl → Header reached server)
-- `url-compose-facility` — expect: "7" (proves FromUrl → gather field reached server)
+- `url-compose-facility` — expect: "3" (proves FromUrl("page") → gather field "requestedPage" reached server)
+
+**Controller update:** `ComposeEcho` needs to accept the gather field:
+```csharp
+[HttpGet("ComposeEcho/{id:int}")]
+public IActionResult ComposeEcho(int id, string? requestedPage) =>
+    Json(new {
+        residentId = id,
+        name = $"Resident #{id}",
+        receivedTab = Request.Headers["X-Tab"].FirstOrDefault() ?? "(none)",
+        receivedFacility = requestedPage ?? "(none)"
+    });
+```
 
 ### Task 11: C# Unit Tests (16 tests) — `WhenReadingUrlParams.cs`
 
@@ -477,7 +504,9 @@ p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
 | `from_url_as_route_param_value` | `RouteParam("facilityId", p.FromUrl<int>("facilityId"))` → routeParams value is url-source read |
 | `from_url_as_header_value` | `Header("X-Tab", p.FromUrl("tab"))` → headers value is url-source read |
 | `empty_param_name_throws_in_pipeline` | `p.FromUrl("")` → ArgumentException |
+| `whitespace_param_name_throws_in_pipeline` | `p.FromUrl("  ")` → ArgumentException |
 | `empty_param_name_throws_in_gather` | `.FromUrl("")` → ArgumentException |
+| `whitespace_param_name_throws_in_gather` | `.FromUrl("  ")` → ArgumentException |
 | `empty_alias_throws_in_gather` | `.FromUrl("tab", "")` → ArgumentException |
 
 ### Task 12: vitest Tests (6 tests) — `core/evaluate-url.test.ts`
@@ -495,7 +524,9 @@ p.Get("/Sandbox/HttpPipeline/Http/ComposeEcho/{id}")
 
 Note: Mock `resolveSource` to return a pre-built `URLSearchParams` for evaluate tests. Test `resolveSource` directly for the resolver test (requires mocking `window.location`). Verify `applyShape` mock call counts for null test.
 
-### Task 13: Playwright Tests (11 tests) — `WhenUrlParamsRead.cs`
+**Setup:** The `vitest.config.ts` may reference `Scripts/__tests__/vitest.setup.ts`. If this file does not exist, create it (can be empty or with jsdom globals). The `__tests__` directory structure does not exist yet — the implementer creates it.
+
+### Task 13: Playwright Tests (10 tests) — `WhenUrlParamsRead.cs`
 
 **File:** `tests/Alis.Reactive.PlaywrightTests/HttpPipeline/WhenUrlParamsRead.cs`
 
@@ -525,9 +556,9 @@ Navigate to `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`.
 
 | Test | Click | Assert |
 |---|---|---|
-| `url_param_composes_route_param_resolves` | "Compose All Sources" | `#url-compose-name` → "Resident #42" (route param) |
-| `url_param_composes_header_reaches_server` | "Compose All Sources" | `#url-compose-tab` → "medications" (FromUrl → Header) |
-| `url_param_composes_gather_field_reaches_server` | "Compose All Sources" | `#url-compose-facility` → "7" (FromUrl → gather) |
+| `url_param_composes_route_param_resolves` | "Compose All Sources" | `#url-compose-name` → "Resident #7" (FromUrl<int>("facilityId") → RouteParam) |
+| `url_param_composes_header_reaches_server` | "Compose All Sources" | `#url-compose-tab` → "medications" (FromUrl("tab") → Header) |
+| `url_param_composes_gather_field_reaches_server` | "Compose All Sources" | `#url-compose-facility` → "3" (FromUrl("page") → gather "requestedPage") |
 
 **Missing param test:**
 
@@ -558,7 +589,7 @@ Navigate to `/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3`.
 - [ ] Composes with Headers (`Header("X-Tab", p.FromUrl("tab"))`)
 - [ ] Composes with Route Params (`RouteParam("id", p.FromUrl<int>("id"))`)
 - [ ] Empty param name throws ArgumentException in both PipelineBuilder and GatherBuilder
-- [ ] All 16 C# unit tests pass (Task 11)
+- [ ] All 18 C# unit tests pass (Task 11)
 - [ ] All 6 vitest tests pass (Task 12)
-- [ ] All 11 Playwright tests pass (Task 13)
+- [ ] All 10 Playwright tests pass (Task 13)
 - [ ] All existing 799+ Playwright tests pass (no regressions)
