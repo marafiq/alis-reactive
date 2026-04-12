@@ -75,7 +75,7 @@ namespace Alis.Reactive.Builders
         {
             _emitter.AddStep(Reaction.Call(
                 PluginSource.Of(_pluginName), _method,
-                _args.Count > 0 ? _args : null));
+                _args));
         }
     }
 }
