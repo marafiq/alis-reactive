@@ -213,7 +213,74 @@ Trace the full code path. Identify the exact line. Understand WHY before changin
 If stuck after 2 attempts: research online, save findings, dispatch agents with specific
 input and evidence-based output criteria. Fix the root cause. Verify in browser.
 
-### 9. Quality Aspirations
+A patch is a commit that fixes a symptom without understanding the cause. Ten patches is
+ten mistakes. The scout rule applies: leave every file cleaner than you found it. If you
+touch a file and see a code smell, fix it — do not walk past broken windows.
+
+### 9. Code Hygiene
+
+These small practices compound. They are not optional style preferences — they prevent
+entire categories of bugs and keep the codebase readable under pressure.
+
+**Revealing names over complex conditions.** Extract boolean expressions into named variables
+that explain intent. The name is the documentation.
+
+```csharp
+// Wrong: condition is opaque
+if (field.Shape != null && field.Shape.Kind != "none" && !field.IsServerOnly)
+
+// Right: name reveals intent
+var requiresClientValidation = field.Shape != null && field.Shape.Kind != "none" && !field.IsServerOnly;
+if (requiresClientValidation)
+```
+
+**Variables close to usage.** Declare a variable where it is first needed, not at the top of
+the method. Long distances between declaration and usage hide bugs and make code harder to
+follow. If a variable is used once, inline it.
+
+**Avoid nesting.** Use early returns and guard clauses to flatten control flow. Deep nesting
+hides logic and makes branches hard to trace.
+
+```csharp
+// Wrong: nested
+if (component != null)
+{
+    if (component.Vendor == "fusion")
+    {
+        // 20 lines of logic
+    }
+}
+
+// Right: guard clause, flat
+if (component == null) return;
+if (component.Vendor != "fusion") return;
+// 20 lines of logic
+```
+
+**No dead code.** Delete unused variables, unreachable branches, commented-out code. Do not
+keep code "for reference" — git has history. Commented-out code is a lie that rots.
+
+**Small methods, single responsibility.** If a method needs a comment explaining what a
+block does, extract that block into a named method. The method name replaces the comment.
+
+### 10. Prefer BDD Vertical Slice Playwright Tests
+
+Every Playwright test is an isolated vertical slice. It tests one user-visible behavior from
+page load through interaction to visible outcome — not internal state, not implementation.
+
+**Isolated:** Each test navigates to a fresh page. No shared state between tests. No test
+ordering. If test B breaks when test A is skipped, test B is broken.
+
+**Vertical:** The test exercises the full stack — C# view renders the plan, runtime boots it,
+user interacts, browser reflects the outcome. No mocking. No `page.evaluate()`. No shortcuts.
+
+**Behavior-first:** The test name describes what the user sees, not what the code does.
+`selecting_care_level_updates_billing_amount` not `domready_trigger_fires_sequential_reaction`.
+
+Load the `bdd-testing` skill before writing any Playwright test. The 5 BDD rules and the
+7-behavior contract per input component are defined there.
+
+### 11. Quality Aspirations
 
 Known weaknesses tracked for improvement:
 
@@ -226,7 +293,7 @@ Known weaknesses tracked for improvement:
   by level. Should aspire to OTel-style structured tracing — explicit data flowing through
   modules, correlation IDs, proper span context, actionable error messages.
 
-### 10. Git Worktrees for Feature Work
+### 12. Git Worktrees for Feature Work
 
 ```bash
 git worktree add .worktrees/<feature-name> -b feature/<feature-name>
