@@ -1,26 +1,94 @@
 # Alis.Reactive Framework
 
-C# fluent builders capture reactive browser intent as descriptors. `Html.RenderPlan(plan)`
-serializes to JSON validated against `reactive-plan.schema.json`. The JS runtime executes
-the plan — the only contract. C# never executes behavior, JS never invents it.
+C# fluent builders express reactive browser intent. `Html.RenderPlan(plan)` serializes that
+intent to JSON validated against `reactive-plan.schema.json` (61 definitions). The TypeScript
+runtime executes the plan — nothing more. C# never executes browser behavior. TypeScript
+never invents information the plan does not carry.
 
-## Skills
+## Architecture — 5 Layers, 4 Boundaries
 
-| Skill | Status | Use for |
-|-------|--------|---------|
-| `reactive-dsl` | WIP | Plan, triggers, Element, Dispatch, Component, InputField, .Reactive() |
-| `http-pipeline` | OK | Get/Post, Gather, Response, Chained, Parallel, WhileLoading, Into |
-| `conditions-dsl` | OK | When/Then/ElseIf/Else, operators, guard composition, source types |
-| `validation-rules-alis-reactive` | WIP | FluentValidation rules, Validate, ValidationErrors, WhenField |
-| `onboard-fusion-component` | WIP | Adding SF components, 7-file vertical slice |
-| `dotnet-xml-docs` | OK | XML documentation on public types |
+Each boundary is a quality gate. A failing test is the only reason to cross one.
+
+```
+Layer 1  C# Domain Model + Builders
+         Quality: DDD value objects, internal constructors, C# 8.0, SOLID
+         Harness: AssertSchemaValid() against rendered plan JSON
+         ↓
+         BOUNDARY: failing AssertSchemaValid() drives schema update
+         ↓
+Layer 2  JSON Schema (reactive-plan.schema.json)
+         Quality: additionalProperties: false on every object, 61 $defs
+         Harness: schema test suite across 3 test bases (Core, Fusion, Native)
+         ↓
+         BOUNDARY: schema change → failing vitest drives TS type update
+         ↓
+Layer 3  TypeScript Types + Runtime
+         Quality: discriminated unions match schema, runtime is a dumb executor
+         Harness: vitest + jsdom via boot(), npm run typecheck
+         ↓
+         BOUNDARY: browser first, then Playwright — eyes before automation
+         ↓
+Layer 4  Browser Verification
+         Quality: real interactions, visible outcomes, no page.evaluate()
+         Harness: Playwright BDD (5 rules), 70 test classes
+         ↓
+         BOUNDARY: working sandbox example before writing docs
+         ↓
+Layer 5  Documentation + Skills
+         Quality: dev-facing language, verified code examples, no internals vocabulary
+         Harness: Rider diagnostics, sandbox-verified examples
+```
+
+Detailed flows: `.claude/rules/process-pipeline.md`, `process-layers.md`, `process-task-types.md`
+
+## Plan-Driven IDs — No DOM Scanning
+
+`IdGenerator` generates every HTML element ID at C# render time from the model type and
+property expression. Format: `{Namespace_TypeName}__{MemberPath}`.
+
+```
+Model:      Alis.Reactive.SandboxApp.Models.OrderModel
+Expression: m => m.Address.City
+ID:         Alis_Reactive_SandboxApp_Models_OrderModel__Address_City
+```
+
+All vendors (Syncfusion, Native) produce the same ID for the same expression. IDs are
+deterministic and collision-free by construction. The plan carries every ID the runtime needs.
+
+Non-input component IDs (buttons, elements, containers) are the developer's responsibility —
+chosen explicitly via `p.Element("my-id")` or `Html.NativeButton("btn-id", ...)`. The framework
+does not generate fallback IDs. If an ID collides, that is a developer error, not a framework
+concern. No fallbacks, no auto-generated suffixes, no scanning to resolve ambiguity.
+
+The runtime uses `getElementById` only — direct lookup, zero scanning. Every `getElementById`
+call in the runtime has a comment justifying it (`error-display.ts:5`: "No fallbacks. No
+querySelector scanning. ID-aware only."). The single `querySelectorAll` in `root.ts:25`
+discovers `[data-reactive-plan]` elements at boot — that is the only wide DOM query.
+
+If you think you need `querySelectorAll` or DOM traversal, the plan is missing information.
+Fix the C# descriptor to carry it.
+
+## The Plan Contract
+
+C# `Render()` serializes the plan to JSON inside a `<script type="application/json"
+data-reactive-plan>` element. The runtime discovers these elements, parses the JSON, merges
+partials by `planId`, and boots each composed plan.
+
+Top-level JSON shape: `version` (3), `planId`, `partId`?, `types`, `components`, `behaviors`.
+
+Polymorphic types use `WriteOnlyPolymorphicConverter<T>` — write-only, no deserialization.
+Each concrete type carries a `kind` discriminator (`"compare"`, `"read"`, `"component"`, etc.)
+matched by TypeScript discriminated unions.
+
+Schema validation happens in C# tests via `AssertSchemaValid()`. The TypeScript runtime
+trusts the JSON — it does not re-validate. If the JSON is malformed, `JSON.parse` throws
+at boot time with a clear error message.
 
 ## Build & Run
 
 ```bash
 npm run build:all                # JS bundles + CSS
 dotnet build                     # All C# projects
-npm run build:api-docs           # API reference from XML docs
 
 npm run watch                    # esbuild watch
 npm run watch:css                # Tailwind watch
@@ -29,7 +97,7 @@ lsof -ti:5220 | xargs kill -9 2>/dev/null; dotnet run --project Alis.Reactive.Sa
 npm run typecheck                # TS type checking
 npm run lint                     # ESLint
 
-npm test                                                     # TS vitest
+npm test                                                     # TS vitest (config exists, tests being built)
 dotnet test tests/Alis.Reactive.UnitTests                    # Core + schema
 dotnet test tests/Alis.Reactive.Native.UnitTests             # Native
 dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion
@@ -40,7 +108,6 @@ dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests       # Tag helpers
 dotnet test tests/Alis.Reactive.PlaywrightTests \
   --logger "trx;LogFileName=playwright-results.trx" \
   --results-directory TestResults
-./scripts/sonar-analyze.sh                                   # SonarQube (Docker)
 ```
 
 After TS/CSS changes: `npm run build:all && dotnet build`, restart SandboxApp.
@@ -50,18 +117,108 @@ All tests pass before every commit.
 
 | Layer | Technology |
 |-------|-----------|
-| C# | .NET 10, **C# 8.0 enforced** in library projects. Apps/tests use latest. |
+| C# | .NET 10. **C# 8.0 enforced** in library projects (no records, no primary constructors, no file-scoped namespaces). Apps and tests use `latest`. |
 | TS | TypeScript 5.8, esbuild ESM, Tailwind CSS v4 |
-| Components | Fusion (SF EJ2 32.x) + Native. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
-| Validation | FluentValidation 12.x |
-| Tests | NUnit 4.5 + Verify, Vitest 3.x + jsdom, Playwright 1.52 |
+| Components | Syncfusion EJ2 (Fusion) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
+| Validation | FluentValidation 12.x, extracted to client rules via `FluentValidationAdapter` |
+| Tests | NUnit 4.5, Vitest 3.x + jsdom, Playwright 1.52 |
+| Schema | JSON Schema with 61 `$defs`, validated by `Json.Schema` (NJsonSchema) |
+
+## Skills
+
+8 skills in `.claude/skills/`. Load applicable skills BEFORE reading code.
+
+| Skill | Use for |
+|-------|---------|
+| `reactive-dsl` | Plan, triggers, Element, Dispatch, Component, InputField, .Reactive() |
+| `http-pipeline` | Get/Post, Gather, Response, Chained, Parallel, WhileLoading, Into |
+| `conditions-dsl` | When/Then/ElseIf/Else, operators, guard composition, source types |
+| `validation-rules` | FluentValidation rules, Validate, ValidationErrors, WhenField |
+| `onboard-fusion-component` | Adding Syncfusion components, 7-file vertical slice |
+| `solid-ts-audit` | SOLID analysis of TypeScript runtime modules |
+| `modern-csharp` | C# patterns (needs rewrite — currently promotes C# 12+, repo uses C# 8.0) |
+| `bdd-testing` | Playwright BDD tests, 5 rules, 7-behavior contract, blind reviewer |
+
+XML documentation quality is enforced by hookify rule `hookify.xml-docs-quality.local.md`.
+
+## Rules
+
+### 1. Plan Is the Only Contract
+
+No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
+No inline `<script>` blocks — `root.ts` handles discovery and boot automatically.
+
+### 2. New or Changed Primitive — All Layers
+
+1. C# descriptor — sealed class, `internal` constructor
+2. Polymorphic registration — `WriteOnlyPolymorphicConverter` switch
+3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
+4. JSON schema — failing `AssertSchemaValid()` test drives the update
+5. TS types — new interface in `Scripts/types/`, discriminated union with `kind`
+6. Runtime handler — new switch case + `assertNever`
+7. C# unit test — `AssertSchemaValid()` validates rendered JSON against schema
+8. TS unit test — runtime behavior via `boot()`
+9. Playwright test — browser behavior with sandbox view
+10. Sandbox view — demonstrate the primitive
+
+### 3. Vertical Slices — Duplication Over Abstraction
+
+Each component module is self-contained. No shared base classes for behavior.
+Duplication between slices is intentional.
+
+### 4. Vendor Isolation
+
+New component = C# vertical slice with `IInputComponent`. Zero TS runtime changes.
+`resolver.ts` is the only module that maps vendor to DOM root (`resolveVendorRoot` at line 60)
+and wires vendor-specific events (`wireEvent` at line 188). Adding a third vendor must only
+touch `resolver.ts` and add a `resolution/event-{vendor}.ts` file. Vendor checks in other
+modules violate this rule.
+
+### 5. Fail Fast — Fallbacks Are Exceptions
+
+Default thinking is throw, not fallback. When something is missing or unknown, surface
+the error immediately. Fallbacks hide bugs for hours because wrong values propagate silently.
+A fallback is a rare, deliberate, justified exception — never the default response to uncertainty.
+
+### 6. Plan-Driven IDs — No DOM Scanning
+
+See "Plan-Driven IDs" section above. `IdGenerator` generates every element ID from the model
+expression at C# render time. Runtime uses `getElementById` only.
+
+### 7. API Surface Is Frozen
+
+Enforced by hookify rule `hookify.protect-api-surface.local.md`. No `public` constructors
+on descriptor or plan model classes. All descriptor constructors are `internal`. All plan
+model properties use `internal set`. Developers interact through builder APIs and factory
+methods (`Html.On`, `Html.InputField`, `p.Get`, `p.When`) — never through constructors.
+
+### 8. Root Cause, Not Patch
+
+Trace the full code path. Identify the exact line. Understand WHY before changing WHAT.
+If stuck after 2 attempts: research online, save findings, dispatch agents with specific
+input and evidence-based output criteria. Fix the root cause. Verify in browser.
+
+### 9. Quality Aspirations
+
+These are known weaknesses tracked for improvement:
+
+- **DDD depth**: Domain model uses `null` where Value Objects with constructor invariants
+  should enforce valid state. Association and aggregation boundaries are implicit.
+  Screaming names (types that express domain intent) are underused.
+- **Serialization**: `[JsonIgnore(Condition = WhenWritingNull)]` attributes are scattered
+  across plan model classes. A cleaner approach would use explicit serialization contracts.
+- **TS tracing**: `trace.ts` is 38 lines of `console.log` with levels. Should aspire to
+  OTel-style structured tracing — explicit data flowing through modules, correlation IDs,
+  proper span context, actionable error messages.
+
+### 10. Git Worktrees for Feature Work
+
+```bash
+git worktree add .worktrees/<feature-name> -b feature/<feature-name>
+cd .worktrees/<feature-name>
+```
 
 ## Process
-
-Pipeline: **C# → Schema → TS Types → TS Runtime → Browser → Docs**.
-Each layer has skills, thinking, and a test harness. A failing test drives every boundary crossing.
-
-Detailed flows in `.claude/rules/`: `process-pipeline.md`, `process-layers.md`, `process-task-types.md`
 
 ### Prompt Clarity Gate
 Prompt must be clear and specific. If vague — stop, ask, push back, propose a checklist.
@@ -74,7 +231,6 @@ Prompt must be clear and specific. If vague — stop, ask, push back, propose a 
 
 ### Thoughtful Editing
 Before editing: understand the code path and blast radius. Design your strategy.
-Confirm right skills and processes are loaded and you are following the plan.
 If editing the same file multiple times, rethink your approach and design choices.
 
 ### Wrong Plan Protocol
@@ -91,70 +247,11 @@ If touching an unexpected layer, the plan or task is wrong. Stop, save learnings
 - [ ] Each boundary crossing driven by a failing test?
 - [ ] Root cause fixed, not a patch? No code smells?
 - [ ] Output evidence: what proves this change is correct?
-- [ ] Coverage matrix: every item in scope mapped to a test or justified as untestable?
 
-## Rules
+### Review Loop — Every Change
 
-### 1. Git Worktrees for Feature Work
+Each change cycles through three gates with team sign-off:
 
-```bash
-git worktree add .worktrees/<feature-name> -b feature/<feature-name>
-cd .worktrees/<feature-name>
-```
-
-### 2. Plan Is the Only Contract
-
-No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
-No inline `<script>` blocks — `root.ts` handles discovery and boot automatically.
-
-### 3. New or Changed Primitive — 10 Steps, All Layers
-
-1. C# descriptor — sealed class, `internal` constructor
-2. Polymorphic registration — `WriteOnlyPolymorphicConverter` switch
-3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
-4. JSON schema — failing `AssertSchemaValid()` test drives the update
-5. TS types — new interface in `Scripts/types/`, discriminated union
-6. Runtime handler — new switch case + `assertNever`
-7. C# unit test — `VerifyJson` snapshot + `AssertSchemaValid`
-8. TS unit test — runtime behavior via `boot()`
-9. Playwright test — browser behavior with sandbox view
-10. Sandbox view — demonstrate the primitive
-
-
-### 5. Vertical Slices — Duplication Over Abstraction
-
-Each module is self-contained. No shared base classes for behavior.
-Duplication between slices is intentional.
-
-### 6. Vendor Isolation
-
-New component = C# vertical slice with `IInputComponent`. Zero TS runtime changes.
-`component.ts` is the ONLY module that maps vendor to root (`resolveRoot`, `evalRead`).
-Adding a third vendor must only touch `component.ts`. Vendor checks (`if vendor === "x"`)
-in other modules violate this rule — add exports to `component.ts` instead.
-
-### 7. Fail Fast — Fallbacks Are Exceptions
-
-Default thinking is throw, not fallback. When something is missing or unknown, surface
-the error immediately. Fallbacks hide bugs for hours because wrong values propagate silently.
-A fallback is a rare, deliberate, justified exception — never the default response to uncertainty.
-
-### 8. Plan-Driven IDs — No DOM Scanning
-
-`IdGenerator` generates every element ID from the model expression at C# render time.
-The plan carries IDs. Runtime uses `getElementById` only — direct lookup, zero scanning.
-If you think you need `querySelectorAll` or DOM traversal, the plan is missing information.
-Fix the C# descriptor to carry it.
-
-### 9. API Surface Is Frozen
-
-Enforced by hookify rule `.claude/hookify.protect-api-surface.local.md`.
-
-### 10. Root Cause, Not Patch
-
-Trace the full code path. Identify the exact line. Understand WHY before changing WHAT.
-If stuck after 2 attempts: research online, save findings to a temp file, dispatch agents
-with specific input and evidence-based output criteria. Fix the root cause. Verify in browser.
-Run all tests.
-
-
+1. **Plan Review**: Post plan → 3 reviewers (Codex xhigh + 2 agents) → fix findings → sign-off
+2. **Implementation Review**: Post diff → 2 reviewers verify against plan + code → sign-off
+3. **Post-Implementation**: Every file:line reference verified → all tests pass → browser confirmed
