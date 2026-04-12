@@ -2,12 +2,12 @@ namespace Alis.Reactive.DesignSystem.Tokens
 {
     public static class CssUtils
     {
-        public static string MergeClasses(string generated, string? userClass)
+        public static string MergeClasses(string generated, string? cssClass)
         {
-            if (string.IsNullOrWhiteSpace(userClass))
+            if (string.IsNullOrWhiteSpace(cssClass))
                 return generated;
 
-            return generated + " " + userClass.Trim();
+            return generated + " " + cssClass.Trim();
         }
     }
 }

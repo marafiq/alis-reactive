@@ -10,9 +10,11 @@ public class NativeKvTagHelper : TagHelper
     [HtmlAttributeName("value")]
     public string Value { get; set; } = "";
     public KvLayout Layout { get; set; } = KvLayout.Stacked;
+    [HtmlAttributeName("class")]
+    public string? CssClass { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        KvRenderer.Render(output, Label, Value, Layout);
+        KvRenderer.Render(output, Label, Value, Layout, CssClass);
     }
 }
