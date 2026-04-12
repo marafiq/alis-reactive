@@ -77,6 +77,43 @@
                     s.Plugin("analytics", "track").Arg("array-sent").Fire();
                 }));
         });
+
+    // Button: Filter active → exercise ALL 5 methods in button HTTP pipeline
+    Html.NativeButton("arr-filter-btn", "Filter Active & Inspect")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Get("/Sandbox/Plugins/ArrayManager/Residents")
+             .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
+             {
+                 // 1. filter: get active residents only
+                 TypedPluginSource<object> active = p.Plugin<object>("array", "filter")
+                     .Arg(json, x => x.Items).Arg("status").Arg("active");
+
+                 // 2. count: how many active
+                 TypedPluginSource<int> activeCount = p.Plugin<int>("array", "count").Arg(active);
+                 s.Element("arr-f-count").SetText(activeCount);
+
+                 // 3. sum: total age of active residents
+                 TypedPluginSource<int> activeAgeSum = p.Plugin<int>("array", "sum").Arg(active).Arg("age");
+                 s.Element("arr-f-age-sum").SetText(activeAgeSum);
+
+                 // 4. pluck: name of first active resident
+                 TypedPluginSource<string> firstName = p.Plugin<string>("array", "pluck")
+                     .Arg(active).Arg(0).Arg("name");
+                 s.Element("arr-f-first").SetText(firstName);
+
+                 // 5. some: display as text (true/false)
+                 TypedPluginSource<bool> allActive = p.Plugin<bool>("array", "some")
+                     .Arg(active).Arg("status").Arg("active");
+                 s.Element("arr-f-some").SetText(allActive);
+
+                 s.Element("arr-f-result").AddClass("text-green-600");
+
+                 // Void: track the filter action
+                 s.Plugin("analytics", "track").Arg("filter-inspect").Fire();
+             }));
+        });
+
 }
 
 <native-vstack gap="Lg">
@@ -109,6 +146,21 @@
         <div id="arr-echo-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
             <p>Count: <span id="arr-echo-count">—</span></p>
             <p>Header: <span id="arr-echo-header">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Button: Filter Active — All 5 Methods + Conditions</native-heading>
+        @(Html.NativeButton("arr-filter-btn", "Filter Active & Inspect")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+        <div id="arr-f-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p>Active Count: <span id="arr-f-count">—</span></p>
+            <p>Active Age Sum: <span id="arr-f-age-sum">—</span></p>
+            <p>First Active Name: <span id="arr-f-first">—</span></p>
+            <p>Some Active: <span id="arr-f-some">—</span></p>
         </div>
     </native-card-body>
     </native-card>
