@@ -121,14 +121,17 @@ describe("ScopedTracer", () => {
     expect(sink.events[0].spanId).toBeUndefined();
   });
 
-  it("span without traceparent has no parentSpanId", () => {
+  it("span without traceparent gets browser-local root as parent", () => {
     const sink = captureSink();
     configure({ level: "debug", sink });
     const t = createTracer("test");
-    const span = t.span("root.span");
+    const span = t.span("child.span");
     span.end();
     const spanCall = (sink.span as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(spanCall.parentSpanId).toBeUndefined();
+    // Browser-local root span exists, so child has a parent
+    expect(spanCall.parentSpanId).toBeDefined();
+    expect(spanCall.parentSpanId).toMatch(/^[0-9a-f]{16}$/);
+    expect(spanCall.traceId).toMatch(/^[0-9a-f]{32}$/);
   });
 
   it("does not attach breadcrumbs to non-error events", () => {

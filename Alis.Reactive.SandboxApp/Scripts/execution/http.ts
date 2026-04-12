@@ -57,6 +57,8 @@ function buildFetch(req: Request, gatherResult: GatherResult, plan: Plan, ctx?: 
 
 /** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
 export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
+  let requestSpan: import("../tracing/types").Span | undefined;
+
   try {
     // 1. Validation gate (if container specified)
     if (req.container) {
@@ -83,7 +85,7 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     ctx = { ...ctx, request: requestPayload };
 
     // Create request span and inject traceparent
-    const requestSpan = ctx?.span?.child("http.request", {
+    requestSpan = ctx?.span?.child("http.request", {
       "http.method": req.method,
       "http.url": resolved.url,
     });
@@ -115,6 +117,8 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     }
   } catch (err) {
     const status = err instanceof TypeError ? 0 : -1;
+    requestSpan?.set("http.status", status);
+    requestSpan?.end("error");
     t.error("http.request.fail", { url: req.url, method: req.method, status }, err as Error);
     await routeHandlers(req.error, status, plan, ctx);
     await runComplete(req, plan, ctx);

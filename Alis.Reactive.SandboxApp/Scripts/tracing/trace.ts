@@ -27,10 +27,15 @@ export function configure(config: TraceConfig): void {
         ? new ContextOnlySpan(root, parsed.spanId)
         : new ActiveSpan("boot", "boot", undefined, activeSink, undefined, root);
     } else {
-      rootSpan = NOOP_SPAN;
+      rootSpan = activeLevel >= LEVELS.debug
+        ? new ActiveSpan("boot", "boot", undefined, activeSink)
+        : NOOP_SPAN;
     }
   } else {
-    rootSpan = NOOP_SPAN;
+    // No server traceparent — generate browser-local trace when tracing is on
+    rootSpan = activeLevel >= LEVELS.debug
+      ? new ActiveSpan("boot", "boot", undefined, activeSink)
+      : NOOP_SPAN;
   }
 }
 
