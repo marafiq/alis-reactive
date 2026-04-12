@@ -11,8 +11,7 @@ namespace Alis.Reactive.Native.Components
     {
         private static readonly JsonSerializerOptions CompactOptions = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
         internal static NativeActionLinkContract CreateContract<TModel>(

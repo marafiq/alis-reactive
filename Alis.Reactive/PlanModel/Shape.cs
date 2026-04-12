@@ -97,12 +97,16 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the shape kind (string, number, boolean, date, array, object, nullable, raw, any, or none).</summary>
         public string Kind { get; }
         /// <summary>Gets the element shape for array shapes, or <see langword="null"/> for non-array shapes.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public Shape Item { get; private set; }
         /// <summary>Gets the wrapped shape for nullable shapes, or <see langword="null"/> for non-nullable shapes.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public Shape Inner { get; private set; }
         /// <summary>Gets the named field shapes for object shapes, or <see langword="null"/> for non-object shapes.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyDictionary<string, Shape> Fields { get; private set; }
         /// <summary>Gets whether the object shape accepts properties beyond those listed in <see cref="Fields"/>. When true, the value may contain extra keys not declared in the shape.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public bool? Additional { get; private set; }
 
         internal bool IsNone => Kind == "none";
