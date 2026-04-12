@@ -11,18 +11,26 @@ public enum DividerStyle
 
 internal static class DividerRenderer
 {
-    public static void Render(TagHelperOutput output, DividerStyle style, string? label)
+    public static void Render(TagHelperOutput output, DividerStyle style, string? label, string? cssClass)
     {
-        output.TagName = null;
         if (!string.IsNullOrEmpty(label))
         {
-            output.Content.SetHtmlContent(DividerCss.LabeledHtml(label));
+            output.TagName = "div";
+            output.Attributes.SetAttribute("class", DividerCss.LabeledWrapperClasses(cssClass));
+            output.Content.SetHtmlContent(
+                $"<div class=\"{DividerCss.LabeledLineOuterClasses()}\">" +
+                $"<div class=\"{DividerCss.LabeledLineInnerClasses()}\"></div></div>" +
+                $"<div class=\"{DividerCss.LabeledTextWrapperClasses()}\">" +
+                $"<span class=\"{DividerCss.LabeledTextClasses()}\">{label}</span></div>");
         }
         else
         {
-            output.Content.SetHtmlContent(style == DividerStyle.Dashed
-                ? DividerCss.DashedHtml
-                : DividerCss.PlainHtml);
+            output.TagName = "hr";
+            var classes = style == DividerStyle.Dashed
+                ? DividerCss.DashedClasses(cssClass)
+                : DividerCss.PlainClasses(cssClass);
+            output.Attributes.SetAttribute("class", classes);
+            output.TagMode = TagMode.SelfClosing;
         }
     }
 }
