@@ -5,6 +5,9 @@ using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
+    /// <summary>
+    /// Base class for all value nodes in a reactive plan. Not constructed in application code.
+    /// </summary>
     [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ValueProducer>))]
     public abstract class ValueProducer
     {
@@ -57,11 +60,18 @@ namespace Alis.Reactive.PlanModel
             new ArrayProducer(items, shape);
     }
 
+    /// <summary>A constant value embedded in the plan.</summary>
+    /// <remarks>
+    /// Created when a literal is passed to a builder such as <c>p.Element("id").SetText("hello")</c>.
+    /// </remarks>
     public sealed class LiteralProducer : ValueProducer
     {
+        /// <summary>Gets the kind. Always <c>"literal"</c>.</summary>
         public string Kind => "literal";
+        /// <summary>Gets the constant value embedded in the plan.</summary>
         [JsonInclude]
         public object Value { get; }
+        /// <summary>Gets the expected type shape, or <see langword="null"/> when not specified.</summary>
         public Shape Shape { get; }
 
         internal LiteralProducer(object value, Shape shape)
@@ -71,13 +81,26 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>A value read from a live source when the plan executes in the browser.</summary>
+    /// <remarks>
+    /// Created by source-reading builders such as <c>p.Plugin&lt;int&gt;("array", "count").Arg(json, x =&gt; x.Items)</c>.
+    /// </remarks>
     public sealed class ReadProducer : ValueProducer
     {
+        /// <summary>Gets the kind. Always <c>"read"</c>.</summary>
         public string Kind => "read";
+        /// <summary>
+        /// Gets the value source: <see cref="ComponentSource"/>, <see cref="PluginSource"/>,
+        /// <see cref="UrlSource"/>, or <see cref="PayloadSource"/>.
+        /// </summary>
         public Source From { get; }
+        /// <summary>Gets the property or method name to read on the source.</summary>
         public string Member { get; }
+        /// <summary>Gets the nested property path, or <see langword="null"/> for direct reads.</summary>
         public Path Path { get; }
+        /// <summary>Gets the expected type shape, or <see langword="null"/> when not specified.</summary>
         public Shape Shape { get; }
+        /// <summary>Gets optional method arguments, or <see langword="null"/> for property reads.</summary>
         public IReadOnlyList<ValueProducer> Args { get; }
 
         internal ReadProducer(Source from, string member, Path path, Shape shape, List<ValueProducer> args = null)
@@ -90,10 +113,14 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>A composite value built from named field expressions.</summary>
     public sealed class ObjectProducer : ValueProducer
     {
+        /// <summary>Gets the kind. Always <c>"object"</c>.</summary>
         public string Kind => "object";
+        /// <summary>Gets the named fields and their value expressions.</summary>
         public IReadOnlyDictionary<string, ValueProducer> Fields { get; }
+        /// <summary>Gets the expected type shape, or <see langword="null"/> when not specified.</summary>
         public Shape Shape { get; }
 
         internal ObjectProducer(Dictionary<string, ValueProducer> fields, Shape shape)
@@ -103,10 +130,14 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>A composite value built from ordered item expressions.</summary>
     public sealed class ArrayProducer : ValueProducer
     {
+        /// <summary>Gets the kind. Always <c>"array"</c>.</summary>
         public string Kind => "array";
+        /// <summary>Gets the ordered item expressions.</summary>
         public IReadOnlyList<ValueProducer> Items { get; }
+        /// <summary>Gets the expected type shape, or <see langword="null"/> when not specified.</summary>
         public Shape Shape { get; }
 
         internal ArrayProducer(List<ValueProducer> items, Shape shape)

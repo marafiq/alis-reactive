@@ -24,13 +24,17 @@ namespace Alis.Reactive.PlanModel
             => throw new NotSupportedException("Plan types are write-only.");
     }
 
+    /// <summary>One step in a property navigation path: a property name or array index.</summary>
     public sealed class PathSegment
     {
+        /// <summary>Gets the segment kind (property or index).</summary>
         public string Kind { get; }
 
+        /// <summary>Gets the property name for property segments, or <see langword="null"/> for index segments.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Name { get; }
 
+        /// <summary>Gets the array index for index segments, or <see langword="null"/> for property segments.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Index { get; }
 
@@ -48,11 +52,13 @@ namespace Alis.Reactive.PlanModel
             new PathSegment("index", null, index);
     }
 
+    /// <summary>An ordered sequence of segments for navigating nested properties on a value.</summary>
     [JsonConverter(typeof(PathJsonConverter))]
     public sealed class Path
     {
         internal static readonly Path None = new Path(Array.Empty<PathSegment>());
 
+        /// <summary>Gets the ordered path segments.</summary>
         [JsonIgnore]
         public IReadOnlyList<PathSegment> Segments { get; }
 

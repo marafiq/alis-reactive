@@ -5,6 +5,9 @@ using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
+    /// <summary>
+    /// Base class for conditional predicates evaluated when the plan executes. Not constructed in application code.
+    /// </summary>
     [JsonConverter(typeof(WriteOnlyPolymorphicConverter<Condition>))]
     public abstract class Condition
     {
@@ -26,13 +29,20 @@ namespace Alis.Reactive.PlanModel
             new ConfirmCondition(message);
     }
 
+    /// <summary>Compares two values using a relational operator.</summary>
     public sealed class CompareCondition : Condition
     {
+        /// <summary>Gets the kind. Always <c>"compare"</c>.</summary>
         public string Kind => "compare";
+        /// <summary>Gets the left-hand operand.</summary>
         public ValueProducer Left { get; }
+        /// <summary>Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, empty, contains, startsWith, endsWith).</summary>
         public string Op { get; }
+        /// <summary>Gets the right-hand operand, or <see langword="null"/> for unary operators.</summary>
         public ValueProducer Right { get; }
+        /// <summary>Gets the expected type shape for comparison, or <see langword="null"/> when inferred.</summary>
         public Shape Shape { get; }
+        /// <summary>Gets the element type shape used by collection operators such as <c>contains</c>, or <see langword="null"/> for non-collection comparisons.</summary>
         public Shape ItemShape { get; }
 
         internal CompareCondition(ValueProducer left, string op, ValueProducer right, Shape shape, Shape itemShape)
@@ -45,9 +55,12 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>Logical AND: all child conditions must be true.</summary>
     public sealed class AllCondition : Condition
     {
+        /// <summary>Gets the kind. Always <c>"all"</c>.</summary>
         public string Kind => "all";
+        /// <summary>Gets the child conditions that must all be true.</summary>
         public IReadOnlyList<Condition> Terms { get; }
 
         internal AllCondition(List<Condition> terms)
@@ -56,9 +69,12 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>Logical OR: at least one child condition must be true.</summary>
     public sealed class AnyCondition : Condition
     {
+        /// <summary>Gets the kind. Always <c>"any"</c>.</summary>
         public string Kind => "any";
+        /// <summary>Gets the child conditions where at least one must be true.</summary>
         public IReadOnlyList<Condition> Terms { get; }
 
         internal AnyCondition(List<Condition> terms)
@@ -67,9 +83,12 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>Logical NOT: inverts a single child condition.</summary>
     public sealed class NotCondition : Condition
     {
+        /// <summary>Gets the kind. Always <c>"not"</c>.</summary>
         public string Kind => "not";
+        /// <summary>Gets the condition to invert.</summary>
         public Condition Term { get; }
 
         internal NotCondition(Condition term)
@@ -78,9 +97,12 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>Prompts the user for confirmation before the reaction proceeds.</summary>
     public sealed class ConfirmCondition : Condition
     {
+        /// <summary>Gets the kind. Always <c>"confirm"</c>.</summary>
         public string Kind => "confirm";
+        /// <summary>Gets the confirmation message shown to the user.</summary>
         public string Message { get; }
 
         internal ConfirmCondition(string message)

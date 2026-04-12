@@ -6,9 +6,8 @@ using System.Linq;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// The type contract the plan expresses. Declares what a value IS and enables
-    /// Shape-to-Shape conversion. One shared type used everywhere: JsType properties,
-    /// ValueProducer reads, conditions, validation rules, gather.
+    /// Declares the expected type for a value in the plan (string, number, date, array, object, etc.).
+    /// Used across value expressions, conditions, and validation to ensure type consistency.
     /// </summary>
     public sealed class Shape : IEquatable<Shape>
     {
@@ -84,17 +83,22 @@ namespace Alis.Reactive.PlanModel
             return Any;
         }
 
+        /// <summary>Gets the shape kind (string, number, boolean, date, array, object, nullable, raw, any, or none).</summary>
         public string Kind { get; }
+        /// <summary>Gets the element shape for array shapes, or <see langword="null"/> for non-array shapes.</summary>
         public Shape Item { get; private set; }
+        /// <summary>Gets the wrapped shape for nullable shapes, or <see langword="null"/> for non-nullable shapes.</summary>
         public Shape Inner { get; private set; }
+        /// <summary>Gets the named field shapes for object shapes, or <see langword="null"/> for non-object shapes.</summary>
         public IReadOnlyDictionary<string, Shape> Fields { get; private set; }
+        /// <summary>Gets whether the object shape accepts properties beyond those listed in <see cref="Fields"/>. When true, the value may contain extra keys not declared in the shape.</summary>
         public bool? Additional { get; private set; }
 
         internal bool IsNone => Kind == "none";
 
         /// <summary>
         /// Returns true if this shape represents a value that can be meaningfully serialized
-        /// to a single string — suitable for HTTP headers, route params, and query strings.
+        /// to a single string. Suitable for HTTP headers, route params, and query strings.
         /// Scalars: string, number, boolean, date. Nullable wrapping a scalar is also scalar.
         /// Non-scalars: array, object, raw, any, none.
         /// </summary>
@@ -122,6 +126,9 @@ namespace Alis.Reactive.PlanModel
             Kind = kind;
         }
 
+        /// <summary>Determines whether two <see cref="Shape"/> instances represent the same type contract.</summary>
+        /// <param name="other">The shape to compare with.</param>
+        /// <returns><see langword="true"/> if the shapes are structurally equal.</returns>
         public bool Equals(Shape other)
         {
             if (other is null) return false;
@@ -141,8 +148,10 @@ namespace Alis.Reactive.PlanModel
             return true;
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj) => Equals(obj as Shape);
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
 #if NET6_0_OR_GREATER
@@ -161,7 +170,9 @@ namespace Alis.Reactive.PlanModel
 #endif
         }
 
+        /// <summary>Returns <see langword="true"/> if both shapes are structurally equal.</summary>
         public static bool operator ==(Shape left, Shape right) => Equals(left, right);
+        /// <summary>Returns <see langword="true"/> if the shapes are not structurally equal.</summary>
         public static bool operator !=(Shape left, Shape right) => !Equals(left, right);
     }
 }
