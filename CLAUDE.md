@@ -228,10 +228,12 @@ that explain intent. The name is the documentation.
 ```csharp
 // Wrong: condition is opaque
 if (field.Shape != null && field.Shape.Kind != "none" && !field.IsServerOnly)
+    ExtractRule(field);
 
 // Right: name reveals intent
 var requiresClientValidation = field.Shape != null && field.Shape.Kind != "none" && !field.IsServerOnly;
 if (requiresClientValidation)
+    ExtractRule(field);
 ```
 
 **Variables close to usage.** Declare a variable where it is first needed, not at the top of
@@ -266,13 +268,15 @@ block does, extract that block into a named method. The method name replaces the
 ### 10. Prefer BDD Vertical Slice Playwright Tests
 
 Every Playwright test is an isolated vertical slice. It tests one user-visible behavior from
-page load through interaction to visible outcome — not internal state, not implementation.
+page load through interaction to visible outcome.
 
 **Isolated:** Each test navigates to a fresh page. No shared state between tests. No test
 ordering. If test B breaks when test A is skipped, test B is broken.
 
 **Vertical:** The test exercises the full stack — C# view renders the plan, runtime boots it,
 user interacts, browser reflects the outcome. No mocking. No `page.evaluate()`. No shortcuts.
+Framework tests that verify the gather pipeline may assert on `request.PostData` — this is
+the one justified exception where asserting on non-visible data is correct.
 
 **Behavior-first:** The test name describes what the user sees, not what the code does.
 `selecting_care_level_updates_billing_amount` not `domready_trigger_fires_sequential_reaction`.
