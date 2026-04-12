@@ -24,7 +24,7 @@ public class WhenFinallyExecutes : PlaywrightTestBase
     {
         await NavigateToHttpPage();
 
-        await ClickButton("Save (Success)");
+        await ClickButton("Finally OK");
 
         await Expect(Page.Locator("#finally-spinner")).ToBeHiddenAsync();
         await Expect(Page.Locator("#finally-result")).ToHaveTextAsync("Saved successfully!");
@@ -38,7 +38,7 @@ public class WhenFinallyExecutes : PlaywrightTestBase
     {
         await NavigateToHttpPage();
 
-        await ClickButton("Save (Fail 500)");
+        await ClickButton("Finally 500");
 
         await Expect(Page.Locator("#finally-spinner")).ToBeHiddenAsync();
         await Expect(Page.Locator("#finally-result"))
@@ -63,7 +63,7 @@ public class WhenFinallyExecutes : PlaywrightTestBase
             });
         });
 
-        await ClickButton("Save (Success)");
+        await ClickButton("Finally OK");
 
         await Expect(Page.Locator("#finally-spinner")).ToBeHiddenAsync();
         AssertNoConsoleErrorsExcept("502", "http");
@@ -81,7 +81,7 @@ public class WhenFinallyExecutes : PlaywrightTestBase
             await route.AbortAsync("connectionrefused");
         });
 
-        await ClickButton("Save (Success)");
+        await ClickButton("Finally OK");
 
         await Expect(Page.Locator("#finally-spinner")).ToBeHiddenAsync();
         AssertNoConsoleErrorsExcept("network", "TypeError", "http", "ERR_");

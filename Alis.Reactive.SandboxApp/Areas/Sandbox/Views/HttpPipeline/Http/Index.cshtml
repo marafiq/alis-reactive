@@ -805,7 +805,7 @@
             No manual <code>.Hide()</code> in success/error handlers.
         </p>
         <div class="flex gap-3">
-            @(Html.NativeButton("finally-save-btn", "Save (Success)")
+            @(Html.NativeButton("finally-save-btn", "Finally OK")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
@@ -821,7 +821,7 @@
                      )
                      .Finally(f => f.Element("finally-spinner").Hide());
                 }))
-            @(Html.NativeButton("finally-fail-btn", "Save (Fail 500)")
+            @(Html.NativeButton("finally-fail-btn", "Finally 500")
                 .CssClass("rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
