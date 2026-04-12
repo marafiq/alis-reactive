@@ -7,7 +7,7 @@ import { scope } from "../core/trace";
 
 /** Deep-merge validation rules from an incoming component into an existing one. */
 function deepMergeValidationRules(existing: Component | undefined, incoming: Component): void {
-  if (!existing?.container?.validationRules || !incoming.container?.validationRules) return;
+  if (!existing?.container || !incoming.container) return;
   const ruleMap = new Map(existing.container.validationRules.map(cv => [cv.component, cv]));
   for (const cv of incoming.container.validationRules) ruleMap.set(cv.component, cv);
   incoming.container.validationRules = [...ruleMap.values()];
@@ -183,7 +183,7 @@ export class PlanRegistry {
   private pruneOrphanedValidationRules(plan: Plan, partId: string, removedKeys: Set<string>): void {
     if (removedKeys.size === 0) return;
     for (const [compKey, comp] of Object.entries(plan.components)) {
-      if (!comp.container?.validationRules) continue;
+      if (!comp.container) continue;
       if (this.keyOwners.get(`c:${compKey}`) !== partId) continue;
       comp.container.validationRules = comp.container.validationRules
         .filter(cv => !removedKeys.has(cv.component));

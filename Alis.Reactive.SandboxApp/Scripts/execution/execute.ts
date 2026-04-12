@@ -8,6 +8,7 @@ import type {
   InjectReaction, ShowValidationErrorsReaction,
   ExecContext, Condition,
 } from "../types";
+import { isEvaluable } from "../types";
 import {
   resolveSource, resolveElement, getJsTypeForSource,
   setProperty, callMethod,
@@ -213,7 +214,7 @@ function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void 
   }
 
   const jsType = getJsTypeForSource(plan, reaction.on);
-  const prop = jsType.properties?.[reaction.property];
+  const prop = jsType.properties[reaction.property];
   if (!prop) throw new Error(`[alis] property "${reaction.property}" not found on type`);
   setProperty(root, prop, value);
 }
@@ -225,7 +226,7 @@ function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): voi
     throw new Error(`[alis] Call reaction does not support source kind "${reaction.on.kind}". Only component, payload, and plugin sources can be call targets.`);
   }
   const root = resolveSource(plan, reaction.on, ctx);
-  const args = reaction.args?.map(a => evaluateValue(a, plan, ctx)) ?? [];
+  const args = reaction.args.map(a => evaluateValue(a, plan, ctx));
   const target = reaction.on.kind === "component" ? reaction.on.component
     : reaction.on.kind === "plugin" ? (reaction.on as import("../types").PluginSource).name
     : reaction.on.scope;
@@ -242,7 +243,7 @@ function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): voi
   }
 
   const jsType = getJsTypeForSource(plan, reaction.on);
-  const method = jsType.methods?.[reaction.method];
+  const method = jsType.methods[reaction.method];
   if (!method) throw new Error(`[alis] method "${reaction.method}" not found on type`);
   callMethod(root, method, args);
 }
@@ -250,7 +251,7 @@ function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): voi
 // ── Dispatch reaction ──────────────────────────────────────
 
 function executeDispatch(reaction: DispatchReaction, plan: Plan, ctx?: ExecContext): void {
-  const detail = reaction.data
+  const detail = isEvaluable(reaction.data)
     ? evaluateValue(reaction.data, plan, ctx)
     : {};
   log.trace("dispatch", { event: reaction.event, detail });

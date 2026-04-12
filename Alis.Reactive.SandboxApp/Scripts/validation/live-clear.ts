@@ -26,8 +26,6 @@ export function wireLiveValidation(plan: Plan, containerKey: string): void {
   const containerId = containerComp.id;
   const containerScope = containerComp.container;
 
-  if (!containerScope.validationRules) return;
-
   for (const cv of containerScope.validationRules) {
     const comp = plan.components[cv.component];
     if (!comp) continue;

@@ -58,7 +58,7 @@ export function wireBehavior(
       if (!comp) throw new Error(`[alis] trigger component not found: ${trigger.component}`);
 
       const jsType = getJsType(plan, trigger.component);
-      const eventDef = jsType.events?.[trigger.event];
+      const eventDef = jsType.events[trigger.event];
       const channel = eventDef?.channel ?? trigger.event;
 
       log.debug("component-event", { component: trigger.component, event: trigger.event, channel });

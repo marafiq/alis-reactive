@@ -18,7 +18,7 @@ function compareValues(a: unknown, b: unknown, shape: Shape): number {
 
 function resolveTarget(rule: ValidationRule, otherValue?: unknown): unknown {
   if (otherValue !== undefined) return otherValue;
-  if (rule.constraint?.kind === "literal") return rule.constraint.value;
+  if (rule.constraint.kind === "literal") return rule.constraint.value;
   return undefined;
 }
 
@@ -27,7 +27,7 @@ function failsComparisonRule(
 ): boolean {
   const target = resolveTarget(rule, otherValue);
   if (target === undefined) return true;
-  if (!rule.shape) return true;
+  if (rule.shape.kind === "none") return true;
   const cmp = compareValues(value, target, rule.shape);
   switch (rule.name) {
     case "min": return !empty && (Number.isNaN(cmp) || cmp < 0);
@@ -39,11 +39,11 @@ function failsComparisonRule(
 }
 
 function failsRangeRule(rule: ValidationRule, value: unknown, empty: boolean): boolean {
-  if (!rule.constraint || rule.constraint.kind !== "literal") return true;
+  if (rule.constraint.kind !== "literal") return true;
   const arr = rule.constraint.value;
   if (!Array.isArray(arr) || arr.length < 2) return true;
   if (empty) return false;
-  if (!rule.shape) return true;
+  if (rule.shape.kind === "none") return true;
   const [lo, hi] = arr;
   const cmpLo = compareValues(value, lo, rule.shape);
   const cmpHi = compareValues(value, hi, rule.shape);
@@ -53,8 +53,8 @@ function failsRangeRule(rule: ValidationRule, value: unknown, empty: boolean): b
 }
 
 /** Shape-aware equality — applies shape to both sides and uses strict equality. */
-function shapeEqual(a: unknown, b: unknown, shape?: Shape): boolean {
-  if (shape) {
+function shapeEqual(a: unknown, b: unknown, shape: Shape): boolean {
+  if (shape.kind !== "none") {
     const ca = applyShape(a, shape);
     const cb = applyShape(b, shape);
     return ca === cb;
@@ -74,7 +74,7 @@ function failsEqualityRule(
       return !shapeEqual(value, target, rule.shape);
     }
     case "notEqual": {
-      const constraint = rule.constraint?.kind === "literal" ? rule.constraint.value : undefined;
+      const constraint = rule.constraint.kind === "literal" ? rule.constraint.value : undefined;
       return !empty && shapeEqual(value, constraint, rule.shape);
     }
     case "notEqualTo": {
@@ -122,7 +122,6 @@ export function ruleFails(
 }
 
 function getConstraintValue(rule: ValidationRule): unknown {
-  if (!rule.constraint) return undefined;
   if (rule.constraint.kind === "literal") return rule.constraint.value;
   return undefined;
 }
