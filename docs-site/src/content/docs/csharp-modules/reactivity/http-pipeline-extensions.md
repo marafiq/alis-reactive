@@ -136,8 +136,7 @@ pipeline.Element("current-facility").SetText(pipeline.FromUrl("facilityId"));
 Yes — all gather strategies compose freely:
 
 ```csharp
-pipeline.Put("/api/residents/{id}")
-    .Gather(g =>
+pipeline.Put("/api/residents/{id}", g =>
     {
         g.RouteParam("id", 42);
         g.Header("X-Tab", pipeline.FromUrl("tab"));
