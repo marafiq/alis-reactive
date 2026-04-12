@@ -272,4 +272,75 @@ args is a phantom with no pipeline binding.
 - AllowFiltering(true) required on MultiSelect/DropDownList for Filtering event
 - Switch/NativeCheckBox model property MUST be `bool`
 - DomReady fires AFTER all custom-event listeners wired (two-phase boot)
+- `.Reactive()` stays close to its component — it is the last call inside the build callback
+- `Html.On` is for triggers not tied to a specific component (DomReady, CustomEvent)
+- Every view ends with `@Html.RenderPlan(plan)` — no exceptions
+- When adding a new sandbox view, update the section's `Index.cshtml` to link to it
+
+## Canonical Reference — Verified Patterns from Sandbox Views
+
+These patterns are extracted from 127 real sandbox views. Use exactly these forms.
+
+**Most common: .Reactive() on component (252+ uses)**
+Source: `Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml`
+```csharp
+@{ Html.InputField(plan, m => m.Category, o => o.Required().Label("Category"))
+   .FusionDropDownList(b => b
+       .DataSource(categories)
+       .Reactive(plan, evt => evt.Changed, (args, p) =>
+       {
+           p.Element("change-value").SetText(args, x => x.Value);
+       })); }
+```
+
+**DomReady with HTTP (36 uses)**
+Source: `Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml`
+```csharp
+Html.On(plan, t => t.DomReady(p =>
+    p.Get("/Sandbox/HttpPipeline/Http/Residents")
+     .WhileLoading(l => l.Element("load-spinner").Show())
+     .Response(r => r.OnSuccess<ResidentsResponse>((json, s) =>
+     {
+         s.Element("load-spinner").Hide();
+         s.Element("load-first").SetText(json, x => x.First);
+     }))));
+```
+
+**Button + POST + Validate (34 uses)**
+Source: `Areas/Sandbox/Views/Validation/Contract/Index.cshtml`
+```csharp
+@(Html.NativeButton("submit-btn", "Submit")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post("/Sandbox/Validation/Contract/Submit", g => g.IncludeAll())
+         .Validate<ResidentValidator>("resident-form")
+         .Response(r => r
+            .OnSuccess(s => s.Element("result").SetText("Saved"))
+            .OnError(400, e => e.ValidationErrors("resident-form")));
+    }))
+```
+
+**Conditions with component reads (150+ uses)**
+Source: `Areas/Sandbox/Views/Conditions/CareLevelCascade/Index.cshtml`
+```csharp
+p.When(args, x => x.Value).Eq("Memory Care")
+ .Then(then =>
+ {
+     then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Enhanced Monitoring");
+ })
+ .Else(else_ =>
+ {
+     else_.Component<FusionDropDownList>(m => m.Protocol).SetValue("");
+ });
+```
+
+**CustomEvent with typed payload (26 uses)**
+Source: `Areas/Sandbox/Views/CoreBehaviors/Payload/Index.cshtml`
+```csharp
+Html.On(plan, t => t.CustomEvent<PayloadShowcaseModel>("payload-test", (payload, p) =>
+{
+    p.Element("int-value").SetText(payload, x => x.IntValue);
+    p.Element("address-street").SetText(payload, x => x.Address!.Street);
+}));
+```
 - One .Reactive() per event — multiple events chain on same builder
