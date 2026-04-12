@@ -807,8 +807,10 @@ Every trace event follows these rules:
    | `module.noun.not-found` | `validation.container.not-found` | Missing resource |
    | `module.noun.qualifier` | `gather.serialize.fail` | Operation outcome |
 
-   Avoid: past tense (`activated`, `initialized`), abbreviations (`req`, `res`), generic
-   names (`error`, `data`, `info`).
+   Avoid: past-tense verbs as event names (`activated`, `initialized`, `connected`,
+   `failed`). Use base verb form: `start`, `connect`, `fail`. Compound adjective states
+   like `not-found` are acceptable — they describe a state, not an action.
+   Avoid: abbreviations (`req`, `res`), generic names (`error`, `data`, `info`).
 
 ### Complete Migration Map (66 Call Sites)
 
@@ -836,8 +838,8 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 |------|-----|-----|
 | 22 | `log.error("reaction failed", { error: String(err) })` | `scoped.error("reaction.fail", { trigger: describeTrigger(trigger), planId: plan.planId }, err)` |
 | 25 | `log.error("reaction failed (sync)", { error: String(err) })` | `scoped.error("reaction.fail", { trigger: describeTrigger(trigger), planId: plan.planId }, err)` |
-| 49 | `log.debug("document-event: listening", { event })` | `t.debug("trigger.wired", { kind: "document-event", event: trigger.event })` |
-| 64 | `log.debug("component-event", { component, event, channel })` | `t.debug("trigger.wired", { kind: "component-event", component: trigger.component, event: trigger.event, channel })` |
+| 49 | `log.debug("document-event: listening", { event })` | `t.debug("trigger.wire", { kind: "document-event", event: trigger.event })` |
+| 64 | `log.debug("component-event", { component, event, channel })` | `t.debug("trigger.wire", { kind: "component-event", component: trigger.component, event: trigger.event, channel })` |
 
 #### execution/execute.ts (6 sites)
 
@@ -895,7 +897,7 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 | 80 | `log.warn("reconnecting", { hubUrl, error })` | `t.warn("signalr.reconnect", { hubUrl }, err ?? undefined)` |
 | 84 | `log.info("reconnected", { hubUrl, connectionId })` | `t.info("signalr.connection.restore", { hubUrl, connectionId })` |
 | 90 | `log.debug("stopped", { hubUrl })` | `t.debug("signalr.connection.stop", { hubUrl })` |
-| 93 | `log.warn("disconnected", { hubUrl, error })` | `t.warn("signalr.connection.lost", { hubUrl }, err ?? undefined)` |
+| 93 | `log.warn("disconnected", { hubUrl, error })` | `t.warn("signalr.connection.drop", { hubUrl }, err ?? undefined)` |
 | 131 | `log.debug("method", { hubUrl, method })` | `t.debug("signalr.method", { hubUrl: trigger.hubUrl, method: trigger.method })` |
 | 134 | `result.catch(err => log.error("reaction failed", ...))` | `result.catch(err => scoped.error("signalr.reaction.fail", { hubUrl: trigger.hubUrl, method: trigger.method }, err))` |
 | 138 | `log.debug("listening", { hubUrl, method })` | `t.debug("signalr.listen", { hubUrl: trigger.hubUrl, method: trigger.method })` |
@@ -919,7 +921,7 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 
 | Line | Old | New |
 |------|-----|-----|
-| 39 | `log.warn("ConfirmCondition in sync context — denying")` | `t.warn("condition.confirm.sync-denied", {})` |
+| 39 | `log.warn("ConfirmCondition in sync context — denying")` | `t.warn("condition.confirm.sync-deny", {})` |
 | 102 | `log.trace("eval", { op, left, right })` | `t.trace("condition.eval", { op: cond.op, left: shapedLeft, right: shapedRight })` |
 | 151 | `log.warn("invalid condition regex", { operand })` | `t.warn("condition.regex.invalid", { operand: shapedRight })` |
 
