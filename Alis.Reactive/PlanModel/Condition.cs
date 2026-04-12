@@ -42,20 +42,20 @@ namespace Alis.Reactive.PlanModel
         public ValueProducer Left { get; }
         /// <summary>Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, empty, contains, startsWith, endsWith).</summary>
         public string Op { get; }
-        /// <summary>Gets the right-hand operand, or <see langword="null"/> for unary operators.</summary>
+        /// <summary>Gets the right-hand operand. <see cref="ValueProducer.None"/> for unary operators.</summary>
         public ValueProducer Right { get; }
-        /// <summary>Gets the expected type shape for comparison, or <see langword="null"/> when inferred.</summary>
+        /// <summary>Gets the expected type shape for comparison. <see cref="PlanModel.Shape.None"/> when not specified.</summary>
         public Shape Shape { get; }
-        /// <summary>Gets the element type shape used by collection operators such as <c>contains</c>, or <see langword="null"/> for non-collection comparisons.</summary>
+        /// <summary>Gets the element type shape used by collection operators such as <c>contains</c>. <see cref="PlanModel.Shape.None"/> for non-collection comparisons.</summary>
         public Shape ItemShape { get; }
 
-        internal CompareCondition(ValueProducer left, string op, ValueProducer right, Shape shape, Shape itemShape)
+        internal CompareCondition(ValueProducer left, string op, ValueProducer right = null, Shape shape = null, Shape itemShape = null)
         {
             Left = left ?? throw new ArgumentNullException(nameof(left));
             Op = op ?? throw new ArgumentNullException(nameof(op));
-            Right = right;
-            Shape = shape == null || shape.IsNone ? null : shape;
-            ItemShape = itemShape == null || itemShape.IsNone ? null : itemShape;
+            Right = right ?? ValueProducer.None;
+            Shape = shape ?? Shape.None;
+            ItemShape = itemShape ?? Shape.None;
         }
     }
 

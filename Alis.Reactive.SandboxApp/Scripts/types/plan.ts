@@ -340,9 +340,9 @@ export interface CompareCondition {
   kind: "compare";
   left: ValueProducer;
   op: CompareOp;
-  right?: ValueProducer;
-  shape?: Shape;
-  itemShape?: Shape;
+  right: ValueProducer;
+  shape: Shape;
+  itemShape: Shape;
 }
 
 export interface AllCondition {

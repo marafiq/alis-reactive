@@ -534,7 +534,7 @@
     },
     "CompareCondition": {
       "type": "object",
-      "required": ["kind", "left", "op"],
+      "required": ["kind", "left", "op", "right", "shape", "itemShape"],
       "properties": {
         "kind": { "const": "compare" },
         "left": { "$ref": "#/$defs/ValueProducer" },

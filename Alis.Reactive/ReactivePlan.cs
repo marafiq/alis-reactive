@@ -297,7 +297,7 @@ namespace Alis.Reactive
             }
             else
             {
-                right = null;
+                right = ValueProducer.None;
             }
 
             return Condition.Compare(left, cmp.Op, right, conditionShape);
