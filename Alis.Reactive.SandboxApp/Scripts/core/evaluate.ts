@@ -30,6 +30,9 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
     case "array":
       return producer.items.map(i => evaluateValue(i, plan, ctx));
 
+    case "none":
+      throw new Error("[alis] NoneProducer must not be evaluated — this is a pipeline bug");
+
     default:
       assertNever(producer, "value producer kind");
   }

@@ -38,6 +38,8 @@ export function evaluateCondition(condition: Condition, plan: Plan, ctx?: ExecCo
     case "confirm":
       log.warn("ConfirmCondition in sync context — denying (callers should use async path)");
       return false;
+    case "none":
+      return true;
     default:
       assertNever(condition, "condition kind");
   }
@@ -65,6 +67,8 @@ export async function evaluateConditionAsync(condition: Condition, plan: Plan, c
       if (!confirmFn) throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
       return confirmFn(condition.message);
     }
+    case "none":
+      return true;
     default:
       assertNever(condition, "condition kind");
   }

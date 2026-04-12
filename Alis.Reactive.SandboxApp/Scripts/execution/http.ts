@@ -45,7 +45,8 @@ function buildFetch(req: Request, gatherResult: GatherResult, plan: Plan, ctx?: 
     for (const [name, producer] of Object.entries(req.headers)) {
       const value = evaluateValue(producer, plan, ctx);
       if (value != null) {
-        const wire = formatForWire(value, producer.shape);
+        const shape = "shape" in producer ? producer.shape : undefined;
+        const wire = formatForWire(value, shape);
         existing[name] = String(wire);
       }
     }

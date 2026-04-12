@@ -455,7 +455,8 @@
         { "$ref": "#/$defs/LiteralProducer" },
         { "$ref": "#/$defs/ReadProducer" },
         { "$ref": "#/$defs/ObjectProducer" },
-        { "$ref": "#/$defs/ArrayProducer" }
+        { "$ref": "#/$defs/ArrayProducer" },
+        { "$ref": "#/$defs/NoneProducer" }
       ]
     },
     "LiteralProducer": {
@@ -513,13 +514,22 @@
         "shape": { "$ref": "#/$defs/Shape" }
       }
     },
+    "NoneProducer": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
     "Condition": {
       "oneOf": [
         { "$ref": "#/$defs/CompareCondition" },
         { "$ref": "#/$defs/AllCondition" },
         { "$ref": "#/$defs/AnyCondition" },
         { "$ref": "#/$defs/NotCondition" },
-        { "$ref": "#/$defs/ConfirmCondition" }
+        { "$ref": "#/$defs/ConfirmCondition" },
+        { "$ref": "#/$defs/NoneCondition" }
       ]
     },
     "CompareCondition": {
@@ -580,6 +590,14 @@
       "properties": {
         "kind": { "const": "confirm" },
         "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "NoneCondition": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
       }
     },
     "Shape": {

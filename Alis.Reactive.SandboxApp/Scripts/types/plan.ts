@@ -272,13 +272,14 @@ export interface ResponseHandler {
   reaction: Reaction;
 }
 
-// ── ValueProducer (discriminated union — 4 kinds) ─────────────
+// ── ValueProducer (discriminated union — 5 kinds) ─────────────
 
 export type ValueProducer =
   | LiteralProducer
   | ReadProducer
   | ObjectProducer
-  | ArrayProducer;
+  | ArrayProducer
+  | NoneProducer;
 
 export interface LiteralProducer {
   kind: "literal";
@@ -307,14 +308,25 @@ export interface ArrayProducer {
   shape?: Shape;
 }
 
-// ── Condition (discriminated union — 5 kinds) ─────────────────
+export interface NoneProducer {
+  kind: "none";
+}
+
+export type EvaluableProducer = Exclude<ValueProducer, NoneProducer>;
+
+export function isEvaluable(p: ValueProducer): p is EvaluableProducer {
+  return p.kind !== "none";
+}
+
+// ── Condition (discriminated union — 6 kinds) ─────────────────
 
 export type Condition =
   | CompareCondition
   | AllCondition
   | AnyCondition
   | NotCondition
-  | ConfirmCondition;
+  | ConfirmCondition
+  | NoneCondition;
 
 export type CompareOp =
   | "eq" | "neq" | "gt" | "gte" | "lt" | "lte"
@@ -351,6 +363,16 @@ export interface NotCondition {
 export interface ConfirmCondition {
   kind: "confirm";
   message: string;
+}
+
+export interface NoneCondition {
+  kind: "none";
+}
+
+export type EvaluableCondition = Exclude<Condition, NoneCondition>;
+
+export function isActiveCondition(c: Condition): c is EvaluableCondition {
+  return c.kind !== "none";
 }
 
 // ── Shape (discriminated union — 9 kinds) ─────────────────────

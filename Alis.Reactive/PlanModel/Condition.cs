@@ -27,6 +27,10 @@ namespace Alis.Reactive.PlanModel
 
         internal static Condition Confirm(string message) =>
             new ConfirmCondition(message);
+
+        internal static readonly Condition None = new NoneCondition();
+
+        internal bool IsNone => this is NoneCondition;
     }
 
     /// <summary>Compares two values using a relational operator.</summary>
@@ -109,5 +113,14 @@ namespace Alis.Reactive.PlanModel
         {
             Message = message ?? throw new ArgumentNullException(nameof(message));
         }
+    }
+
+    /// <summary>Sentinel for "no guard specified." Evaluates to true (no restriction). Not constructed in application code.</summary>
+    public sealed class NoneCondition : Condition
+    {
+        /// <summary>Gets the kind. Always <c>"none"</c>.</summary>
+        public string Kind => "none";
+
+        internal NoneCondition() { }
     }
 }

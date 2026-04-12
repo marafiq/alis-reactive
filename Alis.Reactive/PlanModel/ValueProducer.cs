@@ -37,6 +37,10 @@ namespace Alis.Reactive.PlanModel
         internal static ValueProducer Null() =>
             new LiteralProducer(null, Shape.None);
 
+        internal static readonly ValueProducer None = new NoneProducer();
+
+        internal bool IsNone => this is NoneProducer;
+
         /// <summary>
         /// Creates a literal with any JSON-serializable value.
         /// System.Text.Json handles serialization at Render time.
@@ -148,5 +152,14 @@ namespace Alis.Reactive.PlanModel
             Items = items ?? throw new ArgumentNullException(nameof(items));
             Shape = shape == null || shape.IsNone ? null : shape;
         }
+    }
+
+    /// <summary>Sentinel for "no value specified." Not constructed in application code.</summary>
+    public sealed class NoneProducer : ValueProducer
+    {
+        /// <summary>Gets the kind. Always <c>"none"</c>.</summary>
+        public string Kind => "none";
+
+        internal NoneProducer() { }
     }
 }

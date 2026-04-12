@@ -190,7 +190,8 @@ function gatherExplicitFields(
       gatheredComponents.add(field.value.from.component);
     }
     const raw = evaluateValue(field.value, plan, ctx);
-    emitValue(field.key, raw, field.value.shape, transport);
+    const shape = "shape" in field.value ? field.value.shape : undefined;
+    emitValue(field.key, raw, shape, transport);
   }
   return gatheredComponents;
 }
