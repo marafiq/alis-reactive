@@ -50,7 +50,7 @@ The contract between C# and TS. Soul of the framework.
 - Confirm required fields are truly required.
 - Check whether this change affects TS types (if yes → boundary crossing).
 
-**Harness:** 310 `AssertSchemaValid()` calls. 26 focused tests in `AllPlansConformToSchema.cs`.
+**Harness:** 70 `AssertSchemaValid()` calls across 9 test files (PlanTestBase, FusionTestBase, NativeTestBase).
 
 **Gaps:** No TS-to-schema validation. No reverse validation. Drift detection tool not yet built.
 
@@ -76,8 +76,8 @@ from TS while present in C# and schema for weeks.
 **Before writing code, verify:**
 - Confirm this is the runtime's job, not information the plan should carry.
   Why: Logic in the runtime is invisible to C# unit tests and schema validation.
-- Confirm no vendor knowledge leaks outside `component.ts`.
-  Why: Adding a third vendor must only touch component.ts — leaks force changes across entire runtime.
+- Confirm no vendor knowledge leaks outside `resolver.ts`.
+  Why: Adding a third vendor must only touch resolver.ts — leaks force changes across entire runtime.
 - Confirm no fallbacks. Wrong values propagate silently for hours before surfacing.
   Why: Fail-fast surfaces errors at the source. Fallbacks hide them until they reach the browser.
 - Confirm no DOM scanning. Plan carries IDs; runtime uses getElementById only.
@@ -109,7 +109,7 @@ smoke test catches more than elaborate Playwright infrastructure.
 
 **Skills:** `bdd-testing`, `superpowers:test-driven-development`
 
-**The 5 BDD Rules** (from `feedback_bdd_constitution`):
+**The 5 BDD Rules** (from `bdd-principles.md`):
 1. Test describes BEHAVIOR, not implementation
 2. Test is independently understandable
 3. Test FAILS when behavior breaks

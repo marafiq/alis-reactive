@@ -182,19 +182,19 @@ OPTIONS := .Label("text") [.Required()]
 
 COMPONENT_TYPE :=
   -- Fusion (b is SF builder — chain SF methods then .Reactive())
-  | .AutoComplete(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.REACTIVE])
-  | .DropDownList(b => b [.DataSource(items)] .Fields<T>(t,v [,g]) [.Placeholder("...")] [.REACTIVE])
-  | .MultiSelect(b => b [.DataSource(items)] .Fields<T>(t,v [,g]) [.Placeholder("...")] [.AllowFiltering(true)] [.Mode(VisualMode.Box)] [.REACTIVE])
-  | .MultiColumnComboBox(b => b [.DataSource(items)] .Fields<T>(t,v [,g]) [.REACTIVE])
-  | .DatePicker(b => b [.REACTIVE])
-  | .DateTimePicker(b => b [.REACTIVE])
-  | .DateRangePicker(b => b [.REACTIVE])
-  | .TimePicker(b => b [.REACTIVE])
-  | .NumericTextBox(b => b [.Min(n)] [.Max(n)] [.Step(n)] [.REACTIVE])
-  | .Switch(b => b [.REACTIVE])                                      -- model prop MUST be bool
-  | .InputMask(b => b [.REACTIVE])
-  | .RichTextEditor(b => b [.REACTIVE])
-  | .FileUpload(b => b [.REACTIVE])
+  | .FusionAutoComplete(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.REACTIVE])
+  | .FusionDropDownList(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.REACTIVE])
+  | .FusionMultiSelect(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.AllowFiltering(true)] [.Mode(VisualMode.Box)] [.REACTIVE])
+  | .FusionMultiColumnComboBox(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.REACTIVE])
+  | .FusionDatePicker(b => b [.REACTIVE])
+  | .FusionDateTimePicker(b => b [.REACTIVE])
+  | .FusionDateRangePicker(b => b [.REACTIVE])
+  | .FusionTimePicker(b => b [.REACTIVE])
+  | .FusionNumericTextBox(b => b [.Min(n)] [.Max(n)] [.Step(n)] [.REACTIVE])
+  | .FusionSwitch(b => b [.REACTIVE])                                -- model prop MUST be bool
+  | .FusionInputMask(b => b [.REACTIVE])
+  | .FusionRichTextEditor(b => b [.REACTIVE])
+  | .FusionFileUpload(b => b [.REACTIVE])
 
   -- Native (b is framework builder — chain config then .Reactive())
   | .NativeTextBox(b => b [.Placeholder("...")] [.Type("email")] [.CssClass("...")] [.REACTIVE])
@@ -272,4 +272,84 @@ args is a phantom with no pipeline binding.
 - AllowFiltering(true) required on MultiSelect/DropDownList for Filtering event
 - Switch/NativeCheckBox model property MUST be `bool`
 - DomReady fires AFTER all custom-event listeners wired (two-phase boot)
+- `.Reactive()` stays close to its component — it is the last call inside the build callback
+- `Html.On` is for triggers not tied to a specific component (DomReady, CustomEvent)
+- Every view ends with `@Html.RenderPlan(plan)` — no exceptions
+- When adding a new sandbox view, update the section's `Index.cshtml` to link to it
+
+## Canonical Reference — Verified Patterns from Sandbox Views
+
+These patterns are extracted from 127 real sandbox views. Use exactly these forms.
+
+**Most common: .Reactive() on component (252+ uses)**
+Source: `Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml`
+```csharp
+@{ Html.InputField(plan, m => m.Category, o => o.Label("Category (SF DropDownList)"))
+   .FusionDropDownList(b => b
+       .DataSource(categories)
+       .Reactive(plan, evt => evt.Changed, (args, p) =>
+       {
+           p.Element("change-value").SetText(args, x => x.Value);
+       })); }
+```
+
+**DomReady with HTTP (36 uses)**
+Source: `Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml`
+```csharp
+Html.On(plan, t => t.DomReady(p =>
+    p.Get("/Sandbox/HttpPipeline/Http/Residents")
+     .WhileLoading(l => l.Element("load-spinner").Show())
+     .Response(r => r.OnSuccess<ResidentsResponse>((json, s) =>
+     {
+         s.Element("load-spinner").Hide();
+         s.Element("load-first").SetText(json, x => x.First);
+     }))));
+```
+
+**Button + POST + Validate (34 uses)**
+Source: `Areas/Sandbox/Views/Validation/Contract/Index.cshtml`
+```csharp
+@(Html.NativeButton("submit-btn", "Submit")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post("/Sandbox/Validation/Contract/Submit", g => g.IncludeAll())
+         .Validate<ResidentValidator>("resident-form")
+         .Response(r => r
+            .OnSuccess(s => s.Element("result").SetText("Saved"))
+            .OnError(400, e => e.ValidationErrors("resident-form")));
+    }))
+```
+
+**Conditions with component reads (150+ uses)**
+Source: `Areas/Sandbox/Views/Conditions/CareLevelCascade/Index.cshtml:37-51`
+```csharp
+var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
+
+p.Element("s1-current-level").SetText(careLevel.Value());
+
+p.When(careLevel.Value()).Eq("Memory Care")
+ .Then(then =>
+ {
+     then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Enhanced Monitoring");
+ })
+ .ElseIf(careLevel.Value()).Eq("Skilled Nursing")
+ .Then(then =>
+ {
+     then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Full Clinical");
+ })
+ .Else(else_ =>
+ {
+     else_.Component<FusionDropDownList>(m => m.Protocol).SetValue("");
+ });
+```
+
+**CustomEvent with typed payload (26 uses)**
+Source: `Areas/Sandbox/Views/CoreBehaviors/Payload/Index.cshtml`
+```csharp
+Html.On(plan, t => t.CustomEvent<PayloadShowcaseModel>("payload-test", (payload, p) =>
+{
+    p.Element("int-value").SetText(payload, x => x.IntValue);
+    p.Element("address-street").SetText(payload, x => x.Address!.Street);
+}));
+```
 - One .Reactive() per event — multiple events chain on same builder

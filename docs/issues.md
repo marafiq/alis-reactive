@@ -5,30 +5,30 @@ Issues identified during quality audit. Deferred to post-1.0.
 ## Important
 
 ### 1. ElementBuilder.Show()/Hide() return type inconsistency
-**File:** `Alis.Reactive/Builders/ElementBuilder.cs:124-134`
+**File:** `Alis.Reactive/Builders/ElementBuilder.cs:161,171`
 
-`Show()` and `Hide()` return `PipelineBuilder<TModel>` instead of `ElementBuilder<TModel>`. Breaks fluent chaining:
+`Show()` and `Hide()` return `PipelineBuilder<TModel>` instead of `ElementBuilder<TModel>`,
+which exits the element context and breaks fluent chaining:
 ```csharp
-p.Element("x").Show().AddClass("active")  // Fails — Show() exits element context
+p.Element("x").Show().AddClass("active")  // Fails — Show() returns PipelineBuilder, AddClass is on ElementBuilder
 ```
-**Fix:** Change return type to `ElementBuilder<TModel>`, return `this`.
+**Note:** AddClass, RemoveClass, ToggleClass, SetText(string), and SetHtml(string) also
+return `PipelineBuilder<TModel>`. A design decision is needed on whether all ElementBuilder
+methods should return `ElementBuilder<TModel>` for fluent element-level chaining, or whether
+the current pattern (exit to pipeline after each mutation) is intentional.
 
-### 2. Schema doesn't constrain MutateElementCommand.value
-**File:** `Alis.Reactive/Schemas/reactive-plan.schema.json:344`
+### 2. conditions.ts — silent fall-through when itemShape set on non-array
+**File:** `Alis.Reactive.SandboxApp/Scripts/conditions/conditions.ts:122-127`
 
-`value` field is unconstrained (`{}`). Should be `oneOf: [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]` to match `types.ts` contract (`string | string[]`).
+In the `array-contains` case, when `cond.itemShape` is present but the source resolves to a
+scalar (not an array), the ternary falls through to `items = shapedLeft`. Then
+`Array.isArray(items)` returns `false`, and the entire expression evaluates to `false` silently.
+No error is thrown. Violates Rule 7 (Fail Fast — Fallbacks Are Exceptions) in CLAUDE.md.
 
-## Minor
+### 3. resolver.ts — unknown vendor error missing element ID
+**File:** `Alis.Reactive.SandboxApp/Scripts/resolution/resolver.ts:72`
 
-### 3. conditions.ts — silent undefined when elementShape set on non-array
-**File:** `Scripts/conditions.ts:105-106`
+The `resolveVendorRoot` function's default branch throws `[alis] unknown vendor: "${_}"` but
+does not include `el.id` (available in scope via the `el: HTMLElement` parameter). In a form
+with 20+ components, the error is undiagnosable without the element ID or component key.
 
-When `elementShape` is present but source resolves to scalar, `items` becomes `undefined`. Should throw early with diagnostic message.
-
-### 4. component.ts — error message missing componentId
-**File:** `Scripts/component.ts:16-27`
-
-`unknown vendor` error doesn't include which component failed. Hard to trace in large forms.
-
-### 5. Validation module needs refactor
-Observed during ComponentGather testing — validation behaves differently from what the interactive pattern was designed for. Needs stricter module boundaries. Separate design session required.

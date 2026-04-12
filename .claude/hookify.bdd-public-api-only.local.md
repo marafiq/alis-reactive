@@ -31,4 +31,4 @@ and create fragile tests that break on refactors even when behavior is unchanged
 | Guards (`All/Any/Not`) | `When(source).Eq(value).And(...)` via condition builders |
 
 50 existing violations tracked for gradual migration (9 test files in Native + Fusion).
-Write new tests using the public API. See `memory/feedback_bdd_no_internals.md`.
+Write new tests using the public API. See `memory/bdd-principles.md`.
