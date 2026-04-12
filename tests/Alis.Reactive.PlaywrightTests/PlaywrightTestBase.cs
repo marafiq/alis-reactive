@@ -36,11 +36,14 @@ public abstract class PlaywrightTestBase : PageTest
 
         Page.Console += (_, msg) =>
         {
+            // Strip %c CSS format markers from console.log style arguments so
+            // tests can grep the trace text without worrying about CSS tokens.
+            var text = msg.Text.Replace("%c", "");
             lock (_consoleLock)
             {
-                _consoleMessages.Add($"[{msg.Type}] {msg.Text}");
+                _consoleMessages.Add($"[{msg.Type}] {text}");
                 if (msg.Type == "error")
-                    _consoleErrors.Add(msg.Text);
+                    _consoleErrors.Add(text);
             }
         };
 
