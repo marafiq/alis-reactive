@@ -5,7 +5,7 @@
 
 import type {
   Plan, ContainerScope, ComponentValidation,
-  ValidationRule,
+  ValidationRule, ValueProducer,
 } from "../types";
 import type { ExecContext } from "../types";
 import { resolveElement } from "../resolution/resolver";
@@ -92,23 +92,37 @@ export function showServerErrors(plan: Plan, containerKey: string, data: unknown
   let summaryHasErrors = false;
 
   for (const [name, msgs] of Object.entries(errors)) {
-    const msgResult = toString(msgs);
-    const msg = Array.isArray(msgs) ? msgs.join(", ") : msgResult.ok ? msgResult.value : "";
-
-    const compKey = findComponentKeyByName(containerScope, name);
-    if (compKey) {
-      const comp = plan.components[compKey];
-      if (comp) {
-        showServerErrorInline(containerId, compKey, msg, plan, containerScope);
-      }
-    } else if (summaryEl) {
-      addToSummary(summaryEl, name, msg);
-      summaryHasErrors = true;
-    }
+    const addedToSummary = placeServerError(name, msgs, containerScope, containerId, summaryEl, plan);
+    if (addedToSummary) summaryHasErrors = true;
   }
 
   if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
   log.debug("showServerErrors", { containerId, fieldCount: Object.keys(errors).length });
+}
+
+/** Place a single server error on its component or into the summary. Returns true if any summary errors added. */
+function placeServerError(
+  name: string, msgs: unknown, containerScope: ContainerScope,
+  containerId: string, summaryEl: HTMLElement | null, plan: Plan,
+): boolean {
+  const msgResult = toString(msgs);
+  const msg = Array.isArray(msgs) ? msgs.join(", ") : msgResult.ok ? msgResult.value : "";
+
+  const compKey = findComponentKeyByName(containerScope, name);
+  if (compKey) {
+    const comp = plan.components[compKey];
+    if (comp) {
+      showServerErrorInline(containerId, compKey, msg, plan, containerScope);
+    }
+    // compKey exists but component missing from plan — silently skip (not a summary item)
+    return false;
+  }
+  // No component found by name — route to summary
+  if (summaryEl) {
+    addToSummary(summaryEl, name, msg);
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -162,80 +176,127 @@ function evaluateComponentRules(
   ctx?: ExecContext,
 ): boolean {
   const comp = plan.components[cv.component];
-  if (!comp) {
-    log.trace("component-not-found", { component: cv.component });
-    if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return true;
-    if (cv.rules.length > 0 && summaryEl) {
-      addToSummary(summaryEl, cv.component, cv.rules[0].message);
-    }
-    return false;
-  }
+  if (!comp) return handleMissingComponent(cv, plan, summaryEl, ctx);
 
-  let el: HTMLElement;
-  try {
-    el = resolveElement(plan, cv.component);
-  } catch (e) {
-    if (!isResolutionError(e)) throw e;
-    if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return true;
-    if (cv.rules.length > 0 && summaryEl) {
-      addToSummary(summaryEl, cv.component, cv.rules[0].message);
-    }
-    return false;
-  }
+  const resolved = resolveFieldElement(plan, cv, summaryEl, ctx);
+  if (resolved.done) return resolved.result;
 
-  if (!container.contains(el)) {
+  if (!container.contains(resolved.el)) {
     log.trace("field outside form, skipping", { component: cv.component, containerId });
     return true;
   }
 
-  // Error spans are generated HTML elements ({componentDomId}_error), NOT plan components.
-  // They are created by Html.Field() in C# and follow a predictable ID convention.
-  // getElementById is correct here — error spans are not registered in plan.components.
-  const errorSpan = document.getElementById(comp.id + "_error");
-  const hidden = errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
+  const hidden = isErrorSpanHidden(comp.id);
+  const value = readValueSafe(cv.value, plan);
 
-  // Read value via the shared evaluateValue — same concept as pipeline and gather.
-  // Component may not be resolved yet (partial not merged) — suppress resolution errors only.
-  let value: unknown;
-  try {
-    value = evaluateValue(cv.value, plan);
-  } catch (e) {
-    if (isResolutionError(e)) { value = undefined; }
-    else throw e;
+  return evaluateRulesForField(cv, plan, containerId, comp.id, value, hidden, summaryEl, ctx);
+}
+
+/** When the component is not found in the plan, check if all rules are conditionally skipped. */
+function handleMissingComponent(
+  cv: ComponentValidation, plan: Plan, summaryEl: HTMLElement | null, ctx?: ExecContext,
+): boolean {
+  log.trace("component-not-found", { component: cv.component });
+  if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return true;
+  if (cv.rules.length > 0 && summaryEl) {
+    addToSummary(summaryEl, cv.component, cv.rules[0].message);
   }
+  return false;
+}
 
+type FieldResolution = { done: false; el: HTMLElement } | { done: true; result: boolean };
+
+/** Resolve the field element. On resolution error, returns early result (true if all skipped, false otherwise). */
+function resolveFieldElement(
+  plan: Plan, cv: ComponentValidation, summaryEl: HTMLElement | null, ctx?: ExecContext,
+): FieldResolution {
+  try {
+    return { done: false, el: resolveElement(plan, cv.component) };
+  } catch (e) {
+    if (!isResolutionError(e)) throw e;
+    if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return { done: true, result: true };
+    if (cv.rules.length > 0 && summaryEl) {
+      addToSummary(summaryEl, cv.component, cv.rules[0].message);
+    }
+    return { done: true, result: false };
+  }
+}
+
+/**
+ * Error spans are generated HTML elements ({componentDomId}_error), NOT plan components.
+ * They are created by Html.Field() in C# and follow a predictable ID convention.
+ * getElementById is correct here — error spans are not registered in plan.components.
+ */
+function isErrorSpanHidden(compId: string): boolean {
+  const errorSpan = document.getElementById(compId + "_error");
+  return errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
+}
+
+/**
+ * Read value via the shared evaluateValue — same concept as pipeline and gather.
+ * Component may not be resolved yet (partial not merged) — suppress resolution errors only.
+ */
+function readValueSafe(valueProducer: ValueProducer, plan: Plan): unknown {
+  try {
+    return evaluateValue(valueProducer, plan);
+  } catch (e) {
+    if (isResolutionError(e)) return undefined;
+    throw e;
+  }
+}
+
+/** Evaluate each rule against the field value. Returns false on first failure. */
+function evaluateRulesForField(
+  cv: ComponentValidation, plan: Plan, containerId: string, compId: string,
+  value: unknown, hidden: boolean, summaryEl: HTMLElement | null, ctx?: ExecContext,
+): boolean {
   for (const rule of cv.rules) {
-    // Condition may reference components not yet merged — skip rule if unresolvable
-    if (rule.when) {
-      try {
-        const condResult = evaluateCondition(rule.when, plan, ctx);
-        if (!condResult) continue;
-      } catch (e) {
-        if (isResolutionError(e)) continue;
-        throw e;
-      }
-    }
+    if (!isRuleActive(rule, plan, ctx)) continue;
 
-    // Pre-resolve otherValue if present — keeps rule-engine pure (no DOM)
-    let otherValue: unknown;
-    if (rule.otherValue) {
-      try { otherValue = evaluateValue(rule.otherValue, plan); }
-      catch (e) { if (isResolutionError(e)) otherValue = undefined; else throw e; }
-    }
+    const otherValue = resolveOtherValue(rule, plan);
 
     if (ruleFails(rule, value, otherValue)) {
-      log.trace("rule-fail", { component: cv.component, rule: rule.name, value, message: rule.message });
-      if (hidden) {
-        if (summaryEl) addToSummary(summaryEl, cv.component, rule.message);
-      } else {
-        showInline(containerId, comp.id, rule.message);
-        if (summaryEl) removeSummaryEntry(summaryEl, cv.component);
-      }
+      reportRuleFailure(cv.component, rule, value, containerId, compId, hidden, summaryEl);
       return false;
     }
   }
-
   return true;
+}
+
+/** Check if a rule's condition is met. Returns false if condition skips this rule. */
+function isRuleActive(rule: ValidationRule, plan: Plan, ctx?: ExecContext): boolean {
+  if (!rule.when) return true;
+  try {
+    return evaluateCondition(rule.when, plan, ctx);
+  } catch (e) {
+    if (isResolutionError(e)) return false;
+    throw e;
+  }
+}
+
+/** Pre-resolve otherValue if present — keeps rule-engine pure (no DOM). */
+function resolveOtherValue(rule: ValidationRule, plan: Plan): unknown {
+  if (!rule.otherValue) return undefined;
+  try {
+    return evaluateValue(rule.otherValue, plan);
+  } catch (e) {
+    if (isResolutionError(e)) return undefined;
+    throw e;
+  }
+}
+
+/** Show the error inline or in the summary depending on visibility. */
+function reportRuleFailure(
+  component: string, rule: ValidationRule, value: unknown,
+  containerId: string, compId: string, hidden: boolean, summaryEl: HTMLElement | null,
+): void {
+  log.trace("rule-fail", { component, rule: rule.name, value, message: rule.message });
+  if (hidden) {
+    if (summaryEl) addToSummary(summaryEl, component, rule.message);
+  } else {
+    showInline(containerId, compId, rule.message);
+    if (summaryEl) removeSummaryEntry(summaryEl, component);
+  }
 }
 
 /** Only suppress errors from component/element resolution — not contract bugs. */
@@ -246,7 +307,6 @@ function isResolutionError(e: unknown): boolean {
 }
 
 // -- Helpers --
-
 
 function allRulesConditionallySkipped(rules: ValidationRule[], plan: Plan, ctx?: ExecContext): boolean {
   if (rules.length === 0) return true;

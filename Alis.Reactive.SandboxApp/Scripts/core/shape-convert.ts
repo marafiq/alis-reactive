@@ -24,21 +24,34 @@ export function applyShape(value: unknown, shape?: Shape): unknown {
   if (!shape) return value;
 
   switch (shape.kind) {
-    case "string":   { const r = toString(value); return r.ok ? r.value : value; }
-    case "number":   { const r = toNumber(value); return r.ok ? r.value : value; }
-    case "boolean":  { const r = toBoolean(value); return r.ok ? r.value : value; }
-    case "date":     { const r = toDate(value); return r.ok ? r.value : value; }
-    case "array":    { const r = toArray(value); if (!r.ok) return value; return shape.item ? r.value.map(v => applyShape(v, shape.item)) : r.value; }
+    case "string":   return applyScalar(value, toString);
+    case "number":   return applyScalar(value, toNumber);
+    case "boolean":  return applyScalar(value, toBoolean);
+    case "date":     return applyScalar(value, toDate);
+    case "array":    return applyArrayShape(value, shape);
     case "nullable": return value == null ? null : applyShape(value, shape.inner);
-    case "raw":      return value;
-    case "any":      return value;
-    case "object":   return value;
+    case "raw":
+    case "any":
+    case "object":
     case "none":     return value;
     default: {
       const _: never = shape;
       throw new Error(`[alis] unknown shape kind: "${(_ as Shape).kind}"`);
     }
   }
+}
+
+/** Apply a scalar conversion, returning original value on failure. */
+function applyScalar<T>(value: unknown, convert: (v: unknown) => ConvertResult<T>): unknown {
+  const r = convert(value);
+  return r.ok ? r.value : value;
+}
+
+/** Apply array shape — convert to array, then recursively apply item shape. */
+function applyArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }>): unknown {
+  const r = toArray(value);
+  if (!r.ok) return value;
+  return shape.item ? r.value.map(v => applyShape(v, shape.item)) : r.value;
 }
 
 /**
@@ -50,21 +63,24 @@ export function convertByShape(value: unknown, shape: Shape): ConvertResult<unkn
     case "number":   return toNumber(value);
     case "boolean":  return toBoolean(value);
     case "date":     return toDate(value);
-    case "array": {
-      const r = toArray(value);
-      if (!r.ok) return r;
-      return shape.item ? ok(r.value.map(v => applyShape(v, shape.item))) : r;
-    }
+    case "array":    return convertArrayShape(value, shape);
     case "nullable": return value == null ? ok(null) : convertByShape(value, shape.inner);
-    case "raw":      return ok(value);
-    case "any":      return ok(value);
-    case "object":   return ok(value);
+    case "raw":
+    case "any":
+    case "object":
     case "none":     return ok(value);
     default: {
       const _: never = shape;
       throw new Error(`[alis] unknown shape kind: "${(_ as Shape).kind}"`);
     }
   }
+}
+
+/** Convert array shape — convert to array, then recursively apply item shape. */
+function convertArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }>): ConvertResult<unknown> {
+  const r = toArray(value);
+  if (!r.ok) return r;
+  return shape.item ? ok(r.value.map(v => applyShape(v, shape.item))) : r;
 }
 
 // ── Conversion functions ──────────────────────────────────

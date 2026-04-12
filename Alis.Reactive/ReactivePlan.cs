@@ -14,19 +14,6 @@ namespace Alis.Reactive
     /// </summary>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
-        private static readonly JsonSerializerOptions CompactOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        private static readonly JsonSerializerOptions FormattedOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            WriteIndented = true
-        };
-
         private readonly Dictionary<string, ComponentRegistration> _componentsMap =
             new Dictionary<string, ComponentRegistration>();
 
@@ -80,14 +67,14 @@ namespace Alis.Reactive
         public string Render()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(_context.Plan, CompactOptions);
+            return ReactivePlanSerializer.Serialize(_context.Plan);
         }
 
         /// <summary>Registers all components and resolves validation, then serializes the plan as indented JSON for debugging.</summary>
         public string RenderFormatted()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(_context.Plan, FormattedOptions);
+            return ReactivePlanSerializer.SerializeFormatted(_context.Plan);
         }
 
         private void ResolveAll()
@@ -131,24 +118,30 @@ namespace Alis.Reactive
         /// </summary>
         private void WalkRequestReactions(Request request)
         {
-            if (request.Before != null)
-                foreach (var r in request.Before) CollectValidationFromReaction(r);
-
-            if (request.Success != null)
-                foreach (var h in request.Success)
-                    if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
-
-            if (request.Error != null)
-                foreach (var h in request.Error)
-                    if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
-
-            if (request.Complete != null)
-                foreach (var r in request.Complete) CollectValidationFromReaction(r);
+            CollectValidationFromReactions(request.Before);
+            CollectValidationFromResponseHandlers(request.Success);
+            CollectValidationFromResponseHandlers(request.Error);
+            CollectValidationFromReactions(request.Complete);
 
             if (request.Next != null)
             {
                 ResolveRequestValidation(request.Next);
                 WalkRequestReactions(request.Next);
+            }
+        }
+
+        private void CollectValidationFromReactions(List<Reaction>? reactions)
+        {
+            if (reactions == null) return;
+            foreach (var r in reactions) CollectValidationFromReaction(r);
+        }
+
+        private void CollectValidationFromResponseHandlers(List<ResponseHandler>? handlers)
+        {
+            if (handlers == null) return;
+            foreach (var h in handlers)
+            {
+                if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
             }
         }
 
@@ -168,16 +161,13 @@ namespace Alis.Reactive
                     $"Request at '{request.Url}' specifies ValidatorType '{request.ValidatorType.Name}' " +
                     "but no Container (formId) is set. Call .Validate<T>(formId) to specify the form.");
 
-            var fields = extractor.ExtractRules(request.ValidatorType, container);
+            var extractedFields = extractor.ExtractRules(request.ValidatorType, container);
 
-            // Enrich each field with component registration info.
-            // Components may be in this plan's _componentsMap, or in a partial plan's map
-            // (partials merge in the browser). For fields not found locally, generate the
-            // expected component ID using the same IdGenerator convention all components use.
             var componentValidations = new List<ComponentValidation>();
-            foreach (var field in fields)
+            foreach (var field in extractedFields)
             {
-                if (_componentsMap.TryGetValue(field.FieldName, out var reg))
+                var isLocallyRegistered = _componentsMap.TryGetValue(field.FieldName, out var reg);
+                if (isLocallyRegistered)
                 {
                     field.FieldId = reg.ComponentId;
                     field.Shape = reg.Shape;
@@ -187,29 +177,23 @@ namespace Alis.Reactive
                     field.FieldId = IdGenerator.For(typeof(TModel), field.FieldName);
                 }
 
-                // Every input component registers "value" as a readable property via CreateEnrichedType.
-                // For components where valueMember differs (e.g. "checked"), "value" is an alias
-                // pointing to the same path with the same shape. Always safe to use.
-                var fieldValueMember = "value";
-                var fieldShape = field.Shape;
+                var canonicalValueMember = "value";
                 var fieldValue = ValueProducer.Read(
-                    ComponentSource.Of(field.FieldId), fieldValueMember, shape: fieldShape);
+                    ComponentSource.Of(field.FieldId), canonicalValueMember, shape: field.Shape);
 
                 var planRules = field.Rules.Select(r => ToPlanValidationRule(r, field)).ToList();
                 componentValidations.Add(new ComponentValidation(
                     field.FieldId, fieldValue, planRules, field.FieldName));
             }
 
-            // Attach to the container component's ContainerScope.
-            // Merge — multiple requests can target the same container (e.g., save + submit).
-            if (_context.Plan.MutableComponents.TryGetValue(container, out var comp))
+            var containerAlreadyExists = _context.Plan.MutableComponents.TryGetValue(container, out var comp);
+            if (containerAlreadyExists)
             {
                 comp.Container ??= ContainerScope.Of();
                 MergeValidationRules(comp.Container, componentValidations);
             }
             else
             {
-                // Create a container component for the form
                 _context.EnsureElement(container);
                 var formComp = _context.Plan.MutableComponents[container];
                 formComp.Container = ContainerScope.Of();
@@ -318,5 +302,24 @@ namespace Alis.Reactive
 
             return Condition.Compare(left, cmp.Op, right, conditionShape);
         }
+    }
+
+    internal static class ReactivePlanSerializer
+    {
+        private static readonly JsonSerializerOptions Compact = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+
+        private static readonly JsonSerializerOptions Formatted = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = true
+        };
+
+        internal static string Serialize(Plan plan) => JsonSerializer.Serialize(plan, Compact);
+        internal static string SerializeFormatted(Plan plan) => JsonSerializer.Serialize(plan, Formatted);
     }
 }

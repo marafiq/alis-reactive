@@ -135,68 +135,98 @@ export function resolveGather(
   if (!input) return { urlParams, body };
 
   if (input.kind === "value") {
-    // ValueInput — evaluate the value producer directly
-    const value = evaluateValue(input.value, plan, ctx);
-    const formData = input.transport === "form-data" ? new FormData() : null;
-    const transport = selectTransport(input.transport, method, urlParams, formData, body);
-
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
-        emitValue(key, val, undefined, transport);
-      }
-    } else {
-      emitValue("value", value, undefined, transport);
-    }
-
-    return { urlParams, body: formData ?? body };
+    return resolveValueInput(input, method, urlParams, body, plan, ctx);
   }
 
-  // GatherInput — each field carries a ValueProducer
-  const gatherInput = input as GatherInput;
+  return resolveGatherInput(input as GatherInput, method, urlParams, body, plan, ctx);
+}
+
+/** ValueInput — evaluate the value producer directly and emit as object fields or single value. */
+function resolveValueInput(
+  input: Extract<RequestInput, { kind: "value" }>,
+  method: string, urlParams: string[], body: Record<string, unknown>,
+  plan: Plan, ctx?: ExecContext,
+): GatherResult {
+  const value = evaluateValue(input.value, plan, ctx);
+  const formData = input.transport === "form-data" ? new FormData() : null;
+  const transport = selectTransport(input.transport, method, urlParams, formData, body);
+
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+      emitValue(key, val, undefined, transport);
+    }
+  } else {
+    emitValue("value", value, undefined, transport);
+  }
+
+  return { urlParams, body: formData ?? body };
+}
+
+/** GatherInput — each field carries a ValueProducer. Handles components, statics, and includeAll. */
+function resolveGatherInput(
+  gatherInput: GatherInput, method: string, urlParams: string[], body: Record<string, unknown>,
+  plan: Plan, ctx?: ExecContext,
+): GatherResult {
   const formData = gatherInput.transport === "form-data" ? new FormData() : null;
   const transport = selectTransport(gatherInput.transport, method, urlParams, formData, body);
 
-  // Gather explicit component fields — each carries a ValueProducer with shape
+  const gatheredComponents = gatherExplicitFields(gatherInput, transport, plan, ctx);
+  emitStaticValues(gatherInput, transport, plan, ctx);
+
+  if (gatherInput.includeAll) {
+    gatherDynamicComponents(plan, gatheredComponents, transport);
+  }
+
+  return { urlParams, body: formData ?? body };
+}
+
+/** Gather explicit component fields — each carries a ValueProducer with shape. Returns tracked component keys. */
+function gatherExplicitFields(
+  gatherInput: GatherInput, transport: TransportStrategy, plan: Plan, ctx?: ExecContext,
+): Set<string> {
   const gatheredComponents = new Set<string>();
   for (const field of gatherInput.components) {
-    // Track component for includeAll dedup
     if (field.value.kind === "read" && field.value.from.kind === "component") {
       gatheredComponents.add(field.value.from.component);
     }
     const raw = evaluateValue(field.value, plan, ctx);
     emitValue(field.key, raw, field.value.shape, transport);
   }
+  return gatheredComponents;
+}
 
-  // Emit static/event values merged alongside component fields
-  if (gatherInput.statics) {
-    const staticValues = evaluateValue(gatherInput.statics, plan, ctx);
-    if (typeof staticValues === "object" && staticValues !== null && !Array.isArray(staticValues)) {
-      for (const [key, val] of Object.entries(staticValues as Record<string, unknown>)) {
-        emitValue(key, val, undefined, transport);
-      }
-    }
+/** Emit static/event values merged alongside component fields. */
+function emitStaticValues(
+  gatherInput: GatherInput, transport: TransportStrategy, plan: Plan, ctx?: ExecContext,
+): void {
+  if (!gatherInput.statics) return;
+  const staticValues = evaluateValue(gatherInput.statics, plan, ctx);
+  if (typeof staticValues !== "object" || staticValues === null || Array.isArray(staticValues)) return;
+  for (const [key, val] of Object.entries(staticValues as Record<string, unknown>)) {
+    emitValue(key, val, undefined, transport);
   }
+}
 
-  // IncludeAll: gather dynamically-merged components from partial plan injection.
-  // The C# builder expands all KNOWN components at build time. This loop catches
-  // components added AFTER build time via partial plan merge.
-  if (gatherInput.includeAll) {
-    for (const [compKey, comp] of Object.entries(plan.components)) {
-      if (gatheredComponents.has(compKey)) continue;
-      if (!comp.valueMember) continue;
-      if (!document.getElementById(comp.id)) continue;
-      if (!comp.bindingPath) continue;
-      const jsType = plan.types[comp.type];
-      const prop = jsType?.properties?.[comp.valueMember];
-      if (!prop) continue;
-      const root = resolveComponent(plan, compKey);
-      const raw = readProperty(root, prop);
-      const value = applyShape(raw, prop.shape);
-      emitValue(comp.bindingPath, value, prop.shape, transport);
-    }
+/**
+ * IncludeAll: gather dynamically-merged components from partial plan injection.
+ * The C# builder expands all KNOWN components at build time. This loop catches
+ * components added AFTER build time via partial plan merge.
+ */
+function gatherDynamicComponents(
+  plan: Plan, gatheredComponents: Set<string>, transport: TransportStrategy,
+): void {
+  for (const [compKey, comp] of Object.entries(plan.components)) {
+    if (gatheredComponents.has(compKey)) continue;
+    if (!comp.valueMember || !comp.bindingPath) continue;
+    if (!document.getElementById(comp.id)) continue;
+    const jsType = plan.types[comp.type];
+    const prop = jsType?.properties?.[comp.valueMember];
+    if (!prop) continue;
+    const root = resolveComponent(plan, compKey);
+    const raw = readProperty(root, prop);
+    const value = applyShape(raw, prop.shape);
+    emitValue(comp.bindingPath, value, prop.shape, transport);
   }
-
-  return { urlParams, body: formData ?? body };
 }
 
 function setNested(obj: Record<string, unknown>, key: string, value: unknown): void {

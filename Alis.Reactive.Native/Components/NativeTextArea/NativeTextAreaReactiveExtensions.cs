@@ -20,8 +20,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeTextAreaReactiveExtensions
     {
-        private static readonly NativeTextArea _component = new NativeTextArea();
-
         /// <summary>
         /// Wires a <see cref="NativeTextArea"/> browser event into a reactive pipeline.
         /// </summary>

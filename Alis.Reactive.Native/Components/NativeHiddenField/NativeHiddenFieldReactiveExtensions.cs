@@ -11,8 +11,6 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeHiddenFieldReactiveExtensions
     {
-        private static readonly NativeHiddenField _component = new NativeHiddenField();
-
         public static NativeHiddenFieldBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeHiddenFieldBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,

@@ -13,12 +13,10 @@ namespace Alis.Reactive.Builders
     /// <typeparam name="TModel">The view model type.</typeparam>
     public sealed class TriggerBuilder<TModel> where TModel : class
     {
-        private readonly ReactivePlan<TModel> _plan;
         private readonly PlanBuildContext _context;
 
         internal TriggerBuilder(ReactivePlan<TModel> plan, PlanBuildContext context)
         {
-            _plan = plan;
             _context = context;
         }
 

@@ -75,7 +75,8 @@ namespace Alis.Reactive.Builders.Requests
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
             var reaction = pb.BuildReaction();
-            if (!(reaction is SequenceReaction))
+            var isPlainSequence = reaction is SequenceReaction;
+            if (!isPlainSequence)
                 throw new InvalidOperationException(
                     "WhileLoading only supports plain commands (sequential). " +
                     "Conditions, HTTP, and parallel pipelines are not valid here.");
@@ -111,105 +112,137 @@ namespace Alis.Reactive.Builders.Requests
             var request = new Request(_verb, _url);
 
             if (_gatherBuilder != null)
-            {
-                // Expand IncludeAll: add a GatherField for every registered input component
-                // with explicit bindingPath and shape — the plan carries all information.
-                if (_gatherBuilder.IsIncludeAll)
-                {
-                    var registered = _context.GetRegisteredComponents();
-                    foreach (var kvp in registered)
-                    {
-                        var reg = kvp.Value;
-                        if (!_gatherBuilder.Fields.Exists(f => f.Key == kvp.Key))
-                        {
-                            var value = ValueProducer.Read(
-                                ComponentSource.Of(reg.ComponentId), reg.ValueMember, shape: reg.Shape);
-                            _gatherBuilder.AddField(GatherField.Of(kvp.Key, value));
-                        }
-                    }
-                }
-
-                // Build request input from gather fields + static fields + event fields.
-                // When both component and static/event fields exist, merge statics into
-                // a ValueInput object that the runtime emits alongside gathered components.
-                if (_gatherBuilder.Fields.Count > 0)
-                {
-                    ValueProducer statics = null;
-                    if (_gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0)
-                    {
-                        var fields = new Dictionary<string, ValueProducer>();
-                        foreach (var sf in _gatherBuilder.StaticFields)
-                            fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.FromClrType(sf.Value?.GetType()));
-                        foreach (var ef in _gatherBuilder.EventFields)
-                            fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
-                        statics = ValueProducer.Object(fields);
-                    }
-                    var gatherInput = new GatherInput(_gatherBuilder.Fields, _transport, statics);
-                    if (_gatherBuilder.IsIncludeAll) gatherInput.IncludeAll = true;
-                    request.Input = gatherInput;
-                }
-
-                // Static and event fields become a ValueInput when no component fields
-                if (request.Input == null && (_gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0))
-                {
-                    var fields = new Dictionary<string, ValueProducer>();
-                    foreach (var sf in _gatherBuilder.StaticFields)
-                        fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.FromClrType(sf.Value?.GetType()));
-                    foreach (var ef in _gatherBuilder.EventFields)
-                        fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
-                    request.Input = new ValueInput(ValueProducer.Object(fields), _transport);
-                }
-            }
+                ResolveRequestPayload(request);
 
             if (_container != null)
                 request.Container = _container;
 
-            if (_whileLoading != null && _whileLoading.Count > 0)
+            var hasWhileLoadingCommands = _whileLoading != null && _whileLoading.Count > 0;
+            if (hasWhileLoadingCommands)
                 request.Before = _whileLoading;
 
             if (_response != null)
-            {
-                if (_response.SuccessHandlers.Count > 0)
-                    request.Success = _response.SuccessHandlers;
-                if (_response.ErrorHandlers.Count > 0)
-                    request.Error = _response.ErrorHandlers;
-                if (_response.ChainedRequest != null)
-                    request.Next = _response.ChainedRequest;
-            }
+                AttachResponseLifecycle(request);
 
             if (_validatorType != null)
                 request.ValidatorType = _validatorType;
 
-            if (_gatherBuilder != null && _gatherBuilder.HeaderFields.Count > 0)
+            var hasHeaders = _gatherBuilder != null && _gatherBuilder.HeaderFields.Count > 0;
+            if (hasHeaders)
                 request.Headers = new Dictionary<string, ValueProducer>(_gatherBuilder.HeaderFields);
 
-            if (_gatherBuilder != null && _gatherBuilder.RouteParamFields.Count > 0)
-            {
-                var placeholderRe = new System.Text.RegularExpressions.Regex(@"\{(\w+)\}");
-
-                // Forward: every RouteParam must match a URL placeholder
-                foreach (var paramName in _gatherBuilder.RouteParamFields.Keys)
-                {
-                    if (!_url.Contains("{" + paramName + "}"))
-                        throw new InvalidOperationException(
-                            $"Route param '{paramName}' does not match any placeholder in URL '{_url}'. " +
-                            $"Expected '{{{paramName}}}' in the URL template.");
-                }
-
-                // Reverse: every URL placeholder must have a matching RouteParam
-                foreach (System.Text.RegularExpressions.Match match in placeholderRe.Matches(_url))
-                {
-                    var placeholder = match.Groups[1].Value;
-                    if (!_gatherBuilder.RouteParamFields.ContainsKey(placeholder))
-                        throw new InvalidOperationException(
-                            $"URL template '{_url}' has placeholder '{{{placeholder}}}' " +
-                            $"but no matching .RouteParam(\"{placeholder}\", ...) was provided.");
-                }
-
-                request.RouteParams = new Dictionary<string, ValueProducer>(_gatherBuilder.RouteParamFields);
-            }
+            var hasRouteParams = _gatherBuilder != null && _gatherBuilder.RouteParamFields.Count > 0;
+            if (hasRouteParams)
+                ValidateRouteParamAlignment(request);
 
             return request;
+        }
+
+        /// <summary>
+        /// Resolves the request payload from gathered component fields, static values,
+        /// and event-sourced values. IncludeAll expands to every registered input component.
+        /// </summary>
+        private void ResolveRequestPayload(Request request)
+        {
+            if (_gatherBuilder.IsIncludeAll)
+                ExpandIncludeAllComponents();
+
+            var hasComponentFields = _gatherBuilder.Fields.Count > 0;
+            if (hasComponentFields)
+            {
+                var statics = BuildStaticAndEventFields();
+                var gatherInput = new GatherInput(_gatherBuilder.Fields, _transport, statics);
+                if (_gatherBuilder.IsIncludeAll) gatherInput.IncludeAll = true;
+                request.Input = gatherInput;
+                return;
+            }
+
+            var hasStaticOrEventFieldsOnly = _gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0;
+            if (hasStaticOrEventFieldsOnly)
+                request.Input = new ValueInput(BuildStaticAndEventFields(), _transport);
+        }
+
+        /// <summary>
+        /// Adds a GatherField for every registered input component that isn't already
+        /// explicitly included. Each field carries its binding path and shape from the
+        /// component registration — the plan carries all information.
+        /// </summary>
+        private void ExpandIncludeAllComponents()
+        {
+            var registered = _context.GetRegisteredComponents();
+            foreach (var kvp in registered)
+            {
+                var alreadyIncluded = _gatherBuilder.Fields.Exists(f => f.Key == kvp.Key);
+                if (alreadyIncluded)
+                    continue;
+
+                var reg = kvp.Value;
+                var componentValue = ValueProducer.Read(
+                    ComponentSource.Of(reg.ComponentId), reg.ValueMember, shape: reg.Shape);
+                _gatherBuilder.AddField(GatherField.Of(kvp.Key, componentValue));
+            }
+        }
+
+        /// <summary>
+        /// Builds a single ValueProducer.Object from static literal values and event-sourced
+        /// values. Static fields use LiteralRaw with shape inference; event fields read from
+        /// the trigger payload. Returns null when neither source has fields.
+        /// </summary>
+        private ValueProducer BuildStaticAndEventFields()
+        {
+            var hasNoFields = _gatherBuilder.StaticFields.Count == 0 && _gatherBuilder.EventFields.Count == 0;
+            if (hasNoFields) return null;
+
+            var fields = new Dictionary<string, ValueProducer>();
+            foreach (var sf in _gatherBuilder.StaticFields)
+                fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.FromClrType(sf.Value?.GetType()));
+            foreach (var ef in _gatherBuilder.EventFields)
+                fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
+            return ValueProducer.Object(fields);
+        }
+
+        /// <summary>
+        /// Wires success handlers, error handlers, and chained request onto the request.
+        /// Each is independently optional — a request may have success without error, or
+        /// a chained next without any handlers.
+        /// </summary>
+        private void AttachResponseLifecycle(Request request)
+        {
+            if (_response.SuccessHandlers.Count > 0)
+                request.Success = _response.SuccessHandlers;
+            if (_response.ErrorHandlers.Count > 0)
+                request.Error = _response.ErrorHandlers;
+            if (_response.ChainedRequest != null)
+                request.Next = _response.ChainedRequest;
+        }
+
+        /// <summary>
+        /// Validates bidirectional alignment between URL template placeholders and RouteParam
+        /// declarations. Every RouteParam must match a {placeholder} in the URL, and every
+        /// {placeholder} in the URL must have a corresponding RouteParam.
+        /// </summary>
+        private void ValidateRouteParamAlignment(Request request)
+        {
+            var placeholderRe = new System.Text.RegularExpressions.Regex(@"\{(\w+)\}");
+
+            foreach (var paramName in _gatherBuilder.RouteParamFields.Keys)
+            {
+                if (!_url.Contains("{" + paramName + "}"))
+                    throw new InvalidOperationException(
+                        $"Route param '{paramName}' does not match any placeholder in URL '{_url}'. " +
+                        $"Expected '{{{paramName}}}' in the URL template.");
+            }
+
+            foreach (System.Text.RegularExpressions.Match match in placeholderRe.Matches(_url))
+            {
+                var placeholder = match.Groups[1].Value;
+                if (!_gatherBuilder.RouteParamFields.ContainsKey(placeholder))
+                    throw new InvalidOperationException(
+                        $"URL template '{_url}' has placeholder '{{{placeholder}}}' " +
+                        $"but no matching .RouteParam(\"{placeholder}\", ...) was provided.");
+            }
+
+            request.RouteParams = new Dictionary<string, ValueProducer>(_gatherBuilder.RouteParamFields);
         }
     }
 }

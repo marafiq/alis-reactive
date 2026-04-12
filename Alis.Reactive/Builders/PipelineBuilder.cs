@@ -28,6 +28,7 @@ namespace Alis.Reactive.Builders
         private ParallelBuilder<TModel> _parallelBuilder;
         private PipelineMode _mode = PipelineMode.Sequential;
         private List<Reaction> _segments;
+        private int _preConditionBoundary;
 
         internal PipelineBuilder(PlanBuildContext context)
         {
@@ -169,15 +170,15 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
-            // Register the inject target in the plan — every component reference
-            // must be in the plan. No fallbacks in the runtime.
             Context.EnsureElement(elementId);
-            Steps.Add(Reaction.Inject(elementId, ValueProducer.Read(PayloadSource.Success(), "responseBody")));
+            var responseBody = ValueProducer.Read(PayloadSource.Success(), "responseBody");
+            Steps.Add(Reaction.Inject(elementId, responseBody));
             return this;
         }
 
         internal void SetConditionalBranches(List<BranchCase> branches)
         {
+            _preConditionBoundary = Steps.Count;
             ConditionalBranches = branches;
         }
 
@@ -186,37 +187,65 @@ namespace Alis.Reactive.Builders
             _segments ??= new List<Reaction>();
 
             if (_mode == PipelineMode.Http && _httpBuilder != null)
-            {
-                var request = _httpBuilder.BuildRequest();
-                if (Steps.Count > 0)
-                    request.Before = new List<Reaction>(Steps);
-                _segments.Add(Reaction.Request(request));
-                Steps.Clear();
-                _httpBuilder = null;
-            }
+                FlushHttpRequest();
             else if (_mode == PipelineMode.Parallel && _parallelBuilder != null)
-            {
-                _segments.Add(_parallelBuilder.BuildReaction(
-                    Steps.Count > 0 ? new List<Reaction>(Steps) : null));
-                Steps.Clear();
-                _parallelBuilder = null;
-            }
+                FlushParallelRequest();
             else
-            {
-                if (Steps.Count > 0)
-                {
-                    _segments.Add(Reaction.Sequence(new List<Reaction>(Steps)));
-                    Steps.Clear();
-                }
-            }
+                FlushCommandsAroundCondition();
 
-            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
+            var hasUnflushedBranch = ConditionalBranches != null && ConditionalBranches.Count > 0;
+            if (hasUnflushedBranch)
             {
                 _segments.Add(Reaction.Branch(ConditionalBranches));
                 ConditionalBranches = null;
             }
 
             _mode = PipelineMode.Sequential;
+        }
+
+        private void FlushHttpRequest()
+        {
+            var request = _httpBuilder.BuildRequest();
+            var hasWhileLoadingCommands = Steps.Count > 0;
+            if (hasWhileLoadingCommands)
+                request.Before = new List<Reaction>(Steps);
+            _segments.Add(Reaction.Request(request));
+            Steps.Clear();
+            _httpBuilder = null;
+        }
+
+        private void FlushParallelRequest()
+        {
+            var hasPendingCommands = Steps.Count > 0;
+            _segments.Add(_parallelBuilder.BuildReaction(
+                hasPendingCommands ? new List<Reaction>(Steps) : null));
+            Steps.Clear();
+            _parallelBuilder = null;
+        }
+
+        private void FlushCommandsAroundCondition()
+        {
+            var hasPreConditionCommands = _preConditionBoundary > 0;
+            var hasPostConditionCommands = Steps.Count > _preConditionBoundary;
+            var hasPendingBranch = ConditionalBranches != null && ConditionalBranches.Count > 0;
+
+            if (hasPreConditionCommands)
+                _segments.Add(Reaction.Sequence(
+                    new List<Reaction>(Steps.GetRange(0, _preConditionBoundary))));
+
+            if (hasPendingBranch)
+            {
+                _segments.Add(Reaction.Branch(ConditionalBranches));
+                ConditionalBranches = null;
+            }
+
+            if (hasPostConditionCommands)
+                _segments.Add(Reaction.Sequence(
+                    new List<Reaction>(Steps.GetRange(
+                        _preConditionBoundary, Steps.Count - _preConditionBoundary))));
+
+            Steps.Clear();
+            _preConditionBoundary = 0;
         }
 
         internal Reaction BuildReaction()
@@ -230,7 +259,8 @@ namespace Alis.Reactive.Builders
 
         internal List<Reaction> BuildReactions()
         {
-            if (_segments == null || _segments.Count == 0)
+            var isSingleSegmentPipeline = _segments == null || _segments.Count == 0;
+            if (isSingleSegmentPipeline)
                 return new List<Reaction> { BuildSingleReaction() };
 
             FlushSegment();
@@ -239,10 +269,10 @@ namespace Alis.Reactive.Builders
 
         private Reaction BuildSingleReaction()
         {
+            var pendingCommands = Steps.Count > 0 ? Steps : null;
             return _mode switch
             {
-                PipelineMode.Parallel => _parallelBuilder!.BuildReaction(
-                    Steps.Count > 0 ? Steps : null),
+                PipelineMode.Parallel => _parallelBuilder!.BuildReaction(pendingCommands),
                 PipelineMode.Http => BuildHttpReaction(),
                 PipelineMode.Conditional => BuildConditionalReaction(),
                 _ => Reaction.Sequence(Steps),
@@ -252,12 +282,26 @@ namespace Alis.Reactive.Builders
         private Reaction BuildConditionalReaction()
         {
             var branch = Reaction.Branch(ConditionalBranches ?? new List<BranchCase>());
-            if (Steps.Count > 0)
-            {
-                var all = new List<Reaction>(Steps) { branch };
-                return Reaction.Sequence(all);
-            }
-            return branch;
+            if (Steps.Count == 0)
+                return branch;
+
+            var hasPreConditionCommands = _preConditionBoundary > 0;
+            var hasPostConditionCommands = Steps.Count > _preConditionBoundary;
+
+            var reactions = new List<Reaction>();
+
+            if (hasPreConditionCommands)
+                reactions.Add(Reaction.Sequence(
+                    new List<Reaction>(Steps.GetRange(0, _preConditionBoundary))));
+
+            reactions.Add(branch);
+
+            if (hasPostConditionCommands)
+                reactions.Add(Reaction.Sequence(
+                    new List<Reaction>(Steps.GetRange(
+                        _preConditionBoundary, Steps.Count - _preConditionBoundary))));
+
+            return Reaction.Sequence(reactions);
         }
 
         private Reaction BuildHttpReaction()

@@ -12,9 +12,7 @@ namespace Alis.Reactive.Builders
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
-                FlushSegment();
-
+            FlushPendingConditionIfNeeded();
             SetMode(PipelineMode.Conditional);
 
             var source = new EventArgSource<TPayload, TProp>(path);
@@ -27,9 +25,7 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, TProp>> path)
             where TPayload : class
         {
-            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
-                FlushSegment();
-
+            FlushPendingConditionIfNeeded();
             SetMode(PipelineMode.Conditional);
 
             var source = responseBody.Read(path);
@@ -39,9 +35,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a conditional branch from a typed source (component, plugin, or URL value).</summary>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
-            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
-                FlushSegment();
-
+            FlushPendingConditionIfNeeded();
             SetMode(PipelineMode.Conditional);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
@@ -50,12 +44,17 @@ namespace Alis.Reactive.Builders
         /// <param name="message">The confirmation message shown to the user.</param>
         public GuardBuilder<TModel> Confirm(string message)
         {
-            if (ConditionalBranches != null && ConditionalBranches.Count > 0)
-                FlushSegment();
-
+            FlushPendingConditionIfNeeded();
             SetMode(PipelineMode.Conditional);
 
             return new GuardBuilder<TModel>(Condition.Confirm(message), this);
+        }
+
+        private void FlushPendingConditionIfNeeded()
+        {
+            var hasPendingCondition = ConditionalBranches != null && ConditionalBranches.Count > 0;
+            if (hasPendingCondition)
+                FlushSegment();
         }
     }
 }

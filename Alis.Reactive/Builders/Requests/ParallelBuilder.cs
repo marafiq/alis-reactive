@@ -30,7 +30,8 @@ namespace Alis.Reactive.Builders.Requests
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
             var reaction = pb.BuildReaction();
-            if (!(reaction is SequenceReaction))
+            var isPlainSequence = reaction is SequenceReaction;
+            if (!isPlainSequence)
                 throw new InvalidOperationException(
                     "OnAllSettled only supports plain commands (sequential). " +
                     "Conditions, HTTP, and parallel pipelines are not valid here.");
@@ -42,7 +43,8 @@ namespace Alis.Reactive.Builders.Requests
         {
             var requestReactions = _branches.Select(r => Reaction.Request(r)).ToList();
 
-            if (preFetch != null && preFetch.Count > 0)
+            var hasPreFetchCommands = preFetch != null && preFetch.Count > 0;
+            if (hasPreFetchCommands)
                 requestReactions.InsertRange(0, preFetch);
 
             return Reaction.Parallel(requestReactions, _onSettled);
