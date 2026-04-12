@@ -32,11 +32,3 @@ The `resolveVendorRoot` function's default branch throws `[alis] unknown vendor:
 does not include `el.id` (available in scope via the `el: HTMLElement` parameter). In a form
 with 20+ components, the error is undiagnosable without the element ID or component key.
 
-## Minor
-
-### 4. Validation module needs refactor
-Observed during ComponentGather testing — validation behaves differently from what the
-interactive pattern was designed for. Needs stricter module boundaries.
-
-**Status:** Placeholder — requires a dedicated design session before actionable details can
-be written. No specific file, behavior, or reproduction identified yet.
