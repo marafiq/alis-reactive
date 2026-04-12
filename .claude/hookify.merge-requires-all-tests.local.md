@@ -16,6 +16,7 @@ Before any merge:
    - `dotnet test tests/Alis.Reactive.Native.UnitTests`
    - `dotnet test tests/Alis.Reactive.Fusion.UnitTests`
    - `dotnet test tests/Alis.Reactive.FluentValidator.UnitTests`
+   - `dotnet test tests/Alis.Reactive.DriftDetection.Tests`
    - `dotnet test tests/Alis.Reactive.PlaywrightTests`
 2. **Every single test must pass.** No exceptions.
 3. **Ask the user for explicit permission** before executing the merge. Never merge without confirmation.

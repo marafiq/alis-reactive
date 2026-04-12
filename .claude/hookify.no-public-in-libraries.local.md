@@ -14,7 +14,7 @@ conditions:
 
 **BLOCKED: `public` declaration in library project.**
 
-The 3 library projects (Alis.Reactive, Alis.Reactive.Native, Alis.Reactive.Fusion) default to `internal`.
+The 3 core library projects (Alis.Reactive, Alis.Reactive.Native, Alis.Reactive.Fusion) default to `internal`. Alis.Reactive.FluentValidator is excluded because its public surface (validators, rule types) is intentionally public for consumer inheritance.
 Every `internal` member was made internal deliberately to protect the API surface.
 
 Changing `internal` to `public` is the #1 source of cascading breaks in this repo (M16, M17 in forensic index — 6+ commit cascades, 170+ affected files).

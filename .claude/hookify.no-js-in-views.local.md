@@ -6,7 +6,7 @@ action: block
 conditions:
   - field: file_path
     operator: regex_match
-    pattern: \.cshtml$
+    pattern: ^(?!.*/_Layout\.)(?!.*/_ViewImports\.)(?!.*/_ViewStart\.).*\.cshtml$
   - field: new_text
     operator: regex_match
     pattern: <script[\s>]|document\.(addEventListener|querySelector|getElementById)|window\.(alis|addEventListener)|\.onclick\s*=

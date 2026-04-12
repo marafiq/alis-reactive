@@ -1,5 +1,5 @@
 ---
-name: check-xml-docs-on-csharp-edit
+name: xml-docs-quality
 enabled: true
 event: file
 conditions:
@@ -8,12 +8,12 @@ conditions:
     pattern: (?:^|/)Alis\.Reactive(\.Native|\.Fusion)?/(?!.*tests/).*\.cs$
   - field: new_text
     operator: regex_match
-    pattern: (public|internal|protected)\s+(class|interface|struct|enum|sealed|static|void|string|bool|int|IHtmlContent|ReactivePlan|InputBoundField)
+    pattern: public\s+(class|interface|struct|enum|sealed|static|void|string|bool|int|IHtmlContent|ReactivePlan|InputBoundField)
 ---
 
 **XML Documentation Quality Check Required**
 
-You just edited a C# file with public/internal API surface. Before proceeding:
+You just edited a C# file with public API surface. Before proceeding:
 
 1. **Load the `dotnet-xml-docs` skill** if not already loaded this session.
 2. **Verify XML docs follow gold standard** (see `Alis.Reactive.Native/Extensions/HtmlExtensions.cs` and `PlanExtensions.cs`):

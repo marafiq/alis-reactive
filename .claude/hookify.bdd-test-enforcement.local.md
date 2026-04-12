@@ -6,7 +6,7 @@ action: warn
 conditions:
   - field: file_path
     operator: regex_match
-    pattern: (PlaywrightTests|\.spec\.ts|\.test\.ts).*\.(cs|ts)$
+    pattern: (PlaywrightTests.*\.cs$|\.spec\.ts$|\.test\.ts$)
   - field: new_text
     operator: regex_match
     pattern: page\.Evaluate|page\.evaluate|Thread\.Sleep|Task\.Delay|\.Retry\]|\[Retry\(|try\s*\{.*Assert|catch\s*\(.*Assert|innerHTML|dangerouslySetInnerHTML|window\.alis\.|document\.querySelector|querySelectorAll

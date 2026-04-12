@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if echo \"$TOOL_INPUT\" | grep -q '\"git commit\"\\|\"git commit \"'; then cd /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive && npm test 2>&1 && dotnet test tests/Alis.Reactive.UnitTests 2>&1 && dotnet test tests/Alis.Reactive.PlaywrightTests 2>&1 || (echo 'BLOCKED: Tests must pass before committing. Fix failing tests first.' && exit 1); fi"
+            "command": "if echo \"$TOOL_INPUT\" | grep -q '\"git commit\"\\|\"git commit \"'; then cd /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/Alis.Reactive && npm test 2>&1 && dotnet test tests/Alis.Reactive.UnitTests 2>&1 && dotnet test tests/Alis.Reactive.Native.UnitTests 2>&1 && dotnet test tests/Alis.Reactive.Fusion.UnitTests 2>&1 && dotnet test tests/Alis.Reactive.FluentValidator.UnitTests 2>&1 && dotnet test tests/Alis.Reactive.DriftDetection.Tests 2>&1 && dotnet test tests/Alis.Reactive.PlaywrightTests 2>&1 || (echo 'BLOCKED: Tests must pass before committing. Fix failing tests first.' && exit 1); fi"
           }
         ]
       }

@@ -6,7 +6,7 @@ action: block
 conditions:
   - field: file_path
     operator: regex_match
-    pattern: \.cshtml$
+    pattern: ^(?!.*/_Layout\.)(?!.*/_ViewImports\.)(?!.*/_ViewStart\.)(?!.*/_SandboxBreadcrumb\.).*\.cshtml$
   - field: new_text
     operator: regex_match
     pattern: <input[\s>]|<select[\s>]|<textarea[\s>]|Html\.TextBoxFor|Html\.DropDownListFor|Html\.CheckBoxFor|Html\.TextAreaFor|Html\.HiddenFor|\.DropDownListFor\(|\.AutoCompleteFor\(|\.NumericTextBoxFor\(|\.DatePickerFor\(|\.SwitchFor\(|\.TimePickerFor\(|\.MaskedTextBoxFor\(|\.RichTextEditorFor\(|\.UploaderFor\(|\.MultiSelectFor\(|\.DateTimePickerFor\(|\.DateRangePickerFor\(|\.ColorPickerFor\(

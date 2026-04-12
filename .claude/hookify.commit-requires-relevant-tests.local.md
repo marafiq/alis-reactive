@@ -2,6 +2,7 @@
 name: commit-requires-relevant-tests
 enabled: true
 event: bash
+action: warn
 pattern: git\s+commit
 ---
 

@@ -6,7 +6,7 @@ action: block
 conditions:
   - field: file_path
     operator: regex_match
-    pattern: ^(?!.*tests/).*?(Builders/|Extensions/|Components/.*Html|Components/.*Reactive|Components/.*Extensions|ReactivePlan|InputBoundField|ElementBuilder|PipelineBuilder|TriggerBuilder|ResponseBody|ReactiveEvent|ValueExpression|ComponentRef).*\.cs$
+    pattern: ^(?!.*(tests/|Tests/|Analyzers/|SandboxApp/)).*?(Builders/|Extensions/|Components/.*Html|Components/.*Reactive|Components/.*Extensions|ReactivePlan|InputBoundField|ElementBuilder|PipelineBuilder|TriggerBuilder|ResponseBody|ReactiveEvent|ValueExpression|ComponentRef).*\.cs$
   - field: new_text
     operator: regex_match
     pattern: \b(public\s+(static\s+)?(void|sealed|class|interface|abstract|partial|override|virtual|new|async)?\s*\w+\s*[<(]|public\s+\w+\s+\w+\s*\{)
