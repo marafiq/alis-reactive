@@ -7,7 +7,7 @@
 
 ## Problem
 
-The TS runtime has 38 lines of level-gated console logging (`core/trace.ts`). There are 66
+The TS runtime has 38 lines of level-gated console logging (`core/trace.ts`). There are 65
 `log.*` calls across 16 files and 47 throw statements with `[alis]` prefix. There is no
 correlation between events, no span hierarchy, no breadcrumb trail, no structured error
 context, and no distributed trace continuity between server and browser.
@@ -81,26 +81,26 @@ configure({
 const t = tracer("http");
 
 // ─── Structured events (replaces log.*) ─────────────────────
-t.error("request.failed", { url, method, status: 500 }, err);
-t.warn("gather.serialize.failed", { field: name, error: result.error });
+t.error("request.fail", { url, method, status: 500 }, err);
+t.warn("gather.serialize.fail", { field: name, error: result.error });
 t.info("boot.start", { planId: plan.planId, behaviors: plan.behaviors.length });
-t.debug("http.request.sent", { method: "POST", url: "/api/orders" });
+t.debug("http.request.send", { method: "POST", url: "/api/orders" });
 t.trace("reaction.set", { component: "OrderModel__Status", property: "value", value: 42 });
 
 // ─── Level guard for hot paths ──────────────────────────────
 if (t.enabled("trace")) {
-  t.trace("condition.evaluated", { op: cond.op, left: shapedLeft, right: shapedRight });
+  t.trace("condition.eval", { op: cond.op, left: shapedLeft, right: shapedRight });
 }
 
 // ─── Spans (new capability) ─────────────────────────────────
 const span = t.span("http.request", { "http.method": "POST", "http.url": url });
 span.set("http.status", 200);
-span.event("response.parsed", { bodyLength: 1234 });
+span.event("response.parse", { bodyLength: 1234 });
 span.end("ok");                // or "error"
 
 // ─── Bind active span to scoped tracer ──────────────────────
 const scopedWithSpan = t.withSpan(ctx.span);
-scopedWithSpan.debug("http.request.sent", { method, url });
+scopedWithSpan.debug("http.request.send", { method, url });
 // ↑ traceId/spanId from ctx.span automatically attached to the event
 
 // ─── Flush (page unload) ────────────────────────────────────
@@ -298,13 +298,13 @@ function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext): void {
   try {
     const result = executeReaction(reaction, plan, ctx);
     if (result instanceof Promise) {
-      result.catch(err => scoped.error("reaction.failed", {
+      result.catch(err => scoped.error("reaction.fail", {
         trigger: describeTrigger(trigger),
         planId: plan.planId,
       }, err as Error));
     }
   } catch (err) {
-    scoped.error("reaction.failed", {
+    scoped.error("reaction.fail", {
       trigger: describeTrigger(trigger),
       planId: plan.planId,
     }, err as Error);
@@ -779,7 +779,7 @@ function describeTrigger(trigger: StartsWhen): string {
 Every trace event follows these rules:
 
 1. **Event names are dotted, noun-first:** `boot.start`, `http.response`, `reaction.failed`,
-   `component.resolved`, `gather.serialize.failed`. Not verbs, not past tense.
+   `component.resolve`, `gather.serialize.fail`. Not verbs, not past tense.
 
 2. **Data fields use domain names:** `component` not `target`, `planId` not `id`, `field` not
    `name`, `method` not `m`.
@@ -803,9 +803,9 @@ Every trace event follows these rules:
    | Pattern | Example | When |
    |---------|---------|------|
    | `module.noun` | `boot.start`, `boot.complete` | Lifecycle events |
-   | `module.noun.qualifier` | `http.request.sent`, `http.request.failed` | Specific outcomes |
+   | `module.noun.qualifier` | `http.request.send`, `http.request.fail` | Specific outcomes |
    | `module.noun.not-found` | `validation.container.not-found` | Missing resource |
-   | `module.noun.qualifier` | `gather.serialize.failed` | Operation outcome |
+   | `module.noun.qualifier` | `gather.serialize.fail` | Operation outcome |
 
    Avoid: past tense (`activated`, `initialized`), abbreviations (`req`, `res`), generic
    names (`error`, `data`, `info`).
@@ -834,8 +834,8 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 
 | Line | Old | New |
 |------|-----|-----|
-| 22 | `log.error("reaction failed", { error: String(err) })` | `scoped.error("reaction.failed", { trigger: describeTrigger(trigger), planId: plan.planId }, err)` |
-| 25 | `log.error("reaction failed (sync)", { error: String(err) })` | `scoped.error("reaction.failed", { trigger: describeTrigger(trigger), planId: plan.planId }, err)` |
+| 22 | `log.error("reaction failed", { error: String(err) })` | `scoped.error("reaction.fail", { trigger: describeTrigger(trigger), planId: plan.planId }, err)` |
+| 25 | `log.error("reaction failed (sync)", { error: String(err) })` | `scoped.error("reaction.fail", { trigger: describeTrigger(trigger), planId: plan.planId }, err)` |
 | 49 | `log.debug("document-event: listening", { event })` | `t.debug("trigger.wired", { kind: "document-event", event: trigger.event })` |
 | 64 | `log.debug("component-event", { component, event, channel })` | `t.debug("trigger.wired", { kind: "component-event", component: trigger.component, event: trigger.event, channel })` |
 
@@ -845,41 +845,40 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 |------|-----|-----|
 | 147 | `log.trace("no-branch-taken")` | `t.trace("branch.no-match", { caseCount: reaction.cases.length })` |
 | 171 | `log.trace("no-branch-taken")` | `t.trace("branch.no-match", { caseCount: reaction.cases.length })` |
-| 188 | `log.error("parallel step failed", { error: String(r.reason) })` | `t.error("parallel.step.failed", { stepIndex: i }, r.reason as Error)` |
+| 188 | `log.error("parallel step failed", { error: String(r.reason) })` | `t.error("parallel.step.fail", { stepIndex: i }, r.reason as Error)` |
 | 205 | `log.trace("set", { target, property, value })` | `t.trace("reaction.set", { component: target, property: reaction.property, value })` |
 | 232 | `log.trace("call", { target, method, args })` | `t.trace("reaction.call", { component: target, method: reaction.method, args })` |
 | 256 | `log.trace("dispatch", { event, detail })` | `t.trace("reaction.dispatch", { event: reaction.event, detail })` |
 
-#### execution/http.ts (4 sites)
+#### execution/http.ts (3 sites)
 
 | Line | Old | New |
 |------|-----|-----|
-| 65 | `log.debug("validation failed, aborting request")` | `t.debug("http.validation.failed", { container: req.container })` |
-| 85 | `log.debug("fetch", { method, url })` | `t.debug("http.request.sent", { method: req.method, url: resolved.url })` |
-| 103 | `log.error(status === 0 ? "network error" : "client error", ...)` | `t.error("http.request.failed", { url: req.url, method: req.method, status }, err)` |
-| 107 | `log.debug("chained request", { chainIndex, url, method })` | `t.debug("http.request.chained", { chainIndex, url, method })` |
+| 65 | `log.debug("validation failed, aborting request")` | `t.debug("http.validation.fail", { container: req.container })` |
+| 85 | `log.debug("fetch", { method, url })` | `t.debug("http.request.send", { method: req.method, url: resolved.url })` |
+| 103 | `log.error(status === 0 ? "network error" : "client error", ...)` | `t.error("http.request.fail", { url: req.url, method: req.method, status }, err)` |
 
 #### execution/gather.ts (3 sites)
 
 | Line | Old | New |
 |------|-----|-----|
-| 37 | `log.warn("gather serialize failed, using empty", { name, error })` | `t.warn("gather.serialize.failed", { field: name, error: result.error })` |
+| 37 | `log.warn("gather serialize failed, using empty", { name, error })` | `t.warn("gather.serialize.fail", { field: name, error: result.error })` |
 | 111 | `log.trace("file", { name, count })` | `t.trace("gather.file", { field: name, count: raw.length })` |
 | 120 | `log.trace("gathered", { name, value })` | `t.trace("gather.value", { field: name, value: raw })` |
 
-#### execution/server-push.ts (8 sites)
+#### execution/server-push.ts (9 sites)
 
 | Line | Old | New |
 |------|-----|-----|
 | 29 | `log.info("manual retry", { url })` | `t.info("sse.retry", { url })` |
 | 45 | `log.debug("connected", { url })` | `t.debug("sse.connection.open", { url })` |
 | 54 | `log.error("connection closed permanently", { url })` | `t.error("sse.connection.close", { url, permanent: true })` |
-| 61 | `log.warn("connection error (reconnecting)", { url })` | `t.warn("sse.reconnecting", { url })` |
+| 61 | `log.warn("connection error (reconnecting)", { url })` | `t.warn("sse.reconnect", { url })` |
 | 73 | `log.debug("closed", { url })` | `t.debug("sse.connection.close", { url, permanent: false })` |
 | 77 | `log.debug("created", { url })` | `t.debug("sse.connection.new", { url })` |
 | 93 | `log.debug("message", { url, event })` | `t.debug("sse.message", { url: trigger.url, event: trigger.event })` |
-| 96 | `result.catch(err => log.error("reaction failed", ...))` | `result.catch(err => scoped.error("sse.reaction.failed", { url: trigger.url, event: trigger.event }, err))` |
-| 102 | `log.debug("listening", { url, event })` | `t.debug("sse.listening", { url: trigger.url, event: eventName })` |
+| 96 | `result.catch(err => log.error("reaction failed", ...))` | `result.catch(err => scoped.error("sse.reaction.fail", { url: trigger.url, event: trigger.event }, err))` |
+| 102 | `log.debug("listening", { url, event })` | `t.debug("sse.listen", { url: trigger.url, event: eventName })` |
 
 #### execution/signalr.ts (15 sites)
 
@@ -887,19 +886,19 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 |------|-----|-----|
 | 29 | `log.info("connected", { hubUrl })` | `t.info("signalr.connection.open", { hubUrl })` |
 | 33 | `log.warn("start failed, retrying", { hubUrl, attempt, delay, error })` | `t.warn("signalr.start.retry", { hubUrl, attempt: attempt + 1, delay }, err)` |
-| 38 | `log.error("start failed after all retries", { hubUrl, attempts })` | `t.error("signalr.start.failed", { hubUrl, attempts: maxAttempts })` |
+| 38 | `log.error("start failed after all retries", { hubUrl, attempts })` | `t.error("signalr.start.fail", { hubUrl, attempts: maxAttempts })` |
 | 46 | `log.warn("retry requested but no connection found", { hubUrl })` | `t.warn("signalr.retry.no-connection", { hubUrl })` |
-| 53 | `log.debug("retry skipped — not disconnected", { hubUrl, state })` | `t.debug("signalr.retry.skipped", { hubUrl, state: connection.state })` |
+| 53 | `log.debug("retry skipped — not disconnected", { hubUrl, state })` | `t.debug("signalr.retry.skip", { hubUrl, state: connection.state })` |
 | 57 | `log.info("manual retry", { hubUrl })` | `t.info("signalr.retry", { hubUrl })` |
 | 71 | `if (level >= Warning) log.warn("lib", { message })` | `t.warn("signalr.lib", { message })` |
 | 72 | `else if (level >= Info) log.debug("lib", { message })` | `t.debug("signalr.lib", { message })` |
-| 80 | `log.warn("reconnecting", { hubUrl, error })` | `t.warn("signalr.reconnecting", { hubUrl }, err ?? undefined)` |
+| 80 | `log.warn("reconnecting", { hubUrl, error })` | `t.warn("signalr.reconnect", { hubUrl }, err ?? undefined)` |
 | 84 | `log.info("reconnected", { hubUrl, connectionId })` | `t.info("signalr.connection.restore", { hubUrl, connectionId })` |
 | 90 | `log.debug("stopped", { hubUrl })` | `t.debug("signalr.connection.stop", { hubUrl })` |
 | 93 | `log.warn("disconnected", { hubUrl, error })` | `t.warn("signalr.connection.lost", { hubUrl }, err ?? undefined)` |
 | 131 | `log.debug("method", { hubUrl, method })` | `t.debug("signalr.method", { hubUrl: trigger.hubUrl, method: trigger.method })` |
-| 134 | `result.catch(err => log.error("reaction failed", ...))` | `result.catch(err => scoped.error("signalr.reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method }, err))` |
-| 138 | `log.debug("listening", { hubUrl, method })` | `t.debug("signalr.listening", { hubUrl: trigger.hubUrl, method: trigger.method })` |
+| 134 | `result.catch(err => log.error("reaction failed", ...))` | `result.catch(err => scoped.error("signalr.reaction.fail", { hubUrl: trigger.hubUrl, method: trigger.method }, err))` |
+| 138 | `log.debug("listening", { hubUrl, method })` | `t.debug("signalr.listen", { hubUrl: trigger.hubUrl, method: trigger.method })` |
 
 #### execution/retry-indicator.ts (4 sites)
 
@@ -907,7 +906,7 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 |------|-----|-----|
 | 22 | `log.warn("target not found", { key, id })` | `t.warn("retry.target.not-found", { key, id })` |
 | 46 | `log.info("shown", { key, placed })` | `t.info("retry.indicator.show", { key, placed: anchored.size })` |
-| 48 | `log.error("no indicators placed", { key, targets })` | `t.error("retry.placement.failed", { key, targets: [...targetIds] })` |
+| 48 | `log.error("no indicators placed", { key, targets })` | `t.error("retry.placement.fail", { key, targets: [...targetIds] })` |
 | 55 | `if (icons.length > 0) log.debug("removed", { key })` | `if (icons.length > 0) t.debug("retry.indicator.clear", { key })` |
 
 #### resolution/resolver.ts (1 site)
@@ -921,7 +920,7 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 | Line | Old | New |
 |------|-----|-----|
 | 39 | `log.warn("ConfirmCondition in sync context — denying")` | `t.warn("condition.confirm.sync-denied", {})` |
-| 102 | `log.trace("eval", { op, left, right })` | `t.trace("condition.evaluated", { op: cond.op, left: shapedLeft, right: shapedRight })` |
+| 102 | `log.trace("eval", { op, left, right })` | `t.trace("condition.eval", { op: cond.op, left: shapedLeft, right: shapedRight })` |
 | 151 | `log.warn("invalid condition regex", { operand })` | `t.warn("condition.regex.invalid", { operand: shapedRight })` |
 
 #### validation/orchestrator.ts (9 sites)
@@ -935,7 +934,7 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 | 111 | `log.debug("showServerErrors", { containerId, fieldCount })` | `t.debug("validation.server-errors", { containerId, fieldCount: Object.keys(errors).length })` |
 | 166 | `log.trace("component-not-found", { component })` | `t.trace("validation.component.not-found", { component: cv.component })` |
 | 187 | `log.trace("field outside form, skipping", { component, containerId })` | `t.trace("validation.field.outside-form", { component: cv.component, containerId })` |
-| 227 | `log.trace("rule-fail", { component, rule, value, message })` | `t.trace("validation.rule.failed", { component: cv.component, rule: rule.name, value, message: rule.message })` |
+| 227 | `log.trace("rule-fail", { component, rule, value, message })` | `t.trace("validation.rule.fail", { component: cv.component, rule: rule.name, value, message: rule.message })` |
 | 312 | `log.warn("showServerErrors: response is not ProblemDetails shape")` | `t.warn("validation.server-errors.invalid-shape", {})` |
 
 #### components/fusion/confirm.ts (2 sites)
@@ -950,9 +949,9 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 | Line | Old | New |
 |------|-----|-----|
 | 43 | `log.debug("activate", { id, href })` | `t.debug("action-link.start", { id: anchor.id, href: anchor.href })` |
-| 46 | `result.catch(err => log.error("reaction failed", ...))` | `result.catch(err => t.error("action-link.failed", { id: anchor.id }, err))` |
+| 46 | `result.catch(err => log.error("reaction failed", ...))` | `result.catch(err => t.error("action-link.fail", { id: anchor.id }, err))` |
 
-**Total: 66 call sites across 16 files.**
+**Total: 65 call sites across 16 files.**
 
 ### Performance Budget
 
@@ -989,7 +988,7 @@ per-field), callers use `t.enabled()` to avoid the object allocation entirely:
 
 ```typescript
 if (t.enabled("trace")) {
-  t.trace("condition.evaluated", { op: cond.op, left: shapedLeft, right: shapedRight });
+  t.trace("condition.eval", { op: cond.op, left: shapedLeft, right: shapedRight });
 }
 ```
 
