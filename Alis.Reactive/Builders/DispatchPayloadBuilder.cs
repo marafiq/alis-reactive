@@ -101,6 +101,11 @@ namespace Alis.Reactive.Builders
                 var isTopLevel = segments.Length == 1;
                 if (isTopLevel)
                 {
+                    if (root.ContainsKey(kvp.Key) && root[kvp.Key] is ObjectProducer)
+                        throw new InvalidOperationException(
+                            $"Dispatch payload conflict: '{kvp.Key}' has nested children " +
+                            $"but is also set as a leaf value. " +
+                            $"Set either the parent or the children, not both.");
                     root[kvp.Key] = kvp.Value;
                     continue;
                 }
