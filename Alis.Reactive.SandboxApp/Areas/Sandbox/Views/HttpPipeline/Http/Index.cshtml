@@ -46,14 +46,16 @@
         p.Element("url-display-tab").SetText(p.FromUrl("tab"));
         p.Element("url-display-facility").SetText(p.FromUrl("facilityId"));
     }));
+
+    // NOTE: Finally demo buttons are wired inline below via .Reactive()
 }
 
 <native-vstack gap="Lg">
     <div>
         <native-heading level="H1">HTTP Requests</native-heading>
         <native-text color="Secondary">
-            Ten HTTP patterns: DomReady GET, POST with gather, chained, parallel, PUT, DELETE with Confirm,
-            FormData, GET with search params, multi-status error handling, and NativeActionLink row actions.
+            Eleven HTTP patterns: DomReady GET, POST with gather, chained, parallel, PUT, DELETE with Confirm,
+            FormData, GET with search params, multi-status error handling, NativeActionLink row actions, and Finally cleanup.
         </native-text>
     </div>
 
@@ -790,6 +792,55 @@
                 <p>B Tenant-Id: <span id="header-parallel-b-tenant">—</span></p>
             </div>
             <p id="header-parallel-all" class="text-text-muted">All: waiting...</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <!-- Section: Finally Demo — guaranteed cleanup -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Finally Demo &mdash; Guaranteed Cleanup</native-heading>
+        <p class="text-sm text-text-secondary mb-3">
+            Both buttons use <code>.Finally()</code> to hide the spinner.
+            No manual <code>.Hide()</code> in success/error handlers.
+        </p>
+        <div class="flex gap-3">
+            @(Html.NativeButton("finally-save-btn", "Save (Success)")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/HttpPipeline/Http/FlakyEndpoint", g => g.Static("name", "John"))
+                     .WhileLoading(l => l.Element("finally-spinner").Show())
+                     .Response(r => r
+                        .OnSuccess(s =>
+                        {
+                            s.Element("finally-result").SetText("Saved successfully!");
+                            s.Element("finally-result").AddClass("text-green-600");
+                            s.Element("finally-result").RemoveClass("text-red-600");
+                        })
+                     )
+                     .Finally(f => f.Element("finally-spinner").Hide());
+                }))
+            @(Html.NativeButton("finally-fail-btn", "Save (Fail 500)")
+                .CssClass("rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/HttpPipeline/Http/FlakyEndpoint", g => g.Static("name", "fail"))
+                     .WhileLoading(l => l.Element("finally-spinner").Show())
+                     .Response(r => r
+                        .OnError(500, e =>
+                        {
+                            e.Element("finally-result").SetText("Server error (500) — but spinner is gone!");
+                            e.Element("finally-result").AddClass("text-red-600");
+                            e.Element("finally-result").RemoveClass("text-green-600");
+                        })
+                     )
+                     .Finally(f => f.Element("finally-spinner").Hide());
+                }))
+        </div>
+        <div id="finally-result-area" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p id="finally-spinner" hidden class="text-amber-600">Processing...</p>
+            <p id="finally-result">—</p>
         </div>
     </native-card-body>
     </native-card>

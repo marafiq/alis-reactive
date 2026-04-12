@@ -20,6 +20,7 @@ namespace Alis.Reactive.Builders.Requests
         private GatherBuilder<TModel> _gatherBuilder;
         private string _transport = "json";
         private List<Reaction> _whileLoading;
+        private List<Reaction> _finally;
         private ResponseBuilder<TModel> _response;
         private string _container;
         private Type _validatorType;
@@ -84,6 +85,25 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
+        /// <summary>Executes commands after the HTTP request completes, regardless of success, error, or network failure (e.g. hide a spinner).</summary>
+        /// <remarks>
+        /// Supports element commands, component commands, and condition guards.
+        /// Does not provide response body access because the response may not
+        /// exist on network failure.
+        /// </remarks>
+        /// <param name="pipeline">Builds the commands to execute after the request completes.</param>
+        /// <returns>This builder for chaining.</returns>
+        public HttpRequestBuilder<TModel> Finally(Action<PipelineBuilder<TModel>> pipeline)
+        {
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(pb);
+            var reaction = pb.BuildReaction();
+            _finally = reaction is SequenceReaction seq
+                ? new List<Reaction>(seq.Steps)
+                : new List<Reaction> { reaction };
+            return this;
+        }
+
         /// <summary>Validates the form before sending the request using the specified validator.</summary>
         /// <typeparam name="TValidator">The validator type.</typeparam>
         /// <param name="formId">The DOM element ID of the form container for error display.</param>
@@ -120,6 +140,10 @@ namespace Alis.Reactive.Builders.Requests
             var hasWhileLoadingCommands = _whileLoading != null && _whileLoading.Count > 0;
             if (hasWhileLoadingCommands)
                 request.Before = _whileLoading;
+
+            var hasFinallyCommands = _finally != null && _finally.Count > 0;
+            if (hasFinallyCommands)
+                request.Complete = _finally;
 
             if (_response != null)
                 AttachResponseLifecycle(request);
