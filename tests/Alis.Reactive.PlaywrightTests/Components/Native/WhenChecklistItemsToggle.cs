@@ -293,7 +293,7 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     public async Task boot_trace_is_emitted()
     {
         await NavigateAndBoot();
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
+        var hasBootTrace = _consoleMessages.Any(m => m.Contains("boot.complete"));
         Assert.That(hasBootTrace, Is.True);
         AssertNoConsoleErrors();
     }
