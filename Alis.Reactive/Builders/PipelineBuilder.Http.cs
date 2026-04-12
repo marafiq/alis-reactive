@@ -5,6 +5,9 @@ namespace Alis.Reactive.Builders
 {
     public partial class PipelineBuilder<TModel> where TModel : class
     {
+        /// <summary>Starts an HTTP GET request to the specified URL.</summary>
+        /// <param name="url">The request URL, which may contain template placeholders.</param>
+        /// <returns>An HTTP request builder for configuring gather, validation, and response handling.</returns>
         public HttpRequestBuilder<TModel> Get(string url)
         {
             SetMode(PipelineMode.Http);
@@ -13,6 +16,9 @@ namespace Alis.Reactive.Builders
             return _httpBuilder;
         }
 
+        /// <summary>Starts an HTTP POST request to the specified URL.</summary>
+        /// <param name="url">The request URL, which may contain template placeholders.</param>
+        /// <returns>An HTTP request builder for configuring gather, validation, and response handling.</returns>
         public HttpRequestBuilder<TModel> Post(string url)
         {
             SetMode(PipelineMode.Http);
@@ -21,6 +27,7 @@ namespace Alis.Reactive.Builders
             return _httpBuilder;
         }
 
+        /// <summary>Starts an HTTP POST with inline gather configuration.</summary>
         public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
         {
             SetMode(PipelineMode.Http);
@@ -30,6 +37,7 @@ namespace Alis.Reactive.Builders
             return _httpBuilder;
         }
 
+        /// <summary>Starts an HTTP PUT with inline gather configuration.</summary>
         public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
         {
             SetMode(PipelineMode.Http);
@@ -39,6 +47,9 @@ namespace Alis.Reactive.Builders
             return _httpBuilder;
         }
 
+        /// <summary>Starts an HTTP DELETE request to the specified URL.</summary>
+        /// <param name="url">The request URL, which may contain template placeholders.</param>
+        /// <returns>An HTTP request builder for configuring gather, validation, and response handling.</returns>
         public HttpRequestBuilder<TModel> Delete(string url)
         {
             SetMode(PipelineMode.Http);
@@ -47,6 +58,7 @@ namespace Alis.Reactive.Builders
             return _httpBuilder;
         }
 
+        /// <summary>Executes multiple HTTP requests concurrently.</summary>
         public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
         {
             SetMode(PipelineMode.Parallel);
