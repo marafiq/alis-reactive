@@ -182,19 +182,19 @@ OPTIONS := .Label("text") [.Required()]
 
 COMPONENT_TYPE :=
   -- Fusion (b is SF builder — chain SF methods then .Reactive())
-  | .AutoComplete(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.REACTIVE])
-  | .DropDownList(b => b [.DataSource(items)] .Fields<T>(t,v [,g]) [.Placeholder("...")] [.REACTIVE])
-  | .MultiSelect(b => b [.DataSource(items)] .Fields<T>(t,v [,g]) [.Placeholder("...")] [.AllowFiltering(true)] [.Mode(VisualMode.Box)] [.REACTIVE])
-  | .MultiColumnComboBox(b => b [.DataSource(items)] .Fields<T>(t,v [,g]) [.REACTIVE])
-  | .DatePicker(b => b [.REACTIVE])
-  | .DateTimePicker(b => b [.REACTIVE])
-  | .DateRangePicker(b => b [.REACTIVE])
-  | .TimePicker(b => b [.REACTIVE])
-  | .NumericTextBox(b => b [.Min(n)] [.Max(n)] [.Step(n)] [.REACTIVE])
-  | .Switch(b => b [.REACTIVE])                                      -- model prop MUST be bool
-  | .InputMask(b => b [.REACTIVE])
-  | .RichTextEditor(b => b [.REACTIVE])
-  | .FileUpload(b => b [.REACTIVE])
+  | .FusionAutoComplete(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.REACTIVE])
+  | .FusionDropDownList(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.REACTIVE])
+  | .FusionMultiSelect(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.Placeholder("...")] [.AllowFiltering(true)] [.Mode(VisualMode.Box)] [.REACTIVE])
+  | .FusionMultiColumnComboBox(b => b [.DataSource(items)] [.Fields<T>(t,v [,g])] [.REACTIVE])
+  | .FusionDatePicker(b => b [.REACTIVE])
+  | .FusionDateTimePicker(b => b [.REACTIVE])
+  | .FusionDateRangePicker(b => b [.REACTIVE])
+  | .FusionTimePicker(b => b [.REACTIVE])
+  | .FusionNumericTextBox(b => b [.Min(n)] [.Max(n)] [.Step(n)] [.REACTIVE])
+  | .FusionSwitch(b => b [.REACTIVE])                                -- model prop MUST be bool
+  | .FusionInputMask(b => b [.REACTIVE])
+  | .FusionRichTextEditor(b => b [.REACTIVE])
+  | .FusionFileUpload(b => b [.REACTIVE])
 
   -- Native (b is framework builder — chain config then .Reactive())
   | .NativeTextBox(b => b [.Placeholder("...")] [.Type("email")] [.CssClass("...")] [.REACTIVE])
