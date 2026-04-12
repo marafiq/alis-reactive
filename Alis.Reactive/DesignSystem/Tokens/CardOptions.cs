@@ -1,4 +1,4 @@
-namespace Alis.Reactive.DesignSystem.Layout
+namespace Alis.Reactive.DesignSystem.Tokens
 {
     public enum CardElevation
     {
