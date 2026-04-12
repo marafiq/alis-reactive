@@ -70,7 +70,7 @@ export function wireBehavior(
 
     case "component-event": {
       const comp = plan.components[trigger.component];
-      if (!comp) throw new Error(`[alis] trigger component not found: ${trigger.component}`);
+      if (!comp) throw new Error(`[alis] trigger component not found: "${trigger.component}" (available: ${Object.keys(plan.components).join(", ")})`);
 
       const jsType = getJsType(plan, trigger.component);
       const eventDef = jsType.events?.[trigger.event];

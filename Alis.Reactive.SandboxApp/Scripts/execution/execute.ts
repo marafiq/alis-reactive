@@ -217,7 +217,7 @@ function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void 
 
   const jsType = getJsTypeForSource(plan, reaction.on);
   const prop = jsType.properties?.[reaction.property];
-  if (!prop) throw new Error(`[alis] property "${reaction.property}" not found on type`);
+  if (!prop) throw new Error(`[alis] property "${reaction.property}" not found on type (available: ${Object.keys(jsType.properties ?? {}).join(", ")})`);
   setProperty(root, prop, value);
 }
 
@@ -246,7 +246,7 @@ function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): voi
 
   const jsType = getJsTypeForSource(plan, reaction.on);
   const method = jsType.methods?.[reaction.method];
-  if (!method) throw new Error(`[alis] method "${reaction.method}" not found on type`);
+  if (!method) throw new Error(`[alis] method "${reaction.method}" not found on type (available: ${Object.keys(jsType.methods ?? {}).join(", ")})`);
   callMethod(root, method, args);
 }
 

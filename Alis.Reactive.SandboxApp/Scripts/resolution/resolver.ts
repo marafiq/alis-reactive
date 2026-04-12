@@ -44,9 +44,9 @@ export function resolveSource(plan: Plan, source: Source, ctx?: ExecContext): un
 /** Resolve a component's raw DOM element (not vendor root). For inject, validation, error display. */
 export function resolveElement(plan: Plan, componentKey: string): HTMLElement {
   const comp = plan.components[componentKey];
-  if (!comp) throw new Error(`[alis] component not found: ${componentKey}`);
+  if (!comp) throw new Error(`[alis] component not found: "${componentKey}" (available: ${Object.keys(plan.components).join(", ")})`);
   const el = document.getElementById(comp.id);
-  if (!el) throw new Error(`[alis] element not found: ${comp.id}`);
+  if (!el) throw new Error(`[alis] element not found: "${comp.id}" (component: ${componentKey}, vendor: ${comp.vendor})`);
   return el;
 }
 
