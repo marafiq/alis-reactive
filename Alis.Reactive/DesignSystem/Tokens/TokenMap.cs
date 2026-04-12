@@ -108,6 +108,16 @@ namespace Alis.Reactive.DesignSystem.Tokens
             { GridCols.C6, "grid-cols-6" }
         };
 
+        private static readonly Dictionary<ElementSpacing, string> SpacingMap = new Dictionary<ElementSpacing, string>
+        {
+            { ElementSpacing.None, "" },
+            { ElementSpacing.Xs, "mb-1" },
+            { ElementSpacing.Sm, "mb-2" },
+            { ElementSpacing.Base, "mb-3" },
+            { ElementSpacing.Md, "mb-4" },
+            { ElementSpacing.Lg, "mb-6" }
+        };
+
         private static readonly Dictionary<AccentColor, string> AccentMap = new Dictionary<AccentColor, string>
         {
             { AccentColor.Primary, "border-accent" },
@@ -128,6 +138,7 @@ namespace Alis.Reactive.DesignSystem.Tokens
         public static string Color(TextColor color) => ColorMap[color];
         public static string Size(TextSize size) => SizeMap[size];
         public static string Cols(GridCols cols) => ColsMap[cols];
+        public static string Spacing(ElementSpacing spacing) => SpacingMap[spacing];
         public static string Accent(AccentColor accent) => AccentMap[accent];
     }
 }

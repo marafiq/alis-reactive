@@ -4,10 +4,13 @@ namespace Alis.Reactive.DesignSystem.Layout
 {
     public static class TextCss
     {
-        public static string Classes(TextSize size, TextColor color = TextColor.Primary, bool bold = false, string? cssClass = null)
+        public static string Classes(TextSize size, TextColor color = TextColor.Primary, bool bold = false, ElementSpacing spacing = ElementSpacing.Base, string? cssClass = null)
         {
             var boldClass = bold ? " font-semibold" : "";
-            var baseClasses = $"{TokenMap.Size(size)} {TokenMap.Color(color)}{boldClass} mb-3";
+            var spacingClass = TokenMap.Spacing(spacing);
+            var baseClasses = string.IsNullOrEmpty(spacingClass)
+                ? $"{TokenMap.Size(size)} {TokenMap.Color(color)}{boldClass}"
+                : $"{TokenMap.Size(size)} {TokenMap.Color(color)}{boldClass} {spacingClass}";
             return CssUtils.MergeClasses(baseClasses, cssClass);
         }
     }
