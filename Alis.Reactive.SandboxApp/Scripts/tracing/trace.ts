@@ -66,8 +66,8 @@ function buildScopedTracer(scope: string, boundSpan: Span | undefined): ScopedTr
       severityNumber: SEVERITY[level as Exclude<Level, "off">],
       data,
       error: err ? serializeError(err) : undefined,
-      traceId: boundSpan?.traceId,
-      spanId: boundSpan?.spanId,
+      traceId: boundSpan && boundSpan !== NOOP_SPAN ? boundSpan.traceId : undefined,
+      spanId: boundSpan && boundSpan !== NOOP_SPAN ? boundSpan.spanId : undefined,
       breadcrumbs: level === "error" ? breadcrumbs.snapshot() : undefined,
     };
 
@@ -81,19 +81,22 @@ function buildScopedTracer(scope: string, boundSpan: Span | undefined): ScopedTr
     debug: (event, data) => emitEvent("debug", event, data),
     trace: (event, data) => emitEvent("trace", event, data),
     span: (name, attrs) => {
+      const effectiveParent = boundSpan !== NOOP_SPAN ? boundSpan : undefined;
       // TwP: rootSpan is ContextOnlySpan — propagate trace context without collecting
       if (rootSpan instanceof ContextOnlySpan) {
-        return (boundSpan ?? rootSpan).child(name);
+        return (effectiveParent ?? rootSpan).child(name);
       }
       // Full tracing: create ActiveSpan for span collection
       if (activeLevel >= LEVELS.debug) {
-        return new ActiveSpan(name, scope, (boundSpan ?? rootSpan) as ActiveSpan | undefined, activeSink, attrs);
+        const parent = effectiveParent as ActiveSpan | undefined
+          ?? (rootSpan !== NOOP_SPAN ? rootSpan as ActiveSpan : undefined);
+        return new ActiveSpan(name, scope, parent, activeSink, attrs);
       }
       // No trace context, no tracing: noop
       return NOOP_SPAN;
     },
     enabled: (level) => LEVELS[level] <= activeLevel,
-    withSpan: (span) => buildScopedTracer(scope, span ?? NOOP_SPAN),
+    withSpan: (span) => buildScopedTracer(scope, span),
   };
 }
 

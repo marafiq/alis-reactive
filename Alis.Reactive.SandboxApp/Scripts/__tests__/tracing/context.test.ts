@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseTraceparent, formatTraceparent, isValidLevel } from "../../tracing/context";
+import { parseTraceparent, formatTraceparent, isValidLevel, resolveLevel } from "../../tracing/context";
 
 describe("parseTraceparent", () => {
   it("parses valid traceparent", () => {
@@ -58,5 +58,23 @@ describe("isValidLevel", () => {
     expect(isValidLevel("verbose")).toBe(false);
     expect(isValidLevel("")).toBe(false);
     expect(isValidLevel("DEBUG")).toBe(false);
+  });
+});
+
+describe("resolveLevel", () => {
+  it("returns plan level when provided", () => {
+    expect(resolveLevel("debug", "error")).toBe("debug");
+  });
+
+  it("falls back to element data-trace when plan level is undefined", () => {
+    expect(resolveLevel(undefined, "warn")).toBe("warn");
+  });
+
+  it("defaults to off when no sources provided", () => {
+    expect(resolveLevel(undefined, undefined)).toBe("off");
+  });
+
+  it("skips invalid plan level and uses element level", () => {
+    expect(resolveLevel("INVALID", "info")).toBe("info");
   });
 });

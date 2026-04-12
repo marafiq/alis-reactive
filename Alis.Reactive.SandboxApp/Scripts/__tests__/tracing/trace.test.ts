@@ -111,6 +111,26 @@ describe("ScopedTracer", () => {
     expect(sink.events[0].error?.type).toBe("Error");
   });
 
+  it("withSpan(undefined) does not emit zero trace IDs", () => {
+    const sink = captureSink();
+    configure({ level: "debug", sink });
+    const t = createTracer("test");
+    const scoped = t.withSpan(undefined);
+    scoped.debug("test.event", {});
+    expect(sink.events[0].traceId).toBeUndefined();
+    expect(sink.events[0].spanId).toBeUndefined();
+  });
+
+  it("span without traceparent has no parentSpanId", () => {
+    const sink = captureSink();
+    configure({ level: "debug", sink });
+    const t = createTracer("test");
+    const span = t.span("root.span");
+    span.end();
+    const spanCall = (sink.span as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(spanCall.parentSpanId).toBeUndefined();
+  });
+
   it("does not attach breadcrumbs to non-error events", () => {
     const sink = captureSink();
     configure({ level: "debug", sink });
