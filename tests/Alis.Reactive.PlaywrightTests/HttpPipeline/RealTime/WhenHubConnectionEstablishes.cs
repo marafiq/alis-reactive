@@ -71,9 +71,9 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
         await LoadPanelBtn.ClickAsync();
         await WaitForTraceMessage("merge", 5000);
 
-        // Match only our "connected" trace, not the library's routed "lib" messages
+        // Match only our connection.open trace, not the library's routed "lib" messages
         var connectTraces = _consoleMessages
-            .Where(m => m.Contains("[alis:signalr] connected")
+            .Where(m => m.Contains("[alis:signalr] signalr.connection.open")
                         && m.Contains("resident-status"))
             .ToList();
 
