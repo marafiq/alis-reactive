@@ -53,7 +53,10 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a string literal argument.</summary>
         public PluginCallBuilder<TModel> Arg(string value)
-        { _args.Add(ValueProducer.Literal(value)); return this; }
+        {
+            if (value == null) throw new System.ArgumentNullException(nameof(value));
+            _args.Add(ValueProducer.Literal(value)); return this;
+        }
 
         /// <summary>Adds an int literal argument.</summary>
         public PluginCallBuilder<TModel> Arg(int value)

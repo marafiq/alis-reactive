@@ -203,7 +203,8 @@ namespace Alis.Reactive.PlanModel
                 throw new System.ArgumentException("Method name required.", nameof(member));
             var typeKey = "plugin." + pluginName;
             if (!_plan.MutableTypes.ContainsKey(typeKey))
-                _plan.MutableTypes[typeKey] = new JsType();
+                throw new System.InvalidOperationException(
+                    $"Plugin '{pluginName}' is not registered. Call plan.RegisterPlugin(\"{pluginName}\", ...) first.");
             _plan.MutableTypes[typeKey].WithMethod(member, Path.Parse(member), returns: returns);
         }
 

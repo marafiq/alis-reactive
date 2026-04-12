@@ -10,7 +10,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_read_produces_plugin_source()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("array", p => p.Method("count", PlanModel.Shape.Number));
+        plan.RegisterPlugin("array", p => p.Method<int>("count"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<int> src = p.Plugin<int>("array", "count");
@@ -26,7 +26,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_string_carries_shape()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("auth", p => p.Method("getToken", PlanModel.Shape.String));
+        plan.RegisterPlugin("auth", p => p.Method<string>("getToken"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<string> src = p.Plugin<string>("auth", "getToken");
@@ -41,7 +41,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_int_carries_shape()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("array", p => p.Method("count", PlanModel.Shape.Number));
+        plan.RegisterPlugin("array", p => p.Method<int>("count"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<int> src = p.Plugin<int>("array", "count");
@@ -56,7 +56,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_bool_carries_shape()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("auth", p => p.Method("isAdmin", PlanModel.Shape.Boolean));
+        plan.RegisterPlugin("auth", p => p.Method<bool>("isAdmin"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<bool> src = p.Plugin<bool>("auth", "isAdmin");
@@ -71,7 +71,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_in_condition()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("auth", p => p.Method("isAdmin", PlanModel.Shape.Boolean));
+        plan.RegisterPlugin("auth", p => p.Method<bool>("isAdmin"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<bool> src = p.Plugin<bool>("auth", "isAdmin");
@@ -86,7 +86,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_in_set_text()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("prefs", p => p.Method("getTheme", PlanModel.Shape.String));
+        plan.RegisterPlugin("prefs", p => p.Method<string>("getTheme"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<string> src = p.Plugin<string>("prefs", "getTheme");
@@ -101,7 +101,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_in_header()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("auth", p => p.Method("getToken", PlanModel.Shape.String));
+        plan.RegisterPlugin("auth", p => p.Method<string>("getToken"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<string> src = p.Plugin<string>("auth", "getToken");
@@ -119,7 +119,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_in_route_param()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("auth", p => p.Method("getTenantId", PlanModel.Shape.Number));
+        plan.RegisterPlugin("auth", p => p.Method<int>("getTenantId"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<int> src = p.Plugin<int>("auth", "getTenantId");
@@ -137,7 +137,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_read_with_typed_source_arg()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("array", p => p.Method("count", PlanModel.Shape.Number));
+        plan.RegisterPlugin("array", p => p.Method<int>("count"));
         var component = new TypedComponentSource<string>("ddl", "fusion", "value");
         Trigger(plan).DomReady(p =>
         {
@@ -154,7 +154,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_read_with_literal_string_arg()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("array", p => p.Method("count", PlanModel.Shape.Number));
+        plan.RegisterPlugin("array", p => p.Method<int>("count"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<int> src = p.Plugin<int>("array", "count").Arg("test");
@@ -170,7 +170,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_read_with_literal_int_arg()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("array", p => p.Method("count", PlanModel.Shape.Number));
+        plan.RegisterPlugin("array", p => p.Method<int>("count"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<int> src = p.Plugin<int>("array", "count").Arg(42);
@@ -185,7 +185,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_void_call_fire()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("logger", p => p.Method("flush", null));
+        plan.RegisterPlugin("logger", p => p.Void("flush"));
         Trigger(plan).DomReady(p =>
         {
             p.Plugin("logger", "flush").Fire();
@@ -201,7 +201,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_void_call_with_arg_fire()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("analytics", p => p.Method("track", null));
+        plan.RegisterPlugin("analytics", p => p.Void("track"));
         Trigger(plan).DomReady(p =>
         {
             p.Plugin("analytics", "track").Arg("pageView").Fire();
@@ -216,7 +216,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_gather_from_typed_source()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("auth", p => p.Method("getToken", PlanModel.Shape.String));
+        plan.RegisterPlugin("auth", p => p.Method<string>("getToken"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<string> src = p.Plugin<string>("auth", "getToken");
@@ -234,13 +234,14 @@ public class WhenUsingPlugins : PlanTestBase
     public void plugin_auto_registers_jstype()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("auth", p => p.Method("getToken", PlanModel.Shape.String));
+        plan.RegisterPlugin("auth", p => p.Method<string>("getToken"));
         Trigger(plan).DomReady(p =>
         {
             TypedPluginSource<string> src = p.Plugin<string>("auth", "getToken");
             p.Element("x").SetText(src);
         });
         var json = plan.RenderFormatted();
+        AssertSchemaValid(json);
         Assert.That(json, Does.Contain("\"plugin.auth\""));
     }
 
@@ -258,7 +259,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void empty_plugin_name_throws()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("auth", p => p.Method("getToken", PlanModel.Shape.String));
+        plan.RegisterPlugin("auth", p => p.Method<string>("getToken"));
         Assert.Throws<System.ArgumentException>(() =>
         {
             Trigger(plan).DomReady(p =>
@@ -272,7 +273,7 @@ public class WhenUsingPlugins : PlanTestBase
     public void empty_member_throws()
     {
         var plan = CreatePlan();
-        plan.RegisterPlugin("auth", p => p.Method("getToken", PlanModel.Shape.String));
+        plan.RegisterPlugin("auth", p => p.Method<string>("getToken"));
         Assert.Throws<System.ArgumentException>(() =>
         {
             Trigger(plan).DomReady(p =>
