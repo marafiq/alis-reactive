@@ -18,7 +18,7 @@ Layer 1: C# Descriptors & Builders
    │
 Layer 2: JSON Schema (reactive-plan.schema.json)
    │  The contract. A failing test is the only reason to edit this file.
-   │  Harness: 310 AssertSchemaValid() + additionalProperties: false
+   │  Harness: 70 AssertSchemaValid() calls + additionalProperties: false
    │
    ▼  BOUNDARY: Schema change → failing vitest drives TS type update
    │

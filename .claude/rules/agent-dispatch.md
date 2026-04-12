@@ -10,8 +10,8 @@ evidence contract that prevents false alarms, wasted effort, and architecture re
 
 | Layer | Skills to Load | Test Command | Evidence Format |
 |-------|---------------|--------------|-----------------|
-| 1 C# | modern-csharp, dotnet-xml-docs, TDD | `dotnet test tests/Alis.Reactive.UnitTests` | VerifyJson snapshot + file:line |
-| 2 Schema | (contract file) | `dotnet test` (310 AssertSchemaValid) | Schema diff + failing test output |
+| 1 C# | modern-csharp, bdd-testing (TDD principles) | `dotnet test tests/Alis.Reactive.UnitTests` | AssertSchemaValid() + file:line |
+| 2 Schema | (contract file) | `dotnet test` (70 AssertSchemaValid calls) | Schema diff + failing test output |
 | 3 TS | solid-ts-audit | `npm test` | vitest output + file:line |
 | 4 Browser | bdd-testing | Playwright tests | Browser state + test name |
 | 5 Docs | dotnet-xml-docs | Rider diagnostics | Sandbox-verified code example |

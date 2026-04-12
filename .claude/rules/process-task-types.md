@@ -69,7 +69,7 @@ May span sessions. Track which steps are complete.
 
 Load `onboard-fusion-component` skill first. 7-file vertical slice. Zero TS runtime changes.
 If TS changes seem needed, the plan is missing information — fix the C# descriptor.
-`component.ts` owns all vendor knowledge.
+`resolver.ts` owns all vendor knowledge.
 
 ## Writing Tests (Matches Tested Layer)
 

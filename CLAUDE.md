@@ -1,50 +1,54 @@
 # Alis.Reactive Framework
 
 C# fluent builders express reactive browser intent. `Html.RenderPlan(plan)` serializes that
-intent to JSON validated against `reactive-plan.schema.json` (61 definitions). The TypeScript
-runtime executes the plan — nothing more. C# never executes browser behavior. TypeScript
-never invents information the plan does not carry.
+intent to JSON validated against `Alis.Reactive/Schemas/reactive-plan.schema.json` (61
+definitions). The TypeScript runtime executes plan instructions without adding behavior the
+plan does not describe. C# never executes browser behavior. TypeScript never invents
+information the plan does not carry.
+
+Throughout this document, "the runtime" means the TypeScript code in
+`Alis.Reactive.SandboxApp/Scripts/` that executes plans in the browser.
 
 ## Architecture — 5 Layers, 4 Boundaries
 
-Each boundary is a quality gate. A failing test is the only reason to cross one.
+Each boundary is guarded by a test harness. A failing test is the only reason to cross one.
 
 ```
 Layer 1  C# Domain Model + Builders
          Quality: DDD value objects, internal constructors, C# 8.0, SOLID
-         Harness: AssertSchemaValid() against rendered plan JSON
+         Harness: AssertSchemaValid() — 70 calls across Core, Fusion, Native test bases
          ↓
          BOUNDARY: failing AssertSchemaValid() drives schema update
          ↓
-Layer 2  JSON Schema (reactive-plan.schema.json)
+Layer 2  JSON Schema (Alis.Reactive/Schemas/reactive-plan.schema.json)
          Quality: additionalProperties: false on every object, 61 $defs
-         Harness: schema test suite across 3 test bases (Core, Fusion, Native)
+         Harness: AssertSchemaValid() in PlanTestBase, FusionTestBase, NativeTestBase
          ↓
          BOUNDARY: schema change → failing vitest drives TS type update
          ↓
 Layer 3  TypeScript Types + Runtime
-         Quality: discriminated unions match schema, runtime is a dumb executor
-         Harness: vitest + jsdom via boot(), npm run typecheck
+         Quality: discriminated unions match schema, fail-fast, no fallbacks
+         Harness: npm run typecheck (vitest configured but no tests on this branch yet)
          ↓
          BOUNDARY: browser first, then Playwright — eyes before automation
          ↓
 Layer 4  Browser Verification
          Quality: real interactions, visible outcomes, no page.evaluate()
-         Harness: Playwright BDD (5 rules), 70 test classes
+         Harness: Playwright BDD (5 rules), 69 test fixtures
          ↓
          BOUNDARY: working sandbox example before writing docs
          ↓
 Layer 5  Documentation + Skills
          Quality: dev-facing language, verified code examples, no internals vocabulary
-         Harness: Rider diagnostics, sandbox-verified examples
+         Harness: sandbox-verified examples
 ```
 
 Detailed flows: `.claude/rules/process-pipeline.md`, `process-layers.md`, `process-task-types.md`
 
 ## Plan-Driven IDs — No DOM Scanning
 
-`IdGenerator` generates every HTML element ID at C# render time from the model type and
-property expression. Format: `{Namespace_TypeName}__{MemberPath}`.
+`IdGenerator` (`Alis.Reactive/IdGenerator.cs`) generates every HTML element ID at C# render
+time from the model type and property expression. Format: `{Namespace_TypeName}__{MemberPath}`.
 
 ```
 Model:      Alis.Reactive.SandboxApp.Models.OrderModel
@@ -60,35 +64,40 @@ chosen explicitly via `p.Element("my-id")` or `Html.NativeButton("btn-id", ...)`
 does not generate fallback IDs. If an ID collides, that is a developer error, not a framework
 concern. No fallbacks, no auto-generated suffixes, no scanning to resolve ambiguity.
 
-The runtime uses `getElementById` only — direct lookup, zero scanning. Every `getElementById`
-call in the runtime has a comment justifying it (`error-display.ts:5`: "No fallbacks. No
-querySelector scanning. ID-aware only."). The single `querySelectorAll` in `root.ts:25`
-discovers `[data-reactive-plan]` elements at boot — that is the only wide DOM query.
+The runtime uses `getElementById` for all plan model class and element resolution. Wide DOM
+queries exist in 3 justified locations only:
+- `root.ts:25` — discovers `[data-reactive-plan]` script elements at boot
+- `inject.ts:16` — discovers plans in dynamically injected HTML
+- `retry-indicator.ts:53` — cleans up retry indicator elements by data attribute
 
-If you think you need `querySelectorAll` or DOM traversal, the plan is missing information.
-Fix the C# descriptor to carry it.
+Scoped `querySelector` calls exist in `error-display.ts` and `orchestrator.ts` for validation
+summary element lookups (generated HTML, not plan components).
+
+If you think you need `querySelectorAll` or DOM traversal for plan component resolution, the
+plan is missing information. Fix the C# plan model class to carry it.
 
 ## The Plan Contract
 
 C# `Render()` serializes the plan to JSON inside a `<script type="application/json"
 data-reactive-plan>` element. The runtime discovers these elements, parses the JSON, merges
-partials by `planId`, and boots each composed plan.
+partials by `planId`, and boots each composed plan. Sandbox URL: `http://localhost:5220`.
 
 Top-level JSON shape: `version` (3), `planId`, `partId`?, `types`, `components`, `behaviors`.
 
-Polymorphic types use `WriteOnlyPolymorphicConverter<T>` — write-only, no deserialization.
-Each concrete type carries a `kind` discriminator (`"compare"`, `"read"`, `"component"`, etc.)
-matched by TypeScript discriminated unions.
+`WriteOnlyPolymorphicConverter<T>` enables polymorphic serialization by delegating to the
+concrete type via `JsonSerializer.Serialize(writer, value, value.GetType(), options)`. Each
+concrete plan model class carries its own `kind` property (e.g., `public string Kind => "set"`)
+which becomes the discriminator in the JSON, matched by TypeScript discriminated unions.
 
-Schema validation happens in C# tests via `AssertSchemaValid()`. The TypeScript runtime
-trusts the JSON — it does not re-validate. If the JSON is malformed, `JSON.parse` throws
-at boot time with a clear error message.
+Schema validation happens in C# tests via `AssertSchemaValid()`. The runtime trusts the
+JSON — it does not re-validate. If the JSON is malformed, `JSON.parse` throws at boot time.
 
 ## Build & Run
 
 ```bash
 npm run build:all                # JS bundles + CSS
 dotnet build                     # All C# projects
+npm run build:api-docs           # API reference from XML docs
 
 npm run watch                    # esbuild watch
 npm run watch:css                # Tailwind watch
@@ -97,7 +106,7 @@ lsof -ti:5220 | xargs kill -9 2>/dev/null; dotnet run --project Alis.Reactive.Sa
 npm run typecheck                # TS type checking
 npm run lint                     # ESLint
 
-npm test                                                     # TS vitest (config exists, tests being built)
+npm test                                                     # TS vitest (configured, no tests on this branch)
 dotnet test tests/Alis.Reactive.UnitTests                    # Core + schema
 dotnet test tests/Alis.Reactive.Native.UnitTests             # Native
 dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion
@@ -108,21 +117,23 @@ dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests       # Tag helpers
 dotnet test tests/Alis.Reactive.PlaywrightTests \
   --logger "trx;LogFileName=playwright-results.trx" \
   --results-directory TestResults
+./scripts/sonar-analyze.sh                                   # SonarQube (Docker)
 ```
 
 After TS/CSS changes: `npm run build:all && dotnet build`, restart SandboxApp.
-All tests pass before every commit.
+All tests pass before every commit. TS tests go in `Alis.Reactive.SandboxApp/Scripts/__tests__/`
+with `.test.ts` suffix.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| C# | .NET 10. **C# 8.0 enforced** in library projects (no records, no primary constructors, no file-scoped namespaces). Apps and tests use `latest`. |
+| C# | .NET 10. **C# 8.0 enforced** in 4 library projects (Core, Fusion, Native, FluentValidator). Analyzers uses `latest`. Apps and tests use `latest`. |
 | TS | TypeScript 5.8, esbuild ESM, Tailwind CSS v4 |
-| Components | Syncfusion EJ2 (Fusion) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
+| Components | Syncfusion EJ2 32.x (Fusion) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
 | Validation | FluentValidation 12.x, extracted to client rules via `FluentValidationAdapter` |
-| Tests | NUnit 4.5, Vitest 3.x + jsdom, Playwright 1.52 |
-| Schema | JSON Schema with 61 `$defs`, validated by `Json.Schema` (NJsonSchema) |
+| Tests | NUnit 4.3-4.5, Vitest 3.x + jsdom (configured, no tests yet), Playwright 1.52 |
+| Schema | JSON Schema with 61 `$defs`, validated by `JsonSchema.Net` |
 
 ## Skills
 
@@ -139,7 +150,10 @@ All tests pass before every commit.
 | `modern-csharp` | C# patterns (needs rewrite — currently promotes C# 12+, repo uses C# 8.0) |
 | `bdd-testing` | Playwright BDD tests, 5 rules, 7-behavior contract, blind reviewer |
 
-XML documentation quality is enforced by hookify rule `hookify.xml-docs-quality.local.md`.
+10 hookify rules in `.claude/hookify.*.local.md` enforce quality gates automatically:
+`enforce-csharp8`, `no-public-in-libraries`, `no-raw-inputs`, `no-js-in-views`,
+`bdd-test-enforcement`, `bdd-public-api-only`, `xml-docs-quality`,
+`commit-requires-relevant-tests`, `merge-requires-all-tests`, `protect-api-surface`.
 
 ## Rules
 
@@ -150,14 +164,14 @@ No inline `<script>` blocks — `root.ts` handles discovery and boot automatical
 
 ### 2. New or Changed Primitive — All Layers
 
-1. C# descriptor — sealed class, `internal` constructor
-2. Polymorphic registration — `WriteOnlyPolymorphicConverter` switch
+1. C# plan model class — sealed class, `internal` constructor
+2. Polymorphic registration — `WriteOnlyPolymorphicConverter` delegates to concrete type
 3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
 4. JSON schema — failing `AssertSchemaValid()` test drives the update
-5. TS types — new interface in `Scripts/types/`, discriminated union with `kind`
+5. TS types — new interface in `Alis.Reactive.SandboxApp/Scripts/types/`, discriminated union with `kind`
 6. Runtime handler — new switch case + `assertNever`
 7. C# unit test — `AssertSchemaValid()` validates rendered JSON against schema
-8. TS unit test — runtime behavior via `boot()`
+8. TS unit test — `Alis.Reactive.SandboxApp/Scripts/__tests__/*.test.ts`, runtime behavior via `boot()`
 9. Playwright test — browser behavior with sandbox view
 10. Sandbox view — demonstrate the primitive
 
@@ -169,10 +183,9 @@ Duplication between slices is intentional.
 ### 4. Vendor Isolation
 
 New component = C# vertical slice with `IInputComponent`. Zero TS runtime changes.
-`resolver.ts` is the only module that maps vendor to DOM root (`resolveVendorRoot` at line 60)
-and wires vendor-specific events (`wireEvent` at line 188). Adding a third vendor must only
-touch `resolver.ts` and add a `resolution/event-{vendor}.ts` file. Vendor checks in other
-modules violate this rule.
+`resolver.ts` is the only module that maps vendor to DOM root (`resolveVendorRoot`) and wires
+vendor-specific events (`wireEvent`). Adding a third vendor must only touch `resolver.ts` and
+add a `resolution/event-{vendor}.ts` file. Vendor checks in other modules violate this rule.
 
 ### 5. Fail Fast — Fallbacks Are Exceptions
 
@@ -182,15 +195,16 @@ A fallback is a rare, deliberate, justified exception — never the default resp
 
 ### 6. Plan-Driven IDs — No DOM Scanning
 
-See "Plan-Driven IDs" section above. `IdGenerator` generates every element ID from the model
-expression at C# render time. Runtime uses `getElementById` only.
+`IdGenerator` generates every element ID from the model expression at C# render time.
+The runtime resolves plan components via `getElementById` only. Non-input IDs are the
+developer's explicit choice. No fallback IDs. No scanning.
 
 ### 7. API Surface Is Frozen
 
-Enforced by hookify rule `hookify.protect-api-surface.local.md`. No `public` constructors
-on descriptor or plan model classes. All descriptor constructors are `internal`. All plan
-model properties use `internal set`. Developers interact through builder APIs and factory
-methods (`Html.On`, `Html.InputField`, `p.Get`, `p.When`) — never through constructors.
+No `public` constructors on plan model classes. All plan model class constructors are
+`internal`. All plan model properties use `internal set`. Developers interact through builder
+APIs and factory methods (`Html.On`, `Html.InputField`, `p.Get`, `p.When`) — never through
+constructors.
 
 ### 8. Root Cause, Not Patch
 
@@ -200,16 +214,16 @@ input and evidence-based output criteria. Fix the root cause. Verify in browser.
 
 ### 9. Quality Aspirations
 
-These are known weaknesses tracked for improvement:
+Known weaknesses tracked for improvement:
 
 - **DDD depth**: Domain model uses `null` where Value Objects with constructor invariants
   should enforce valid state. Association and aggregation boundaries are implicit.
   Screaming names (types that express domain intent) are underused.
-- **Serialization**: `[JsonIgnore(Condition = WhenWritingNull)]` attributes are scattered
-  across plan model classes. A cleaner approach would use explicit serialization contracts.
-- **TS tracing**: `trace.ts` is 38 lines of `console.log` with levels. Should aspire to
-  OTel-style structured tracing — explicit data flowing through modules, correlation IDs,
-  proper span context, actionable error messages.
+- **Serialization**: `[JsonIgnore(Condition = WhenWritingNull)]` attributes scattered
+  across plan model classes instead of explicit serialization contracts.
+- **TS tracing**: `core/trace.ts` is 38 lines using `console.error`/`warn`/`log` dispatched
+  by level. Should aspire to OTel-style structured tracing — explicit data flowing through
+  modules, correlation IDs, proper span context, actionable error messages.
 
 ### 10. Git Worktrees for Feature Work
 
@@ -247,11 +261,12 @@ If touching an unexpected layer, the plan or task is wrong. Stop, save learnings
 - [ ] Each boundary crossing driven by a failing test?
 - [ ] Root cause fixed, not a patch? No code smells?
 - [ ] Output evidence: what proves this change is correct?
+- [ ] Coverage matrix: every item in scope mapped to a test or justified as untestable?
 
 ### Review Loop — Every Change
 
 Each change cycles through three gates with team sign-off:
 
-1. **Plan Review**: Post plan → 3 reviewers (Codex xhigh + 2 agents) → fix findings → sign-off
-2. **Implementation Review**: Post diff → 2 reviewers verify against plan + code → sign-off
-3. **Post-Implementation**: Every file:line reference verified → all tests pass → browser confirmed
+1. **Plan Review**: Post plan → reviewers verify against code → fix findings → sign-off
+2. **Implementation Review**: Post diff → reviewers verify against plan + actual code → sign-off
+3. **Post-Implementation**: All tests pass → browser verified → no broken cross-references
