@@ -20,9 +20,9 @@ import { validateContainer, showServerErrors } from "../validation";
 import { executeRequest } from "./http";
 import { injectHtml } from "./inject";
 import { assertNever } from "../core/assert-never";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 
-const log = scope("execute");
+const t = tracer("execute");
 
 let activePlan: Plan | undefined;
 
@@ -144,7 +144,7 @@ function executeBranch(
       return executeReaction(c.reaction, plan, ctx);
     }
   }
-  log.trace("no-branch-taken");
+  t.trace("branch.no-match", { caseCount: reaction.cases.length });
 }
 
 function hasConfirm(condition: Condition): boolean {
@@ -168,7 +168,7 @@ async function executeBranchAsync(
       return;
     }
   }
-  log.trace("no-branch-taken");
+  t.trace("branch.no-match", { caseCount: reaction.cases.length });
 }
 
 // ── Parallel executor ─────────────────────────────────────
@@ -184,8 +184,9 @@ async function executeParallel(
       return r instanceof Promise ? r : Promise.resolve();
     })
   );
-  for (const r of results) {
-    if (r.status === "rejected") log.error("parallel step failed", { error: String(r.reason) });
+  for (let i = 0; i < results.length; i++) {
+    const r = results[i];
+    if (r.status === "rejected") t.error("parallel.step.fail", { stepIndex: i }, r.reason as Error);
   }
   if (reaction.onSettled) {
     const r = executeReaction(reaction.onSettled, plan, ctx);
@@ -202,7 +203,7 @@ function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void 
   const root = resolveSource(plan, reaction.on, ctx);
   const value = evaluateValue(reaction.value, plan, ctx);
   const target = reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope;
-  log.trace("set", { target, property: reaction.property, value });
+  t.trace("reaction.set", { component: target, property: reaction.property, value });
 
   if (reaction.on.kind === "payload") {
     // Payload objects (event args, response bodies) don't have JsTypes.
@@ -229,7 +230,7 @@ function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): voi
   const target = reaction.on.kind === "component" ? reaction.on.component
     : reaction.on.kind === "plugin" ? (reaction.on as import("../types").PluginSource).name
     : reaction.on.scope;
-  log.trace("call", { target, method: reaction.method, args });
+  t.trace("reaction.call", { component: target, method: reaction.method, args });
 
   if (reaction.on.kind === "payload") {
     // Payload objects (event args, response bodies) don't have JsTypes.
@@ -253,7 +254,7 @@ function executeDispatch(reaction: DispatchReaction, plan: Plan, ctx?: ExecConte
   const detail = reaction.data
     ? evaluateValue(reaction.data, plan, ctx)
     : {};
-  log.trace("dispatch", { event: reaction.event, detail });
+  t.trace("reaction.dispatch", { event: reaction.event, detail });
   document.dispatchEvent(new CustomEvent(reaction.event, { detail }));
 }
 

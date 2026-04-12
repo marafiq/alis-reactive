@@ -1,6 +1,6 @@
-import { scope } from "../../core/trace";
+import { tracer } from "../../tracing";
 
-const log = scope("confirm");
+const t = tracer("confirm");
 const ELEMENT_ID = "alisConfirmDialog";
 
 let queue = Promise.resolve();
@@ -38,7 +38,7 @@ export function init(): void {
   // Not a plan component — getElementById is correct.
   const el = document.getElementById(ELEMENT_ID);
   if (!el) {
-    log.warn("confirm element not found", { id: ELEMENT_ID });
+    t.warn("confirm.element.not-found", { id: ELEMENT_ID });
     return;
   }
 
@@ -60,5 +60,5 @@ export function init(): void {
     });
   };
 
-  log.info("initialized");
+  t.info("confirm.ready", {});
 }

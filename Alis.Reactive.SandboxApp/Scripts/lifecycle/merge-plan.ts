@@ -3,7 +3,7 @@
 
 import type { Plan, Behavior, Component } from "../types";
 import { unwireField } from "../validation/live-clear";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 
 /** Deep-merge validation rules from an incoming component into an existing one. */
 function deepMergeValidationRules(existing: Component | undefined, incoming: Component): void {
@@ -13,7 +13,7 @@ function deepMergeValidationRules(existing: Component | undefined, incoming: Com
   incoming.container.validationRules = [...ruleMap.values()];
 }
 
-const log = scope("merge");
+const t = tracer("merge");
 
 type WireBehaviors = (behaviors: Behavior[], plan: Plan, signal?: AbortSignal) => void;
 type WireContainerValidation = (plan: Plan) => void;
@@ -79,7 +79,7 @@ export class PlanRegistry {
     for (const [key, type] of Object.entries(incoming.types)) {
       const owner = this.keyOwners.get(`t:${key}`);
       if (owner && owner !== partId && partId) {
-        log.error("cross-source type collision", { key, owner, incoming: partId });
+        t.error("merge.type.collision", { key, owner, incomingPartId: partId });
         continue;
       }
       target.types[key] = type;
@@ -92,7 +92,7 @@ export class PlanRegistry {
     for (const [key, comp] of Object.entries(incoming.components)) {
       const owner = this.keyOwners.get(`c:${key}`);
       if (owner && owner !== partId && partId) {
-        log.error("cross-source component collision", { key, owner, incoming: partId });
+        t.error("merge.component.collision", { key, owner, incomingPartId: partId });
         continue;
       }
       deepMergeValidationRules(target.components[key], comp);

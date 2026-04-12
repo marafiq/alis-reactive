@@ -16,12 +16,12 @@ import type {
 import type { ExecContext } from "../types";
 import { walkPath, walkPathParent } from "../core/walk";
 import { resolvePlugin } from "../core/plugin-registry";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 import { assertNever } from "../core/assert-never";
 import { wire as wireNative } from "./event-native";
 import { wire as wireFusion } from "./event-fusion";
 
-const log = scope("resolver");
+const t = tracer("resolver");
 
 // ── Source resolution ──────────────────────────────────────
 
@@ -192,4 +192,4 @@ export function wireEvent(
   }
 }
 
-log.debug("loaded");
+t.debug("resolver.ready", {});

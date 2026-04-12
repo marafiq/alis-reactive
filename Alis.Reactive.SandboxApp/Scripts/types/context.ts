@@ -23,4 +23,6 @@ export interface ExecContext {
    * Resolved by PayloadSource with scope "local". Not currently used.
    */
   readonly local?: Record<string, unknown>;
+  /** Active trace span for this execution branch. */
+  readonly span?: import("../tracing/types").Span;
 }

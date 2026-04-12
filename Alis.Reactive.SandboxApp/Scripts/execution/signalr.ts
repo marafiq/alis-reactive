@@ -5,9 +5,9 @@ import * as signalR from "@microsoft/signalr";
 import type { SignalRTrigger, Reaction, Plan } from "../types";
 import { executeReaction } from "./execute";
 import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 
-const log = scope("signalr");
+const t = tracer("signalr");
 
 interface ManagedConnection {
   readonly connection: signalR.HubConnection;
@@ -26,16 +26,16 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       await connection.start();
-      log.info("connected", { hubUrl });
+      t.info("signalr.connection.open", { hubUrl });
       return;
     } catch (err) {
       const delay = delays[attempt] ?? 30000;
-      log.warn("start failed, retrying", { hubUrl, attempt: attempt + 1, delay, error: String(err) });
+      t.warn("signalr.start.retry", { hubUrl, attempt: attempt + 1, delay }, err as Error);
       await new Promise(r => setTimeout(r, delay));
     }
   }
 
-  log.error("start failed after all retries", { hubUrl, attempts: maxAttempts });
+  t.error("signalr.start.fail", { hubUrl, attempts: maxAttempts });
   const managed = hubs.get(hubUrl);
   if (managed) showRetryIndicators(hubUrl, managed.targetIds, () => retryConnection(hubUrl));
 }
@@ -43,18 +43,18 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
 function retryConnection(hubUrl: string): void {
   const managed = hubs.get(hubUrl);
   if (!managed) {
-    log.warn("retry requested but no connection found", { hubUrl });
+    t.warn("signalr.retry.no-connection", { hubUrl });
     removeRetryIndicators(hubUrl);
     return;
   }
 
   const { connection } = managed;
   if (connection.state !== signalR.HubConnectionState.Disconnected) {
-    log.debug("retry skipped — not disconnected", { hubUrl, state: connection.state });
+    t.debug("signalr.retry.skip", { hubUrl, state: connection.state });
     return;
   }
 
-  log.info("manual retry", { hubUrl });
+  t.info("signalr.retry", { hubUrl });
   removeRetryIndicators(hubUrl);
   managed.startPromise = startWithRetry(connection, hubUrl);
 }
@@ -68,8 +68,8 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
     .withAutomaticReconnect()
     .configureLogging({
       log: (level: signalR.LogLevel, message: string) => {
-        if (level >= signalR.LogLevel.Warning) log.warn("lib", { message });
-        else if (level >= signalR.LogLevel.Information) log.debug("lib", { message });
+        if (level >= signalR.LogLevel.Warning) t.warn("signalr.lib", { message });
+        else if (level >= signalR.LogLevel.Information) t.debug("signalr.lib", { message });
       }
     })
     .build();
@@ -77,20 +77,20 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
   const targetIds = new Set<string>();
 
   connection.onreconnecting(err => {
-    log.warn("reconnecting", { hubUrl, error: err ? String(err) : undefined });
+    t.warn("signalr.reconnect", { hubUrl }, err ?? undefined);
   });
 
   connection.onreconnected(connectionId => {
-    log.info("reconnected", { hubUrl, connectionId });
+    t.info("signalr.connection.restore", { hubUrl, connectionId });
     removeRetryIndicators(hubUrl);
   });
 
   connection.onclose(err => {
     if (managed!.stopping) {
-      log.debug("stopped", { hubUrl });
+      t.debug("signalr.connection.stop", { hubUrl });
       hubs.delete(hubUrl);
     } else {
-      log.warn("disconnected", { hubUrl, error: err ? String(err) : undefined });
+      t.warn("signalr.connection.drop", { hubUrl }, err ?? undefined);
       showRetryIndicators(hubUrl, targetIds, () => retryConnection(hubUrl));
     }
   });
@@ -128,12 +128,12 @@ export function wireSignalR(
     }
 
     const evt = args[0] as Record<string, unknown>;
-    log.debug("method", { hubUrl: trigger.hubUrl, method: trigger.method });
+    t.debug("signalr.method", { hubUrl: trigger.hubUrl, method: trigger.method });
     const result = executeReaction(reaction, plan, { event: evt });
     if (result instanceof Promise) {
-      result.catch(err => log.error("reaction failed", { error: String(err) }));
+      result.catch(err => t.error("signalr.reaction.fail", { hubUrl: trigger.hubUrl, method: trigger.method }, err as Error));
     }
   });
 
-  log.debug("listening", { hubUrl: trigger.hubUrl, method: trigger.method });
+  t.debug("signalr.listen", { hubUrl: trigger.hubUrl, method: trigger.method });
 }

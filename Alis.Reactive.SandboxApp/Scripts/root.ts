@@ -2,14 +2,15 @@
 // esbuild bundles from here. Auto-discovers [data-reactive-plan] elements on page load.
 // V3: plans have version, planId, types, components, behaviors.
 
-import { boot, trace } from "./lifecycle/boot";
+import { boot } from "./lifecycle/boot";
 import { init as initConfirm } from "./components/fusion/confirm";
 import { initNativeActionLinks } from "./components/native/native-action-link";
 import "./components/native/drawer";  // side-effect: wires close button + Escape key
 import "./components/native/loader";  // side-effect: handles target positioning + timeout
 import { composeInitialPlans } from "./lifecycle/merge-plan";
 import type { Plan } from "./types";
-import type { TraceLevel } from "./core/trace";
+import { configure, flush } from "./tracing";
+import { resolveLevel } from "./tracing/context";
 import { registerPlugin } from "./core/plugin-registry";
 
 // Drain passive plugin queue — plugins push here from separate bundles before framework loads
@@ -26,9 +27,6 @@ const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
 const plans: Plan[] = [];
 
 for (const el of planEls) {
-  const traceLevel = el.dataset.trace as TraceLevel | undefined;
-  if (traceLevel) trace.setLevel(traceLevel);
-
   try {
     const text = el.textContent?.trim();
     if (!text) throw new Error("[alis] empty plan element");
@@ -37,6 +35,18 @@ for (const el of planEls) {
     throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(e as Error).message}`);
   }
 }
+
+// Configure tracing from first plan's traceparent and resolved level
+if (plans.length > 0) {
+  const firstPlan = plans[0];
+  const firstEl = planEls[0];
+  configure({
+    level: resolveLevel(firstPlan.traceLevel, firstEl?.dataset.trace),
+    traceparent: firstPlan.traceparent,
+  });
+}
+
+window.addEventListener("beforeunload", () => flush());
 
 for (const plan of composeInitialPlans(plans)) {
   boot(plan);

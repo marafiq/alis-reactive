@@ -9,9 +9,9 @@ import { validateContainer } from "../validation";
 import { evaluateValue } from "../core/evaluate";
 import { formatForWire } from "../core/wire-format";
 import { resolveRouteParams } from "../core/url-template";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 
-const log = scope("http");
+const t = tracer("http");
 
 interface ResolvedFetch {
   readonly url: string;
@@ -62,7 +62,7 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     if (req.container) {
       const valid = validateContainer(plan, req.container, ctx);
       if (!valid) {
-        log.debug("validation failed, aborting request");
+        t.debug("http.validation.fail", { container: req.container });
         return;
       }
     }
@@ -82,7 +82,7 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     const requestPayload = gatherResult.body instanceof FormData ? {} : gatherResult.body;
     ctx = { ...ctx, request: requestPayload };
 
-    log.debug("fetch", { method: req.method, url: resolved.url });
+    t.debug("http.request.send", { method: req.method, url: resolved.url });
 
     // 4. Fetch
     const response = await fetch(resolved.url, resolved.init);
@@ -100,7 +100,7 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     }
   } catch (err) {
     const status = err instanceof TypeError ? 0 : -1;
-    log.error(status === 0 ? "network error" : "client error", { url: req.url, error: String(err) });
+    t.error("http.request.fail", { url: req.url, method: req.method }, err as Error);
     await routeHandlers(req.error, status, plan, ctx);
     await runComplete(req, plan, ctx);
     return; // no chained on error

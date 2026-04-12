@@ -4,9 +4,19 @@ import { executeReaction } from "./execute";
 import { wireServerPush } from "./server-push";
 import { wireSignalR } from "./signalr";
 import { assertNever } from "../core/assert-never";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 
-const log = scope("trigger");
+const t = tracer("trigger");
+
+function describeTrigger(trigger: StartsWhen): string {
+  switch (trigger.kind) {
+    case "page-ready":       return "page-ready";
+    case "document-event":   return `document-event:${trigger.event}`;
+    case "component-event":  return `component-event:${trigger.component}.${trigger.event}`;
+    case "server-push":      return `server-push:${trigger.url}/${trigger.event}`;
+    case "signalr":          return `signalr:${trigger.hubUrl}/${trigger.method}`;
+  }
+}
 
 /**
  * Execute a reaction and handle errors for both sync and async paths.
@@ -16,13 +26,14 @@ const log = scope("trigger");
  * this returns, so the mutation is visible.
  */
 function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext): void {
+  const scoped = t.withSpan(ctx?.span);
   try {
     const result = executeReaction(reaction, plan, ctx);
     if (result instanceof Promise) {
-      result.catch(err => log.error("reaction failed", { error: String(err) }));
+      result.catch(err => scoped.error("reaction.fail", { planId: plan.planId }, err as Error));
     }
   } catch (err) {
-    log.error("reaction failed (sync)", { error: String(err) });
+    scoped.error("reaction.fail", { planId: plan.planId }, err as Error);
   }
 }
 
@@ -46,7 +57,7 @@ export function wireBehavior(
       break;
 
     case "document-event":
-      log.debug("document-event: listening", { event: trigger.event });
+      t.debug("trigger.wire", { kind: "document-event", event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
         const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e };
         runReaction(reaction, plan, ctx);
@@ -61,7 +72,7 @@ export function wireBehavior(
       const eventDef = jsType.events?.[trigger.event];
       const channel = eventDef?.channel ?? trigger.event;
 
-      log.debug("component-event", { component: trigger.component, event: trigger.event, channel });
+      t.debug("trigger.wire", { kind: "component-event", component: trigger.component, event: trigger.event, channel });
 
       wireEvent(plan, trigger.component, channel, (eventData) => {
         const ctx: ExecContext = { event: eventData };

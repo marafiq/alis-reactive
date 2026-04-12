@@ -4,11 +4,11 @@
 
 import type { Condition, CompareCondition, Plan, ValueProducer } from "../types";
 import type { ExecContext } from "../types";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 import { assertNever } from "../core/assert-never";
 import { applyShape, toString } from "../core/shape-convert";
 
-const log = scope("conditions");
+const t = tracer("conditions");
 
 // evaluateValue lives in execute.ts which imports conditions.ts.
 // Break the cycle: callers set the evaluator once at boot time.
@@ -36,7 +36,7 @@ export function evaluateCondition(condition: Condition, plan: Plan, ctx?: ExecCo
     case "not":
       return !evaluateCondition(condition.term, plan, ctx);
     case "confirm":
-      log.warn("ConfirmCondition in sync context — denying (callers should use async path)");
+      t.warn("condition.confirm.sync-deny", {});
       return false;
     default:
       assertNever(condition, "condition kind");
@@ -81,7 +81,7 @@ function evaluateCompare(cond: CompareCondition, plan: Plan, ctx?: ExecContext):
   if (unary !== undefined) return unary;
 
   const shapedRight = resolveRight(cond, evalValue, plan, ctx);
-  log.trace("eval", { op: cond.op, left: shapedLeft, right: shapedRight });
+  if (t.enabled("trace")) t.trace("condition.eval", { op: cond.op, left: shapedLeft, right: shapedRight });
 
   return evaluateBinaryOp(cond, shapedLeft, shapedRight);
 }
@@ -170,7 +170,7 @@ function matchesRegex(left: unknown, right: unknown): boolean {
   try {
     return new RegExp(op).test(str);
   } catch {
-    log.warn("invalid condition regex", { operand: right });
+    t.warn("condition.regex.invalid", { operand: right });
     return false;
   }
 }

@@ -9,6 +9,8 @@ export interface Plan {
   version: 3;
   planId: string;
   partId?: string;
+  traceparent?: string;
+  traceLevel?: string;
   types: Record<string, JsType>;
   components: Record<string, Component>;
   behaviors: Behavior[];
