@@ -58,3 +58,58 @@
         </p>
     </a>
 </div>
+
+<h2 class="text-lg font-semibold text-text-primary mt-10 mb-4">Nested &amp; Conditional</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <a asp-area="Sandbox" asp-controller="NestedBugs" asp-action="NestedCondition"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+        <div class="flex items-start justify-between">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                Nested Condition
+            </h3>
+            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+        </div>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Nested model validation with SetValidator — address fields under a parent model with conditional visibility
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="NestedBugs" asp-action="ParentChild"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+        <div class="flex items-start justify-between">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                Parent Child
+            </h3>
+            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+        </div>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Parent-child form with nested property validation — tests field correlation across model hierarchies
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="NestedBugs" asp-action="IncludeConditional"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+        <div class="flex items-start justify-between">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                Include Conditional
+            </h3>
+            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+        </div>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Conditional Include — gather specific fields based on condition state, not the entire form
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="NestedBugs" asp-action="OperatorConditions"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+        <div class="flex items-start justify-between">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                Operator Conditions
+            </h3>
+            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+        </div>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Validation rules that activate based on condition operators — WhenField toggles rule enforcement dynamically
+        </p>
+    </a>
+</div>
