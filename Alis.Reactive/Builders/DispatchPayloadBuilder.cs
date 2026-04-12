@@ -111,7 +111,16 @@ namespace Alis.Reactive.Builders
                 {
                     var needsNesting = !current.ContainsKey(segments[i]);
                     if (needsNesting)
+                    {
                         current[segments[i]] = ValueProducer.Object(new Dictionary<string, ValueProducer>());
+                    }
+                    else if (!(current[segments[i]] is ObjectProducer))
+                    {
+                        throw new InvalidOperationException(
+                            $"Dispatch payload conflict: '{segments[i]}' is set as a leaf value " +
+                            $"but also used as a parent for '{kvp.Key}'. " +
+                            $"Set either the parent or the children, not both.");
+                    }
 
                     current = ((ObjectProducer)current[segments[i]]).WritableFields;
                 }
