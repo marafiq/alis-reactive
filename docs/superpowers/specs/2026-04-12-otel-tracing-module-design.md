@@ -7,8 +7,8 @@
 
 ## Problem
 
-The TS runtime has 38 lines of level-gated console logging (`core/trace.ts`). There are 65
-`log.*` calls across 16 files and 47 throw statements with `[alis]` prefix. There is no
+The TS runtime has 38 lines of level-gated console logging (`core/trace.ts`). There are 66
+`log.*` calls across 14 files and 47 throw statements with `[alis]` prefix. There is no
 correlation between events, no span hierarchy, no breadcrumb trail, no structured error
 context, and no distributed trace continuity between server and browser.
 
@@ -749,13 +749,13 @@ breadcrumbs, trace context, and plan context automatically attached.
 
 | Location | Event Name | Required Context Fields |
 |----------|-----------|------------------------|
-| `trigger.ts:19-26` (runReaction) | `reaction.failed` | trigger kind, trigger event/component, planId, error + stack, breadcrumbs (auto) |
-| `execute.ts:187-188` (parallel) | `parallel.step.failed` | step index, parent reaction kind, error + stack, breadcrumbs (auto) |
-| `http.ts:101-106` (fetch) | `http.request.failed` | method, url, status, error + stack, breadcrumbs (auto) |
-| `root.ts:36-38` (parse) | `plan.parse.failed` | element id, content length, parse error + stack |
-| `server-push.ts:96` (SSE reaction) | `sse.reaction.failed` | url, event, error + stack, breadcrumbs (auto) |
-| `signalr.ts:134` (SignalR reaction) | `signalr.reaction.failed` | hubUrl, method, error + stack, breadcrumbs (auto) |
-| `native-action-link.ts:46` (action link) | `action-link.failed` | anchor id, error + stack, breadcrumbs (auto) |
+| `trigger.ts:19-26` (runReaction) | `reaction.fail` | trigger kind, trigger event/component, planId, error + stack, breadcrumbs (auto) |
+| `execute.ts:187-188` (parallel) | `parallel.step.fail` | step index, parent reaction kind, error + stack, breadcrumbs (auto) |
+| `http.ts:101-106` (fetch) | `http.request.fail` | method, url, status, error + stack, breadcrumbs (auto) |
+| `root.ts:36-38` (parse) | `plan.parse.fail` | element id, content length, parse error + stack |
+| `server-push.ts:96` (SSE reaction) | `sse.reaction.fail` | url, event, error + stack, breadcrumbs (auto) |
+| `signalr.ts:134` (SignalR reaction) | `signalr.reaction.fail` | hubUrl, method, error + stack, breadcrumbs (auto) |
+| `native-action-link.ts:46` (action link) | `action-link.fail` | anchor id, error + stack, breadcrumbs (auto) |
 
 (Note: this is 7 catch points, not 5. The initial review correctly identified 5 in execute/trigger/http/root.
 The full audit found 2 more in server-push.ts:96 and signalr.ts:134.)
@@ -778,7 +778,7 @@ function describeTrigger(trigger: StartsWhen): string {
 
 Every trace event follows these rules:
 
-1. **Event names are dotted, noun-first:** `boot.start`, `http.response`, `reaction.failed`,
+1. **Event names are dotted, noun-first:** `boot.start`, `http.response`, `reaction.fail`,
    `component.resolve`, `gather.serialize.fail`. Not verbs, not past tense.
 
 2. **Data fields use domain names:** `component` not `target`, `planId` not `id`, `field` not
@@ -951,7 +951,7 @@ Old `core/trace.ts` is deleted. Every `import { scope } from "../core/trace"` be
 | 43 | `log.debug("activate", { id, href })` | `t.debug("action-link.start", { id: anchor.id, href: anchor.href })` |
 | 46 | `result.catch(err => log.error("reaction failed", ...))` | `result.catch(err => t.error("action-link.fail", { id: anchor.id }, err))` |
 
-**Total: 65 call sites across 16 files.**
+**Total: 66 call sites across 14 files.**
 
 ### Performance Budget
 
