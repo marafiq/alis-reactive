@@ -32,7 +32,7 @@ component: "Component Class\nsealed, IInputComponent\nVendor + ReadExpr" {
   style.stroke: "#4285f4"
   style.font-size: 16
 }
-events: "Events + Args\nTypedEventDescriptor\ntyped arg properties" {
+events: "Events + Args\nTypedEvent\ntyped arg properties" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
@@ -82,7 +82,7 @@ A `sealed class` with a parameterless constructor. Implements `IInputComponent` 
 
 ### 2. Events registry — what the component can fire
 
-A singleton class with `TypedEventDescriptor<TArgs>` properties. The `.Reactive()` lambda `evt => evt.Changed` resolves to this event definition, which carries the JS event name and the typed args class.
+A singleton class with `TypedEvent<TArgs>` properties. The `.Reactive()` lambda `evt => evt.Changed` resolves to this event definition, which carries the JS event name and the typed args class.
 
 ### 3. Event args — typed payload properties
 

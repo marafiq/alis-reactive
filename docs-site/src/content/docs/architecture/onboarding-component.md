@@ -110,11 +110,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native.Extensions;     // for InputBoundField<TModel, TProp>
 using Syncfusion.EJ2;                       // for setup.Helper.EJS()
 using Syncfusion.EJ2.DropDowns;             // SF component namespace (varies)
@@ -278,7 +274,7 @@ Registers the component in the plan's `ComponentsMap` and renders the SF builder
 ```csharp
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns; // or the SF namespace for your component
-using Alis.Reactive.Descriptors;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native.Extensions;
 
 public static class FusionXxxHtmlExtensions
@@ -375,12 +371,12 @@ public sealed class FusionXxxEvents
     public static readonly FusionXxxEvents Instance = new();
     private FusionXxxEvents() { }
 
-    public TypedEventDescriptor<FusionXxxChangeArgs> Changed =>
+    public TypedEvent<FusionXxxChangeArgs> Changed =>
         new("change", new FusionXxxChangeArgs());
 }
 ```
 
-Each property creates a `TypedEventDescriptor` with:
+Each property creates a `TypedEvent` with:
 - **JS event name** — the string SF uses for `addEventListener` (e.g., `"change"`, `"filtering"`, `"focus"`, `"blur"`)
 - **Phantom args instance** — used only for compile-time type inference, never read at runtime
 
@@ -398,7 +394,7 @@ private static readonly FusionXxx Component = new();
 public static XxxBuilder Reactive<TModel, TArgs>(
     this XxxBuilder builder,
     ReactivePlan<TModel> plan,
-    Func<FusionXxxEvents, TypedEventDescriptor<TArgs>> eventSelector,
+    Func<FusionXxxEvents, TypedEvent<TArgs>> eventSelector,
     Action<TArgs, PipelineBuilder<TModel>> pipeline)
     where TModel : class
 {
@@ -626,16 +622,16 @@ Not every component follows the standard template. These patterns appear in the 
 
 ### Multiple events on one component
 
-Some components have Changed + Focus + Blur. Add one `TypedEventDescriptor` per event:
+Some components have Changed + Focus + Blur. Add one `TypedEvent` per event:
 
 ```csharp
-public TypedEventDescriptor<FusionXxxChangeArgs> Changed =>
+public TypedEvent<FusionXxxChangeArgs> Changed =>
     new("change", new FusionXxxChangeArgs());
 
-public TypedEventDescriptor<FusionXxxFocusArgs> Focus =>
+public TypedEvent<FusionXxxFocusArgs> Focus =>
     new("focus", new FusionXxxFocusArgs());
 
-public TypedEventDescriptor<FusionXxxBlurArgs> Blur =>
+public TypedEvent<FusionXxxBlurArgs> Blur =>
     new("blur", new FusionXxxBlurArgs());
 ```
 
@@ -924,7 +920,7 @@ public sealed class FusionXxxEvents
     public static readonly FusionXxxEvents Instance = new();
     private FusionXxxEvents() { }
 
-    public TypedEventDescriptor<FusionXxxSelectedArgs> Selected =>
+    public TypedEvent<FusionXxxSelectedArgs> Selected =>
         new("selected", new FusionXxxSelectedArgs());
 }
 ```
@@ -938,7 +934,7 @@ private static readonly FusionXxx Component = new();
 
 public static FusionXxxBuilder<TModel> Reactive<TModel, TArgs>(
     this FusionXxxBuilder<TModel> builder,
-    Func<FusionXxxEvents, TypedEventDescriptor<TArgs>> eventSelector,
+    Func<FusionXxxEvents, TypedEvent<TArgs>> eventSelector,
     Action<TArgs, PipelineBuilder<TModel>> pipeline)
     where TModel : class
 {
