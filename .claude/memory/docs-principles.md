@@ -32,7 +32,7 @@ Show small code (3-5 lines) that answers one question. Never dump big JSON blobs
 All code must be verified in a working sandbox page before appearing in docs. Create the actual view/controller/model in SandboxApp, build, run, test in browser, then copy to docs.
 
 Cascade examples use real Gather pattern:
-`.Gather(g => g.Include<FusionDropDownList, Model>(m => m.Country))` -- never string concatenation for URLs.
+`.Gather(g => g.Include(m => m.Country))` -- never string concatenation for URLs.
 
 "If you get anything wrong in terms of syntax or explanation, users will not use it. It will never come back."
 
@@ -44,7 +44,7 @@ Cascade examples use real Gather pattern:
 4. Do not document `this` param on single-param extensions. When other params exist, include `html` minimally to avoid CS1573.
 5. Code comments must be truthful. Research actual behavior before writing.
 6. No em-dashes in XML docs. Rider grammar linter flags them as redundant punctuation. Use colons or restructure.
-7. Run Rider diagnostics (`mcp__jetbrains__get_file_problems`) on every file touched before committing.
+7. Run Rider diagnostics on every file touched before committing.
 8. When launching doc agents, the FIRST instruction must be: load `dotnet-xml-docs` skill. Do not bury it in a setup section.
 9. No "runtime" in summaries or remarks (see Dev-Facing Voice above).
 10. No implementation details in summaries (see Dev-Facing Voice above).

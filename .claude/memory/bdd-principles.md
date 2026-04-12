@@ -65,12 +65,12 @@ Passing is not enough. See blind reviewer protocol below.
 Sandbox pages must use framework primitives. Never work around the framework.
 
 - `Html.On(plan, t => t.DomReady(...))` -- never raw `<script>`
-- `Html.TextBoxFor(m => m.Name)` -- never raw `<input type="text">`
-- `Component<NativeButton>().Reactive(evt => evt.Click, ...)` -- never raw onclick
+- `Html.InputField(plan, m => m.Name).NativeTextBox(...)` -- never raw `<input type="text">`
+- `Html.NativeButton("id", "text").Reactive(plan, evt => evt.Click, ...)` -- never raw onclick
 - `.Validate<TValidator>()` -- never manual validation logic
 - `p.Element("id").SetText(...)` -- never raw DOM manipulation
 - `.Gather(g => g.IncludeAll())` -- never manual form serialization
-- `Html.Field(m => m.Name).Required().Label("Name")` -- never raw label/input combos
+- `Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))` -- never raw label/input combos
 
 Tests must also use the public DSL, not internal constructors. Arrange with `Html.On`,
 `CreatePlan()`, `Trigger()`, and builders. Never `new SequentialReaction(...)` or similar

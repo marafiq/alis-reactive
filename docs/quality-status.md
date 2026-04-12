@@ -9,10 +9,10 @@ Single source of truth for quality work. Updated after each quality session.
 - XML docs on builders — PRs #95, #97 (Builder APIs, PlanModel contract types)
 - Design system cleanup — PR #96 (unused builders removed, enums moved, TagMode fix)
 - Schema drift detection — `tests/Alis.Reactive.DriftDetection.Tests/`
-- Plugin Source vertical slice — 4 source kinds (component, URL, plugin, event)
+- Plugin Source vertical slice — 4 source kinds (component, payload, URL, plugin)
 - HTTP Headers, URL Templates, URL Query Source — all landed
-- Skill review — 6/8 reviewed with fixes (reactive-dsl, http-pipeline, conditions-dsl,
-  onboard-fusion, validation-rules, bdd-testing, solid-ts-audit)
+- Skill review — 7/8 reviewed (reactive-dsl, http-pipeline, conditions-dsl,
+  onboard-fusion, validation-rules, bdd-testing, solid-ts-audit). 6 had fixes applied.
 - GitHub issue triage — 4 stale issues closed (#36, #44, #46, #50)
 
 ## Open — Code
