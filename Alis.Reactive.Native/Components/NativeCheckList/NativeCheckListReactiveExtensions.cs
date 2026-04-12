@@ -20,8 +20,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeCheckListReactiveExtensions
     {
-        private static readonly NativeCheckList _component = new NativeCheckList();
-
         /// <summary>
         /// Wires a <see cref="NativeCheckList"/> browser event into a reactive pipeline.
         /// </summary>

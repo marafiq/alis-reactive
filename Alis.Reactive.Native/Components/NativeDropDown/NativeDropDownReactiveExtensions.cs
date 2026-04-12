@@ -21,8 +21,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeDropDownReactiveExtensions
     {
-        private static readonly NativeDropDown _component = new NativeDropDown();
-
         /// <summary>
         /// Wires a <see cref="NativeDropDown"/> browser event into a reactive pipeline.
         /// </summary>

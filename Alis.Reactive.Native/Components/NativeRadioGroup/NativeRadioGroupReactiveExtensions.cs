@@ -24,8 +24,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeRadioGroupReactiveExtensions
     {
-        private static readonly NativeRadioGroup _component = new NativeRadioGroup();
-
         /// <summary>
         /// Wires a <see cref="NativeRadioGroup"/> browser event into a reactive pipeline.
         /// </summary>

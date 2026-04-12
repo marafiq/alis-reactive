@@ -24,8 +24,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeTextBoxReactiveExtensions
     {
-        private static readonly NativeTextBox _component = new NativeTextBox();
-
         /// <summary>
         /// Wires a <see cref="NativeTextBox"/> browser event into a reactive pipeline.
         /// </summary>

@@ -20,8 +20,6 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeButtonReactiveExtensions
     {
-        private static readonly NativeButton _component = new NativeButton();
-
         public static NativeButtonBuilder<TModel> Reactive<TModel, TArgs>(
             this NativeButtonBuilder<TModel> builder,
             ReactivePlan<TModel> plan,
