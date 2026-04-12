@@ -14,6 +14,7 @@ internal static class KvRenderer
     public static void Render(TagHelperOutput output, string label, string value, KvLayout layout, string? cssClass)
     {
         output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
 
         if (layout == KvLayout.Inline)
         {

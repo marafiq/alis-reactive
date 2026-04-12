@@ -16,6 +16,7 @@ internal static class DividerRenderer
         if (!string.IsNullOrEmpty(label))
         {
             output.TagName = "div";
+            output.TagMode = TagMode.StartTagAndEndTag;
             output.Attributes.SetAttribute("class", DividerCss.LabeledWrapperClasses(cssClass));
             output.Content.SetHtmlContent(
                 $"<div class=\"{DividerCss.LabeledLineOuterClasses()}\">" +
