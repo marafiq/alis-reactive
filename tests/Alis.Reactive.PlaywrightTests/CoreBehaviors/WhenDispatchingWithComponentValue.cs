@@ -1,36 +1,63 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
 /// <summary>
-/// Issue #86: Dispatch payloads cannot carry live component values.
-/// The user types "Jane Smith" in a textbox, clicks Dispatch, but the
-/// listener receives "LITERAL-NOT-RUNTIME" — the build-time literal —
-/// because Dispatch&lt;T&gt; wraps the payload in LiteralRaw.
-///
-/// This test FAILS today. When issue #86 is fixed (source-backed dispatch
-/// payloads), it should pass.
+/// Issue #86: Dispatch payloads can now carry live component values
+/// alongside literal values in the same typed payload.
 /// </summary>
 [TestFixture]
 public class WhenDispatchingWithComponentValue : PlaywrightTestBase
 {
-    [Test]
-    public async Task dispatch_should_carry_textbox_value_not_build_time_literal()
+    private async Task NavigateToDispatchSourcePage()
     {
         await NavigateToAndWaitForBoot("/Sandbox/CoreBehaviors/DispatchSource");
+    }
 
-        // Type a runtime value into the textbox
-        var textbox = Page.GetByPlaceholder("Type a name...");
-        await textbox.FillAsync("Jane Smith");
+    [Test]
+    public async Task dispatch_carries_live_textbox_value_to_listener()
+    {
+        await NavigateToDispatchSourcePage();
 
-        // Click the dispatch button
+        await Page.GetByPlaceholder("Type a name...").FillAsync("Jane Smith");
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Dispatch Transfer" }));
 
-        // Wait for the listener to fire
-        await Expect(Page.Locator("#received-status")).ToHaveTextAsync("Received!");
+        await Expect(Page.Locator("#received-result")).ToHaveTextAsync("Received!");
+        await Expect(Page.Locator("#received-name")).ToHaveTextAsync("Jane Smith");
+        AssertNoConsoleErrors();
+    }
 
-        // THE REAL ASSERTION: the listener should show what the user typed,
-        // not the build-time literal. Today this FAILS because the dispatch
-        // payload is "LITERAL-NOT-RUNTIME" regardless of what's in the textbox.
-        await Expect(Page.Locator("#received-name")).ToHaveTextAsync("Jane Smith",
-            new() { Timeout = 3000 });
+    [Test]
+    public async Task dispatch_carries_literal_status_alongside_source_name()
+    {
+        await NavigateToDispatchSourcePage();
+
+        await Page.GetByPlaceholder("Type a name...").FillAsync("Bob Jones");
+        await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Dispatch Transfer" }));
+
+        await Expect(Page.Locator("#received-result")).ToHaveTextAsync("Received!");
+        // Source field — live value from textbox
+        await Expect(Page.Locator("#received-name")).ToHaveTextAsync("Bob Jones");
+        // Literal field — baked at build time
+        await Expect(Page.Locator("#received-status-value")).ToHaveTextAsync("active");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task dispatch_reads_updated_textbox_value_on_second_click()
+    {
+        await NavigateToDispatchSourcePage();
+
+        var textbox = Page.GetByPlaceholder("Type a name...");
+        var button = Page.GetByRole(AriaRole.Button, new() { Name = "Dispatch Transfer" });
+
+        // First dispatch
+        await textbox.FillAsync("First");
+        await ClickWhenStable(button);
+        await Expect(Page.Locator("#received-name")).ToHaveTextAsync("First");
+
+        // Change value and dispatch again — proves runtime read, not cached
+        await textbox.FillAsync("Second");
+        await ClickWhenStable(button);
+        await Expect(Page.Locator("#received-name")).ToHaveTextAsync("Second");
+        AssertNoConsoleErrors();
     }
 }
