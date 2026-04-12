@@ -6,7 +6,7 @@ action: block
 conditions:
   - field: file_path
     operator: regex_match
-    pattern: (?:^|/)(?:Alis\.Reactive|Alis\.Reactive\.Native|Alis\.Reactive\.Fusion)/(?!.*tests/).*\.cs$
+    pattern: (?:^|/)(?:Alis\.Reactive|Alis\.Reactive\.Native|Alis\.Reactive\.Fusion)/(?!\.worktrees/)(?!.*tests/).*\.cs$
   - field: new_text
     operator: regex_match
     pattern: \bpublic\s+(static\s+)?(sealed\s+|abstract\s+|partial\s+|override\s+|virtual\s+|new\s+|async\s+)*(class|interface|struct|enum|record|void|string|bool|int|long|decimal|double|float|object|Task|IEnumerable|IReadOnlyList|IReadOnlyDictionary|Action|Func)\b
