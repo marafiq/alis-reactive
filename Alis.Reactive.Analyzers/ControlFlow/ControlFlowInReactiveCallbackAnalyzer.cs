@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
@@ -13,12 +12,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
     public sealed class ControlFlowInReactiveCallbackAnalyzer : DiagnosticAnalyzer
     {
         // ── DATA (OCP: extend by adding one line) ─────────────────
-
-        private static readonly ImmutableHashSet<string> AnalyzedParameterTypes =
-            ImmutableHashSet.Create(
-                "Alis.Reactive.Builders.PipelineBuilder<TModel>",
-                "Alis.Reactive.Builders.TriggerBuilder<TModel>"
-            );
 
         private static readonly ImmutableHashSet<SyntaxKind> AllowedStatementKinds =
             ImmutableHashSet.Create(
@@ -81,50 +74,58 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             context.ConfigureGeneratedCodeAnalysis(
                 GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(
-                AnalyzeLambda,
-                SyntaxKind.SimpleLambdaExpression,
-                SyntaxKind.ParenthesizedLambdaExpression);
+
+            context.RegisterCompilationStartAction(compilationCtx =>
+            {
+                var pipelineBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
+                    "Alis.Reactive.Builders.PipelineBuilder`1");
+                var triggerBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
+                    "Alis.Reactive.Builders.TriggerBuilder`1");
+
+                if (pipelineBuilderType == null && triggerBuilderType == null)
+                    return;
+
+                compilationCtx.RegisterSyntaxNodeAction(
+                    nodeCtx => AnalyzeLambda(nodeCtx, pipelineBuilderType, triggerBuilderType),
+                    SyntaxKind.SimpleLambdaExpression,
+                    SyntaxKind.ParenthesizedLambdaExpression);
+            });
         }
 
         // ── VALIDATION ────────────────────────────────────────────
 
-        private static void AnalyzeLambda(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeLambda(
+            SyntaxNodeAnalysisContext context,
+            INamedTypeSymbol? pipelineBuilderType,
+            INamedTypeSymbol? triggerBuilderType)
         {
             var lambda = (LambdaExpressionSyntax)context.Node;
 
-            if (!IsRazorGeneratedFile(lambda.SyntaxTree))
+            if (!AnalyzerHelpers.IsRazorGeneratedFile(lambda.SyntaxTree))
                 return;
 
-            if (!HasAnalyzedParameter(lambda, context.SemanticModel, context.CancellationToken))
+            if (!HasAnalyzedParameter(lambda, context.SemanticModel,
+                pipelineBuilderType, triggerBuilderType, context.CancellationToken))
                 return;
 
-            var body = lambda.Body;
-
-            if (body is BlockSyntax block)
+            if (lambda.Body is BlockSyntax block)
             {
-                // Block-bodied: check each direct child statement
                 foreach (var statement in block.Statements)
                 {
                     if (!AllowedStatementKinds.Contains(statement.Kind()))
                     {
-                        // Disallowed statement — report it, skip expression scan inside
-                        // (avoids double-reporting ternary/switch-expr nested in flagged statements)
-                        var label = GetLabel(statement.Kind());
                         context.ReportDiagnostic(
-                            Diagnostic.Create(Rule, statement.GetLocation(), label));
+                            Diagnostic.Create(Rule, statement.GetLocation(), GetLabel(statement.Kind())));
                     }
                     else
                     {
-                        // Allowed statement — scan its descendants for flagged expressions
                         ScanForFlaggedExpressions(statement, context);
                     }
                 }
             }
             else
             {
-                // Expression-bodied: scan the entire body for flagged expressions
-                ScanForFlaggedExpressions(body, context);
+                ScanForFlaggedExpressions(lambda.Body, context);
             }
         }
 
@@ -135,17 +136,14 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             {
                 if (FlaggedExpressionKinds.Contains(node.Kind()))
                 {
-                    var label = GetLabel(node.Kind());
                     context.ReportDiagnostic(
-                        Diagnostic.Create(Rule, node.GetLocation(), label));
+                        Diagnostic.Create(Rule, node.GetLocation(), GetLabel(node.Kind())));
                 }
             }
         }
 
         private static bool ShouldDescendInto(SyntaxNode node)
         {
-            // Do not descend into nested lambdas or anonymous methods —
-            // they are analyzed independently if their parameter matches
             return !(node is LambdaExpressionSyntax)
                 && !(node is AnonymousMethodExpressionSyntax);
         }
@@ -153,12 +151,14 @@ namespace Alis.Reactive.Analyzers.ControlFlow
         private static bool HasAnalyzedParameter(
             LambdaExpressionSyntax lambda,
             SemanticModel semanticModel,
+            INamedTypeSymbol? pipelineBuilderType,
+            INamedTypeSymbol? triggerBuilderType,
             System.Threading.CancellationToken cancellationToken)
         {
             if (lambda is SimpleLambdaExpressionSyntax simple)
             {
                 var symbol = semanticModel.GetDeclaredSymbol(simple.Parameter, cancellationToken);
-                return symbol != null && IsAnalyzedType(symbol.Type);
+                return symbol != null && IsAnalyzedType(symbol.Type, pipelineBuilderType, triggerBuilderType);
             }
 
             if (lambda is ParenthesizedLambdaExpressionSyntax parens)
@@ -166,7 +166,7 @@ namespace Alis.Reactive.Analyzers.ControlFlow
                 foreach (var param in parens.ParameterList.Parameters)
                 {
                     var symbol = semanticModel.GetDeclaredSymbol(param, cancellationToken);
-                    if (symbol != null && IsAnalyzedType(symbol.Type))
+                    if (symbol != null && IsAnalyzedType(symbol.Type, pipelineBuilderType, triggerBuilderType))
                         return true;
                 }
             }
@@ -174,11 +174,13 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             return false;
         }
 
-        private static bool IsAnalyzedType(ITypeSymbol? type)
+        private static bool IsAnalyzedType(
+            ITypeSymbol? type,
+            INamedTypeSymbol? pipelineBuilderType,
+            INamedTypeSymbol? triggerBuilderType)
         {
-            if (type is not INamedTypeSymbol named) return false;
-            if (!named.IsGenericType) return false;
-            return AnalyzedParameterTypes.Contains(named.ConstructedFrom.ToDisplayString());
+            return AnalyzerHelpers.IsClosedGenericOf(type, pipelineBuilderType)
+                || AnalyzerHelpers.IsClosedGenericOf(type, triggerBuilderType);
         }
 
         private static string GetLabel(SyntaxKind kind)
@@ -193,15 +195,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             var name = kind.ToString();
             var spaced = PascalCaseRegex.Replace(name, "$1 $2");
             return spaced.ToLowerInvariant();
-        }
-
-        private static bool IsRazorGeneratedFile(SyntaxTree tree)
-        {
-            var path = tree.FilePath;
-            if (string.IsNullOrEmpty(path)) return false;
-
-            return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

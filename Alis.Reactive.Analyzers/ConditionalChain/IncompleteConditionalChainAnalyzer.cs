@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System;
 
 namespace Alis.Reactive.Analyzers.ConditionalChain
 {
@@ -54,42 +53,18 @@ namespace Alis.Reactive.Analyzers.ConditionalChain
             INamedTypeSymbol? conditionSourceBuilderType)
         {
             var statement = (ExpressionStatementSyntax)context.Node;
-            if (!IsRazorGeneratedFile(statement.SyntaxTree))
+            if (!AnalyzerHelpers.IsRazorGeneratedFile(statement.SyntaxTree))
                 return;
 
-            var typeInfo = context.SemanticModel.GetTypeInfo(statement.Expression, context.CancellationToken);
-            var type = typeInfo.Type;
+            var type = context.SemanticModel.GetTypeInfo(statement.Expression, context.CancellationToken).Type;
+            if (type == null)
+                return;
 
-            if (type == null) return;
-
-            if (!IsDanglingBuilderType(type, guardBuilderType, conditionSourceBuilderType)) return;
-
-            context.ReportDiagnostic(Diagnostic.Create(Rule, statement.Expression.GetLocation()));
-        }
-
-        private static bool IsRazorGeneratedFile(SyntaxTree tree)
-        {
-            var path = tree.FilePath;
-            if (string.IsNullOrEmpty(path)) return false;
-
-            return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsDanglingBuilderType(
-            ITypeSymbol type,
-            INamedTypeSymbol? guardBuilderType,
-            INamedTypeSymbol? conditionSourceBuilderType)
-        {
-            if (type is not INamedTypeSymbol named) return false;
-            if (!named.IsGenericType) return false;
-
-            var original = named.ConstructedFrom;
-
-            return (guardBuilderType != null
-                    && SymbolEqualityComparer.Default.Equals(original, guardBuilderType))
-                || (conditionSourceBuilderType != null
-                    && SymbolEqualityComparer.Default.Equals(original, conditionSourceBuilderType));
+            if (AnalyzerHelpers.IsClosedGenericOf(type, guardBuilderType)
+                || AnalyzerHelpers.IsClosedGenericOf(type, conditionSourceBuilderType))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, statement.Expression.GetLocation()));
+            }
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -44,10 +43,24 @@ namespace Alis.Reactive.Analyzers.Validation
             context.ConfigureGeneratedCodeAnalysis(
                 GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+
+            context.RegisterCompilationStartAction(compilationCtx =>
+            {
+                var reactiveValidatorType = compilationCtx.Compilation.GetTypeByMetadataName(
+                    "Alis.Reactive.FluentValidator.ReactiveValidator`1");
+
+                if (reactiveValidatorType == null)
+                    return;
+
+                compilationCtx.RegisterSyntaxNodeAction(
+                    nodeCtx => AnalyzeInvocation(nodeCtx, reactiveValidatorType),
+                    SyntaxKind.InvocationExpression);
+            });
         }
 
-        private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeInvocation(
+            SyntaxNodeAnalysisContext context,
+            INamedTypeSymbol reactiveValidatorType)
         {
             var invocation = (InvocationExpressionSyntax)context.Node;
 
@@ -61,7 +74,12 @@ namespace Alis.Reactive.Analyzers.Validation
             if (!IsOnRuleForChain(memberAccess.Expression))
                 return;
 
-            if (!IsInsideReactiveValidator(invocation))
+            var classDecl = AnalyzerHelpers.FindContainingClass(invocation);
+            if (classDecl == null)
+                return;
+
+            if (!AnalyzerHelpers.InheritsFromReactiveValidator(
+                classDecl, context.SemanticModel, reactiveValidatorType, context.CancellationToken))
                 return;
 
             context.ReportDiagnostic(
@@ -69,71 +87,32 @@ namespace Alis.Reactive.Analyzers.Validation
         }
 
         /// <summary>
-        /// Walk the receiver chain (the expression before .When/.Unless) to find a
-        /// RuleFor or RuleForEach call. This distinguishes FV's .When() (on a RuleFor chain)
-        /// from the framework's .When() (on PipelineBuilder, which has no RuleFor ancestor).
+        /// Walk the receiver chain to find a RuleFor or RuleForEach call.
+        /// This distinguishes FV's .When() (on a RuleFor chain) from the framework's
+        /// .When() (on PipelineBuilder, which has no RuleFor ancestor).
         /// </summary>
         private static bool IsOnRuleForChain(ExpressionSyntax expression)
         {
             var current = expression;
 
-            while (current != null)
+            while (current is InvocationExpressionSyntax invocation)
             {
-                if (current is InvocationExpressionSyntax invocation)
+                if (invocation.Expression is MemberAccessExpressionSyntax access)
                 {
-                    if (invocation.Expression is MemberAccessExpressionSyntax access)
-                    {
-                        var name = access.Name.Identifier.Text;
-                        if (name == "RuleFor" || name == "RuleForEach")
-                            return true;
+                    var name = access.Name.Identifier.Text;
+                    if (name == "RuleFor" || name == "RuleForEach")
+                        return true;
+                    current = access.Expression;
+                    continue;
+                }
 
-                        current = access.Expression;
-                        continue;
-                    }
-
-                    if (invocation.Expression is IdentifierNameSyntax identifier)
-                    {
-                        var name = identifier.Identifier.Text;
-                        if (name == "RuleFor" || name == "RuleForEach")
-                            return true;
-                    }
-
-                    break;
+                if (invocation.Expression is IdentifierNameSyntax identifier)
+                {
+                    var name = identifier.Identifier.Text;
+                    return name == "RuleFor" || name == "RuleForEach";
                 }
 
                 break;
-            }
-
-            return false;
-        }
-
-        private static bool IsInsideReactiveValidator(SyntaxNode node)
-        {
-            var current = node.Parent;
-
-            while (current != null)
-            {
-                if (current is ClassDeclarationSyntax classDecl)
-                    return HasReactiveValidatorBase(classDecl);
-
-                current = current.Parent;
-            }
-
-            return false;
-        }
-
-        private static bool HasReactiveValidatorBase(ClassDeclarationSyntax classDecl)
-        {
-            if (classDecl.BaseList == null)
-                return false;
-
-            foreach (var baseType in classDecl.BaseList.Types)
-            {
-                var typeName = baseType.Type.ToString();
-                // Check for ReactiveValidator<...> pattern — base type starts with "ReactiveValidator<"
-                // or equals "ReactiveValidator" (raw, non-generic, unlikely but safe)
-                if (typeName.StartsWith("ReactiveValidator<", StringComparison.Ordinal) || typeName == "ReactiveValidator")
-                    return true;
             }
 
             return false;
