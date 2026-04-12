@@ -4,7 +4,7 @@ import { executeReaction } from "./execute";
 import { wireServerPush } from "./server-push";
 import { wireSignalR } from "./signalr";
 import { assertNever } from "../core/assert-never";
-import { tracer } from "../tracing";
+import { tracer, getRootSpan } from "../tracing";
 
 const t = tracer("trigger");
 
@@ -50,17 +50,20 @@ export function wireBehavior(
     case "page-ready":
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
-          runReaction(reaction, plan, {}, triggerDesc);
+          const span = getRootSpan().child("trigger.page-ready");
+          runReaction(reaction, plan, { span }, triggerDesc);
         }, opts);
       } else {
-        runReaction(reaction, plan, {}, triggerDesc);
+        const span = getRootSpan().child("trigger.page-ready");
+        runReaction(reaction, plan, { span }, triggerDesc);
       }
       break;
 
     case "document-event":
       t.debug("trigger.wire", { kind: "document-event", event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
-        const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e };
+        const span = getRootSpan().child("trigger.document-event", { event: trigger.event });
+        const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e, span };
         runReaction(reaction, plan, ctx, triggerDesc);
       }, opts);
       break;
@@ -76,7 +79,8 @@ export function wireBehavior(
       t.debug("trigger.wire", { kind: "component-event", component: trigger.component, event: trigger.event, channel });
 
       wireEvent(plan, trigger.component, channel, (eventData) => {
-        const ctx: ExecContext = { event: eventData };
+        const span = getRootSpan().child("trigger.component-event", { component: trigger.component, event: trigger.event });
+        const ctx: ExecContext = { event: eventData, span };
         runReaction(reaction, plan, ctx, triggerDesc);
       }, opts);
       break;

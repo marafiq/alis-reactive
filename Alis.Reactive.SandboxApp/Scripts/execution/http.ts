@@ -82,10 +82,25 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     const requestPayload = gatherResult.body instanceof FormData ? {} : gatherResult.body;
     ctx = { ...ctx, request: requestPayload };
 
+    // Create request span and inject traceparent
+    const requestSpan = ctx?.span?.child("http.request", {
+      "http.method": req.method,
+      "http.url": resolved.url,
+    });
+
+    const tp = requestSpan?.traceparent();
+    if (tp && !tp.startsWith("00-" + "0".repeat(32))) {
+      const headers = resolved.init.headers as Record<string, string> ?? {};
+      headers["traceparent"] = tp;
+      resolved.init.headers = headers;
+    }
+
     t.debug("http.request.send", { method: req.method, url: resolved.url });
 
     // 4. Fetch
     const response = await fetch(resolved.url, resolved.init);
+    requestSpan?.set("http.status", response.status);
+    requestSpan?.end(response.ok ? "ok" : "error");
 
     // 5. Route response
     const body = await readResponseBody(response);

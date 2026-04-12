@@ -179,8 +179,10 @@ async function executeParallel(
   ctx?: ExecContext,
 ): Promise<void> {
   const results = await Promise.allSettled(
-    reaction.steps.map(s => {
-      const r = executeReaction(s, plan, ctx);
+    reaction.steps.map((s, i) => {
+      const childSpan = ctx?.span?.child(`parallel.step[${i}]`);
+      const childCtx = childSpan ? { ...ctx, span: childSpan } : ctx;
+      const r = executeReaction(s, plan, childCtx);
       return r instanceof Promise ? r : Promise.resolve();
     })
   );
