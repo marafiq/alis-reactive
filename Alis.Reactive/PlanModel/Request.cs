@@ -4,22 +4,30 @@ using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
+    /// <summary>An HTTP request definition in the reactive plan.</summary>
     public sealed class Request
     {
+        /// <summary>Gets the HTTP method (GET, POST, PUT, DELETE, PATCH).</summary>
         public string Method { get; }
+        /// <summary>Gets the request URL, which may contain template placeholders like <c>{id}</c>.</summary>
         public string Url { get; }
+        /// <summary>Gets the DOM element ID where validation errors are displayed, or <see langword="null"/> when validation is not configured for this request.</summary>
         public string? Container { get; internal set; }
+        /// <summary>Gets the request body strategy, or <see langword="null"/> for bodiless requests.</summary>
         public RequestInput? Input { get; internal set; }
+        /// <summary>Gets reactions to execute before the request is sent, or <see langword="null"/> if none.</summary>
         public List<Reaction>? Before { get; internal set; }
+        /// <summary>Gets the success response handlers, or <see langword="null"/> if none.</summary>
         public List<ResponseHandler>? Success { get; internal set; }
+        /// <summary>Gets the error response handlers, or <see langword="null"/> if none.</summary>
         public List<ResponseHandler>? Error { get; internal set; }
+        /// <summary>Gets reactions to execute after the request completes regardless of outcome, or <see langword="null"/> if none.</summary>
         public List<Reaction>? Complete { get; internal set; }
+        /// <summary>Gets the chained follow-up request, or <see langword="null"/> if none.</summary>
         public Request? Next { get; internal set; }
-        /// <summary>Custom HTTP headers to send with this request. Each value is a ValueProducer
-        /// evaluated at request time — supports literals, component reads, and event args.</summary>
+        /// <summary>Gets the custom HTTP headers, or <see langword="null"/> if none. Each value is evaluated at request time.</summary>
         public Dictionary<string, ValueProducer>? Headers { get; internal set; }
-        /// <summary>URL template parameters. Each value is a ValueProducer evaluated at request time.
-        /// Placeholders like {id} in the URL are replaced with the evaluated, URI-encoded values.</summary>
+        /// <summary>Gets the URL template parameters, or <see langword="null"/> if none. Each value is evaluated and URI-encoded before replacing placeholders in the URL.</summary>
         public Dictionary<string, ValueProducer>? RouteParams { get; internal set; }
 
         internal Request(string method, string url)
@@ -38,6 +46,7 @@ namespace Alis.Reactive.PlanModel
         internal System.Type ValidatorType { get; set; }
     }
 
+    /// <summary>Base class for request body strategies. Not constructed in application code.</summary>
     [JsonConverter(typeof(WriteOnlyPolymorphicConverter<RequestInput>))]
     public abstract class RequestInput
     {
@@ -64,10 +73,14 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>Sends a single evaluated value as the request body.</summary>
     public sealed class ValueInput : RequestInput
     {
+        /// <summary>Gets the kind. Always <c>"value"</c>.</summary>
         public string Kind => "value";
+        /// <summary>Gets the value expression to send as the body.</summary>
         public ValueProducer Value { get; }
+        /// <summary>Gets the transport format (json or form).</summary>
         public string Transport { get; }
 
         internal ValueInput(ValueProducer value, string transport)
@@ -77,8 +90,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Maps an HTTP parameter name to a ValueProducer that reads the value at request time.
-    /// Uses the shared evaluateValue path — same concept as pipeline reads and validation.</summary>
+    /// <summary>Maps an HTTP parameter name to a value expression evaluated at request time.</summary>
     internal sealed class GatherField
     {
         /// <summary>HTTP parameter name (from model binding path or explicit override).</summary>
@@ -128,9 +140,12 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
+    /// <summary>Maps an optional HTTP status code to a reaction.</summary>
     public sealed class ResponseHandler
     {
+        /// <summary>Gets the HTTP status code to match, or <see langword="null"/> to match any status.</summary>
         public int? Status { get; internal set; }
+        /// <summary>Gets the reaction to execute when the status matches.</summary>
         public Reaction Reaction { get; }
 
         internal ResponseHandler(Reaction reaction)
