@@ -31,4 +31,4 @@ This code violates the BDD Constitution. Five Rules:
 - `window.alis` — framework internals. Test the user-visible outcome.
 
 **Load skill:** `bdd-testing` before writing any Playwright test.
-**Read:** `memory/feedback_bdd_constitution.md` for the full BDD Constitution.
+**Read:** `memory/bdd-principles.md` for the consolidated BDD principles.

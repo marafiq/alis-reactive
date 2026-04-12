@@ -9,7 +9,7 @@ type: reference
 Write from the developer's perspective. The developer reads docs to understand what to do, not how the framework works internally.
 
 - No "runtime" in dev-facing docs. Say "execute in the browser" not "the runtime merges/discovers/executes".
-- No "descriptors", "entries", "CallMutation", "SetPropMutation" in user docs. Use "intent", "fluent builders", "reactions". Reserve internals for contributor docs.
+- No internal type names in user docs: "descriptors", "entries", "CallReaction", "SetReaction", "SequentialReaction". Use "intent", "fluent builders", "reactions". Reserve internals for contributor docs.
 - No implementation details in summary/remarks: script tags, data attributes, hidden divs, THelper closure, HtmlEncoder belong in code comments, not XML docs.
 - "C# Fluent Builders" not "C# Modules" or "C# DSL". Framework users write fluent C# to express intent.
 - "boot" not "auto-boot". Do not leak implementation module names.

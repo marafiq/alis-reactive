@@ -24,4 +24,4 @@ You just edited a C# file with public/internal API surface. Before proceeding:
    - Every public member has `<summary>` ending with full stop
    - Code examples in docs MUST be verified against actual source
 3. **Run Rider diagnostics** on the file: `mcp__jetbrains__get_file_problems`
-4. **Read style memory**: `feedback_xml_docs_style.md` for nuanced rules
+4. **Read style memory**: `memory/docs-principles.md` for nuanced rules

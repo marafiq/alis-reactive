@@ -67,7 +67,7 @@ Sandbox pages must use framework primitives. Never work around the framework.
 - `Html.On(plan, t => t.DomReady(...))` -- never raw `<script>`
 - `Html.InputField(plan, m => m.Name).NativeTextBox(...)` -- never raw `<input type="text">`
 - `Html.NativeButton("id", "text").Reactive(plan, evt => evt.Click, ...)` -- never raw onclick
-- `.Validate<TValidator>()` -- never manual validation logic
+- `.Validate<TValidator>("form-id")` -- never manual validation logic
 - `p.Element("id").SetText(...)` -- never raw DOM manipulation
 - `.Gather(g => g.IncludeAll())` -- never manual form serialization
 - `Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))` -- never raw label/input combos
@@ -78,7 +78,7 @@ internal types. The test exercises the same code path as production.
 
 ## 7-Behavior Contract Per Component
 
-Every component test covers all seven:
+Every input component test covers all seven:
 
 1. RENDERS -- component shows with correct initial state
 2. INTERACTS -- user action fires event, pipeline executes

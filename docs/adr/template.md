@@ -2,7 +2,7 @@
 
 **Status:** proposed | accepted | implemented | superseded by ADR-NNN
 **Date:** YYYY-MM-DD
-**Domain:** schema | runtime | validation | pipeline | components | process
+**Domain:** schema | runtime | validation | pipeline | components | process | quality | docs
 
 ## Context
 
@@ -19,3 +19,7 @@ What follows from this decision? (positive and negative)
 ## Alternatives Considered
 
 What other approaches were evaluated? Why were they rejected?
+
+## References
+
+Related ADRs, issues, or memory files.

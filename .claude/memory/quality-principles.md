@@ -43,13 +43,12 @@ cannot satisfy all 9. Use the 3-layer judge pattern to enforce.
 Each agent reads EVERY LINE in their scope. Reports per-file: Clean or finding with
 file:line, severity, what is wrong, tangible outcome. Scopes:
 
-- core + types
-- execution core (execute, commands, element, trigger, inject)
-- network + HTTP (gather, http, pipeline, retry-indicator, signalr, server-push)
-- resolution + conditions
-- validation
-- lifecycle + boot
-- components
+- core + types (`core/`, `types/`)
+- execution (`execution/execute`, `execution/gather`, `execution/http`, `execution/inject`, `execution/trigger`, `execution/retry-indicator`, `execution/server-push`, `execution/signalr`)
+- resolution + conditions (`resolution/`, `conditions/`)
+- validation (`validation/`)
+- lifecycle + boot (`lifecycle/`)
+- components (`components/`)
 
 ### Layer 2: Three Judges (run after all readers complete, in parallel)
 
@@ -131,10 +130,10 @@ boundary -- it is never one flat flow.
 
 ### Layer 1: C# Descriptors and Builders
 
-- **Skills:** TDD, modern-csharp, dotnet-xml-docs
+- **Skills:** modern-csharp (TDD principles are in bdd-testing skill). XML docs enforced by `hookify.xml-docs-quality.local.md`.
 - **Thinking:** Value Objects, Encapsulation, SOLID, serialization impact on schema
 - **Tests:** Write FAILING unit test FIRST (Red), review it, THEN write code (Green)
-- **Harness:** VerifyJson snapshots + AssertSchemaValid
+- **Harness:** `AssertSchemaValid()` validates serialized plan JSON against schema
 
 ### Boundary 1-2: C# to Schema
 

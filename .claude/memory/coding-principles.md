@@ -28,8 +28,7 @@ Callback parameter naming convention (locked):
 | `Action<GatherBuilder>` | `gather` |
 | `Action<ResponseBuilder>` | `response` |
 | `Action<HttpRequestBuilder>` | `request` |
-| `Func<ConditionSourceBuilder, GuardBuilder>` | `guard` |
-| `Func<ConditionStart, GuardBuilder>` | `inner` |
+| `Func<ConditionStart<TModel>, GuardBuilder<TModel>>` | `inner` |
 
 ## Fail-Fast, Not Fallback
 
@@ -88,7 +87,7 @@ a missing secret, mention the possibility without reading the secret store.
 ## Validation Design
 
 ### Schema Principles
-- `shape` on ValidationRule is derived from `TProperty` at C# compile time. Never guess or infer at runtime.
+- `shape` on ValidationRule is derived from the comparison operand's CLR type during rule extraction (via `Shape.FromClrType()`). Non-comparison rules (required, email, regex) carry `Shape.None`; component shape comes from `Shape.FromClrType(typeof(TProp))` at registration time.
 - `field` on ValidationRule for cross-property comparisons uses the same deterministic ID system as everything else: TModel, prop expression, known type, predictable ID.
 - Schema must be deterministic — no fallbacks, no silent drops. Every FluentValidation rule either extracts to a client rule or is explicitly documented as server-only.
 - `Empty()` and `Null()` are extractable. PrecisionScale, IsInEnum, IsEnumName are server-only.
@@ -99,12 +98,12 @@ a missing secret, mention the possibility without reading the secret store.
 
 ### Date Handling
 - `shape: "date"` uses `toDate()` from `core/shape-convert.ts` — handles Date objects (SF), ISO strings, date-only strings with timezone safety.
-- DateTime constraints serialize as `"YYYY-MM-DD"` when time is midnight — parsed as local midnight, timezone-safe.
+- DateTime constraints serialize as `"yyyy-MM-dd"` (C# format string) when time is midnight — parsed as local midnight, timezone-safe.
 - Facility timezone is the application's responsibility.
 
 ### Validator Scope
 - Validator scope = form scope. Always. List the fields a view renders before creating the validator.
-- Nested properties require `SetValidator()`. Direct chain (`RuleFor(x => x.Address.Street)`) is silently dropped by the FluentValidation adapter.
+- Nested properties require `SetValidator()`. Direct chain (`RuleFor(x => x.Address.Street)`) extracts a rule but the field path won't correlate with components at runtime because the component-to-field mapping relies on the prefix built during `SetValidator` traversal.
 - Verify the extracted field list in the plan JSON.
 
 ### Live Re-Validation

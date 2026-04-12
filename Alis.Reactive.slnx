@@ -4,23 +4,15 @@
     <File Path=".claude/settings.json" />
   </Folder>
   <Folder Name="/.claude/memory/">
-    <File Path=".claude/memory/MEMORY.md" />
-    <File Path=".claude/memory/component-architecture.md" />
-    <File Path=".claude/memory/vertical-slice-design.md" />
-    <File Path=".claude/memory/idgenerator-design.md" />
-    <File Path=".claude/memory/event-args-mutation-design.md" />
-    <File Path=".claude/memory/feedback_api_surface_frozen.md" />
-    <File Path=".claude/memory/feedback_no_tech_debt.md" />
-    <File Path=".claude/memory/feedback_rubber_stamping.md" />
-    <File Path=".claude/memory/feedback_xml_docs_style.md" />
-    <File Path=".claude/memory/feedback_bdd_no_internals.md" />
-    <File Path=".claude/memory/feedback_validation_completion.md" />
-    <File Path=".claude/memory/feedback_docs_writing_style.md" />
-    <File Path=".claude/memory/feedback_plan_render_rule.md" />
+    <File Path=".claude/memory/quality-principles.md" />
+    <File Path=".claude/memory/bdd-principles.md" />
+    <File Path=".claude/memory/coding-principles.md" />
+    <File Path=".claude/memory/docs-principles.md" />
+    <File Path=".claude/memory/forensic-master-index.md" />
     <File Path=".claude/memory/validation-roadmap.md" />
     <File Path=".claude/memory/project_docs_site.md" />
-    <File Path=".claude/memory/project_coerce_serialization_gap.md" />
     <File Path=".claude/memory/solid-ts-research.md" />
+    <File Path=".claude/memory/vision_working_principles.md" />
   </Folder>
   <Folder Name="/.claude/skills/reactive-dsl/">
     <File Path=".claude/skills/reactive-dsl/SKILL.md" />
