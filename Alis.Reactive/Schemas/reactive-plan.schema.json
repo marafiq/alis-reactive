@@ -25,6 +25,7 @@
   "$defs": {
     "JsType": {
       "type": "object",
+      "required": ["properties", "methods", "events"],
       "properties": {
         "properties": {
           "type": "object",
@@ -54,7 +55,7 @@
     },
     "Method": {
       "type": "object",
-      "required": ["path"],
+      "required": ["path", "args", "returns"],
       "properties": {
         "path": { "$ref": "#/$defs/Path" },
         "args": {

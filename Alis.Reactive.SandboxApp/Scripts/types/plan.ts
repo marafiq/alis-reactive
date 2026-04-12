@@ -17,9 +17,9 @@ export interface Plan {
 // ── JsType ────────────────────────────────────────────────────
 
 export interface JsType {
-  properties?: Record<string, Property>;
-  methods?: Record<string, Method>;
-  events?: Record<string, Event>;
+  properties: Record<string, Property>;
+  methods: Record<string, Method>;
+  events: Record<string, Event>;
 }
 
 export interface Property {
@@ -30,8 +30,8 @@ export interface Property {
 
 export interface Method {
   path: Path;
-  args?: Shape[];
-  returns?: Shape;
+  args: Shape[];
+  returns: Shape;
 }
 
 export interface Event {
