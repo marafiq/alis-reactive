@@ -55,7 +55,7 @@ export interface Component {
 
 export interface ContainerScope {
   components: string[];
-  validationRules?: ComponentValidation[];
+  validationRules: ComponentValidation[];
 }
 
 export interface ComponentValidation {
@@ -77,10 +77,10 @@ export type ValidationRuleName =
 export interface ValidationRule {
   name: ValidationRuleName;
   message: string;
-  constraint?: ValueProducer;
-  otherValue?: ValueProducer;
-  when?: Condition;
-  shape?: Shape;
+  constraint: ValueProducer;
+  otherValue: ValueProducer;
+  when: Condition;
+  shape: Shape;
 }
 
 // ── Source ─────────────────────────────────────────────────────

@@ -202,7 +202,7 @@ namespace Alis.Reactive
         private static void MergeValidationRules(
             ContainerScope container, List<ComponentValidation> incoming)
         {
-            if (container.ValidationRules == null)
+            if (container.ValidationRules.Count == 0)
             {
                 container.ValidationRules = incoming;
                 return;
@@ -246,7 +246,7 @@ namespace Alis.Reactive
             if (extracted.When != null)
                 rule.When = ToCondition(extracted.When);
 
-            if (extracted.Shape != null && !extracted.Shape.IsNone)
+            if (!extracted.Shape.IsNone)
                 rule.Shape = extracted.Shape;
 
             return rule;

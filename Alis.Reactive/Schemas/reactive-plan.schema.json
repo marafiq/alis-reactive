@@ -91,7 +91,7 @@
     },
     "ContainerScope": {
       "type": "object",
-      "required": ["components"],
+      "required": ["components", "validationRules"],
       "properties": {
         "components": {
           "type": "array",
@@ -118,7 +118,7 @@
     },
     "ValidationRule": {
       "type": "object",
-      "required": ["name", "message"],
+      "required": ["name", "message", "constraint", "otherValue", "when", "shape"],
       "properties": {
         "name": {
           "type": "string",
