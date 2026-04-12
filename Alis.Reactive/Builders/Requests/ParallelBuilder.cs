@@ -5,6 +5,7 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    /// <summary>Builds a set of HTTP requests that execute concurrently.</summary>
     public class ParallelBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
@@ -23,6 +24,7 @@ namespace Alis.Reactive.Builders.Requests
             _branches.Add(builder.BuildRequest());
         }
 
+        /// <summary>Executes commands after all parallel requests complete.</summary>
         public ParallelBuilder<TModel> OnAllSettled(Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>(_context);

@@ -6,7 +6,9 @@ namespace Alis.Reactive
     /// </summary>
     public sealed class TypedEvent<TArgs>
     {
+        /// <summary>Gets the JavaScript event name.</summary>
         public string JsEvent { get; }
+        /// <summary>Gets the typed event arguments instance.</summary>
         public TArgs Args { get; }
 
         internal TypedEvent(string jsEvent, TArgs args)

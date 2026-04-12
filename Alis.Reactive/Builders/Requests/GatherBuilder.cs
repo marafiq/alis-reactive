@@ -6,6 +6,13 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    /// <summary>
+    /// Builds the HTTP request payload by gathering values from components, static data, event args, plugins, headers, route params, and URL query params.
+    /// </summary>
+    /// <remarks>
+    /// Obtained via <c>.Gather(g =&gt; g.Include(m =&gt; m.Name).Header("X-Key", val))</c>.
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
     public class GatherBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
@@ -27,18 +34,31 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
+        /// <summary>Includes all registered input component values in the request payload.</summary>
+        /// <returns>This builder for chaining.</returns>
         public GatherBuilder<TModel> IncludeAll()
         {
             _includeAll = true;
             return this;
         }
 
+        /// <summary>Includes a static key-value pair in the request payload.</summary>
+        /// <param name="param">The HTTP parameter name.</param>
+        /// <param name="value">The constant value to send.</param>
+        /// <returns>This builder for chaining.</returns>
         public GatherBuilder<TModel> Static(string param, object value)
         {
             StaticFields.Add(new StaticField(param, value));
             return this;
         }
 
+        /// <summary>Includes a value from the triggering event payload in the request.</summary>
+        /// <typeparam name="TArgs">The event args type.</typeparam>
+        /// <typeparam name="TProp">The property type to extract.</typeparam>
+        /// <param name="args">The event args instance.</param>
+        /// <param name="path">Expression selecting the property from the event args.</param>
+        /// <param name="param">The HTTP parameter name.</param>
+        /// <returns>This builder for chaining.</returns>
         public GatherBuilder<TModel> FromEvent<TArgs, TProp>(
             TArgs args,
             Expression<Func<TArgs, TProp>> path,

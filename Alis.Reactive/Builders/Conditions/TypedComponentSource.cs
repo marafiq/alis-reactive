@@ -6,6 +6,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// A typed source that reads the current value of a component in the browser.
     /// Returned by each component's Value() extension method.
     /// </summary>
+    /// <summary>A typed source that reads a property from a registered component.</summary>
     public sealed class TypedComponentSource<TProp> : TypedSource<TProp>
     {
         private readonly string _componentId;

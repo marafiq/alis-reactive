@@ -5,6 +5,13 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Builders.Requests
 {
+    /// <summary>
+    /// Builds an HTTP request with optional gather, validation, response handling, and chaining.
+    /// </summary>
+    /// <remarks>
+    /// Obtained via <c>p.Get("/url")</c>, <c>p.Post("/url")</c>, etc.
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
@@ -25,11 +32,26 @@ namespace Alis.Reactive.Builders.Requests
         internal HttpRequestBuilder<TModel> SetVerb(string verb) { _verb = verb; return this; }
         internal HttpRequestBuilder<TModel> SetUrl(string url) { _url = url; return this; }
 
+        /// <summary>Sets the request to HTTP GET.</summary>
+        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Get(string url) { _verb = "GET"; _url = url; return this; }
+        /// <summary>Sets the request to HTTP POST.</summary>
+        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Post(string url) { _verb = "POST"; _url = url; return this; }
+        /// <summary>Sets the request to HTTP PUT.</summary>
+        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Put(string url) { _verb = "PUT"; _url = url; return this; }
+        /// <summary>Sets the request to HTTP DELETE.</summary>
+        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Delete(string url) { _verb = "DELETE"; _url = url; return this; }
 
+        /// <summary>Configures the request body by gathering values from components, events, plugins, and static data.</summary>
+        /// <param name="gather">Builds the gather fields: <c>g =&gt; g.Include(m =&gt; m.Name).Header("X-Key", source)</c>.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {
             var builder = new GatherBuilder<TModel>(_context);
@@ -38,9 +60,16 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
+        /// <summary>Sends the request body as JSON (default).</summary>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> AsJson() { _transport = "json"; return this; }
+        /// <summary>Sends the request body as form-data.</summary>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> AsFormData() { _transport = "form-data"; return this; }
 
+        /// <summary>Executes commands before the HTTP request is sent (e.g. show a spinner).</summary>
+        /// <param name="pipeline">Builds the commands to execute before the request.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>(_context);
@@ -54,6 +83,10 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
+        /// <summary>Validates the form before sending the request using the specified validator.</summary>
+        /// <typeparam name="TValidator">The validator type.</typeparam>
+        /// <param name="formId">The DOM element ID of the form container for error display.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Validate<TValidator>(string formId)
             where TValidator : class
         {
@@ -62,6 +95,9 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
+        /// <summary>Configures response handlers for success and error outcomes.</summary>
+        /// <param name="response">Builds the response handlers: <c>r =&gt; r.OnSuccess(...).OnError(...)</c>.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response)
         {
             var builder = new ResponseBuilder<TModel>(_context);

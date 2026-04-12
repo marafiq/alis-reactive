@@ -7,6 +7,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// Returned by <c>PipelineBuilder.FromUrl()</c> and <c>PipelineBuilder.FromUrl&lt;T&gt;()</c>.
     /// Plugs into all TypedSource&lt;T&gt; consumers: conditions, guards, branches, element ops, gather, headers, route params.
     /// </summary>
+    /// <summary>A typed source that reads a URL query parameter from the browser address bar.</summary>
     public sealed class TypedUrlSource<TProp> : TypedSource<TProp>
     {
         private readonly string _paramName;

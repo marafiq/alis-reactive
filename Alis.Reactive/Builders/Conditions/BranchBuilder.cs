@@ -5,6 +5,13 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
+    /// <summary>
+    /// Chains ElseIf and Else cases after a Then branch.
+    /// </summary>
+    /// <remarks>
+    /// Obtained via <c>.Then(...)</c>. Chain <c>.ElseIf(source).Gt(5).Then(...)</c> or <c>.Else(...)</c>.
+    /// </remarks>
+    /// <typeparam name="TModel">The view model type.</typeparam>
     public sealed class BranchBuilder<TModel> where TModel : class
     {
         private readonly List<BranchCase> _cases;
@@ -18,6 +25,7 @@ namespace Alis.Reactive.Builders.Conditions
             _cases = cases;
         }
 
+        /// <summary>Adds an ElseIf branch from an event payload property.</summary>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TPayload, TProp>(
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
@@ -29,6 +37,7 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
+        /// <summary>Adds an ElseIf branch from an HTTP response body property.</summary>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TPayload, TProp>(
             ResponseBody<TPayload> responseBody,
             Expression<Func<TPayload, TProp>> path)
@@ -41,6 +50,7 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
+        /// <summary>Adds an ElseIf branch from a typed source.</summary>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
         {
             if (_elseCalled)
@@ -49,6 +59,8 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
+        /// <summary>Executes the pipeline when no previous condition matched (default case).</summary>
+        /// <param name="pipeline">Builds the commands for the default case.</param>
         public void Else(Action<PipelineBuilder<TModel>> pipeline)
         {
             if (_elseCalled)
