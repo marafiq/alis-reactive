@@ -397,7 +397,7 @@ private static readonly FusionXxx Component = new();
 
 public static XxxBuilder Reactive<TModel, TArgs>(
     this XxxBuilder builder,
-    IReactivePlan<TModel> plan,
+    ReactivePlan<TModel> plan,
     Func<FusionXxxEvents, TypedEventDescriptor<TArgs>> eventSelector,
     Action<TArgs, PipelineBuilder<TModel>> pipeline)
     where TModel : class
@@ -894,7 +894,7 @@ public static class FusionXxxHtmlExtensions
 {
     public static FusionXxxBuilder<TModel> FusionXxx<TModel>(
         this IHtmlHelper<TModel> html,
-        IReactivePlan<TModel> plan,
+        ReactivePlan<TModel> plan,
         string elementId,
         Action<XxxBuilder> build)
         where TModel : class
@@ -912,7 +912,7 @@ public static class FusionXxxHtmlExtensions
 **Key differences from input component factory:**
 - Takes `IHtmlHelper<TModel>` directly (not `InputBoundField`)
 - Takes explicit `string elementId` (not model-expression-derived)
-- Takes `IReactivePlan<TModel>` for passing to `.Reactive()`
+- Takes `ReactivePlan<TModel>` for passing to `.Reactive()`
 - NO `plan.AddToComponentsMap()` call
 - Returns a builder that wraps the SF content + allows `.Reactive()` chaining
 

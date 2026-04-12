@@ -81,7 +81,7 @@ Every object in the plan is self-describing. The runtime never guesses — it re
 
 ## The plan — collector and serializer
 
-`IReactivePlan<TModel>` has two responsibilities:
+`ReactivePlan<TModel>` has two responsibilities:
 
 **Collecting entries** — `Html.On()` calls `plan.AddEntry()`. `Html.InputField()` calls `plan.AddToComponentsMap()`. By the time `Html.RenderPlan(plan)` is called (which invokes `plan.Render()`), the plan holds every entry and every component registration.
 
