@@ -61,6 +61,22 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
+        /// <summary>Dispatches a custom browser event with a source-backed payload whose fields are resolved at runtime.</summary>
+        /// <typeparam name="TPayload">The payload type that the listener will consume via <c>CustomEvent&lt;TPayload&gt;</c>.</typeparam>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="configure">Sets payload fields from component values, URL params, plugin reads, or literals.</param>
+        /// <returns>This builder for chaining.</returns>
+        public PipelineBuilder<TModel> Dispatch<TPayload>(
+            string eventName,
+            Action<DispatchPayloadBuilder<TPayload, TModel>> configure)
+            where TPayload : class
+        {
+            var builder = new DispatchPayloadBuilder<TPayload, TModel>();
+            configure(builder);
+            Steps.Add(Reaction.Dispatch(eventName, builder.Build()));
+            return this;
+        }
+
         /// <summary>Targets a DOM element by ID for mutations (SetText, AddClass, Show, Hide).</summary>
         /// <param name="elementId">The HTML element ID.</param>
         /// <returns>An element builder for chaining mutations.</returns>

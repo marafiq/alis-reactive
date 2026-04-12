@@ -1,0 +1,64 @@
+@model DispatchSourceModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Issue #86 — Dispatch Source Gap";
+
+    var plan = Html.ReactivePlan<DispatchSourceModel>();
+
+    // Register the textbox so it's a component source the framework knows about
+    Html.InputField(plan, m => m.Name, o => o.Label("Resident Name"))
+        .NativeTextBox(b => b.Placeholder("Type a name..."));
+
+    // Button click: dispatch "transfer" event with the textbox's LIVE runtime value.
+    // Uses the new source-backed Dispatch overload (issue #86 fix).
+    Html.On(plan, t => t.CustomEvent("do-transfer", p =>
+    {
+        p.Dispatch<DispatchSourceModel>("transfer", d => d
+            .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value())
+        );
+    }));
+
+    // Listener: receives "transfer" event and displays the payload
+    Html.On(plan, t => t.CustomEvent<DispatchSourceModel>("transfer", (payload, p) =>
+    {
+        p.Element("received-name").SetText(payload, x => x.Name);
+        p.Element("received-status").SetText("Received!");
+        p.Element("received-status").AddClass("text-green-600");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Issue #86 &mdash; Dispatch Source Gap</native-heading>
+        <native-text color="Secondary">
+            Type a name, click Dispatch. The listener shows what you typed —
+            the dispatch payload reads the textbox value at runtime via source-backed
+            Dispatch (issue #86 fix).
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Input</native-heading>
+        <div class="space-y-3">
+            <div id="@IdGenerator.For<DispatchSourceModel>(m => m.Name)-field"></div>
+            @(Html.NativeButton("dispatch-btn", "Dispatch Transfer")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Dispatch("do-transfer");
+                }))
+        </div>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Listener Output</native-heading>
+        <div class="space-y-2 font-mono text-sm">
+            <p>Received Name: <span id="received-name" class="text-text-muted">—</span></p>
+            <p id="received-status" class="text-text-muted">Waiting for dispatch...</p>
+        </div>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
