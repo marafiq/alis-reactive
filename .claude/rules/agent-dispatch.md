@@ -158,7 +158,7 @@ Sign-off requires: every definition mapped to a test or justified as untestable
 **Cascade preamble** (include in every BDD agent prompt):
 > You are writing Playwright tests for Alis.Reactive — a framework serving
 > senior living communities. Load skill: bdd-testing. Read the BDD Constitution
-> at `memory/feedback_bdd_constitution.md` before writing any test.
+> at `memory/bdd-principles.md` before writing any test.
 > Five Rules: (1) Behavior, (2) Independent, (3) Fails when broken,
 > (4) Real interactions, (5) Blind reviewed.
 > Cardinal Rule: framework code is read-only.
@@ -201,7 +201,6 @@ Output evidence: 7-behavior contract covered, blind reviewer passes all tests
 - Layer details + boundaries + harness: `process-layers.md` (auto-loaded)
 - Task types + 10-step checklist: `process-task-types.md` (auto-loaded)
 - Pipeline + speed gate + wrong plan protocol: `process-pipeline.md` (auto-loaded)
-- BDD constitution (225 lines, full rules): `memory/feedback_bdd_constitution.md`
-- 3-layer audit pattern (full detail): `memory/feedback_audit_agent_layers.md`
+- BDD principles (consolidated): `memory/bdd-principles.md`
+- Quality principles (audit, review, evidence): `memory/quality-principles.md`
 - Forensic mistake patterns: `memory/forensic-master-index.md`
-- Positive language guidance: `memory/feedback_review_language.md`

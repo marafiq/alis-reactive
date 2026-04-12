@@ -109,7 +109,7 @@ smoke test catches more than elaborate Playwright infrastructure.
 
 **Skills:** `bdd-testing`, `superpowers:test-driven-development`
 
-**The 5 BDD Rules** (from `feedback_bdd_constitution`):
+**The 5 BDD Rules** (from `bdd-principles.md`):
 1. Test describes BEHAVIOR, not implementation
 2. Test is independently understandable
 3. Test FAILS when behavior breaks
