@@ -54,6 +54,76 @@ jobs:
           dotnet test tests/Alis.Reactive.Fusion.UnitTests --configuration Release --no-build
           dotnet test tests/Alis.Reactive.FluentValidator.UnitTests --configuration Release --no-build
 
+  playwright:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build JS + CSS bundles
+        run: npm run build:all
+
+      - name: Build all C# projects
+        run: dotnet build
+
+      - name: Install Playwright browsers
+        run: pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+
+      - name: Run Playwright tests (attempt 1)
+        id: pw1
+        run: |
+          dotnet test tests/Alis.Reactive.PlaywrightTests \
+            --no-build \
+            --logger "html;LogFileName=playwright-report.html" \
+            --logger "trx;LogFileName=playwright-results.trx" \
+            --results-directory TestResults \
+            -- NUnit.NumberOfTestWorkers=1
+        continue-on-error: true
+
+      - name: Retry failed tests (attempt 2)
+        id: pw2
+        if: steps.pw1.outcome == 'failure'
+        run: |
+          FAILED=$(grep 'outcome="Failed"' TestResults/playwright-results.trx \
+            | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
+            | grep -v "ResultSummary" | paste -sd '|' -)
+          if [ -n "$FAILED" ]; then
+            echo "Retrying: $FAILED"
+            dotnet test tests/Alis.Reactive.PlaywrightTests \
+              --no-build --filter "$FAILED" \
+              --logger "html;LogFileName=retry-2-report.html" \
+              --logger "trx;LogFileName=retry-2-results.trx" \
+              --results-directory TestResults \
+              -- NUnit.NumberOfTestWorkers=1
+          fi
+        continue-on-error: true
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            TestResults/playwright-report.html
+            TestResults/playwright-results.trx
+            TestResults/retry-*-report.html
+            TestResults/retry-*-results.trx
+          retention-days: 14
+
   pack-and-publish:
     needs: test
     runs-on: ubuntu-latest
