@@ -12,23 +12,26 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the request URL, which may contain template placeholders like <c>{id}</c>.</summary>
         public string Url { get; }
         /// <summary>Gets the DOM element ID where validation errors are displayed, or <see langword="null"/> when validation is not configured for this request.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Container { get; internal set; }
         /// <summary>Gets the request body strategy, or <see langword="null"/> for bodiless requests.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public RequestInput? Input { get; internal set; }
-        /// <summary>Gets reactions to execute before the request is sent, or <see langword="null"/> if none.</summary>
-        public List<Reaction>? Before { get; internal set; }
-        /// <summary>Gets the success response handlers, or <see langword="null"/> if none.</summary>
-        public List<ResponseHandler>? Success { get; internal set; }
-        /// <summary>Gets the error response handlers, or <see langword="null"/> if none.</summary>
-        public List<ResponseHandler>? Error { get; internal set; }
-        /// <summary>Gets reactions to execute after the request completes regardless of outcome, or <see langword="null"/> if none.</summary>
-        public List<Reaction>? Complete { get; internal set; }
+        /// <summary>Gets reactions to execute before the request is sent.</summary>
+        public IReadOnlyList<Reaction> Before { get; internal set; } = System.Array.Empty<Reaction>();
+        /// <summary>Gets the success response handlers.</summary>
+        public IReadOnlyList<ResponseHandler> Success { get; internal set; } = System.Array.Empty<ResponseHandler>();
+        /// <summary>Gets the error response handlers.</summary>
+        public IReadOnlyList<ResponseHandler> Error { get; internal set; } = System.Array.Empty<ResponseHandler>();
+        /// <summary>Gets reactions to execute after the request completes regardless of outcome.</summary>
+        public IReadOnlyList<Reaction> Complete { get; internal set; } = System.Array.Empty<Reaction>();
         /// <summary>Gets the chained follow-up request, or <see langword="null"/> if none.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Request? Next { get; internal set; }
-        /// <summary>Gets the custom HTTP headers, or <see langword="null"/> if none. Each value is evaluated at request time.</summary>
-        public Dictionary<string, ValueProducer>? Headers { get; internal set; }
-        /// <summary>Gets the URL template parameters, or <see langword="null"/> if none. Each value is evaluated and URI-encoded before replacing placeholders in the URL.</summary>
-        public Dictionary<string, ValueProducer>? RouteParams { get; internal set; }
+        /// <summary>Gets the custom HTTP headers. Each value is evaluated at request time.</summary>
+        public IReadOnlyDictionary<string, ValueProducer> Headers { get; internal set; } = new Dictionary<string, ValueProducer>();
+        /// <summary>Gets the URL template parameters. Each value is evaluated and URI-encoded before replacing placeholders in the URL.</summary>
+        public IReadOnlyDictionary<string, ValueProducer> RouteParams { get; internal set; } = new Dictionary<string, ValueProducer>();
 
         internal Request(string method, string url)
         {
@@ -144,6 +147,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class ResponseHandler
     {
         /// <summary>Gets the HTTP status code to match, or <see langword="null"/> to match any status.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Status { get; internal set; }
         /// <summary>Gets the reaction to execute when the status matches.</summary>
         public Reaction Reaction { get; }

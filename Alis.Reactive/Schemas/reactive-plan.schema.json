@@ -363,7 +363,7 @@
     },
     "Request": {
       "type": "object",
-      "required": ["method", "url"],
+      "required": ["method", "url", "before", "success", "error", "complete", "headers", "routeParams"],
       "properties": {
         "method": {
           "type": "string",

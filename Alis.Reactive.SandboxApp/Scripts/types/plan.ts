@@ -233,14 +233,14 @@ export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 export interface Request {
   method: HttpMethod;
   url: string;
-  headers?: Record<string, ValueProducer>;
-  routeParams?: Record<string, ValueProducer>;
+  headers: Record<string, ValueProducer>;
+  routeParams: Record<string, ValueProducer>;
   container?: string;
   input?: RequestInput;
-  before?: Reaction[];
-  success?: ResponseHandler[];
-  error?: ResponseHandler[];
-  complete?: Reaction[];
+  before: Reaction[];
+  success: ResponseHandler[];
+  error: ResponseHandler[];
+  complete: Reaction[];
   next?: Request;
 }
 

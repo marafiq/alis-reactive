@@ -130,15 +130,13 @@ namespace Alis.Reactive
             }
         }
 
-        private void CollectValidationFromReactions(List<Reaction>? reactions)
+        private void CollectValidationFromReactions(IReadOnlyList<Reaction> reactions)
         {
-            if (reactions == null) return;
             foreach (var r in reactions) CollectValidationFromReaction(r);
         }
 
-        private void CollectValidationFromResponseHandlers(List<ResponseHandler>? handlers)
+        private void CollectValidationFromResponseHandlers(IReadOnlyList<ResponseHandler> handlers)
         {
-            if (handlers == null) return;
             foreach (var h in handlers)
             {
                 if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
