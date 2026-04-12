@@ -1,3 +1,0 @@
-﻿{
-  planId: Alis.Reactive.UnitTests.TestModel
-}

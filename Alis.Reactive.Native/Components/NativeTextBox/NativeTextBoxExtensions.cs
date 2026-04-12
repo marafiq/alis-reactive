@@ -1,5 +1,5 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -26,7 +26,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeTextBox, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.EmitSet("value", ValueProducer.Literal(value));
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeTextBox, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("focus"));
+            return self.EmitCall("focus");
         }
 
         /// <summary>
@@ -50,7 +50,9 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeTextBox, TModel> self)
             where TModel : class
         {
-            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
+            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.String, "read");
+            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember);
         }
     }
 }

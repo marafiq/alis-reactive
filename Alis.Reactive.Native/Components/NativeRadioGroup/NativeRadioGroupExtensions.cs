@@ -1,8 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -29,7 +28,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeRadioGroup, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.EmitSet("value", ValueProducer.Literal(value));
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
+            return self.EmitSet("value", ValueProducer.Read(PayloadSource.Event(), "value", Path.Parse(sourcePath)));
         }
 
         /// <summary>
@@ -59,7 +58,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeRadioGroup, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("focus"));
+            return self.EmitCall("focus");
         }
 
         /// <summary>
@@ -71,7 +70,9 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeRadioGroup, TModel> self)
             where TModel : class
         {
-            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
+            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.String, "read");
+            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember);
         }
     }
 }

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Tooltip — Event Explorer</title>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/material.css" />
+    <script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui; margin: 0; padding: 20px; background: #f5f5f5; }
+        h1 { margin: 0 0 10px; font-size: 1.4rem; }
+        .layout { display: flex; gap: 20px; height: calc(100vh - 120px); }
+        .demo-panel { flex: 1; background: white; border-radius: 8px; padding: 20px; }
+        .log-panel { width: 400px; background: #1e1e1e; color: #d4d4d4; border-radius: 8px;
+                     overflow-y: auto; padding: 12px; font-family: monospace; font-size: 12px; }
+        .log-entry { margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 8px; }
+        .log-event { color: #569cd6; font-weight: bold; }
+        .log-time { color: #808080; font-size: 10px; }
+        .log-data { color: #ce9178; white-space: pre-wrap; max-height: 150px; overflow-y: auto; }
+        .controls { margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
+        .controls button { padding: 6px 14px; border: 1px solid #ccc; border-radius: 4px;
+                          background: white; cursor: pointer; font-size: 13px; }
+        #clear-btn { background: #ff4444; color: white; border-color: #ff4444; }
+
+        /* Demo targets */
+        .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+        .staff-card { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer;
+                      transition: box-shadow 0.2s; }
+        .staff-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .staff-name { font-weight: 600; font-size: 1.1rem; }
+        .staff-role { color: #666; font-size: 0.85rem; margin-top: 4px; }
+        .staff-shift { color: #1a73e8; font-size: 0.85rem; margin-top: 4px; }
+
+        /* Tooltip custom content */
+        .tooltip-content { padding: 8px; }
+        .tooltip-content h4 { margin: 0 0 6px; }
+        .tooltip-content .detail { font-size: 12px; color: #555; margin: 2px 0; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h1>SF Tooltip Event Explorer</h1>
+        <button id="clear-btn" onclick="clearLog()">Clear Log</button>
+        <button onclick="callMethod('open', 'card-1')">Open on Card 1</button>
+        <button onclick="callMethod('close')">Close</button>
+        <button onclick="callMethod('refresh')">Refresh</button>
+    </div>
+
+    <div class="layout">
+        <div class="demo-panel">
+            <h3>Staff Cards — Hover for Tooltip</h3>
+            <div id="tooltip-target">
+                <div class="card-grid">
+                    <div class="staff-card" id="card-1" data-staff="Jane Blonde" data-role="CNA" data-shift="AM (6:00-14:00)" data-items="6 care items" data-phone="555-0101">
+                        <div class="staff-name">Jane Blonde</div>
+                        <div class="staff-role">CNA — Certified Nursing Assistant</div>
+                        <div class="staff-shift">AM Shift (6:00 AM - 2:00 PM)</div>
+                    </div>
+                    <div class="staff-card" id="card-2" data-staff="Mike Ross" data-role="RN" data-shift="AM (6:00-14:00)" data-items="4 care items" data-phone="555-0102">
+                        <div class="staff-name">Mike Ross</div>
+                        <div class="staff-role">RN — Registered Nurse</div>
+                        <div class="staff-shift">AM Shift (6:00 AM - 2:00 PM)</div>
+                    </div>
+                    <div class="staff-card" id="card-3" data-staff="Sarah Connor" data-role="CNA" data-shift="PM (14:00-22:00)" data-items="5 care items" data-phone="555-0103">
+                        <div class="staff-name">Sarah Connor</div>
+                        <div class="staff-role">CNA — Certified Nursing Assistant</div>
+                        <div class="staff-shift">PM Shift (2:00 PM - 10:00 PM)</div>
+                    </div>
+                    <div class="staff-card" id="card-4" data-staff="UNASSIGNED" data-role="—" data-shift="Night (22:00-6:00)" data-items="3 care items" data-phone="—">
+                        <div class="staff-name" style="color: red;">UNASSIGNED</div>
+                        <div class="staff-role">Needs coverage</div>
+                        <div class="staff-shift">Night Shift (10:00 PM - 6:00 AM)</div>
+                    </div>
+                    <div class="staff-card" id="card-5" data-staff="Tom Hardy" data-role="LPN" data-shift="PM (14:00-22:00)" data-items="7 care items" data-phone="555-0105">
+                        <div class="staff-name">Tom Hardy</div>
+                        <div class="staff-role">LPN — Licensed Practical Nurse</div>
+                        <div class="staff-shift">PM Shift (2:00 PM - 10:00 PM)</div>
+                    </div>
+                    <div class="staff-card" id="card-6" data-staff="Lisa Chen" data-role="RN" data-shift="Night (22:00-6:00)" data-items="3 care items" data-phone="555-0106">
+                        <div class="staff-name">Lisa Chen</div>
+                        <div class="staff-role">RN — Registered Nurse</div>
+                        <div class="staff-shift">Night Shift (10:00 PM - 6:00 AM)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="log-panel" id="log"></div>
+    </div>
+
+    <script>
+        var logEl = document.getElementById('log');
+
+        function log(eventName, data) {
+            var entry = document.createElement('div');
+            entry.className = 'log-entry';
+            var time = new Date().toLocaleTimeString();
+            var clean = {};
+            if (data) {
+                ['name', 'type', 'cancel', 'isInteracted', 'target', 'element',
+                 'collidedPosition', 'hasCollision', 'opensOn'
+                ].forEach(function(key) {
+                    if (data[key] !== undefined) {
+                        if (key === 'target' || key === 'element') {
+                            clean[key] = data[key] ? (data[key].id || data[key].className || '[DOM]') : null;
+                        } else {
+                            try { clean[key] = data[key]; } catch(e) { clean[key] = '[error]'; }
+                        }
+                    }
+                });
+            }
+            entry.innerHTML = '<div class="log-time">' + time + '</div>' +
+                '<div class="log-event">' + eventName + '</div>' +
+                '<div class="log-data">' + JSON.stringify(clean, null, 2) + '</div>';
+            logEl.insertBefore(entry, logEl.firstChild);
+        }
+
+        function clearLog() { logEl.innerHTML = ''; }
+
+        var tooltipObj = new ej.popups.Tooltip({
+            target: '.staff-card',
+            position: 'RightTop',
+            opensOn: 'Hover',
+            showTipPointer: true,
+            cssClass: 'e-tooltip-custom',
+            width: 250,
+
+            // Dynamic content from data attributes
+            beforeRender: function(args) {
+                log('beforeRender', args);
+                if (args.target) {
+                    var staff = args.target.getAttribute('data-staff');
+                    var role = args.target.getAttribute('data-role');
+                    var shift = args.target.getAttribute('data-shift');
+                    var items = args.target.getAttribute('data-items');
+                    var phone = args.target.getAttribute('data-phone');
+                    this.content = '<div class="tooltip-content">' +
+                        '<h4>' + staff + '</h4>' +
+                        '<div class="detail">Role: ' + role + '</div>' +
+                        '<div class="detail">Shift: ' + shift + '</div>' +
+                        '<div class="detail">Workload: ' + items + '</div>' +
+                        '<div class="detail">Phone: ' + phone + '</div>' +
+                        '</div>';
+                }
+            },
+            beforeOpen: function(args) { log('beforeOpen', args); },
+            open: function(args) { log('open', args); },
+            beforeClose: function(args) { log('beforeClose', args); },
+            close: function(args) { log('close', args); },
+            beforeCollision: function(args) { log('beforeCollision', args); },
+            created: function() { log('created', {}); },
+            destroyed: function() { log('destroyed', {}); },
+        });
+        tooltipObj.appendTo('#tooltip-target');
+
+        function callMethod(method, param) {
+            log('METHOD: ' + method, { param: param });
+            switch(method) {
+                case 'open':
+                    var target = document.getElementById(param);
+                    if (target) tooltipObj.open(target);
+                    break;
+                case 'close':
+                    tooltipObj.close();
+                    break;
+                case 'refresh':
+                    tooltipObj.refresh();
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

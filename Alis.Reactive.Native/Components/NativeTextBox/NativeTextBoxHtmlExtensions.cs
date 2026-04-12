@@ -1,5 +1,5 @@
 using System;
-using Alis.Reactive.Descriptors;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
@@ -34,8 +34,8 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ReadExpr, "textbox",
-                CoercionTypes.InferFromType(typeof(TProp))));
+                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMember, "textbox",
+                Shape.FromClrType(typeof(TProp))));
 
             var builder = new NativeTextBoxBuilder<TModel, TProp>(setup.Helper, setup.Expression);
             build(builder);

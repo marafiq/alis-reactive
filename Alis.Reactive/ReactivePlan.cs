@@ -1,28 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Resolvers;
+using Alis.Reactive.PlanModel;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive
 {
     /// <summary>
     /// Collects reactive behavior for a view: triggers, reactions, and component registrations.
-    /// Renders the collected behavior so it executes in the browser.
+    /// Renders the collected behavior as a Plan document for browser execution.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Create a plan at the top of a view with <c>Html.ReactivePlan()</c>, pass it to
-    /// <see cref="Alis.Reactive.Builders.TriggerBuilder{TModel}"/> via <c>Html.On(plan, ...)</c>
-    /// to define behavior, and call <c>Html.RenderPlan(plan)</c> at the bottom to activate it.
-    /// </para>
-    /// <para>
-    /// Partial views that share the same <typeparamref name="TModel"/> use
-    /// <c>Html.ResolvePlan()</c> instead. Both plans merge and execute as a single unit.
-    /// </para>
-    /// </remarks>
-    /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
         private static readonly JsonSerializerOptions CompactOptions = new JsonSerializerOptions
@@ -38,157 +27,296 @@ namespace Alis.Reactive
             WriteIndented = true
         };
 
-        private readonly List<Entry> _entries = new List<Entry>();
-        private readonly Dictionary<string, ComponentRegistration> _componentsMap = new Dictionary<string, ComponentRegistration>();
+        private readonly Dictionary<string, ComponentRegistration> _componentsMap =
+            new Dictionary<string, ComponentRegistration>();
 
-        /// <summary>
-        /// NEVER make public. Constructed exclusively by framework builders. Public constructors
-        /// on descriptor types allow devs to bypass the builder API and create invalid plan state.
-        /// </summary>
-        internal ReactivePlan(bool isPartial = false) { IsPartial = isPartial; }
+        private readonly PlanBuildContext _context;
 
-        /// <summary>
-        /// Gets the unique plan identifier, derived from the model's full type name.
-        /// </summary>
-        /// <remarks>
-        /// Used to scope validation summary elements. Each view's summary is tagged
-        /// with this ID so errors route to the correct view.
-        /// </remarks>
-        public string PlanId { get; } = typeof(TModel).FullName!;
-
-        /// <summary>
-        /// Gets whether this plan belongs to a partial view.
-        /// </summary>
-        /// <remarks>
-        /// Partial plans merge into the owning view's plan in the browser.
-        /// The view emits the validation summary. Partial views do not.
-        /// </remarks>
-        public bool IsPartial { get; }
-
-        /// <summary>
-        /// Gets the registered components keyed by model binding path.
-        /// </summary>
-        /// <remarks>
-        /// Populated when component builders (e.g. <c>Html.InputField(...).NativeTextBox()</c>)
-        /// register themselves. Used by validation and gather resolvers to map model
-        /// properties to their component IDs, vendors, and read expressions.
-        /// </remarks>
-        internal IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
-
-        /// <summary>
-        /// Registers a trigger-reaction pair in the plan. Called by
-        /// <see cref="Builders.TriggerBuilder{TModel}"/>, not intended for direct use in views.
-        /// </summary>
-        internal void AddEntry(Entry entry)
+        internal ReactivePlan(bool isPartial = false)
         {
-            _entries.Add(entry);
+            IsPartial = isPartial;
+            var plan = Plan.Create(PlanId, isPartial ? PlanId : null);
+            _context = new PlanBuildContext(plan, _componentsMap);
         }
 
-        /// <summary>
-        /// Registers a component for a model property so validation and gather can find it.
-        /// Called by component builders, not intended for direct use in views.
-        /// </summary>
-        /// <param name="bindingPath">The model property path (e.g. <c>"FacilityId"</c>, <c>"Address.City"</c>).</param>
-        /// <param name="entry">The component registration describing ID, vendor, and read expression.</param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when a different component is already registered for <paramref name="bindingPath"/>.
-        /// Each model property maps to exactly one component.
-        /// </exception>
+        /// <summary>Gets the unique plan identifier, derived from the model type's full name.</summary>
+        public string PlanId { get; } = typeof(TModel).FullName!;
+        /// <summary>Gets whether this plan represents a partial view that merges into a parent plan.</summary>
+        public bool IsPartial { get; }
+        internal IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
+        internal PlanBuildContext Context => _context;
+
+        /// <summary>Registers a plugin's type metadata in the plan. Must be called before any p.Plugin() reference.</summary>
+        public void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName))
+                throw new ArgumentException("Plugin name required.", nameof(pluginName));
+            if (configure == null)
+                throw new ArgumentNullException(nameof(configure));
+            _context.RegisterPlugin(pluginName, configure);
+        }
+
         internal void AddToComponentsMap(string bindingPath, ComponentRegistration entry)
         {
             if (_componentsMap.TryGetValue(bindingPath, out var existing))
             {
                 if (existing.ComponentId == entry.ComponentId
                     && existing.Vendor == entry.Vendor
-                    && existing.ReadExpr == entry.ReadExpr
+                    && existing.ValueMember == entry.ValueMember
                     && existing.ComponentType == entry.ComponentType
-                    && existing.CoerceAs == entry.CoerceAs)
+                    && existing.Shape == entry.Shape)
                     return;
 
                 throw new InvalidOperationException(
                     $"Duplicate component registration for binding path '{bindingPath}': " +
-                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ReadExpr}, {existing.ComponentType}, {existing.CoerceAs}] vs " +
-                    $"new [{entry.ComponentId}, {entry.Vendor}, {entry.ReadExpr}, {entry.ComponentType}, {entry.CoerceAs}]. " +
-                    "Each binding path must map to exactly one component.");
+                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ValueMember}, {existing.ComponentType}, {existing.Shape.Kind}] vs " +
+                    $"new [{entry.ComponentId}, {entry.Vendor}, {entry.ValueMember}, {entry.ComponentType}, {entry.Shape.Kind}].");
             }
 
             _componentsMap[bindingPath] = entry;
         }
 
-        /// <summary>
-        /// Renders the plan for embedding in the page.
-        /// </summary>
-        /// <remarks>
-        /// Called by <c>Html.RenderPlan(plan)</c>, not called directly in views.
-        /// Resolves validation rules and component enrichment before rendering.
-        /// </remarks>
-        /// <returns>The rendered plan string consumed by the browser.</returns>
+        /// <summary>Registers all components and resolves validation, then serializes the plan as compact JSON.</summary>
         public string Render()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(new
-            {
-                planId = PlanId,
-                components = SerializeComponentsMap(),
-                entries = _entries
-            }, CompactOptions);
+            return JsonSerializer.Serialize(_context.Plan, CompactOptions);
         }
 
-        /// <summary>
-        /// Renders the plan with indentation for debugging and test snapshots.
-        /// </summary>
-        /// <returns>The rendered plan string with indentation for readability.</returns>
+        /// <summary>Registers all components and resolves validation, then serializes the plan as indented JSON for debugging.</summary>
         public string RenderFormatted()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(new
-            {
-                planId = PlanId,
-                components = SerializeComponentsMap(),
-                entries = _entries
-            }, FormattedOptions);
+            return JsonSerializer.Serialize(_context.Plan, FormattedOptions);
         }
 
-        // Flatten ComponentRegistration to anonymous objects for JSON serialization
-        private Dictionary<string, object> SerializeComponentsMap()
-        {
-            var result = new Dictionary<string, object>();
-            foreach (var kvp in _componentsMap)
-            {
-                result[kvp.Key] = new
-                {
-                    id = kvp.Value.ComponentId,
-                    vendor = kvp.Value.Vendor,
-                    readExpr = kvp.Value.ReadExpr,
-                    componentType = kvp.Value.ComponentType,
-                    coerceAs = kvp.Value.CoerceAs
-                };
-            }
-            return result;
-        }
-
-        // Resolve validation rules and component enrichment before serialization.
-        // Must run before every Render/RenderFormatted call.
         private void ResolveAll()
         {
-            var extractor = ReactivePlanConfig.Extractor;
-            if (extractor != null)
+            _context.RegisterInputComponents();
+            ResolveValidation();
+        }
+
+        private void ResolveValidation()
+        {
+            // Walk all behaviors to find RequestReaction nodes with a ValidatorType.
+            foreach (var behavior in _context.Plan.Behaviors)
             {
-                ValidationResolver.Resolve(_entries, extractor, _componentsMap);
+                CollectValidationFromReaction(behavior.Reaction);
             }
-            else if (ValidationResolver.HasValidatorTypes(_entries))
+        }
+
+        private void CollectValidationFromReaction(Reaction reaction)
+        {
+            switch (reaction)
             {
-                throw new InvalidOperationException(
-                    "One or more requests use Validate<TValidator>() but no validation extractor is registered. " +
-                    "Call ReactivePlanConfig.UseValidationExtractor(...) at app startup.");
+                case RequestReaction rr:
+                    ResolveRequestValidation(rr.Request);
+                    WalkRequestReactions(rr.Request);
+                    break;
+                case SequenceReaction seq:
+                    foreach (var step in seq.Steps) CollectValidationFromReaction(step);
+                    break;
+                case ParallelReaction par:
+                    foreach (var step in par.Steps) CollectValidationFromReaction(step);
+                    if (par.OnSettled != null) CollectValidationFromReaction(par.OnSettled);
+                    break;
+                case BranchReaction br:
+                    foreach (var c in br.Cases) CollectValidationFromReaction(c.Reaction);
+                    break;
             }
-            else if (_componentsMap.Count > 0)
+        }
+
+        /// <summary>
+        /// Walks all nested reactions inside a Request (Before, Success, Error, Complete, Next).
+        /// </summary>
+        private void WalkRequestReactions(Request request)
+        {
+            if (request.Before != null)
+                foreach (var r in request.Before) CollectValidationFromReaction(r);
+
+            if (request.Success != null)
+                foreach (var h in request.Success)
+                    if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
+
+            if (request.Error != null)
+                foreach (var h in request.Error)
+                    if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
+
+            if (request.Complete != null)
+                foreach (var r in request.Complete) CollectValidationFromReaction(r);
+
+            if (request.Next != null)
             {
-                ValidationResolver.EnrichFromComponents(_entries, _componentsMap);
+                ResolveRequestValidation(request.Next);
+                WalkRequestReactions(request.Next);
+            }
+        }
+
+        private void ResolveRequestValidation(Request request)
+        {
+            if (request.ValidatorType == null)
+                return;
+
+            var extractor = ReactivePlanConfig.Extractor
+                ?? throw new InvalidOperationException(
+                    $"Request at '{request.Url}' specifies ValidatorType '{request.ValidatorType.Name}' " +
+                    "but no IValidationExtractor is registered. " +
+                    "Call ReactivePlanConfig.UseValidationExtractor() at app startup.");
+
+            var container = request.Container
+                ?? throw new InvalidOperationException(
+                    $"Request at '{request.Url}' specifies ValidatorType '{request.ValidatorType.Name}' " +
+                    "but no Container (formId) is set. Call .Validate<T>(formId) to specify the form.");
+
+            var fields = extractor.ExtractRules(request.ValidatorType, container);
+
+            // Enrich each field with component registration info.
+            // Components may be in this plan's _componentsMap, or in a partial plan's map
+            // (partials merge in the browser). For fields not found locally, generate the
+            // expected component ID using the same IdGenerator convention all components use.
+            var componentValidations = new List<ComponentValidation>();
+            foreach (var field in fields)
+            {
+                if (_componentsMap.TryGetValue(field.FieldName, out var reg))
+                {
+                    field.FieldId = reg.ComponentId;
+                    field.Shape = reg.Shape;
+                }
+                else
+                {
+                    field.FieldId = IdGenerator.For(typeof(TModel), field.FieldName);
+                }
+
+                // Every input component registers "value" as a readable property via CreateEnrichedType.
+                // For components where valueMember differs (e.g. "checked"), "value" is an alias
+                // pointing to the same path with the same shape. Always safe to use.
+                var fieldValueMember = "value";
+                var fieldShape = field.Shape;
+                var fieldValue = ValueProducer.Read(
+                    ComponentSource.Of(field.FieldId), fieldValueMember, shape: fieldShape);
+
+                var planRules = field.Rules.Select(r => ToPlanValidationRule(r, field)).ToList();
+                componentValidations.Add(new ComponentValidation(
+                    field.FieldId, fieldValue, planRules, field.FieldName));
             }
 
-            // Stamp planId on all validation descriptors for summary div scoping
-            ValidationResolver.StampPlanId(_entries, PlanId);
+            // Attach to the container component's ContainerScope.
+            // Merge — multiple requests can target the same container (e.g., save + submit).
+            if (_context.Plan.MutableComponents.TryGetValue(container, out var comp))
+            {
+                comp.Container ??= ContainerScope.Of();
+                MergeValidationRules(comp.Container, componentValidations);
+            }
+            else
+            {
+                // Create a container component for the form
+                _context.EnsureElement(container);
+                var formComp = _context.Plan.MutableComponents[container];
+                formComp.Container = ContainerScope.Of();
+                MergeValidationRules(formComp.Container, componentValidations);
+            }
+        }
+
+        private static void MergeValidationRules(
+            ContainerScope container, List<ComponentValidation> incoming)
+        {
+            if (container.ValidationRules == null)
+            {
+                container.ValidationRules = incoming;
+                return;
+            }
+            // Merge by component key — incoming rules for the same component replace,
+            // new components are appended. This handles the case where two requests
+            // in the same plan both validate the same container.
+            var existing = container.ValidationRules.ToDictionary(cv => cv.Component);
+            foreach (var cv in incoming)
+                existing[cv.Component] = cv;
+            container.ValidationRules = existing.Values.ToList();
+        }
+
+        private PlanModel.ValidationRule ToPlanValidationRule(
+            Validation.ValidationRule extracted, ValidationField field)
+        {
+            var rule = new PlanModel.ValidationRule(extracted.Rule, extracted.Message);
+
+            if (extracted.Constraint != null)
+                rule.Constraint = ValueProducer.LiteralRaw(extracted.Constraint, extracted.Shape);
+
+            if (extracted.Field != null)
+            {
+                string otherComponentId;
+                Shape otherShape = null;
+
+                if (_componentsMap.TryGetValue(extracted.Field, out var otherReg))
+                {
+                    otherComponentId = otherReg.ComponentId;
+                    otherShape = otherReg.Shape;
+                }
+                else
+                {
+                    otherComponentId = IdGenerator.For(typeof(TModel), extracted.Field);
+                }
+
+                rule.OtherValue = ValueProducer.Read(
+                    ComponentSource.Of(otherComponentId), "value", shape: otherShape);
+            }
+
+            if (extracted.When != null)
+                rule.When = ToCondition(extracted.When);
+
+            if (extracted.Shape != null && !extracted.Shape.IsNone)
+                rule.Shape = extracted.Shape;
+
+            return rule;
+        }
+
+        private Condition ToCondition(FieldCondition fc) => fc switch
+        {
+            FieldCompare cmp => ResolveCompare(cmp),
+            FieldAll all => Condition.All(all.Terms.Select(ToCondition).ToArray()),
+            FieldAny any => Condition.Any(any.Terms.Select(ToCondition).ToArray()),
+            FieldNot not => Condition.Not(ToCondition(not.Term)),
+            _ => throw new InvalidOperationException($"Unknown FieldCondition type: {fc.GetType().Name}")
+        };
+
+        private Condition ResolveCompare(FieldCompare cmp)
+        {
+            // Build a read from the condition's field component.
+            // Try local map first; fall back to IdGenerator for partial-owned fields.
+            string fieldComponentId;
+            ComponentRegistration fieldReg = null;
+            if (_componentsMap.TryGetValue(cmp.Field, out fieldReg))
+            {
+                fieldComponentId = fieldReg.ComponentId;
+            }
+            else
+            {
+                fieldComponentId = IdGenerator.For(typeof(TModel), cmp.Field);
+            }
+
+            var left = ValueProducer.Read(
+                ComponentSource.Of(fieldComponentId),
+                "value");
+
+            var conditionShape = fieldReg?.Shape;
+            ValueProducer right;
+            if (cmp.Value is object[] arr)
+            {
+                // in/not-in/between: value is an array — produce ArrayProducer so TS
+                // receives Array.isArray(right) === true at runtime.
+                var items = arr.Select(v => ValueProducer.LiteralRaw(v, conditionShape)).ToList();
+                right = ValueProducer.Array(items, conditionShape);
+            }
+            else if (cmp.Value != null)
+            {
+                right = ValueProducer.LiteralRaw(cmp.Value, conditionShape);
+            }
+            else
+            {
+                right = null;
+            }
+
+            return Condition.Compare(left, cmp.Op, right, conditionShape);
         }
     }
 }

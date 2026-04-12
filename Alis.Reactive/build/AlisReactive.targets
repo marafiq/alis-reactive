@@ -1,0 +1,47 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    Alis.Reactive static assets (JS + CSS) — versioned filenames.
+
+    Defaults (auto-detected by framework):
+      net10.0+  JS  → wwwroot/scripts/alis-reactive.{version}.js
+                CSS → wwwroot/css/design-system.{version}.css
+      net48     JS  → Scripts/alis-reactive.{version}.js
+                CSS → Content/css/design-system.{version}.css
+
+    Override in your csproj:
+      <PropertyGroup>
+        <AlisReactiveJsPath>my/custom/js</AlisReactiveJsPath>
+        <AlisReactiveCssPath>my/custom/css</AlisReactiveCssPath>
+      </PropertyGroup>
+  -->
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+    <AlisReactiveJsPath Condition="'$(AlisReactiveJsPath)' == ''">Scripts</AlisReactiveJsPath>
+    <AlisReactiveCssPath Condition="'$(AlisReactiveCssPath)' == ''">Content\css</AlisReactiveCssPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net48'">
+    <AlisReactiveJsPath Condition="'$(AlisReactiveJsPath)' == ''">wwwroot\scripts</AlisReactiveJsPath>
+    <AlisReactiveCssPath Condition="'$(AlisReactiveCssPath)' == ''">wwwroot\css</AlisReactiveCssPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AlisReactivePkgDir>$(MSBuildThisFileDirectory)</AlisReactivePkgDir>
+    <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == ''">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(AlisReactivePkgDir.TrimEnd('\/'))))))</AlisReactiveVersion>
+  </PropertyGroup>
+
+  <Target Name="CopyAlisReactiveAssets" AfterTargets="Build">
+    <MakeDir Directories="$(AlisReactiveJsPath)" Condition="!Exists('$(AlisReactiveJsPath)')" />
+    <MakeDir Directories="$(AlisReactiveCssPath)" Condition="!Exists('$(AlisReactiveCssPath)')" />
+
+    <Copy SourceFiles="$(AlisReactivePkgDir)assets\js\alis-reactive.js"
+          DestinationFiles="$(AlisReactiveJsPath)\alis-reactive.$(AlisReactiveVersion).js"
+          SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="$(AlisReactivePkgDir)assets\css\design-system.css"
+          DestinationFiles="$(AlisReactiveCssPath)\design-system.$(AlisReactiveVersion).css"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

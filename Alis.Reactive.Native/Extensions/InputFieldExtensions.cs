@@ -1,7 +1,11 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.InputField;
+#if NET48
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Extensions
 {
@@ -27,7 +31,11 @@ namespace Alis.Reactive.Native.Extensions
         /// <param name="options">Optional configuration for label text and required marker.</param>
         /// <returns>A bound field ready to receive a component extension.</returns>
         public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             Action<InputFieldOptions>? options = null)
@@ -41,7 +49,11 @@ namespace Alis.Reactive.Native.Extensions
                 expression,
                 opts,
                 IdGenerator.For(expression),
+#if NET48
+                ExpressionHelper.GetExpressionText(expression),
+#else
                 html.NameFor(expression),
+#endif
                 html.ViewContext.Writer);
         }
     }

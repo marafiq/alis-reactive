@@ -440,3 +440,250 @@ public class AllRulesValidator : AbstractValidator<TestModel>
         RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m).LessThanOrEqualTo(500000m);
     }
 }
+
+// --- New FieldCondition operator validators ---
+
+public class WhenFieldGtValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldGtValidator()
+    {
+        WhenFieldGt(x => x.Age, 18, () =>
+        {
+            RuleFor(x => x.JobTitle).NotEmpty().WithMessage("Adults must have a job title");
+        });
+    }
+}
+
+public class WhenFieldGteValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldGteValidator()
+    {
+        WhenFieldGte(x => x.Salary, 50000m, () =>
+        {
+            RuleFor(x => x.Email).NotEmpty().WithMessage("High earners must provide email");
+        });
+    }
+}
+
+public class WhenFieldLtValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldLtValidator()
+    {
+        WhenFieldLt(x => x.Age, 18, () =>
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Minors must have guardian name");
+        });
+    }
+}
+
+public class WhenFieldLteValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldLteValidator()
+    {
+        WhenFieldLte(x => x.Salary, 0m, () =>
+        {
+            RuleFor(x => x.Notes).NotEmpty().WithMessage("Explain zero or negative salary");
+        });
+    }
+}
+
+public class WhenFieldNullValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldNullValidator()
+    {
+        WhenFieldNull(x => x.MiddleName, () =>
+        {
+            RuleFor(x => x.Notes).NotEmpty().WithMessage("Explain missing middle name");
+        });
+    }
+}
+
+public class WhenFieldNotNullValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldNotNullValidator()
+    {
+        WhenFieldNotNull(x => x.MiddleName, () =>
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Full name required when middle name given");
+        });
+    }
+}
+
+public class WhenFieldEmptyValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldEmptyValidator()
+    {
+        WhenFieldEmpty(x => x.Email, () =>
+        {
+            RuleFor(x => x.Phone).NotEmpty().WithMessage("Phone required when email empty");
+        });
+    }
+}
+
+public class WhenFieldNotEmptyValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldNotEmptyValidator()
+    {
+        WhenFieldNotEmpty(x => x.Notes, () =>
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name required when notes provided");
+        });
+    }
+}
+
+public class WhenFieldInValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldInValidator()
+    {
+        WhenFieldIn(x => x.CareLevel, new[] { "memory-care", "skilled-nursing" }, () =>
+        {
+            RuleFor(x => x.Notes).NotEmpty().WithMessage("Notes required for high-acuity care");
+        });
+    }
+}
+
+public class WhenFieldNotInValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldNotInValidator()
+    {
+        WhenFieldNotIn(x => x.CareLevel, new[] { "independent", "assisted" }, () =>
+        {
+            RuleFor(x => x.Phone).NotEmpty().WithMessage("Phone required for non-standard care");
+        });
+    }
+}
+
+public class WhenFieldBetweenValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldBetweenValidator()
+    {
+        WhenFieldBetween(x => x.Age, 18, 65, () =>
+        {
+            RuleFor(x => x.JobTitle).NotEmpty().WithMessage("Working-age residents need job title");
+        });
+    }
+}
+
+public class WhenFieldContainsValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldContainsValidator()
+    {
+        WhenFieldContains(x => x.Notes, "urgent", () =>
+        {
+            RuleFor(x => x.Phone).NotEmpty().WithMessage("Phone required for urgent cases");
+        });
+    }
+}
+
+public class WhenFieldStartsWithValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldStartsWithValidator()
+    {
+        WhenFieldStartsWith(x => x.Name, "Dr.", () =>
+        {
+            RuleFor(x => x.Email).NotEmpty().WithMessage("Email required for doctors");
+        });
+    }
+}
+
+public class WhenFieldEndsWithValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldEndsWithValidator()
+    {
+        WhenFieldEndsWith(x => x.Email, "@hospital.org", () =>
+        {
+            RuleFor(x => x.JobTitle).NotEmpty().WithMessage("Job title required for hospital staff");
+        });
+    }
+}
+
+// --- Composition validators ---
+
+public class WhenFieldsAndValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldsAndValidator()
+    {
+        WhenFields(c => c.Field(x => x.IsEmployed).Truthy()
+                          .And(c.Field(x => x.Age).Gte(18)),
+            () =>
+            {
+                RuleFor(x => x.JobTitle).NotEmpty().WithMessage("Employed adults need job title");
+            });
+    }
+}
+
+public class WhenFieldsOrValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldsOrValidator()
+    {
+        WhenFields(c => c.Field(x => x.CareLevel).Eq("memory-care")
+                          .Or(c.Field(x => x.CareLevel).Eq("skilled-nursing")),
+            () =>
+            {
+                RuleFor(x => x.Notes).NotEmpty().WithMessage("Notes required for high-acuity");
+            });
+    }
+}
+
+public class WhenFieldsNotValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldsNotValidator()
+    {
+        WhenFields(c => c.Field(x => x.IsEmployed).Truthy().Not(),
+            () =>
+            {
+                RuleFor(x => x.Notes).NotEmpty().WithMessage("Explain unemployment");
+            });
+    }
+}
+
+public class WhenFieldsComplexValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldsComplexValidator()
+    {
+        // (employed AND salary > 50k) OR age >= 65
+        WhenFields(c =>
+            c.Field(x => x.IsEmployed).Truthy()
+             .And(c.Field(x => x.Salary).Gt(50000m))
+             .Or(c.Field(x => x.Age).Gte(65)),
+            () =>
+            {
+                RuleFor(x => x.Email).NotEmpty().WithMessage("Email required for high-value residents");
+            });
+    }
+}
+
+// --- Remaining CompareOp operators ---
+
+public class WhenFieldMatchesValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldMatchesValidator()
+    {
+        WhenFieldMatches(x => x.Phone, @"^\d{3}-", () =>
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name required for valid phone format");
+        });
+    }
+}
+
+public class WhenFieldMinLengthValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldMinLengthValidator()
+    {
+        WhenFieldMinLength(x => x.Notes, 10, () =>
+        {
+            RuleFor(x => x.Email).NotEmpty().WithMessage("Email required when notes are substantial");
+        });
+    }
+}
+
+public class WhenFieldArrayContainsValidator : ReactiveValidator<TestModel>
+{
+    public WhenFieldArrayContainsValidator()
+    {
+        WhenFieldArrayContains(x => x.Tags, "urgent", () =>
+        {
+            RuleFor(x => x.Phone).NotEmpty().WithMessage("Phone required when tagged urgent");
+        });
+    }
+}

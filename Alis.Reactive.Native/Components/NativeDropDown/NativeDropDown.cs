@@ -11,6 +11,6 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeDropDown : NativeComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMember => "value";
     }
 }

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Schedule — API Payload Test</title>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/material.css" />
+    <script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui; margin: 20px; }
+        #status { margin: 10px 0; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h2>SF Schedule — Loading from API (camelCase JSON)</h2>
+    <div id="status">Loading...</div>
+    <div id="schedule"></div>
+
+    <script>
+        var shiftData = [
+            { text: 'AM Shift (6:00 AM - 2:00 PM)', id: 1, color: '#1aaa55' },
+            { text: 'PM Shift (2:00 PM - 10:00 PM)', id: 2, color: '#357cd2' },
+            { text: 'Night Shift (10:00 PM - 6:00 AM)', id: 3, color: '#7fa900' }
+        ];
+
+        var scheduleObj = new ej.schedule.Schedule({
+            width: '100%',
+            height: '600px',
+            selectedDate: new Date(),
+            currentView: 'Week',
+            views: [{ option: 'Day' }, { option: 'Week' }, { option: 'Month' }, { option: 'Agenda' }],
+            group: { resources: ['Shifts'] },
+            resources: [{
+                field: 'shiftId',
+                title: 'Shift',
+                name: 'Shifts',
+                dataSource: shiftData,
+                textField: 'text',
+                idField: 'id',
+                colorField: 'color'
+            }],
+            eventSettings: {
+                fields: {
+                    id: 'id',
+                    subject: { name: 'subject' },
+                    startTime: { name: 'startTime' },
+                    endTime: { name: 'endTime' },
+                    description: { name: 'description' },
+                    isAllDay: { name: 'isAllDay' }
+                }
+            },
+            startHour: '05:00',
+            endHour: '23:00',
+            dataBound: function() {
+                document.getElementById('status').textContent = 'dataBound fired — events: ' + scheduleObj.getEvents().length;
+            },
+            actionFailure: function(args) {
+                document.getElementById('status').textContent = 'ACTION FAILURE: ' + JSON.stringify(args);
+            }
+        });
+        scheduleObj.appendTo('#schedule');
+
+        // Fetch from the REAL API
+        fetch('/api/schedule/assignments?facilityId=mystery-manor')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                document.getElementById('status').textContent =
+                    'API returned ' + data.assignments.length + ' events. Setting dataSource...';
+
+                // Log first event to see exact shape
+                console.log('First event from API:', JSON.stringify(data.assignments[0]));
+
+                scheduleObj.eventSettings.dataSource = data.assignments;
+                scheduleObj.dataBind();
+            })
+            .catch(function(err) {
+                document.getElementById('status').textContent = 'FETCH ERROR: ' + err;
+            });
+    </script>
+</body>
+</html>

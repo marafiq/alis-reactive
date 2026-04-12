@@ -196,6 +196,55 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             }
         }
 
+        // ── Section 19-22: URL Query Params ─────────────────────
+
+        [HttpGet("UrlParamEcho")]
+        public IActionResult UrlParamEcho(string? tab, string? facilityId, string? page) =>
+            Json(new { tab, facilityId, page });
+
+        [HttpGet("ComposeEcho/{id:int}")]
+        public IActionResult ComposeEcho(int id, string? facility) =>
+            Json(new {
+                residentId = id,
+                name = $"Resident #{id}",
+                receivedTab = Request.Headers["X-Tab"].FirstOrDefault() ?? "(none)",
+                receivedFacility = facility ?? "(none)"
+            });
+
+        // ── Section 15-18: Route Params ────────────────────��───
+
+        [HttpGet("Residents/{id:int}")]
+        public IActionResult ResidentById(int id) =>
+            Json(new { residentId = id, name = $"Resident #{id}" });
+
+        [HttpGet("Facilities/{facilityId:int}/Residents/{residentId:int}")]
+        public IActionResult FacilityResident(int facilityId, int residentId) =>
+            Json(new { facilityId, residentId, name = $"Resident #{residentId} at Facility #{facilityId}" });
+
+        [HttpGet("ResidentByName/{name}")]
+        public IActionResult ResidentByName(string name) =>
+            Json(new { receivedName = name });
+
+        // ── Section 12: Custom Headers ─────────────────────────
+
+        [HttpGet("EchoHeaders")]
+        public IActionResult EchoHeaders()
+        {
+            var apiVersion = Request.Headers["X-Api-Version"].FirstOrDefault() ?? "(none)";
+            var requestId = Request.Headers["X-Request-Id"].FirstOrDefault() ?? "(none)";
+            var tenantId = Request.Headers["X-Tenant-Id"].FirstOrDefault() ?? "(none)";
+            return Json(new { apiVersion, requestId, tenantId });
+        }
+
+        [HttpPost("EchoHeaders")]
+        public IActionResult EchoHeadersPost([FromBody] object? body)
+        {
+            var apiVersion = Request.Headers["X-Api-Version"].FirstOrDefault() ?? "(none)";
+            var requestId = Request.Headers["X-Request-Id"].FirstOrDefault() ?? "(none)";
+            var tenantId = Request.Headers["X-Tenant-Id"].FirstOrDefault() ?? "(none)";
+            return Json(new { apiVersion, requestId, tenantId });
+        }
+
         // ── DTOs ─────────────────────────────────────────────
 
         public class SaveRequest

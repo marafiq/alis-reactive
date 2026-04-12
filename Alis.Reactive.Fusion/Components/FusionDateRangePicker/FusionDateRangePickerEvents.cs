@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionDateRangePickerEvents() { }
 
         /// <summary>Fires when the date range value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionDateRangePickerChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionDateRangePickerChangeArgs>(
+        public TypedEvent<FusionDateRangePickerChangeArgs> Changed =>
+            new TypedEvent<FusionDateRangePickerChangeArgs>(
                 "change", new FusionDateRangePickerChangeArgs());
     }
 }

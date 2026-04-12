@@ -141,8 +141,11 @@ public sealed class DateRangePickerLocator
                 .ClickWhenStableAsync(_page);
         }
 
-        // Click Apply to confirm the range selection
-        await ApplyButton.ClickWhenStableAsync(_page);
+        // Wait for the Apply button to be stable after EJ2 re-renders the popup,
+        // then click to confirm the range selection.
+        await ApplyButton.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
+        await _page.WaitForTimeoutAsync(150);
+        await ApplyButton.ClickAsync(new() { Timeout = 5000 });
     }
 
     // ─── Private Helpers ───

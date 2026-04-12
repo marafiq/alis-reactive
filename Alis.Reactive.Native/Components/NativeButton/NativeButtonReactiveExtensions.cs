@@ -1,7 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -17,7 +16,7 @@ namespace Alis.Reactive.Native.Components
     ///            .Response(r => r.OnSuccess(s => s.Element("result").SetText("Saved!")));
     ///       })
     ///
-    /// .Reactive() is always the last call — the builder implements IHtmlContent.
+    /// .Reactive() is always the last call -- the builder implements IHtmlContent.
     /// </summary>
     public static class NativeButtonReactiveExtensions
     {
@@ -26,17 +25,15 @@ namespace Alis.Reactive.Native.Components
         public static NativeButtonBuilder<TModel> Reactive<TModel, TArgs>(
             this NativeButtonBuilder<TModel> builder,
             ReactivePlan<TModel> plan,
-            Func<NativeButtonEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<NativeButtonEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
             var descriptor = eventSelector(NativeButtonEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
+            var pb = new PipelineBuilder<TModel>(plan.Context);
             pipeline(descriptor.Args, pb);
 
-            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, _component.Vendor);
-            foreach (var reaction in pb.BuildReactions())
-                plan.AddEntry(new Entry(trigger, reaction));
+            plan.Context.WireComponentEvent(builder.ElementId, "native", descriptor.JsEvent, pb.BuildReactions());
 
             return builder;
         }

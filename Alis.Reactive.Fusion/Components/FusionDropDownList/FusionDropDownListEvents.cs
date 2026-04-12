@@ -14,18 +14,18 @@ namespace Alis.Reactive.Fusion.Components
         private FusionDropDownListEvents() { }
 
         /// <summary>Fires when the selected value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionDropDownListChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionDropDownListChangeArgs>(
+        public TypedEvent<FusionDropDownListChangeArgs> Changed =>
+            new TypedEvent<FusionDropDownListChangeArgs>(
                 "change", new FusionDropDownListChangeArgs());
 
         /// <summary>Fires when the component receives focus (SF "focus" event).</summary>
-        public TypedEventDescriptor<FusionDropDownListFocusArgs> Focus =>
-            new TypedEventDescriptor<FusionDropDownListFocusArgs>(
+        public TypedEvent<FusionDropDownListFocusArgs> Focus =>
+            new TypedEvent<FusionDropDownListFocusArgs>(
                 "focus", new FusionDropDownListFocusArgs());
 
         /// <summary>Fires when the component loses focus (SF "blur" event).</summary>
-        public TypedEventDescriptor<FusionDropDownListBlurArgs> Blur =>
-            new TypedEventDescriptor<FusionDropDownListBlurArgs>(
+        public TypedEvent<FusionDropDownListBlurArgs> Blur =>
+            new TypedEvent<FusionDropDownListBlurArgs>(
                 "blur", new FusionDropDownListBlurArgs());
     }
 }

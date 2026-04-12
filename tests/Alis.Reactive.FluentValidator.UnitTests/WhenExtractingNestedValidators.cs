@@ -11,7 +11,7 @@ public class WhenExtractingNestedValidators
         var desc = _adapter.ExtractRules(typeof(NestedValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();
+        var fieldNames = desc.Select(f => f.FieldName).ToList();
         Assert.That(fieldNames, Does.Contain("Name"));
         Assert.That(fieldNames, Does.Contain("Address.Street"));
         Assert.That(fieldNames, Does.Contain("Address.City"));
@@ -24,7 +24,7 @@ public class WhenExtractingNestedValidators
         var desc = _adapter.ExtractRules(typeof(DeeplyNestedValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();
+        var fieldNames = desc.Select(f => f.FieldName).ToList();
         Assert.That(fieldNames, Does.Contain("DeepAddress.Street"));
         Assert.That(fieldNames, Does.Contain("DeepAddress.Country.Code"));
     }

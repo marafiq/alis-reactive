@@ -1,4 +1,4 @@
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -8,14 +8,14 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeButton, TModel> self, string text)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("textContent"), value: text);
+            return self.EmitSet("textContent", ValueProducer.Literal(text));
         }
 
         public static ComponentRef<NativeButton, TModel> FocusIn<TModel>(
             this ComponentRef<NativeButton, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("focus"));
+            return self.EmitCall("focus");
         }
     }
 }

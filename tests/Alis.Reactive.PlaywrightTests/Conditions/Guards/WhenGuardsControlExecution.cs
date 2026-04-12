@@ -393,7 +393,7 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── NOT (InvertGuard) ──
+    // ── NOT (Not condition) ──
 
     [Test]
     public async Task not_inverts_guard()

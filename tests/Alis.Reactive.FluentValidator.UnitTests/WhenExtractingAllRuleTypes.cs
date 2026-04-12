@@ -12,7 +12,7 @@ public class WhenExtractingAllRuleTypes
 
         Assert.That(desc, Is.Not.Null);
 
-        var fieldNames = desc!.Fields.Select(f => f.FieldName).ToList();
+        var fieldNames = desc.Select(f => f.FieldName).ToList();
         Assert.That(fieldNames, Does.Contain("Name"));
         Assert.That(fieldNames, Does.Contain("Email"));
         Assert.That(fieldNames, Does.Contain("Phone"));
@@ -25,7 +25,7 @@ public class WhenExtractingAllRuleTypes
     {
         var desc = _adapter.ExtractRules(typeof(AllRulesValidator), "testForm");
 
-        var nameField = desc!.Fields.First(f => f.FieldName == "Name");
+        var nameField = desc.First(f => f.FieldName == "Name");
         var ruleTypes = nameField.Rules.Select(r => r.Rule).ToList();
         Assert.That(ruleTypes, Does.Contain("required"));
         Assert.That(ruleTypes, Does.Contain("maxLength"));
@@ -36,7 +36,7 @@ public class WhenExtractingAllRuleTypes
     {
         var desc = _adapter.ExtractRules(typeof(AllRulesValidator), "testForm");
 
-        var emailField = desc!.Fields.First(f => f.FieldName == "Email");
+        var emailField = desc.First(f => f.FieldName == "Email");
         Assert.That(emailField.Rules[0].Rule, Is.EqualTo("email"));
     }
 
@@ -45,7 +45,7 @@ public class WhenExtractingAllRuleTypes
     {
         var desc = _adapter.ExtractRules(typeof(AllRulesValidator), "testForm");
 
-        var phoneField = desc!.Fields.First(f => f.FieldName == "Phone");
+        var phoneField = desc.First(f => f.FieldName == "Phone");
         Assert.That(phoneField.Rules[0].Rule, Is.EqualTo("regex"));
     }
 
@@ -54,7 +54,7 @@ public class WhenExtractingAllRuleTypes
     {
         var desc = _adapter.ExtractRules(typeof(AllRulesValidator), "testForm");
 
-        var ageField = desc!.Fields.First(f => f.FieldName == "Age");
+        var ageField = desc.First(f => f.FieldName == "Age");
         Assert.That(ageField.Rules[0].Rule, Is.EqualTo("range"));
     }
 
@@ -63,7 +63,7 @@ public class WhenExtractingAllRuleTypes
     {
         var desc = _adapter.ExtractRules(typeof(AllRulesValidator), "testForm");
 
-        var salaryField = desc!.Fields.First(f => f.FieldName == "Salary");
+        var salaryField = desc.First(f => f.FieldName == "Salary");
         var ruleTypes = salaryField.Rules.Select(r => r.Rule).ToList();
         Assert.That(ruleTypes, Does.Contain("min"));
         Assert.That(ruleTypes, Does.Contain("max"));

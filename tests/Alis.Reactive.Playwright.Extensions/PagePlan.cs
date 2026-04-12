@@ -5,37 +5,24 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// Reads the plan JSON from the page and provides strongly-typed component locators.
+/// Reads the V3 plan JSON from the page and provides typed component locators.
+/// V3 plan: { version, planId, types, components, behaviors }
+/// Components keyed by deterministic ID (FullNamespace__PropertyPath).
 ///
-/// The plan JSON already contains componentId, vendor, readExpr, and bindingPath
-/// for every component on the page. TModel is a phantom — it provides compile-time
-/// expression safety without referencing the app.
-///
-/// Usage:
-///   var plan = await ReactivePlan&lt;ResidentModel&gt;.FromPage(Page);
-///   var physician = plan.AutoComplete(m => m.Physician);
-///   await physician.TypeAndSelect("smi", "Dr. Smith");
-///
-/// Rename Physician → PrimaryPhysician on the model:
-///   - View breaks at compile time (Html.InputField uses same expression)
-///   - Test breaks at compile time (plan.AutoComplete uses same expression)
-///   - Coupled to domain, decoupled from implementation.
+/// BDD: tests use model expressions → locators → real browser interactions.
+/// Tests never see plan internals — they interact with behavior.
 /// </summary>
 public sealed class PagePlan<TModel> where TModel : class
 {
     private readonly IPage _page;
-    private readonly Dictionary<string, ComponentEntry> _components;
+    private readonly Dictionary<string, BoundComponent> _components;
 
-    private PagePlan(IPage page, Dictionary<string, ComponentEntry> components)
+    private PagePlan(IPage page, Dictionary<string, BoundComponent> components)
     {
         _page = page;
         _components = components;
     }
 
-    /// <summary>
-    /// Read the plan JSON from [data-reactive-plan] on the page.
-    /// Call AFTER the page has loaded and booted.
-    /// </summary>
     public static async Task<PagePlan<TModel>> FromPage(IPage page)
     {
         var json = await page.EvalOnSelectorAsync<string>(
@@ -43,181 +30,132 @@ public sealed class PagePlan<TModel> where TModel : class
             "el => el.textContent");
 
         var doc = JsonDocument.Parse(json);
-        var components = new Dictionary<string, ComponentEntry>(StringComparer.OrdinalIgnoreCase);
+        var components = new Dictionary<string, BoundComponent>(StringComparer.OrdinalIgnoreCase);
+        var root = doc.RootElement;
 
-        if (doc.RootElement.TryGetProperty("components", out var comps))
+        if (root.TryGetProperty("components", out var comps))
         {
             foreach (var prop in comps.EnumerateObject())
             {
-                var bindingPath = prop.Name;
+                var key = prop.Name;
                 var obj = prop.Value;
-                components[bindingPath] = new ComponentEntry(
-                    Id: obj.GetProperty("id").GetString()!,
-                    Vendor: obj.GetProperty("vendor").GetString()!,
-                    ReadExpr: obj.GetProperty("readExpr").GetString()!,
+                var id = obj.GetProperty("id").GetString()!;
+                var vendor = obj.GetProperty("vendor").GetString()!;
+                var typeKey = obj.GetProperty("type").GetString()!;
+
+                var bindingPath = ExtractBindingPath(key);
+
+                components[bindingPath] = new BoundComponent(
+                    ElementId: id,
                     BindingPath: bindingPath,
-                    ComponentType: obj.GetProperty("componentType").GetString()!);
+                    ComponentKey: key,
+                    Vendor: vendor,
+                    TypeKey: typeKey);
             }
         }
 
         return new PagePlan<TModel>(page, components);
     }
 
-    /// <summary>All component binding paths discovered in the plan.</summary>
     public IReadOnlyCollection<string> ComponentNames => _components.Keys;
 
-    // ─── Typed Component Locators (expression-based) ───
+    // ── Typed Component Locators ──
 
-    /// <summary>AutoComplete — resolved from plan via model expression.</summary>
     public AutoCompleteLocator AutoComplete(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "autocomplete");
-        return new AutoCompleteLocator(_page, entry.Id);
-    }
+        => new AutoCompleteLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>DropDownList — resolved from plan via model expression.</summary>
     public DropDownListLocator DropDownList(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "dropdownlist");
-        return new DropDownListLocator(_page, entry.Id);
-    }
+        => new DropDownListLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>NumericTextBox — resolved from plan via model expression.</summary>
     public NumericTextBoxLocator NumericTextBox(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "numerictextbox");
-        return new NumericTextBoxLocator(_page, entry.Id);
-    }
+        => new NumericTextBoxLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>Switch — resolved from plan via model expression.</summary>
     public SwitchLocator Switch(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "switch");
-        return new SwitchLocator(_page, entry.Id);
-    }
+        => new SwitchLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>Native TextBox — resolved from plan via model expression.</summary>
     public NativeTextBoxLocator TextBox(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "textbox");
-        return new NativeTextBoxLocator(_page, entry.Id);
-    }
+        => new NativeTextBoxLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>DatePicker — resolved from plan via model expression.</summary>
     public DatePickerLocator DatePicker(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "datepicker");
-        return new DatePickerLocator(_page, entry.Id);
-    }
+        => new DatePickerLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>TimePicker — resolved from plan via model expression.</summary>
     public TimePickerLocator TimePicker(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "timepicker");
-        return new TimePickerLocator(_page, entry.Id);
-    }
+        => new TimePickerLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>DateTimePicker — resolved from plan via model expression.</summary>
     public DateTimePickerLocator DateTimePicker(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "datetimepicker");
-        return new DateTimePickerLocator(_page, entry.Id);
-    }
+        => new DateTimePickerLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>DateRangePicker — resolved from plan via model expression.</summary>
     public DateRangePickerLocator DateRangePicker(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "daterangepicker");
-        return new DateRangePickerLocator(_page, entry.Id);
-    }
+        => new DateRangePickerLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>MultiColumnComboBox — resolved from plan via model expression.</summary>
     public MultiColumnComboBoxLocator MultiColumnComboBox(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "multicolumncombobox");
-        return new MultiColumnComboBoxLocator(_page, entry.Id);
-    }
+        => new MultiColumnComboBoxLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>InputMask — resolved from plan via model expression.</summary>
     public InputMaskLocator InputMask(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "inputmask");
-        return new InputMaskLocator(_page, entry.Id);
-    }
+        => new InputMaskLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>RichTextEditor — resolved from plan via model expression.</summary>
     public RichTextEditorLocator RichTextEditor(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "richtexteditor");
-        return new RichTextEditorLocator(_page, entry.Id);
-    }
+        => new RichTextEditorLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    /// <summary>MultiSelect — resolved from plan via model expression.</summary>
     public MultiSelectLocator MultiSelect(Expression<Func<TModel, object?>> expr)
-    {
-        var entry = Resolve(ToBindingPath(expr), expectedComponentType: "multiselect");
-        return new MultiSelectLocator(_page, entry.Id);
-    }
+        => new MultiSelectLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    // ─── String-based overloads (for non-model elements) ───
-
-    /// <summary>AutoComplete — by binding path string (when expression isn't available).</summary>
+    // String overloads
     public AutoCompleteLocator AutoComplete(string bindingPath)
-    {
-        var entry = Resolve(bindingPath, expectedComponentType: "autocomplete");
-        return new AutoCompleteLocator(_page, entry.Id);
-    }
+        => new AutoCompleteLocator(_page, Resolve(bindingPath).ElementId);
 
-    /// <summary>Look up any component entry by binding path.</summary>
-    public ComponentEntry? FindComponent(string bindingPath)
-        => _components.TryGetValue(bindingPath, out var entry) ? entry : null;
+    public BoundComponent? FindComponent(string bindingPath)
+        => _components.TryGetValue(bindingPath, out var c) ? c : FindBySuffix(bindingPath);
 
-    /// <summary>Look up any component entry by model expression.</summary>
-    public ComponentEntry? FindComponent(Expression<Func<TModel, object?>> expr)
+    public BoundComponent? FindComponent(Expression<Func<TModel, object?>> expr)
         => FindComponent(ToBindingPath(expr));
 
-    // ─── Page-Level Surfaces ───
-
-    /// <summary>Any element by raw ID — for status spans, echo divs, results.</summary>
+    // Page-level
     public ILocator Element(string elementId) => _page.Locator($"#{elementId}");
 
-    /// <summary>Validation error message for a model property. Encapsulates data-valmsg-for selector.</summary>
     public ILocator ErrorFor(Expression<Func<TModel, object?>> expr)
         => _page.Locator($"span[data-valmsg-for='{ToBindingPath(expr)}']");
 
-    // ─── Internal ───
+    // ── Internal ──
 
-    private ComponentEntry Resolve(string bindingPath, string expectedComponentType)
+    private BoundComponent Resolve(string bindingPath)
     {
-        if (!_components.TryGetValue(bindingPath, out var entry))
-        {
-            var available = string.Join(", ", _components.Keys);
-            throw new InvalidOperationException(
-                $"Component '{bindingPath}' not found in plan. Available: [{available}]");
-        }
+        if (_components.TryGetValue(bindingPath, out var c)) return c;
+        var bySuffix = FindBySuffix(bindingPath);
+        if (bySuffix != null) return bySuffix;
 
-        if (entry.ComponentType != expectedComponentType)
-        {
-            throw new InvalidOperationException(
-                $"Component '{bindingPath}' is '{entry.ComponentType}', expected '{expectedComponentType}'. " +
-                $"The view uses a different component type than the test expects.");
-        }
+        throw new InvalidOperationException(
+            $"Component '{bindingPath}' not found in plan. Available: [{string.Join(", ", _components.Keys)}]");
+    }
 
-        return entry;
+    private BoundComponent? FindBySuffix(string path)
+    {
+        foreach (var kvp in _components)
+        {
+            if (kvp.Value.ComponentKey.EndsWith("__" + path, StringComparison.OrdinalIgnoreCase) ||
+                kvp.Value.ComponentKey.EndsWith(path, StringComparison.OrdinalIgnoreCase) ||
+                kvp.Key.EndsWith(path, StringComparison.OrdinalIgnoreCase))
+                return kvp.Value;
+        }
+        return null;
+    }
+
+    private static string ExtractBindingPath(string componentKey)
+    {
+        var idx = componentKey.LastIndexOf("__", StringComparison.Ordinal);
+        return idx >= 0 ? componentKey.Substring(idx + 2) : componentKey;
     }
 
     private static string ToBindingPath(Expression<Func<TModel, object?>> expr)
     {
         var member = expr.Body;
-
-        // Unwrap Convert (boxing for value types)
         if (member is UnaryExpression { NodeType: ExpressionType.Convert } unary)
             member = unary.Operand;
 
         return member switch
         {
             MemberExpression m => BuildPath(m),
-            _ => throw new ArgumentException($"Expression must be a property access (m => m.Prop), got: {expr}")
+            _ => throw new ArgumentException($"Expression must be property access, got: {expr}")
         };
     }
 
@@ -235,10 +173,10 @@ public sealed class PagePlan<TModel> where TModel : class
     }
 }
 
-/// <summary>A component registration from the plan JSON.</summary>
-public sealed record ComponentEntry(
-    string Id,
-    string Vendor,
-    string ReadExpr,
+/// <summary>A component resolved from the V3 plan.</summary>
+public sealed record BoundComponent(
+    string ElementId,
     string BindingPath,
-    string ComponentType);
+    string ComponentKey,
+    string Vendor,
+    string TypeKey);

@@ -14,13 +14,13 @@ namespace Alis.Reactive.Fusion.Components
         private FusionAutoCompleteEvents() { }
 
         /// <summary>Fires when the selected value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionAutoCompleteChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionAutoCompleteChangeArgs>(
+        public TypedEvent<FusionAutoCompleteChangeArgs> Changed =>
+            new TypedEvent<FusionAutoCompleteChangeArgs>(
                 "change", new FusionAutoCompleteChangeArgs());
 
         /// <summary>Fires when the user types to filter (SF "filtering" event).</summary>
-        public TypedEventDescriptor<FusionAutoCompleteFilteringArgs> Filtering =>
-            new TypedEventDescriptor<FusionAutoCompleteFilteringArgs>(
+        public TypedEvent<FusionAutoCompleteFilteringArgs> Filtering =>
+            new TypedEvent<FusionAutoCompleteFilteringArgs>(
                 "filtering", new FusionAutoCompleteFilteringArgs());
     }
 }

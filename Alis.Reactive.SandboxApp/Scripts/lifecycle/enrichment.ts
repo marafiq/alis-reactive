@@ -1,35 +1,6 @@
-// Enrichment — Enriches validation fields from plan.components.
-// No DOM, no wiring, no side effects beyond mutation of validation field objects.
+// Enrichment — V3 plans carry all information in types/components/behaviors.
+// No enrichment needed — the plan is the contract.
+// This module is kept as a no-op placeholder for the lifecycle pipeline.
+// If future enrichment is needed, it goes here.
 
-import type { Entry, ComponentEntry, ValidationDescriptor } from "../types";
-import { scope } from "../core/trace";
-import { walkValidationDescriptors } from "./walk-reactions";
-
-const log = scope("enrichment");
-
-export function enrichEntries(entries: Entry[], components: Record<string, ComponentEntry>): void {
-  walkValidationDescriptors(entries, desc => enrichValidationFields(desc, components));
-}
-
-function enrichValidationFields(
-  desc: ValidationDescriptor,
-  components: Record<string, ComponentEntry>
-): void {
-  for (const f of desc.fields) {
-    const comp = components[f.fieldName];
-    if (comp) {
-      f.fieldId = comp.id;
-      f.vendor = comp.vendor;
-      f.readExpr = comp.readExpr;
-      f.coerceAs = comp.coerceAs;
-    } else {
-      if (f.fieldId) {
-        log.warn("clearing enrichment — component removed", { fieldName: f.fieldName });
-      }
-      f.fieldId = undefined;
-      f.vendor = undefined;
-      f.readExpr = undefined;
-      f.coerceAs = undefined;
-    }
-  }
-}
+export {};

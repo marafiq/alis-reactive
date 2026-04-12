@@ -8,6 +8,6 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeHiddenField : NativeComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMember => "value";
     }
 }

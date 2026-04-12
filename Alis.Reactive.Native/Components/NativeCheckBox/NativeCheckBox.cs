@@ -11,6 +11,6 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeCheckBox : NativeComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "checked";
+        public string ValueMember => "checked";
     }
 }

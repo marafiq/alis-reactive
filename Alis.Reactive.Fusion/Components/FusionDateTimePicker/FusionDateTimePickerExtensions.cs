@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -23,8 +23,8 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionDateTimePicker, TModel> self, DateTime value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"),
-                value: value.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture));
+            return self.EmitSet("value",
+                ValueProducer.Literal(value.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture)));
         }
 
         /// <summary>Moves focus into the date-time picker.</summary>
@@ -32,14 +32,14 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionDateTimePicker, TModel> FocusIn<TModel>(
             this ComponentRef<FusionDateTimePicker, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("focusIn"));
+            => self.EmitCall("focusIn");
 
         /// <summary>Removes focus from the date-time picker.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDateTimePicker, TModel> FocusOut<TModel>(
             this ComponentRef<FusionDateTimePicker, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("focusOut"));
+            => self.EmitCall("focusOut");
 
         /// <summary>Reads the current date-time value for use in conditions or gather.</summary>
         /// <remarks>
@@ -50,6 +50,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime> Value<TModel>(
             this ComponentRef<FusionDateTimePicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, Component.ValueMember); }
     }
 }

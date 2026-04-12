@@ -14,18 +14,18 @@ namespace Alis.Reactive.Fusion.Components
         private FusionNumericTextBoxEvents() { }
 
         /// <summary>Fires when the numeric value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionNumericTextBoxChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionNumericTextBoxChangeArgs>(
+        public TypedEvent<FusionNumericTextBoxChangeArgs> Changed =>
+            new TypedEvent<FusionNumericTextBoxChangeArgs>(
                 "change", new FusionNumericTextBoxChangeArgs());
 
         /// <summary>Fires when the component receives focus (SF "focus" event).</summary>
-        public TypedEventDescriptor<FusionNumericTextBoxFocusArgs> Focus =>
-            new TypedEventDescriptor<FusionNumericTextBoxFocusArgs>(
+        public TypedEvent<FusionNumericTextBoxFocusArgs> Focus =>
+            new TypedEvent<FusionNumericTextBoxFocusArgs>(
                 "focus", new FusionNumericTextBoxFocusArgs());
 
         /// <summary>Fires when the component loses focus (SF "blur" event).</summary>
-        public TypedEventDescriptor<FusionNumericTextBoxBlurArgs> Blur =>
-            new TypedEventDescriptor<FusionNumericTextBoxBlurArgs>(
+        public TypedEvent<FusionNumericTextBoxBlurArgs> Blur =>
+            new TypedEvent<FusionNumericTextBoxBlurArgs>(
                 "blur", new FusionNumericTextBoxBlurArgs());
     }
 }

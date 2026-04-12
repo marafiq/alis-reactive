@@ -1,4 +1,4 @@
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -23,11 +23,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> ExpandItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, bool isExpand, int index)
             where TModel : class
-            => self.Emit(new CallMutation("expandItem", args: new MethodArg[]
-            {
-                new LiteralArg(isExpand),
-                new LiteralArg(index)
-            }));
+            => self.EmitCall("expandItem", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(isExpand), ValueProducer.Literal(index) });
 
         /// <summary>
         /// Enables or disables a panel by index.
@@ -36,10 +32,6 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> EnableItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, int index, bool isEnable = true)
             where TModel : class
-            => self.Emit(new CallMutation("enableItem", args: new MethodArg[]
-            {
-                new LiteralArg(index),
-                new LiteralArg(isEnable)
-            }));
+            => self.EmitCall("enableItem", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index), ValueProducer.Literal(isEnable) });
     }
 }

@@ -1,74 +1,65 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
-    /// Preserves the property type through the condition and mutation pipeline so operators
-    /// enforce compile-time type safety.
+    /// Preserves the property type through the condition and mutation pipeline
+    /// for compile-time type safety.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// You never create a <see cref="TypedSource{TProp}"/> directly. Instead, use one of:
-    /// </para>
-    /// <para>
-    /// <b>Event args:</b> <c>p.When(args, x =&gt; x.Score)</c> creates an
-    /// <see cref="EventArgSource{TPayload, TProp}"/> internally.
-    /// </para>
-    /// <para>
-    /// <b>Component value:</b> <c>comp.Value()</c> returns a
-    /// <see cref="TypedComponentSource{TProp}"/> that can be passed to <c>When()</c>,
-    /// <c>SetText()</c>, or source-vs-source operators.
-    /// </para>
-    /// </remarks>
-    /// <typeparam name="TProp">The property type. Condition operators accept only <typeparamref name="TProp"/> operands.</typeparam>
     public abstract class TypedSource<TProp>
     {
         /// <summary>
-        /// Converts this typed source to the underlying bind source descriptor.
+        /// Produces a ValueProducer that reads this source's value.
         /// </summary>
-        /// <returns>A <see cref="BindSource"/> used by the plan.</returns>
-        public abstract BindSource ToBindSource();
+        internal abstract ValueProducer ToValueProducer();
 
         /// <summary>
-        /// Gets the coercion type inferred from <typeparamref name="TProp"/> (e.g. <c>"string"</c>,
-        /// <c>"number"</c>, <c>"boolean"</c>).
+        /// Returns the ComponentSource for this typed source (for Set/Call reactions).
+        /// Only valid for component sources.
         /// </summary>
-        public string CoercionType => CoercionTypes.InferFromType(typeof(TProp));
+        internal virtual ComponentSource ToComponentSource() =>
+            throw new InvalidOperationException("Not a component source.");
 
         /// <summary>
-        /// Gets the element-level coercion type for array sources (e.g. <c>"string"</c> for
-        /// <c>string[]</c>). Returns <see langword="null"/> for non-array types.
+        /// The member name to read on the resolved source.
         /// </summary>
-        public string? ElementCoercionType =>
-            CoercionTypes.InferFromType(typeof(TProp)) == CoercionTypes.Array
-                ? CoercionTypes.InferElementType(typeof(TProp))
-                : null;
+        internal virtual string ReadMember => throw new InvalidOperationException("Not a component source.");
+
+        /// <summary>
+        /// Shape inferred from TProp.
+        /// </summary>
+        internal Shape Shape => Shape.FromClrType(typeof(TProp));
+
+        /// <summary>
+        /// Element shape for array types (e.g., Shape.String for string[]).
+        /// </summary>
+        internal Shape ElementShape
+        {
+            get
+            {
+                var t = typeof(TProp);
+                if (t.IsArray) return Shape.FromClrType(t.GetElementType());
+                if (t.IsGenericType) return Shape.FromClrType(t.GetGenericArguments()[0]);
+                return Shape.None;
+            }
+        }
     }
 
     /// <summary>
-    /// A typed source that reads a property from the event payload at evaluation time.
-    /// Created internally when calling <c>When(args, x =&gt; x.Property)</c>.
+    /// A typed source that reads from the event payload.
+    /// Delegates to <see cref="PayloadTypedSource{TPayload, TProp}"/> with event scope.
     /// </summary>
-    /// <typeparam name="TPayload">The event args type.</typeparam>
-    /// <typeparam name="TProp">The property type selected by the expression.</typeparam>
     public sealed class EventArgSource<TPayload, TProp> : TypedSource<TProp>
     {
-        private readonly Expression<Func<TPayload, TProp>> _expression;
+        private readonly PayloadTypedSource<TPayload, TProp> _inner;
 
-        /// <summary>
-        /// NEVER make public. Constructed by <see cref="PipelineBuilder{TModel}"/> and
-        /// <see cref="ConditionStart{TModel}"/> when starting a condition from event args.
-        /// </summary>
-        public EventArgSource(Expression<Func<TPayload, TProp>> expression)
+        internal EventArgSource(Expression<Func<TPayload, TProp>> expression)
         {
-            _expression = expression;
+            _inner = new PayloadTypedSource<TPayload, TProp>(PayloadSource.Event(), expression);
         }
 
-        /// <inheritdoc/>
-        public override BindSource ToBindSource() =>
-            new EventSource(ExpressionPathHelper.ToEventPath(_expression));
+        internal override ValueProducer ToValueProducer() => _inner.ToValueProducer();
     }
 }

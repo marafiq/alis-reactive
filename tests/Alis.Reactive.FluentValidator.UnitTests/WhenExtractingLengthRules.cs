@@ -11,8 +11,8 @@ public class WhenExtractingLengthRules
         var desc = _adapter.ExtractRules(typeof(MaxLengthValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc!.Fields[0].Rules[0].Rule, Is.EqualTo("maxLength"));
-        Assert.That(desc.Fields[0].Rules[0].Constraint, Is.EqualTo(100));
+        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("maxLength"));
+        Assert.That(desc[0].Rules[0].Constraint, Is.EqualTo(100));
     }
 
     [Test]
@@ -21,8 +21,8 @@ public class WhenExtractingLengthRules
         var desc = _adapter.ExtractRules(typeof(MinLengthValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc!.Fields[0].Rules[0].Rule, Is.EqualTo("minLength"));
-        Assert.That(desc.Fields[0].Rules[0].Constraint, Is.EqualTo(3));
+        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("minLength"));
+        Assert.That(desc[0].Rules[0].Constraint, Is.EqualTo(3));
     }
 
     [Test]
@@ -31,7 +31,7 @@ public class WhenExtractingLengthRules
         var desc = _adapter.ExtractRules(typeof(BothLengthValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var rules = desc!.Fields[0].Rules;
+        var rules = desc[0].Rules;
         Assert.That(rules, Has.Count.GreaterThanOrEqualTo(2));
 
         var ruleTypes = rules.Select(r => r.Rule).ToList();

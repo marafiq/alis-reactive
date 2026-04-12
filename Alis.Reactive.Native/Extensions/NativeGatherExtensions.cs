@@ -1,7 +1,6 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Requests;
-using Alis.Reactive.Descriptors.Requests;
 using Alis.Reactive.Native.Components;
 
 namespace Alis.Reactive.Native.Extensions
@@ -45,12 +44,7 @@ namespace Alis.Reactive.Native.Extensions
         {
             var elementId = IdGenerator.For(expr);
             var propertyName = ExpressionPathHelper.ToPropertyName(expr);
-            self.AddItem(new ComponentGather(
-                elementId,
-                DefaultComponent.Vendor,
-                propertyName,
-                DefaultComponent.ReadExpr));
-            return self;
+            return self.Include(elementId, DefaultComponent.Vendor, propertyName, DefaultComponent.ValueMember);
         }
     }
 }

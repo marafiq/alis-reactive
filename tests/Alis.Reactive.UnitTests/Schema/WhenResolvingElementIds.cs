@@ -60,13 +60,13 @@ public class WhenResolvingElementIds
     public void Event_path_uses_camel_case_dots()
     {
         var eventPath = ExpressionPathHelper.ToEventPath<Address>(a => a.City);
-        Assert.That(eventPath, Is.EqualTo("evt.city"));
+        Assert.That(eventPath, Is.EqualTo("city"));
     }
 
     [Test]
     public void Nested_event_path_uses_camel_case_dots()
     {
         var eventPath = ExpressionPathHelper.ToEventPath<Contact>(c => c.HomeAddress!.City);
-        Assert.That(eventPath, Is.EqualTo("evt.homeAddress.city"));
+        Assert.That(eventPath, Is.EqualTo("homeAddress.city"));
     }
 }

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Schedule — Custom Editor Template Test</title>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/material.css" />
+    <script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui; margin: 20px; }
+        #status { margin: 10px 0; font-family: monospace; white-space: pre-wrap; max-height: 200px; overflow-y: auto; background: #1e1e1e; color: #d4d4d4; padding: 10px; border-radius: 4px; font-size: 12px; }
+        .custom-field { margin-bottom: 12px; }
+        .custom-field label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; color: #333; }
+        .custom-field .e-field { width: 100%; }
+    </style>
+</head>
+<body>
+    <h2>SF Schedule — Custom Editor Template (Proof of Concept)</h2>
+    <p>Double-click an event to see our custom editor fields inside SF's popup.</p>
+    <div id="status"></div>
+    <div id="schedule"></div>
+
+    <!-- CUSTOM EDITOR TEMPLATE — this is what we'd render from Razor -->
+    <script id="editorTemplate" type="text/x-template">
+        <table class="custom-event-editor" width="100%" cellpadding="5">
+            <tbody>
+                <tr>
+                    <td colspan="2">
+                        <div class="custom-field">
+                            <label>Staff Member</label>
+                            <input id="staffName" class="e-field e-input" name="subject" type="text" />
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="custom-field">
+                            <label>Shift Start</label>
+                            <input id="startTime" class="e-field" name="startTime" type="text" />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="custom-field">
+                            <label>Shift End</label>
+                            <input id="endTime" class="e-field" name="endTime" type="text" />
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="custom-field">
+                            <label>Shift</label>
+                            <input id="shiftId" class="e-field" name="shiftId" type="text" />
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="custom-field">
+                            <label>Care Notes</label>
+                            <textarea id="description" class="e-field e-input" name="description" rows="3" style="width:100%"></textarea>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </script>
+
+    <script>
+        var statusEl = document.getElementById('status');
+        function log(msg) {
+            statusEl.textContent = msg + '\n' + statusEl.textContent;
+        }
+
+        var shiftData = [
+            { text: 'AM Shift (6:00 AM - 2:00 PM)', id: 1, color: '#1aaa55' },
+            { text: 'PM Shift (2:00 PM - 10:00 PM)', id: 2, color: '#357cd2' },
+            { text: 'Night Shift (10:00 PM - 6:00 AM)', id: 3, color: '#7fa900' }
+        ];
+
+        var staffList = [
+            { text: 'Jane Blonde (CNA)', value: 'Jane Blonde (CNA)' },
+            { text: 'Mike Ross (RN)', value: 'Mike Ross (RN)' },
+            { text: 'Sarah Connor (CNA)', value: 'Sarah Connor (CNA)' },
+            { text: 'Tom Hardy (LPN)', value: 'Tom Hardy (LPN)' },
+            { text: 'Lisa Chen (RN)', value: 'Lisa Chen (RN)' },
+            { text: 'UNASSIGNED', value: 'UNASSIGNED' },
+        ];
+
+        var scheduleObj = new ej.schedule.Schedule({
+            width: '100%',
+            height: '600px',
+            selectedDate: new Date(),
+            currentView: 'Week',
+            views: [{ option: 'Week' }],
+            group: { resources: ['Shifts'] },
+            resources: [{
+                field: 'shiftId',
+                title: 'Shift',
+                name: 'Shifts',
+                dataSource: shiftData,
+                textField: 'text',
+                idField: 'id',
+                colorField: 'color'
+            }],
+            eventSettings: {
+                fields: {
+                    id: 'id',
+                    subject: { name: 'subject' },
+                    startTime: { name: 'startTime' },
+                    endTime: { name: 'endTime' },
+                    description: { name: 'description' },
+                    isAllDay: { name: 'isAllDay' }
+                }
+            },
+            startHour: '05:00',
+            endHour: '23:00',
+
+            // KEY: Custom editor template
+            editorTemplate: '#editorTemplate',
+
+            popupOpen: function(args) {
+                if (args.type === 'Editor') {
+                    log('POPUP_OPEN Editor — initializing SF sub-components inside template');
+
+                    // Initialize SF DropDownList on the staffName field
+                    var staffField = args.element.querySelector('#staffName');
+                    if (staffField && !staffField.classList.contains('e-dropdownlist')) {
+                        var ddl = new ej.dropdowns.DropDownList({
+                            dataSource: staffList,
+                            fields: { text: 'text', value: 'value' },
+                            placeholder: 'Select staff member',
+                            value: args.data ? args.data.subject : null,
+                            floatLabelType: 'Always',
+                        });
+                        ddl.appendTo(staffField);
+                    }
+
+                    // Initialize SF DateTimePicker on start/end fields
+                    var startField = args.element.querySelector('#startTime');
+                    if (startField && !startField.classList.contains('e-datetimepicker')) {
+                        new ej.calendars.DateTimePicker({
+                            value: args.data ? new Date(args.data.startTime) : null,
+                            floatLabelType: 'Always',
+                        }).appendTo(startField);
+                    }
+
+                    var endField = args.element.querySelector('#endTime');
+                    if (endField && !endField.classList.contains('e-datetimepicker')) {
+                        new ej.calendars.DateTimePicker({
+                            value: args.data ? new Date(args.data.endTime) : null,
+                            floatLabelType: 'Always',
+                        }).appendTo(endField);
+                    }
+
+                    // Initialize SF DropDownList on shift field
+                    var shiftField = args.element.querySelector('#shiftId');
+                    if (shiftField && !shiftField.classList.contains('e-dropdownlist')) {
+                        new ej.dropdowns.DropDownList({
+                            dataSource: shiftData,
+                            fields: { text: 'text', value: 'id' },
+                            placeholder: 'Select shift',
+                            value: args.data ? args.data.shiftId : null,
+                            floatLabelType: 'Always',
+                        }).appendTo(shiftField);
+                    }
+                }
+            },
+
+            actionBegin: function(args) {
+                if (args.requestType === 'eventChange' || args.requestType === 'eventCreate') {
+                    log('ACTION_BEGIN ' + args.requestType + ': ' + JSON.stringify({
+                        id: args.data ? (Array.isArray(args.data) ? args.data[0].id : args.data.id) : null,
+                        subject: args.data ? (Array.isArray(args.data) ? args.data[0].subject : args.data.subject) : null,
+                        shiftId: args.data ? (Array.isArray(args.data) ? args.data[0].shiftId : args.data.shiftId) : null,
+                        description: args.data ? (Array.isArray(args.data) ? args.data[0].description : args.data.description) : null,
+                    }));
+                    // HERE: intercept and POST to server instead of letting SF handle it locally
+                    // args.cancel = true; // would prevent local update
+                    // fetch('/api/schedule/assign', { method: 'POST', body: JSON.stringify(args.data) });
+                }
+            },
+
+            actionComplete: function(args) {
+                if (args.requestType === 'eventChanged' || args.requestType === 'eventCreated') {
+                    log('ACTION_COMPLETE ' + args.requestType);
+                }
+            },
+
+            dataBound: function() {
+                log('dataBound — events: ' + scheduleObj.getEvents().length);
+            },
+        });
+        scheduleObj.appendTo('#schedule');
+
+        // Load from API
+        fetch('/api/schedule/assignments?selectedFacilityId=mystery-manor')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                scheduleObj.eventSettings.dataSource = data.assignments;
+                scheduleObj.dataBind();
+                log('Loaded ' + data.assignments.length + ' events from API');
+            });
+    </script>
+</body>
+</html>

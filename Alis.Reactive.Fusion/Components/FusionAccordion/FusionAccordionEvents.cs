@@ -11,8 +11,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionAccordionEvents() { }
 
         /// <summary>Fires after a panel expands or collapses (SF "expanded" event).</summary>
-        public TypedEventDescriptor<FusionAccordionExpandedArgs> Expanded =>
-            new TypedEventDescriptor<FusionAccordionExpandedArgs>(
+        public TypedEvent<FusionAccordionExpandedArgs> Expanded =>
+            new TypedEvent<FusionAccordionExpandedArgs>(
                 "expanded", new FusionAccordionExpandedArgs());
     }
 }

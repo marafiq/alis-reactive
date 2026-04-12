@@ -1,8 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -23,7 +22,9 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiSelect, TModel> SetValue<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self, string[]? value)
             where TModel : class
-            => self.Emit(new SetPropMutation("value"), value: value);
+            => self.EmitSet("value", value == null
+                ? ValueProducer.Null()
+                : ValueProducer.LiteralRaw(value, Shape.ArrayOf(Shape.String)));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -37,7 +38,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+            return self.EmitSet("dataSource", ValueProducer.Read(PayloadSource.Event(), sourcePath));
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
@@ -53,7 +54,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
+            return self.EmitSet("dataSource", ValueProducer.Read(source.Scope, sourcePath));
         }
 
         /// <summary>Flushes pending property changes to the component in the browser.</summary>
@@ -61,21 +62,21 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiSelect, TModel> DataBind<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("dataBind"));
+            => self.EmitCall("dataBind");
 
         /// <summary>Opens the selection popup.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiSelect, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("showPopup"));
+            => self.EmitCall("showPopup");
 
         /// <summary>Closes the selection popup.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiSelect, TModel> HidePopup<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("hidePopup"));
+            => self.EmitCall("hidePopup");
 
         /// <summary>Reads the current selected values for use in conditions or gather.</summary>
         /// <remarks>
@@ -86,6 +87,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string[]>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.ArrayOf(Shape.String), "read"); return new TypedComponentSource<string[]>(self.TargetId, Component.Vendor, Component.ValueMember); }
     }
 }

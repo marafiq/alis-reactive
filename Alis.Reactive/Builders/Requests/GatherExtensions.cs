@@ -1,65 +1,76 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Vendor-agnostic gather extensions for any <see cref="IComponent"/> + <see cref="IInputComponent"/>.
-    /// Works for both Native and Fusion components: vendor and readExpr
-    /// are resolved from the component instance at build time.
+    /// Vendor-agnostic gather extensions for including component values in HTTP requests.
     /// </summary>
-    /// <remarks>
-    /// Gather collects current component values from the browser and includes them
-    /// in the HTTP request payload before sending. Use inside
-    /// <see cref="HttpRequestBuilder{TModel}.Gather"/> to specify which components contribute values:
-    /// <code>
-    /// p.Post("/api/save", g => g.Include&lt;NativeTextBox, MyModel&gt;(m => m.Name));
-    /// </code>
-    /// </remarks>
     public static class GatherExtensions
     {
         /// <summary>
-        /// Gathers the value of a component bound to a model property.
-        /// The component is identified by the model expression (m => m.FacilityId).
+        /// Includes an input component's value, identified by model expression.
+        /// The property name from the expression becomes the HTTP parameter name.
         /// </summary>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
-            Expression<Func<TModel, object?>> expr)
+            Expression<Func<TModel, object>> expr)
             where TComponent : IComponent, IInputComponent, new()
             where TModel : class
         {
             var component = new TComponent();
             var elementId = IdGenerator.For<TModel>(expr);
             var propertyName = ExpressionPathHelper.ToPropertyName(expr);
-            self.AddItem(new ComponentGather(
-                elementId,
-                component.Vendor,
-                propertyName,
-                component.ReadExpr));
+            self.Include(elementId, component.Vendor, propertyName, component.ValueMember);
             return self;
         }
 
         /// <summary>
-        /// Escape hatch: gathers a component value by raw element ID instead of model expression.
-        /// Use for non-model-bound components (grids, string-id controls) that cannot use
-        /// the expression-based <see cref="Include{TComponent,TModel}(GatherBuilder{TModel}, System.Linq.Expressions.Expression{System.Func{TModel, object}})"/> overload.
+        /// Includes a component's value by explicit element ID and property name.
+        /// Works for both input and display components. For input components, reads
+        /// the ValueMember; for display components, reads the named property.
         /// </summary>
-        /// <param name="refId">The element ID of the component on the page.</param>
-        /// <param name="name">The key name in the request payload.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             string refId,
             string name)
-            where TComponent : IComponent, IInputComponent, new()
+            where TComponent : IComponent, new()
             where TModel : class
         {
             var component = new TComponent();
-            self.AddItem(new ComponentGather(
-                refId,
-                component.Vendor,
-                name,
-                component.ReadExpr));
+            var valueMember = (component is IInputComponent input) ? input.ValueMember : name;
+            self.Include(refId, component.Vendor, name, valueMember);
+            return self;
+        }
+
+        /// <summary>
+        /// Includes a typed component property read in the gather.
+        /// The member name becomes the HTTP parameter name.
+        /// Use with display component readable properties like
+        /// <c>schedule.CurrentView()</c> or <c>schedule.SelectedDate()</c>.
+        /// </summary>
+        public static GatherBuilder<TModel> Include<TModel, TProp>(
+            this GatherBuilder<TModel> self,
+            TypedComponentSource<TProp> source)
+            where TModel : class
+        {
+            self.Include(source.ComponentId, source.Vendor, source.ReadMember, source.ReadMember);
+            return self;
+        }
+
+        /// <summary>
+        /// Includes a typed component property read with an explicit HTTP parameter name.
+        /// Use when the parameter name differs from the component property name.
+        /// </summary>
+        public static GatherBuilder<TModel> Include<TModel, TProp>(
+            this GatherBuilder<TModel> self,
+            TypedComponentSource<TProp> source,
+            string paramName)
+            where TModel : class
+        {
+            self.Include(source.ComponentId, source.Vendor, paramName, source.ReadMember);
             return self;
         }
     }

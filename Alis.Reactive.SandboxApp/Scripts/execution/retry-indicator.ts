@@ -1,30 +1,22 @@
-import type { Reaction, Command } from "../types";
+// retry-indicator.ts — Visual retry indicators for lost SSE/SignalR connections.
+//
+// getElementById is correct here. targetIds are raw DOM IDs collected during
+// SSE/SignalR behavior wiring — NOT component keys from plan.components.
+// This module has no Plan access and operates as a pure UI overlay for
+// connection-lost indicators. It does not resolve components.
+
 import { scope } from "../core/trace";
 
 const log = scope("retry-indicator");
 
 const RETRY_ATTR = "data-alis-retry";
 
-/**
- * Extracts the first mutate-element target ID from a reaction's top-level commands.
- * Used to determine where retry indicators should be anchored.
- * Only inspects sequential and conditional reactions — HTTP/parallel-http
- * are skipped (their preFetch commands are not relevant for anchor placement).
- */
-export function firstMutationTarget(reaction: Reaction): string | undefined {
-  let commands: Command[] | undefined;
-  if (reaction.kind === "sequential" || reaction.kind === "conditional") {
-    commands = reaction.commands;
-  }
-
-  const cmd = commands?.find(c => c.kind === "mutate-element");
-  return cmd?.kind === "mutate-element" ? cmd.target : undefined;
-}
-
 export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry: () => void): void {
   const anchored = new Set<HTMLElement>();
 
   for (const id of targetIds) {
+    // getElementById is correct — targetIds are raw DOM IDs, not component keys.
+    // See module header comment for rationale.
     const el = document.getElementById(id);
     if (!el) {
       log.warn("target not found", { key, id });

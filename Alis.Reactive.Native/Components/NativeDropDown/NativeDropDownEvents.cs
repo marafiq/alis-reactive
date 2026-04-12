@@ -18,8 +18,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Fires when the user selects a different option.
         /// </summary>
-        public TypedEventDescriptor<NativeDropDownChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeDropDownChangeArgs>(
+        public TypedEvent<NativeDropDownChangeArgs> Changed =>
+            new TypedEvent<NativeDropDownChangeArgs>(
                 "change", new NativeDropDownChangeArgs());
     }
 }

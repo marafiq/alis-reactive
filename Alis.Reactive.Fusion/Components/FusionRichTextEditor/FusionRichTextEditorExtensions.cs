@@ -1,5 +1,5 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionRichTextEditor, TModel> self, string value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            return self.EmitSet("value", ValueProducer.Literal(value));
         }
 
         /// <summary>Moves focus into the rich text editor.</summary>
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionRichTextEditor, TModel> FocusIn<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("focusIn"));
+            => self.EmitCall("focusIn");
 
         /// <summary>Reads the current HTML content for use in conditions or gather.</summary>
         /// <remarks>
@@ -40,6 +40,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.String, "read"); return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember); }
     }
 }

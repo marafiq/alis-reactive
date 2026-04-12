@@ -2,8 +2,14 @@ using System;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Mvc.Html;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Components
 {
@@ -17,9 +23,16 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     /// <typeparam name="TModel">The view model type.</typeparam>
     /// <typeparam name="TProp">The bound property type.</typeparam>
-    public class NativeTextBoxBuilder<TModel, TProp> : IHtmlContent
+    public class NativeTextBoxBuilder<TModel, TProp> :
+#if NET48
+        IHtmlString
+    {
+        private readonly HtmlHelper<TModel> _html;
+#else
+        IHtmlContent
     {
         private readonly IHtmlHelper<TModel> _html;
+#endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
         private readonly string _bindingPath;
@@ -30,12 +43,20 @@ namespace Alis.Reactive.Native.Components
 
         // NEVER make public — devs create builders via the .NativeTextBox() factory,
         // which also registers the component in the plan's ComponentsMap.
+#if NET48
+        internal NativeTextBoxBuilder(HtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+#else
         internal NativeTextBoxBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+#endif
         {
             _html = html;
             _expression = expression;
             _elementId = IdGenerator.For<TModel, TProp>(expression);
+#if NET48
+            _bindingPath = ExpressionHelper.GetExpressionText(expression);
+#else
             _bindingPath = html.NameFor(expression);
+#endif
         }
 
         /// <summary>Gets the resolved element ID for this input.</summary>
@@ -78,6 +99,16 @@ namespace Alis.Reactive.Native.Components
             return this;
         }
 
+#if NET48
+        /// <inheritdoc />
+        public string ToHtmlString()
+        {
+            var sw = new StringWriter();
+            WriteTo(sw, HtmlEncoder.Default);
+            return sw.ToString();
+        }
+#endif
+
         /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
@@ -90,7 +121,11 @@ namespace Alis.Reactive.Native.Components
             if (_placeholder != null) attrs["placeholder"] = _placeholder;
 
             var result = _html.TextBoxFor(_expression, attrs);
+#if NET48
+            writer.Write(result.ToHtmlString());
+#else
             result.WriteTo(writer, HtmlEncoder.Default);
+#endif
         }
     }
 

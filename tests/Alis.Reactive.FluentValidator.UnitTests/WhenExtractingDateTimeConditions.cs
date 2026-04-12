@@ -1,3 +1,5 @@
+using Alis.Reactive.Validation;
+
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 /// <summary>
@@ -16,14 +18,15 @@ public class WhenExtractingDateTimeConditions
         var desc = _adapter.ExtractRules(typeof(DateTimeConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var nameField = desc!.Fields.First(f => f.FieldName == "Name");
+        var nameField = desc.First(f => f.FieldName == "Name");
         Assert.That(nameField.Rules, Has.Count.EqualTo(1));
         Assert.That(nameField.Rules[0].When, Is.Not.Null);
-        Assert.That(nameField.Rules[0].When!.Field, Is.EqualTo("AdmissionDate"));
-        Assert.That(nameField.Rules[0].When.Op, Is.EqualTo("eq"));
+        var when = (FieldCompare)nameField.Rules[0].When!;
+        Assert.That(when.Field, Is.EqualTo("AdmissionDate"));
+        Assert.That(when.Op, Is.EqualTo("eq"));
 
         // Value must be Unix ms (long), NOT an ISO string
-        var condValue = nameField.Rules[0].When.Value;
+        var condValue = when.Value;
         Assert.That(condValue, Is.TypeOf<long>(),
             "DateTime condition value must be serialized as Unix ms (long)");
 
@@ -38,12 +41,13 @@ public class WhenExtractingDateTimeConditions
         var desc = _adapter.ExtractRules(typeof(DateTimeNeqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var scoreField = desc!.Fields.First(f => f.FieldName == "Score");
+        var scoreField = desc.First(f => f.FieldName == "Score");
         Assert.That(scoreField.Rules[0].When, Is.Not.Null);
-        Assert.That(scoreField.Rules[0].When!.Field, Is.EqualTo("AdmissionDate"));
-        Assert.That(scoreField.Rules[0].When.Op, Is.EqualTo("neq"));
+        var neqWhen = (FieldCompare)scoreField.Rules[0].When!;
+        Assert.That(neqWhen.Field, Is.EqualTo("AdmissionDate"));
+        Assert.That(neqWhen.Op, Is.EqualTo("neq"));
 
-        var condValue = scoreField.Rules[0].When.Value;
+        var condValue = neqWhen.Value;
         Assert.That(condValue, Is.TypeOf<long>(),
             "DateTime condition value must be serialized as Unix ms (long)");
 
@@ -58,10 +62,11 @@ public class WhenExtractingDateTimeConditions
         var desc = _adapter.ExtractRules(typeof(ReactiveNeqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        var emailField = desc!.Fields.First(f => f.FieldName == "Email");
+        var emailField = desc.First(f => f.FieldName == "Email");
         var condition = emailField.Rules[0].When;
         Assert.That(condition, Is.Not.Null);
-        Assert.That(condition!.Value, Is.EqualTo("Independent"),
+        var strWhen = (FieldCompare)condition!;
+        Assert.That(strWhen.Value, Is.EqualTo("Independent"),
             "String condition values must remain as strings, not converted to Unix ms");
     }
 }

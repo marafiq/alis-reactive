@@ -1,5 +1,6 @@
 using System;
 using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -32,7 +33,7 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime> StartDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "startDate");
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, "startDate", "startDate", Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "startDate"); }
 
         /// <summary>Reads the end date for use in conditions or gather.</summary>
         /// <remarks>
@@ -43,7 +44,7 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime> EndDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "endDate");
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, "endDate", "endDate", Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "endDate"); }
 
         /// <summary>Reads both dates as an array for use in conditions or gather.</summary>
         /// <remarks>
@@ -59,6 +60,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime[]> Value<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<DateTime[]>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.ArrayOf(Shape.Date), "read"); return new TypedComponentSource<DateTime[]>(self.TargetId, Component.Vendor, Component.ValueMember); }
     }
 }

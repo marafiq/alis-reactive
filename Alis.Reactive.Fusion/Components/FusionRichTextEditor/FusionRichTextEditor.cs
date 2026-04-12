@@ -10,6 +10,6 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionRichTextEditor : FusionComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "value";
+        public string ValueMember => "value";
     }
 }

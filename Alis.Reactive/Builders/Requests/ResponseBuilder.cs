@@ -1,105 +1,116 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.Descriptors.Reactions;
-using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Configures success and error response handlers for an HTTP request, plus optional
-    /// chained follow-up requests.
+    /// Builds response handlers for HTTP success, error, and chained requests.
     /// </summary>
     /// <remarks>
-    /// Accessed via <see cref="HttpRequestBuilder{TModel}.Response"/>:
-    /// <code>
-    /// p.Post("/api/save", gather: g =&gt; g.IncludeAll())
-    ///  .Response(response: r =&gt;
-    ///  {
-    ///      r.OnSuccess(pipeline: s =&gt; s.Into("result"));
-    ///      r.OnError(400, pipeline: s =&gt; s.ValidationErrors("myForm"));
-    ///  });
-    /// </code>
+    /// Obtained via <c>.Response(r =&gt; r.OnSuccess(...).OnError(...))</c>.
     /// </remarks>
     /// <typeparam name="TModel">The view model type.</typeparam>
     public class ResponseBuilder<TModel> where TModel : class
     {
-        internal List<StatusHandler> SuccessHandlers { get; } = new List<StatusHandler>();
-        internal List<StatusHandler> ErrorHandlers { get; } = new List<StatusHandler>();
-        internal RequestDescriptor? ChainedRequest { get; private set; }
+        private readonly PlanBuildContext _context;
+        internal List<ResponseHandler> SuccessHandlers { get; } = new List<ResponseHandler>();
+        internal List<ResponseHandler> ErrorHandlers { get; } = new List<ResponseHandler>();
+        internal Request ChainedRequest { get; private set; }
 
-        /// <summary>
-        /// Registers a success handler (status 2xx, no specific code filter).
-        /// </summary>
-        /// <param name="pipeline">Builds the reaction commands that run on success.</param>
+        internal ResponseBuilder(PlanBuildContext context)
+        {
+            _context = context;
+        }
+
+        /// <summary>Handles a successful HTTP response.</summary>
+        /// <param name="pipeline">Builds the commands to execute on success.</param>
+        /// <returns>This builder for chaining.</returns>
         public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var builder = new PipelineBuilder<TModel>();
-            pipeline(builder);
-            SuccessHandlers.Add(BuildHandler(null, builder));
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(pb);
+            SuccessHandlers.Add(new ResponseHandler(pb.BuildReaction()));
             return this;
         }
 
-        /// <summary>
-        /// Registers a typed JSON success handler. The ResponseBody&lt;T&gt; phantom enables
-        /// compile-time path walking into the response body — same pattern as
-        /// CustomEvent&lt;T&gt; provides typed access to event payloads.
-        ///
-        /// Usage: .OnSuccess&lt;ApiResponse&gt;((json, s) =&gt; s.Element("x").SetText(json, r =&gt; r.Data.Name))
-        /// Generates: source = "responseBody.data.name" — resolved at runtime via walk(ctx, path).
-        /// </summary>
+        /// <summary>Handles a successful HTTP response with a typed response body.</summary>
+        /// <typeparam name="TResponse">The response body type.</typeparam>
+        /// <param name="pipeline">Builds the commands. The response body provides typed access to response properties.</param>
+        /// <returns>This builder for chaining.</returns>
         public ResponseBuilder<TModel> OnSuccess<TResponse>(
             Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> pipeline)
-            where TResponse : class, new()
+            where TResponse : class
         {
-            var builder = new PipelineBuilder<TModel>();
-            pipeline(new ResponseBody<TResponse>(new TResponse()), builder);
-            SuccessHandlers.Add(BuildHandler(null, builder));
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(new ResponseBody<TResponse>(PayloadSource.Success()), pb);
+            SuccessHandlers.Add(new ResponseHandler(pb.BuildReaction()));
             return this;
         }
 
-        /// <summary>
-        /// Registers an error handler for a specific HTTP status code.
-        /// </summary>
-        /// <param name="statusCode">The HTTP status code to handle.</param>
-        /// <param name="pipeline">Builds the reaction commands that run on this error status.</param>
+        /// <summary>Handles any HTTP error response.</summary>
+        /// <param name="pipeline">Builds the commands to execute on error.</param>
+        /// <returns>This builder for chaining.</returns>
+        public ResponseBuilder<TModel> OnError(Action<PipelineBuilder<TModel>> pipeline)
+        {
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(pb);
+            ErrorHandlers.Add(new ResponseHandler(pb.BuildReaction()));
+            return this;
+        }
+
+        /// <summary>Handles an HTTP error response with a specific status code.</summary>
+        /// <param name="statusCode">The HTTP status code to match.</param>
+        /// <param name="pipeline">Builds the commands to execute for this status code.</param>
+        /// <returns>This builder for chaining.</returns>
         public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> pipeline)
         {
-            var builder = new PipelineBuilder<TModel>();
-            pipeline(builder);
-            ErrorHandlers.Add(BuildHandler(statusCode, builder));
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(pb);
+            var handler = new ResponseHandler(pb.BuildReaction()) { Status = statusCode };
+            ErrorHandlers.Add(handler);
             return this;
         }
 
-        /// <summary>
-        /// Chains a sequential HTTP request that fires after the current request succeeds.
-        /// </summary>
-        /// <param name="request">Configures the chained HTTP request.</param>
+        /// <summary>Handles any HTTP error response with a typed error body.</summary>
+        /// <typeparam name="TError">The error response body type.</typeparam>
+        /// <param name="pipeline">Builds the commands. The error body provides typed access to error properties.</param>
+        /// <returns>This builder for chaining.</returns>
+        public ResponseBuilder<TModel> OnError<TError>(
+            Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)
+            where TError : class
+        {
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(new ResponseBody<TError>(PayloadSource.Error()), pb);
+            ErrorHandlers.Add(new ResponseHandler(pb.BuildReaction()));
+            return this;
+        }
+
+        /// <summary>Handles a specific HTTP error status code with a typed error body.</summary>
+        /// <typeparam name="TError">The error response body type.</typeparam>
+        /// <param name="statusCode">The HTTP status code to match.</param>
+        /// <param name="pipeline">Builds the commands. The error body provides typed access to error properties.</param>
+        /// <returns>This builder for chaining.</returns>
+        public ResponseBuilder<TModel> OnError<TError>(int statusCode,
+            Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)
+            where TError : class
+        {
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(new ResponseBody<TError>(PayloadSource.Error()), pb);
+            var handler = new ResponseHandler(pb.BuildReaction()) { Status = statusCode };
+            ErrorHandlers.Add(handler);
+            return this;
+        }
+
+        /// <summary>Chains a follow-up HTTP request that fires after the current response.</summary>
+        /// <param name="request">Builds the chained request.</param>
+        /// <returns>This builder for chaining.</returns>
         public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> request)
         {
-            var chainedBuilder = new HttpRequestBuilder<TModel>();
+            var chainedBuilder = new HttpRequestBuilder<TModel>(_context);
             request(chainedBuilder);
-            ChainedRequest = chainedBuilder.BuildRequestDescriptor();
+            ChainedRequest = chainedBuilder.BuildRequest();
             return this;
-        }
-
-        /// <summary>
-        /// Builds a StatusHandler from a PipelineBuilder. Sequential reactions use
-        /// commands (backward compatible). Non-sequential (conditional, http) use
-        /// the full reaction — conditions inside response handlers are preserved.
-        /// </summary>
-        private static StatusHandler BuildHandler(int? statusCode, PipelineBuilder<TModel> builder)
-        {
-            var reaction = builder.BuildReaction();
-            if (reaction is SequentialReaction sr)
-            {
-                return statusCode.HasValue
-                    ? new StatusHandler(statusCode.Value, sr.Commands)
-                    : new StatusHandler(sr.Commands);
-            }
-            return statusCode.HasValue
-                ? new StatusHandler(statusCode.Value, reaction)
-                : new StatusHandler(reaction);
         }
     }
 }
-

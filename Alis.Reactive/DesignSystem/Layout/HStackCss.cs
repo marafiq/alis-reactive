@@ -9,11 +9,11 @@ namespace Alis.Reactive.DesignSystem.Layout
             AlignItems align = AlignItems.Center,
             JustifyContent justify = JustifyContent.Start,
             bool wrap = false,
-            string? userClass = null)
+            string? cssClass = null)
         {
             var wrapClass = wrap ? "flex-wrap" : "";
             var baseClasses = $"flex {TokenMap.Gap(gap)} {TokenMap.Items(align)} {TokenMap.Justify(justify)} {wrapClass}".Trim();
-            return CssUtils.MergeClasses(baseClasses, userClass);
+            return CssUtils.MergeClasses(baseClasses, cssClass);
         }
     }
 }

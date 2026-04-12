@@ -34,7 +34,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             });
         }
 
-        /// <summary>Returns HTML partial with native + TestWidget components.</summary>
+        /// <summary>Returns HTML partial with native components.</summary>
         [HttpGet("Partial")]
         public IActionResult Partial()
         {

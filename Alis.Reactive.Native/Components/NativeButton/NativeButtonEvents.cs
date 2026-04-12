@@ -11,8 +11,8 @@ namespace Alis.Reactive.Native.Components
         private NativeButtonEvents() { }
 
         /// <summary>Fires when the user clicks the button (DOM "click" event).</summary>
-        public TypedEventDescriptor<NativeButtonClickArgs> Click =>
-            new TypedEventDescriptor<NativeButtonClickArgs>(
+        public TypedEvent<NativeButtonClickArgs> Click =>
+            new TypedEvent<NativeButtonClickArgs>(
                 "click", new NativeButtonClickArgs());
     }
 }

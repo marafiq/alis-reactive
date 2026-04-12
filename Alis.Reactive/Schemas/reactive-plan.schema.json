@@ -2,597 +2,686 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://alis.reactive/schemas/reactive-plan.schema.json",
   "title": "Reactive Plan",
-  "description": "The complete runtime plan serialized by ReactivePlan.Render()",
+  "description": "The runtime plan produced by the domain model and executed by the browser runtime.",
   "type": "object",
-  "required": ["planId", "components", "entries"],
-  "additionalProperties": false,
+  "required": ["version", "planId", "types", "components", "behaviors"],
   "properties": {
-    "planId": {
-      "type": "string",
-      "description": "typeof(TModel).FullName — runtime merge key"
+    "version": { "const": 3 },
+    "planId": { "type": "string", "minLength": 1 },
+    "partId": { "type": "string", "minLength": 1 },
+    "types": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/JsType" }
     },
     "components": {
       "type": "object",
-      "additionalProperties": { "$ref": "#/$defs/ComponentEntry" },
-      "description": "Binding path → component registration. Shared by gather and validation."
+      "additionalProperties": { "$ref": "#/$defs/Component" }
     },
-    "entries": {
+    "behaviors": {
       "type": "array",
-      "items": { "$ref": "#/$defs/Entry" }
+      "items": { "$ref": "#/$defs/Behavior" }
     }
   },
   "$defs": {
-    "ComponentEntry": {
+    "JsType": {
       "type": "object",
-      "required": ["id", "vendor", "readExpr", "componentType", "coerceAs"],
       "properties": {
-        "id": { "type": "string", "description": "DOM element ID" },
-        "vendor": { "$ref": "#/$defs/Vendor" },
-        "readExpr": { "type": "string", "description": "Property path from vendor root" },
-        "componentType": { "type": "string", "description": "Component kind — autocomplete, dropdownlist, switch, textbox, etc." },
-        "coerceAs": { "$ref": "#/$defs/CoercionType", "description": "Coercion type inferred from C# typeof(TProp)" }
-      },
-      "additionalProperties": false
+        "properties": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/Property" }
+        },
+        "methods": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/Method" }
+        },
+        "events": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/Event" }
+        }
+      }
     },
-    "Entry": {
+    "Property": {
       "type": "object",
-      "required": ["trigger", "reaction"],
+      "required": ["path", "shape", "access"],
+      "properties": {
+        "path": { "$ref": "#/$defs/Path" },
+        "shape": { "$ref": "#/$defs/Shape" },
+        "access": {
+          "type": "string",
+          "enum": ["read", "write", "readwrite"]
+        }
+      }
+    },
+    "Method": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": { "$ref": "#/$defs/Path" },
+        "args": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Shape" }
+        },
+        "returns": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "Event": {
+      "type": "object",
+      "required": ["channel"],
+      "properties": {
+        "channel": { "type": "string", "minLength": 1 },
+        "payloadType": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Component": {
+      "type": "object",
+      "required": ["id", "vendor", "type"],
       "additionalProperties": false,
       "properties": {
-        "trigger": { "$ref": "#/$defs/Trigger" },
+        "id": { "type": "string", "minLength": 1 },
+        "vendor": {
+          "type": "string",
+          "enum": ["native", "fusion"]
+        },
+        "type": { "type": "string", "minLength": 1 },
+        "bindingPath": { "type": "string" },
+        "valueMember": { "type": "string" },
+        "container": { "$ref": "#/$defs/ContainerScope" }
+      }
+    },
+    "ContainerScope": {
+      "type": "object",
+      "required": ["components"],
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "validationRules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ComponentValidation" }
+        }
+      }
+    },
+    "ComponentValidation": {
+      "type": "object",
+      "required": ["component", "value", "rules"],
+      "properties": {
+        "component": { "type": "string", "minLength": 1 },
+        "value": { "$ref": "#/$defs/ValueProducer" },
+        "serverFieldName": { "type": "string", "minLength": 1 },
+        "rules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValidationRule" }
+        }
+      }
+    },
+    "ValidationRule": {
+      "type": "object",
+      "required": ["name", "message"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "required", "empty",
+            "minLength", "maxLength",
+            "email", "regex", "url", "creditCard",
+            "range", "exclusiveRange",
+            "min", "max", "gt", "lt",
+            "equalTo", "notEqual", "notEqualTo",
+            "atLeastOne"
+          ]
+        },
+        "message": { "type": "string", "minLength": 1 },
+        "constraint": { "$ref": "#/$defs/ValueProducer" },
+        "otherValue": { "$ref": "#/$defs/ValueProducer" },
+        "when": { "$ref": "#/$defs/Condition" },
+        "shape": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "Source": {
+      "oneOf": [
+        { "$ref": "#/$defs/ComponentSource" },
+        { "$ref": "#/$defs/PayloadSource" },
+        { "$ref": "#/$defs/UrlSource" },
+        { "$ref": "#/$defs/PluginSource" }
+      ]
+    },
+    "ComponentSource": {
+      "type": "object",
+      "required": ["kind", "component"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "component" },
+        "component": { "type": "string", "minLength": 1 }
+      }
+    },
+    "PayloadSource": {
+      "type": "object",
+      "required": ["kind", "scope"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "payload" },
+        "scope": {
+          "type": "string",
+          "enum": ["event", "success", "error", "request", "dispatch", "local"]
+        },
+        "type": { "type": "string", "minLength": 1 }
+      }
+    },
+    "UrlSource": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "url" }
+      }
+    },
+    "PluginSource": {
+      "type": "object",
+      "required": ["kind", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "plugin" },
+        "name": { "type": "string", "minLength": 1, "pattern": "^\\S+$" }
+      }
+    },
+    "Behavior": {
+      "type": "object",
+      "required": ["startsWhen", "reaction"],
+      "properties": {
+        "startsWhen": { "$ref": "#/$defs/StartsWhen" },
         "reaction": { "$ref": "#/$defs/Reaction" }
       }
     },
-
-    "Trigger": {
+    "StartsWhen": {
       "oneOf": [
-        { "$ref": "#/$defs/DomReadyTrigger" },
-        { "$ref": "#/$defs/CustomEventTrigger" },
+        { "$ref": "#/$defs/PageReadyTrigger" },
+        { "$ref": "#/$defs/DocumentEventTrigger" },
         { "$ref": "#/$defs/ComponentEventTrigger" },
         { "$ref": "#/$defs/ServerPushTrigger" },
         { "$ref": "#/$defs/SignalRTrigger" }
       ]
     },
-    "DomReadyTrigger": {
+    "PageReadyTrigger": {
       "type": "object",
       "required": ["kind"],
-      "additionalProperties": false,
       "properties": {
-        "kind": { "const": "dom-ready" }
+        "kind": { "const": "page-ready" }
       }
     },
-    "CustomEventTrigger": {
+    "DocumentEventTrigger": {
       "type": "object",
       "required": ["kind", "event"],
-      "additionalProperties": false,
       "properties": {
-        "kind": { "const": "custom-event" },
-        "event": { "type": "string", "minLength": 1 }
+        "kind": { "const": "document-event" },
+        "event": { "type": "string", "minLength": 1 },
+        "payloadType": { "type": "string", "minLength": 1 }
       }
-    },
-    "Vendor": {
-      "type": "string",
-      "enum": ["fusion", "native"],
-      "description": "Component vendor — determines the root object for all component interactions. native→el (DOM element), fusion→el.ej2_instances[0] (Syncfusion instance). Used by reads (readExpr), events (addEventListener), and writes (bracket notation on resolved root)."
     },
     "ComponentEventTrigger": {
       "type": "object",
-      "required": ["kind", "componentId", "jsEvent", "vendor"],
-      "additionalProperties": false,
+      "required": ["kind", "component", "event"],
       "properties": {
         "kind": { "const": "component-event" },
-        "componentId": { "type": "string", "minLength": 1 },
-        "jsEvent": { "type": "string", "minLength": 1 },
-        "vendor": { "$ref": "#/$defs/Vendor" },
-        "bindingPath": { "type": "string", "minLength": 1, "description": "Dot-notation model binding path (e.g. Address.City). Carried for future HTTP gather." },
-        "readExpr": { "type": "string", "minLength": 1, "description": "Property path from vendor-determined root for reading the component value in event payload. Examples: 'value', 'checked'. Runtime uses walk(el, readExpr) — plan-driven, no hardcoded property lists." }
+        "component": { "type": "string", "minLength": 1 },
+        "event": { "type": "string", "minLength": 1 }
       }
     },
     "ServerPushTrigger": {
       "type": "object",
       "required": ["kind", "url"],
-      "additionalProperties": false,
       "properties": {
         "kind": { "const": "server-push" },
-        "url": { "type": "string", "minLength": 1, "description": "SSE endpoint URL (e.g. /api/notifications/stream)" },
-        "eventType": { "type": "string", "minLength": 1, "description": "Optional SSE event type filter. Maps to the event: field in the SSE protocol." }
+        "url": { "type": "string", "minLength": 1 },
+        "event": { "type": "string", "minLength": 1 },
+        "payloadType": { "type": "string", "minLength": 1 }
       }
     },
     "SignalRTrigger": {
       "type": "object",
-      "required": ["kind", "hubUrl", "methodName"],
-      "additionalProperties": false,
+      "required": ["kind", "hubUrl", "method"],
       "properties": {
         "kind": { "const": "signalr" },
-        "hubUrl": { "type": "string", "minLength": 1, "description": "Hub URL (e.g. /hubs/notifications). Connection shared across triggers with same hubUrl." },
-        "methodName": { "type": "string", "minLength": 1, "description": "Server method name to listen for (e.g. ReceiveNotification). Maps to connection.on(methodName, handler)." }
+        "hubUrl": { "type": "string", "minLength": 1 },
+        "method": { "type": "string", "minLength": 1 },
+        "payloadType": { "type": "string", "minLength": 1 }
       }
     },
-
     "Reaction": {
       "oneOf": [
-        { "$ref": "#/$defs/SequentialReaction" },
-        { "$ref": "#/$defs/ConditionalReaction" },
-        { "$ref": "#/$defs/HttpReaction" },
-        { "$ref": "#/$defs/ParallelHttpReaction" }
+        { "$ref": "#/$defs/SequenceReaction" },
+        { "$ref": "#/$defs/ParallelReaction" },
+        { "$ref": "#/$defs/BranchReaction" },
+        { "$ref": "#/$defs/SetReaction" },
+        { "$ref": "#/$defs/CallReaction" },
+        { "$ref": "#/$defs/RequestReaction" },
+        { "$ref": "#/$defs/DispatchReaction" },
+        { "$ref": "#/$defs/InjectReaction" },
+        { "$ref": "#/$defs/ShowValidationErrorsReaction" }
       ]
     },
-    "SequentialReaction": {
+    "SequenceReaction": {
       "type": "object",
-      "required": ["kind", "commands"],
-      "additionalProperties": false,
+      "required": ["kind", "steps"],
       "properties": {
-        "kind": { "const": "sequential" },
-        "commands": {
+        "kind": { "const": "sequence" },
+        "steps": {
           "type": "array",
-          "items": { "$ref": "#/$defs/Command" }
+          "items": { "$ref": "#/$defs/Reaction" }
         }
       }
     },
-
-    "Command": {
-      "oneOf": [
-        { "$ref": "#/$defs/DispatchCommand" },
-        { "$ref": "#/$defs/MutateElementCommand" },
-        { "$ref": "#/$defs/MutateEventCommand" },
-        { "$ref": "#/$defs/ValidationErrorsCommand" },
-        { "$ref": "#/$defs/IntoCommand" }
-      ]
+    "ParallelReaction": {
+      "type": "object",
+      "required": ["kind", "steps"],
+      "properties": {
+        "kind": { "const": "parallel" },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Reaction" }
+        },
+        "onSettled": { "$ref": "#/$defs/Reaction" }
+      }
     },
-    "DispatchCommand": {
+    "BranchReaction": {
+      "type": "object",
+      "required": ["kind", "cases"],
+      "properties": {
+        "kind": { "const": "branch" },
+        "cases": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/BranchCase" }
+        }
+      }
+    },
+    "BranchCase": {
+      "type": "object",
+      "required": ["reaction"],
+      "properties": {
+        "when": { "$ref": "#/$defs/Condition" },
+        "reaction": { "$ref": "#/$defs/Reaction" }
+      }
+    },
+    "SetReaction": {
+      "type": "object",
+      "required": ["kind", "on", "property", "value"],
+      "properties": {
+        "kind": { "const": "set" },
+        "on": { "$ref": "#/$defs/Source" },
+        "property": { "type": "string", "minLength": 1 },
+        "value": { "$ref": "#/$defs/ValueProducer" }
+      }
+    },
+    "CallReaction": {
+      "type": "object",
+      "required": ["kind", "on", "method"],
+      "properties": {
+        "kind": { "const": "call" },
+        "on": { "$ref": "#/$defs/Source" },
+        "method": { "type": "string", "minLength": 1 },
+        "args": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValueProducer" }
+        }
+      }
+    },
+    "RequestReaction": {
+      "type": "object",
+      "required": ["kind", "request"],
+      "properties": {
+        "kind": { "const": "request" },
+        "request": { "$ref": "#/$defs/Request" }
+      }
+    },
+    "DispatchReaction": {
       "type": "object",
       "required": ["kind", "event"],
-      "additionalProperties": false,
       "properties": {
         "kind": { "const": "dispatch" },
-        "event": { "type": "string" },
-        "payload": { "type": "object" }
+        "event": { "type": "string", "minLength": 1 },
+        "data": { "$ref": "#/$defs/ValueProducer" },
+        "payloadType": { "type": "string", "minLength": 1 }
       }
     },
-
-    "BindSource": {
+    "InjectReaction": {
+      "type": "object",
+      "required": ["kind", "component", "value"],
+      "properties": {
+        "kind": { "const": "inject" },
+        "component": { "type": "string", "minLength": 1 },
+        "value": { "$ref": "#/$defs/ValueProducer" }
+      }
+    },
+    "ShowValidationErrorsReaction": {
+      "type": "object",
+      "required": ["kind", "container"],
+      "properties": {
+        "kind": { "const": "show-validation-errors" },
+        "container": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Request": {
+      "type": "object",
+      "required": ["method", "url"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+        },
+        "url": { "type": "string" },
+        "headers": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/ValueProducer" }
+        },
+        "routeParams": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-zA-Z0-9_]+$" },
+          "additionalProperties": { "$ref": "#/$defs/ValueProducer" }
+        },
+        "container": { "type": "string", "minLength": 1 },
+        "input": { "$ref": "#/$defs/RequestInput" },
+        "before": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Reaction" }
+        },
+        "success": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ResponseHandler" }
+        },
+        "error": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ResponseHandler" }
+        },
+        "complete": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Reaction" }
+        },
+        "next": { "$ref": "#/$defs/Request" }
+      }
+    },
+    "RequestInput": {
       "oneOf": [
-        { "$ref": "#/$defs/EventSource" },
-        { "$ref": "#/$defs/ComponentSource" }
+        { "$ref": "#/$defs/GatherInput" },
+        { "$ref": "#/$defs/ValueInput" }
       ]
     },
-    "EventSource": {
+    "GatherInput": {
       "type": "object",
-      "required": ["kind", "path"],
-      "additionalProperties": false,
+      "required": ["kind", "components", "transport"],
       "properties": {
-        "kind": { "const": "event" },
-        "path": { "type": "string", "minLength": 1 }
+        "kind": { "const": "gather" },
+        "components": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GatherField" }
+        },
+        "transport": {
+          "type": "string",
+          "enum": ["query", "json", "form-data"]
+        },
+        "statics": { "$ref": "#/$defs/ValueProducer" },
+        "includeAll": { "type": "boolean" }
       }
     },
-    "ComponentSource": {
+    "ValueInput": {
       "type": "object",
-      "required": ["kind", "componentId", "vendor", "readExpr"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "component" },
-        "componentId": { "type": "string", "minLength": 1 },
-        "vendor": { "$ref": "#/$defs/Vendor" },
-        "readExpr": { "type": "string", "minLength": 1 }
-      }
-    },
-    "BindExpr": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Dot-notation path into execution context, e.g. evt.address.city"
-    },
-    "CoercionType": {
-      "type": "string",
-      "enum": ["string", "number", "boolean", "date", "raw", "array"],
-      "description": "Type coercion applied to resolved BindExpr value"
-    },
-
-    "GuardOp": {
-      "type": "string",
-      "enum": [
-        "eq", "neq", "gt", "gte", "lt", "lte",
-        "truthy", "falsy", "is-null", "not-null",
-        "is-empty", "not-empty",
-        "in", "not-in", "between",
-        "array-contains",
-        "contains", "starts-with", "ends-with", "matches", "min-length"
-      ],
-      "description": "Comparison operator for a ValueGuard"
-    },
-    "Guard": {
-      "oneOf": [
-        { "$ref": "#/$defs/ValueGuard" },
-        { "$ref": "#/$defs/AllGuard" },
-        { "$ref": "#/$defs/AnyGuard" },
-        { "$ref": "#/$defs/InvertGuard" },
-        { "$ref": "#/$defs/ConfirmGuard" }
-      ]
-    },
-    "ValueGuard": {
-      "type": "object",
-      "required": ["kind", "source", "coerceAs", "op"],
-      "additionalProperties": false,
+      "required": ["kind", "value", "transport"],
       "properties": {
         "kind": { "const": "value" },
-        "source": { "$ref": "#/$defs/BindSource" },
-        "coerceAs": { "$ref": "#/$defs/CoercionType" },
-        "op": { "$ref": "#/$defs/GuardOp" },
-        "operand": {
-          "description": "Comparison value for binary operators (eq, neq, gt, etc.)"
-        },
-        "rightSource": {
-          "$ref": "#/$defs/BindSource",
-          "description": "When present, the right-hand side is a source (component or event), not a literal operand. Enables source-vs-source comparisons."
-        },
-        "elementCoerceAs": {
-          "$ref": "#/$defs/CoercionType",
-          "description": "Element-level coercion for array operators (array-contains). Specifies how to coerce individual elements and the operand."
+        "value": { "$ref": "#/$defs/ValueProducer" },
+        "transport": {
+          "type": "string",
+          "enum": ["query", "json", "form-data"]
         }
       }
     },
-    "AllGuard": {
+    "GatherField": {
       "type": "object",
-      "required": ["kind", "guards"],
-      "additionalProperties": false,
+      "required": ["key", "value"],
+      "properties": {
+        "key": { "type": "string", "minLength": 1 },
+        "value": { "$ref": "#/$defs/ValueProducer" }
+      }
+    },
+    "ResponseHandler": {
+      "type": "object",
+      "required": ["reaction"],
+      "properties": {
+        "status": { "type": "integer" },
+        "reaction": { "$ref": "#/$defs/Reaction" }
+      }
+    },
+    "ValueProducer": {
+      "oneOf": [
+        { "$ref": "#/$defs/LiteralProducer" },
+        { "$ref": "#/$defs/ReadProducer" },
+        { "$ref": "#/$defs/ObjectProducer" },
+        { "$ref": "#/$defs/ArrayProducer" }
+      ]
+    },
+    "LiteralProducer": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "const": "literal" },
+        "value": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" },
+            { "type": "null" }
+          ]
+        },
+        "shape": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "ReadProducer": {
+      "type": "object",
+      "required": ["kind", "from", "member"],
+      "properties": {
+        "kind": { "const": "read" },
+        "from": { "$ref": "#/$defs/Source" },
+        "member": { "type": "string", "minLength": 1 },
+        "path": { "$ref": "#/$defs/Path" },
+        "shape": { "$ref": "#/$defs/Shape" },
+        "args": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValueProducer" }
+        }
+      }
+    },
+    "ObjectProducer": {
+      "type": "object",
+      "required": ["kind", "fields"],
+      "properties": {
+        "kind": { "const": "object" },
+        "fields": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/ValueProducer" }
+        },
+        "shape": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "ArrayProducer": {
+      "type": "object",
+      "required": ["kind", "items"],
+      "properties": {
+        "kind": { "const": "array" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValueProducer" }
+        },
+        "shape": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "Condition": {
+      "oneOf": [
+        { "$ref": "#/$defs/CompareCondition" },
+        { "$ref": "#/$defs/AllCondition" },
+        { "$ref": "#/$defs/AnyCondition" },
+        { "$ref": "#/$defs/NotCondition" },
+        { "$ref": "#/$defs/ConfirmCondition" }
+      ]
+    },
+    "CompareCondition": {
+      "type": "object",
+      "required": ["kind", "left", "op"],
+      "properties": {
+        "kind": { "const": "compare" },
+        "left": { "$ref": "#/$defs/ValueProducer" },
+        "op": {
+          "type": "string",
+          "enum": [
+            "eq", "neq", "gt", "gte", "lt", "lte",
+            "truthy", "falsy", "is-null", "not-null",
+            "is-empty", "not-empty",
+            "in", "not-in", "between",
+            "array-contains",
+            "contains", "starts-with", "ends-with", "matches", "min-length"
+          ]
+        },
+        "right": { "$ref": "#/$defs/ValueProducer" },
+        "shape": { "$ref": "#/$defs/Shape" },
+        "itemShape": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "AllCondition": {
+      "type": "object",
+      "required": ["kind", "terms"],
       "properties": {
         "kind": { "const": "all" },
-        "guards": {
+        "terms": {
           "type": "array",
-          "items": { "$ref": "#/$defs/Guard" },
-          "minItems": 2
+          "items": { "$ref": "#/$defs/Condition" }
         }
       }
     },
-    "AnyGuard": {
+    "AnyCondition": {
       "type": "object",
-      "required": ["kind", "guards"],
-      "additionalProperties": false,
+      "required": ["kind", "terms"],
       "properties": {
         "kind": { "const": "any" },
-        "guards": {
+        "terms": {
           "type": "array",
-          "items": { "$ref": "#/$defs/Guard" },
-          "minItems": 2
+          "items": { "$ref": "#/$defs/Condition" }
         }
       }
     },
-    "InvertGuard": {
+    "NotCondition": {
       "type": "object",
-      "required": ["kind", "inner"],
-      "additionalProperties": false,
+      "required": ["kind", "term"],
       "properties": {
         "kind": { "const": "not" },
-        "inner": { "$ref": "#/$defs/Guard" }
+        "term": { "$ref": "#/$defs/Condition" }
       }
     },
-    "ConfirmGuard": {
+    "ConfirmCondition": {
       "type": "object",
       "required": ["kind", "message"],
-      "additionalProperties": false,
       "properties": {
         "kind": { "const": "confirm" },
         "message": { "type": "string", "minLength": 1 }
       }
     },
-    "Branch": {
-      "type": "object",
-      "required": ["reaction"],
-      "additionalProperties": false,
-      "properties": {
-        "guard": {
-          "oneOf": [
-            { "$ref": "#/$defs/Guard" },
-            { "type": "null" }
-          ]
-        },
-        "reaction": { "$ref": "#/$defs/Reaction" }
-      }
-    },
-    "ConditionalReaction": {
-      "type": "object",
-      "required": ["kind", "branches"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "conditional" },
-        "commands": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Command" }
-        },
-        "branches": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Branch" },
-          "minItems": 1
-        }
-      }
-    },
-    "Mutation": {
+    "Shape": {
       "oneOf": [
-        { "$ref": "#/$defs/SetPropMutation" },
-        { "$ref": "#/$defs/CallMutation" }
+        { "$ref": "#/$defs/StringShape" },
+        { "$ref": "#/$defs/NumberShape" },
+        { "$ref": "#/$defs/BooleanShape" },
+        { "$ref": "#/$defs/DateShape" },
+        { "$ref": "#/$defs/RawShape" },
+        { "$ref": "#/$defs/ArrayShape" },
+        { "$ref": "#/$defs/ObjectShape" },
+        { "$ref": "#/$defs/NullableShape" },
+        { "$ref": "#/$defs/AnyShape" },
+        { "$ref": "#/$defs/NoneShape" }
       ]
     },
-    "SetPropMutation": {
+    "StringShape": {
       "type": "object",
-      "required": ["kind", "prop"],
-      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": { "kind": { "const": "string" } }
+    },
+    "NumberShape": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": { "kind": { "const": "number" } }
+    },
+    "BooleanShape": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": { "kind": { "const": "boolean" } }
+    },
+    "DateShape": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": { "kind": { "const": "date" } }
+    },
+    "RawShape": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": { "kind": { "const": "raw" } }
+    },
+    "ArrayShape": {
+      "type": "object",
+      "required": ["kind", "item"],
       "properties": {
-        "kind": { "const": "set-prop" },
-        "prop": { "type": "string", "minLength": 1, "description": "Property name to set: root[prop] = val" },
-        "coerce": { "$ref": "#/$defs/CoercionType" }
+        "kind": { "const": "array" },
+        "item": { "$ref": "#/$defs/Shape" }
       }
     },
-    "MethodArg": {
-      "oneOf": [
-        { "$ref": "#/$defs/LiteralArg" },
-        { "$ref": "#/$defs/SourceArg" }
-      ]
-    },
-    "LiteralArg": {
-      "type": "object",
-      "required": ["kind", "value"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "literal" },
-        "value": { "description": "Literal argument value" }
-      }
-    },
-    "SourceArg": {
-      "type": "object",
-      "required": ["kind", "source"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "source" },
-        "source": { "$ref": "#/$defs/BindSource" },
-        "coerce": { "$ref": "#/$defs/CoercionType" }
-      }
-    },
-    "CallMutation": {
-      "type": "object",
-      "required": ["kind", "method"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "call" },
-        "method": { "type": "string", "minLength": 1, "description": "Method to call: root[method](...args)" },
-        "chain": { "type": "string", "minLength": 1 },
-        "args": { "type": "array", "items": { "$ref": "#/$defs/MethodArg" }, "description": "Per-arg resolution: each arg is literal or source-walked" }
-      }
-    },
-    "MutateElementCommand": {
-      "type": "object",
-      "required": ["kind", "target", "mutation"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "mutate-element" },
-        "target": { "type": "string", "minLength": 1 },
-        "mutation": { "$ref": "#/$defs/Mutation" },
-        "value": { "description": "Static value for mutations — string for scalars, array for multi-select" },
-        "source": { "$ref": "#/$defs/BindSource" },
-        "vendor": { "$ref": "#/$defs/Vendor" }
-      }
-    },
-
-    "GatherItem": {
-      "oneOf": [
-        { "$ref": "#/$defs/ComponentGather" },
-        { "$ref": "#/$defs/StaticGather" },
-        { "$ref": "#/$defs/AllGather" },
-        { "$ref": "#/$defs/EventGather" }
-      ]
-    },
-    "AllGather": {
+    "ObjectShape": {
       "type": "object",
       "required": ["kind"],
       "properties": {
-        "kind": { "const": "all" }
-      },
-      "additionalProperties": false
-    },
-    "ComponentGather": {
-      "type": "object",
-      "required": ["kind", "componentId", "vendor", "name", "readExpr"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "component" },
-        "componentId": { "type": "string", "minLength": 1, "description": "DOM element ID of the component" },
-        "vendor": { "$ref": "#/$defs/Vendor" },
-        "name": { "type": "string", "minLength": 1, "description": "Property name for the gathered value in the request body" },
-        "readExpr": { "type": "string", "minLength": 1, "description": "Property path from vendor-determined root. Vendor resolves root (native→el, fusion→ej2_instances[0]), then readExpr is walked from that root. Examples: 'checked', 'value'" }
-      }
-    },
-    "StaticGather": {
-      "type": "object",
-      "required": ["kind", "param", "value"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "static" },
-        "param": { "type": "string", "minLength": 1 },
-        "value": { "description": "Static value to include in the request" }
-      }
-    },
-    "EventGather": {
-      "type": "object",
-      "required": ["kind", "param", "path"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "event" },
-        "param": { "type": "string", "minLength": 1, "description": "Query parameter or body field name" },
-        "path": { "type": "string", "minLength": 1, "description": "Dot-notation path into event payload (e.g., evt.text)" }
-      }
-    },
-
-    "StatusHandler": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "statusCode": { "type": "integer", "description": "HTTP status code to match. Null = catch-all." },
-        "commands": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Command" }
-        },
-        "reaction": { "$ref": "#/$defs/Reaction", "description": "Full reaction for non-sequential handlers (conditional, http). Mutually exclusive with commands." }
-      },
-      "oneOf": [
-        { "required": ["commands"] },
-        { "required": ["reaction"] }
-      ]
-    },
-
-    "RequestDescriptor": {
-      "type": "object",
-      "required": ["verb", "url"],
-      "additionalProperties": false,
-      "properties": {
-        "verb": { "type": "string", "enum": ["GET", "POST", "PUT", "DELETE"] },
-        "url": { "type": "string", "minLength": 1 },
-        "gather": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/GatherItem" }
-        },
-        "contentType": {
-          "type": "string",
-          "enum": ["form-data"],
-          "description": "Request body format. Omitted for JSON (default). Set to form-data for multipart/form-data (file uploads)."
-        },
-        "whileLoading": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Command" }
-        },
-        "onSuccess": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/StatusHandler" }
-        },
-        "onError": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/StatusHandler" }
-        },
-        "chained": { "$ref": "#/$defs/RequestDescriptor" },
-        "validation": { "$ref": "#/$defs/ValidationDescriptor" }
-      }
-    },
-
-    "HttpReaction": {
-      "type": "object",
-      "required": ["kind", "request"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "http" },
-        "preFetch": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Command" }
-        },
-        "request": { "$ref": "#/$defs/RequestDescriptor" }
-      }
-    },
-
-    "ParallelHttpReaction": {
-      "type": "object",
-      "required": ["kind", "requests"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "parallel-http" },
-        "preFetch": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Command" }
-        },
-        "requests": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/RequestDescriptor" },
-          "minItems": 2
-        },
-        "onAllSettled": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Command" }
-        }
-      }
-    },
-
-    "ValidationErrorsCommand": {
-      "type": "object",
-      "required": ["kind", "formId"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "validation-errors" },
-        "formId": { "type": "string", "minLength": 1 }
-      }
-    },
-    "MutateEventCommand": {
-      "type": "object",
-      "required": ["kind", "mutation"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "mutate-event" },
-        "mutation": { "$ref": "#/$defs/Mutation", "description": "set-prop or call on the event args object (ctx.evt). Same mutation algebra as mutate-element." },
-        "value": { "description": "Static value for set-prop mutations" },
-        "source": { "$ref": "#/$defs/BindSource" }
-      }
-    },
-    "IntoCommand": {
-      "type": "object",
-      "required": ["kind", "target"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "into" },
-        "target": { "type": "string", "minLength": 1 }
-      }
-    },
-
-    "ValidationCondition": {
-      "type": "object",
-      "required": ["field", "op"],
-      "additionalProperties": false,
-      "properties": {
-        "field": { "type": "string", "minLength": 1, "description": "Model property name to evaluate" },
-        "op": { "type": "string", "enum": ["truthy", "falsy", "eq", "neq"] },
-        "value": { "description": "Comparison value for eq/neq operators" }
-      }
-    },
-    "ValidationRuleType": {
-      "type": "string",
-      "enum": ["required", "empty", "minLength", "maxLength", "email", "regex", "url",
-               "creditCard", "range", "exclusiveRange", "min", "max", "gt", "lt",
-               "equalTo", "notEqual", "notEqualTo", "atLeastOne"]
-    },
-    "ValidationRule": {
-      "type": "object",
-      "required": ["rule", "message"],
-      "additionalProperties": false,
-      "properties": {
-        "rule": { "$ref": "#/$defs/ValidationRuleType" },
-        "message": { "type": "string", "minLength": 1 },
-        "constraint": { "description": "Rule-specific constraint value" },
-        "field": { "type": "string", "minLength": 1, "description": "Cross-property: binding path of field to compare against" },
-        "coerceAs": { "$ref": "#/$defs/CoercionType", "description": "Coercion type for comparison — derived from TProperty" },
-        "when": { "$ref": "#/$defs/ValidationCondition" }
-      }
-    },
-    "ValidationField": {
-      "type": "object",
-      "required": ["fieldName", "rules"],
-      "additionalProperties": false,
-      "properties": {
-        "fieldName": { "type": "string", "minLength": 1, "description": "Model property name (dot notation)" },
-        "rules": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/ValidationRule" }
-        },
-        "fieldId": { "type": "string", "description": "DOM element ID — enriched from ComponentsMap at render time" },
-        "vendor": { "$ref": "#/$defs/Vendor", "description": "Component vendor — enriched from ComponentsMap" },
-        "readExpr": { "type": "string", "description": "Property path from vendor root — enriched from ComponentsMap" },
-        "coerceAs": { "$ref": "#/$defs/CoercionType", "description": "Coercion type — enriched from ComponentsMap" }
-      }
-    },
-    "ValidationDescriptor": {
-      "type": "object",
-      "required": ["formId", "planId", "fields"],
-      "additionalProperties": false,
-      "properties": {
-        "formId": { "type": "string", "minLength": 1, "description": "Form container element ID" },
-        "planId": { "type": "string", "minLength": 1, "description": "Plan identity — used by runtime to scope validation summary div lookup" },
+        "kind": { "const": "object" },
         "fields": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/ValidationField" }
-        }
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/Shape" }
+        },
+        "additional": { "type": "boolean" }
       }
+    },
+    "NullableShape": {
+      "type": "object",
+      "required": ["kind", "inner"],
+      "properties": {
+        "kind": { "const": "nullable" },
+        "inner": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "AnyShape": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": { "kind": { "const": "any" } }
+    },
+    "NoneShape": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": { "kind": { "const": "none" } }
+    },
+    "Path": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/PathSegment" }
+    },
+    "PathSegment": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "name"],
+          "properties": {
+            "kind": { "const": "property" },
+            "name": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "index"],
+          "properties": {
+            "kind": { "const": "index" },
+            "index": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
     }
   }
 }

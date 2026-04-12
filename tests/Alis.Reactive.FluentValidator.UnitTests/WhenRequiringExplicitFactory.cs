@@ -18,6 +18,6 @@ public class WhenRequiringExplicitFactory
         var desc = adapter.ExtractRules(typeof(RequiredValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc!.Fields[0].FieldName, Is.EqualTo("Name"));
+        Assert.That(desc[0].FieldName, Is.EqualTo("Name"));
     }
 }

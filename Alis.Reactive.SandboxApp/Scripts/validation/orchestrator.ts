@@ -1,196 +1,90 @@
-// Validation Orchestrator — Fail-Closed
+// Validation Orchestrator — Fail-Closed, V3 ContainerScope
 //
-// Every declared validation field MUST be accounted for.
-// No silent skips. No pass-by-default. Four possible outcomes per field:
-//   1. Enriched + visible → validate, error inline
-//   2. Enriched + hidden  → validate, error to summary
-//   3. Unenriched + unconditional rules → first rule message to summary (block)
-//   4. Unenriched + all conditions false → skip (field not needed yet)
-//
-// Vendor-agnostic: delegates value reading to component.ts via resolveRoot.
+// Uses SHARED evaluateValue for ALL component value reads.
+// No parallel read path — same concept as pipeline and gather.
 
-import type { ValidationDescriptor, ValidationField, ValidationRule } from "../types";
-import { resolveRoot } from "../resolution/component";
+import type {
+  Plan, ContainerScope, ComponentValidation,
+  ValidationRule,
+} from "../types";
+import type { ExecContext } from "../types";
+import { resolveElement } from "../resolution/resolver";
+import { evaluateCondition } from "../conditions/conditions";
+import { evaluateValue } from "../core/evaluate";
 import { scope } from "../core/trace";
-import { walk } from "../core/walk";
-import { ruleFails, type PeerReader } from "./rule-engine";
-import { evalCondition, type ConditionReader } from "./condition";
-import { toString, toDate } from "../core/coerce";
+import { toString } from "../core/shape-convert";
+import { ruleFails } from "./rule-engine";
 import {
-  showInline, clearInline, clearAllInline,
+  showInline, clearInline,
   addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
   showServerErrorInline,
 } from "./error-display";
 
 const log = scope("validation");
 
-// ── Public API ──────────────────────────────────────────────
+// -- Public API --
 
-export function validate(desc: ValidationDescriptor): boolean {
-  clearAllInline(desc.formId, desc.fields);
-  const summaryEl = findSummaryElement(desc.planId);
-  if (summaryEl) {
-    clearSummary(summaryEl);
-    hideSummaryDiv(summaryEl);
+export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecContext): boolean {
+  const containerComp = plan.components[containerKey];
+  if (!containerComp) {
+    log.warn("validate: container component not found", { containerKey });
+    return false;
   }
 
-  const container = document.getElementById(desc.formId);
-  if (!container) {
-    if (desc.fields.length > 0) {
-      log.warn("validate: form container missing, blocking", { formId: desc.formId });
+  const containerScope = containerComp.container;
+  if (!containerScope) {
+    log.warn("validate: component has no container scope", { containerKey });
+    return true;
+  }
+
+  const containerId = containerComp.id;
+  let container: HTMLElement;
+  try {
+    container = resolveElement(plan, containerKey);
+  } catch (e) {
+    if (!isResolutionError(e)) throw e;
+    if ((containerScope.validationRules?.length ?? 0) > 0) {
+      log.warn("validate: form container missing, blocking", { containerId });
       return false;
     }
     return true;
   }
 
-  const byName = buildByName(desc);
-  const condReader = domConditionReader(byName);
-  const peerReader = domPeerReader(byName);
+  const planId = plan.planId;
+  const summaryEl = findSummaryElement(planId);
+
+  clearContainerErrors(containerScope, plan, containerId, summaryEl);
+
+  if (!containerScope.validationRules || containerScope.validationRules.length === 0) {
+    return true;
+  }
+
   let valid = true;
   let summaryHasErrors = false;
 
-  for (const f of desc.fields) {
-    if (!evaluateField(f, desc.formId, container, condReader, peerReader, summaryEl)) {
+  for (const cv of containerScope.validationRules) {
+    if (!evaluateComponentRules(cv, plan, containerId, container, summaryEl, ctx)) {
       valid = false;
-      summaryHasErrors = summaryHasErrors || hasSummaryEntry(summaryEl, f.fieldName);
+      summaryHasErrors = summaryHasErrors || hasSummaryEntry(summaryEl, cv.component);
     }
   }
 
   if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
 
-  log.debug("validate", { formId: desc.formId, valid });
+  log.debug("validate", { containerId, valid });
   return valid;
 }
 
-/** Re-validate a single field on blur/change (live-validate). */
-export function revalidateField(desc: ValidationDescriptor, field: ValidationField): void {
-  if (!field.fieldId || !field.vendor || !field.readExpr) return;
+export function showServerErrors(plan: Plan, containerKey: string, data: unknown): void {
+  const containerComp = plan.components[containerKey];
+  if (!containerComp?.container) return;
 
-  clearInline(desc.formId, field);
+  const containerId = containerComp.id;
+  const containerScope = containerComp.container;
+  const planId = plan.planId;
+  const summaryEl = findSummaryElement(planId);
 
-  const container = document.getElementById(desc.formId);
-  if (!container) return;
-
-  const el = document.getElementById(field.fieldId);
-  if (!el || !container.contains(el)) return;
-
-  const byName = buildByName(desc);
-  const condReader = domConditionReader(byName);
-  const peerReader = domPeerReader(byName);
-  const summaryEl = findSummaryElement(desc.planId);
-
-  evaluateField(field, desc.formId, container, condReader, peerReader, summaryEl);
-}
-
-// ── Per-field evaluation (shared by validate + revalidateField) ──
-
-/** Handles fields that cannot be resolved (unenriched or missing element). */
-function handleUnresolvableField(
-  f: ValidationField, condReader: ConditionReader, summaryEl: HTMLElement | null
-): boolean {
-  if (allRulesConditionallySkipped(f, condReader)) {
-    log.trace("unresolvable-skip", { fieldName: f.fieldName, reason: "all conditions false" });
-    return true;
-  }
-  log.trace("unresolvable-block", { fieldName: f.fieldName, fieldId: f.fieldId, rules: f.rules.length });
-  if (f.rules.length > 0 && summaryEl) {
-    addToSummary(summaryEl, f.fieldName, f.rules[0].message);
-  }
-  return false;
-}
-
-/**
- * Checks a rule's When condition. Returns:
- *   "skip"  — condition is false, skip this rule
- *   "block" — condition is unresolvable (null), block with summary
- *   "eval"  — condition passed or no condition, evaluate the rule
- */
-function checkRuleCondition(
-  rule: ValidationRule, condReader: ConditionReader
-): "skip" | "block" | "eval" {
-  if (!rule.when) return "eval";
-  const result = evalCondition(rule.when, condReader);
-  if (result === false) return "skip";
-  if (result === null) return "block";
-  return "eval";
-}
-
-/** Reports a validation failure — routes to inline or summary based on visibility. */
-function reportFailure(
-  f: ValidationField, message: string, hidden: boolean,
-  formId: string, summaryEl: HTMLElement | null
-): void {
-  if (hidden) {
-    if (summaryEl) addToSummary(summaryEl, f.fieldName, message);
-  } else {
-    showInline(formId, f, message);
-    if (summaryEl) removeSummaryEntry(summaryEl, f.fieldName);
-  }
-}
-
-/** Evaluates all rules for a resolved field. Returns true if all pass. */
-function evaluateRules(
-  f: ValidationField, value: unknown, hidden: boolean,
-  formId: string, condReader: ConditionReader, peerReader: PeerReader,
-  summaryEl: HTMLElement | null
-): boolean {
-  for (const rule of f.rules) {
-    const condStatus = checkRuleCondition(rule, condReader);
-    if (condStatus === "skip") continue;
-    if (condStatus === "block") {
-      log.trace("rule-block", { fieldName: f.fieldName, rule: rule.rule, reason: "condition unresolvable" });
-      if (summaryEl) addToSummary(summaryEl, f.fieldName, rule.message);
-      return false;
-    }
-
-    if (ruleFails(rule, value, peerReader)) {
-      log.trace("rule-fail", { fieldName: f.fieldName, rule: rule.rule, value, message: rule.message });
-      reportFailure(f, rule.message, hidden, formId, summaryEl);
-      return false;
-    }
-  }
-  return true;
-}
-
-function evaluateField(
-  f: ValidationField, formId: string, container: HTMLElement,
-  condReader: ConditionReader, peerReader: PeerReader,
-  summaryEl: HTMLElement | null
-): boolean {
-  if (!f.fieldId || !f.vendor || !f.readExpr) {
-    return handleUnresolvableField(f, condReader, summaryEl);
-  }
-
-  const el = document.getElementById(f.fieldId);
-  if (!el) {
-    return handleUnresolvableField(f, condReader, summaryEl);
-  }
-
-  if (!container.contains(el)) {
-    log.trace("field outside form, skipping", { fieldName: f.fieldName, formId });
-    return true;
-  }
-
-  const errorSpan = document.getElementById(f.fieldId + "_error");
-  const hidden = errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
-  const root = resolveRoot(el, f.vendor);
-  const value = walk(root, f.readExpr);
-
-  return evaluateRules(f, value, hidden, formId, condReader, peerReader, summaryEl);
-}
-
-function hasSummaryEntry(summaryEl: HTMLElement | null, fieldName: string): boolean {
-  if (!summaryEl) return false;
-  return summaryEl.querySelector(`[data-valmsg-summary-for="${fieldName}"]`) !== null;
-}
-
-export function showServerErrors(desc: ValidationDescriptor, data: unknown): void {
-  clearAllInline(desc.formId, desc.fields);
-  const summaryEl = findSummaryElement(desc.planId);
-  if (summaryEl) {
-    clearSummary(summaryEl);
-    hideSummaryDiv(summaryEl);
-  }
+  clearContainerErrors(containerScope, plan, containerId, summaryEl);
 
   const errors = extractErrors(data);
   if (!errors) return;
@@ -198,13 +92,15 @@ export function showServerErrors(desc: ValidationDescriptor, data: unknown): voi
   let summaryHasErrors = false;
 
   for (const [name, msgs] of Object.entries(errors)) {
-    // Server 400 Problem Details always sends string or string[] per field
     const msgResult = toString(msgs);
     const msg = Array.isArray(msgs) ? msgs.join(", ") : msgResult.ok ? msgResult.value : "";
 
-    const spanExists = findErrorSpanExists(name, desc.fields);
-    if (spanExists) {
-      showServerErrorInline(desc.formId, name, msg, desc.fields);
+    const compKey = findComponentKeyByName(containerScope, name);
+    if (compKey) {
+      const comp = plan.components[compKey];
+      if (comp) {
+        showServerErrorInline(containerId, compKey, msg, plan, containerScope);
+      }
     } else if (summaryEl) {
       addToSummary(summaryEl, name, msg);
       summaryHasErrors = true;
@@ -212,100 +108,192 @@ export function showServerErrors(desc: ValidationDescriptor, data: unknown): voi
   }
 
   if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
-
-  log.debug("showServerErrors", { formId: desc.formId, fieldCount: Object.keys(errors).length });
+  log.debug("showServerErrors", { containerId, fieldCount: Object.keys(errors).length });
 }
 
-export function clearAll(desc: ValidationDescriptor): void {
-  clearAllInline(desc.formId, desc.fields);
-  const summaryEl = findSummaryElement(desc.planId);
+/**
+ * Re-validate a single component within its container.
+ * Called on blur/change by live-clear to give immediate field-level feedback.
+ */
+export function revalidateField(plan: Plan, containerKey: string, componentKey: string): void {
+  const containerComp = plan.components[containerKey];
+  if (!containerComp?.container?.validationRules) return;
+
+  const cv = containerComp.container.validationRules.find(r => r.component === componentKey);
+  if (!cv) return;
+
+  const containerId = containerComp.id;
+
+  // Clear existing error for this field
+  const comp = plan.components[componentKey];
+  if (comp) clearInline(containerId, comp.id);
+
+  // Find the container element
+  let container: HTMLElement;
+  try {
+    container = resolveElement(plan, containerKey);
+  } catch (e) {
+    if (!isResolutionError(e)) throw e;
+    return;
+  }
+
+  const summaryEl = findSummaryElement(plan.planId);
+
+  evaluateComponentRules(cv, plan, containerId, container, summaryEl);
+}
+
+export function clearContainerValidation(plan: Plan, containerKey: string): void {
+  const containerComp = plan.components[containerKey];
+  if (!containerComp?.container) return;
+
+  const containerId = containerComp.id;
+  const summaryEl = findSummaryElement(plan.planId);
+  clearContainerErrors(containerComp.container, plan, containerId, summaryEl);
+}
+
+// -- Per-component evaluation --
+
+function evaluateComponentRules(
+  cv: ComponentValidation,
+  plan: Plan,
+  containerId: string,
+  container: HTMLElement,
+  summaryEl: HTMLElement | null,
+  ctx?: ExecContext,
+): boolean {
+  const comp = plan.components[cv.component];
+  if (!comp) {
+    log.trace("component-not-found", { component: cv.component });
+    if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return true;
+    if (cv.rules.length > 0 && summaryEl) {
+      addToSummary(summaryEl, cv.component, cv.rules[0].message);
+    }
+    return false;
+  }
+
+  let el: HTMLElement;
+  try {
+    el = resolveElement(plan, cv.component);
+  } catch (e) {
+    if (!isResolutionError(e)) throw e;
+    if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return true;
+    if (cv.rules.length > 0 && summaryEl) {
+      addToSummary(summaryEl, cv.component, cv.rules[0].message);
+    }
+    return false;
+  }
+
+  if (!container.contains(el)) {
+    log.trace("field outside form, skipping", { component: cv.component, containerId });
+    return true;
+  }
+
+  // Error spans are generated HTML elements ({componentDomId}_error), NOT plan components.
+  // They are created by Html.Field() in C# and follow a predictable ID convention.
+  // getElementById is correct here — error spans are not registered in plan.components.
+  const errorSpan = document.getElementById(comp.id + "_error");
+  const hidden = errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
+
+  // Read value via the shared evaluateValue — same concept as pipeline and gather.
+  // Component may not be resolved yet (partial not merged) — suppress resolution errors only.
+  let value: unknown;
+  try {
+    value = evaluateValue(cv.value, plan);
+  } catch (e) {
+    if (isResolutionError(e)) { value = undefined; }
+    else throw e;
+  }
+
+  for (const rule of cv.rules) {
+    // Condition may reference components not yet merged — skip rule if unresolvable
+    if (rule.when) {
+      try {
+        const condResult = evaluateCondition(rule.when, plan, ctx);
+        if (!condResult) continue;
+      } catch (e) {
+        if (isResolutionError(e)) continue;
+        throw e;
+      }
+    }
+
+    // Pre-resolve otherValue if present — keeps rule-engine pure (no DOM)
+    let otherValue: unknown;
+    if (rule.otherValue) {
+      try { otherValue = evaluateValue(rule.otherValue, plan); }
+      catch (e) { if (isResolutionError(e)) otherValue = undefined; else throw e; }
+    }
+
+    if (ruleFails(rule, value, otherValue)) {
+      log.trace("rule-fail", { component: cv.component, rule: rule.name, value, message: rule.message });
+      if (hidden) {
+        if (summaryEl) addToSummary(summaryEl, cv.component, rule.message);
+      } else {
+        showInline(containerId, comp.id, rule.message);
+        if (summaryEl) removeSummaryEntry(summaryEl, cv.component);
+      }
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/** Only suppress errors from component/element resolution — not contract bugs. */
+function isResolutionError(e: unknown): boolean {
+  if (!(e instanceof Error)) return false;
+  const msg = e.message;
+  return msg.includes("component not found") || msg.includes("element not found");
+}
+
+// -- Helpers --
+
+
+function allRulesConditionallySkipped(rules: ValidationRule[], plan: Plan, ctx?: ExecContext): boolean {
+  if (rules.length === 0) return true;
+  for (const rule of rules) {
+    if (!rule.when) return false;
+    try {
+      const result = evaluateCondition(rule.when, plan, ctx);
+      if (result) return false;
+    } catch (e) {
+      if (isResolutionError(e)) continue;
+      throw e;
+    }
+  }
+  return true;
+}
+
+function clearContainerErrors(
+  containerScope: ContainerScope,
+  plan: Plan,
+  containerId: string,
+  summaryEl: HTMLElement | null,
+): void {
+  if (containerScope.validationRules) {
+    for (const cv of containerScope.validationRules) {
+      const comp = plan.components[cv.component];
+      if (comp) clearInline(containerId, comp.id);
+    }
+  }
   if (summaryEl) {
     clearSummary(summaryEl);
     hideSummaryDiv(summaryEl);
   }
 }
 
-// ── DOM readers (bridge pure modules ↔ DOM) ─────────────
-
-/**
- * Returns true if every rule on this field has a condition AND that condition evaluates to false.
- * Used for fields missing from DOM: if all rules are conditionally suppressed
- * (condition false) or the condition field itself is missing (unresolvable),
- * the field's entire section wasn't rendered — skip it.
- *
- * Unresolvable condition for a missing field = section not rendered = skip.
- * This differs from enriched fields where unresolvable = block (fail-closed).
- */
-function allRulesConditionallySkipped(f: ValidationField, condReader: ConditionReader): boolean {
-  if (f.rules.length === 0) return true;
-  for (const rule of f.rules) {
-    if (!rule.when) return false; // unconditional rule → must block
-    const result = evalCondition(rule.when, condReader);
-    if (result === true) return false; // condition met → must block (field should exist but doesn't)
-  }
-  return true; // all conditions false → skip
+function findComponentKeyByName(containerScope: ContainerScope, name: string): string | undefined {
+  // Plan-driven: each ComponentValidation carries serverFieldName set at C# build time.
+  // No heuristics — the plan declares the mapping.
+  return containerScope.validationRules?.find(
+    cv => cv.serverFieldName === name || cv.component === name
+  )?.component;
 }
 
-function domConditionReader(byName: Map<string, ValidationField>): ConditionReader {
-  return {
-    readConditionSource(fieldName: string): string | undefined {
-      const srcField = byName.get(fieldName);
-      if (!srcField?.fieldId || !srcField.vendor || !srcField.readExpr)
-        return undefined;
-      const el = document.getElementById(srcField.fieldId);
-      if (!el) return undefined;
-      const root = resolveRoot(el, srcField.vendor);
-      const val = walk(root, srcField.readExpr);
-      // Normalize: null/undefined/false → "" (empty = no value expressed)
-      if (val == null || val === false) return "";
-
-      // Date fields: convert to Unix ms string for comparison with C# Unix ms condition values.
-      // C# WhenField<DateTime> serializes via DateTimeOffset.ToUnixTimeMilliseconds().
-      // JS Date.getTime() produces the same Unix ms. String(ms) === String(ms) → exact match.
-      if (srcField.coerceAs === "date") {
-        const dateResult = toDate(val);
-        if (!dateResult.ok) return undefined; // fail-closed
-        if (Number.isNaN(dateResult.value)) return "";
-        const msResult = toString(dateResult.value);
-        return msResult.ok ? msResult.value : "";
-      }
-
-      const result = toString(val);
-      // toString Err means walk returned a plain object (plan misconfiguration).
-      // Return undefined → fail-closed. See: https://github.com/marafiq/alis-reactive/issues/50
-      return result.ok ? result.value : undefined;
-    },
-  };
+function hasSummaryEntry(summaryEl: HTMLElement | null, componentKey: string): boolean {
+  if (!summaryEl) return false;
+  return summaryEl.querySelector(`[data-valmsg-summary-for="${componentKey}"]`) !== null;
 }
 
-function domPeerReader(byName: Map<string, ValidationField>): PeerReader {
-  return {
-    readPeer(fieldName: string): unknown {
-      const other = byName.get(fieldName);
-      if (!other?.fieldId || !other.vendor || !other.readExpr) return undefined;
-      const otherEl = document.getElementById(other.fieldId);
-      if (!otherEl) return undefined;
-      const otherRoot = resolveRoot(otherEl, other.vendor);
-      return walk(otherRoot, other.readExpr);
-    },
-  };
-}
-
-// ── Helpers ─────────────────────────────────────────────
-
-function buildByName(desc: ValidationDescriptor): Map<string, ValidationField> {
-  const map = new Map<string, ValidationField>();
-  for (const f of desc.fields) map.set(f.fieldName, f);
-  return map;
-}
-
-function findErrorSpanExists(fieldName: string, fields: ValidationField[]): boolean {
-  const field = fields.find(f => f.fieldName === fieldName);
-  if (!field?.fieldId) return false;
-  return document.getElementById(field.fieldId + "_error") !== null;
-}
-
-/** Visibility check — owned by orchestrator (routing decision), not error-display. */
 function isHidden(el: HTMLElement): boolean {
   let node: HTMLElement | null = el;
   while (node) {
@@ -315,11 +303,6 @@ function isHidden(el: HTMLElement): boolean {
   return false;
 }
 
-/**
- * Extracts field errors from server response.
- * Accepts only ProblemDetails shape: { errors: Record<string, string[]> }.
- * Rejects arbitrary objects — validation lane should not reinterpret random payloads.
- */
 function extractErrors(data: unknown): Record<string, unknown> | null {
   if (!data || typeof data !== "object") return null;
   const obj = data as Record<string, unknown>;

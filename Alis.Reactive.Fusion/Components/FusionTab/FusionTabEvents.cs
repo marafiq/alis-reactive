@@ -11,8 +11,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionTabEvents() { }
 
         /// <summary>Fires when a tab is selected (SF "selected" event).</summary>
-        public TypedEventDescriptor<FusionTabSelectedArgs> Selected =>
-            new TypedEventDescriptor<FusionTabSelectedArgs>(
+        public TypedEvent<FusionTabSelectedArgs> Selected =>
+            new TypedEvent<FusionTabSelectedArgs>(
                 "selected", new FusionTabSelectedArgs());
     }
 }

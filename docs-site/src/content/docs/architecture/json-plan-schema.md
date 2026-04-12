@@ -29,7 +29,7 @@ C# unit tests validate rendered plans against this schema using `AssertSchemaVal
       "vendor": "fusion",
       "readExpr": "value",
       "componentType": "autocomplete",
-      "coerceAs": "string"
+      "shape": { "kind": "string" }
     }
   },
   "entries": [
@@ -55,7 +55,7 @@ Each component entry carries:
 | `vendor` | Yes | `"native"` or `"fusion"` — determines `resolveRoot()` strategy |
 | `readExpr` | Yes | Dot-path from vendor root to readable value (e.g., `"value"`, `"checked"`) |
 | `componentType` | Yes | Semantic label (e.g., `"datepicker"`, `"numerictextbox"`) |
-| `coerceAs` | Yes | Coercion type inferred from `typeof(TProp)` — `"string"`, `"number"`, `"boolean"`, `"date"`, `"array"`, `"raw"`. Used by gather (daterange decomposition) and validation (field enrichment). |
+| `shape` | Yes | Type contract inferred from `typeof(TProp)` via `Shape.FromClrType()`. Nested object with `kind` (`"string"`, `"number"`, `"boolean"`, `"date"`, `"array"`, `"raw"`), plus `item` for arrays and `inner` for nullable types. Used by gather and validation. |
 
 ---
 
@@ -210,7 +210,7 @@ Used in `when` conditions and conditional reaction branches:
 
 | Kind | Fields | Description |
 |------|--------|-------------|
-| `value` | `source`, `coerceAs`, `op` | Evaluates an operator against a source value |
+| `value` | `source`, `shape`, `op` | Evaluates an operator against a source value |
 | `all` | `guards` (min 2) | All guards must pass (logical AND) |
 | `any` | `guards` (min 2) | At least one guard must pass (logical OR) |
 | `not` | `inner` | Inverts the inner guard |

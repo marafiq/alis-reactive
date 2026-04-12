@@ -18,8 +18,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Fires when the user checks or unchecks any checkbox in the list.
         /// </summary>
-        public TypedEventDescriptor<NativeCheckListChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeCheckListChangeArgs>(
+        public TypedEvent<NativeCheckListChangeArgs> Changed =>
+            new TypedEvent<NativeCheckListChangeArgs>(
                 "change", new NativeCheckListChangeArgs());
     }
 }

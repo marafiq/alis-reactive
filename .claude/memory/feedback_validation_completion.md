@@ -1,13 +1,13 @@
 ---
 name: feedback_validation_completion
-description: Critical design feedback for validation module completion — coerceAs, cross-property, dates, BDD test quality, no dead code
+description: Critical design feedback for validation module completion — shape, cross-property, dates, BDD test quality, no dead code
 type: feedback
 ---
 
 ## Validation Module Completion — User Feedback (2026-03-19)
 
 ### Schema Design Principles
-- `coerceAs` on ValidationRule is derived from `TProperty` — the property expression gives you the type at C# compile time. NEVER guess or infer at runtime.
+- `shape` on ValidationRule is derived from `TProperty` — the property expression gives you the type at C# compile time. NEVER guess or infer at runtime.
 - `field` on ValidationRule for cross-property comparisons — same deterministic ID system as everything else. TModel → prop expression → type known → ID predictable. No new "peer" concept — it's just reading another component with a known ID.
 - Schema must be DETERMINISTIC — no fallbacks, no silent drops. Every FV validator either extracts to a client rule or is explicitly documented as server-only.
 - Rules schema is the heart — design from the schema outward, not implementation inward.
@@ -17,7 +17,7 @@ type: feedback
 - Cross-property reads the other field using the SAME mechanism as everything else: binding path → enriched fieldId → resolveRoot → walk(readExpr). No scanning, no new concepts.
 
 ### Date Handling
-- `coerceAs: "date"` uses existing `toDate()` from `core/coerce.ts` — already handles Date objects (SF components), ISO strings, date-only strings with timezone safety.
+- `shape: "date"` uses existing `toDate()` from `core/coerce.ts` — already handles Date objects (SF components), ISO strings, date-only strings with timezone safety.
 - DateTime constraints serialized as `"YYYY-MM-DD"` (date-only) when time is midnight — `toDate()` parses as LOCAL midnight, timezone-safe.
 - Senior living facilities have different timezones. The UI shows local datetime. The framework compares dates consistently via coercion. Facility timezone is the application's responsibility.
 - User is conflicted about Unix timestamps vs ISO strings. Current decision: ISO strings with `toDate()` handling. May revisit.
@@ -43,8 +43,8 @@ type: feedback
 
 ### No Dead Code, No Fallbacks
 - Replace `Number()` completely with `coerce()` — don't leave old code paths.
-- If `coerceAs` is not set, the comparison should use a deterministic default (number for backward compatibility), but this should be explicit in the schema, not a silent fallback.
-- `peerReader.readPeer()` should return `unknown` (raw value) not `string` — the rule engine coerces via `coerceAs`.
+- If `shape` is not set, the comparison should use a deterministic default (number for backward compatibility), but this should be explicit in the schema, not a silent fallback.
+- `peerReader.readPeer()` should return `unknown` (raw value) not `string` — the rule engine coerces via `shape`.
 
 ### Native Compound Components (Radio Group + CheckList)
 - Inline init scripts (same pattern as SF) — NO DOM scanning modules.

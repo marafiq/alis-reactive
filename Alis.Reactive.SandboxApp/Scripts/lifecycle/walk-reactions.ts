@@ -1,43 +1,47 @@
-// walk-reactions.ts — Shared reaction tree walker
-//
-// The reaction tree has a consistent shape:
-//   sequential → no requests (skip)
-//   http → one request (may have chained)
-//   parallel-http → N requests
-//   conditional → recurse into branches
-//
-// Multiple modules need to walk this tree to visit validation descriptors:
-//   - enrichment.ts: enrich fields from components
-//   - boot.ts: wire live-clearing per validation descriptor
-//
-// This module extracts the shared walk so each consumer provides only the leaf action.
+// walk-reactions.ts — V3 reaction tree walker.
+// Walks the reaction tree visiting each Request found.
+// Used by modules that need to traverse the reaction tree.
 
-import type { Entry, Reaction, ValidationDescriptor, RequestDescriptor } from "../types";
+import type { Behavior, Reaction, Request } from "../types";
+import { assertNever } from "../core/assert-never";
 
-type ValidationVisitor = (desc: ValidationDescriptor) => void;
+type RequestVisitor = (req: Request) => void;
 
-/** Walk all entries, visiting each ValidationDescriptor found in the reaction tree. */
-export function walkValidationDescriptors(entries: Entry[], visitor: ValidationVisitor): void {
-  for (const entry of entries) {
-    walkReaction(entry.reaction, visitor);
+/** Walk all behaviors, visiting each Request found in the reaction tree. */
+export function walkRequests(behaviors: Behavior[], visitor: RequestVisitor): void {
+  for (const behavior of behaviors) {
+    walkReaction(behavior.reaction, visitor);
   }
 }
 
-function walkReaction(reaction: Reaction, visitor: ValidationVisitor): void {
+function walkReaction(reaction: Reaction, visitor: RequestVisitor): void {
   switch (reaction.kind) {
-    case "http":
+    case "sequence":
+      for (const step of reaction.steps) walkReaction(step, visitor);
+      break;
+    case "parallel":
+      for (const step of reaction.steps) walkReaction(step, visitor);
+      if (reaction.onSettled) walkReaction(reaction.onSettled, visitor);
+      break;
+    case "branch":
+      for (const c of reaction.cases) walkReaction(c.reaction, visitor);
+      break;
+    case "request":
       walkRequest(reaction.request, visitor);
       break;
-    case "parallel-http":
-      for (const req of reaction.requests) walkRequest(req, visitor);
+    case "set":
+    case "call":
+    case "dispatch":
+    case "inject":
+    case "show-validation-errors":
+      // Leaf reactions — no nested requests to walk
       break;
-    case "conditional":
-      for (const branch of reaction.branches) walkReaction(branch.reaction, visitor);
-      break;
+    default:
+      assertNever(reaction, "reaction kind");
   }
 }
 
-function walkRequest(req: RequestDescriptor, visitor: ValidationVisitor): void {
-  if (req.validation) visitor(req.validation);
-  if (req.chained) walkRequest(req.chained, visitor);
+function walkRequest(req: Request, visitor: RequestVisitor): void {
+  visitor(req);
+  if (req.next) walkRequest(req.next, visitor);
 }

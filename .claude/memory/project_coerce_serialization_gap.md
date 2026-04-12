@@ -1,6 +1,6 @@
 ---
 name: Coerce first-class module — session complete
-description: CoerceResult pattern, ComponentRegistration.CoerceAs, Unix ms for WhenField<DateTime>, DateRangePicker readExpr "value" with DateTime[] — PR #49 ready for merge
+description: CoerceResult pattern, ComponentRegistration.Shape, Unix ms for WhenField<DateTime>, DateRangePicker readExpr "value" with DateTime[] — PR #49 ready for merge
 type: project
 ---
 
@@ -13,17 +13,17 @@ type: project
 ### What Was Delivered (4 Tasks + Bug Fixes + Docs)
 
 1. **Task 1: CoerceResult<T> pattern** — all coerce functions return Result (never throw). ESLint bans raw String(). coerceOrThrow for mutations.
-2. **Task 2: ComponentRegistration.CoerceAs** — typeof(TProp) flows C# → plan JSON → TS. Enrichment propagates.
-3. **Task 3: Unix ms for WhenField<DateTime>** — validation conditions serialize DateTime as Unix ms. domConditionReader uses coerceAs "date" → toDate → Unix ms string.
+2. **Task 2: ComponentRegistration.Shape** — typeof(TProp) flows C# → plan JSON → TS. Enrichment propagates.
+3. **Task 3: Unix ms for WhenField<DateTime>** — validation conditions serialize DateTime as Unix ms. domConditionReader uses shape "date" → toDate → Unix ms string.
 4. **Task 4: DateRangePicker readExpr "value"** — reads [Date, Date] from ej2.value. Model DateTime[]. Zero TS runtime changes for array handling (existing emitArray works).
 
 **Bug fixes from PR review:**
 - F2: DateOnly not handled in SerializeDateConstraint → added branch
 - F3: Exception message missing fields → include all 5 fields
 - F5: live-clear wiredFields.add before getElementById → moved after element check
-- AddToComponentsMap idempotency check → compare CoerceAs too
+- AddToComponentsMap idempotency check → compare Shape too
 
-**Schema:** ValidationField enriched properties declared. ValidationRule.coerceAs → $ref to shared CoercionType.
+**Schema:** ValidationField enriched properties declared. ValidationRule.shape → $ref to shared CoercionType.
 **CLAUDE.md:** Rule 3a (schema changes require failing test first). Stale refs fixed (root.ts, data-reactive-plan, design-system.css).
 **Docs site:** runtime.mdx (coercion section + dependency graph), json-plan-schema.md (ComponentEntry fields), fusion-components.md (DateRangePicker rewritten).
 

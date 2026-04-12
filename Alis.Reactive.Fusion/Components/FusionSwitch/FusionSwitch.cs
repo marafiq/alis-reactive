@@ -10,6 +10,6 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionSwitch : FusionComponent, IInputComponent
     {
         /// <inheritdoc />
-        public string ReadExpr => "checked";
+        public string ValueMember => "checked";
     }
 }

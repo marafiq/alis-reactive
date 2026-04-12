@@ -1,7 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -22,22 +21,16 @@ namespace Alis.Reactive.Fusion.Components
 
         public static FusionAccordionBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionAccordionBuilder<TModel> builder,
-            Func<FusionAccordionEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<FusionAccordionEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
             var descriptor = eventSelector(FusionAccordionEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
+            var pb = new PipelineBuilder<TModel>(builder.Plan.Context);
             pipeline(descriptor.Args, pb);
 
-            var trigger = new ComponentEventTrigger(
-                builder.ElementId,
-                descriptor.JsEvent,
-                Component.Vendor,
-                builder.ElementId);       // bindingPath = elementId for non-input
+            builder.Plan.Context.WireComponentEvent(builder.ElementId, Component.Vendor, descriptor.JsEvent, pb.BuildReactions());
 
-            foreach (var reaction in pb.BuildReactions())
-                builder.Plan.AddEntry(new Entry(trigger, reaction));
 
             return builder;
         }

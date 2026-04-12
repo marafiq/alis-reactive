@@ -13,7 +13,7 @@ A trigger defines *when* a pipeline executes. Every reactive behavior starts wit
 
 ```csharp
 @{
-    IReactivePlan<MyModel> plan = new ReactivePlan<MyModel>();
+    var plan = Html.ReactivePlan<MyModel>();
 
     // These three calls can appear in any order — they all just add entries to `plan`
     Html.On(plan, t => t.DomReady(p => p.Dispatch("init")));

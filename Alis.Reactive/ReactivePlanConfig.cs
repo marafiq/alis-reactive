@@ -18,7 +18,7 @@ namespace Alis.Reactive
 
         /// <summary>
         /// Registers the validation extractor that converts FluentValidation rules to
-        /// client-side validation descriptors.
+        /// client-side validation rules.
         /// </summary>
         /// <remarks>
         /// Must be called exactly once at app startup. Calling it a second time throws

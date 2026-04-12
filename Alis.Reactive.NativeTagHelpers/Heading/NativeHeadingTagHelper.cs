@@ -7,12 +7,13 @@ namespace Alis.Reactive.NativeTagHelpers.Heading;
 public class NativeHeadingTagHelper : TagHelper
 {
     public HeadingLevel Level { get; set; } = HeadingLevel.H2;
+    public ElementSpacing Spacing { get; set; } = ElementSpacing.Sm;
     public string? Overline { get; set; }
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        HeadingRenderer.Render(output, Level, Overline, CssClass);
+        HeadingRenderer.Render(output, Level, Spacing, Overline, CssClass);
     }
 }

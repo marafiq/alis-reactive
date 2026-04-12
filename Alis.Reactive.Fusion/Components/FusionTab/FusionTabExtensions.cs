@@ -1,4 +1,4 @@
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -21,10 +21,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         public static ComponentRef<FusionTab, TModel> Select<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class
-            => self.Emit(new CallMutation("select", args: new MethodArg[]
-            {
-                new LiteralArg(index)
-            }));
+            => self.EmitCall("select", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index) });
 
         /// <summary>
         /// Shows or hides a tab by index: ej2.hideTab(index, isHidden).
@@ -32,18 +29,13 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionTab, TModel> HideTab<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index, bool isHidden = true)
             where TModel : class
-            => self.Emit(new CallMutation("hideTab", args: new MethodArg[]
-            {
-                new LiteralArg(index),
-                new LiteralArg(isHidden)
-            }));
+            => self.EmitCall("hideTab", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index), ValueProducer.Literal(isHidden) });
 
         /// <summary>
         /// Sets the selected tab index via property: ej2.selectedItem = index.
         /// </summary>
         public static ComponentRef<FusionTab, TModel> SetSelectedItem<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class
-            => self.Emit(new SetPropMutation("selectedItem", coerce: "number"),
-                value: index.ToString());
+            => self.EmitSet("selectedItem", ValueProducer.Literal(index));
     }
 }

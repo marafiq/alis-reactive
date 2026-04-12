@@ -426,13 +426,9 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await FillAllRequiredFields();
         await SubmitFormDataAndWaitForEcho();
 
-        // FormData encoding may round-trip fewer fields than JSON (e.g., booleans,
-        // arrays serialize differently via multipart/form-data). Verify the server
-        // received a substantial number of fields proving gather worked.
-        var fieldCountText = await Page.Locator("#echo-field-count").TextContentAsync();
-        var fieldCount = int.Parse(fieldCountText!);
-        Assert.That(fieldCount, Is.GreaterThanOrEqualTo(14),
-            "FormData POST should gather at least 14 of 20 fields");
+        // All 20 onboarded input components must gather into the FormData POST.
+        await Expect(Page.Locator("#echo-field-count"))
+            .ToHaveTextAsync("20", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 

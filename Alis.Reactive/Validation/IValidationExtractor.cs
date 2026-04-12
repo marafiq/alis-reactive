@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Alis.Reactive.Validation
 {
@@ -8,6 +9,6 @@ namespace Alis.Reactive.Validation
     /// </summary>
     public interface IValidationExtractor
     {
-        ValidationDescriptor? ExtractRules(Type validatorType, string formId);
+        List<ValidationField> ExtractRules(Type validatorType, string formId);
     }
 }

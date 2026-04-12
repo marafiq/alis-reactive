@@ -1,0 +1,61 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs.OperatorConditionModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
+@{
+    ViewData["Title"] = "Operator Conditions — Gte, Lt, In, Contains, NotEmpty";
+    var plan = Html.ReactivePlan<OperatorConditionModel>();
+}
+
+<h1>New Operator Conditions</h1>
+
+<form id="op-form" class="space-y-4 p-4">
+    @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))
+       .NativeTextBox(b => b.Placeholder("Age").CssClass("border px-2 py-1")); }
+
+    @{ Html.InputField(plan, m => m.Salary, o => o.Label("Salary"))
+       .NativeTextBox(b => b.Placeholder("Salary").CssClass("border px-2 py-1")); }
+
+    @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
+       .NativeDropDown(b => b
+           .Items(new[] {
+               new SelectListItem("-- Select --", ""),
+               new SelectListItem("Independent", "independent"),
+               new SelectListItem("Assisted", "assisted"),
+               new SelectListItem("Memory Care", "memory-care"),
+               new SelectListItem("Skilled Nursing", "skilled-nursing")
+           })
+           .CssClass("border px-2 py-1")); }
+
+    @{ Html.InputField(plan, m => m.Email, o => o.Label("Email"))
+       .NativeTextBox(b => b.Placeholder("Email").CssClass("border px-2 py-1")); }
+
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Name"))
+       .NativeTextBox(b => b.Placeholder("Name").CssClass("border px-2 py-1")); }
+
+    @{ Html.InputField(plan, m => m.Notes, o => o.Label("Notes"))
+       .NativeTextBox(b => b.Placeholder("Notes").CssClass("border px-2 py-1")); }
+
+    @{ Html.InputField(plan, m => m.Phone, o => o.Label("Phone"))
+       .NativeTextBox(b => b.Placeholder("Phone").CssClass("border px-2 py-1")); }
+
+    @{ Html.InputField(plan, m => m.JobTitle, o => o.Label("Job Title"))
+       .NativeTextBox(b => b.Placeholder("Job title").CssClass("border px-2 py-1")); }
+
+    @{ Html.InputField(plan, m => m.MiddleName, o => o.Label("Middle Name"))
+       .NativeTextBox(b => b.Placeholder("Middle name").CssClass("border px-2 py-1")); }
+
+    @(Html.NativeButton("submit-btn", "Submit")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post("/Sandbox/Validation/NestedBugs/SubmitOperatorConditions", g => g.IncludeAll())
+             .Validate<OperatorConditionValidator>("op-form")
+             .Response(r => r
+                .OnSuccess(s => s.Element("result").SetText("Saved"))
+                .OnError(400, e => e.ValidationErrors("op-form")));
+        }))
+
+    <div id="result" class="mt-2 text-green-600"></div>
+</form>
+
+@Html.RenderPlan(plan)

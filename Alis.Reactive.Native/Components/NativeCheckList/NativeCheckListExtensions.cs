@@ -1,8 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -29,7 +28,10 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self, string[] value)
             where TModel : class
         {
-            return self.Emit(new SetPropMutation("value"), value: value);
+            var items = new System.Collections.Generic.List<ValueProducer>();
+            foreach (var v in value)
+                items.Add(ValueProducer.Literal(v));
+            return self.EmitSet("value", ValueProducer.Array(items));
         }
 
         /// <summary>
@@ -47,7 +49,7 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.Emit(new SetPropMutation("value"), source: new EventSource(sourcePath));
+            return self.EmitSet("value", ValueProducer.Read(PayloadSource.Event(), "value", Path.Parse(sourcePath)));
         }
 
         /// <summary>
@@ -59,7 +61,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("focus"));
+            return self.EmitCall("focus");
         }
 
         /// <summary>
@@ -71,7 +73,9 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class
         {
-            return new TypedComponentSource<string[]>(self.TargetId, _component.Vendor, _component.ReadExpr);
+            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
+            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.ArrayOf(Shape.String), "read");
+            return new TypedComponentSource<string[]>(self.TargetId, _component.Vendor, _component.ValueMember);
         }
     }
 }

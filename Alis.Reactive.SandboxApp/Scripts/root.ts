@@ -1,17 +1,23 @@
 // root.ts — ESM entry point for alis-reactive runtime
 // esbuild bundles from here. Auto-discovers [data-reactive-plan] elements on page load.
-// Lives at Scripts/ root by design — everything else is organized in subdirectories.
+// V3: plans have version, planId, types, components, behaviors.
 
 import { boot, trace } from "./lifecycle/boot";
 import { init as initConfirm } from "./components/fusion/confirm";
 import { initNativeActionLinks } from "./components/native/native-action-link";
 import "./components/native/drawer";  // side-effect: wires close button + Escape key
 import "./components/native/loader";  // side-effect: handles target positioning + timeout
-// NativeCheckList and NativeRadioGroup use inline init scripts (same pattern as SF).
-// No side-effect imports needed — builders ship JS with HTML.
 import { composeInitialPlans } from "./lifecycle/merge-plan";
 import type { Plan } from "./types";
 import type { TraceLevel } from "./core/trace";
+import { registerPlugin } from "./core/plugin-registry";
+
+// Drain passive plugin queue — plugins push here from separate bundles before framework loads
+const pendingPlugins = (window as any).__alisPlugins as Array<{ name: string; instance: unknown }> | undefined;
+if (pendingPlugins) {
+  for (const entry of pendingPlugins) registerPlugin(entry.name, entry.instance);
+  delete (window as any).__alisPlugins;
+}
 
 initConfirm();
 initNativeActionLinks();
@@ -24,7 +30,9 @@ for (const el of planEls) {
   if (traceLevel) trace.setLevel(traceLevel);
 
   try {
-    plans.push(JSON.parse(el.textContent!));
+    const text = el.textContent?.trim();
+    if (!text) throw new Error("[alis] empty plan element");
+    plans.push(JSON.parse(text));
   } catch (e) {
     throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(e as Error).message}`);
   }

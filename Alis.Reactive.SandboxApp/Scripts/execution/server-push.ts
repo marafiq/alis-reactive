@@ -1,35 +1,35 @@
-import type { ServerPushTrigger, Reaction, ComponentEntry } from "../types";
+// server-push.ts — SSE (EventSource) trigger wiring.
+// Uses ServerPushTrigger from the plan schema.
+
+import type { ServerPushTrigger, Reaction, Plan } from "../types";
 import { executeReaction } from "./execute";
-import { showRetryIndicators, removeRetryIndicators, firstMutationTarget } from "./retry-indicator";
+import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
 import { scope } from "../core/trace";
 
 const log = scope("server-push");
 
-interface WiredEntry {
+interface WiredBehavior {
   readonly trigger: ServerPushTrigger;
   readonly reaction: Reaction;
-  readonly components?: Record<string, ComponentEntry>;
+  readonly plan: Plan;
 }
 
 interface ManagedSource {
   readonly es: EventSource;
   readonly targetIds: Set<string>;
-  readonly wired: WiredEntry[];
+  readonly wired: WiredBehavior[];
   stopping: boolean;
 }
 
 // Connection pool — singleton EventSource per URL
 const sources = new Map<string, ManagedSource>();
 
-function retrySSE(url: string, entries: readonly WiredEntry[]): void {
+function retrySSE(url: string, behaviors: readonly WiredBehavior[]): void {
   removeRetryIndicators(url);
   log.info("manual retry", { url });
 
-  // Re-wire all triggers — creates a fresh EventSource and re-registers handlers.
-  // Signal is intentionally omitted — the original abort context is no longer
-  // meaningful for a fresh connection after manual retry.
-  for (const entry of entries) {
-    wireServerPush(entry.trigger, entry.reaction, entry.components);
+  for (const b of behaviors) {
+    wireServerPush(b.trigger, b.reaction, b.plan);
   }
 }
 
@@ -39,7 +39,7 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
 
   const es = new EventSource(url);
   const targetIds = new Set<string>();
-  const wired: WiredEntry[] = [];
+  const wired: WiredBehavior[] = [];
 
   es.onopen = () => {
     log.debug("connected", { url });
@@ -54,8 +54,8 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
       log.error("connection closed permanently", { url });
       sources.delete(url);
       if (managed && managed.targetIds.size > 0) {
-        const entries = managed.wired;
-        showRetryIndicators(url, managed.targetIds, () => retrySSE(url, entries));
+        const wiredBehaviors = managed.wired;
+        showRetryIndicators(url, managed.targetIds, () => retrySSE(url, wiredBehaviors));
       }
     } else {
       log.warn("connection error (reconnecting)", { url });
@@ -81,30 +81,23 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
 export function wireServerPush(
   trigger: ServerPushTrigger,
   reaction: Reaction,
-  components?: Record<string, ComponentEntry>,
-  signal?: AbortSignal
+  plan: Plan,
+  signal?: AbortSignal,
 ): void {
   const managed = getOrCreate(trigger.url, signal);
 
-  // Track the first target element for retry indicator placement
-  const target = firstMutationTarget(reaction);
-  if (target) managed.targetIds.add(target);
-
-  // Store wiring info for retry re-registration (signal omitted — see retrySSE)
-  managed.wired.push({ trigger, reaction, components });
+  managed.wired.push({ trigger, reaction, plan });
 
   const handler = (e: MessageEvent) => {
-    // Framework only supports JSON payloads — non-JSON is a server-side bug.
-    // Throw immediately so the developer fixes their SSE endpoint.
     const evt: Record<string, unknown> = JSON.parse(e.data);
-    log.debug("message", { url: trigger.url, eventType: trigger.eventType });
-    executeReaction(reaction, { evt, components }).catch(err =>
-      log.error("reaction failed", { error: String(err) }));
+    log.debug("message", { url: trigger.url, event: trigger.event });
+    const result = executeReaction(reaction, plan, { event: evt });
+    if (result instanceof Promise) {
+      result.catch(err => log.error("reaction failed", { error: String(err) }));
+    }
   };
 
-  // Always use addEventListener — onmessage assignment overwrites previous handlers
-  // when multiple triggers share the same URL without an eventType.
-  const eventName = trigger.eventType ?? "message";
+  const eventName = trigger.event ?? "message";
   managed.es.addEventListener(eventName, handler as EventListener);
-  log.debug("listening", { url: trigger.url, eventType: eventName });
+  log.debug("listening", { url: trigger.url, event: eventName });
 }

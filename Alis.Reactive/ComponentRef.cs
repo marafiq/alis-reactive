@@ -1,18 +1,13 @@
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
 {
     /// <summary>
     /// Typed reference to a component instance on the page.
-    /// Returned by p.Component&lt;T&gt;(). Vendor-specific extension methods
-    /// constrain TComponent to add mutation methods (SetValue, Show, etc.).
-    ///
-    /// The ref itself is vendor-agnostic — each extension method creates a
-    /// discriminated Mutation (set-prop, call).
-    /// Runtime resolves vendor root via resolveRoot, then switches on mutation.kind.
+    /// Returned by p.Component&lt;T&gt;(). Vendor-specific extensions add
+    /// mutation methods (SetValue, Show, Focus, etc.) that emit
+    /// Set/Call reactions on the component's source.
     /// </summary>
     public class ComponentRef<TComponent, TModel>
         where TComponent : IComponent, new()
@@ -21,28 +16,44 @@ namespace Alis.Reactive
         private static readonly TComponent _instance = new TComponent();
 
         internal string TargetId { get; }
-        internal ICommandEmitter Emitter { get; }
+        internal PipelineBuilder<TModel> Pipeline { get; }
 
         internal ComponentRef(string targetId, PipelineBuilder<TModel> pipeline)
         {
             TargetId = targetId;
-            Emitter = pipeline;
+            Pipeline = pipeline;
         }
 
         /// <summary>
-        /// Emits a MutateElementCommand with a discriminated Mutation.
-        /// Called by vendor extension methods — not by DSL users directly.
-        /// Vendor is resolved from the cached TComponent instance.
+        /// Emits a Set reaction on this component.
+        /// Called by vendor extension methods.
+        /// Uses the component's actual vendor (not hardcoded "native").
         /// </summary>
-        internal ComponentRef<TComponent, TModel> Emit(
-            Mutation mutation,
-            object? value = null,
-            BindSource? source = null)
+        internal ComponentRef<TComponent, TModel> EmitSet(
+            string property, ValueProducer value)
         {
-            Emitter.AddCommand(new MutateElementCommand(
-                TargetId, mutation, value, source, vendor: _instance.Vendor));
+            var componentKey = Pipeline.Context.EnsureComponent(TargetId, Vendor);
+            Pipeline.Context.EnsureProperty(componentKey, property, property, Shape.Any, "write");
+            Pipeline.Steps.Add(Reaction.Set(
+                ComponentSource.Of(componentKey), property, value));
             return this;
         }
 
+        /// <summary>
+        /// Emits a Call reaction on this component.
+        /// Called by vendor extension methods.
+        /// Uses the component's actual vendor (not hardcoded "native").
+        /// </summary>
+        internal ComponentRef<TComponent, TModel> EmitCall(
+            string method, System.Collections.Generic.List<ValueProducer>? args = null)
+        {
+            var componentKey = Pipeline.Context.EnsureComponent(TargetId, Vendor);
+            Pipeline.Context.EnsureMethod(componentKey, method, method);
+            Pipeline.Steps.Add(Reaction.Call(
+                ComponentSource.Of(componentKey), method, args));
+            return this;
+        }
+
+        internal string Vendor => _instance.Vendor;
     }
 }

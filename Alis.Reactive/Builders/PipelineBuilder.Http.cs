@@ -5,82 +5,78 @@ namespace Alis.Reactive.Builders
 {
     public partial class PipelineBuilder<TModel> where TModel : class
     {
-        // ── HTTP Request Methods ──
-
-        /// <summary>Starts a GET request to the given URL.</summary>
+        /// <summary>Starts an HTTP GET request to the specified URL.</summary>
+        /// <param name="url">The request URL, which may contain template placeholders.</param>
+        /// <returns>An HTTP request builder for configuring gather, validation, and response handling.</returns>
         public HttpRequestBuilder<TModel> Get(string url)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(Context);
             _httpBuilder.SetVerb("GET").SetUrl(url);
             return _httpBuilder;
         }
 
-        /// <summary>Starts a POST request to the given URL.</summary>
+        /// <summary>Starts an HTTP POST request to the specified URL.</summary>
+        /// <param name="url">The request URL, which may contain template placeholders.</param>
+        /// <returns>An HTTP request builder for configuring gather, validation, and response handling.</returns>
         public HttpRequestBuilder<TModel> Post(string url)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(Context);
             _httpBuilder.SetVerb("POST").SetUrl(url);
             return _httpBuilder;
         }
 
-        /// <summary>Starts a POST request with a gather configuration.</summary>
-        /// <remarks>
-        /// <code>
-        /// p.Post("/api/save", gather: g =&gt; g.IncludeAll())
-        ///  .Response(response: r =&gt; r.OnSuccess(pipeline: s =&gt; s.Into("result")));
-        /// </code>
-        /// </remarks>
+        /// <summary>Starts an HTTP POST with inline gather configuration.</summary>
         public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(Context);
             _httpBuilder.SetVerb("POST").SetUrl(url);
             _httpBuilder.Gather(gather);
             return _httpBuilder;
         }
 
-        /// <summary>Starts a PUT request with a gather configuration.</summary>
+        /// <summary>Starts an HTTP PUT with inline gather configuration.</summary>
         public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(Context);
             _httpBuilder.SetVerb("PUT").SetUrl(url);
             _httpBuilder.Gather(gather);
             return _httpBuilder;
         }
 
-        /// <summary>Starts a DELETE request to the given URL.</summary>
+        /// <summary>Starts an HTTP DELETE request to the specified URL.</summary>
+        /// <param name="url">The request URL, which may contain template placeholders.</param>
+        /// <returns>An HTTP request builder for configuring gather, validation, and response handling.</returns>
         public HttpRequestBuilder<TModel> Delete(string url)
         {
             SetMode(PipelineMode.Http);
-            _httpBuilder = new HttpRequestBuilder<TModel>();
+            _httpBuilder = new HttpRequestBuilder<TModel>(Context);
             _httpBuilder.SetVerb("DELETE").SetUrl(url);
             return _httpBuilder;
         }
 
-        /// <summary>Starts parallel HTTP requests that fire concurrently.</summary>
+        /// <summary>Executes multiple HTTP requests concurrently.</summary>
         public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
         {
             SetMode(PipelineMode.Parallel);
-            _parallelBuilder = new ParallelBuilder<TModel>();
+            _parallelBuilder = new ParallelBuilder<TModel>(Context);
             foreach (var branch in branches)
-            {
                 _parallelBuilder.AddBranch(branch);
-            }
             return _parallelBuilder;
         }
 
         private void SetMode(PipelineMode mode)
         {
-            if (_mode == mode || _mode == PipelineMode.Sequential)
+            if (_mode == PipelineMode.Sequential)
             {
                 _mode = mode;
                 return;
             }
-
-            // Transitioning between non-Sequential modes — flush current segment first
+            // Re-entering the same non-Sequential mode (e.g., Http -> Http)
+            // must flush the previous segment first to avoid silently discarding it.
             FlushSegment();
             _mode = mode;
         }

@@ -45,7 +45,7 @@
 - See [validation-roadmap.md](validation-roadmap.md) — broader roadmap
 - Plan: `docs/superpowers/plans/2026-03-19-validation-completion.md`
 - Conditional parity VERIFIED (all 11 existing rule types work under WhenField)
-- NEXT: Execute plan — coerceAs, field, 23 rule types, 100% extraction, Playwright
+- NEXT: Execute plan — Shape, field, 23 rule types, 100% extraction, Playwright
 - readExpr as object — separate plan needed (DateRangePicker start/end)
 
 ## Validation Deep Audit (March 2026)

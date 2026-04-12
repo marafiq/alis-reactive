@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Dialog — Event Explorer</title>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/material.css" />
+    <script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui; margin: 0; padding: 20px; background: #f5f5f5; }
+        h1 { margin: 0 0 10px; font-size: 1.4rem; }
+        .layout { display: flex; gap: 20px; height: calc(100vh - 80px); }
+        .demo-panel { flex: 1; background: white; border-radius: 8px; padding: 20px; }
+        .log-panel { width: 400px; background: #1e1e1e; color: #d4d4d4; border-radius: 8px;
+                     overflow-y: auto; padding: 12px; font-family: monospace; font-size: 12px; }
+        .log-entry { margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 8px; }
+        .log-event { color: #569cd6; font-weight: bold; }
+        .log-time { color: #808080; font-size: 10px; }
+        .log-data { color: #ce9178; white-space: pre-wrap; max-height: 150px; overflow-y: auto; }
+        .controls { margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .controls button { padding: 6px 14px; border: 1px solid #ccc; border-radius: 4px;
+                          background: white; cursor: pointer; font-size: 13px; }
+        #clear-btn { background: #ff4444; color: white; border-color: #ff4444; }
+        .btn-primary { background: #1a73e8; color: white; border-color: #1a73e8; }
+
+        /* Form inside dialog */
+        .form-row { margin-bottom: 12px; }
+        .form-row label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
+        .form-row input, .form-row select, .form-row textarea {
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;
+        }
+        .form-row textarea { height: 60px; resize: vertical; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h1>SF Dialog Event Explorer</h1>
+        <button id="clear-btn" onclick="clearLog()">Clear Log</button>
+        <button class="btn-primary" onclick="callMethod('showModal')">Open Modal Dialog</button>
+        <button onclick="callMethod('showNonModal')">Open Non-Modal</button>
+        <button onclick="callMethod('showConfirm')">Confirm Dialog</button>
+        <button onclick="callMethod('showForm')">Edit Assignment Form</button>
+        <button onclick="callMethod('hide')">Hide All</button>
+    </div>
+
+    <div class="layout">
+        <div class="demo-panel">
+            <h3>Dialog Targets</h3>
+            <p>Click the buttons above to open different dialog types. Watch the event log on the right.</p>
+
+            <!-- Modal Dialog -->
+            <div id="modal-dialog" style="display:none;">
+                <p>This is a <strong>modal dialog</strong>. The overlay blocks interaction with the page.</p>
+                <p>SF Schedule uses this pattern for its built-in event editor.</p>
+            </div>
+
+            <!-- Non-modal Dialog -->
+            <div id="nonmodal-dialog" style="display:none;">
+                <p>This is a <strong>non-modal dialog</strong>. You can still interact with the page behind it.</p>
+            </div>
+
+            <!-- Confirm Dialog -->
+            <div id="confirm-dialog" style="display:none;">
+                <p>Are you sure you want to <strong>delete this shift assignment</strong>?</p>
+                <p style="color: #666; font-size: 13px;">This action cannot be undone. The staff member will need to be reassigned.</p>
+            </div>
+
+            <!-- Edit Assignment Form Dialog -->
+            <div id="form-dialog" style="display:none;">
+                <div class="form-row">
+                    <label>Staff Member</label>
+                    <select id="form-staff">
+                        <option value="">— Select Staff —</option>
+                        <option value="jane">Jane Blonde (CNA)</option>
+                        <option value="mike">Mike Ross (RN)</option>
+                        <option value="sarah">Sarah Connor (CNA)</option>
+                        <option value="tom">Tom Hardy (LPN)</option>
+                        <option value="lisa">Lisa Chen (RN)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Shift</label>
+                    <select id="form-shift">
+                        <option value="am">AM (6:00 AM - 2:00 PM)</option>
+                        <option value="pm">PM (2:00 PM - 10:00 PM)</option>
+                        <option value="night">Night (10:00 PM - 6:00 AM)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Date</label>
+                    <input type="date" id="form-date" />
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <textarea id="form-notes" placeholder="Care instructions, special requirements..."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="log-panel" id="log"></div>
+    </div>
+
+    <script>
+        var logEl = document.getElementById('log');
+        var dialogs = {};
+
+        function log(eventName, data) {
+            var entry = document.createElement('div');
+            entry.className = 'log-entry';
+            var time = new Date().toLocaleTimeString();
+            var clean = {};
+            if (data) {
+                ['name', 'type', 'cancel', 'isInteracted', 'target', 'element',
+                 'container', 'event', 'header', 'content', 'visible'
+                ].forEach(function(key) {
+                    if (data[key] !== undefined) {
+                        if (key === 'target' || key === 'element' || key === 'container' || key === 'event') {
+                            clean[key] = '[DOM]';
+                        } else {
+                            try { clean[key] = data[key]; } catch(e) { clean[key] = '[error]'; }
+                        }
+                    }
+                });
+            }
+            entry.innerHTML = '<div class="log-time">' + time + '</div>' +
+                '<div class="log-event">' + eventName + '</div>' +
+                '<div class="log-data">' + JSON.stringify(clean, null, 2) + '</div>';
+            logEl.insertBefore(entry, logEl.firstChild);
+        }
+
+        function clearLog() { logEl.innerHTML = ''; }
+
+        function makeEvents(prefix) {
+            return {
+                beforeOpen: function(args) { log(prefix + '.beforeOpen', args); },
+                open: function(args) { log(prefix + '.open', args); },
+                beforeClose: function(args) { log(prefix + '.beforeClose', args); },
+                close: function(args) { log(prefix + '.close', args); },
+                overlayClick: function(args) { log(prefix + '.overlayClick', args); },
+                created: function() { log(prefix + '.created', {}); },
+                destroyed: function() { log(prefix + '.destroyed', {}); },
+            };
+        }
+
+        // Modal Dialog
+        dialogs.modal = new ej.popups.Dialog(Object.assign({
+            header: 'Modal Dialog',
+            content: document.getElementById('modal-dialog'),
+            isModal: true,
+            showCloseIcon: true,
+            width: '450px',
+            visible: false,
+            animationSettings: { effect: 'Zoom' },
+            buttons: [
+                { click: function() { log('BUTTON: OK clicked', {}); dialogs.modal.hide(); },
+                  buttonModel: { content: 'OK', isPrimary: true } },
+                { click: function() { log('BUTTON: Cancel clicked', {}); dialogs.modal.hide(); },
+                  buttonModel: { content: 'Cancel' } }
+            ]
+        }, makeEvents('modal')));
+        dialogs.modal.appendTo('#modal-dialog');
+
+        // Non-modal Dialog
+        var nonmodalDiv = document.createElement('div');
+        nonmodalDiv.id = 'nonmodal-container';
+        document.body.appendChild(nonmodalDiv);
+        dialogs.nonmodal = new ej.popups.Dialog(Object.assign({
+            header: 'Non-Modal Dialog',
+            content: '<p>This dialog does not block page interaction.</p>',
+            isModal: false,
+            showCloseIcon: true,
+            width: '350px',
+            visible: false,
+            position: { X: 'right', Y: 'top' },
+        }, makeEvents('nonmodal')));
+        dialogs.nonmodal.appendTo('#nonmodal-container');
+
+        // Confirm Dialog
+        dialogs.confirm = new ej.popups.Dialog(Object.assign({
+            header: 'Confirm Delete',
+            content: document.getElementById('confirm-dialog'),
+            isModal: true,
+            showCloseIcon: false,
+            width: '400px',
+            visible: false,
+            buttons: [
+                { click: function() { log('CONFIRM: Delete confirmed', {}); dialogs.confirm.hide(); },
+                  buttonModel: { content: 'Delete', cssClass: 'e-danger', isPrimary: true } },
+                { click: function() { log('CONFIRM: Cancelled', {}); dialogs.confirm.hide(); },
+                  buttonModel: { content: 'Keep' } }
+            ]
+        }, makeEvents('confirm')));
+        dialogs.confirm.appendTo('#confirm-dialog');
+
+        // Form Dialog (Edit Assignment)
+        dialogs.form = new ej.popups.Dialog(Object.assign({
+            header: 'Edit Shift Assignment',
+            content: document.getElementById('form-dialog'),
+            isModal: true,
+            showCloseIcon: true,
+            width: '500px',
+            visible: false,
+            buttons: [
+                { click: function() {
+                    var data = {
+                        staff: document.getElementById('form-staff').value,
+                        shift: document.getElementById('form-shift').value,
+                        date: document.getElementById('form-date').value,
+                        notes: document.getElementById('form-notes').value
+                    };
+                    log('FORM: Save clicked', data);
+                    dialogs.form.hide();
+                  },
+                  buttonModel: { content: 'Save Assignment', isPrimary: true } },
+                { click: function() { log('FORM: Delete clicked', {}); dialogs.form.hide(); },
+                  buttonModel: { content: 'Delete', cssClass: 'e-danger' } },
+                { click: function() { log('FORM: Cancel clicked', {}); dialogs.form.hide(); },
+                  buttonModel: { content: 'Cancel' } }
+            ]
+        }, makeEvents('form')));
+        dialogs.form.appendTo('#form-dialog');
+
+        function callMethod(method) {
+            log('METHOD: ' + method, {});
+            switch(method) {
+                case 'showModal': dialogs.modal.show(); break;
+                case 'showNonModal': dialogs.nonmodal.show(); break;
+                case 'showConfirm': dialogs.confirm.show(); break;
+                case 'showForm':
+                    document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
+                    dialogs.form.show();
+                    break;
+                case 'hide':
+                    Object.keys(dialogs).forEach(function(k) { dialogs[k].hide(); });
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

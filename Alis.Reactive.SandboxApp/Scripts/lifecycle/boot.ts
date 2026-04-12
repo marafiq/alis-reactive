@@ -1,16 +1,14 @@
-// Boot — Plan lifecycle: boot, merge, reset
-//
-// Single responsibility: wire triggers (two-phase) and register plans.
-// Delegates enrichment to enrichment.ts, state to merge-plan.ts PlanRegistry.
+// Boot — Plan lifecycle: boot, merge, reset.
+// Single responsibility: wire behaviors (two-phase) and register plans.
+// Delegates state to merge-plan.ts PlanRegistry.
 
-import type { Plan, Entry, ComponentEntry } from "../types";
+import type { Plan, Behavior } from "../types";
 import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
-import { wireTrigger } from "../execution/trigger";
-import { enrichEntries } from "./enrichment";
-import { wireLiveValidation, unwireFields } from "../validation/live-clear";
+import { wireBehavior } from "../execution/trigger";
+import { setActivePlan } from "../execution/execute";
+import { wireLiveValidation } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
-import { walkValidationDescriptors } from "./walk-reactions";
 import {
   applyMergedPlan,
   getBootedPlan as getTrackedBootedPlan,
@@ -24,39 +22,53 @@ const BOOTED_ATTR = "alisBooted";
 let bootAbort = new AbortController();
 
 export function boot(plan: Plan): void {
-  log.info("booting", { entries: plan.entries.length });
+  log.info("booting", { behaviors: plan.behaviors.length });
 
-  enrichEntries(plan.entries, plan.components);
-  walkValidationDescriptors(plan.entries, wireLiveValidation);
-  wireEntries(plan.entries, plan.components, bootAbort.signal);
+  // Wire validation live-clear for components with container scopes
+  wireContainerValidation(plan);
 
+  // Two-phase behavior wiring
+  wireBehaviors(plan.behaviors, plan, bootAbort.signal);
+
+  setActivePlan(plan);
   registerBootedPlan(plan);
   document.documentElement.dataset[BOOTED_ATTR] = "true";
   log.info("booted");
 }
 
 /**
- * Two-phase wiring: wire all non-dom-ready listeners first, then execute dom-ready.
- * This ensures custom-event listeners exist before dom-ready dispatches into them.
+ * Two-phase wiring: wire all non-page-ready listeners first, then execute page-ready.
+ * This ensures document-event listeners exist before page-ready dispatches into them.
  */
-function wireEntries(entries: Entry[], components: Record<string, ComponentEntry>, signal?: AbortSignal): void {
-  const deferred: Entry[] = [];
-  for (const entry of entries) {
-    if (entry.trigger.kind === "dom-ready") {
-      deferred.push(entry);
+function wireBehaviors(behaviors: Behavior[], plan: Plan, signal?: AbortSignal): void {
+  const deferred: Behavior[] = [];
+  for (const behavior of behaviors) {
+    if (behavior.startsWhen.kind === "page-ready") {
+      deferred.push(behavior);
     } else {
-      wireTrigger(entry.trigger, entry.reaction, components, signal);
+      wireBehavior(behavior.startsWhen, behavior.reaction, plan, signal);
     }
   }
-  for (const entry of deferred) {
-    wireTrigger(entry.trigger, entry.reaction, components, signal);
+  for (const behavior of deferred) {
+    wireBehavior(behavior.startsWhen, behavior.reaction, plan, signal);
+  }
+}
+
+/** Wire live validation for all components that have container scopes. */
+function wireContainerValidation(plan: Plan): void {
+  for (const [key, comp] of Object.entries(plan.components)) {
+    if (comp.container) {
+      wireLiveValidation(plan, key);
+    }
   }
 }
 
 export function mergePlan(incoming: Plan): void {
-  const merged = applyMergedPlan(incoming, { enrichEntries, wireEntries, unwireFields });
+  const merged = applyMergedPlan(incoming, {
+    wireBehaviors,
+    wireContainerValidation,
+  });
 
-  walkValidationDescriptors(merged.entries, wireLiveValidation);
   clearSummaryForPlan(merged.planId);
 
   log.info("merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });

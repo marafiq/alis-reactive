@@ -12,8 +12,8 @@ namespace Alis.Reactive.Native.Components
         private NativeHiddenFieldEvents() { }
 
         /// <summary>Fires when the hidden input value changes (DOM "change" event).</summary>
-        public TypedEventDescriptor<NativeHiddenFieldChangeArgs> Changed =>
-            new TypedEventDescriptor<NativeHiddenFieldChangeArgs>(
+        public TypedEvent<NativeHiddenFieldChangeArgs> Changed =>
+            new TypedEvent<NativeHiddenFieldChangeArgs>(
                 "change", new NativeHiddenFieldChangeArgs());
     }
 }

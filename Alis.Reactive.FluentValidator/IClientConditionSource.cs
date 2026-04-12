@@ -10,6 +10,6 @@ namespace Alis.Reactive.FluentValidator
     /// </summary>
     internal interface IClientConditionSource
     {
-        IReadOnlyDictionary<IValidationRule, ValidationCondition> ClientConditions { get; }
+        IReadOnlyDictionary<IValidationRule, FieldCondition> ClientConditions { get; }
     }
 }

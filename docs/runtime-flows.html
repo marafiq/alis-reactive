@@ -814,24 +814,24 @@ sequenceDiagram
         end
 
     else All other operators (coerced resolution)
-        conditions->>resolver: resolveSourceAs(guard.source, guard.coerceAs, ctx)
+        conditions->>resolver: resolveSourceAs(guard.source, guard.shape, ctx)
         resolver-->>conditions: resolved (coerced)
-        Note over conditions: opCoerceAs = guard.elementCoerceAs ?? guard.coerceAs
+        Note over conditions: opShape = guard.elementShape ?? guard.shape
         alt guard.rightSource exists (source-vs-source)
-            conditions->>resolver: resolveSourceAs(guard.rightSource, opCoerceAs, ctx)
+            conditions->>resolver: resolveSourceAs(guard.rightSource, opShape, ctx)
             resolver-->>conditions: operand
         else literal operand
             alt operand is Array
                 loop Each element
-                    conditions->>coerce: coerce(v, opCoerceAs)
+                    conditions->>coerce: convertByShape(v, opShape)
                 end
             else scalar operand
-                conditions->>coerce: coerce(guard.operand, opCoerceAs)
+                conditions->>coerce: convertByShape(guard.operand, opShape)
             end
         end
-        opt guard.elementCoerceAs != null AND resolved is Array
+        opt guard.elementShape != null AND resolved is Array
             loop Each item in resolved
-                conditions->>coerce: coerce(item, guard.elementCoerceAs)
+                conditions->>coerce: convertByShape(item, guard.elementShape)
             end
             Note over conditions: items = coerced array
         end
@@ -916,10 +916,10 @@ sequenceDiagram
     participant resolver as resolver.ts
     participant coerce as core/coerce.ts
 
-    Caller->>resolver: resolveSourceAs(source, coerceAs, ctx)
+    Caller->>resolver: resolveSourceAs(source, shape, ctx)
     resolver->>resolver: resolveSource(source, ctx)
     resolver-->>resolver: raw
-    resolver->>coerce: coerce(raw, coerceAs)
+    resolver->>coerce: convertByShape(raw, shape)
     coerce-->>resolver: coerced value
     resolver-->>Caller: coerced value
 </div>

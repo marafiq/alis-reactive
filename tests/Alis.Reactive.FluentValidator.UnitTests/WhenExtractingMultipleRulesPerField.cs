@@ -11,9 +11,9 @@ public class WhenExtractingMultipleRulesPerField
         var desc = _adapter.ExtractRules(typeof(MultipleRulesValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc!.Fields, Has.Count.EqualTo(1));
+        Assert.That(desc, Has.Count.EqualTo(1));
 
-        var rules = desc.Fields[0].Rules;
+        var rules = desc[0].Rules;
         Assert.That(rules, Has.Count.GreaterThanOrEqualTo(3));
 
         var ruleTypes = rules.Select(r => r.Rule).ToList();

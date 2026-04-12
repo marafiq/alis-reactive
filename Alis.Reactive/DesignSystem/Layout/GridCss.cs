@@ -4,19 +4,19 @@ namespace Alis.Reactive.DesignSystem.Layout
 {
     public static class GridCss
     {
-        public static string Classes(GridCols cols, SpacingScale gap = SpacingScale.Md, string? userClass = null)
+        public static string Classes(GridCols cols, SpacingScale gap = SpacingScale.Md, string? cssClass = null)
         {
             var baseClasses = $"grid {TokenMap.Cols(cols)} {TokenMap.Gap(gap)}";
-            return CssUtils.MergeClasses(baseClasses, userClass);
+            return CssUtils.MergeClasses(baseClasses, cssClass);
         }
 
-        public static string ResponsiveClasses(GridCols cols, SpacingScale gap = SpacingScale.Md, string? userClass = null)
+        public static string ResponsiveClasses(GridCols cols, SpacingScale gap = SpacingScale.Md, string? cssClass = null)
         {
             var colCount = (int)cols;
             var responsive = colCount <= 2
                 ? $"grid grid-cols-1 sm:{TokenMap.Cols(cols)} {TokenMap.Gap(gap)}"
                 : $"grid grid-cols-1 sm:grid-cols-2 lg:{TokenMap.Cols(cols)} {TokenMap.Gap(gap)}";
-            return CssUtils.MergeClasses(responsive, userClass);
+            return CssUtils.MergeClasses(responsive, cssClass);
         }
     }
 }

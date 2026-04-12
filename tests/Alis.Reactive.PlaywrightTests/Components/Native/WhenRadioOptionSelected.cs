@@ -218,11 +218,11 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_value_readexpr()
+    public async Task plan_carries_value_value_member()
     {
         await NavigateAndBoot();
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"value\""));
+        Assert.That(planJson, Does.Contain("\"member\": \"value\""));
         AssertNoConsoleErrors();
     }
 

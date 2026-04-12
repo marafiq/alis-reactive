@@ -98,10 +98,10 @@ public sealed class ValidationRule
     public string? CoerceAs { get; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public ValidationCondition? When { get; }
+    public FieldCondition? When { get; }
 
     public ValidationRule(string rule, string message, object? constraint = null,
-        ValidationCondition? when = null, string? field = null, string? coerceAs = null)
+        FieldCondition? when = null, string? field = null, string? coerceAs = null)
     {
         Rule = rule;
         Message = message;
@@ -141,10 +141,10 @@ private sealed class ExtractedRule
     public object? Constraint { get; }
     public string? Field { get; }
     public string? CoerceAs { get; }
-    public ValidationCondition? When { get; }
+    public FieldCondition? When { get; }
 
     public ExtractedRule(string rule, string message, object? constraint,
-        ValidationCondition? when = null, string? field = null, string? coerceAs = null)
+        FieldCondition? when = null, string? field = null, string? coerceAs = null)
     {
         Rule = rule; Message = message; Constraint = constraint;
         When = when; Field = field; CoerceAs = coerceAs;
@@ -193,7 +193,7 @@ export interface ValidationRule {
   constraint?: unknown;
   field?: string;
   coerceAs?: CoercionType;
-  when?: ValidationCondition;
+  when?: FieldCondition;
 }
 ```
 

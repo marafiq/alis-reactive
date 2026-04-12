@@ -20,10 +20,10 @@ p.Element("x").Show().AddClass("active")  // Fails — Show() exits element cont
 
 ## Minor
 
-### 3. conditions.ts — silent undefined when elementCoerceAs set on non-array
+### 3. conditions.ts — silent undefined when elementShape set on non-array
 **File:** `Scripts/conditions.ts:105-106`
 
-When `elementCoerceAs` is present but source resolves to scalar, `items` becomes `undefined`. Should throw early with diagnostic message.
+When `elementShape` is present but source resolves to scalar, `items` becomes `undefined`. Should throw early with diagnostic message.
 
 ### 4. component.ts — error message missing componentId
 **File:** `Scripts/component.ts:16-27`

@@ -53,9 +53,12 @@ namespace Alis.Reactive
         /// </summary>
         /// <typeparam name="TSource">The event payload type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
-        /// <returns>A dot-path like <c>evt.address.city</c>.</returns>
+        /// <returns>A dot-path like <c>address.city</c>.</returns>
         public static string ToEventPath<TSource>(Expression<Func<TSource, object?>> expression)
-            => ToPath("evt", expression);
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join(".", members);
+        }
 
         /// <summary>
         /// Converts a typed expression to an event payload dot-path, preserving type safety for value types.
@@ -63,18 +66,33 @@ namespace Alis.Reactive
         /// <typeparam name="TSource">The event payload type.</typeparam>
         /// <typeparam name="TProp">The property type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
-        /// <returns>A dot-path like <c>evt.facilityId</c>.</returns>
+        /// <returns>A dot-path like <c>facilityId</c>.</returns>
         public static string ToEventPath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
-            => ToPath<TSource, TProp>("evt", expression);
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join(".", members);
+        }
 
         /// <summary>
         /// Converts an expression to an HTTP response body dot-path (<c>responseBody.</c> prefix).
         /// </summary>
         /// <typeparam name="TSource">The response body type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
-        /// <returns>A dot-path like <c>responseBody.data.name</c>.</returns>
+        /// <returns>A dot-path like <c>data.name</c>.</returns>
         public static string ToResponsePath<TSource>(Expression<Func<TSource, object?>> expression)
-            => ToPath("responseBody", expression);
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join(".", members);
+        }
+
+        /// <summary>
+        /// Converts a typed expression to an HTTP response body dot-path, preserving type safety for value types.
+        /// </summary>
+        public static string ToResponsePath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join(".", members);
+        }
 
         private static List<string> ExtractMemberChain(Expression expr)
         {

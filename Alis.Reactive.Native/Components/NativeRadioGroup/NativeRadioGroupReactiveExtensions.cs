@@ -1,7 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -41,7 +40,7 @@ namespace Alis.Reactive.Native.Components
         public static NativeRadioGroupBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeRadioGroupBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,
-            Func<NativeRadioGroupEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<NativeRadioGroupEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
@@ -49,16 +48,11 @@ namespace Alis.Reactive.Native.Components
 
             for (int i = 0; i < builder.Options.Count; i++)
             {
-                var pb = new PipelineBuilder<TModel>();
+                var pb = new PipelineBuilder<TModel>(plan.Context);
                 pipeline(descriptor.Args, pb);
 
                 var radioId = $"{builder.ElementId}_r{i}";
-                var trigger = new ComponentEventTrigger(
-                    radioId, descriptor.JsEvent, _component.Vendor,
-                    builder.BindingPath, _component.ReadExpr);
-
-                foreach (var reaction in pb.BuildReactions())
-                    plan.AddEntry(new Entry(trigger, reaction));
+                plan.Context.WireComponentEvent(radioId, "native", descriptor.JsEvent, pb.BuildReactions());
             }
 
             return builder;

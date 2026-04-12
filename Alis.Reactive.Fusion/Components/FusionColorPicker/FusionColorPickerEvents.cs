@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionColorPickerEvents() { }
 
         /// <summary>Fires when the color value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionColorPickerChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionColorPickerChangeArgs>(
+        public TypedEvent<FusionColorPickerChangeArgs> Changed =>
+            new TypedEvent<FusionColorPickerChangeArgs>(
                 "change", new FusionColorPickerChangeArgs());
     }
 }

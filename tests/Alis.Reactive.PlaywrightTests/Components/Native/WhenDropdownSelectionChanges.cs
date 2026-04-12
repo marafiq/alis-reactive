@@ -178,10 +178,10 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("mutate-element"),
-            "Plan must contain mutate-element commands");
-        Assert.That(planJson, Does.Contain("\"prop\""),
-            "Plan must contain structured prop field for SetValue");
+        Assert.That(planJson, Does.Contain("\"set\""),
+            "Plan must contain set reactions");
+        Assert.That(planJson, Does.Contain("\"property\""),
+            "Plan must contain structured property field for SetValue");
         AssertNoConsoleErrors();
     }
 
@@ -201,17 +201,17 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_value_readexpr_for_component_source()
+    public async Task plan_carries_value_value_member_for_component_source()
     {
-        // NativeDropDown.ReadExpr is "value" — the plan's ComponentSource must
+        // NativeDropDown valueMember is "value" — the plan's ComponentSource must
         // carry this so the runtime reads el.value (not el.checked or el.textContent).
-        // If readExpr changes or is lost, component value reads return wrong data.
+        // If valueMember changes or is lost, component value reads return wrong data.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"readExpr\": \"value\""),
-            "Plan must carry readExpr 'value' for NativeDropDown component sources — " +
-            "runtime walks this path to read the selected value");
+        Assert.That(planJson, Does.Contain("\"member\": \"value\""),
+            "Plan must carry property member 'value' for NativeDropDown component sources — " +
+            "runtime reads this property to get the selected value");
         AssertNoConsoleErrors();
     }
 
@@ -223,8 +223,8 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"prop\": \"value\""),
-            "Plan must carry prop 'value' for SetValue mutation — " +
+        Assert.That(planJson, Does.Contain("\"property\": \"text\""),
+            "Plan must carry property .text. for SetValue mutation — " +
             "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();
     }

@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Requests;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Reactions;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
 {
@@ -12,122 +11,82 @@ namespace Alis.Reactive.Builders
     /// event dispatches, HTTP calls, component interactions, and conditional logic.
     /// </summary>
     /// <remarks>
-    /// <para>
     /// Received as the <c>p</c> parameter inside trigger callbacks:
     /// <c>t.DomReady(p =&gt; { p.Element("id").AddClass("x"); p.Dispatch("ready"); })</c>.
-    /// </para>
-    /// <para>
-    /// Commands execute in declaration order. Conditions (<c>When</c>/<c>Then</c>/<c>Else</c>)
-    /// and HTTP calls (<c>Get</c>/<c>Post</c>) create branching points that produce
-    /// separate reaction segments.
-    /// </para>
+    /// Commands execute in declaration order.
     /// </remarks>
-    /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
-    public partial class PipelineBuilder<TModel> : ICommandEmitter where TModel : class
+    /// <typeparam name="TModel">The view model type.</typeparam>
+    public partial class PipelineBuilder<TModel> : IReactionEmitter where TModel : class
     {
         private enum PipelineMode { Sequential, Http, Parallel, Conditional }
 
-        internal List<Command> Commands { get; } = new List<Command>();
-        internal List<Branch>? ConditionalBranches { get; private set; }
-        private HttpRequestBuilder<TModel>? _httpBuilder;
-        private ParallelBuilder<TModel>? _parallelBuilder;
+        internal List<Reaction> Steps { get; } = new List<Reaction>();
+        internal List<BranchCase> ConditionalBranches { get; private set; }
+        internal PlanBuildContext Context { get; }
+
+        private HttpRequestBuilder<TModel> _httpBuilder;
+        private ParallelBuilder<TModel> _parallelBuilder;
         private PipelineMode _mode = PipelineMode.Sequential;
+        private List<Reaction> _segments;
 
-        /// <summary>
-        /// Completed reaction segments. When a new When() is called after a previous
-        /// When().Then().Else() block, the current segment (commands + branches) is
-        /// flushed here so both conditionals produce independent reactions.
-        /// </summary>
-        private List<Reaction>? _segments;
-
-        /// <summary>
-        /// Adds a command to the pipeline. Vendor extensions accept
-        /// <see cref="ICommandEmitter"/>, not <see cref="PipelineBuilder{TModel}"/> directly.
-        /// </summary>
-        void ICommandEmitter.AddCommand(Command command)
+        internal PipelineBuilder(PlanBuildContext context)
         {
-            Commands.Add(command);
+            Context = context;
         }
 
-        /// <summary>
-        /// Fires a custom event in the browser that other triggers can listen for.
-        /// </summary>
-        /// <param name="eventName">The event name (e.g. <c>"order-submitted"</c>).</param>
-        /// <returns>This builder for chaining additional commands.</returns>
+        /// <inheritdoc />
+        void IReactionEmitter.AddStep(Reaction step) => Steps.Add(step);
+
+        /// <inheritdoc />
+        PlanBuildContext IReactionEmitter.BuildContext => Context;
+
+        /// <summary>Dispatches a custom browser event by name.</summary>
+        /// <param name="eventName">The event name. Listeners registered with <c>t.CustomEvent("name", ...)</c> will fire.</param>
+        /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
-            Commands.Add(new DispatchCommand(eventName));
+            Steps.Add(Reaction.Dispatch(eventName));
             return this;
         }
 
-        /// <summary>
-        /// Fires a custom event with a payload object in the browser.
-        /// </summary>
-        /// <typeparam name="TPayload">The payload type, serialized as the event's detail data.</typeparam>
+        /// <summary>Dispatches a custom browser event with a typed payload.</summary>
+        /// <typeparam name="TPayload">The payload type.</typeparam>
         /// <param name="eventName">The event name.</param>
-        /// <param name="payload">The data to attach to the event.</param>
-        /// <returns>This builder for chaining additional commands.</returns>
+        /// <param name="payload">The data to send with the event.</param>
+        /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
-            Commands.Add(new DispatchCommand(eventName, payload));
+            Steps.Add(Reaction.Dispatch(eventName, ValueProducer.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload)))));
             return this;
         }
 
-        /// <summary>
-        /// Targets a DOM element by its ID for mutations (CSS classes, text, visibility).
-        /// </summary>
-        /// <remarks>
-        /// Use <c>Element()</c> for non-input display elements. For input components bound to
-        /// a model property, use <see cref="Component{TComponent}(Expression{Func{TModel, object}})"/> instead.
-        /// </remarks>
+        /// <summary>Targets a DOM element by ID for mutations (SetText, AddClass, Show, Hide).</summary>
         /// <param name="elementId">The HTML element ID.</param>
-        /// <returns>An element builder for chaining mutations like <c>AddClass</c>, <c>SetText</c>, <c>Show</c>.</returns>
+        /// <returns>An element builder for chaining mutations.</returns>
         public ElementBuilder<TModel> Element(string elementId)
         {
             return new ElementBuilder<TModel>(this, elementId);
         }
 
-        // ── Component<T>() — 3 overloads ──
-
-        /// <summary>
-        /// Targets a component by model expression (input components bound to a model property).
-        /// </summary>
-        /// <remarks>
-        /// Available component types include:
-        /// <b>Native</b> — <c>NativeTextBox</c>, <c>NativeCheckBox</c>, <c>NativeHiddenField</c>,
-        /// <c>NativeSelect</c>, <c>NativeButton</c>, <c>NativeRadioButton</c>.
-        /// <b>Fusion</b> — <c>FusionDropDownList</c>, <c>FusionNumericTextBox</c>,
-        /// <c>FusionDatePicker</c>, <c>FusionTimePicker</c>, <c>FusionSwitch</c>,
-        /// <c>FusionAutoComplete</c>, <c>FusionColorPicker</c>, <c>FusionInputMask</c>,
-        /// <c>FusionMultiSelect</c>, <c>FusionRichTextEditor</c>, <c>FusionFileUpload</c>,
-        /// <c>FusionMultiColumnComboBox</c>, <c>FusionDateTimePicker</c>,
-        /// <c>FusionDateRangePicker</c>.
-        /// </remarks>
-        /// <typeparam name="TComponent">The component type (implements <see cref="IComponent"/> with <c>new()</c>).</typeparam>
-        /// <param name="expr">The model property expression (e.g. <c>m =&gt; m.Address.City</c>).</param>
-        /// <returns>A component reference for chaining mutations like <c>SetValue</c> or <c>Focus</c>.</returns>
+        /// <summary>References a component bound to a model expression for method calls and property mutations.</summary>
+        /// <typeparam name="TComponent">The component type.</typeparam>
+        /// <param name="expr">The model expression that identifies the component.</param>
+        /// <returns>A typed component reference.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(
-            Expression<Func<TModel, object?>> expr)
+            Expression<Func<TModel, object>> expr)
             where TComponent : IComponent, new()
         {
             var elementId = IdGenerator.For<TModel>(expr);
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
-        /// <summary>
-        /// Targets a component from a different model (cross-plan component reference).
-        /// </summary>
-        /// <remarks>
-        /// Uses <see cref="IdGenerator.For{TModel}(Expression{Func{TModel, object}})"/> with
-        /// <typeparamref name="TOtherModel"/> to produce the correct element ID.
-        /// Example: <c>p.Component&lt;NativeHiddenField, Step2Model&gt;(m =&gt; m.Diagnosis).SetValue(...)</c>.
-        /// </remarks>
+        /// <summary>References a component bound to a different model (cross-partial scenarios).</summary>
         /// <typeparam name="TComponent">The component type.</typeparam>
-        /// <typeparam name="TOtherModel">The other view's model type.</typeparam>
-        /// <param name="expr">The model property expression on the other model.</param>
-        /// <returns>A component reference for chaining mutations.</returns>
+        /// <typeparam name="TOtherModel">The other view model type.</typeparam>
+        /// <param name="expr">The model expression on the other model.</param>
+        /// <returns>A typed component reference.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
-            Expression<Func<TOtherModel, object?>> expr)
+            Expression<Func<TOtherModel, object>> expr)
             where TComponent : IComponent, new()
             where TOtherModel : class
         {
@@ -135,19 +94,19 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
-        /// <summary>Targets a component by its string ID (non-input components).</summary>
+        /// <summary>References a component by explicit ID.</summary>
         /// <typeparam name="TComponent">The component type.</typeparam>
-        /// <param name="refId">The HTML element ID of the component.</param>
-        /// <returns>A component reference for chaining mutations.</returns>
+        /// <param name="refId">The component element ID.</param>
+        /// <returns>A typed component reference.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
             where TComponent : IComponent, new()
         {
             return new ComponentRef<TComponent, TModel>(refId, this);
         }
 
-        /// <summary>Targets an app-level component by its default ID (e.g. <c>FusionConfirm</c>).</summary>
+        /// <summary>References an app-level component (e.g. Toast, Confirm) by its default ID.</summary>
         /// <typeparam name="TComponent">The app-level component type.</typeparam>
-        /// <returns>A component reference for chaining mutations.</returns>
+        /// <returns>A typed component reference.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>()
             where TComponent : IAppLevelComponent, new()
         {
@@ -155,126 +114,126 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(comp.DefaultId, this);
         }
 
-        /// <summary>
-        /// Displays server-side validation errors returned in the 400 response body
-        /// at the correct form fields.
-        /// </summary>
-        /// <remarks>
-        /// Typically used inside a <c>.Response(r =&gt; r.OnError(400, ...))</c> handler.
-        /// Pair with <see cref="Requests.HttpRequestBuilder{TModel}.Validate{TValidator}"/>
-        /// for client-side validation before the request fires.
-        /// </remarks>
-        /// <param name="formId">The form element ID to scope error display to.</param>
-        /// <returns>This builder for chaining additional commands.</returns>
+        /// <summary>Reads a URL query parameter as a string for use in conditions or as a value source.</summary>
+        /// <param name="paramName">The query parameter name.</param>
+        /// <returns>A typed source for conditions, SetText, or gather.</returns>
+        public Conditions.TypedUrlSource<string> FromUrl(string paramName)
+        {
+            return new Conditions.TypedUrlSource<string>(paramName);
+        }
+
+        /// <summary>Reads a URL query parameter as a typed value: <c>p.FromUrl&lt;int&gt;("page")</c>.</summary>
+        /// <param name="paramName">The query parameter name.</param>
+        /// <returns>A typed source for conditions, SetText, or gather.</returns>
+        public Conditions.TypedUrlSource<T> FromUrl<T>(string paramName)
+        {
+            return new Conditions.TypedUrlSource<T>(paramName);
+        }
+
+        /// <summary>Reads a value from a plugin method. Chain <c>.Arg()</c> to pass arguments.</summary>
+        /// <param name="pluginName">The registered plugin name.</param>
+        /// <param name="member">The method name on the plugin.</param>
+        /// <returns>A builder that implicitly converts to <see cref="Conditions.TypedPluginSource{T}"/>.</returns>
+        public PluginReadBuilder<T, TModel> Plugin<T>(string pluginName, string member)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
+            Context.EnsurePluginMethod(pluginName, member, returns: PlanModel.Shape.FromClrType(typeof(T)));
+            return new PluginReadBuilder<T, TModel>(pluginName, member);
+        }
+
+        /// <summary>Calls a plugin method that does not return a value. Chain <c>.Arg()</c> then <c>.Fire()</c>.</summary>
+        /// <param name="pluginName">The registered plugin name.</param>
+        /// <param name="member">The method name on the plugin.</param>
+        /// <returns>A builder for adding arguments and firing the call.</returns>
+        public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
+            Context.EnsurePluginMethod(pluginName, member);
+            return new PluginCallBuilder<TModel>(pluginName, member, this);
+        }
+
+        /// <summary>Displays accumulated validation errors in the specified container.</summary>
+        /// <param name="formId">The DOM element ID of the validation error container.</param>
+        /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
-            Commands.Add(new ValidationErrorsCommand(formId));
+            Steps.Add(Reaction.ShowValidationErrors(formId));
             return this;
         }
 
-        /// <summary>
-        /// Injects the HTTP response body as inner HTML of the target element.
-        /// </summary>
-        /// <remarks>
-        /// Typically used inside a <c>.Response(r =&gt; r.OnSuccess(...))</c> handler for
-        /// loading partial views:
-        /// <c>p.Get("/url").Response(response: r =&gt; r.OnSuccess(pipeline: s =&gt; s.Into("container")))</c>.
-        /// </remarks>
-        /// <param name="elementId">The HTML element ID to inject content into.</param>
-        /// <returns>This builder for chaining additional commands.</returns>
-        /// <seealso cref="ValidationErrors"/>
+        /// <summary>Injects the HTTP success response body into a DOM element as HTML content.</summary>
+        /// <remarks>Must follow an HTTP request (Get/Post). The response body is read from the success payload.</remarks>
+        /// <param name="elementId">The target element ID.</param>
+        /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
-            Commands.Add(new IntoCommand(elementId));
+            // Register the inject target in the plan — every component reference
+            // must be in the plan. No fallbacks in the runtime.
+            Context.EnsureElement(elementId);
+            Steps.Add(Reaction.Inject(elementId, ValueProducer.Read(PayloadSource.Success(), "responseBody")));
             return this;
         }
 
-        internal void SetConditionalBranches(List<Branch> branches)
+        internal void SetConditionalBranches(List<BranchCase> branches)
         {
             ConditionalBranches = branches;
         }
 
-        /// <summary>
-        /// Flushes the current segment (accumulated commands + conditional branches)
-        /// into _segments, then resets for the next segment. Called by When() when
-        /// a previous conditional block already exists.
-        /// </summary>
         internal void FlushSegment()
         {
             _segments ??= new List<Reaction>();
 
             if (_mode == PipelineMode.Http && _httpBuilder != null)
             {
-                // HTTP mode: pre-HTTP commands belong inside the HttpReaction
-                _segments.Add(new HttpReaction(
-                    Commands.Count > 0 ? new List<Command>(Commands) : null,
-                    _httpBuilder.BuildRequestDescriptor()));
-                Commands.Clear();
+                var request = _httpBuilder.BuildRequest();
+                if (Steps.Count > 0)
+                    request.Before = new List<Reaction>(Steps);
+                _segments.Add(Reaction.Request(request));
+                Steps.Clear();
                 _httpBuilder = null;
             }
             else if (_mode == PipelineMode.Parallel && _parallelBuilder != null)
             {
                 _segments.Add(_parallelBuilder.BuildReaction(
-                    Commands.Count > 0 ? new List<Command>(Commands) : null));
-                Commands.Clear();
+                    Steps.Count > 0 ? new List<Reaction>(Steps) : null));
+                Steps.Clear();
                 _parallelBuilder = null;
             }
             else
             {
-                // Sequential/Conditional: flush commands as a standalone reaction
-                if (Commands.Count > 0)
+                if (Steps.Count > 0)
                 {
-                    _segments.Add(new SequentialReaction(new List<Command>(Commands)));
-                    Commands.Clear();
+                    _segments.Add(Reaction.Sequence(new List<Reaction>(Steps)));
+                    Steps.Clear();
                 }
             }
 
-            // Flush current conditional block
             if (ConditionalBranches != null && ConditionalBranches.Count > 0)
             {
-                _segments.Add(new ConditionalReaction(null, ConditionalBranches.ToArray()));
+                _segments.Add(Reaction.Branch(ConditionalBranches));
                 ConditionalBranches = null;
             }
 
             _mode = PipelineMode.Sequential;
         }
 
-        /// <summary>
-        /// Returns the single reaction for this pipeline.
-        /// </summary>
-        /// <remarks>
-        /// Throws if the pipeline produced multiple segments. Callers that
-        /// need multi-segment support must use <see cref="BuildReactions"/> instead.
-        /// </remarks>
-        /// <returns>The single reaction built from the pipeline commands.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the pipeline contains multiple reaction segments.</exception>
         internal Reaction BuildReaction()
         {
             var reactions = BuildReactions();
             if (reactions.Count > 1)
                 throw new InvalidOperationException(
-                    $"BuildReaction() requires exactly one reaction segment but found {reactions.Count}. " +
-                    "Use BuildReactions() for pipelines with multiple When() blocks.");
+                    $"BuildReaction() requires exactly one reaction segment but found {reactions.Count}.");
             return reactions[0];
         }
 
-        /// <summary>
-        /// Builds all reactions from the pipeline. A single When() block produces
-        /// one reaction. Multiple When() blocks produce multiple reactions.
-        /// Commands between/around conditions produce sequential reactions.
-        /// </summary>
-        /// <returns>All reaction segments built from the pipeline commands.</returns>
         internal List<Reaction> BuildReactions()
         {
-            // If no segments were flushed, build a single reaction (common case)
             if (_segments == null || _segments.Count == 0)
-            {
                 return new List<Reaction> { BuildSingleReaction() };
-            }
 
-            // Flush any trailing content (commands, branches, HTTP, parallel)
             FlushSegment();
-
             return _segments;
         }
 
@@ -283,15 +242,51 @@ namespace Alis.Reactive.Builders
             return _mode switch
             {
                 PipelineMode.Parallel => _parallelBuilder!.BuildReaction(
-                    Commands.Count > 0 ? Commands : null),
-                PipelineMode.Http => new HttpReaction(
-                    Commands.Count > 0 ? Commands : null,
-                    _httpBuilder!.BuildRequestDescriptor()),
-                PipelineMode.Conditional => new ConditionalReaction(
-                    Commands.Count > 0 ? Commands : null,
-                    ConditionalBranches!.ToArray()),
-                _ => new SequentialReaction(Commands),
+                    Steps.Count > 0 ? Steps : null),
+                PipelineMode.Http => BuildHttpReaction(),
+                PipelineMode.Conditional => BuildConditionalReaction(),
+                _ => Reaction.Sequence(Steps),
             };
+        }
+
+        private Reaction BuildConditionalReaction()
+        {
+            var branch = Reaction.Branch(ConditionalBranches ?? new List<BranchCase>());
+            if (Steps.Count > 0)
+            {
+                var all = new List<Reaction>(Steps) { branch };
+                return Reaction.Sequence(all);
+            }
+            return branch;
+        }
+
+        private Reaction BuildHttpReaction()
+        {
+            var request = _httpBuilder!.BuildRequest();
+            var requestReaction = Reaction.Request(request);
+            if (Steps.Count > 0)
+            {
+                var all = new List<Reaction>(Steps) { requestReaction };
+                return Reaction.Sequence(all);
+            }
+            return requestReaction;
+        }
+
+        internal void SetHttpMode(HttpRequestBuilder<TModel> builder)
+        {
+            _mode = PipelineMode.Http;
+            _httpBuilder = builder;
+        }
+
+        internal void SetParallelMode(ParallelBuilder<TModel> builder)
+        {
+            _mode = PipelineMode.Parallel;
+            _parallelBuilder = builder;
+        }
+
+        internal void SetConditionalMode()
+        {
+            _mode = PipelineMode.Conditional;
         }
     }
 }

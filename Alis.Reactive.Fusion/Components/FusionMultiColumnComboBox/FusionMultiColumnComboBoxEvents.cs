@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         private FusionMultiColumnComboBoxEvents() { }
 
         /// <summary>Fires when the selected value changes (SF "change" event).</summary>
-        public TypedEventDescriptor<FusionMultiColumnComboBoxChangeArgs> Changed =>
-            new TypedEventDescriptor<FusionMultiColumnComboBoxChangeArgs>(
+        public TypedEvent<FusionMultiColumnComboBoxChangeArgs> Changed =>
+            new TypedEvent<FusionMultiColumnComboBoxChangeArgs>(
                 "change", new FusionMultiColumnComboBoxChangeArgs());
     }
 }

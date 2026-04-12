@@ -3,7 +3,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// FusionTab (ej2.navigations.Tab) component.
     /// Non-input component — container with no form value.
-    /// No ReadExpr, no ComponentsMap registration, no validation, no gather.
+    /// No ValueMember, no ComponentsMap registration, no validation, no gather.
     /// </summary>
     public sealed class FusionTab : FusionComponent
     {

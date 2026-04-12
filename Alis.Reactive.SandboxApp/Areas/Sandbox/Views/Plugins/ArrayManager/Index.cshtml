@@ -1,0 +1,176 @@
+@model ArrayManagerModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Builders.Conditions
+@{
+    ViewData["Title"] = "Array Plugin";
+
+    var plan = Html.ReactivePlan<ArrayManagerModel>();
+
+    // Register plugin type metadata
+    plan.RegisterPlugin("array", p =>
+    {
+        p.Method<int>("count");
+        p.Method<object>("pluck");
+        p.Method<object>("filter");
+        p.Method<int>("sum");
+        p.Method<bool>("some");
+    });
+
+    plan.RegisterPlugin("analytics", p =>
+    {
+        p.Void("track");
+    });
+
+    // DomReady: GET residents → use array plugin on response
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get("/Sandbox/Plugins/ArrayManager/Residents")
+         .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
+         {
+             // array.count(items)
+             TypedPluginSource<int> countSrc = p.Plugin<int>("array", "count").Arg(json, x => x.Items);
+             s.Element("arr-total").SetText(countSrc);
+
+             // array.pluck(items, 0, "name")
+             TypedPluginSource<string> pluckSrc = p.Plugin<string>("array", "pluck")
+                 .Arg(json, x => x.Items).Arg(0).Arg("name");
+             s.Element("arr-first-name").SetText(pluckSrc);
+
+             // array.count(array.filter(items, "status", "active")) — nested
+             TypedPluginSource<object> filtered = p.Plugin<object>("array", "filter")
+                 .Arg(json, x => x.Items).Arg("status").Arg("active");
+             TypedPluginSource<int> activeCount = p.Plugin<int>("array", "count").Arg(filtered);
+             s.Element("arr-active-count").SetText(activeCount);
+
+             // array.sum(items, "age")
+             TypedPluginSource<int> sumSrc = p.Plugin<int>("array", "sum")
+                 .Arg(json, x => x.Items).Arg("age");
+             s.Element("arr-total-age").SetText(sumSrc);
+
+             // array.some(items, "status", "critical") → condition
+             TypedPluginSource<bool> someSrc = p.Plugin<bool>("array", "some")
+                 .Arg(json, x => x.Items).Arg("status").Arg("critical");
+             s.When(someSrc).Truthy()
+              .Then(then => then.Element("arr-has-critical").Show())
+              .Else(els => els.Element("arr-no-critical").Show());
+
+             s.Element("arr-results").AddClass("text-green-600");
+         }))));
+
+    // Button: send plugin-computed values in gather + header
+    Html.NativeButton("arr-send-btn", "Send to Server")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            TypedPluginSource<int> countForGather = p.Plugin<int>("array", "count").Arg("items");
+            p.Get("/Sandbox/Plugins/ArrayManager/PluginEcho")
+             .Gather(g => g
+                 .Header("X-Array-Count", countForGather)
+                 .Plugin(countForGather, "count"))
+             .Response(r => r
+                .OnSuccess<PluginArrayEchoResponse>((json, s) =>
+                {
+                    s.Element("arr-echo-count").SetText(json, x => x.ReceivedCount);
+                    s.Element("arr-echo-header").SetText(json, x => x.ReceivedHeader);
+                    s.Element("arr-echo-result").AddClass("text-green-600");
+                    // Void call after success
+                    s.Plugin("analytics", "track").Arg("array-sent").Fire();
+                }));
+        });
+
+    // Button: Filter active → exercise ALL 5 methods in button HTTP pipeline
+    Html.NativeButton("arr-filter-btn", "Filter Active & Inspect")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Get("/Sandbox/Plugins/ArrayManager/Residents")
+             .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
+             {
+                 // 1. filter: get active residents only
+                 TypedPluginSource<object> active = p.Plugin<object>("array", "filter")
+                     .Arg(json, x => x.Items).Arg("status").Arg("active");
+
+                 // 2. count: how many active
+                 TypedPluginSource<int> activeCount = p.Plugin<int>("array", "count").Arg(active);
+                 s.Element("arr-f-count").SetText(activeCount);
+
+                 // 3. sum: total age of active residents
+                 TypedPluginSource<int> activeAgeSum = p.Plugin<int>("array", "sum").Arg(active).Arg("age");
+                 s.Element("arr-f-age-sum").SetText(activeAgeSum);
+
+                 // 4. pluck: name of first active resident
+                 TypedPluginSource<string> firstName = p.Plugin<string>("array", "pluck")
+                     .Arg(active).Arg(0).Arg("name");
+                 s.Element("arr-f-first").SetText(firstName);
+
+                 // 5. some: display as text (true/false)
+                 TypedPluginSource<bool> allActive = p.Plugin<bool>("array", "some")
+                     .Arg(active).Arg("status").Arg("active");
+                 s.Element("arr-f-some").SetText(allActive);
+
+                 s.Element("arr-f-result").AddClass("text-green-600");
+
+                 // Void: track the filter action
+                 s.Plugin("analytics", "track").Arg("filter-inspect").Fire();
+             }));
+        });
+
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Array Plugin</native-heading>
+        <native-text color="Secondary">
+            Native JS array methods exposed to the DSL via plugin. Proves all 4 method patterns.
+        </native-text>
+    </div>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">DomReady: Array Operations on Server Data</native-heading>
+        <div id="arr-results" class="space-y-2 font-mono text-sm text-text-muted">
+            <p>Total: <span id="arr-total">—</span></p>
+            <p>First Name: <span id="arr-first-name">—</span></p>
+            <p>Active Count: <span id="arr-active-count">—</span></p>
+            <p>Total Age: <span id="arr-total-age">—</span></p>
+            <p id="arr-has-critical" hidden class="text-red-600">Critical residents found!</p>
+            <p id="arr-no-critical" hidden class="text-green-600">No critical residents ✓</p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">HTTP: Plugin Values in Gather + Header</native-heading>
+        @(Html.NativeButton("arr-send-btn", "Send to Server")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+        <div id="arr-echo-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p>Count: <span id="arr-echo-count">—</span></p>
+            <p>Header: <span id="arr-echo-header">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Button: Filter Active — All 5 Methods + Conditions</native-heading>
+        @(Html.NativeButton("arr-filter-btn", "Filter Active & Inspect")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+        <div id="arr-f-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+            <p>Active Count: <span id="arr-f-count">—</span></p>
+            <p>Active Age Sum: <span id="arr-f-age-sum">—</span></p>
+            <p>First Active Name: <span id="arr-f-first">—</span></p>
+            <p>Some Active: <span id="arr-f-some">—</span></p>
+        </div>
+    </native-card-body>
+    </native-card>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body>
+    </native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

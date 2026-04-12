@@ -1,163 +1,215 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Reactions;
-using Alis.Reactive.Descriptors.Requests;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Configures an HTTP request: URL, verb, request body (gather), loading state,
-    /// client-side validation, and response handlers.
+    /// Builds an HTTP request with optional gather, validation, response handling, and chaining.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// Accessed via the pipeline's HTTP methods:
-    /// <c>p.Post("/api/save", gather: g =&gt; g.IncludeAll()).Response(response: r =&gt; r.OnSuccess(...))</c>.
-    /// </para>
-    /// <para>
-    /// Typical call order: verb (set by <see cref="PipelineBuilder{TModel}"/>)
-    /// → <see cref="Gather"/> → <see cref="WhileLoading"/>
-    /// → <see cref="Validate{TValidator}"/> → <see cref="Response"/>.
-    /// All steps are optional except the verb and URL.
-    /// </para>
+    /// Obtained via <c>p.Get("/url")</c>, <c>p.Post("/url")</c>, etc.
     /// </remarks>
     /// <typeparam name="TModel">The view model type.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
     {
+        private readonly PlanBuildContext _context;
         private string _verb = "GET";
         private string _url = "";
-        private List<GatherItem>? _gather;
-        private string? _contentType;
-        private List<Command>? _whileLoading;
-        private ResponseBuilder<TModel>? _response;
-        private ValidationDescriptor? _validation;
-        private Type? _validatorType;
+        private GatherBuilder<TModel> _gatherBuilder;
+        private string _transport = "json";
+        private List<Reaction> _whileLoading;
+        private ResponseBuilder<TModel> _response;
+        private string _container;
+        private Type _validatorType;
 
-        internal HttpRequestBuilder<TModel> SetVerb(string verb)
+        internal HttpRequestBuilder(PlanBuildContext context)
         {
-            _verb = verb;
-            return this;
+            _context = context;
         }
 
-        internal HttpRequestBuilder<TModel> SetUrl(string url)
-        {
-            _url = url;
-            return this;
-        }
+        internal HttpRequestBuilder<TModel> SetVerb(string verb) { _verb = verb; return this; }
+        internal HttpRequestBuilder<TModel> SetUrl(string url) { _url = url; return this; }
 
-        // ── Public convenience verbs (used in Chained / Parallel lambdas) ──
-
-        /// <summary>Sets the request verb to GET. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
-        /// <param name="url">The request URL.</param>
+        /// <summary>Sets the request to HTTP GET.</summary>
+        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Get(string url) { _verb = "GET"; _url = url; return this; }
-
-        /// <summary>Sets the request verb to POST. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
-        /// <param name="url">The request URL.</param>
+        /// <summary>Sets the request to HTTP POST.</summary>
+        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Post(string url) { _verb = "POST"; _url = url; return this; }
-
-        /// <summary>Sets the request verb to PUT. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
-        /// <param name="url">The request URL.</param>
+        /// <summary>Sets the request to HTTP PUT.</summary>
+        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Put(string url) { _verb = "PUT"; _url = url; return this; }
-
-        /// <summary>Sets the request verb to DELETE. Used inside <see cref="ResponseBuilder{TModel}.Chained"/> or <see cref="PipelineBuilder{TModel}.Parallel"/> lambdas.</summary>
-        /// <param name="url">The request URL.</param>
+        /// <summary>Sets the request to HTTP DELETE.</summary>
+        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Delete(string url) { _verb = "DELETE"; _url = url; return this; }
 
-        /// <summary>
-        /// Configures gather items for the request body/URL params.
-        /// </summary>
-        /// <param name="gather">Adds gather items for the request body or URL params.</param>
+        /// <summary>Configures the request body by gathering values from components, events, plugins, and static data.</summary>
+        /// <param name="gather">Builds the gather fields: <c>g =&gt; g.Include(m =&gt; m.Name).Header("X-Key", source)</c>.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {
-            var builder = new GatherBuilder<TModel>();
+            var builder = new GatherBuilder<TModel>(_context);
             gather(builder);
-            _gather = builder.Items;
+            _gatherBuilder = builder;
             return this;
         }
 
-        /// <summary>
-        /// Sends the request body as application/json (default).
-        /// </summary>
-        public HttpRequestBuilder<TModel> AsJson() { _contentType = null; return this; }
+        /// <summary>Sends the request body as JSON (default).</summary>
+        /// <returns>This builder for chaining.</returns>
+        public HttpRequestBuilder<TModel> AsJson() { _transport = "json"; return this; }
+        /// <summary>Sends the request body as form-data.</summary>
+        /// <returns>This builder for chaining.</returns>
+        public HttpRequestBuilder<TModel> AsFormData() { _transport = "form-data"; return this; }
 
-        /// <summary>
-        /// Sends the request body as multipart/form-data. Required for file uploads.
-        /// </summary>
-        public HttpRequestBuilder<TModel> AsFormData() { _contentType = "form-data"; return this; }
-
-        /// <summary>
-        /// Configures commands to execute while the request is in-flight.
-        /// These commands are reverted after the response arrives.
-        /// </summary>
-        /// <param name="pipeline">Builds the loading-state commands (reverted after the response arrives).</param>
+        /// <summary>Executes commands before the HTTP request is sent (e.g. show a spinner).</summary>
+        /// <param name="pipeline">Builds the commands to execute before the request.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var builder = new PipelineBuilder<TModel>();
-            pipeline(builder);
-            var reaction = builder.BuildReaction();
-            if (!(reaction is SequentialReaction sr))
+            var pb = new PipelineBuilder<TModel>(_context);
+            pipeline(pb);
+            var reaction = pb.BuildReaction();
+            if (!(reaction is SequenceReaction))
                 throw new InvalidOperationException(
                     "WhileLoading only supports plain commands (sequential). " +
                     "Conditions, HTTP, and parallel pipelines are not valid here.");
-            _whileLoading = sr.Commands;
+            _whileLoading = new List<Reaction>(((SequenceReaction)reaction).Steps);
             return this;
         }
 
-        /// <summary>
-        /// Registers client-side validation from a pre-built descriptor.
-        /// When present, the runtime validates the form before sending the request.
-        /// If validation fails, the request is aborted.
-        /// </summary>
-        public HttpRequestBuilder<TModel> Validate(ValidationDescriptor validation)
-        {
-            _validation = validation;
-            return this;
-        }
-
-        /// <summary>
-        /// Registers client-side validation by validator type.
-        /// Rules are extracted automatically at Render() time via IValidationExtractor.
-        /// Field IDs use standard convention (property name = element ID).
-        /// </summary>
+        /// <summary>Validates the form before sending the request using the specified validator.</summary>
+        /// <typeparam name="TValidator">The validator type.</typeparam>
+        /// <param name="formId">The DOM element ID of the form container for error display.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Validate<TValidator>(string formId)
             where TValidator : class
         {
             _validatorType = typeof(TValidator);
-            _validation = new ValidationDescriptor(formId, new List<ValidationField>());
+            _container = formId;
             return this;
         }
 
-        /// <summary>
-        /// Configures success/error response handlers.
-        /// </summary>
-        /// <param name="response">Defines the success and error handlers for the response.</param>
+        /// <summary>Configures response handlers for success and error outcomes.</summary>
+        /// <param name="response">Builds the response handlers: <c>r =&gt; r.OnSuccess(...).OnError(...)</c>.</param>
+        /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response)
         {
-            var builder = new ResponseBuilder<TModel>();
+            var builder = new ResponseBuilder<TModel>(_context);
             response(builder);
             _response = builder;
             return this;
         }
 
-        internal RequestDescriptor BuildRequestDescriptor()
+        internal Request BuildRequest()
         {
-            var desc = new RequestDescriptor(
-                _verb,
-                _url,
-                _gather,
-                _contentType,
-                _whileLoading,
-                _response?.SuccessHandlers.Count > 0 ? _response.SuccessHandlers : null,
-                _response?.ErrorHandlers.Count > 0 ? _response.ErrorHandlers : null,
-                _response?.ChainedRequest,
-                _validation);
+            var request = new Request(_verb, _url);
+
+            if (_gatherBuilder != null)
+            {
+                // Expand IncludeAll: add a GatherField for every registered input component
+                // with explicit bindingPath and shape — the plan carries all information.
+                if (_gatherBuilder.IsIncludeAll)
+                {
+                    var registered = _context.GetRegisteredComponents();
+                    foreach (var kvp in registered)
+                    {
+                        var reg = kvp.Value;
+                        if (!_gatherBuilder.Fields.Exists(f => f.Key == kvp.Key))
+                        {
+                            var value = ValueProducer.Read(
+                                ComponentSource.Of(reg.ComponentId), reg.ValueMember, shape: reg.Shape);
+                            _gatherBuilder.AddField(GatherField.Of(kvp.Key, value));
+                        }
+                    }
+                }
+
+                // Build request input from gather fields + static fields + event fields.
+                // When both component and static/event fields exist, merge statics into
+                // a ValueInput object that the runtime emits alongside gathered components.
+                if (_gatherBuilder.Fields.Count > 0)
+                {
+                    ValueProducer statics = null;
+                    if (_gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0)
+                    {
+                        var fields = new Dictionary<string, ValueProducer>();
+                        foreach (var sf in _gatherBuilder.StaticFields)
+                            fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.FromClrType(sf.Value?.GetType()));
+                        foreach (var ef in _gatherBuilder.EventFields)
+                            fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
+                        statics = ValueProducer.Object(fields);
+                    }
+                    var gatherInput = new GatherInput(_gatherBuilder.Fields, _transport, statics);
+                    if (_gatherBuilder.IsIncludeAll) gatherInput.IncludeAll = true;
+                    request.Input = gatherInput;
+                }
+
+                // Static and event fields become a ValueInput when no component fields
+                if (request.Input == null && (_gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0))
+                {
+                    var fields = new Dictionary<string, ValueProducer>();
+                    foreach (var sf in _gatherBuilder.StaticFields)
+                        fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.FromClrType(sf.Value?.GetType()));
+                    foreach (var ef in _gatherBuilder.EventFields)
+                        fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
+                    request.Input = new ValueInput(ValueProducer.Object(fields), _transport);
+                }
+            }
+
+            if (_container != null)
+                request.Container = _container;
+
+            if (_whileLoading != null && _whileLoading.Count > 0)
+                request.Before = _whileLoading;
+
+            if (_response != null)
+            {
+                if (_response.SuccessHandlers.Count > 0)
+                    request.Success = _response.SuccessHandlers;
+                if (_response.ErrorHandlers.Count > 0)
+                    request.Error = _response.ErrorHandlers;
+                if (_response.ChainedRequest != null)
+                    request.Next = _response.ChainedRequest;
+            }
 
             if (_validatorType != null)
-                desc.AttachValidator(_validatorType);
+                request.ValidatorType = _validatorType;
 
-            return desc;
+            if (_gatherBuilder != null && _gatherBuilder.HeaderFields.Count > 0)
+                request.Headers = new Dictionary<string, ValueProducer>(_gatherBuilder.HeaderFields);
+
+            if (_gatherBuilder != null && _gatherBuilder.RouteParamFields.Count > 0)
+            {
+                var placeholderRe = new System.Text.RegularExpressions.Regex(@"\{(\w+)\}");
+
+                // Forward: every RouteParam must match a URL placeholder
+                foreach (var paramName in _gatherBuilder.RouteParamFields.Keys)
+                {
+                    if (!_url.Contains("{" + paramName + "}"))
+                        throw new InvalidOperationException(
+                            $"Route param '{paramName}' does not match any placeholder in URL '{_url}'. " +
+                            $"Expected '{{{paramName}}}' in the URL template.");
+                }
+
+                // Reverse: every URL placeholder must have a matching RouteParam
+                foreach (System.Text.RegularExpressions.Match match in placeholderRe.Matches(_url))
+                {
+                    var placeholder = match.Groups[1].Value;
+                    if (!_gatherBuilder.RouteParamFields.ContainsKey(placeholder))
+                        throw new InvalidOperationException(
+                            $"URL template '{_url}' has placeholder '{{{placeholder}}}' " +
+                            $"but no matching .RouteParam(\"{placeholder}\", ...) was provided.");
+                }
+
+                request.RouteParams = new Dictionary<string, ValueProducer>(_gatherBuilder.RouteParamFields);
+            }
+
+            return request;
         }
     }
 }

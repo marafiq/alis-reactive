@@ -1,7 +1,12 @@
 using Alis.Reactive;
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.AppLevel
 {
@@ -24,8 +29,8 @@ namespace Alis.Reactive.Native.AppLevel
         public static ComponentRef<NativeLoader, TModel> SetTarget<TModel>(
             this ComponentRef<NativeLoader, TModel> self, string targetId)
             where TModel : class
-            => self.Emit(new CallMutation("setAttribute",
-                   args: new MethodArg[] { new LiteralArg("data-target"), new LiteralArg(targetId) }));
+            => self.EmitCall("setAttribute",
+                   new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("data-target"), ValueProducer.Literal(targetId) });
 
         /// <summary>
         /// Sets an auto-hide timeout so the loader disappears after the specified duration.
@@ -37,8 +42,8 @@ namespace Alis.Reactive.Native.AppLevel
         public static ComponentRef<NativeLoader, TModel> SetTimeout<TModel>(
             this ComponentRef<NativeLoader, TModel> self, int ms)
             where TModel : class
-            => self.Emit(new CallMutation("setAttribute",
-                   args: new MethodArg[] { new LiteralArg("data-timeout"), new LiteralArg(ms.ToString()) }));
+            => self.EmitCall("setAttribute",
+                   new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("data-timeout"), ValueProducer.Literal(ms.ToString()) });
 
         /// <summary>
         /// Shows the loader overlay, making it visible and accessible.
@@ -49,10 +54,10 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("add", "classList",
-                           new[] { new LiteralArg("alis-loader--visible") }))
-                       .Emit(new CallMutation("removeAttribute",
-                           args: new MethodArg[] { new LiteralArg("aria-hidden") }));
+            EmitClassListCall(self, "classAdd", "classList.add", "alis-loader--visible");
+            self.EmitCall("removeAttribute",
+                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
+            return self;
         }
 
         /// <summary>
@@ -64,10 +69,21 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            return self.Emit(new CallMutation("remove", "classList",
-                           new[] { new LiteralArg("alis-loader--visible") }))
-                       .Emit(new CallMutation("setAttribute",
-                           args: new MethodArg[] { new LiteralArg("aria-hidden"), new LiteralArg("true") }));
+            EmitClassListCall(self, "classRemove", "classList.remove", "alis-loader--visible");
+            self.EmitCall("setAttribute",
+                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden"), ValueProducer.Literal("true") });
+            return self;
+        }
+
+        private static void EmitClassListCall<TModel>(
+            ComponentRef<NativeLoader, TModel> self, string memberName, string pathExpr, string className)
+            where TModel : class
+        {
+            var componentKey = self.Pipeline.Context.EnsureComponent(self.TargetId, self.Vendor);
+            self.Pipeline.Context.EnsureMethod(componentKey, memberName, pathExpr);
+            self.Pipeline.Steps.Add(
+                Reaction.Call(ComponentSource.Of(componentKey), memberName,
+                    new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(className) }));
         }
 
         /// <summary>
@@ -78,9 +94,15 @@ namespace Alis.Reactive.Native.AppLevel
         /// and shown via <see cref="Show{TModel}"/> in a reactive pipeline.
         /// </remarks>
         /// <returns>The loader HTML element.</returns>
+#if NET48
+        public static IHtmlString NativeLoader(this HtmlHelper html)
+        {
+            return new MvcHtmlString(
+#else
         public static IHtmlContent NativeLoader(this IHtmlHelper html)
         {
             return new HtmlString(
+#endif
                 "<div id=\"" + AppLevel.NativeLoader.ElementId + "\" class=\"alis-loader\" aria-hidden=\"true\">\n" +
                 "  <div class=\"alis-loader__spinner\"></div>\n" +
                 "  <p id=\"alis-loader-message\" class=\"alis-loader__message\"></p>\n" +

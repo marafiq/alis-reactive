@@ -1,0 +1,35 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs.IncludeModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
+@{
+    ViewData["Title"] = "Nested Bug — Claim 4: Include inside WhenField";
+    var plan = Html.ReactivePlan<IncludeModel>();
+}
+
+<h1>Claim 4 — Include inside WhenField</h1>
+
+<form id="include-form" class="space-y-4 p-4">
+    @{ Html.InputField(plan, m => m.IsEmployed, o => o.Label("Is Employed"))
+       .NativeCheckBox(b => b.CssClass("mr-2")); }
+
+    @{ Html.InputField(plan, m => m.JobTitle, o => o.Label("Job Title"))
+       .NativeTextBox(b => b.Placeholder("Job title").CssClass("border px-2 py-1")); }
+
+    @{ Html.InputField(plan, m => m.Department, o => o.Label("Department"))
+       .NativeTextBox(b => b.Placeholder("Department").CssClass("border px-2 py-1")); }
+
+    @(Html.NativeButton("submit-btn", "Submit")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post("/Sandbox/Validation/NestedBugs/SubmitInclude", g => g.IncludeAll())
+             .Validate<IncludeBugValidator>("include-form")
+             .Response(r => r
+                .OnSuccess(s => s.Element("result").SetText("Saved"))
+                .OnError(400, e => e.ValidationErrors("include-form")));
+        }))
+
+    <div id="result" class="mt-2 text-green-600"></div>
+</form>
+
+@Html.RenderPlan(plan)

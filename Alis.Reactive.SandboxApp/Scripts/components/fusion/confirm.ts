@@ -34,6 +34,8 @@ function showConfirmDialog(
  * The element must exist in the DOM (rendered by @Html.FusionConfirmDialog() in Layout).
  */
 export function init(): void {
+  // App-level singleton rendered by @Html.FusionConfirmDialog() in Layout.
+  // Not a plan component — getElementById is correct.
   const el = document.getElementById(ELEMENT_ID);
   if (!el) {
     log.warn("confirm element not found", { id: ELEMENT_ID });

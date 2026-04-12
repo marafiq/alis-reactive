@@ -1,5 +1,5 @@
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors.Mutations;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Fusion.Components
 {
@@ -20,14 +20,14 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, string? value)
             where TModel : class
-            => self.Emit(new SetPropMutation("value"), value: value);
+            => self.EmitSet("value", ValueProducer.Literal(value));
 
         /// <summary>Toggles the ColorPicker popup open/closed.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionColorPicker, TModel> Toggle<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
-            => self.Emit(new CallMutation("toggle"));
+            => self.EmitCall("toggle");
 
         /// <summary>Sets the disabled state of the ColorPicker.</summary>
         /// <param name="disabled"><see langword="true"/> to disable, <see langword="false"/> to enable.</param>
@@ -35,8 +35,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> Disable<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, bool disabled = true)
             where TModel : class
-            => self.Emit(new SetPropMutation("disabled", coerce: "boolean"),
-                value: disabled ? "true" : "false");
+            => self.EmitSet("disabled", ValueProducer.Literal(disabled));
 
         /// <summary>Reads the current color value for use in conditions or gather.</summary>
         /// <remarks>
@@ -47,6 +46,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
-            => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
+            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.String, "read"); return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember); }
     }
 }

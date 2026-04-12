@@ -1,7 +1,6 @@
 // Validation — Public API
-//
-// All logic lives in Scripts/validation/ modules.
-// This barrel re-export provides the public surface.
+// V3: validation rules live in Component.container.validationRules.
+// ContainerScope defines which components belong to the form and their rules.
 
-export { validate, revalidateField, showServerErrors, clearAll } from "./orchestrator";
-export { wireLiveValidation, unwireFields, resetLiveClearForTests } from "./live-clear";
+export { validateContainer, showServerErrors, clearContainerValidation, revalidateField } from "./orchestrator";
+export { wireLiveValidation, unwireField, resetLiveClearForTests } from "./live-clear";

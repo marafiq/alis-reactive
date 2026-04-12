@@ -1,7 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Components
 {
@@ -38,17 +37,15 @@ namespace Alis.Reactive.Native.Components
         public static NativeDropDownBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeDropDownBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,
-            Func<NativeDropDownEvents, TypedEventDescriptor<TArgs>> eventSelector,
+            Func<NativeDropDownEvents, TypedEvent<TArgs>> eventSelector,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
             var descriptor = eventSelector(NativeDropDownEvents.Instance);
-            var pb = new PipelineBuilder<TModel>();
+            var pb = new PipelineBuilder<TModel>(plan.Context);
             pipeline(descriptor.Args, pb);
 
-            var trigger = new ComponentEventTrigger(builder.ElementId, descriptor.JsEvent, _component.Vendor, builder.BindingPath, _component.ReadExpr);
-            foreach (var reaction in pb.BuildReactions())
-                plan.AddEntry(new Entry(trigger, reaction));
+            plan.Context.WireComponentEvent(builder.ElementId, "native", descriptor.JsEvent, pb.BuildReactions());
 
             return builder;
         }
