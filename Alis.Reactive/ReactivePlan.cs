@@ -14,19 +14,6 @@ namespace Alis.Reactive
     /// </summary>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
-        private static readonly JsonSerializerOptions CompactOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        private static readonly JsonSerializerOptions FormattedOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            WriteIndented = true
-        };
-
         private readonly Dictionary<string, ComponentRegistration> _componentsMap =
             new Dictionary<string, ComponentRegistration>();
 
@@ -80,14 +67,14 @@ namespace Alis.Reactive
         public string Render()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(_context.Plan, CompactOptions);
+            return ReactivePlanSerializer.Serialize(_context.Plan);
         }
 
         /// <summary>Registers all components and resolves validation, then serializes the plan as indented JSON for debugging.</summary>
         public string RenderFormatted()
         {
             ResolveAll();
-            return JsonSerializer.Serialize(_context.Plan, FormattedOptions);
+            return ReactivePlanSerializer.SerializeFormatted(_context.Plan);
         }
 
         private void ResolveAll()
@@ -315,5 +302,24 @@ namespace Alis.Reactive
 
             return Condition.Compare(left, cmp.Op, right, conditionShape);
         }
+    }
+
+    internal static class ReactivePlanSerializer
+    {
+        private static readonly JsonSerializerOptions Compact = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+
+        private static readonly JsonSerializerOptions Formatted = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = true
+        };
+
+        internal static string Serialize(Plan plan) => JsonSerializer.Serialize(plan, Compact);
+        internal static string SerializeFormatted(Plan plan) => JsonSerializer.Serialize(plan, Formatted);
     }
 }

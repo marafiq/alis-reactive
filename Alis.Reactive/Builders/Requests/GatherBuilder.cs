@@ -170,15 +170,13 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        private static readonly System.Text.RegularExpressions.Regex RouteParamNameRe =
-            new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9_]+$", System.Text.RegularExpressions.RegexOptions.Compiled);
 
         private void ValidateRouteParamName(string paramName)
         {
             if (string.IsNullOrWhiteSpace(paramName))
                 throw new System.ArgumentException("Route param name must not be null or whitespace.", nameof(paramName));
 
-            var hasInvalidCharacters = !RouteParamNameRe.IsMatch(paramName);
+            var hasInvalidCharacters = !GatherValidation.IsValidRouteParamName(paramName);
             if (hasInvalidCharacters)
                 throw new System.ArgumentException(
                     $"Route param name '{paramName}' contains invalid characters. " +
@@ -287,5 +285,14 @@ namespace Alis.Reactive.Builders.Requests
         /// Used at build time to expand to all registered components.
         /// </summary>
         internal bool IsIncludeAll => _includeAll;
+    }
+
+    internal static class GatherValidation
+    {
+        private static readonly System.Text.RegularExpressions.Regex RouteParamNamePattern =
+            new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9_]+$",
+                System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        internal static bool IsValidRouteParamName(string name) => RouteParamNamePattern.IsMatch(name);
     }
 }
