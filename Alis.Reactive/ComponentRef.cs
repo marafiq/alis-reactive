@@ -13,7 +13,6 @@ namespace Alis.Reactive
         where TComponent : IComponent, new()
         where TModel : class
     {
-        private static readonly TComponent _instance = new TComponent();
 
         internal string TargetId { get; }
         internal PipelineBuilder<TModel> Pipeline { get; }
@@ -54,6 +53,6 @@ namespace Alis.Reactive
             return this;
         }
 
-        internal string Vendor => _instance.Vendor;
+        internal string Vendor => new TComponent().Vendor;
     }
 }
