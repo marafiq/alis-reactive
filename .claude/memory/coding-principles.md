@@ -98,7 +98,7 @@ a missing secret, mention the possibility without reading the secret store.
 - Cross-property reads use the same mechanism: binding path, enriched fieldId, resolveRoot, walk(readExpr). No scanning, no new concepts.
 
 ### Date Handling
-- `shape: "date"` uses `toDate()` from `core/coerce.ts` — handles Date objects (SF), ISO strings, date-only strings with timezone safety.
+- `shape: "date"` uses `toDate()` from `core/shape-convert.ts` — handles Date objects (SF), ISO strings, date-only strings with timezone safety.
 - DateTime constraints serialize as `"YYYY-MM-DD"` when time is midnight — parsed as local midnight, timezone-safe.
 - Facility timezone is the application's responsibility.
 
@@ -109,7 +109,7 @@ a missing secret, mention the possibility without reading the secret store.
 
 ### Live Re-Validation
 - Industry standard: clear on input, re-validate on blur/change.
-- `evaluateField()` is shared between `validate()` (submit) and `revalidateField()` (blur).
+- `validateContainer()` handles submit; `revalidateField()` handles blur. Both use the same rule evaluation logic.
 
 ## Validation Session Mistake Patterns
 

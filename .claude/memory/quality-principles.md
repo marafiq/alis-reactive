@@ -27,8 +27,8 @@ Before ANY code change from an audit finding, the issue MUST satisfy ALL nine cr
 | 8 | Verify framework alignment | Plan-driven architecture, fail-fast, vertical slices |
 | 9 | Confirm all tests pass after fix | No regressions |
 
-**Why this exists:** Agents flagged "issues" that were correct design decisions (sync executeCommand,
-window.alis.confirm, evalCondition null blocking). Evidence-first prevents wasted effort and
+**Why this exists:** Agents flagged "issues" that were correct design decisions (sync executeReaction,
+window.alis.confirm, evaluateCondition null blocking). Evidence-first prevents wasted effort and
 accidental architecture reversals.
 
 **How to apply:** Include these 9 criteria in every audit agent prompt. Reject any finding that
