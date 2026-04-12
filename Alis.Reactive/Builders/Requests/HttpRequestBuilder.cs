@@ -85,13 +85,14 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Executes commands after the HTTP request completes, regardless of success, error, or network failure (e.g. hide a spinner).</summary>
+        /// <summary>Executes commands after the HTTP request completes, regardless of success, error, or network failure.</summary>
         /// <remarks>
-        /// Supports element commands, component commands, and condition guards.
+        /// <para>Supports element commands, component commands, and condition guards.
         /// Does not provide response body access because the response may not
-        /// exist on network failure.
+        /// exist on network failure.</para>
+        /// <para>Typical use: hide a loading spinner that <see cref="WhileLoading"/> showed.</para>
         /// </remarks>
-        /// <param name="pipeline">Builds the commands to execute after the request completes.</param>
+        /// <param name="pipeline">Configures the cleanup commands to run after the request settles.</param>
         /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Finally(Action<PipelineBuilder<TModel>> pipeline)
         {

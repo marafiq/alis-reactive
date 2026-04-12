@@ -62,9 +62,14 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Dispatches a custom browser event with a source-backed payload whose fields are resolved at runtime.</summary>
-        /// <typeparam name="TPayload">The payload type that the listener will consume via <c>CustomEvent&lt;TPayload&gt;</c>.</typeparam>
-        /// <param name="eventName">The event name.</param>
-        /// <param name="configure">Sets payload fields from component values, URL params, plugin reads, or literals.</param>
+        /// <remarks>
+        /// Each field on <typeparamref name="TPayload"/> can come from a live component value,
+        /// URL parameter, plugin read, or a compile-time literal. The listener consumes the
+        /// payload via <c>t.CustomEvent&lt;TPayload&gt;(name, (payload, p) =&gt; ...)</c>.
+        /// </remarks>
+        /// <typeparam name="TPayload">The payload type matching the <c>CustomEvent&lt;TPayload&gt;</c> listener.</typeparam>
+        /// <param name="eventName">The event name. Listeners registered with <c>t.CustomEvent("name", ...)</c> will fire.</param>
+        /// <param name="configure">Populates payload fields via <see cref="DispatchPayloadBuilder{TPayload, TModel}"/>.</param>
         /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(
             string eventName,

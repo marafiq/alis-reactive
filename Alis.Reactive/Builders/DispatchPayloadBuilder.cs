@@ -7,11 +7,13 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Builds a dispatch event payload by setting typed fields from live sources
-    /// (component values, URL params, plugin reads) or literals.
+    /// Composes a custom-event dispatch payload from live sources and literals.
+    /// Each field is set via a typed expression on <typeparamref name="TPayload"/>,
+    /// matching the shape that <see cref="Builders.TriggerBuilder{TModel}.CustomEvent{TPayload}"/>
+    /// listeners consume.
     /// </summary>
-    /// <typeparam name="TPayload">The payload type that the listener will consume.</typeparam>
-    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TPayload">The payload type that the listener will consume via <c>CustomEvent&lt;TPayload&gt;</c>.</typeparam>
+    /// <typeparam name="TModel">The view model type providing component registrations.</typeparam>
     public class DispatchPayloadBuilder<TPayload, TModel>
         where TPayload : class
         where TModel : class
@@ -20,10 +22,10 @@ namespace Alis.Reactive.Builders
 
         internal DispatchPayloadBuilder() { }
 
-        /// <summary>Sets a payload field from a typed source (component value, URL param, plugin read).</summary>
-        /// <typeparam name="TProp">The property type.</typeparam>
-        /// <param name="field">Expression selecting the payload property to set.</param>
-        /// <param name="source">The typed source providing the runtime value.</param>
+        /// <summary>Sets a payload field from a live source resolved at dispatch time.</summary>
+        /// <typeparam name="TProp">The field value type, inferred from the expression.</typeparam>
+        /// <param name="field">The payload property to populate, e.g. <c>x =&gt; x.Name</c>.</param>
+        /// <param name="source">A component value, URL param, or plugin read that provides the runtime value.</param>
         /// <returns>This builder for chaining.</returns>
         public DispatchPayloadBuilder<TPayload, TModel> Set<TProp>(
             Expression<Func<TPayload, TProp>> field,
@@ -35,8 +37,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets a payload field to a literal string value.</summary>
-        /// <param name="field">Expression selecting the payload property to set.</param>
-        /// <param name="value">The literal value.</param>
+        /// <param name="field">The payload property to populate, e.g. <c>x =&gt; x.Status</c>.</param>
+        /// <param name="value">The compile-time constant embedded in the plan.</param>
         /// <returns>This builder for chaining.</returns>
         public DispatchPayloadBuilder<TPayload, TModel> Set(
             Expression<Func<TPayload, string>> field,
@@ -48,8 +50,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets a payload field to a literal int value.</summary>
-        /// <param name="field">Expression selecting the payload property to set.</param>
-        /// <param name="value">The literal value.</param>
+        /// <param name="field">The payload property to populate, e.g. <c>x =&gt; x.Status</c>.</param>
+        /// <param name="value">The compile-time constant embedded in the plan.</param>
         /// <returns>This builder for chaining.</returns>
         public DispatchPayloadBuilder<TPayload, TModel> Set(
             Expression<Func<TPayload, int>> field,
@@ -61,8 +63,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets a payload field to a literal bool value.</summary>
-        /// <param name="field">Expression selecting the payload property to set.</param>
-        /// <param name="value">The literal value.</param>
+        /// <param name="field">The payload property to populate, e.g. <c>x =&gt; x.Status</c>.</param>
+        /// <param name="value">The compile-time constant embedded in the plan.</param>
         /// <returns>This builder for chaining.</returns>
         public DispatchPayloadBuilder<TPayload, TModel> Set(
             Expression<Func<TPayload, bool>> field,
