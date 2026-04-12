@@ -81,7 +81,45 @@ namespace Alis.Reactive.Builders
                 throw new InvalidOperationException(
                     "Dispatch payload must have at least one field. Use Dispatch(eventName) for no-payload dispatch.");
 
-            return ValueProducer.Object(_fields);
+            return ValueProducer.Object(ExpandNestedPaths(_fields));
+        }
+
+        /// <summary>
+        /// Expands dotted keys like <c>"address.city"</c> into nested ObjectProducers
+        /// so the dispatched event carries <c>{ address: { city: value } }</c> instead
+        /// of <c>{ "address.city": value }</c>. Matches how typed payload listeners
+        /// resolve nested properties.
+        /// </summary>
+        private static Dictionary<string, ValueProducer> ExpandNestedPaths(
+            Dictionary<string, ValueProducer> flat)
+        {
+            var root = new Dictionary<string, ValueProducer>();
+
+            foreach (var kvp in flat)
+            {
+                var segments = kvp.Key.Split('.');
+                var isTopLevel = segments.Length == 1;
+                if (isTopLevel)
+                {
+                    root[kvp.Key] = kvp.Value;
+                    continue;
+                }
+
+                // Walk/create nested dictionaries for each intermediate segment
+                var current = root;
+                for (var i = 0; i < segments.Length - 1; i++)
+                {
+                    var needsNesting = !current.ContainsKey(segments[i]);
+                    if (needsNesting)
+                        current[segments[i]] = ValueProducer.Object(new Dictionary<string, ValueProducer>());
+
+                    current = ((ObjectProducer)current[segments[i]]).WritableFields;
+                }
+
+                current[segments[segments.Length - 1]] = kvp.Value;
+            }
+
+            return root;
         }
     }
 }

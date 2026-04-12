@@ -1,8 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
 /// <summary>
-/// Issue #86: Dispatch payloads can now carry live component values
-/// alongside literal values in the same typed payload.
+/// Issue #86: Dispatch payloads carry live component values — flat, literal, and nested.
 /// </summary>
 [TestFixture]
 public class WhenDispatchingWithComponentValue : PlaywrightTestBase
@@ -34,9 +33,7 @@ public class WhenDispatchingWithComponentValue : PlaywrightTestBase
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Dispatch Transfer" }));
 
         await Expect(Page.Locator("#received-result")).ToHaveTextAsync("Received!");
-        // Source field — live value from textbox
         await Expect(Page.Locator("#received-name")).ToHaveTextAsync("Bob Jones");
-        // Literal field — baked at build time
         await Expect(Page.Locator("#received-status-value")).ToHaveTextAsync("active");
         AssertNoConsoleErrors();
     }
@@ -49,15 +46,29 @@ public class WhenDispatchingWithComponentValue : PlaywrightTestBase
         var textbox = Page.GetByPlaceholder("Type a name...");
         var button = Page.GetByRole(AriaRole.Button, new() { Name = "Dispatch Transfer" });
 
-        // First dispatch
         await textbox.FillAsync("First");
         await ClickWhenStable(button);
         await Expect(Page.Locator("#received-name")).ToHaveTextAsync("First");
 
-        // Change value and dispatch again — proves runtime read, not cached
         await textbox.FillAsync("Second");
         await ClickWhenStable(button);
         await Expect(Page.Locator("#received-name")).ToHaveTextAsync("Second");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task dispatch_carries_nested_address_city_from_textbox()
+    {
+        await NavigateToDispatchSourcePage();
+
+        await Page.GetByPlaceholder("Type a name...").FillAsync("Alice");
+        await Page.GetByPlaceholder("Type a city...").FillAsync("Seattle");
+        await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Dispatch Transfer" }));
+
+        await Expect(Page.Locator("#received-result")).ToHaveTextAsync("Received!");
+        await Expect(Page.Locator("#received-name")).ToHaveTextAsync("Alice");
+        await Expect(Page.Locator("#received-city")).ToHaveTextAsync("Seattle");
+        await Expect(Page.Locator("#received-status-value")).ToHaveTextAsync("active");
         AssertNoConsoleErrors();
     }
 }

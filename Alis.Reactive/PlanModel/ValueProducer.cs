@@ -128,6 +128,9 @@ namespace Alis.Reactive.PlanModel
             Fields = fields ?? throw new ArgumentNullException(nameof(fields));
             Shape = shape == null || shape.IsNone ? null : shape;
         }
+
+        /// <summary>Gets the underlying mutable dictionary for building nested structures.</summary>
+        internal Dictionary<string, ValueProducer> WritableFields => (Dictionary<string, ValueProducer>)Fields;
     }
 
     /// <summary>A composite value built from ordered item expressions.</summary>
