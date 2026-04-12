@@ -71,6 +71,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the reactions to execute concurrently.</summary>
         public IReadOnlyList<Reaction> Steps { get; }
         /// <summary>Gets the reaction to execute after all steps settle, or <see langword="null"/> if none.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public Reaction? OnSettled { get; }
 
         internal ParallelReaction(List<Reaction> steps, Reaction? onSettled)
@@ -138,14 +139,14 @@ namespace Alis.Reactive.PlanModel
         public Source On { get; }
         /// <summary>Gets the method name to call.</summary>
         public string Method { get; }
-        /// <summary>Gets the method arguments, or <see langword="null"/> when the method takes no arguments.</summary>
-        public IReadOnlyList<ValueProducer>? Args { get; }
+        /// <summary>Gets the method arguments. Empty when the method takes no arguments.</summary>
+        public IReadOnlyList<ValueProducer> Args { get; }
 
         internal CallReaction(Source on, string method, List<ValueProducer>? args)
         {
             On = on ?? throw new ArgumentNullException(nameof(on));
             Method = method ?? throw new ArgumentNullException(nameof(method));
-            Args = args != null && args.Count > 0 ? args : null;
+            Args = args != null && args.Count > 0 ? args : (IReadOnlyList<ValueProducer>)System.Array.Empty<ValueProducer>();
         }
     }
 
@@ -167,15 +168,16 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "dispatch";
         /// <summary>Gets the event name to dispatch.</summary>
         public string Event { get; }
-        /// <summary>Gets the optional event payload, or <see langword="null"/> for no data.</summary>
-        public ValueProducer? Data { get; }
+        /// <summary>Gets the event payload. <see cref="ValueProducer.None"/> when no data is provided.</summary>
+        public ValueProducer Data { get; }
         /// <summary>Gets the optional payload type tag, or <see langword="null"/> when untyped.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public string? PayloadType { get; }
 
         internal DispatchReaction(string eventName, ValueProducer? data, string? payloadType)
         {
             Event = eventName ?? throw new ArgumentNullException(nameof(eventName));
-            Data = data;
+            Data = data ?? ValueProducer.None;
             PayloadType = payloadType;
         }
     }

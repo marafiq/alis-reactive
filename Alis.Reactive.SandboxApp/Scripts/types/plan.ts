@@ -200,7 +200,7 @@ export interface CallReaction {
   kind: "call";
   on: Source;
   method: string;
-  args?: ValueProducer[];
+  args: ValueProducer[];
 }
 
 export interface RequestReaction {
@@ -211,7 +211,7 @@ export interface RequestReaction {
 export interface DispatchReaction {
   kind: "dispatch";
   event: string;
-  data?: ValueProducer;
+  data: ValueProducer;
   payloadType?: string;
 }
 

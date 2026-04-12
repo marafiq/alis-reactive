@@ -315,7 +315,7 @@
     },
     "CallReaction": {
       "type": "object",
-      "required": ["kind", "on", "method"],
+      "required": ["kind", "on", "method", "args"],
       "properties": {
         "kind": { "const": "call" },
         "on": { "$ref": "#/$defs/Source" },
@@ -336,7 +336,7 @@
     },
     "DispatchReaction": {
       "type": "object",
-      "required": ["kind", "event"],
+      "required": ["kind", "event", "data"],
       "properties": {
         "kind": { "const": "dispatch" },
         "event": { "type": "string", "minLength": 1 },
