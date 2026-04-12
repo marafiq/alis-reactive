@@ -5,7 +5,7 @@
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <IsPackable>true</IsPackable>
+        <IsPackable>false</IsPackable>
         <DevelopmentDependency>true</DevelopmentDependency>
         <PackageDescription>Roslyn analyzers for Alis.Reactive — compile-time checks for correct DSL usage, API surface protection, and HTTP pipeline validation.</PackageDescription>
         <PackageTags>reactive;analyzers;roslyn;code-analysis</PackageTags>
