@@ -307,6 +307,14 @@ pipeline.When(comp.Value()).Gt(0m)                   test component value agains
     .Then(then => { ... })
     .Else(otherwise => { ... });
 
+§ From URL query parameter:
+pipeline.When(pipeline.FromUrl<int>("page")).Gt(1)
+    .Then(then => { ... });
+
+§ From plugin read:
+pipeline.When(pipeline.Plugin<int>("arr", "count").Arg(src)).Gt(0)
+    .Then(then => { ... });
+
 § Operators — 21 total, typed to the source:
 ├── .Eq(val) / .NotEq(val)                           equality
 ├── .Truthy() / .Falsy()                             presence (no operand)
@@ -349,7 +357,10 @@ pipeline.Delete(url)
 │   ├── g.IncludeAll()                               all registered components
 │   ├── g.Include<T, TModel>(m => m.Prop)             specific component
 │   ├── g.Static("key", value) / g.FromEvent(args, a => a.Prop, "param")
-│   └── ...                                          (more: Include by string ref)
+│   ├── g.Header("name", value)                      HTTP header
+│   ├── g.RouteParam("name", value)                  URL template param
+│   ├── g.FromUrl("param") / g.FromUrl<T>("param")   URL query param
+│   └── g.Plugin(pluginSource, "param")              plugin value
 │
 ├── .AsJson() (default) / .AsFormData()               content type
 ├── .Validate<TValidator>("formId")                  client-side validation gate
@@ -370,6 +381,20 @@ pipeline.Parallel(                                   § concurrent requests
     b => b.Post(url).Gather(...).Response(...)
 )
 └── .OnAllSettled(pipeline => { ... })               ↻ after all complete
+```
+
+#### Plugin
+
+Read values from registered JS plugins, or call void methods. Plugins are registered once via `plan.RegisterPlugin()`; their methods become sources anywhere in the pipeline.
+
+```
+pipeline.Plugin<T>("pluginName", "method")           § read → TypedPluginSource<T>
+├── .Arg(json, x => x.Items) / .Arg("literal")       response body, event, source, or literal
+└── (implicit conversion)                             use in SetText, When, Gather, Header
+
+pipeline.Plugin("pluginName", "method")              § void
+├── .Arg(...)                                         same arg overloads
+└── .Fire()                                           terminal — emits call
 ```
 
 ### Events and Typed Args
@@ -404,4 +429,6 @@ The following pages cover each module in detail:
 | 🧩 | [**Component API**](../reactivity/component-api/) | Targeting components — write, call, read values |
 | 🔀 | [**Conditions**](../reactivity/conditions/) | Branching — When/Then/ElseIf/Else, operators, composition |
 | 🌐 | [**HTTP Pipeline**](../reactivity/http-pipeline/) | Server communication — gather, validate, post, handle response |
+| 🔗 | [**HTTP Pipeline Extensions**](../reactivity/http-pipeline-extensions/) | Headers, URL templates, URL query params, method arguments |
+| 🔌 | [**Plugin System**](../reactivity/plugins/) | JS plugin registration, method reads, void calls, nesting |
 | 🏷️ | **Tag Helpers** | Layout primitives — headings, cards, stacks, grids |
