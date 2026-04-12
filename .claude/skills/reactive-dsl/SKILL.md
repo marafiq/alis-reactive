@@ -284,7 +284,7 @@ These patterns are extracted from 127 real sandbox views. Use exactly these form
 **Most common: .Reactive() on component (252+ uses)**
 Source: `Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml`
 ```csharp
-@{ Html.InputField(plan, m => m.Category, o => o.Required().Label("Category"))
+@{ Html.InputField(plan, m => m.Category, o => o.Label("Category (SF DropDownList)"))
    .FusionDropDownList(b => b
        .DataSource(categories)
        .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -321,12 +321,21 @@ Source: `Areas/Sandbox/Views/Validation/Contract/Index.cshtml`
 ```
 
 **Conditions with component reads (150+ uses)**
-Source: `Areas/Sandbox/Views/Conditions/CareLevelCascade/Index.cshtml`
+Source: `Areas/Sandbox/Views/Conditions/CareLevelCascade/Index.cshtml:37-51`
 ```csharp
-p.When(args, x => x.Value).Eq("Memory Care")
+var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
+
+p.Element("s1-current-level").SetText(careLevel.Value());
+
+p.When(careLevel.Value()).Eq("Memory Care")
  .Then(then =>
  {
      then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Enhanced Monitoring");
+ })
+ .ElseIf(careLevel.Value()).Eq("Skilled Nursing")
+ .Then(then =>
+ {
+     then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Standard Protocol");
  })
  .Else(else_ =>
  {
