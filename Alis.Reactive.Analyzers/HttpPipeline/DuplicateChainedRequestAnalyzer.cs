@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -49,51 +48,36 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
         {
             var invocation = (InvocationExpressionSyntax)context.Node;
 
-            if (!IsRazorGeneratedFile(invocation.SyntaxTree))
+            if (!AnalyzerHelpers.IsRazorGeneratedFile(invocation.SyntaxTree))
                 return;
 
             if (!IsChainedCall(invocation))
                 return;
 
-            // Walk the receiver chain backwards — if another .Chained() exists earlier, flag this one
-            var current = GetReceiverInvocation(invocation);
+            if (HasEarlierChainedCall(invocation))
+            {
+                var memberAccess = (MemberAccessExpressionSyntax)invocation.Expression;
+                context.ReportDiagnostic(
+                    Diagnostic.Create(Rule, memberAccess.Name.GetLocation()));
+            }
+        }
 
+        private static bool HasEarlierChainedCall(InvocationExpressionSyntax invocation)
+        {
+            var current = AnalyzerHelpers.GetReceiverInvocation(invocation);
             while (current != null)
             {
                 if (IsChainedCall(current))
-                {
-                    // Report at the ".Chained" method name location
-                    var memberAccess = (MemberAccessExpressionSyntax)invocation.Expression;
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(Rule, memberAccess.Name.GetLocation()));
-                    return;
-                }
-                current = GetReceiverInvocation(current);
+                    return true;
+                current = AnalyzerHelpers.GetReceiverInvocation(current);
             }
+            return false;
         }
 
         private static bool IsChainedCall(InvocationExpressionSyntax invocation)
         {
-            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
-                return memberAccess.Name.Identifier.Text == "Chained";
-            return false;
-        }
-
-        private static InvocationExpressionSyntax? GetReceiverInvocation(InvocationExpressionSyntax invocation)
-        {
-            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess
-                && memberAccess.Expression is InvocationExpressionSyntax receiver)
-                return receiver;
-            return null;
-        }
-
-        private static bool IsRazorGeneratedFile(SyntaxTree tree)
-        {
-            var path = tree.FilePath;
-            if (string.IsNullOrEmpty(path)) return false;
-
-            return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
+            return invocation.Expression is MemberAccessExpressionSyntax memberAccess
+                && memberAccess.Name.Identifier.Text == "Chained";
         }
     }
 }

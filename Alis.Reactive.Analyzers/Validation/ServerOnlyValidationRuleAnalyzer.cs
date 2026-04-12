@@ -49,10 +49,24 @@ namespace Alis.Reactive.Analyzers.Validation
             context.ConfigureGeneratedCodeAnalysis(
                 GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+
+            context.RegisterCompilationStartAction(compilationCtx =>
+            {
+                var reactiveValidatorType = compilationCtx.Compilation.GetTypeByMetadataName(
+                    "Alis.Reactive.FluentValidator.ReactiveValidator`1");
+
+                if (reactiveValidatorType == null)
+                    return;
+
+                compilationCtx.RegisterSyntaxNodeAction(
+                    nodeCtx => AnalyzeInvocation(nodeCtx, reactiveValidatorType),
+                    SyntaxKind.InvocationExpression);
+            });
         }
 
-        private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeInvocation(
+            SyntaxNodeAnalysisContext context,
+            INamedTypeSymbol reactiveValidatorType)
         {
             var invocation = (InvocationExpressionSyntax)context.Node;
 
@@ -60,48 +74,19 @@ namespace Alis.Reactive.Analyzers.Validation
                 return;
 
             var methodName = memberAccess.Name.Identifier.Text;
-
             if (!ServerOnlyMethods.Contains(methodName))
                 return;
 
-            var classDecl = FindContainingClass(invocation);
+            var classDecl = AnalyzerHelpers.FindContainingClass(invocation);
             if (classDecl == null)
                 return;
 
-            if (!ExtendsReactiveValidator(classDecl))
+            if (!AnalyzerHelpers.InheritsFromReactiveValidator(
+                classDecl, context.SemanticModel, reactiveValidatorType, context.CancellationToken))
                 return;
 
             context.ReportDiagnostic(
                 Diagnostic.Create(Rule, memberAccess.Name.GetLocation(), methodName));
-        }
-
-        private static ClassDeclarationSyntax? FindContainingClass(SyntaxNode node)
-        {
-            var current = node.Parent;
-            while (current != null)
-            {
-                if (current is ClassDeclarationSyntax classDecl)
-                    return classDecl;
-                current = current.Parent;
-            }
-            return null;
-        }
-
-        private static bool ExtendsReactiveValidator(ClassDeclarationSyntax classDecl)
-        {
-            if (classDecl.BaseList == null)
-                return false;
-
-            foreach (var baseType in classDecl.BaseList.Types)
-            {
-                var typeName = baseType.Type.ToString();
-                // Check for ReactiveValidator<...> pattern — base type starts with "ReactiveValidator<"
-                // or equals "ReactiveValidator" (raw, non-generic, unlikely but safe)
-                if (typeName.StartsWith("ReactiveValidator<", StringComparison.Ordinal) || typeName == "ReactiveValidator")
-                    return true;
-            }
-
-            return false;
         }
     }
 }

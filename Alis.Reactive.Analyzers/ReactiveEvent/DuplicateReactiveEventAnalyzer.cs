@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -51,7 +48,7 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
         {
             var invocation = (InvocationExpressionSyntax)context.Node;
 
-            if (!IsRazorGeneratedFile(invocation.SyntaxTree))
+            if (!AnalyzerHelpers.IsRazorGeneratedFile(invocation.SyntaxTree))
                 return;
 
             if (!IsReactiveCall(invocation))
@@ -61,42 +58,34 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
             if (eventName == null)
                 return;
 
-            // Walk the receiver chain backwards — collect all .Reactive() calls on this builder
-            var seenEvents = new HashSet<string>();
-            var current = GetReceiverInvocation(invocation);
-
-            while (current != null)
-            {
-                if (IsReactiveCall(current))
-                {
-                    var innerEvent = ExtractEventName(current);
-                    if (innerEvent != null)
-                        seenEvents.Add(innerEvent);
-                }
-                current = GetReceiverInvocation(current);
-            }
-
-            // If the current event was already seen in an earlier .Reactive() on this chain, flag it
-            if (seenEvents.Contains(eventName))
+            if (HasEarlierReactiveCallForEvent(invocation, eventName))
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(Rule, invocation.GetLocation(), eventName));
             }
         }
 
-        private static bool IsReactiveCall(InvocationExpressionSyntax invocation)
+        private static bool HasEarlierReactiveCallForEvent(
+            InvocationExpressionSyntax invocation, string eventName)
         {
-            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
-                return memberAccess.Name.Identifier.Text == "Reactive";
+            var current = AnalyzerHelpers.GetReceiverInvocation(invocation);
+            while (current != null)
+            {
+                if (IsReactiveCall(current))
+                {
+                    var innerEvent = ExtractEventName(current);
+                    if (innerEvent == eventName)
+                        return true;
+                }
+                current = AnalyzerHelpers.GetReceiverInvocation(current);
+            }
             return false;
         }
 
-        private static InvocationExpressionSyntax? GetReceiverInvocation(InvocationExpressionSyntax invocation)
+        private static bool IsReactiveCall(InvocationExpressionSyntax invocation)
         {
-            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess
-                && memberAccess.Expression is InvocationExpressionSyntax receiver)
-                return receiver;
-            return null;
+            return invocation.Expression is MemberAccessExpressionSyntax memberAccess
+                && memberAccess.Name.Identifier.Text == "Reactive";
         }
 
         private static string? ExtractEventName(InvocationExpressionSyntax invocation)
@@ -105,23 +94,13 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
             if (args.Count < 2)
                 return null;
 
-            var selectorArg = args[1].Expression;
-            if (selectorArg is SimpleLambdaExpressionSyntax lambda
+            if (args[1].Expression is SimpleLambdaExpressionSyntax lambda
                 && lambda.Body is MemberAccessExpressionSyntax memberAccess)
             {
                 return memberAccess.Name.Identifier.Text;
             }
 
             return null;
-        }
-
-        private static bool IsRazorGeneratedFile(SyntaxTree tree)
-        {
-            var path = tree.FilePath;
-            if (string.IsNullOrEmpty(path)) return false;
-
-            return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

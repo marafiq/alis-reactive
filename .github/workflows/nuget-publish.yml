@@ -11,6 +11,7 @@ on:
       - 'Alis.Reactive.Fusion/**'
       - 'Alis.Reactive.FluentValidator/**'
       - 'Alis.Reactive.NativeTagHelpers/**'
+      - 'Alis.Reactive.Analyzers/**'
       - 'Alis.Reactive.SandboxApp/Scripts/**'
       - 'Alis.Reactive.SandboxApp/Styles/**'
       - 'Directory.Build.props'
@@ -53,6 +54,7 @@ jobs:
           dotnet test tests/Alis.Reactive.Native.UnitTests --configuration Release --no-build
           dotnet test tests/Alis.Reactive.Fusion.UnitTests --configuration Release --no-build
           dotnet test tests/Alis.Reactive.FluentValidator.UnitTests --configuration Release --no-build
+          dotnet test tests/Alis.Reactive.Analyzers.Tests --configuration Release --no-build
 
   playwright:
     runs-on: ubuntu-latest
@@ -178,6 +180,7 @@ jobs:
           dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj $PACK_ARGS
           dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj $PACK_ARGS
           dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj $PACK_ARGS
+          dotnet pack Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj $PACK_ARGS
 
       - name: Log package versions
         run: ls -1 ./nupkgs/
