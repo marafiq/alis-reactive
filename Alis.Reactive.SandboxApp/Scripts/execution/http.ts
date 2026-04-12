@@ -100,7 +100,7 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     }
   } catch (err) {
     const status = err instanceof TypeError ? 0 : -1;
-    t.error("http.request.fail", { url: req.url, method: req.method }, err as Error);
+    t.error("http.request.fail", { url: req.url, method: req.method, status }, err as Error);
     await routeHandlers(req.error, status, plan, ctx);
     await runComplete(req, plan, ctx);
     return; // no chained on error

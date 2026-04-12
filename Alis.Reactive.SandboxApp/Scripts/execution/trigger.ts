@@ -25,15 +25,15 @@ function describeTrigger(trigger: StartsWhen): string {
  * in the same tick as the SF event callback. SF checks args.cancel AFTER
  * this returns, so the mutation is visible.
  */
-function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext): void {
+function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext, triggerDesc: string): void {
   const scoped = t.withSpan(ctx?.span);
   try {
     const result = executeReaction(reaction, plan, ctx);
     if (result instanceof Promise) {
-      result.catch(err => scoped.error("reaction.fail", { planId: plan.planId }, err as Error));
+      result.catch(err => scoped.error("reaction.fail", { trigger: triggerDesc, planId: plan.planId }, err as Error));
     }
   } catch (err) {
-    scoped.error("reaction.fail", { planId: plan.planId }, err as Error);
+    scoped.error("reaction.fail", { trigger: triggerDesc, planId: plan.planId }, err as Error);
   }
 }
 
@@ -44,15 +44,16 @@ export function wireBehavior(
   signal?: AbortSignal
 ): void {
   const opts: AddEventListenerOptions | undefined = signal ? { signal } : undefined;
+  const triggerDesc = describeTrigger(trigger);
 
   switch (trigger.kind) {
     case "page-ready":
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
-          runReaction(reaction, plan, {});
+          runReaction(reaction, plan, {}, triggerDesc);
         }, opts);
       } else {
-        runReaction(reaction, plan, {});
+        runReaction(reaction, plan, {}, triggerDesc);
       }
       break;
 
@@ -60,7 +61,7 @@ export function wireBehavior(
       t.debug("trigger.wire", { kind: "document-event", event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
         const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e };
-        runReaction(reaction, plan, ctx);
+        runReaction(reaction, plan, ctx, triggerDesc);
       }, opts);
       break;
 
@@ -76,7 +77,7 @@ export function wireBehavior(
 
       wireEvent(plan, trigger.component, channel, (eventData) => {
         const ctx: ExecContext = { event: eventData };
-        runReaction(reaction, plan, ctx);
+        runReaction(reaction, plan, ctx, triggerDesc);
       }, opts);
       break;
     }
