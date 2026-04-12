@@ -335,7 +335,7 @@ p.When(careLevel.Value()).Eq("Memory Care")
  .ElseIf(careLevel.Value()).Eq("Skilled Nursing")
  .Then(then =>
  {
-     then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Standard Protocol");
+     then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Full Clinical");
  })
  .Else(else_ =>
  {
