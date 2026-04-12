@@ -82,7 +82,7 @@ A `sealed class` with a parameterless constructor. Implements `IInputComponent` 
 
 ### 2. Events registry — what the component can fire
 
-A singleton class with `TypedEventDescriptor<TArgs>` properties. The `.Reactive()` lambda `evt => evt.Changed` resolves to this descriptor, which carries the JS event name and the typed args class.
+A singleton class with `TypedEventDescriptor<TArgs>` properties. The `.Reactive()` lambda `evt => evt.Changed` resolves to this event definition, which carries the JS event name and the typed args class.
 
 ### 3. Event args — typed payload properties
 
@@ -142,4 +142,4 @@ plan -> runtime: executes {
 }
 ```
 
-**Previous:** [Descriptors & Plan](../descriptors-and-plan/)
+**Previous:** [Plan Model & Plan](../descriptors-and-plan/)

@@ -118,7 +118,7 @@ fetch -> inject -> merge
 | Component IDs | Unique per `Html.InputField` expression — `m => m.Name` produces `"Name"`, `m => m.Address.City` produces `"Address_City"` |
 | Event scope | `Dispatch` fires `CustomEvent` on `document` — visible to all plans |
 | Gather scope | `IncludeAll` gathers from the plan's own ComponentsMap only |
-| Validation scope | `Validate<T>` operates on the plan's own validation descriptors |
+| Validation scope | `Validate<T>` operates on the plan's own validation rules |
 | Listener teardown | `AbortSignal` from `boot.ts` — `resetBootStateForTests()` aborts all listeners |
 
 ## When to use which

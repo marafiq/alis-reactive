@@ -69,7 +69,7 @@ Alis.Reactive.Fusion/Components/FusionXxx/
 ├── FusionXxx.cs                      ← 1. Component type marker
 ├── FusionXxxExtensions.cs            ← 2. Mutations (SetValue, Focus, Value)
 ├── FusionXxxHtmlExtensions.cs        ← 3. Factory method (Html.Xxx())
-├── FusionXxxEvents.cs                ← 4. Event descriptor registry
+├── FusionXxxEvents.cs                ← 4. Event registry
 ├── FusionXxxReactiveExtensions.cs    ← 5. .Reactive() wiring
 └── Events/
     ├── FusionXxxOnChanged.cs         ← 6. Changed event args
@@ -296,7 +296,7 @@ public static class FusionXxxHtmlExtensions
             Component.Vendor,                                // "fusion"
             setup.BindingPath,
             Component.ReadExpr,                              // "value" or "checked"
-            "xxx",                                           // component type descriptor
+            "xxx",                                           // component type label
             CoercionTypes.InferFromType(typeof(TProp))));    // auto-inferred
 
         // 2. Create the SF EJ2 builder — pass htmlAttributes as a PARAMETER to XxxFor()
@@ -365,9 +365,9 @@ SF uses camelCase field names. The helper extracts the member name from the expr
 
 ---
 
-## File 4: Event descriptor registry
+## File 4: Event registry
 
-A singleton that maps event names to typed descriptors:
+A singleton that maps event names to typed event definitions:
 
 ```csharp
 public sealed class FusionXxxEvents
@@ -531,7 +531,7 @@ When onboarding any component — **none of these change:**
 | TS runtime | `trigger.ts`, `commands.ts`, `element.ts`, `gather.ts` | Plan carries vendor + readExpr, runtime resolves via bracket notation |
 | JSON schema | `reactive-plan.schema.json` | Existing mutation kinds (set-prop, call) cover all component APIs |
 | TS types | `types/*.ts` | No new command kinds or trigger kinds |
-| Core descriptors | `Alis.Reactive/` project | Existing mutation algebra handles everything |
+| Core plan models | `Alis.Reactive/` project | Existing mutation algebra handles everything |
 
 **If you find yourself modifying any of these, stop. You're doing it wrong.**
 
@@ -829,7 +829,7 @@ Alis.Reactive.Fusion/Components/FusionXxx/
 ├── FusionXxx.cs                      ← 1. Component type marker (IComponent, NOT IInputComponent)
 ├── FusionXxxExtensions.cs            ← 2. Mutations (methods + properties)
 ├── FusionXxxHtmlExtensions.cs        ← 3. Factory (NO InputField, NO ComponentsMap)
-├── FusionXxxEvents.cs                ← 4. Event descriptor registry
+├── FusionXxxEvents.cs                ← 4. Event registry
 ├── FusionXxxReactiveExtensions.cs    ← 5. .Reactive() wiring
 └── Events/
     └── FusionXxxOnSelected.cs        ← 6. Event args

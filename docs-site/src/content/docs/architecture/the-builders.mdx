@@ -92,7 +92,7 @@ The builder is internal — devs can't construct it directly. It exists only as 
 
 ## ComponentRef — type-constrained mutations
 
-`pipeline.Component<T>(m => m.Prop)` creates a `ComponentRef<T, TModel>`. It caches a static instance of `T` to read `Vendor` and `ReadExpr` — resolved once, reused for every descriptor.
+`pipeline.Component<T>(m => m.Prop)` creates a `ComponentRef<T, TModel>`. It caches a static instance of `T` to read `Vendor` and `ReadExpr` — resolved once, reused for every command.
 
 Extension methods on `ComponentRef` are constrained by `T`. A `ComponentRef<FusionDropDownList>` has `SetValue(string?)`, `DataBind()`, `ShowPopup()`. A `ComponentRef<NativeCheckBox>` has `SetChecked(bool)`. The compiler enforces this — you can't call `ShowPopup()` on a checkbox.
 
@@ -210,4 +210,4 @@ guard -> branch: .Then()
 
 Each branch's `Then` receives a new `PipelineBuilder` — full composition power inside every branch. `Else` is terminal. `ElseIf` opens a new source → operator → guard chain.
 
-**Next:** [Descriptors & Plan](../descriptors-and-plan/) — what the builders actually produce
+**Next:** [Plan Model & Plan](../descriptors-and-plan/) — what the builders actually produce

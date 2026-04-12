@@ -86,7 +86,7 @@ public async Task FacilityAlertStream(CancellationToken ct)
 
 ### Lazy connections
 
-Writing `t.ServerPush(...)` in C# does **not** open an `EventSource`. It produces a JSON descriptor. The actual connection only opens when the browser loads the page and the runtime processes the plan during boot.
+Writing `t.ServerPush(...)` in C# does **not** open an `EventSource`. It produces a JSON plan model. The actual connection only opens when the browser loads the page and the runtime processes the plan during boot.
 
 ### Connection pooling
 

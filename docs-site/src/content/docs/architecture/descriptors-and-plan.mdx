@@ -1,11 +1,11 @@
 ---
-title: Descriptors & Plan
-description: The descriptor hierarchy — Entry, Trigger, Reaction, Command, Mutation — and how the plan collects and serializes them.
+title: Plan Model & Plan
+description: The plan model hierarchy — Entry, Trigger, Reaction, Command, Mutation — and how the plan collects and serializes them.
 sidebar:
   order: 4
 ---
 
-Every fluent builder call creates a **descriptor** — a plain C# object that describes what should happen without executing it. The plan collects these descriptors and serializes them to JSON. This page explains the descriptor hierarchy and the plan's role.
+Every fluent builder call creates a **plan model** — a plain C# object that describes what should happen without executing it. The plan collects these plan models and serializes them to JSON. This page explains the plan model hierarchy and the plan's role.
 
 ## Entry — the atomic unit
 
@@ -41,9 +41,9 @@ reaction -> entry {
 }
 ```
 
-## Descriptor hierarchy
+## Plan model hierarchy
 
-Every descriptor is polymorphic — serialized with a `"kind"` discriminator. The runtime switches on `kind` to decide what to do.
+Every plan model class is polymorphic — serialized with a `"kind"` discriminator. The runtime switches on `kind` to decide what to do.
 
 ```
 Trigger (kind)
@@ -54,8 +54,8 @@ Trigger (kind)
 Reaction (kind)
 ├── SequentialReaction           "sequential"       + commands[]
 ├── ConditionalReaction          "conditional"      + commands? + branches[] (guard + reaction)
-├── HttpReaction                 "http"             + request descriptor
-└── ParallelHttpReaction         "parallel-http"    + request descriptors[]
+├── HttpReaction                 "http"             + request model
+└── ParallelHttpReaction         "parallel-http"    + request models[]
 
 Command (kind)
 ├── DispatchCommand              "dispatch"         + event name, payload?
@@ -119,7 +119,7 @@ components -> render {
 
 At render time, two late-binding resolutions happen:
 - **IncludeAll** gather items expand to concrete component references from the ComponentsMap
-- **Validate\<T\>** rules are extracted from the FluentValidation validator and attached to the HTTP request descriptor
+- **Validate\<T\>** rules are extracted from the FluentValidation validator and attached to the HTTP request model
 
 ## Expression paths — compile-time to runtime
 
@@ -149,4 +149,4 @@ The runtime uses this registry for:
 
 The developer registers once. Every downstream consumer reads from the registry.
 
-**Next:** [The JSON Plan Contract](../the-contract/) — what these descriptors look like as serialized JSON
+**Next:** [The JSON Plan Contract](../the-contract/) — what these plan models look like as serialized JSON

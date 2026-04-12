@@ -9,7 +9,7 @@ A trigger defines *when* a pipeline executes. Every reactive behavior starts wit
 
 ### Placement — anywhere in the view
 
-`Html.On()` builds a **descriptor** and adds it to the plan. It does not execute anything. You can call it anywhere in the `.cshtml` — top, middle, bottom, inside conditionals, in loops. Order doesn't matter. The calls just accumulate entries in the plan object, and `@Html.RenderPlan(plan)` serializes them all to JSON when Razor evaluates that expression.
+`Html.On()` builds a **plan model** and adds it to the plan. It does not execute anything. You can call it anywhere in the `.cshtml` — top, middle, bottom, inside conditionals, in loops. Order doesn't matter. The calls just accumulate entries in the plan object, and `@Html.RenderPlan(plan)` serializes them all to JSON when Razor evaluates that expression.
 
 ```csharp
 @{
@@ -28,7 +28,7 @@ A trigger defines *when* a pipeline executes. Every reactive behavior starts wit
 
 ### Lazy connections — no connection until the browser boots
 
-Writing `t.SignalR(...)` or `t.ServerPush(...)` in C# does **not** open a WebSocket or EventSource. It produces a JSON descriptor — data, not execution. The actual connection only happens when the browser loads the page and the JS runtime processes the plan during boot.
+Writing `t.SignalR(...)` or `t.ServerPush(...)` in C# does **not** open a WebSocket or EventSource. It produces a JSON plan model — data, not execution. The actual connection only happens when the browser loads the page and the JS runtime processes the plan during boot.
 
 - **No page load = no connection.** If the view is never rendered, no resources are consumed.
 - **Partial views are lazy too.** A partial loaded via `.Into()` only connects when the partial arrives and its plan merges.
