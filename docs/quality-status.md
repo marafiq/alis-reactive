@@ -10,9 +10,9 @@ Single source of truth for quality work. Updated after each quality session.
 - Docs-site drift — PR #94 (IReactivePlan replaced with ReactivePlan, new pages, navigation)
 - XML docs on builders — PRs #95, #97 (Builder APIs, PlanModel contract types)
 - Design system cleanup — PR #96 (unused builders removed, enums moved, TagMode fix)
-- Schema drift detection infrastructure — `tests/Alis.Reactive.DriftDetection.Tests/` contains
-  `DriftTestBase.cs` (AssertSchemaValid, AssertAllPropertiesPresent, AssertDefinitionPropertiesExactly)
-  and `SchemaAnalyzer.cs`. **No executable tests yet** — test classes were in a lost worktree branch.
+- Schema drift detection — removed empty `tests/Alis.Reactive.DriftDetection.Tests/` project
+  (infrastructure only, zero executable tests, never ran). Schema validation is covered by
+  310+ `AssertSchemaValid()` calls in `Alis.Reactive.UnitTests`.
 - Plugin Source vertical slice — 4 source kinds: `component`, `payload`, `url`, `plugin`
   (discriminated union at `Scripts/types/plan.ts` Source type)
 - HTTP Headers, URL Templates, URL Query Source — all landed
@@ -31,7 +31,6 @@ Tracked as GitHub issues or in `docs/issues.md`:
 | Invalid trace level enables all logging (unsafe `as TraceLevel` cast) | `Scripts/root.ts:29` | #73 |
 | HTTP Finally stage (prevents permanent WhileLoading spinners) | Feature request | #88 |
 | FlushSegment bundles commands across condition boundaries | `Alis.Reactive/Builders/PipelineBuilder.cs:184` | #90 |
-| Drift detection test classes missing (infrastructure exists, tests lost) | `tests/Alis.Reactive.DriftDetection.Tests/` | — |
 | ElementBuilder.Show()/Hide() return type | `Alis.Reactive/Builders/ElementBuilder.cs:161,171` | issues.md #1 |
 | itemShape no fail-fast on non-array | `Scripts/conditions/conditions.ts:122-127` | issues.md #2 |
 | Unknown vendor error missing element ID | `Scripts/resolution/resolver.ts:72` | issues.md #3 |

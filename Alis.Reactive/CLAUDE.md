@@ -34,7 +34,6 @@ dotnet test tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj -nologo
 dotnet test tests/Alis.Reactive.Native.UnitTests/Alis.Reactive.Native.UnitTests.csproj -nologo
 dotnet test tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj -nologo
 dotnet test tests/Alis.Reactive.FluentValidator.UnitTests/Alis.Reactive.FluentValidator.UnitTests.csproj -nologo
-dotnet test tests/Alis.Reactive.DriftDetection.Tests/Alis.Reactive.DriftDetection.Tests.csproj -nologo
 dotnet test tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj -nologo --logger "console;verbosity=detailed"
 ```
 
