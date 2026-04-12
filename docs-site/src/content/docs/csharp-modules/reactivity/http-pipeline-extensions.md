@@ -155,7 +155,7 @@ var count = pipeline.Plugin<int>("array", "count").Arg(json, x => x.Items);
 s.Element("total").SetText(count);
 ```
 
-The result converts to a typed source automatically — no `.Build()` needed.
+The result converts automatically — no `.Build()` needed.
 
 ### What if the argument comes from event args?
 

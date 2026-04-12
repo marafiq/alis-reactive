@@ -62,7 +62,7 @@ plan.RegisterPlugin("array", p =>
 Call `pipeline.Plugin<T>()` with the plugin name and method name:
 
 ```csharp
-TypedPluginSource<int> countSrc = pipeline.Plugin<int>("array", "count")
+var countSrc = pipeline.Plugin<int>("array", "count")
     .Arg(json, x => x.Items);
 s.Element("total").SetText(countSrc);
 ```
@@ -82,7 +82,7 @@ s.Element("total").SetText(countSrc);
 Chain `.Arg()` calls:
 
 ```csharp
-TypedPluginSource<string> pluckSrc = pipeline.Plugin<string>("array", "pluck")
+var pluckSrc = pipeline.Plugin<string>("array", "pluck")
     .Arg(json, x => x.Items).Arg(0).Arg("name");
 s.Element("first-name").SetText(pluckSrc);
 ```
@@ -97,16 +97,16 @@ Use the non-generic `pipeline.Plugin()` and end with `.Fire()`:
 s.Plugin("analytics", "track").Arg("array-sent").Fire();
 ```
 
-`.Fire()` is the terminal method — it emits the call into the pipeline. No return value, no further chaining after `.Fire()`.
+`.Fire()` executes the call. Nothing chains after it — it's the last step.
 
 ## Can I pass one plugin's output to another?
 
 Yes. Each plugin read returns a typed source that `.Arg()` accepts:
 
 ```csharp
-TypedPluginSource<object> filtered = pipeline.Plugin<object>("array", "filter")
+var filtered = pipeline.Plugin<object>("array", "filter")
     .Arg(json, x => x.Items).Arg("status").Arg("active");
-TypedPluginSource<int> activeCount = pipeline.Plugin<int>("array", "count")
+var activeCount = pipeline.Plugin<int>("array", "count")
     .Arg(filtered);
 s.Element("active-count").SetText(activeCount);
 ```
@@ -118,7 +118,7 @@ This calls `filter(items, "status", "active")`, then passes the result to `count
 Yes — plugin reads are typed sources, so they work with `When()`:
 
 ```csharp
-TypedPluginSource<bool> someSrc = pipeline.Plugin<bool>("array", "some")
+var someSrc = pipeline.Plugin<bool>("array", "some")
     .Arg(json, x => x.Items).Arg("status").Arg("critical");
 s.When(someSrc).Truthy()
     .Then(then => then.Element("alert").Show())
