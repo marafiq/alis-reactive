@@ -22,7 +22,10 @@ export class ConsoleSink {
       levelColor(event.level),
     ];
 
-    const args: unknown[] = [tag, ...styles];
+    // Data is stringified inline for greppability (Playwright, log aggregators),
+    // AND passed as a separate arg for DevTools expandable rendering.
+    const dataStr = event.data ? " " + JSON.stringify(event.data) : "";
+    const args: unknown[] = [tag + dataStr, ...styles];
     if (event.data) args.push(event.data);
     if (event.error) args.push(event.error);
 
