@@ -77,30 +77,47 @@ function evaluateCompare(cond: CompareCondition, plan: Plan, ctx?: ExecContext):
   const left = evalValue(cond.left, plan, ctx);
   const shapedLeft = applyShape(left, cond.shape);
 
-  // Presence operators — use RAW value for null checks (shape conversion turns
-  // null/undefined into defaults like "" or 0 which defeats null detection).
-  switch (cond.op) {
-    case "is-null":   return left == null;
-    case "not-null":  return left != null;
-    case "is-empty":  return isEmpty(left);
-    case "not-empty": return !isEmpty(left);
-    case "truthy":    return !!shapedLeft;
-    case "falsy":     return !shapedLeft;
-  }
+  const unary = evaluateUnaryOp(cond.op, left, shapedLeft);
+  if (unary !== undefined) return unary;
 
-  // Binary operators — need right operand
-  const right = cond.right ? evalValue(cond.right, plan, ctx) : undefined;
-  // For operators that expect array right operands, apply shape to each item individually
-  // instead of applying shape to the whole array (which would stringify it).
-  let shapedRight: unknown;
-  if (Array.isArray(right) && (cond.op === "in" || cond.op === "not-in" || cond.op === "between")) {
-    shapedRight = right.map(item => applyShape(item, cond.shape));
-  } else {
-    shapedRight = cond.right ? applyShape(right, cond.shape) : undefined;
-  }
-
+  const shapedRight = resolveRight(cond, evalValue, plan, ctx);
   log.trace("eval", { op: cond.op, left: shapedLeft, right: shapedRight });
 
+  return evaluateBinaryOp(cond, shapedLeft, shapedRight);
+}
+
+/**
+ * Presence operators — use RAW value for null checks (shape conversion turns
+ * null/undefined into defaults like "" or 0 which defeats null detection).
+ * Returns undefined if the operator is not unary.
+ */
+function evaluateUnaryOp(op: string, rawLeft: unknown, shapedLeft: unknown): boolean | undefined {
+  switch (op) {
+    case "is-null":   return rawLeft == null;
+    case "not-null":  return rawLeft != null;
+    case "is-empty":  return isEmpty(rawLeft);
+    case "not-empty": return !isEmpty(rawLeft);
+    case "truthy":    return !!shapedLeft;
+    case "falsy":     return !shapedLeft;
+    default:          return undefined;
+  }
+}
+
+/** Resolve and shape the right operand for binary comparison. */
+function resolveRight(
+  cond: CompareCondition,
+  evalValue: (p: ValueProducer, plan: Plan, ctx?: ExecContext) => unknown,
+  plan: Plan, ctx?: ExecContext,
+): unknown {
+  const right = cond.right ? evalValue(cond.right, plan, ctx) : undefined;
+  if (Array.isArray(right) && (cond.op === "in" || cond.op === "not-in" || cond.op === "between")) {
+    return right.map(item => applyShape(item, cond.shape));
+  }
+  return cond.right ? applyShape(right, cond.shape) : undefined;
+}
+
+/** Evaluate binary operators that require both left and right operands. */
+function evaluateBinaryOp(cond: CompareCondition, shapedLeft: unknown, shapedRight: unknown): boolean {
   switch (cond.op) {
     case "eq":  return shapedLeft === shapedRight;
     case "neq": return shapedLeft !== shapedRight;
@@ -119,47 +136,48 @@ function evaluateCompare(cond: CompareCondition, plan: Plan, ctx?: ExecContext):
         && (shapedLeft as number) >= shapedRight[0]
         && (shapedLeft as number) <= shapedRight[1];
 
-    case "array-contains": {
-      const items = cond.itemShape && Array.isArray(shapedLeft)
-        ? (shapedLeft as unknown[]).map(item => applyShape(item, cond.itemShape))
-        : shapedLeft;
-      return Array.isArray(items) && items.includes(shapedRight);
-    }
+    case "array-contains":
+      return evaluateArrayContains(cond, shapedLeft, shapedRight);
 
-    case "contains": {
-      const str = asString(shapedLeft);
-      const op = asString(shapedRight);
-      return str != null && op != null && str.includes(op);
-    }
-    case "starts-with": {
-      const str = asString(shapedLeft);
-      const op = asString(shapedRight);
-      return str != null && op != null && str.startsWith(op);
-    }
-    case "ends-with": {
-      const str = asString(shapedLeft);
-      const op = asString(shapedRight);
-      return str != null && op != null && str.endsWith(op);
-    }
-    case "matches": {
-      const str = asString(shapedLeft);
-      const op = asString(shapedRight);
-      if (str == null || op == null) return false;
-      try {
-        return new RegExp(op).test(str);
-      } catch {
-        log.warn("invalid condition regex", { operand: shapedRight });
-        return false;
-      }
-    }
-    case "min-length": {
-      const str = asString(shapedLeft);
-      return str != null && str.length >= Number(shapedRight);
-    }
+    case "contains":    return stringOp(shapedLeft, shapedRight, (s, o) => s.includes(o));
+    case "starts-with": return stringOp(shapedLeft, shapedRight, (s, o) => s.startsWith(o));
+    case "ends-with":   return stringOp(shapedLeft, shapedRight, (s, o) => s.endsWith(o));
+    case "matches":     return matchesRegex(shapedLeft, shapedRight);
+    case "min-length":  return evalMinLength(shapedLeft, shapedRight);
 
     default:
       throw new Error(`[alis] Unknown condition operator: ${cond.op}`);
   }
+}
+
+function evaluateArrayContains(cond: CompareCondition, shapedLeft: unknown, shapedRight: unknown): boolean {
+  const items = cond.itemShape && Array.isArray(shapedLeft)
+    ? (shapedLeft as unknown[]).map(item => applyShape(item, cond.itemShape))
+    : shapedLeft;
+  return Array.isArray(items) && items.includes(shapedRight);
+}
+
+function stringOp(left: unknown, right: unknown, fn: (s: string, o: string) => boolean): boolean {
+  const str = asString(left);
+  const op = asString(right);
+  return str != null && op != null && fn(str, op);
+}
+
+function matchesRegex(left: unknown, right: unknown): boolean {
+  const str = asString(left);
+  const op = asString(right);
+  if (str == null || op == null) return false;
+  try {
+    return new RegExp(op).test(str);
+  } catch {
+    log.warn("invalid condition regex", { operand: right });
+    return false;
+  }
+}
+
+function evalMinLength(left: unknown, right: unknown): boolean {
+  const str = asString(left);
+  return str != null && str.length >= Number(right);
 }
 
 function isEmpty(value: unknown): boolean {

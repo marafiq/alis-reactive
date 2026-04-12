@@ -70,13 +70,13 @@ namespace Alis.Reactive.Builders
 
         private void SetMode(PipelineMode mode)
         {
-            if (_mode == PipelineMode.Sequential)
+            var isFirstNonSequentialSegment = _mode == PipelineMode.Sequential;
+            if (isFirstNonSequentialSegment)
             {
                 _mode = mode;
                 return;
             }
-            // Re-entering the same non-Sequential mode (e.g., Http -> Http)
-            // must flush the previous segment first to avoid silently discarding it.
+
             FlushSegment();
             _mode = mode;
         }

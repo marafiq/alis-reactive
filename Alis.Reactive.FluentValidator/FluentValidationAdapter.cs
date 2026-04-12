@@ -376,33 +376,31 @@ namespace Alis.Reactive.FluentValidator
             string? customMsg, FieldCondition? ruleCondition)
         {
             var (field, constraint, propertyType) = ResolveComparisonOperands(cv);
-            // Apply prefix to peer field for nested validators (e.g., "City" → "Address.City")
-            if (field != null && !string.IsNullOrEmpty(prefix))
+            var isNestedPeerField = field != null && !string.IsNullOrEmpty(prefix);
+            if (isNestedPeerField)
                 field = prefix + "." + field;
+
             var shape = Shape.FromClrType(propertyType);
-            if (shape == Shape.Date && constraint != null)
+            var isDateConstraint = shape == Shape.Date && constraint != null;
+            if (isDateConstraint)
                 constraint = SerializeDateConstraint(constraint);
 
             var (ruleType, defaultMsg) = cv.Comparison switch
             {
-                Comparison.Equal => ("equalTo", field != null
-                    ? $"'{displayName}' must match '{Humanize(field)}'."
-                    : $"'{displayName}' must equal {constraint}."),
-                Comparison.NotEqual => field != null
-                    ? ("notEqualTo", $"'{displayName}' must not match '{Humanize(field)}'.")
-                    : ("notEqual", $"'{displayName}' must not equal '{constraint}'."),
-                Comparison.GreaterThanOrEqual => ("min", field != null
-                    ? $"'{displayName}' must be at least '{Humanize(field)}'."
-                    : $"'{displayName}' must be at least {constraint}."),
-                Comparison.LessThanOrEqual => ("max", field != null
-                    ? $"'{displayName}' must be at most '{Humanize(field)}'."
-                    : $"'{displayName}' must be at most {constraint}."),
-                Comparison.GreaterThan => ("gt", field != null
-                    ? $"'{displayName}' must be greater than '{Humanize(field)}'."
-                    : $"'{displayName}' must be greater than {constraint}."),
-                Comparison.LessThan => ("lt", field != null
-                    ? $"'{displayName}' must be less than '{Humanize(field)}'."
-                    : $"'{displayName}' must be less than {constraint}."),
+                Comparison.Equal => ("equalTo",
+                    ComparisonMessage(displayName, field, constraint, "must match", "must equal")),
+                Comparison.NotEqual when field != null => ("notEqualTo",
+                    $"'{displayName}' must not match '{Humanize(field)}'."),
+                Comparison.NotEqual => ("notEqual",
+                    $"'{displayName}' must not equal '{constraint}'."),
+                Comparison.GreaterThanOrEqual => ("min",
+                    ComparisonMessage(displayName, field, constraint, "must be at least", "must be at least")),
+                Comparison.LessThanOrEqual => ("max",
+                    ComparisonMessage(displayName, field, constraint, "must be at most", "must be at most")),
+                Comparison.GreaterThan => ("gt",
+                    ComparisonMessage(displayName, field, constraint, "must be greater than", "must be greater than")),
+                Comparison.LessThan => ("lt",
+                    ComparisonMessage(displayName, field, constraint, "must be less than", "must be less than")),
                 _ => throw new InvalidOperationException(
                     $"Unknown Comparison type '{cv.Comparison}' on property '{propertyName}'. " +
                     $"This FluentValidation comparison is not supported for client-side extraction.")
@@ -410,6 +408,13 @@ namespace Alis.Reactive.FluentValidator
 
             return new ExtractedRule(ruleType, customMsg ?? defaultMsg, constraint, ruleCondition, field, shape);
         }
+
+        private static string ComparisonMessage(
+            string displayName, string? field, object? constraint,
+            string fieldVerb, string constraintVerb)
+            => field != null
+                ? $"'{displayName}' {fieldVerb} '{Humanize(field)}'."
+                : $"'{displayName}' {constraintVerb} {constraint}.";
 
         private static (string? field, object? constraint, Type? propertyType) ResolveComparisonOperands(
             IComparisonValidator cv)

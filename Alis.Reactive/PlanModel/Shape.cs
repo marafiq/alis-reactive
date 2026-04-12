@@ -53,34 +53,45 @@ namespace Alis.Reactive.PlanModel
 
             if (type == typeof(string)) return String;
             if (type == typeof(bool)) return Boolean;
-            if (type == typeof(DateTime) || type == typeof(DateTimeOffset)
-#if NET6_0_OR_GREATER
-                || type == typeof(DateOnly)
-#endif
-                ) return Date;
-            if (type == typeof(byte) || type == typeof(sbyte) ||
-                type == typeof(short) || type == typeof(ushort) ||
-                type == typeof(int) || type == typeof(uint) ||
-                type == typeof(long) || type == typeof(ulong) ||
-                type == typeof(float) || type == typeof(double) || type == typeof(decimal))
-                return Number;
+            if (IsDateType(type)) return Date;
+            if (IsNumericType(type)) return Number;
+            if (IsStringSerializedType(type)) return String;
+            if (type.IsEnum) return String;
 
-            if (type == typeof(Guid) || type == typeof(TimeSpan)
-#if NET6_0_OR_GREATER
-                || type == typeof(TimeOnly)
-#endif
-                )
-                return String;
-            if (type.IsEnum)
-                return String;
-
-            if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
-            {
-                var elementType = type.IsArray ? type.GetElementType()! : type.GetGenericArguments()[0];
+            var elementType = GetCollectionElementType(type);
+            if (elementType != null)
                 return ArrayOf(FromClrType(elementType));
-            }
 
             return Any;
+        }
+
+        private static bool IsDateType(Type type)
+            => type == typeof(DateTime) || type == typeof(DateTimeOffset)
+#if NET6_0_OR_GREATER
+               || type == typeof(DateOnly)
+#endif
+               ;
+
+        private static bool IsNumericType(Type type)
+            => type == typeof(byte) || type == typeof(sbyte) ||
+               type == typeof(short) || type == typeof(ushort) ||
+               type == typeof(int) || type == typeof(uint) ||
+               type == typeof(long) || type == typeof(ulong) ||
+               type == typeof(float) || type == typeof(double) || type == typeof(decimal);
+
+        private static bool IsStringSerializedType(Type type)
+            => type == typeof(Guid) || type == typeof(TimeSpan)
+#if NET6_0_OR_GREATER
+               || type == typeof(TimeOnly)
+#endif
+               ;
+
+        private static Type GetCollectionElementType(Type type)
+        {
+            if (type.IsArray) return type.GetElementType()!;
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+                return type.GetGenericArguments()[0];
+            return null;
         }
 
         /// <summary>Gets the shape kind (string, number, boolean, date, array, object, nullable, raw, any, or none).</summary>

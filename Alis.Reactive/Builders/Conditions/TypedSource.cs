@@ -39,9 +39,9 @@ namespace Alis.Reactive.Builders.Conditions
         {
             get
             {
-                var t = typeof(TProp);
-                if (t.IsArray) return Shape.FromClrType(t.GetElementType());
-                if (t.IsGenericType) return Shape.FromClrType(t.GetGenericArguments()[0]);
+                var propType = typeof(TProp);
+                if (propType.IsArray) return Shape.FromClrType(propType.GetElementType());
+                if (propType.IsGenericType) return Shape.FromClrType(propType.GetGenericArguments()[0]);
                 return Shape.None;
             }
         }

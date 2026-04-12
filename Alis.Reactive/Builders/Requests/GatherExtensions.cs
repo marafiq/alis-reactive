@@ -40,7 +40,7 @@ namespace Alis.Reactive.Builders.Requests
             where TModel : class
         {
             var component = new TComponent();
-            var valueMember = (component is IInputComponent input) ? input.ValueMember : name;
+            var valueMember = component is IInputComponent input ? input.ValueMember : name;
             self.Include(refId, component.Vendor, name, valueMember);
             return self;
         }

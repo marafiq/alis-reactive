@@ -16,13 +16,11 @@ namespace Alis.Reactive.Builders
     public class ElementBuilder<TModel> where TModel : class
     {
         private readonly PipelineBuilder<TModel> _pipeline;
-        private readonly string _elementId;
         private readonly string _componentKey;
 
         internal ElementBuilder(PipelineBuilder<TModel> pipeline, string elementId)
         {
             _pipeline = pipeline;
-            _elementId = elementId;
             _componentKey = pipeline.Context.EnsureElement(elementId);
         }
 

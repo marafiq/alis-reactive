@@ -1,0 +1,49 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.CommandOrdering.CommandOrderingModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.CommandOrdering
+@{
+    ViewData["Title"] = "Command Ordering Around Conditions";
+
+    var plan = Html.ReactivePlan<CommandOrderingModel>();
+
+    // Bug reproduction: commands between two conditions must execute
+    // in declaration order — before condition, THEN condition, THEN after.
+    //
+    // Pipeline: SetText("before") → When(level).Eq("high").Then(SetText("conditional")) → SetText("after")
+    //
+    // If ordering is CORRECT: "proof" shows "after" (post-condition overwrites conditional)
+    // If ordering is BUGGY:   "proof" shows "conditional" (condition fires after "after" because
+    //                          "after" was bundled with "before" before the branch)
+
+    Html.On(plan, t => t.CustomEvent<CommandOrderingPayload>("ordering-test", (args, p) =>
+    {
+        p.Element("proof").SetText("before");
+        p.When(args, x => x.Level).Eq("high")
+            .Then(then => then.Element("proof").SetText("conditional"));
+        p.Element("proof").SetText("after");
+    }));
+}
+
+<div class="p-6 space-y-4">
+    <h1 class="text-xl font-bold text-text">Command Ordering Around Conditions</h1>
+
+    <div class="flex gap-2">
+        @(Html.NativeButton("btn-high", "Trigger with level=high")
+            .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Dispatch("ordering-test", new CommandOrderingPayload { Level = "high" })))
+
+        @(Html.NativeButton("btn-low", "Trigger with level=low")
+            .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Dispatch("ordering-test", new CommandOrderingPayload { Level = "low" })))
+    </div>
+
+    <div class="font-mono text-sm text-text-muted">
+        <p>Proof element: <span id="proof">&mdash;</span></p>
+    </div>
+</div>
+
+@Html.RenderPlan(plan)

@@ -177,12 +177,16 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (string.IsNullOrWhiteSpace(paramName))
                 throw new System.ArgumentException("Route param name must not be null or whitespace.", nameof(paramName));
-            if (!RouteParamNameRe.IsMatch(paramName))
+
+            var hasInvalidCharacters = !RouteParamNameRe.IsMatch(paramName);
+            if (hasInvalidCharacters)
                 throw new System.ArgumentException(
                     $"Route param name '{paramName}' contains invalid characters. " +
                     "Names must match [a-zA-Z0-9_] (ASCII only) to align with the runtime {{placeholder}} regex.",
                     nameof(paramName));
-            if (RouteParamFields.ContainsKey(paramName))
+
+            var isDuplicate = RouteParamFields.ContainsKey(paramName);
+            if (isDuplicate)
                 throw new System.InvalidOperationException(
                     $"Route param '{paramName}' is already defined. Each route param can only be set once.");
         }
@@ -270,12 +274,11 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         public GatherBuilder<TModel> Include(string componentId, string vendor, string propertyName, string valueMember)
         {
-            Shape shape = null;
-            if (_context.TryFindRegistrationById(componentId, out var reg))
-                shape = reg.Shape;
-            _context.EnsureInputComponent(componentId, vendor, valueMember, shape ?? Shape.Any, propertyName);
-            var value = ValueProducer.Read(ComponentSource.Of(componentId), valueMember, shape: shape ?? Shape.Any);
-            Fields.Add(GatherField.Of(propertyName, value));
+            var isAlreadyRegistered = _context.TryFindRegistrationById(componentId, out var reg);
+            var resolvedShape = isAlreadyRegistered ? reg.Shape : Shape.Any;
+            _context.EnsureInputComponent(componentId, vendor, valueMember, resolvedShape, propertyName);
+            var componentValue = ValueProducer.Read(ComponentSource.Of(componentId), valueMember, shape: resolvedShape);
+            Fields.Add(GatherField.Of(propertyName, componentValue));
             return this;
         }
 

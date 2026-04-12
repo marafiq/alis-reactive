@@ -1,9 +1,17 @@
 // merge-plan.ts — Plan registry and merge logic.
 // Plans: types, components, behaviors. Merge logic for partial plan injection.
 
-import type { Plan, Behavior } from "../types";
+import type { Plan, Behavior, Component } from "../types";
 import { unwireField } from "../validation/live-clear";
 import { scope } from "../core/trace";
+
+/** Deep-merge validation rules from an incoming component into an existing one. */
+function deepMergeValidationRules(existing: Component | undefined, incoming: Component): void {
+  if (!existing?.container?.validationRules || !incoming.container?.validationRules) return;
+  const ruleMap = new Map(existing.container.validationRules.map(cv => [cv.component, cv]));
+  for (const cv of incoming.container.validationRules) ruleMap.set(cv.component, cv);
+  incoming.container.validationRules = [...ruleMap.values()];
+}
 
 const log = scope("merge");
 
@@ -40,19 +48,34 @@ export class PlanRegistry {
       this.removeSource(previousPlanId, partId);
     }
 
-    let target = this.plans.get(incoming.planId);
-    if (!target) {
-      target = {
-        version: 3,
-        planId: incoming.planId,
-        types: {},
-        components: {},
-        behaviors: [],
-      };
-      this.plans.set(incoming.planId, target);
+    const target = this.ensureTarget(incoming.planId);
+    this.mergeTypes(incoming, target, partId);
+    this.mergeComponents(incoming, target, partId);
+
+    const abort = partId ? new AbortController() : undefined;
+    hooks.wireBehaviors(incoming.behaviors, target, abort?.signal);
+    target.behaviors.push(...incoming.behaviors);
+    hooks.wireContainerValidation(target);
+
+    if (partId && abort) {
+      this.trackSource(partId, incoming, abort);
     }
 
-    // Merge types — ownership-aware: block cross-source collisions
+    return target;
+  }
+
+  /** Get or create the target plan for merging. */
+  private ensureTarget(planId: string): Plan {
+    let target = this.plans.get(planId);
+    if (!target) {
+      target = { version: 3, planId, types: {}, components: {}, behaviors: [] };
+      this.plans.set(planId, target);
+    }
+    return target;
+  }
+
+  /** Merge types — ownership-aware: block cross-source collisions. */
+  private mergeTypes(incoming: Plan, target: Plan, partId: string | undefined): void {
     for (const [key, type] of Object.entries(incoming.types)) {
       const owner = this.keyOwners.get(`t:${key}`);
       if (owner && owner !== partId && partId) {
@@ -62,41 +85,29 @@ export class PlanRegistry {
       target.types[key] = type;
       if (partId) this.keyOwners.set(`t:${key}`, partId);
     }
+  }
 
-    // Merge components — ownership-aware with deep-merge for validation rules.
+  /** Merge components — ownership-aware with deep-merge for validation rules. */
+  private mergeComponents(incoming: Plan, target: Plan, partId: string | undefined): void {
     for (const [key, comp] of Object.entries(incoming.components)) {
       const owner = this.keyOwners.get(`c:${key}`);
       if (owner && owner !== partId && partId) {
         log.error("cross-source component collision", { key, owner, incoming: partId });
         continue;
       }
-      const existing = target.components[key];
-      if (existing?.container?.validationRules && comp.container?.validationRules) {
-        const ruleMap = new Map(existing.container.validationRules.map(cv => [cv.component, cv]));
-        for (const cv of comp.container.validationRules) ruleMap.set(cv.component, cv);
-        comp.container.validationRules = [...ruleMap.values()];
-      }
+      deepMergeValidationRules(target.components[key], comp);
       target.components[key] = comp;
       if (partId) this.keyOwners.set(`c:${key}`, partId);
     }
+  }
 
-    // Wire and merge behaviors
-    const abort = partId ? new AbortController() : undefined;
-    hooks.wireBehaviors(incoming.behaviors, target, abort?.signal);
-    target.behaviors.push(...incoming.behaviors);
-
-    // Wire container validation for new components
-    hooks.wireContainerValidation(target);
-
-    if (partId && abort) {
-      this.sourceOwners.set(partId, incoming.planId);
-      this.abortControllers.set(partId, abort);
-      this.sourceBehaviors.set(partId, [...incoming.behaviors]);
-      this.sourceComponentKeys.set(partId, Object.keys(incoming.components));
-      this.sourceTypeKeys.set(partId, Object.keys(incoming.types));
-    }
-
-    return target;
+  /** Record source tracking for later unmerge. */
+  private trackSource(partId: string, incoming: Plan, abort: AbortController): void {
+    this.sourceOwners.set(partId, incoming.planId);
+    this.abortControllers.set(partId, abort);
+    this.sourceBehaviors.set(partId, [...incoming.behaviors]);
+    this.sourceComponentKeys.set(partId, Object.keys(incoming.components));
+    this.sourceTypeKeys.set(partId, Object.keys(incoming.types));
   }
 
   get(planId: string): Plan | undefined {
@@ -123,59 +134,70 @@ export class PlanRegistry {
     }
 
     this.abortControllers.get(partId)?.abort();
-
-    // Remove behaviors from this source
-    const oldBehaviors = this.sourceBehaviors.get(partId);
-    if (oldBehaviors) {
-      for (const behavior of oldBehaviors) {
-        const idx = plan.behaviors.indexOf(behavior);
-        if (idx >= 0) plan.behaviors.splice(idx, 1);
-      }
-    }
-
-    // Remove components owned by this source. Ownership check prevents
-    // deleting keys that were taken over by a different source.
-    const removedComponentKeys = new Set<string>();
-    const oldKeys = this.sourceComponentKeys.get(partId);
-    if (oldKeys) {
-      for (const key of oldKeys) {
-        if (this.keyOwners.get(`c:${key}`) !== partId) continue;
-        const comp = plan.components[key];
-        if (comp) unwireField(comp.id);
-        delete plan.components[key];
-        this.keyOwners.delete(`c:${key}`);
-        removedComponentKeys.add(key);
-      }
-    }
-
-    // Remove orphaned validation rules for deleted components — but ONLY
-    // from containers that this source also owns. If the container belongs
-    // to the root plan, its rules were set at C# build time and the partial
-    // doesn't re-supply them on re-merge.
-    if (removedComponentKeys.size > 0) {
-      for (const [compKey, comp] of Object.entries(plan.components)) {
-        if (!comp.container?.validationRules) continue;
-        const containerOwner = this.keyOwners.get(`c:${compKey}`);
-        if (containerOwner !== partId) continue;  // Not our container — don't touch its rules
-        comp.container.validationRules = comp.container.validationRules
-          .filter(cv => !removedComponentKeys.has(cv.component));
-      }
-    }
-
-    // Remove types owned by this source
-    const oldTypeKeys = this.sourceTypeKeys.get(partId);
-    if (oldTypeKeys) {
-      for (const key of oldTypeKeys) {
-        if (this.keyOwners.get(`t:${key}`) !== partId) continue;
-        delete plan.types[key];
-        this.keyOwners.delete(`t:${key}`);
-      }
-    }
-
+    this.removeSourceBehaviors(plan, partId);
+    const removedComponentKeys = this.removeSourceComponents(plan, partId);
+    this.pruneOrphanedValidationRules(plan, partId, removedComponentKeys);
+    this.removeSourceTypes(plan, partId);
     this.clearTracking(partId);
 
     if (!this.rootPlanIds.has(planId) && plan.behaviors.length === 0 && Object.keys(plan.components).length === 0) {
       this.plans.delete(planId);
+    }
+  }
+
+  /** Remove behaviors that were merged from this source. */
+  private removeSourceBehaviors(plan: Plan, partId: string): void {
+    const oldBehaviors = this.sourceBehaviors.get(partId);
+    if (!oldBehaviors) return;
+    for (const behavior of oldBehaviors) {
+      const idx = plan.behaviors.indexOf(behavior);
+      if (idx >= 0) plan.behaviors.splice(idx, 1);
+    }
+  }
+
+  /**
+   * Remove components owned by this source. Ownership check prevents
+   * deleting keys that were taken over by a different source.
+   */
+  private removeSourceComponents(plan: Plan, partId: string): Set<string> {
+    const removed = new Set<string>();
+    const oldKeys = this.sourceComponentKeys.get(partId);
+    if (!oldKeys) return removed;
+    for (const key of oldKeys) {
+      if (this.keyOwners.get(`c:${key}`) !== partId) continue;
+      const comp = plan.components[key];
+      if (comp) unwireField(comp.id);
+      delete plan.components[key];
+      this.keyOwners.delete(`c:${key}`);
+      removed.add(key);
+    }
+    return removed;
+  }
+
+  /**
+   * Remove orphaned validation rules for deleted components — but ONLY
+   * from containers that this source also owns. If the container belongs
+   * to the root plan, its rules were set at C# build time and the partial
+   * doesn't re-supply them on re-merge.
+   */
+  private pruneOrphanedValidationRules(plan: Plan, partId: string, removedKeys: Set<string>): void {
+    if (removedKeys.size === 0) return;
+    for (const [compKey, comp] of Object.entries(plan.components)) {
+      if (!comp.container?.validationRules) continue;
+      if (this.keyOwners.get(`c:${compKey}`) !== partId) continue;
+      comp.container.validationRules = comp.container.validationRules
+        .filter(cv => !removedKeys.has(cv.component));
+    }
+  }
+
+  /** Remove types owned by this source. */
+  private removeSourceTypes(plan: Plan, partId: string): void {
+    const oldTypeKeys = this.sourceTypeKeys.get(partId);
+    if (!oldTypeKeys) return;
+    for (const key of oldTypeKeys) {
+      if (this.keyOwners.get(`t:${key}`) !== partId) continue;
+      delete plan.types[key];
+      this.keyOwners.delete(`t:${key}`);
     }
   }
 
@@ -209,12 +231,7 @@ export function composeInitialPlans(plans: Plan[]): Plan[] {
     Object.assign(existing.types, plan.types);
     // Deep-merge components — same logic as PlanRegistry.add()
     for (const [key, comp] of Object.entries(plan.components)) {
-      const prev = existing.components[key];
-      if (prev?.container?.validationRules && comp.container?.validationRules) {
-        const ruleMap = new Map(prev.container.validationRules.map(cv => [cv.component, cv]));
-        for (const cv of comp.container.validationRules) ruleMap.set(cv.component, cv);
-        comp.container.validationRules = [...ruleMap.values()];
-      }
+      deepMergeValidationRules(existing.components[key], comp);
       existing.components[key] = comp;
     }
     existing.behaviors.push(...plan.behaviors);

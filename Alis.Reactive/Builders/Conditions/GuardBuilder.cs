@@ -132,7 +132,8 @@ namespace Alis.Reactive.Builders.Conditions
             var reaction = pb.BuildReaction();
             var branchCase = BranchCase.Of(Condition, reaction);
 
-            if (_branchBuilder != null)
+            var isElseIfBranch = _branchBuilder != null;
+            if (isElseIfBranch)
             {
                 _branchBuilder.AddBranch(branchCase);
                 return _branchBuilder;

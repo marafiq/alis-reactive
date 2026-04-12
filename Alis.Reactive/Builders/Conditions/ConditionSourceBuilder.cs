@@ -144,16 +144,12 @@ namespace Alis.Reactive.Builders.Conditions
         private GuardBuilder<TModel> Build(string op, object? operand = null)
         {
             var leftProducer = _typedSource.ToValueProducer();
-            var rightProducer = operand != null ? ValueProducer.LiteralRaw(operand, _shape) : null;
+            var hasOperand = operand != null;
+            var rightProducer = hasOperand ? ValueProducer.LiteralRaw(operand, _shape) : null;
             var condition = Condition.Compare(leftProducer, op, rightProducer, _shape);
             return ComposeAndWrap(condition);
         }
 
-        /// <summary>
-        /// Builds a condition where the right-hand side is an array of values.
-        /// Used by In, NotIn, Between — these operators require array operands,
-        /// not scalar literals.
-        /// </summary>
         private GuardBuilder<TModel> BuildArray(string op, System.Array values)
         {
             var leftProducer = _typedSource.ToValueProducer();
@@ -168,17 +164,20 @@ namespace Alis.Reactive.Builders.Conditions
 
         private GuardBuilder<TModel> ComposeAndWrap(Condition newCondition)
         {
-            if (_mode == CompositionMode.None || _existingCondition == null)
+            var isStandaloneCondition = _mode == CompositionMode.None || _existingCondition == null;
+            if (isStandaloneCondition)
                 return WrapCondition(newCondition);
 
+            var isAndComposition = _mode == CompositionMode.All;
             var terms = new System.Collections.Generic.List<Condition>();
-            if (_mode == CompositionMode.All)
+
+            if (isAndComposition)
                 GuardBuilder<TModel>.FlattenAll(_existingCondition, terms);
             else
                 GuardBuilder<TModel>.FlattenAny(_existingCondition, terms);
 
             terms.Add(newCondition);
-            Condition combined = _mode == CompositionMode.All
+            var combined = isAndComposition
                 ? Condition.All(terms.ToArray())
                 : Condition.Any(terms.ToArray());
 
