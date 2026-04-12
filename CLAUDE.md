@@ -151,9 +151,10 @@ with `.test.ts` suffix.
 | `bdd-testing` | Playwright BDD tests, 5 rules, 7-behavior contract, blind reviewer |
 
 10 hookify rules in `.claude/hookify.*.local.md` enforce quality gates automatically:
-`enforce-csharp8`, `no-public-in-libraries`, `no-raw-inputs`, `no-js-in-views`,
-`bdd-test-enforcement`, `bdd-public-api-only`, `xml-docs-quality`,
-`commit-requires-relevant-tests`, `merge-requires-all-tests`, `protect-api-surface`.
+`enforce-csharp8`, `no-public-in-libraries`, `no-raw-inputs`, `bdd-test-enforcement`,
+`bdd-public-api-only`, `xml-docs-quality`, `commit-requires-relevant-tests`,
+`merge-requires-all-tests` (8 active). `no-js-in-views` and `protect-api-surface` exist
+but are currently disabled (`enabled: false`).
 
 ## Rules
 
