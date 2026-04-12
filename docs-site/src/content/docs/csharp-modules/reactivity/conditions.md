@@ -70,6 +70,37 @@ pipeline.When(careLevel.Value()).Eq("memory-care")
 
 `.Value()` gives you typed access to the component's live value -- the runtime reads it when evaluating the condition.
 
+### From a URL query parameter
+
+Read the browser's current URL to branch on a query parameter:
+
+```csharp
+pipeline.When(pipeline.FromUrl("tab")).Eq("medications")
+    .Then(then => then.Element("med-panel").Show())
+    .Else(else_ => else_.Element("med-panel").Hide());
+```
+
+`pipeline.FromUrl<int>("page")` provides typed access for numeric comparisons:
+
+```csharp
+pipeline.When(pipeline.FromUrl<int>("page")).Gt(1)
+    .Then(then => then.Element("prev-btn").Show())
+    .Else(else_ => else_.Element("prev-btn").Hide());
+```
+
+### From a plugin read
+
+Read a plugin method's return value to branch on the result:
+
+```csharp
+var hasCritical = pipeline.Plugin<bool>("array", "some")
+    .Arg(json, x => x.Items).Arg("status").Arg("critical");
+pipeline.When(hasCritical).Truthy()
+    .Then(then => then.Element("alert").Show());
+```
+
+`pipeline.Plugin<T>()` returns a typed source that works with all operators.
+
 ## What operators are available?
 
 ### Comparison operators

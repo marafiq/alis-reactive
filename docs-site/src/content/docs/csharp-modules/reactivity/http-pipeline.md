@@ -15,7 +15,11 @@ pipeline.Get(url) / .Post(url) / .Put(url) / .Delete(url)  § start a request
 │   ├── g.Static("key", value)                              § fixed value
 │   ├── g.Include<TComp, TModel>(m => m.Prop)               § component value
 │   ├── g.IncludeAll()                                      § all registered components
-│   └── g.FromEvent(args, x => x.Prop, "paramName")         § event payload value
+│   ├── g.FromEvent(args, x => x.Prop, "paramName")         § event payload value
+│   ├── g.Header("name", value | source | args)             § custom HTTP header
+│   ├── g.RouteParam("name", value | source | args)         § URL template param
+│   ├── g.FromUrl("param") / g.FromUrl<T>("param")          § browser URL query param
+│   └── g.Plugin(pluginSource, "param")                     § plugin method result
 ├── .AsFormData()                                           § multipart content type
 ├── .Validate<TValidator>("formId")                         § client-side validation
 ├── .WhileLoading(l => { })                                 § commands during flight
@@ -487,4 +491,4 @@ This single pipeline handles confirmation, validation, loading state, success no
 
 **Previous:** [Conditions](../conditions/) -- runtime branching with When/Then/ElseIf/Else and guard composition.
 
-**Next:** [Validation](../validation/) -- client-side validation with FluentValidation extraction, 16 rule types, and fail-closed orchestration.
+**Next:** [HTTP Pipeline Extensions](../http-pipeline-extensions/) -- custom headers, route parameters, URL query parameters, and method arguments.

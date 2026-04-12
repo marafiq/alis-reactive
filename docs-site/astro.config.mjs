@@ -68,6 +68,8 @@ export default defineConfig({
 								{ label: 'Component API', slug: 'csharp-modules/reactivity/component-api' },
 								{ label: 'Conditions', slug: 'csharp-modules/reactivity/conditions' },
 								{ label: 'HTTP Pipeline', slug: 'csharp-modules/reactivity/http-pipeline' },
+								{ label: 'HTTP Pipeline Extensions', slug: 'csharp-modules/reactivity/http-pipeline-extensions' },
+								{ label: 'Plugin System', slug: 'csharp-modules/reactivity/plugins' },
 								{ label: 'Validation', slug: 'csharp-modules/reactivity/validation' },
 							],
 						},

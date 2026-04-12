@@ -2,7 +2,7 @@
 title: Validation
 description: Client-side validation with FluentValidation extraction — 16 rule types, 21 conditional operators, condition composition, cross-property comparisons, and fail-closed orchestration.
 sidebar:
-  order: 6
+  order: 8
 ---
 
 Validation lives inside the HTTP pipeline. You write a FluentValidation validator in C#, attach it to a request with `.Validate<T>()`, and the framework extracts rules to the JSON plan. The runtime evaluates those rules in the browser before the request fires.
@@ -416,4 +416,4 @@ For Syncfusion components, only blur/change is wired (Syncfusion does not expose
 
 Live clearing is wired automatically for all enriched fields — no additional configuration needed.
 
-**Previous:** [HTTP Pipeline](../http-pipeline/) — GET/POST/PUT/DELETE, gather, loading states, typed responses, and chained/parallel requests.
+**Previous:** [Plugin System](../plugins/) — register JS plugins, read method results, call void methods, and compose plugin chains.

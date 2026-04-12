@@ -237,10 +237,12 @@ Two primitives. The [Runtime](../runtime/) page explains how they execute via br
 
 ## Sources — where values come from
 
-| Kind | Plan shape |
-|------|-----------|
-| `event` | `{ "path": "evt.address.city" }` |
-| `component` | `{ "componentId": "Country", "vendor": "fusion", "readExpr": "value" }` |
+| Kind | Plan shape | What it reads |
+|------|-----------|---------------|
+| `event` | `{ "path": "evt.address.city" }` | Event payload, HTTP response |
+| `component` | `{ "componentId": "Country", "vendor": "fusion", "readExpr": "value" }` | DOM element or vendor component |
+| `url` | `{ "param": "tab" }` | Browser URL query string |
+| `plugin` | `{ "plugin": "array", "member": "count", "args": [...] }` | User-registered JS plugin object |
 
 How these resolve at runtime is covered in [Runtime — Value resolution](../runtime/#value-resolution--resolverts--walkts).
 
@@ -252,6 +254,10 @@ How these resolve at runtime is covered in [Runtime — Value resolution](../run
 | `static` | `{ "kind": "static", "param": "action", "value": "create" }` | Fixed value |
 | `component` | `{ "kind": "component", "componentId": "...", "vendor": "...", "readExpr": "..." }` | One component's live value |
 | `event` | `{ "kind": "event", "param": "q", "path": "evt.text" }` | Value from event payload |
+| `url` | `{ "kind": "url", "param": "tab" }` | URL query parameter |
+| `plugin` | `{ "kind": "plugin", "plugin": "...", "member": "...", "args": [...] }` | Plugin method result |
+| `header` | `{ "name": "X-Api-Key", "value": "..." }` | Custom HTTP request header |
+| `route-param` | `{ "name": "id", "value": ... }` | URL template substitution |
 
 `all` is a placeholder — expanded at C# render time to concrete `component` items from the plan's ComponentsMap.
 
@@ -279,8 +285,8 @@ Every plan is checked against a JSON Schema in unit tests. If a builder produces
 | Reactions | `sequential`, `conditional`, `http`, `parallel-http` |
 | Commands | `mutate-element`, `dispatch`, `mutate-event`, `validation-errors`, `into` |
 | Mutations | `set-prop`, `call` |
-| Sources | `event`, `component` |
-| Gather | `all`, `static`, `component`, `event` |
+| Sources | `event`, `component`, `url`, `plugin` |
+| Gather | `all`, `static`, `component`, `event`, `url`, `plugin`, `header`, `route-param` |
 
 If you need a new capability — say a new mutation kind — it goes into the schema first. The schema is the gatekeeper. The plan is the contract. Both sides (C# and JS) agree on its shape, and neither reaches beyond it.
 

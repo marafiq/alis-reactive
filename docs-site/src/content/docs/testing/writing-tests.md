@@ -35,7 +35,7 @@ public class WhenDispatchingAnEvent : PlanTestBase
     public Task Payload_flows_when_provided() =>
         VerifyJson(Build(p => p.Dispatch("saved", new TestModel { Id = "abc" })).Render());
 
-    private static IReactivePlan<TestModel> Build(
+    private static ReactivePlan<TestModel> Build(
         Action<Builders.PipelineBuilder<TestModel>> configure)
     {
         var plan = CreatePlan();
