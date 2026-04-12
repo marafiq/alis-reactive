@@ -181,9 +181,13 @@ async function executeParallel(
   const childSpans = reaction.steps.map((_, i) => ctx?.span?.child(`parallel.step[${i}]`));
   const results = await Promise.allSettled(
     reaction.steps.map((s, i) => {
-      const childCtx = childSpans[i] ? { ...ctx, span: childSpans[i] } : ctx;
-      const r = executeReaction(s, plan, childCtx);
-      return r instanceof Promise ? r : Promise.resolve();
+      try {
+        const childCtx = childSpans[i] ? { ...ctx, span: childSpans[i] } : ctx;
+        const r = executeReaction(s, plan, childCtx);
+        return r instanceof Promise ? r : Promise.resolve();
+      } catch (err) {
+        return Promise.reject(err);
+      }
     })
   );
   for (let i = 0; i < results.length; i++) {

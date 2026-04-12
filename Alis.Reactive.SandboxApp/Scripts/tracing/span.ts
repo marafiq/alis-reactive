@@ -97,7 +97,11 @@ export class ActiveSpan implements Span {
     this.spanEvents.push({ name, time: performance.now(), attributes: attrs });
   }
 
+  private ended = false;
+
   end(status?: "ok" | "error"): void {
+    if (this.ended) return;
+    this.ended = true;
     const endTime = performance.now();
     this.sink.span({
       traceId: this.traceId,
