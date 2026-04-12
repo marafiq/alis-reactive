@@ -284,28 +284,28 @@ export type ValueProducer =
 export interface LiteralProducer {
   kind: "literal";
   value: string | number | boolean | null;
-  shape?: Shape;
+  shape: Shape;
 }
 
 export interface ReadProducer {
   kind: "read";
   from: Source;
   member: string;
-  path?: Path;
-  shape?: Shape;
-  args?: ValueProducer[];
+  path: Path;
+  shape: Shape;
+  args: ValueProducer[];
 }
 
 export interface ObjectProducer {
   kind: "object";
   fields: Record<string, ValueProducer>;
-  shape?: Shape;
+  shape: Shape;
 }
 
 export interface ArrayProducer {
   kind: "array";
   items: ValueProducer[];
-  shape?: Shape;
+  shape: Shape;
 }
 
 export interface NoneProducer {

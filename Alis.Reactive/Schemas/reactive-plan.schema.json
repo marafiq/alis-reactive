@@ -461,7 +461,7 @@
     },
     "LiteralProducer": {
       "type": "object",
-      "required": ["kind", "value"],
+      "required": ["kind", "value", "shape"],
       "properties": {
         "kind": { "const": "literal" },
         "value": {
@@ -477,7 +477,7 @@
     },
     "ReadProducer": {
       "type": "object",
-      "required": ["kind", "from", "member"],
+      "required": ["kind", "from", "member", "path", "shape", "args"],
       "properties": {
         "kind": { "const": "read" },
         "from": { "$ref": "#/$defs/Source" },
@@ -492,7 +492,7 @@
     },
     "ObjectProducer": {
       "type": "object",
-      "required": ["kind", "fields"],
+      "required": ["kind", "fields", "shape"],
       "properties": {
         "kind": { "const": "object" },
         "fields": {
@@ -504,7 +504,7 @@
     },
     "ArrayProducer": {
       "type": "object",
-      "required": ["kind", "items"],
+      "required": ["kind", "items", "shape"],
       "properties": {
         "kind": { "const": "array" },
         "items": {
