@@ -20,7 +20,7 @@
     //   Address.City → live textbox (source, NESTED path)
     Html.On(plan, t => t.CustomEvent("do-transfer", p =>
     {
-        p.Dispatch<DispatchSourceModel>("transfer", d => d
+        p.DispatchWith<DispatchSourceModel>("transfer", d => d
             .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value())
             .Set(x => x.Status, "active")
             .Set(x => x.Address.City, p.Component<NativeTextBox>(m => m.Address.City).Value())

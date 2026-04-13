@@ -130,7 +130,13 @@ namespace Alis.Reactive.Builders
                     current = ((ObjectProducer)current[segments[i]]).WritableFields;
                 }
 
-                current[segments[segments.Length - 1]] = kvp.Value;
+                var leafKey = segments[segments.Length - 1];
+                if (current.ContainsKey(leafKey) && current[leafKey] is ObjectProducer)
+                    throw new InvalidOperationException(
+                        $"Dispatch payload conflict: '{kvp.Key}' has nested children " +
+                        $"but is also set as a leaf value. " +
+                        $"Set either the parent or the children, not both.");
+                current[leafKey] = kvp.Value;
             }
 
             return root;
