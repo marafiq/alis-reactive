@@ -5,6 +5,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
+#if NET6_0_OR_GREATER
+using System.Diagnostics;
+#endif
 
 namespace Alis.Reactive
 {
@@ -81,6 +84,34 @@ namespace Alis.Reactive
         {
             _context.RegisterInputComponents();
             ResolveValidation();
+            CaptureAmbientTraceparent();
+        }
+
+        /// <summary>
+        /// Capture the ambient ASP.NET Core activity trace id so the browser
+        /// runtime can correlate boot work with the server response trace. Runs
+        /// at render time, after all behaviors are registered, and only sets
+        /// the plan's <c>Traceparent</c> if an <c>Activity</c> is currently
+        /// active and the plan does not already carry a traceparent (for
+        /// tests that explicitly set it). On .NET Framework 4.8 the method
+        /// is a no-op because <c>System.Diagnostics.Activity</c> requires
+        /// an additional package and legacy hosts rarely use W3C tracing.
+        /// </summary>
+        private void CaptureAmbientTraceparent()
+        {
+#if NET6_0_OR_GREATER
+            if (_context.Plan.Traceparent != null)
+                return;
+            var activity = Activity.Current;
+            if (activity == null)
+                return;
+            if (activity.IdFormat != ActivityIdFormat.W3C)
+                return;
+            var id = activity.Id;
+            if (string.IsNullOrEmpty(id))
+                return;
+            _context.Plan.Traceparent = id;
+#endif
         }
 
         private void ResolveValidation()

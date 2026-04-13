@@ -90,7 +90,7 @@ interface TraceablePlan {
  * Multi-plan pages (see `composeInitialPlans`) have more than one
  * `[data-reactive-plan]` script on the page, and each can independently
  * carry tracing config. Because `configure()` is a process-level singleton,
- * we must pick one `{level, traceparent}` pair — the resolution rule is:
+ * we must pick one `{level, traceparent}` pair. Resolution rules:
  *
  * - **level**: the MOST VERBOSE level across all plans. Per-plan, the
  *   existing dataset-over-plan precedence is preserved via `resolveLevel`;
@@ -98,18 +98,31 @@ interface TraceablePlan {
  *   any plan asks for tracing, we enable it for the whole page so no
  *   plan loses its diagnostics.
  *
- * - **traceparent**: the FIRST `plan.traceparent` found while iterating
- *   plans in document order. Distributed traces have exactly one root;
- *   the primary plan (which the author placed first) provides the seed.
+ * - **traceparent**: the FIRST VALID `plan.traceparent` found while
+ *   iterating plans in document order. "Valid" means the string parses
+ *   cleanly via `parseTraceparent` (version 00, lowercase hex, non-zero
+ *   trace-id / span-id). Malformed or stale leading plans do NOT poison
+ *   selection: the walk continues past them and returns the first
+ *   well-formed traceparent it finds. Each rejected candidate is
+ *   reported via `invalidTraceparents` so the caller can surface a
+ *   structured warning instead of silently losing correlation.
  *
- * The caller (`root.ts`) feeds the result into `configure()`.
+ * The caller (`root.ts`) feeds the result into `configure()` and logs
+ * any rejected candidates via the root tracer.
  */
+export interface InitialTracingConfig {
+  readonly level: Level;
+  readonly traceparent: string | undefined;
+  readonly invalidTraceparents: readonly { index: number; value: string }[];
+}
+
 export function resolveInitialTracingConfig(
   planEls: readonly TraceablePlanElement[],
   plans: readonly TraceablePlan[],
-): { level: Level; traceparent: string | undefined } {
+): InitialTracingConfig {
   let level: Level = "off";
   let traceparent: string | undefined;
+  const invalidTraceparents: { index: number; value: string }[] = [];
 
   const limit = Math.min(planEls.length, plans.length);
   for (let i = 0; i < limit; i++) {
@@ -118,11 +131,19 @@ export function resolveInitialTracingConfig(
       level = perPlan;
     }
     if (!traceparent && plans[i].traceparent) {
-      traceparent = plans[i].traceparent;
+      const raw = plans[i].traceparent as string;
+      const parsed = parseTraceparent(raw);
+      if (parsed) {
+        traceparent = raw;
+      } else {
+        // Rejected candidate: keep scanning for a valid traceparent from
+        // later plans instead of silently suppressing their correlation.
+        invalidTraceparents.push({ index: i, value: raw });
+      }
     }
   }
 
-  return { level, traceparent };
+  return { level, traceparent, invalidTraceparents };
 }
 
 /** Generate a 32-hex-digit trace-id per W3C. Uses `crypto.getRandomValues`. */

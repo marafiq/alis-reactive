@@ -9,6 +9,16 @@
     "version": { "const": 3 },
     "planId": { "type": "string", "minLength": 1 },
     "partId": { "type": "string", "minLength": 1 },
+    "traceparent": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$",
+      "description": "W3C traceparent header describing the server side distributed trace that produced this plan. The browser runtime seeds its first interaction root from this value so the entire initial boot phase correlates with the server response trace."
+    },
+    "traceLevel": {
+      "type": "string",
+      "enum": ["off", "error", "warn", "info", "debug", "trace"],
+      "description": "Optional tracing verbosity the browser runtime applies at boot time via configure({ level })."
+    },
     "types": {
       "type": "object",
       "additionalProperties": { "$ref": "#/$defs/JsType" }

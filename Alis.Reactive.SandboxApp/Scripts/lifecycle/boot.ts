@@ -63,6 +63,29 @@ function wireContainerValidation(plan: Plan): void {
 }
 
 export function mergePlan(incoming: Plan): void {
+  // Fragment tracing config is deliberately NOT applied globally.
+  // An injected fragment's server traceparent describes the fetch that
+  // delivered the fragment, not the ongoing user interaction that
+  // triggered the injection, so adopting it would silently replace a
+  // valid in-flight trace with a stale one. Its traceLevel is similarly
+  // scoped to the server that produced it and has no authority to
+  // reconfigure the client runtime mid-interaction. Both are surfaced
+  // via structured warnings so the correlation loss is visible instead
+  // of silent; an explicit fragment-merge tracing semantic can be
+  // designed later if a real consumer needs it.
+  if (incoming.traceparent) {
+    t.warn("plan.merge.traceparent.ignored", {
+      planId: incoming.planId,
+      traceparent: incoming.traceparent,
+    });
+  }
+  if (incoming.traceLevel) {
+    t.warn("plan.merge.traceLevel.ignored", {
+      planId: incoming.planId,
+      traceLevel: incoming.traceLevel,
+    });
+  }
+
   const merged = applyMergedPlan(incoming, {
     wireBehaviors,
     wireContainerValidation,

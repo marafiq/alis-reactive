@@ -214,10 +214,11 @@ describe("resolveInitialTracingConfig — multi-plan config resolution (Codex ro
   it("resolves level and traceparent from a single plan", () => {
     const result = resolveInitialTracingConfig(
       [{ dataset: { trace: "debug" } }],
-      [{ traceparent: "00-aaa-bbb-01" }],
+      [{ traceparent: "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01" }],
     );
     expect(result.level).toBe("debug");
-    expect(result.traceparent).toBe("00-aaa-bbb-01");
+    expect(result.traceparent).toBe("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01");
+    expect(result.invalidTraceparents).toEqual([]);
   });
 
   it("preserves dataset-over-plan precedence per plan", () => {
@@ -272,16 +273,68 @@ describe("resolveInitialTracingConfig — multi-plan config resolution (Codex ro
     expect(result.level).toBe("info");
   });
 
-  it("takes the FIRST traceparent in document order", () => {
+  it("takes the FIRST VALID traceparent in document order", () => {
+    const second = "00-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbbbbbbbbb-01";
+    const third = "00-cccccccccccccccccccccccccccccccc-dddddddddddddddd-01";
     const result = resolveInitialTracingConfig(
       [{ dataset: {} }, { dataset: {} }, { dataset: {} }],
       [
         {}, // no traceparent
-        { traceparent: "00-second-plan-xx-01" },
-        { traceparent: "00-third-plan-xx-01" },
+        { traceparent: second },
+        { traceparent: third },
       ],
     );
-    expect(result.traceparent).toBe("00-second-plan-xx-01");
+    expect(result.traceparent).toBe(second);
+    expect(result.invalidTraceparents).toEqual([]);
+  });
+
+  it("skips a malformed leading traceparent and keeps scanning for a valid one (Codex round 4 finding 3)", () => {
+    // Regression: previously the first non-empty traceparent was taken
+    // without validation, so a malformed leading plan would suppress
+    // correlation for every later plan. The walk now validates with
+    // parseTraceparent and continues past rejections.
+    const valid = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+    const result = resolveInitialTracingConfig(
+      [{ dataset: {} }, { dataset: {} }, { dataset: {} }],
+      [
+        { traceparent: "not-a-traceparent" }, // malformed
+        { traceparent: "" }, // empty (ignored silently)
+        { traceparent: valid }, // first valid — wins
+      ],
+    );
+    expect(result.traceparent).toBe(valid);
+    expect(result.invalidTraceparents).toEqual([
+      { index: 0, value: "not-a-traceparent" },
+    ]);
+  });
+
+  it("reports every rejected candidate, even ones between valid and no-op plans", () => {
+    const valid = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+    const result = resolveInitialTracingConfig(
+      [{ dataset: {} }, { dataset: {} }, { dataset: {} }],
+      [
+        { traceparent: "garbage" },
+        { traceparent: "00-00000000000000000000000000000000-00f067aa0ba902b7-01" }, // reserved all-zero
+        { traceparent: valid },
+      ],
+    );
+    expect(result.traceparent).toBe(valid);
+    expect(result.invalidTraceparents).toHaveLength(2);
+    expect(result.invalidTraceparents[0]).toEqual({ index: 0, value: "garbage" });
+    expect(result.invalidTraceparents[1].index).toBe(1);
+  });
+
+  it("rejects all-zero span-id traceparents (W3C reserved)", () => {
+    const result = resolveInitialTracingConfig(
+      [{ dataset: {} }],
+      [
+        {
+          traceparent: "00-4bf92f3577b34da6a3ce929d0e0e4736-0000000000000000-01",
+        },
+      ],
+    );
+    expect(result.traceparent).toBeUndefined();
+    expect(result.invalidTraceparents).toHaveLength(1);
   });
 
   it("returns undefined traceparent when no plan carries one", () => {

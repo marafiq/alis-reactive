@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    internal sealed class Plan
+    internal sealed partial class Plan
     {
         public int Version => 3;
         public string PlanId { get; }

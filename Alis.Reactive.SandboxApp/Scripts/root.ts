@@ -60,15 +60,22 @@ for (const el of planEls) {
 // Re-configure with the full plan set now that parsing has succeeded.
 // `resolveInitialTracingConfig` walks every plan element + parsed plan,
 // preserves the historical dataset-over-plan precedence per-plan, and
-// returns the most-verbose level across all plans plus the first plan
-// carrying a server traceparent. Multi-plan pages (composeInitialPlans)
-// therefore honor tracing config from every plan, not only plans[0].
+// returns the most-verbose level across all plans plus the first VALID
+// plan carrying a server traceparent. Malformed/stale leading plans do
+// NOT poison selection — later valid traceparents still win.
 if (plans.length > 0) {
   const finalConfig = resolveInitialTracingConfig(planEls, plans);
   configure({
     level: finalConfig.level,
     traceparent: finalConfig.traceparent,
   });
+  // Surface rejected candidates so silent correlation loss is visible.
+  for (const rejected of finalConfig.invalidTraceparents) {
+    rootTracer.warn("plan.traceparent.invalid", {
+      planIndex: rejected.index,
+      value: rejected.value,
+    });
+  }
 }
 
 for (const plan of composeInitialPlans(plans)) {
