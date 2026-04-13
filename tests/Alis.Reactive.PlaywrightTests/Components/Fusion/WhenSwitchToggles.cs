@@ -287,7 +287,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
+        var hasBootTrace = _consoleMessages.Any(m => m.Contains("boot.complete"));
         Assert.That(hasBootTrace, Is.True,
             "Boot trace must be emitted — confirms auto-boot discovered and executed the plan");
         AssertNoConsoleErrors();

@@ -15,13 +15,13 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     public async Task boot_trace_appears_in_console()
     {
         // data-trace="trace" on the plan element enables full tracing.
-        // If auto-boot fails to read data-trace, or trace.setLevel breaks,
+        // If auto-boot fails to read data-trace, or configure() breaks,
         // no [alis:boot] messages appear.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var hasBootStart = _consoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booting"));
-        var hasBootEnd = _consoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booted"));
+        var hasBootStart = _consoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("boot.start"));
+        var hasBootEnd = _consoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("boot.complete"));
 
         Assert.That(hasBootStart, Is.True, "Boot start trace must appear in console");
         Assert.That(hasBootEnd, Is.True, "Boot complete trace must appear in console");
@@ -37,11 +37,11 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         // Two-phase boot guarantees: document-event listeners wire BEFORE dom-ready executes.
         // Without this, dom-ready dispatches "test" but nobody is listening yet — chain breaks silently.
         //
-        // Phase 1: trigger.ts logs "[alis:trigger] document-event: listening" for each document-event behavior
-        // Phase 2: dom-ready executes, which triggers "[alis:execute] dispatch" for the first dispatch
+        // Phase 1: trigger.ts logs "[alis:trigger] trigger.wire" for each document-event behavior
+        // Phase 2: dom-ready executes, which triggers "[alis:execute] reaction.dispatch" for the first dispatch
         //
         // If someone refactors boot.ts to remove two-phase ordering, the dispatch trace would
-        // appear BEFORE the listening traces — and this test catches it.
+        // appear BEFORE the wiring traces — and this test catches it.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -51,13 +51,13 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         var lastWireIndex = -1;
         for (var i = 0; i < messages.Count; i++)
         {
-            if (messages[i].Contains("[alis:trigger]") && messages[i].Contains("document-event"))
+            if (messages[i].Contains("[alis:trigger]") && messages[i].Contains("trigger.wire") && messages[i].Contains("document-event"))
                 lastWireIndex = i;
         }
 
         // Find the FIRST dispatch reaction (phase 2 starts when dom-ready executes)
         var firstDispatchIndex = messages.FindIndex(m =>
-            m.Contains("[alis:execute] dispatch {"));
+            m.Contains("[alis:execute] reaction.dispatch"));
 
         Assert.That(lastWireIndex, Is.GreaterThanOrEqualTo(0),
             "Document-event listener wiring must be traced (phase 1)");
@@ -76,6 +76,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
+        AssertTraceContains("execute", "reaction.dispatch");
         AssertTraceContains("execute", "\"event\":\"test\"");
         AssertTraceContains("execute", "\"event\":\"test-received\"");
         AssertTraceContains("execute", "\"event\":\"final\"");
@@ -94,7 +95,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var dispatchMessages = _consoleMessages
-            .Where(m => m.Contains("[alis:execute] dispatch {"))
+            .Where(m => m.Contains("[alis:execute]") && m.Contains("reaction.dispatch"))
             .ToList();
 
         Assert.That(dispatchMessages, Has.Count.EqualTo(3),
@@ -121,7 +122,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         var mutateMessages = _consoleMessages
-            .Where(m => m.Contains("[alis:execute]") && (m.Contains("set {") || m.Contains("call {")))
+            .Where(m => m.Contains("[alis:execute]") && (m.Contains("reaction.set") || m.Contains("reaction.call")))
             .ToList();
 
         Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-1\"")), Is.True,

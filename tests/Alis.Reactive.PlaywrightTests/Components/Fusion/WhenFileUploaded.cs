@@ -155,7 +155,7 @@ public class WhenFileUploaded : PlaywrightTestBase
     public async Task boot_trace_is_emitted_on_page_load()
     {
         await NavigateAndBoot();
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
+        var hasBootTrace = _consoleMessages.Any(m => m.Contains("boot.complete"));
         Assert.That(hasBootTrace, Is.True);
         AssertNoConsoleErrors();
     }

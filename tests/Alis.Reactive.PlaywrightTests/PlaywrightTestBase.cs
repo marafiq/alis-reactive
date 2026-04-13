@@ -36,11 +36,16 @@ public abstract class PlaywrightTestBase : PageTest
 
         Page.Console += (_, msg) =>
         {
+            // Strip %c CSS format markers — Playwright captures them literally
+            // in msg.Text, but real Chrome DevTools renders the styles correctly.
+            // Keeping them in the captured text would break every substring
+            // assertion like `[alis:execute]` or `reaction.dispatch`.
+            var text = msg.Text.Replace("%c", "");
             lock (_consoleLock)
             {
-                _consoleMessages.Add($"[{msg.Type}] {msg.Text}");
+                _consoleMessages.Add($"[{msg.Type}] {text}");
                 if (msg.Type == "error")
-                    _consoleErrors.Add(msg.Text);
+                    _consoleErrors.Add(text);
             }
         };
 

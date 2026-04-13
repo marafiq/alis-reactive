@@ -20,7 +20,7 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await WaitForTraceMessage("[alis:signalr] signalr.connection.open", 10000);
 
         await LoadPanelBtn.ClickAsync();
         await Expect(PanelResidentName).ToBeVisibleAsync(new() { Timeout = 10000 });
@@ -40,7 +40,7 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await WaitForTraceMessage("[alis:signalr] signalr.connection.open", 10000);
 
         await LoadPanelBtn.ClickAsync();
         await Expect(PanelResidentName).ToBeVisibleAsync(new() { Timeout = 5000 });
@@ -66,14 +66,14 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await WaitForTraceMessage("[alis:signalr] signalr.connection.open", 10000);
 
         await LoadPanelBtn.ClickAsync();
         await WaitForTraceMessage("merge", 5000);
 
-        // Match only our "connected" trace, not the library's routed "lib" messages
+        // Match only our signalr.connection.open trace, not the library's routed "signalr.lib" messages
         var connectTraces = _consoleMessages
-            .Where(m => m.Contains("[alis:signalr] connected")
+            .Where(m => m.Contains("[alis:signalr] signalr.connection.open")
                         && m.Contains("resident-status"))
             .ToList();
 
