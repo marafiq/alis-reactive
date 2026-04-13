@@ -4,26 +4,35 @@ import { executeReaction } from "./execute";
 import { wireServerPush } from "./server-push";
 import { wireSignalR } from "./signalr";
 import { assertNever } from "../core/assert-never";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
+import { run as runInteraction } from "../tracing/interactions";
 
-const log = scope("trigger");
+const t = tracer("trigger");
 
 /**
- * Execute a reaction and handle errors for both sync and async paths.
- * The callback is synchronous. For pure sync reactions (set, call, branch
- * with compare conditions), execution completes before this returns —
- * in the same tick as the SF event callback. SF checks args.cancel AFTER
- * this returns, so the mutation is visible.
+ * The single entry-point choke point for executing a reaction.
+ *
+ * Wraps `executeReaction` in an interaction so the lifecycle
+ * (`interaction.start`, `interaction.end`, `interaction.fail`) is
+ * emitted automatically and the W3C trace-id propagates to every
+ * event and outbound HTTP request inside the reaction. All entry
+ * points — document events, page-ready, component events, server-push,
+ * signalr, native action links — route through this function.
+ *
+ * No try/catch here: the interactions module handles sync return,
+ * sync throw, async resolve, and async reject outcomes and restores
+ * the previous interaction context in every path.
  */
-function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext): void {
-  try {
-    const result = executeReaction(reaction, plan, ctx);
-    if (result instanceof Promise) {
-      result.catch(err => log.error("reaction failed", { error: String(err) }));
-    }
-  } catch (err) {
-    log.error("reaction failed (sync)", { error: String(err) });
-  }
+export function runReaction(
+  reaction: Reaction,
+  plan: Plan,
+  ctx: ExecContext,
+  triggerKind: string,
+  triggerAttrs: Record<string, unknown>,
+): void | Promise<void> {
+  return runInteraction(triggerKind, { ...triggerAttrs, planId: plan.planId }, () =>
+    executeReaction(reaction, plan, ctx),
+  );
 }
 
 export function wireBehavior(
@@ -38,18 +47,18 @@ export function wireBehavior(
     case "page-ready":
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
-          runReaction(reaction, plan, {});
+          runReaction(reaction, plan, {}, "page-ready", {});
         }, opts);
       } else {
-        runReaction(reaction, plan, {});
+        runReaction(reaction, plan, {}, "page-ready", {});
       }
       break;
 
     case "document-event":
-      log.debug("document-event: listening", { event: trigger.event });
+      t.debug("trigger.wire", { kind: "document-event", event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
         const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e };
-        runReaction(reaction, plan, ctx);
+        runReaction(reaction, plan, ctx, "document-event", { event: trigger.event });
       }, opts);
       break;
 
@@ -61,11 +70,19 @@ export function wireBehavior(
       const eventDef = jsType.events?.[trigger.event];
       const channel = eventDef?.channel ?? trigger.event;
 
-      log.debug("component-event", { component: trigger.component, event: trigger.event, channel });
+      t.debug("trigger.wire", {
+        kind: "component-event",
+        component: trigger.component,
+        event: trigger.event,
+        channel,
+      });
 
       wireEvent(plan, trigger.component, channel, (eventData) => {
         const ctx: ExecContext = { event: eventData };
-        runReaction(reaction, plan, ctx);
+        runReaction(reaction, plan, ctx, "component-event", {
+          component: trigger.component,
+          event: trigger.event,
+        });
       }, opts);
       break;
     }
