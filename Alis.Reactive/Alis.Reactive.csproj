@@ -34,6 +34,10 @@
         This guarantees `dotnet pack` always ships the latest JS/CSS, even when
         invoked locally outside CI. The CI verify-packaged-assets workflow enforces
         the inverse: that committed assets stay in sync with sandbox sources.
+
+        Copy is unconditional (no SkipUnchangedFiles) so deliberate or accidental
+        modification of assets/ cannot survive a pack. The negligible disk-write
+        cost is worth the absolute guarantee.
     -->
     <Target Name="SyncPackagedAssetsBeforePack" BeforeTargets="GenerateNuspec">
         <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\js\alis-reactive.js')"
@@ -41,11 +45,9 @@
         <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\css\design-system.css')"
                Text="Sandbox CSS bundle not found at Alis.Reactive.SandboxApp/wwwroot/css/design-system.css. Run 'npm run build:all' before 'dotnet pack'." />
         <Copy SourceFiles="$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\js\alis-reactive.js"
-              DestinationFiles="$(MSBuildThisFileDirectory)assets\js\alis-reactive.js"
-              SkipUnchangedFiles="true" />
+              DestinationFiles="$(MSBuildThisFileDirectory)assets\js\alis-reactive.js" />
         <Copy SourceFiles="$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\css\design-system.css"
-              DestinationFiles="$(MSBuildThisFileDirectory)assets\css\design-system.css"
-              SkipUnchangedFiles="true" />
+              DestinationFiles="$(MSBuildThisFileDirectory)assets\css\design-system.css" />
     </Target>
 
     <!-- Bundle Roslyn analyzers so consumers get compile-time DSL checks (ALIS001-ALIS008) -->
