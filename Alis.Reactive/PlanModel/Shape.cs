@@ -105,9 +105,9 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the named field shapes for object shapes, or <see langword="null"/> for non-object shapes.</summary>
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public IReadOnlyDictionary<string, Shape> Fields { get; private set; }
-        /// <summary>Gets whether the object shape accepts properties beyond those listed in <see cref="Fields"/>. When true, the value may contain extra keys not declared in the shape.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public bool? Additional { get; private set; }
+        /// <summary>Gets whether the object shape accepts properties beyond those listed in <see cref="Fields"/>. When <see langword="true"/>, the value may contain extra keys not declared in the shape. Default <see langword="false"/> means the shape is closed.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+        public bool Additional { get; private set; }
 
         internal bool IsNone => Kind == "none";
 
@@ -179,7 +179,7 @@ namespace Alis.Reactive.PlanModel
                 hash = hash * 31 + (Item != null ? Item.GetHashCode() : 0);
                 hash = hash * 31 + (Inner != null ? Inner.GetHashCode() : 0);
                 hash = hash * 31 + (Fields?.Count ?? 0);
-                hash = hash * 31 + (Additional.HasValue ? Additional.Value.GetHashCode() : 0);
+                hash = hash * 31 + Additional.GetHashCode();
                 return hash;
             }
 #endif
