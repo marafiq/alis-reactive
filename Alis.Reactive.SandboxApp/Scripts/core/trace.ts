@@ -31,8 +31,9 @@ export function scope(name: string): Logger {
 
 function emit(level: number, tag: string, msg: string, data?: unknown): void {
   if (level > active) return;
-  const line = data !== undefined ? `${tag} ${msg} ${JSON.stringify(data)}` : `${tag} ${msg}`;
-  if (level <= LEVELS.error) console.error(line);
-  else if (level <= LEVELS.warn) console.warn(line);
-  else console.log(line);
+  const out = level <= LEVELS.error ? console.error
+            : level <= LEVELS.warn  ? console.warn
+            : console.log;
+  if (data !== undefined) out(`${tag} ${msg}`, data);
+  else                    out(`${tag} ${msg}`);
 }
