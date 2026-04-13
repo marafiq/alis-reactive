@@ -11,7 +11,7 @@ import type { ExecContext } from "../types";
 import { resolveElement } from "../resolution/resolver";
 import { evaluateCondition } from "../conditions/conditions";
 import { evaluateValue } from "../core/evaluate";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 import { toString } from "../core/shape-convert";
 import { ruleFails } from "./rule-engine";
 import {
@@ -20,20 +20,20 @@ import {
   showServerErrorInline,
 } from "./error-display";
 
-const log = scope("validation");
+const t = tracer("validation");
 
 // -- Public API --
 
 export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecContext): boolean {
   const containerComp = plan.components[containerKey];
   if (!containerComp) {
-    log.warn("validate: container component not found", { containerKey });
+    t.warn("validation.container.not-found", { containerKey });
     return false;
   }
 
   const containerScope = containerComp.container;
   if (!containerScope) {
-    log.warn("validate: component has no container scope", { containerKey });
+    t.warn("validation.container.no-scope", { containerKey });
     return true;
   }
 
@@ -44,7 +44,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   } catch (e) {
     if (!isResolutionError(e)) throw e;
     if ((containerScope.validationRules?.length ?? 0) > 0) {
-      log.warn("validate: form container missing, blocking", { containerId });
+      t.warn("validation.form.not-found", { containerId });
       return false;
     }
     return true;
@@ -71,7 +71,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
 
   if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
 
-  log.debug("validate", { containerId, valid });
+  t.debug("validation.complete", { containerId, valid });
   return valid;
 }
 
@@ -97,7 +97,7 @@ export function showServerErrors(plan: Plan, containerKey: string, data: unknown
   }
 
   if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
-  log.debug("showServerErrors", { containerId, fieldCount: Object.keys(errors).length });
+  t.debug("validation.server-errors", { containerId, fieldCount: Object.keys(errors).length });
 }
 
 /** Place a single server error on its component or into the summary. Returns true if any summary errors added. */
@@ -182,7 +182,7 @@ function evaluateComponentRules(
   if (resolved.done) return resolved.result;
 
   if (!container.contains(resolved.el)) {
-    log.trace("field outside form, skipping", { component: cv.component, containerId });
+    t.trace("validation.field.outside-form", { component: cv.component, containerId });
     return true;
   }
 
@@ -196,7 +196,7 @@ function evaluateComponentRules(
 function handleMissingComponent(
   cv: ComponentValidation, plan: Plan, summaryEl: HTMLElement | null, ctx?: ExecContext,
 ): boolean {
-  log.trace("component-not-found", { component: cv.component });
+  t.trace("validation.component.not-found", { component: cv.component });
   if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return true;
   if (cv.rules.length > 0 && summaryEl) {
     addToSummary(summaryEl, cv.component, cv.rules[0].message);
@@ -290,7 +290,7 @@ function reportRuleFailure(
   component: string, rule: ValidationRule, value: unknown,
   containerId: string, compId: string, hidden: boolean, summaryEl: HTMLElement | null,
 ): void {
-  log.trace("rule-fail", { component, rule: rule.name, value, message: rule.message });
+  t.trace("validation.rule.fail", { component, rule: rule.name, value, message: rule.message });
   if (hidden) {
     if (summaryEl) addToSummary(summaryEl, component, rule.message);
   } else {
@@ -369,6 +369,6 @@ function extractErrors(data: unknown): Record<string, unknown> | null {
   if ("errors" in obj && typeof obj.errors === "object" && obj.errors !== null) {
     return obj.errors as Record<string, unknown>;
   }
-  log.warn("showServerErrors: response is not ProblemDetails shape, ignoring", {});
+  t.warn("validation.server-errors.invalid-shape", {});
   return null;
 }

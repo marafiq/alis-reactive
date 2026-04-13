@@ -5,9 +5,9 @@
 // This module has no Plan access and operates as a pure UI overlay for
 // connection-lost indicators. It does not resolve components.
 
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 
-const log = scope("retry-indicator");
+const t = tracer("retry");
 
 const RETRY_ATTR = "data-alis-retry";
 
@@ -19,7 +19,7 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
     // See module header comment for rationale.
     const el = document.getElementById(id);
     if (!el) {
-      log.warn("target not found", { key, id });
+      t.warn("retry.target.not-found", { key, id });
       continue;
     }
 
@@ -43,14 +43,18 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
   }
 
   if (anchored.size > 0) {
-    log.info("shown", { key, placed: anchored.size });
+    t.info("retry.indicator.show", { key, placed: anchored.size });
   } else if (targetIds.size > 0) {
-    log.error("no indicators placed — all targets missing", { key, targets: [...targetIds] });
+    t.error(
+      "retry.placement.fail",
+      { key, targets: [...targetIds] },
+      new Error(`No retry indicators placed — all ${targetIds.size} targets missing`),
+    );
   }
 }
 
 export function removeRetryIndicators(key: string): void {
   const icons = document.querySelectorAll(`[${RETRY_ATTR}="${key}"]`);
   icons.forEach(icon => icon.remove());
-  if (icons.length > 0) log.debug("removed", { key });
+  if (icons.length > 0) t.debug("retry.indicator.clear", { key });
 }

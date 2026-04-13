@@ -12,6 +12,10 @@ export interface Plan {
   types: Record<string, JsType>;
   components: Record<string, Component>;
   behaviors: Behavior[];
+  /** Server-issued W3C traceparent for cross-service correlation. */
+  traceparent?: string;
+  /** Server-configured tracing level (off/error/warn/info/debug/trace). */
+  traceLevel?: string;
 }
 
 // ── JsType ────────────────────────────────────────────────────

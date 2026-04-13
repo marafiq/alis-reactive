@@ -6,11 +6,11 @@ import type { Plan, GatherInput, RequestInput, Transport, Shape } from "../types
 import type { ExecContext } from "../types";
 import { resolveComponent, readProperty } from "../resolution/resolver";
 import { applyShape, toString } from "../core/shape-convert";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 import { evaluateValue } from "../core/evaluate";
 import { formatForWire } from "../core/wire-format";
 
-const log = scope("gather");
+const t = tracer("gather");
 
 export interface GatherResult {
   urlParams: string[];
@@ -34,7 +34,7 @@ function hasFiles(items: unknown[]): boolean {
 function serializeValue(value: unknown, name: string): string {
   const result = toString(value);
   if (!result.ok) {
-    log.warn("gather serialize failed, using empty", { name, error: result.error });
+    t.warn("gather.serialize.fail", { name, error: result.error });
     return "";
   }
   return result.value;
@@ -108,7 +108,7 @@ function selectTransport(
 function emitValue(name: string, raw: unknown, shape: Shape | undefined, transport: TransportStrategy): void {
   if (typeof FileList !== "undefined" && raw instanceof FileList) {
     transport.emitArray(name, Array.from(raw), shape);
-    log.trace("file", { name, count: raw.length });
+    t.trace("gather.file", { name, count: raw.length });
     return;
   }
   if (Array.isArray(raw)) {
@@ -117,7 +117,7 @@ function emitValue(name: string, raw: unknown, shape: Shape | undefined, transpo
   } else {
     transport.emitScalar(name, raw, shape);
   }
-  log.trace("gathered", { name, value: raw });
+  t.trace("gather.value", { name, value: raw });
 }
 
 /**

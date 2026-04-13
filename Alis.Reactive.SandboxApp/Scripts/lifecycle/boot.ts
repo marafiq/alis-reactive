@@ -3,8 +3,7 @@
 // Delegates state to merge-plan.ts PlanRegistry.
 
 import type { Plan, Behavior } from "../types";
-import { setLevel } from "../core/trace";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
 import { wireBehavior } from "../execution/trigger";
 import { setActivePlan } from "../execution/execute";
 import { wireLiveValidation } from "../validation/live-clear";
@@ -16,13 +15,13 @@ import {
   resetMergePlanState,
 } from "./merge-plan";
 
-const log = scope("boot");
+const t = tracer("boot");
 const BOOTED_ATTR = "alisBooted";
 
 let bootAbort = new AbortController();
 
 export function boot(plan: Plan): void {
-  log.info("booting", { behaviors: plan.behaviors.length });
+  t.info("boot.start", { planId: plan.planId, behaviors: plan.behaviors.length });
 
   // Wire validation live-clear for components with container scopes
   wireContainerValidation(plan);
@@ -33,7 +32,7 @@ export function boot(plan: Plan): void {
   setActivePlan(plan);
   registerBootedPlan(plan);
   document.documentElement.dataset[BOOTED_ATTR] = "true";
-  log.info("booted");
+  t.info("boot.complete", { planId: plan.planId });
 }
 
 /**
@@ -71,7 +70,7 @@ export function mergePlan(incoming: Plan): void {
 
   clearSummaryForPlan(merged.planId);
 
-  log.info("merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
+  t.info("plan.merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
 }
 
 export function getBootedPlan(planId: string): Plan | undefined {
@@ -84,8 +83,6 @@ export function resetBootStateForTests(): void {
   resetMergePlanState();
   delete document.documentElement.dataset[BOOTED_ATTR];
 }
-
-export const trace = { setLevel };
 
 function clearSummaryForPlan(planId: string): void {
   const el = findSummaryElement(planId);
