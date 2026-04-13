@@ -9,7 +9,7 @@ A trigger defines *when* a pipeline executes. Every reactive behavior starts wit
 
 ### Placement — anywhere in the view
 
-`Html.On()` builds a **descriptor** and adds it to the plan. It does not execute anything. You can call it anywhere in the `.cshtml` — top, middle, bottom, inside conditionals, in loops. Order doesn't matter. The calls just accumulate entries in the plan object, and `@Html.RenderPlan(plan)` serializes them all to JSON when Razor evaluates that expression.
+`Html.On()` builds a **plan model** and adds it to the plan. It does not execute anything. You can call it anywhere in the `.cshtml` — top, middle, bottom, inside conditionals, in loops. Order doesn't matter. The calls just accumulate entries in the plan object, and `@Html.RenderPlan(plan)` serializes them all to JSON when Razor evaluates that expression.
 
 ```csharp
 @{
@@ -28,7 +28,7 @@ A trigger defines *when* a pipeline executes. Every reactive behavior starts wit
 
 ### Lazy connections — no connection until the browser boots
 
-Writing `t.SignalR(...)` or `t.ServerPush(...)` in C# does **not** open a WebSocket or EventSource. It produces a JSON descriptor — data, not execution. The actual connection only happens when the browser loads the page and the JS runtime processes the plan during boot.
+Writing `t.SignalR(...)` or `t.ServerPush(...)` in C# does **not** open a WebSocket or EventSource. It produces a JSON plan model — data, not execution. The actual connection only happens when the browser loads the page and the JS runtime processes the plan during boot.
 
 - **No page load = no connection.** If the view is never rendered, no resources are consumed.
 - **Partial views are lazy too.** A partial loaded via `.Into()` only connects when the partial arrives and its plan merges.
@@ -100,15 +100,23 @@ Html.On(plan, t => t.CustomEvent<ResidentCreatedPayload>("resident-created", (pa
 
 > **How typed payloads work:** `SetText(payload, x => x.Name)` does not read `payload.Name` at render time. The expression `x => x.Name` is converted to the dot-path `"evt.name"` and embedded in the JSON plan. At runtime, when the event fires, the JS runtime resolves `evt.name` from the actual event data. The `payload` parameter is a compile-time proxy — it exists only for IntelliSense and type checking. The payload type must have a parameterless constructor (`new()` constraint).
 
-Dispatching with data:
+Dispatching with data — two variants:
 
 ```csharp
+// Literal payload: data known at build time
 pipeline.Dispatch("resident-created", new ResidentCreatedPayload
 {
     Name = "Jane Doe",
     Facility = "Sunrise Manor"
 });
+
+// Source-backed payload: fields resolved from live components at runtime
+pipeline.DispatchWith<ResidentCreatedPayload>("resident-created", d => d
+    .Set(x => x.Name, pipeline.Component<NativeTextBox>(m => m.Name).Value())
+    .Set(x => x.Facility, "Sunrise Manor"));
 ```
+
+Use `Dispatch` when the payload is a compile-time constant. Use `DispatchWith` when fields come from live component values, URL params, plugin reads, or need to mix sources with literals.
 
 ## .Reactive() — component events
 

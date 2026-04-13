@@ -28,6 +28,7 @@ pipeline.Get(url) / .Post(url) / .Put(url) / .Delete(url)  § start a request
 │   ├── r.OnSuccess<T>((json, pipeline) => { })             § typed JSON response
 │   ├── r.OnError(code, e => { })                           § status-specific error
 │   └── r.Chained(c => { })                                 § sequential follow-up
+├── .Finally(f => { })                                      § always-runs cleanup
 ├── pipeline.Parallel(a => ..., b => ...)                   § concurrent requests
 │   └── .OnAllSettled(pipeline => { })                      § after all complete
 ```
@@ -54,7 +55,7 @@ pipeline.Put("/api/residents", g => { /* gather */ })
 pipeline.Delete("/api/residents/42")
 ```
 
-Each returns the request builder, which you chain with `.Gather()`, `.WhileLoading()`, `.Validate()`, and `.Response()`.
+Each returns the request builder, which you chain with `.Gather()`, `.WhileLoading()`, `.Validate()`, `.Response()`, and `.Finally()`.
 
 `Post` and `Put` also accept an inline gather configuration -- a shorthand for the most common pattern:
 
@@ -186,6 +187,24 @@ pipeline.Post("/api/residents", g => g.IncludeAll())
 ```
 
 WhileLoading accepts sequential commands only -- no conditions, HTTP requests, or parallel branches inside it. It is designed for simple visual state changes: show/hide spinners, disable buttons, dim sections.
+
+## How do I guarantee cleanup regardless of the outcome?
+
+`Finally` runs after the request completes — on success, on error, and on network failure. Use it to reverse `WhileLoading` state without duplicating the cleanup in every `OnSuccess` and `OnError` handler.
+
+```csharp
+pipeline.Post("/api/residents", g => g.IncludeAll())
+    .WhileLoading(l => l.Element("spinner").Show())
+    .Response(r => r
+        .OnSuccess(p => p.Element("result").SetText("Saved"))
+        .OnError(400, e => e.ValidationErrors("form"))
+    )
+    .Finally(f => f.Element("spinner").Hide());
+```
+
+Without `Finally`, an unhandled error status (e.g. server returns 500 but only `OnError(400)` is registered) would leave the spinner visible indefinitely. `Finally` closes that gap — it executes even when no response handler matches, and even when the network fails entirely.
+
+`Finally` supports element commands, component commands, and condition guards. It does not provide response body access because the response may not exist on network failure.
 
 ## How do I handle the response?
 

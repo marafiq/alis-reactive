@@ -69,7 +69,7 @@ Alis.Reactive.Fusion/Components/FusionXxx/
 ├── FusionXxx.cs                      ← 1. Component type marker
 ├── FusionXxxExtensions.cs            ← 2. Mutations (SetValue, Focus, Value)
 ├── FusionXxxHtmlExtensions.cs        ← 3. Factory method (Html.Xxx())
-├── FusionXxxEvents.cs                ← 4. Event descriptor registry
+├── FusionXxxEvents.cs                ← 4. Event registry
 ├── FusionXxxReactiveExtensions.cs    ← 5. .Reactive() wiring
 └── Events/
     ├── FusionXxxOnChanged.cs         ← 6. Changed event args
@@ -110,11 +110,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Descriptors;
-using Alis.Reactive.Descriptors.Commands;
-using Alis.Reactive.Descriptors.Mutations;
-using Alis.Reactive.Descriptors.Sources;
-using Alis.Reactive.Descriptors.Triggers;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native.Extensions;     // for InputBoundField<TModel, TProp>
 using Syncfusion.EJ2;                       // for setup.Helper.EJS()
 using Syncfusion.EJ2.DropDowns;             // SF component namespace (varies)
@@ -278,7 +274,7 @@ Registers the component in the plan's `ComponentsMap` and renders the SF builder
 ```csharp
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns; // or the SF namespace for your component
-using Alis.Reactive.Descriptors;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native.Extensions;
 
 public static class FusionXxxHtmlExtensions
@@ -296,7 +292,7 @@ public static class FusionXxxHtmlExtensions
             Component.Vendor,                                // "fusion"
             setup.BindingPath,
             Component.ReadExpr,                              // "value" or "checked"
-            "xxx",                                           // component type descriptor
+            "xxx",                                           // component type label
             CoercionTypes.InferFromType(typeof(TProp))));    // auto-inferred
 
         // 2. Create the SF EJ2 builder — pass htmlAttributes as a PARAMETER to XxxFor()
@@ -365,9 +361,9 @@ SF uses camelCase field names. The helper extracts the member name from the expr
 
 ---
 
-## File 4: Event descriptor registry
+## File 4: Event registry
 
-A singleton that maps event names to typed descriptors:
+A singleton that maps event names to typed event definitions:
 
 ```csharp
 public sealed class FusionXxxEvents
@@ -375,12 +371,12 @@ public sealed class FusionXxxEvents
     public static readonly FusionXxxEvents Instance = new();
     private FusionXxxEvents() { }
 
-    public TypedEventDescriptor<FusionXxxChangeArgs> Changed =>
+    public TypedEvent<FusionXxxChangeArgs> Changed =>
         new("change", new FusionXxxChangeArgs());
 }
 ```
 
-Each property creates a `TypedEventDescriptor` with:
+Each property creates a `TypedEvent` with:
 - **JS event name** — the string SF uses for `addEventListener` (e.g., `"change"`, `"filtering"`, `"focus"`, `"blur"`)
 - **Phantom args instance** — used only for compile-time type inference, never read at runtime
 
@@ -398,7 +394,7 @@ private static readonly FusionXxx Component = new();
 public static XxxBuilder Reactive<TModel, TArgs>(
     this XxxBuilder builder,
     ReactivePlan<TModel> plan,
-    Func<FusionXxxEvents, TypedEventDescriptor<TArgs>> eventSelector,
+    Func<FusionXxxEvents, TypedEvent<TArgs>> eventSelector,
     Action<TArgs, PipelineBuilder<TModel>> pipeline)
     where TModel : class
 {
@@ -531,7 +527,7 @@ When onboarding any component — **none of these change:**
 | TS runtime | `trigger.ts`, `commands.ts`, `element.ts`, `gather.ts` | Plan carries vendor + readExpr, runtime resolves via bracket notation |
 | JSON schema | `reactive-plan.schema.json` | Existing mutation kinds (set-prop, call) cover all component APIs |
 | TS types | `types/*.ts` | No new command kinds or trigger kinds |
-| Core descriptors | `Alis.Reactive/` project | Existing mutation algebra handles everything |
+| Core plan models | `Alis.Reactive/` project | Existing mutation algebra handles everything |
 
 **If you find yourself modifying any of these, stop. You're doing it wrong.**
 
@@ -626,16 +622,16 @@ Not every component follows the standard template. These patterns appear in the 
 
 ### Multiple events on one component
 
-Some components have Changed + Focus + Blur. Add one `TypedEventDescriptor` per event:
+Some components have Changed + Focus + Blur. Add one `TypedEvent` per event:
 
 ```csharp
-public TypedEventDescriptor<FusionXxxChangeArgs> Changed =>
+public TypedEvent<FusionXxxChangeArgs> Changed =>
     new("change", new FusionXxxChangeArgs());
 
-public TypedEventDescriptor<FusionXxxFocusArgs> Focus =>
+public TypedEvent<FusionXxxFocusArgs> Focus =>
     new("focus", new FusionXxxFocusArgs());
 
-public TypedEventDescriptor<FusionXxxBlurArgs> Blur =>
+public TypedEvent<FusionXxxBlurArgs> Blur =>
     new("blur", new FusionXxxBlurArgs());
 ```
 
@@ -829,7 +825,7 @@ Alis.Reactive.Fusion/Components/FusionXxx/
 ├── FusionXxx.cs                      ← 1. Component type marker (IComponent, NOT IInputComponent)
 ├── FusionXxxExtensions.cs            ← 2. Mutations (methods + properties)
 ├── FusionXxxHtmlExtensions.cs        ← 3. Factory (NO InputField, NO ComponentsMap)
-├── FusionXxxEvents.cs                ← 4. Event descriptor registry
+├── FusionXxxEvents.cs                ← 4. Event registry
 ├── FusionXxxReactiveExtensions.cs    ← 5. .Reactive() wiring
 └── Events/
     └── FusionXxxOnSelected.cs        ← 6. Event args
@@ -924,7 +920,7 @@ public sealed class FusionXxxEvents
     public static readonly FusionXxxEvents Instance = new();
     private FusionXxxEvents() { }
 
-    public TypedEventDescriptor<FusionXxxSelectedArgs> Selected =>
+    public TypedEvent<FusionXxxSelectedArgs> Selected =>
         new("selected", new FusionXxxSelectedArgs());
 }
 ```
@@ -938,7 +934,7 @@ private static readonly FusionXxx Component = new();
 
 public static FusionXxxBuilder<TModel> Reactive<TModel, TArgs>(
     this FusionXxxBuilder<TModel> builder,
-    Func<FusionXxxEvents, TypedEventDescriptor<TArgs>> eventSelector,
+    Func<FusionXxxEvents, TypedEvent<TArgs>> eventSelector,
     Action<TArgs, PipelineBuilder<TModel>> pipeline)
     where TModel : class
 {

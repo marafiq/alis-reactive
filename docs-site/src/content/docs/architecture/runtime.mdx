@@ -30,7 +30,7 @@ Scripts/
 │   ├── resolver.ts                  walks BindSource — event paths or component reads
 │   └── component.ts                 vendor root resolution (see Component Model)
 ├── conditions/                      evaluates guards — value, all, any, not, confirm
-├── validation/                      client-side validation from plan descriptors
+├── validation/                      client-side validation from plan models
 ├── components/                      component-specific side effects (drawer, loader, confirm)
 ├── core/                            walk.ts, coerce.ts, trace.ts, assert-never.ts
 └── types/                           TypeScript interfaces mirroring the JSON plan schema
@@ -51,7 +51,7 @@ enrich: "enrichment.ts\nFill validation fields\nfrom ComponentsMap" {
   style.stroke: "#4285f4"
   style.font-size: 16
 }
-validation: "walk-reactions.ts\nFind validation descriptors\nWire live-clear listeners" {
+validation: "walk-reactions.ts\nFind validation rules\nWire live-clear listeners" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
@@ -67,7 +67,7 @@ wire: "wireEntries()\nTwo-phase trigger wiring" {
 enrich -> validation -> wire
 ```
 
-**Enrichment** walks validation descriptors and fills in `fieldId`, `vendor`, `readExpr`, and `shape` on each field from the ComponentsMap. The `shape` carries the type contract inferred from `typeof(TProp)` via `Shape.FromClrType()` at C# registration time — used by the condition reader for typed comparison (e.g., Unix ms for dates). This is the only runtime enrichment — gather placeholders and component trigger refs are already resolved at C# render time.
+**Enrichment** walks validation rules and fills in `fieldId`, `vendor`, `readExpr`, and `shape` on each field from the ComponentsMap. The `shape` carries the type contract inferred from `typeof(TProp)` via `Shape.FromClrType()` at C# registration time — used by the condition reader for typed comparison (e.g., Unix ms for dates). This is the only runtime enrichment — gather placeholders and component trigger refs are already resolved at C# render time.
 
 **Two-phase boot** guarantees event chains work regardless of declaration order. Phase 1 wires all CustomEvent and component-event listeners. Phase 2 runs DomReady reactions — which may dispatch events that Phase 1 listeners catch. Without this, a DomReady dispatch would fire before the listener exists and vanish silently.
 

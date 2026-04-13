@@ -245,6 +245,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return Json(new { apiVersion, requestId, tenantId });
         }
 
+        // ── Finally Demo: deterministic success/failure ────────
+
+        [HttpPost("FlakyEndpoint")]
+        public IActionResult FlakyEndpoint([FromBody] SaveRequest? request)
+        {
+            if (request?.Name == "fail")
+                return StatusCode(500, new { error = "Internal server error" });
+
+            return Ok(new { message = $"Saved: {request?.Name}", receivedName = request?.Name });
+        }
+
         // ── DTOs ─────────────────────────────────────────────
 
         public class SaveRequest

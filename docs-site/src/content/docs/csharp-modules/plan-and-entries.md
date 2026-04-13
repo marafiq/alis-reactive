@@ -27,7 +27,7 @@ Every method takes `plan` as its first argument — the plan is the thread that 
 
 Every view that uses Reactive must have a strongly-typed `@model` — no `dynamic`, no `ViewBag`. `Html.ReactivePlan<TModel>()` creates a plan scoped to that model. `TModel` is inferred from `@model`, so every expression — `m => m.Name`, `m => m.Country` — is type-checked at compile time. Partials use `Html.ResolvePlan<TModel>()` to merge into the parent. Both require `@Html.RenderPlan(plan)` at the bottom.
 
-Every `Html.On`, `Html.InputField`, and `.Reactive()` call adds entries to the plan. Nothing executes at this point — it's all descriptors collected into a list.
+Every `Html.On`, `Html.InputField`, and `.Reactive()` call adds entries to the plan. Nothing executes at this point — it's all plan models collected into a list.
 
 `Html.RenderPlan(plan)` serializes the collected entries to JSON and emits a `<script type="application/json">` element into the page. The runtime reads it and executes the described behavior.
 
@@ -80,6 +80,6 @@ See the full [Grammar Tree](../mental-model/#the-grammar-tree) for what's availa
 
 ## When does the plan execute?
 
-Never on the server. `ReactivePlan` collects descriptors, `RenderPlan` serializes them. The JSON is inert until the runtime reads it in the browser. This separation is why there's no JavaScript in your views — the C# fluent builders describe intent, the runtime executes it.
+Never on the server. `ReactivePlan` collects plan models, `RenderPlan` serializes them. The JSON is inert until the runtime reads it in the browser. This separation is why there's no JavaScript in your views — the C# fluent builders describe intent, the runtime executes it.
 
 Next: [Triggers](../reactivity/triggers-and-reactions/) — the different ways to say *when* something should happen.

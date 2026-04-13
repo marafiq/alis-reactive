@@ -1,0 +1,75 @@
+@model DispatchSourceModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Issue #86 — Source-Backed Dispatch";
+
+    var plan = Html.ReactivePlan<DispatchSourceModel>();
+
+    // Register textboxes as component sources
+    Html.InputField(plan, m => m.Name, o => o.Label("Resident Name"))
+        .NativeTextBox(b => b.Placeholder("Type a name..."));
+
+    Html.InputField(plan, m => m.Address.City, o => o.Label("City"))
+        .NativeTextBox(b => b.Placeholder("Type a city..."));
+
+    // Button click: dispatch with MIXED payload
+    //   Name       → live textbox (source)
+    //   Status     → literal "active"
+    //   Address.City → live textbox (source, NESTED path)
+    Html.On(plan, t => t.CustomEvent("do-transfer", p =>
+    {
+        p.DispatchWith<DispatchSourceModel>("transfer", d => d
+            .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value())
+            .Set(x => x.Status, "active")
+            .Set(x => x.Address.City, p.Component<NativeTextBox>(m => m.Address.City).Value())
+        );
+    }));
+
+    // Listener: receives "transfer" event and displays ALL fields including nested
+    Html.On(plan, t => t.CustomEvent<DispatchSourceModel>("transfer", (payload, p) =>
+    {
+        p.Element("received-name").SetText(payload, x => x.Name);
+        p.Element("received-status-value").SetText(payload, x => x.Status);
+        p.Element("received-city").SetText(payload, x => x.Address.City);
+        p.Element("received-result").SetText("Received!");
+        p.Element("received-result").AddClass("text-green-600");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Issue #86 &mdash; Source-Backed Dispatch</native-heading>
+        <native-text color="Secondary">
+            Type a name and city, click Dispatch. The listener shows the live values
+            (source-backed) plus a literal status — including nested Address.City.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Input</native-heading>
+        <div class="space-y-3">
+            <div id="@IdGenerator.For<DispatchSourceModel>(m => m.Name)-field"></div>
+            <div id="@IdGenerator.For<DispatchSourceModel>(m => m.Address.City)-field"></div>
+            @(Html.NativeButton("dispatch-btn", "Dispatch Transfer")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Dispatch("do-transfer");
+                }))
+        </div>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Listener Output</native-heading>
+        <div class="space-y-2 font-mono text-sm">
+            <p>Name (source): <span id="received-name" class="text-text-muted">—</span></p>
+            <p>Status (literal): <span id="received-status-value" class="text-text-muted">—</span></p>
+            <p>City (nested source): <span id="received-city" class="text-text-muted">—</span></p>
+            <p id="received-result" class="text-text-muted">Waiting for dispatch...</p>
+        </div>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
