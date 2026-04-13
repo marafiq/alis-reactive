@@ -5,6 +5,7 @@ import {
   generateTraceId,
   isValidLevel,
   parseTraceparent,
+  resolveInitialTracingConfig,
   resolveLevel,
 } from "../../tracing/context";
 
@@ -195,5 +196,127 @@ describe("generateSpanId", () => {
       ids.add(generateSpanId());
     }
     expect(ids.size).toBe(100);
+  });
+});
+
+describe("resolveInitialTracingConfig — multi-plan config resolution (Codex round 3 finding 2)", () => {
+  // root.ts discovers every [data-reactive-plan] element on the page and
+  // feeds the union of (dataset.trace, parsed plan) pairs into this helper.
+  // Rule: most-verbose level across all plans (dataset-over-plan precedence
+  // preserved per-plan), first traceparent in document order wins.
+
+  it("returns off/undefined when no plans are discovered", () => {
+    const result = resolveInitialTracingConfig([], []);
+    expect(result.level).toBe("off");
+    expect(result.traceparent).toBeUndefined();
+  });
+
+  it("resolves level and traceparent from a single plan", () => {
+    const result = resolveInitialTracingConfig(
+      [{ dataset: { trace: "debug" } }],
+      [{ traceparent: "00-aaa-bbb-01" }],
+    );
+    expect(result.level).toBe("debug");
+    expect(result.traceparent).toBe("00-aaa-bbb-01");
+  });
+
+  it("preserves dataset-over-plan precedence per plan", () => {
+    // plan.traceLevel = trace, dataset = error → dataset wins for that plan.
+    const result = resolveInitialTracingConfig(
+      [{ dataset: { trace: "error" } }],
+      [{ traceLevel: "trace" }],
+    );
+    expect(result.level).toBe("error");
+  });
+
+  it("takes the MOST VERBOSE level across multiple plans", () => {
+    // plans[0] says info, plans[1] says trace — trace wins globally
+    // because the whole runtime uses a singleton level and any plan
+    // asking for tracing must get it.
+    const result = resolveInitialTracingConfig(
+      [
+        { dataset: { trace: "info" } },
+        { dataset: { trace: "trace" } },
+      ],
+      [{}, {}],
+    );
+    expect(result.level).toBe("trace");
+  });
+
+  it("reverse order of verbosity also yields the most-verbose level", () => {
+    const result = resolveInitialTracingConfig(
+      [
+        { dataset: { trace: "trace" } },
+        { dataset: { trace: "info" } },
+      ],
+      [{}, {}],
+    );
+    expect(result.level).toBe("trace");
+  });
+
+  it("mixes dataset + plan.traceLevel across multiple plans", () => {
+    // plans[0] has plan.traceLevel = warn. plans[1] has dataset = debug.
+    // Per-plan resolved levels: warn and debug. Most verbose: debug.
+    const result = resolveInitialTracingConfig(
+      [{ dataset: {} }, { dataset: { trace: "debug" } }],
+      [{ traceLevel: "warn" }, {}],
+    );
+    expect(result.level).toBe("debug");
+  });
+
+  it("invalid dataset.trace values fall through to plan.traceLevel", () => {
+    const result = resolveInitialTracingConfig(
+      [{ dataset: { trace: "bogus" } }],
+      [{ traceLevel: "info" }],
+    );
+    expect(result.level).toBe("info");
+  });
+
+  it("takes the FIRST traceparent in document order", () => {
+    const result = resolveInitialTracingConfig(
+      [{ dataset: {} }, { dataset: {} }, { dataset: {} }],
+      [
+        {}, // no traceparent
+        { traceparent: "00-second-plan-xx-01" },
+        { traceparent: "00-third-plan-xx-01" },
+      ],
+    );
+    expect(result.traceparent).toBe("00-second-plan-xx-01");
+  });
+
+  it("returns undefined traceparent when no plan carries one", () => {
+    const result = resolveInitialTracingConfig(
+      [{ dataset: { trace: "trace" } }, { dataset: { trace: "error" } }],
+      [{}, {}],
+    );
+    expect(result.traceparent).toBeUndefined();
+  });
+
+  it("handles pre-parse call where plans array is empty-object placeholders", () => {
+    // root.ts calls this once BEFORE parsing plans, passing dataset info
+    // from plan elements and an empty-object array for plans. The helper
+    // must not crash on that shape.
+    const result = resolveInitialTracingConfig(
+      [{ dataset: { trace: "trace" } }, { dataset: { trace: "info" } }],
+      [{}, {}],
+    );
+    expect(result.level).toBe("trace");
+    expect(result.traceparent).toBeUndefined();
+  });
+
+  it("ignores plan elements beyond the plans array length and vice versa", () => {
+    // Defensive: mismatched-length inputs should not panic.
+    const result1 = resolveInitialTracingConfig(
+      [{ dataset: { trace: "trace" } }],
+      [{}, {}, {}],
+    );
+    expect(result1.level).toBe("trace");
+
+    const result2 = resolveInitialTracingConfig(
+      [{ dataset: { trace: "info" } }, { dataset: { trace: "trace" } }],
+      [{}],
+    );
+    // Only plans[0] contributes because plans array stops at length 1.
+    expect(result2.level).toBe("info");
   });
 });

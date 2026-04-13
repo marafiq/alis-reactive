@@ -242,9 +242,9 @@ describe("currentTraceparent", () => {
     });
   });
 
-  it("preserves server flags when configured from traceparent", () => {
+  it("preserves server flags when a page-ready inherits from configuredFromTraceparent", () => {
     setRootFromTraceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00");
-    run("test", {}, () => {
+    run("page-ready", {}, () => {
       const tp = currentTraceparent()!;
       const [, traceId, , flags] = tp.split("-");
       expect(traceId).toBe("4bf92f3577b34da6a3ce929d0e0e4736");
@@ -287,34 +287,33 @@ describe("setRootFromTraceparent", () => {
     expect(currentTraceparent()).toBeUndefined();
   });
 
-  it("server traceparent is consumed once — subsequent top-level runs mint fresh roots", () => {
+  it("page-ready is the only trigger kind that inherits configuredFromTraceparent", () => {
     setRootFromTraceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01");
 
-    let firstTraceId: string | undefined;
-    let secondTraceId: string | undefined;
+    let pageReadyTraceId: string | undefined;
+    let clickTraceId: string | undefined;
 
-    run("first", {}, () => {
-      firstTraceId = getCurrentTraceId();
+    // Only `page-ready` inherits.
+    run("page-ready", {}, () => {
+      pageReadyTraceId = getCurrentTraceId();
     });
-    run("second", {}, () => {
-      secondTraceId = getCurrentTraceId();
+    // `document-event` is a user interaction → fresh root, clears config.
+    run("document-event", {}, () => {
+      clickTraceId = getCurrentTraceId();
     });
 
-    // First top-level run inherits the server traceparent.
-    expect(firstTraceId).toBe("4bf92f3577b34da6a3ce929d0e0e4736");
-    // Second top-level run gets its own freshly-minted trace-id —
-    // configuredFromTraceparent was consumed exactly once.
-    expect(secondTraceId).toBeDefined();
-    expect(secondTraceId).not.toBe(firstTraceId);
-    expect(secondTraceId).toMatch(/^[0-9a-f]{32}$/);
+    expect(pageReadyTraceId).toBe("4bf92f3577b34da6a3ce929d0e0e4736");
+    expect(clickTraceId).toBeDefined();
+    expect(clickTraceId).not.toBe(pageReadyTraceId);
+    expect(clickTraceId).toMatch(/^[0-9a-f]{32}$/);
   });
 
-  it("consumed traceparent does not leak into nested runs", () => {
+  it("a nested run inside an outer page-ready reuses the inherited server trace", () => {
     setRootFromTraceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01");
     let outerTraceId: string | undefined;
     let nestedTraceId: string | undefined;
 
-    run("outer", {}, () => {
+    run("page-ready", {}, () => {
       outerTraceId = getCurrentTraceId();
       run("inner", {}, () => {
         nestedTraceId = getCurrentTraceId();
@@ -322,8 +321,126 @@ describe("setRootFromTraceparent", () => {
     });
 
     expect(outerTraceId).toBe("4bf92f3577b34da6a3ce929d0e0e4736");
-    // Sync nesting reuses outer's trace-id, not a re-consumed traceparent.
+    // Sync nesting reuses outer's root regardless of inner name.
     expect(nestedTraceId).toBe(outerTraceId);
+  });
+});
+
+describe("run — boot phase server traceparent inheritance (Codex round 3 finding 1)", () => {
+  // boot.ts wires every DomReady behavior as its own top-level `run()`
+  // call. When multiple page-ready behaviors fire during the initial
+  // boot burst, they must all share the server-issued trace so the full
+  // page-load startup correlates to a single distributed trace.
+  // Regression: an earlier one-shot-consume rule cleared
+  // configuredFromTraceparent on the first non-nested run, which broke
+  // correlation for every page-ready beyond the first.
+
+  const SERVER_TRACE_ID = "4bf92f3577b34da6a3ce929d0e0e4736";
+  const SERVER_TRACEPARENT = `00-${SERVER_TRACE_ID}-00f067aa0ba902b7-01`;
+
+  it("multiple page-ready behaviors in the same boot burst share the server trace-id", () => {
+    setRootFromTraceparent(SERVER_TRACEPARENT);
+
+    const ids: Array<string | undefined> = [];
+    // Simulate boot.ts wireBehaviors calling runInteraction once per page-ready.
+    run("page-ready", { planId: "plan-1" }, () => {
+      ids.push(getCurrentTraceId());
+    });
+    run("page-ready", { planId: "plan-1" }, () => {
+      ids.push(getCurrentTraceId());
+    });
+    run("page-ready", { planId: "plan-2" }, () => {
+      ids.push(getCurrentTraceId());
+    });
+
+    expect(ids).toEqual([SERVER_TRACE_ID, SERVER_TRACE_ID, SERVER_TRACE_ID]);
+  });
+
+  it("the first non-page-ready top-level run ends the boot phase and clears the configured root", () => {
+    setRootFromTraceparent(SERVER_TRACEPARENT);
+
+    let firstPageReady: string | undefined;
+    let firstClick: string | undefined;
+    let secondPageReady: string | undefined;
+    let secondClick: string | undefined;
+
+    run("page-ready", {}, () => {
+      firstPageReady = getCurrentTraceId();
+    });
+    run("document-event", {}, () => {
+      firstClick = getCurrentTraceId();
+    });
+    run("page-ready", {}, () => {
+      secondPageReady = getCurrentTraceId();
+    });
+    run("document-event", {}, () => {
+      secondClick = getCurrentTraceId();
+    });
+
+    // Page-ready during the boot burst inherits the server trace.
+    expect(firstPageReady).toBe(SERVER_TRACE_ID);
+    // First click ends the boot phase: fresh root, not the server trace.
+    expect(firstClick).toBeDefined();
+    expect(firstClick).not.toBe(SERVER_TRACE_ID);
+    // After boot ends, configuredFromTraceparent is cleared. A later
+    // page-ready (e.g. from a mergePlan partial) does NOT inherit a
+    // stale page-load trace.
+    expect(secondPageReady).toBeDefined();
+    expect(secondPageReady).not.toBe(SERVER_TRACE_ID);
+    expect(secondPageReady).not.toBe(firstClick);
+    // A later click also gets its own fresh root.
+    expect(secondClick).toBeDefined();
+    expect(secondClick).not.toBe(firstClick);
+    expect(secondClick).not.toBe(secondPageReady);
+    expect(secondClick).not.toBe(SERVER_TRACE_ID);
+  });
+
+  it("sse/signalr/action-link do NOT inherit the server traceparent even before any page-ready fires", () => {
+    setRootFromTraceparent(SERVER_TRACEPARENT);
+
+    let sseId: string | undefined;
+    let signalrId: string | undefined;
+    let actionLinkId: string | undefined;
+
+    // A page could theoretically receive SSE before its page-ready fires
+    // (async race). These are server-initiated events with their own
+    // distributed traces — they must NOT collapse into the page-load trace.
+    run("server-push", {}, () => {
+      sseId = getCurrentTraceId();
+    });
+    run("signalr", {}, () => {
+      signalrId = getCurrentTraceId();
+    });
+    run("action-link", {}, () => {
+      actionLinkId = getCurrentTraceId();
+    });
+
+    expect(sseId).not.toBe(SERVER_TRACE_ID);
+    expect(signalrId).not.toBe(SERVER_TRACE_ID);
+    expect(actionLinkId).not.toBe(SERVER_TRACE_ID);
+    expect(new Set([sseId, signalrId, actionLinkId]).size).toBe(3);
+  });
+
+  it("inheritance survives across component-event fired synchronously inside a page-ready", () => {
+    // A page-ready reaction whose body synchronously dispatches a custom
+    // event (simulated by directly calling nested `run`) — the nested
+    // run is inside the sync stack, so the depth counter already makes
+    // it a sync-nested call that reuses current. This verifies the
+    // depth-counter fix and the page-ready inheritance fix compose.
+    setRootFromTraceparent(SERVER_TRACEPARENT);
+
+    let pageReadyId: string | undefined;
+    let nestedId: string | undefined;
+
+    run("page-ready", {}, () => {
+      pageReadyId = getCurrentTraceId();
+      run("component-event", {}, () => {
+        nestedId = getCurrentTraceId();
+      });
+    });
+
+    expect(pageReadyId).toBe(SERVER_TRACE_ID);
+    expect(nestedId).toBe(SERVER_TRACE_ID);
   });
 });
 

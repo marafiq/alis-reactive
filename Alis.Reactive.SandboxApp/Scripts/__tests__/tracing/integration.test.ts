@@ -56,14 +56,17 @@ describe("configure → tracer → run end-to-end", () => {
     expect(new Set(traceIds).size).toBe(1);
   });
 
-  it("server-side traceparent becomes the default root for new interactions", () => {
+  it("server-side traceparent seeds the page-ready boot phase", () => {
+    // Only `page-ready` triggers inherit the server traceparent (the boot
+    // phase). Other trigger kinds represent user-initiated or
+    // server-initiated interactions that have their own distributed trace.
     const sink = new RecordingSink();
     tracing.configure({
       level: "trace",
       sink,
       traceparent: "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
     });
-    run("test", {}, () => {
+    run("page-ready", {}, () => {
       const evt = sink.events[sink.events.length - 1];
       expect(evt.traceId).toBe("4bf92f3577b34da6a3ce929d0e0e4736");
     });

@@ -10,7 +10,7 @@ import "./components/native/loader";  // side-effect: handles target positioning
 import { composeInitialPlans } from "./lifecycle/merge-plan";
 import type { Plan } from "./types";
 import { configure, tracer } from "./tracing";
-import { resolveLevel } from "./tracing/context";
+import { resolveInitialTracingConfig } from "./tracing/context";
 import { registerPlugin } from "./core/plugin-registry";
 
 // Drain passive plugin queue — plugins push here from separate bundles before framework loads
@@ -23,16 +23,21 @@ if (pendingPlugins) {
 initConfirm();
 initNativeActionLinks();
 
-const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
+const planEls = Array.from(
+  document.querySelectorAll<HTMLElement>("[data-reactive-plan]"),
+);
 
-// Configure tracing eagerly from the first plan element's data-trace attribute,
-// BEFORE attempting to parse any plan JSON. Without this, parse-error events
-// would emit while activeLevel is still "off" and silently drop. After parsing
-// succeeds we re-configure with the full plan info (traceLevel + traceparent).
-const firstEl: HTMLElement | undefined = planEls[0];
-configure({
-  level: resolveLevel(undefined, firstEl?.dataset.trace),
-});
+// Pre-parse configure: pick the most verbose `data-trace` across ALL
+// plan elements so a parse error from ANY element emits at the level the
+// page author asked for. Without this step, `plan.parse.fail` events
+// would fire while `activeLevel` is still `off` and be silently dropped.
+// Plan JSON hasn't been parsed yet, so we pass an empty plans array —
+// only dataset attributes contribute to this first configure call.
+const preParseConfig = resolveInitialTracingConfig(
+  planEls,
+  planEls.map(() => ({})),
+);
+configure({ level: preParseConfig.level });
 
 const rootTracer = tracer("root");
 const plans: Plan[] = [];
@@ -52,13 +57,17 @@ for (const el of planEls) {
   }
 }
 
-// Re-configure with the full plan info now that parsing has succeeded.
-// resolveLevel still gives precedence to data-trace over plan.traceLevel,
-// preserving the historical override path from the pre-tracing root.ts.
+// Re-configure with the full plan set now that parsing has succeeded.
+// `resolveInitialTracingConfig` walks every plan element + parsed plan,
+// preserves the historical dataset-over-plan precedence per-plan, and
+// returns the most-verbose level across all plans plus the first plan
+// carrying a server traceparent. Multi-plan pages (composeInitialPlans)
+// therefore honor tracing config from every plan, not only plans[0].
 if (plans.length > 0) {
+  const finalConfig = resolveInitialTracingConfig(planEls, plans);
   configure({
-    level: resolveLevel(plans[0].traceLevel, firstEl?.dataset.trace),
-    traceparent: plans[0].traceparent,
+    level: finalConfig.level,
+    traceparent: finalConfig.traceparent,
   });
 }
 

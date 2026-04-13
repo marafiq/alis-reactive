@@ -72,6 +72,59 @@ export function isValidLevel(candidate: string | undefined): candidate is Level 
   return candidate !== undefined && Object.prototype.hasOwnProperty.call(LEVELS, candidate);
 }
 
+/** Shape of a plan element read by `root.ts` (dataset.trace attribute). */
+interface TraceablePlanElement {
+  readonly dataset?: { readonly trace?: string };
+}
+
+/** Shape of a parsed plan carrying optional tracing config. */
+interface TraceablePlan {
+  readonly traceLevel?: string;
+  readonly traceparent?: string;
+}
+
+/**
+ * Resolve tracing configuration from the full set of discovered initial
+ * plans and their DOM elements.
+ *
+ * Multi-plan pages (see `composeInitialPlans`) have more than one
+ * `[data-reactive-plan]` script on the page, and each can independently
+ * carry tracing config. Because `configure()` is a process-level singleton,
+ * we must pick one `{level, traceparent}` pair — the resolution rule is:
+ *
+ * - **level**: the MOST VERBOSE level across all plans. Per-plan, the
+ *   existing dataset-over-plan precedence is preserved via `resolveLevel`;
+ *   across plans, `trace > debug > info > warn > error > off` wins. If
+ *   any plan asks for tracing, we enable it for the whole page so no
+ *   plan loses its diagnostics.
+ *
+ * - **traceparent**: the FIRST `plan.traceparent` found while iterating
+ *   plans in document order. Distributed traces have exactly one root;
+ *   the primary plan (which the author placed first) provides the seed.
+ *
+ * The caller (`root.ts`) feeds the result into `configure()`.
+ */
+export function resolveInitialTracingConfig(
+  planEls: readonly TraceablePlanElement[],
+  plans: readonly TraceablePlan[],
+): { level: Level; traceparent: string | undefined } {
+  let level: Level = "off";
+  let traceparent: string | undefined;
+
+  const limit = Math.min(planEls.length, plans.length);
+  for (let i = 0; i < limit; i++) {
+    const perPlan = resolveLevel(plans[i].traceLevel, planEls[i]?.dataset?.trace, "off");
+    if (LEVELS[perPlan] > LEVELS[level]) {
+      level = perPlan;
+    }
+    if (!traceparent && plans[i].traceparent) {
+      traceparent = plans[i].traceparent;
+    }
+  }
+
+  return { level, traceparent };
+}
+
 /** Generate a 32-hex-digit trace-id per W3C. Uses `crypto.getRandomValues`. */
 export function generateTraceId(): string {
   return randomHex(16);

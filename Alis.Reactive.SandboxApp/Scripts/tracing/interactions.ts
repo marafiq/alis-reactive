@@ -55,12 +55,14 @@ let configuredFromTraceparent: InteractionRoot | undefined;
 
 /**
  * Called by `configure()` when the server plan carries a W3C traceparent.
- * The parsed root is consumed exactly once by the next non-nested `run()`
- * call so the page's first client interaction continues the server's
- * distributed trace. Subsequent top-level interactions mint fresh roots
- * — the server traceparent is a one-shot seed, NOT a permanent reuse,
- * because every later click is its own logical interaction and should
- * not collapse into the page-load trace.
+ * The parsed root is used as the shared root for the entire initial
+ * boot phase — every `page-ready` behavior that fires before the first
+ * user interaction inherits the same server trace so the full startup
+ * batch stitches back to the server response. The boot phase ends
+ * on the first non-nested, non-`page-ready` `run()` (a click, an SSE
+ * message, an action-link activation) — at that moment the configured
+ * root is cleared so subsequent interactions cannot silently inherit
+ * a stale page-load trace.
  *
  * Passing undefined clears any pending configured root.
  */
@@ -102,13 +104,24 @@ export function run<T>(
   const prev = current;
   let localRoot: InteractionRoot;
   if (isNested) {
+    // Sync nested inside an active interaction — reuse current root so
+    // inner dispatches / sub-reactions correlate under one trace.
     localRoot = current!;
-  } else if (configuredFromTraceparent) {
-    // One-shot consume: the server traceparent seeds the FIRST top-level
-    // interaction only. Clear it so the next entry-point mints a fresh root.
+  } else if (name === "page-ready" && configuredFromTraceparent) {
+    // Initial boot phase. Every `page-ready` behavior (including multiple
+    // DomReady behaviors wired from one plan, or from several plans under
+    // `composeInitialPlans`) inherits the server-issued trace so the full
+    // startup batch correlates back to the server response. We do NOT
+    // clear `configuredFromTraceparent` here — other page-ready behaviors
+    // in the same boot burst must also inherit.
     localRoot = configuredFromTraceparent;
-    configuredFromTraceparent = undefined;
   } else {
+    // Either no server traceparent, or the first non-page-ready entry
+    // point has fired (click, SSE, signalr, action-link). Either way
+    // this is a fresh client-initiated interaction. If a configured
+    // traceparent is still hanging around from boot, clear it now so
+    // future runs cannot incorrectly inherit a stale page-load trace.
+    configuredFromTraceparent = undefined;
     localRoot = newRoot();
   }
   current = localRoot;
