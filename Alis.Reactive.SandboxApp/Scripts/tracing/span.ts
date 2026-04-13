@@ -86,7 +86,11 @@ export class ActiveSpan implements Span {
   }
 
   child(name: string, attrs?: Record<string, unknown>): Span {
-    return new ActiveSpan(name, this.scope, this, this.sink, attrs);
+    // Child scope is derived from the name's dotted prefix — "trigger.page-ready"
+    // becomes scope "trigger". Falls back to parent's scope if name has no dot.
+    const dot = name.indexOf(".");
+    const childScope = dot > 0 ? name.substring(0, dot) : this.scope;
+    return new ActiveSpan(name, childScope, this, this.sink, attrs);
   }
 
   set(key: string, value: string | number | boolean): void {

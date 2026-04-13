@@ -22,11 +22,11 @@ export class ConsoleSink {
       levelColor(event.level),
     ];
 
-    // Data is stringified inline for greppability (Playwright, log aggregators),
-    // AND passed as a separate arg for DevTools expandable rendering.
+    // Data is stringified inline for greppability (Playwright, log aggregators)
+    // and human readability. Passing data as a second arg too would print it
+    // twice in Chrome DevTools — once inline, once as an expandable Object.
     const dataStr = event.data ? " " + JSON.stringify(event.data) : "";
     const args: unknown[] = [tag + dataStr, ...styles];
-    if (event.data) args.push(event.data);
     if (event.error) args.push(event.error);
 
     switch (event.level) {
