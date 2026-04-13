@@ -15,10 +15,18 @@
  * The reason — JavaScript is single-threaded but async. While interaction
  * A is awaiting, an unrelated DOM event can fire and start interaction B.
  * If B reused A's trace-id (because `current` was still set), every event
- * from B would be misattributed to A's distributed trace. The depth
- * counter only treats run calls as nested when an outer run is on the
- * actual synchronous call stack, so concurrent async interactions get
- * independent roots.
+ * from B would be misattributed to A's distributed trace.
+ *
+ * Async-context discipline for framework code: a single module-global
+ * `current` cannot survive arbitrary async resumption order, so files
+ * that emit AFTER an `await` must capture the active root at entry via
+ * `getCurrentRoot()` and either pin a tracer with `boundTracer(scope, root)`
+ * (preferred for the function's own emits) or wrap sub-call invocations
+ * with `runWithRoot(root, fn)` so the sub-call's synchronous body runs
+ * under the captured root. The pattern chains: every framework async
+ * function captures its own root at entry and wraps its awaits, so the
+ * correct root propagates through the entire call graph without relying
+ * on any global mutable state.
  *
  * `currentTraceparent()` is read by `http.ts` immediately before `fetch`
  * (and before any `await`) to inject a W3C header. When no interaction is
@@ -36,7 +44,7 @@ import {
 } from "./context";
 import { tracer } from "./trace";
 
-interface InteractionRoot {
+export interface InteractionRoot {
   readonly traceId: string;
   readonly flags: string;
 }
@@ -47,11 +55,14 @@ let configuredFromTraceparent: InteractionRoot | undefined;
 
 /**
  * Called by `configure()` when the server plan carries a W3C traceparent.
- * The parsed root becomes the default for any interaction that starts
- * without an existing context — so a server-initiated request thread
- * can continue into the client runtime without losing correlation.
+ * The parsed root is consumed exactly once by the next non-nested `run()`
+ * call so the page's first client interaction continues the server's
+ * distributed trace. Subsequent top-level interactions mint fresh roots
+ * — the server traceparent is a one-shot seed, NOT a permanent reuse,
+ * because every later click is its own logical interaction and should
+ * not collapse into the page-load trace.
  *
- * Passing undefined clears the configured root.
+ * Passing undefined clears any pending configured root.
  */
 export function setRootFromTraceparent(traceparent: string | undefined): void {
   if (!traceparent) {
@@ -70,7 +81,9 @@ export function setRootFromTraceparent(traceparent: string | undefined): void {
  * Emits `interaction.start` before calling `fn`, then `interaction.end`
  * on success or `interaction.fail` on error. Handles all four outcome
  * shapes: synchronous return, synchronous throw, resolved promise, and
- * rejected promise. Errors are rethrown so callers see them as usual.
+ * rejected promise. Errors are rethrown so callers can choose to contain
+ * them — `runReaction` in `trigger.ts` is the framework's containment
+ * layer for fire-and-forget entry points.
  *
  * Synchronously nested calls (inner `run` invoked from inside outer `run`'s
  * `fn` body, before any `await`) reuse the outer interaction — the inner
@@ -87,9 +100,17 @@ export function run<T>(
   // Async-concurrent interactions see depth === 0 and get fresh roots.
   const isNested = depth > 0;
   const prev = current;
-  const localRoot: InteractionRoot = isNested
-    ? current!
-    : configuredFromTraceparent ?? newRoot();
+  let localRoot: InteractionRoot;
+  if (isNested) {
+    localRoot = current!;
+  } else if (configuredFromTraceparent) {
+    // One-shot consume: the server traceparent seeds the FIRST top-level
+    // interaction only. Clear it so the next entry-point mints a fresh root.
+    localRoot = configuredFromTraceparent;
+    configuredFromTraceparent = undefined;
+  } else {
+    localRoot = newRoot();
+  }
   current = localRoot;
 
   depth++;
@@ -148,6 +169,35 @@ export function run<T>(
 }
 
 /**
+ * Run `fn` synchronously with `root` installed as the active interaction
+ * context. Restores the previous `current` after `fn` returns. Used by
+ * framework async functions to re-enter their captured root before
+ * invoking sub-calls whose synchronous body would otherwise read whichever
+ * unrelated interaction last touched the global `current`.
+ *
+ * `fn` may itself return a Promise — `runWithRoot` does NOT await it.
+ * The synchronous portion of `fn` runs under `root`. If `fn` schedules
+ * async work, that work must take responsibility for re-entering its own
+ * root (the standard pattern is: capture at entry, wrap awaits with
+ * another `runWithRoot`, use `boundTracer` for own emits).
+ *
+ * If `root` is undefined, `runWithRoot` is a no-op pass-through.
+ */
+export function runWithRoot<T>(
+  root: InteractionRoot | undefined,
+  fn: () => T,
+): T {
+  if (!root) return fn();
+  const prev = current;
+  current = root;
+  try {
+    return fn();
+  } finally {
+    current = prev;
+  }
+}
+
+/**
  * The current W3C traceparent header for the active interaction, or
  * undefined if no interaction is running.
  *
@@ -162,6 +212,15 @@ export function run<T>(
 export function currentTraceparent(): string | undefined {
   if (!current) return undefined;
   return formatTraceparent(current.traceId, generateSpanId(), current.flags);
+}
+
+/**
+ * Snapshot of the active interaction root, or undefined if none is
+ * running. Used by framework async functions to capture root at entry
+ * for later re-entry around sub-calls.
+ */
+export function getCurrentRoot(): InteractionRoot | undefined {
+  return current;
 }
 
 /**

@@ -19,9 +19,14 @@ const t = tracer("trigger");
  * points — document events, page-ready, component events, server-push,
  * signalr, native action links — route through this function.
  *
- * No try/catch here: the interactions module handles sync return,
- * sync throw, async resolve, and async reject outcomes and restores
- * the previous interaction context in every path.
+ * Returns void: callers are fire-and-forget DOM/SSE/SignalR handlers.
+ * Failures (sync throws AND rejected promises) are emitted as
+ * `interaction.fail` structured events by `runInteraction` and then
+ * SWALLOWED here so they do not surface as global browser exceptions
+ * or unhandled promise rejections. The structured event carries the
+ * full error + breadcrumbs for diagnostics; bubbling to the page on
+ * top of that would only generate noise (and, for action links, leave
+ * the click visibly canceled with a global error after `preventDefault`).
  */
 export function runReaction(
   reaction: Reaction,
@@ -29,10 +34,22 @@ export function runReaction(
   ctx: ExecContext,
   triggerKind: string,
   triggerAttrs: Record<string, unknown>,
-): void | Promise<void> {
-  return runInteraction(triggerKind, { ...triggerAttrs, planId: plan.planId }, () =>
-    executeReaction(reaction, plan, ctx),
-  );
+): void {
+  let result: void | Promise<void>;
+  try {
+    result = runInteraction(triggerKind, { ...triggerAttrs, planId: plan.planId }, () =>
+      executeReaction(reaction, plan, ctx),
+    );
+  } catch {
+    // Sync throw — interaction.fail already emitted by runInteraction.
+    return;
+  }
+  if (result instanceof Promise) {
+    // Async reject — interaction.fail already emitted by runInteraction.
+    // Attach a no-op .catch so the rejection does not surface as an
+    // unhandled promise rejection.
+    result.catch(() => {});
+  }
 }
 
 export function wireBehavior(

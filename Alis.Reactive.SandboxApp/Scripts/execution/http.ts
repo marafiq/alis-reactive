@@ -9,10 +9,13 @@ import { validateContainer } from "../validation";
 import { evaluateValue } from "../core/evaluate";
 import { formatForWire } from "../core/wire-format";
 import { resolveRouteParams } from "../core/url-template";
-import { tracer } from "../tracing";
-import { currentTraceparent } from "../tracing/interactions";
-
-const t = tracer("http");
+import { boundTracer } from "../tracing/trace";
+import {
+  currentTraceparent,
+  getCurrentRoot,
+  runWithRoot,
+  type InteractionRoot,
+} from "../tracing/interactions";
 
 interface ResolvedFetch {
   readonly url: string;
@@ -56,13 +59,23 @@ function buildFetch(req: Request, gatherResult: GatherResult, plan: Plan, ctx?: 
   return { url, init };
 }
 
-/** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
+/**
+ * Execute a single HTTP request with gather, before, response routing,
+ * complete, and chaining.
+ *
+ * Async-context discipline (see interactions.ts JSDoc): `executeRequest`
+ * captures the active interaction root at entry, builds a `boundTracer`
+ * pinned to that root for its OWN emits, and wraps every sub-call await
+ * with `runWithRoot(root, …)` so the sub-call's synchronous body runs
+ * under the captured root even if a concurrent unrelated interaction
+ * has overwritten the global `current` between awaits.
+ */
 export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
-  // Capture W3C traceparent BEFORE any await so the header reflects the
-  // interaction currently executing, not whichever interaction happens to
-  // be active when the first `await` resolves. See Lesson 2 in the
-  // structured tracing plan — this exact ordering was a Phase 2 BLOCK on
-  // the abandoned branch.
+  // Capture root + traceparent BEFORE any await. This is the cross-async
+  // anchor for the entire request: every emit and every sub-call below
+  // re-enters `root` so it cannot be displaced by a concurrent interaction.
+  const root: InteractionRoot | undefined = getCurrentRoot();
+  const t = boundTracer("http", root);
   const tp = currentTraceparent();
 
   try {
@@ -75,10 +88,11 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
       }
     }
 
-    // 2. Before reactions
+    // 2. Before reactions — sub-reactions need root re-entered for their
+    //    sync bodies' emits.
     if (req.before) {
       for (const r of req.before) {
-        await executeReaction(r, plan, ctx);
+        await runWithRoot(root, () => executeReaction(r, plan, ctx));
       }
     }
 
@@ -112,11 +126,11 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     const body = await readResponseBody(response);
     if (response.ok) {
       const successCtx: ExecContext = { ...ctx, response: body ?? undefined };
-      await routeHandlers(req.success, response.status, plan, successCtx);
+      await runWithRoot(root, () => routeHandlers(req.success, response.status, plan, successCtx));
     } else {
       const errorCtx: ExecContext = { ...ctx, response: body ?? undefined };
-      await routeHandlers(req.error, response.status, plan, errorCtx);
-      await runComplete(req, plan, ctx);
+      await runWithRoot(root, () => routeHandlers(req.error, response.status, plan, errorCtx));
+      await runWithRoot(root, () => runComplete(req, plan, ctx));
       return; // no chained on error
     }
   } catch (err) {
@@ -126,24 +140,26 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
       { url: req.url, method: req.method, status },
       err instanceof Error ? err : new Error(String(err)),
     );
-    await routeHandlers(req.error, status, plan, ctx);
-    await runComplete(req, plan, ctx);
+    await runWithRoot(root, () => routeHandlers(req.error, status, plan, ctx));
+    await runWithRoot(root, () => runComplete(req, plan, ctx));
     return; // no chained on error
   }
 
-  // 6. Complete
-  await runComplete(req, plan, ctx);
+  // 7. Complete
+  await runWithRoot(root, () => runComplete(req, plan, ctx));
 
-  // 7. Chained — only after success
+  // 8. Chained — only after success
   if (req.next) {
-    await executeRequest(req.next, plan, ctx);
+    await runWithRoot(root, () => executeRequest(req.next!, plan, ctx));
   }
 }
 
 async function runComplete(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
+  // Capture root at entry so awaited sub-reaction emits stay correlated.
+  const root = getCurrentRoot();
   if (req.complete) {
     for (const r of req.complete) {
-      await executeReaction(r, plan, ctx);
+      await runWithRoot(root, () => executeReaction(r, plan, ctx));
     }
   }
 }
@@ -164,10 +180,14 @@ export async function routeHandlers(
 ): Promise<void> {
   if (!handlers || handlers.length === 0) return;
 
+  // Capture root at entry — sub-reactions called via `await executeReaction`
+  // need the captured root re-entered for their sync-body emits.
+  const root = getCurrentRoot();
+
   // First pass: exact status match
   for (const h of handlers) {
     if (h.status != null && h.status === status) {
-      await executeReaction(h.reaction, plan, ctx);
+      await runWithRoot(root, () => executeReaction(h.reaction, plan, ctx));
       return;
     }
   }
@@ -175,7 +195,7 @@ export async function routeHandlers(
   // Second pass: default handler (no status)
   for (const h of handlers) {
     if (h.status == null) {
-      await executeReaction(h.reaction, plan, ctx);
+      await runWithRoot(root, () => executeReaction(h.reaction, plan, ctx));
       return;
     }
   }

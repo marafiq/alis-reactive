@@ -1,13 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   currentTraceparent,
+  getCurrentRoot,
   getCurrentSpanId,
   getCurrentTraceId,
   resetForTests as resetInteractions,
   run,
+  runWithRoot,
   setRootFromTraceparent,
 } from "../../tracing/interactions";
-import { configure, resetForTests as resetTrace } from "../../tracing/trace";
+import {
+  boundTracer,
+  configure,
+  resetForTests as resetTrace,
+  tracer,
+} from "../../tracing/trace";
 import type { TraceEvent, TraceSink } from "../../tracing/types";
 
 class RecordingSink implements TraceSink {
@@ -278,5 +285,127 @@ describe("setRootFromTraceparent", () => {
   it("ignores malformed traceparent and leaves no default root", () => {
     setRootFromTraceparent("garbage");
     expect(currentTraceparent()).toBeUndefined();
+  });
+
+  it("server traceparent is consumed once — subsequent top-level runs mint fresh roots", () => {
+    setRootFromTraceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01");
+
+    let firstTraceId: string | undefined;
+    let secondTraceId: string | undefined;
+
+    run("first", {}, () => {
+      firstTraceId = getCurrentTraceId();
+    });
+    run("second", {}, () => {
+      secondTraceId = getCurrentTraceId();
+    });
+
+    // First top-level run inherits the server traceparent.
+    expect(firstTraceId).toBe("4bf92f3577b34da6a3ce929d0e0e4736");
+    // Second top-level run gets its own freshly-minted trace-id —
+    // configuredFromTraceparent was consumed exactly once.
+    expect(secondTraceId).toBeDefined();
+    expect(secondTraceId).not.toBe(firstTraceId);
+    expect(secondTraceId).toMatch(/^[0-9a-f]{32}$/);
+  });
+
+  it("consumed traceparent does not leak into nested runs", () => {
+    setRootFromTraceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01");
+    let outerTraceId: string | undefined;
+    let nestedTraceId: string | undefined;
+
+    run("outer", {}, () => {
+      outerTraceId = getCurrentTraceId();
+      run("inner", {}, () => {
+        nestedTraceId = getCurrentTraceId();
+      });
+    });
+
+    expect(outerTraceId).toBe("4bf92f3577b34da6a3ce929d0e0e4736");
+    // Sync nesting reuses outer's trace-id, not a re-consumed traceparent.
+    expect(nestedTraceId).toBe(outerTraceId);
+  });
+});
+
+describe("boundTracer — async context preservation", () => {
+  it("pinned tracer carries the captured root through emits even after the global current is overwritten", () => {
+    let pinned: ReturnType<typeof boundTracer> | undefined;
+    let aTraceId: string | undefined;
+
+    run("A", {}, () => {
+      aTraceId = getCurrentTraceId();
+      pinned = boundTracer("test");
+    });
+    // After A's run, current is undefined.
+    expect(getCurrentTraceId()).toBeUndefined();
+
+    // Concurrent unrelated interaction overwrites current.
+    run("B", {}, () => {
+      // pinned tracer was captured under A — emits via pinned should still
+      // carry A's trace-id even though current is now B's root.
+      pinned!.info("post-A");
+      const postAEvent = sink.events.find((e) => e.event === "post-A");
+      expect(postAEvent?.traceId).toBe(aTraceId);
+    });
+  });
+
+  it("pinned tracer survives concurrent overlapping interactions and out-of-order completion", async () => {
+    let aRoot: ReturnType<typeof boundTracer> | undefined;
+    let aTraceIdAtCapture: string | undefined;
+
+    let resolveA!: () => void;
+    const aGate = new Promise<void>((r) => { resolveA = r; });
+
+    const promiseA = run("A", {}, async () => {
+      aTraceIdAtCapture = getCurrentTraceId();
+      aRoot = boundTracer("test");
+      await aGate;
+      // After the await, emit through the pinned tracer — even if a
+      // concurrent interaction has touched current, this emit must
+      // still carry A's trace-id.
+      aRoot.info("post-await");
+    });
+
+    // Start B while A is awaiting; B completes first, displacing current.
+    const promiseB = run("B", {}, () => {});
+    await promiseB;
+    resolveA();
+    await promiseA;
+
+    const postAwaitEvent = sink.events.find((e) => e.event === "post-await");
+    expect(postAwaitEvent).toBeDefined();
+    expect(postAwaitEvent?.traceId).toBe(aTraceIdAtCapture);
+  });
+});
+
+describe("runWithRoot — sync re-entry helper", () => {
+  it("temporarily installs a root and restores the previous current", () => {
+    const fakeRoot = { traceId: "a".repeat(32), flags: "01" } as const;
+    expect(getCurrentRoot()).toBeUndefined();
+    runWithRoot(fakeRoot, () => {
+      expect(getCurrentRoot()).toEqual(fakeRoot);
+      tracer("test").info("inside");
+    });
+    expect(getCurrentRoot()).toBeUndefined();
+    const event = sink.events.find((e) => e.event === "inside");
+    expect(event?.traceId).toBe(fakeRoot.traceId);
+  });
+
+  it("is a no-op when root is undefined", () => {
+    let observed: string | undefined = "before";
+    runWithRoot(undefined, () => {
+      observed = getCurrentTraceId();
+    });
+    expect(observed).toBeUndefined();
+  });
+
+  it("restores current even when fn throws", () => {
+    const fakeRoot = { traceId: "b".repeat(32), flags: "01" } as const;
+    expect(() =>
+      runWithRoot(fakeRoot, () => {
+        throw new Error("boom");
+      }),
+    ).toThrow("boom");
+    expect(getCurrentRoot()).toBeUndefined();
   });
 });

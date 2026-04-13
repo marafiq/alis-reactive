@@ -21,6 +21,8 @@ import { executeRequest } from "./http";
 import { injectHtml } from "./inject";
 import { assertNever } from "../core/assert-never";
 import { tracer } from "../tracing";
+import { boundTracer } from "../tracing/trace";
+import { getCurrentRoot, runWithRoot } from "../tracing/interactions";
 
 const t = tracer("execute");
 
@@ -111,11 +113,15 @@ function executeSequence(
   for (let i = 0; i < reaction.steps.length; i++) {
     const result = executeReaction(reaction.steps[i], plan, ctx);
     if (result instanceof Promise) {
-      // Sync prefix done. Return Promise for async step + remaining.
+      // Sync prefix done. Capture root before crossing the await so each
+      // remaining step's sync body re-enters the right interaction
+      // context — the global `current` may be displaced by a concurrent
+      // unrelated interaction during the await.
       const remaining = reaction.steps.slice(i + 1);
+      const root = getCurrentRoot();
       return result.then(async () => {
         for (const step of remaining) {
-          const r = executeReaction(step, plan, ctx);
+          const r = runWithRoot(root, () => executeReaction(step, plan, ctx));
           if (r instanceof Promise) await r;
         }
       });
@@ -161,14 +167,21 @@ async function executeBranchAsync(
   plan: Plan,
   ctx?: ExecContext,
 ): Promise<void> {
+  // Capture root + bound tracer so post-await emits stay correlated
+  // with this branch's originating interaction.
+  const root = getCurrentRoot();
+  const bt = boundTracer("execute", root);
   for (const c of reaction.cases) {
-    if (!c.when || await evaluateConditionAsync(c.when, plan, ctx)) {
-      const r = executeReaction(c.reaction, plan, ctx);
+    const matches = c.when
+      ? await runWithRoot(root, () => evaluateConditionAsync(c.when!, plan, ctx))
+      : true;
+    if (matches) {
+      const r = runWithRoot(root, () => executeReaction(c.reaction, plan, ctx));
       if (r instanceof Promise) await r;
       return;
     }
   }
-  t.trace("branch.no-match");
+  bt.trace("branch.no-match");
 }
 
 // ── Parallel executor ─────────────────────────────────────
@@ -178,15 +191,18 @@ async function executeParallel(
   plan: Plan,
   ctx?: ExecContext,
 ): Promise<void> {
+  // Capture root + bound tracer for emits and sub-call awaits below.
+  const root = getCurrentRoot();
+  const bt = boundTracer("execute", root);
   const results = await Promise.allSettled(
     reaction.steps.map(s => {
-      const r = executeReaction(s, plan, ctx);
+      const r = runWithRoot(root, () => executeReaction(s, plan, ctx));
       return r instanceof Promise ? r : Promise.resolve();
     })
   );
   for (const r of results) {
     if (r.status === "rejected") {
-      t.error(
+      bt.error(
         "parallel.step.fail",
         {},
         r.reason instanceof Error ? r.reason : new Error(String(r.reason)),
@@ -194,7 +210,7 @@ async function executeParallel(
     }
   }
   if (reaction.onSettled) {
-    const r = executeReaction(reaction.onSettled, plan, ctx);
+    const r = runWithRoot(root, () => executeReaction(reaction.onSettled!, plan, ctx));
     if (r instanceof Promise) await r;
   }
 }
