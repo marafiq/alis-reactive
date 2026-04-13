@@ -23,8 +23,18 @@ if (pendingPlugins) {
 initConfirm();
 initNativeActionLinks();
 
-const rootTracer = tracer("root");
 const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
+
+// Configure tracing eagerly from the first plan element's data-trace attribute,
+// BEFORE attempting to parse any plan JSON. Without this, parse-error events
+// would emit while activeLevel is still "off" and silently drop. After parsing
+// succeeds we re-configure with the full plan info (traceLevel + traceparent).
+const firstEl: HTMLElement | undefined = planEls[0];
+configure({
+  level: resolveLevel(undefined, firstEl?.dataset.trace),
+});
+
+const rootTracer = tracer("root");
 const plans: Plan[] = [];
 
 for (const el of planEls) {
@@ -42,11 +52,10 @@ for (const el of planEls) {
   }
 }
 
-// Configure tracing from the first discovered plan + its data-trace attribute.
-// resolveLevel gives precedence to data-trace over plan.traceLevel, preserving
-// the historical override path from the pre-tracing root.ts.
+// Re-configure with the full plan info now that parsing has succeeded.
+// resolveLevel still gives precedence to data-trace over plan.traceLevel,
+// preserving the historical override path from the pre-tracing root.ts.
 if (plans.length > 0) {
-  const firstEl = planEls[0];
   configure({
     level: resolveLevel(plans[0].traceLevel, firstEl?.dataset.trace),
     traceparent: plans[0].traceparent,

@@ -143,6 +143,66 @@ describe("run — nested reuses outer trace", () => {
   });
 });
 
+describe("run — concurrent async interactions stay isolated", () => {
+  it("a fresh entry-point firing while another is awaiting gets its own trace-id", async () => {
+    // This is the regression test for the module-global `current` bug.
+    // When click A is awaiting and click B fires synchronously between
+    // microtasks, B must NOT inherit A's trace-id even though `current`
+    // is still set to A's root.
+    let aTraceIdAtStart: string | undefined;
+    let bTraceIdAtStart: string | undefined;
+
+    let resolveA!: () => void;
+    const aGate = new Promise<void>((r) => { resolveA = r; });
+
+    const promiseA = run("A", {}, async () => {
+      aTraceIdAtStart = getCurrentTraceId();
+      await aGate;
+    });
+
+    // Start B while A is still awaiting aGate.
+    const promiseB = run("B", {}, async () => {
+      bTraceIdAtStart = getCurrentTraceId();
+    });
+
+    await promiseB;
+    resolveA();
+    await promiseA;
+
+    expect(aTraceIdAtStart).toMatch(/^[0-9a-f]{32}$/);
+    expect(bTraceIdAtStart).toMatch(/^[0-9a-f]{32}$/);
+    expect(aTraceIdAtStart).not.toBe(bTraceIdAtStart);
+  });
+
+  it("interaction.start and interaction.end events carry the right trace-id under concurrency", async () => {
+    let resolveA!: () => void;
+    const aGate = new Promise<void>((r) => { resolveA = r; });
+
+    const promiseA = run("A", {}, async () => {
+      await aGate;
+    });
+    const promiseB = run("B", {}, async () => {
+      // sync body
+    });
+
+    await promiseB;
+    resolveA();
+    await promiseA;
+
+    // sink should contain start/end pairs for both A and B with distinct trace-ids
+    const aStart = sink.events.find((e) => e.event === "interaction.start" && e.data?.name === "A");
+    const aEnd = sink.events.find((e) => e.event === "interaction.end" && e.data?.name === "A");
+    const bStart = sink.events.find((e) => e.event === "interaction.start" && e.data?.name === "B");
+    const bEnd = sink.events.find((e) => e.event === "interaction.end" && e.data?.name === "B");
+
+    expect(aStart?.traceId).toBeDefined();
+    expect(aEnd?.traceId).toBe(aStart?.traceId);
+    expect(bStart?.traceId).toBeDefined();
+    expect(bEnd?.traceId).toBe(bStart?.traceId);
+    expect(aStart?.traceId).not.toBe(bStart?.traceId);
+  });
+});
+
 describe("currentTraceparent", () => {
   it("returns undefined when no interaction is active", () => {
     expect(currentTraceparent()).toBeUndefined();
