@@ -137,11 +137,11 @@ function executeBranch(
 ): void | Promise<void> {
   for (const c of reaction.cases) {
     // Confirm conditions require async — delegate entire branch
-    if (c.when && hasConfirm(c.when)) {
+    if (hasConfirm(c.when)) {
       return executeBranchAsync(reaction, plan, ctx);
     }
-    // Sync condition evaluation
-    if (!c.when || evaluateCondition(c.when, plan, ctx)) {
+    // Sync condition evaluation (NoneCondition returns true — default/else case)
+    if (evaluateCondition(c.when, plan, ctx)) {
       return executeReaction(c.reaction, plan, ctx);
     }
   }
@@ -163,7 +163,7 @@ async function executeBranchAsync(
   ctx?: ExecContext,
 ): Promise<void> {
   for (const c of reaction.cases) {
-    if (!c.when || await evaluateConditionAsync(c.when, plan, ctx)) {
+    if (await evaluateConditionAsync(c.when, plan, ctx)) {
       const r = executeReaction(c.reaction, plan, ctx);
       if (r instanceof Promise) await r;
       return;

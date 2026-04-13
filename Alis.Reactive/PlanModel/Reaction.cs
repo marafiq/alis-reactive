@@ -95,15 +95,14 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Pairs an optional guard condition with a reaction to execute.</summary>
     public sealed class BranchCase
     {
-        /// <summary>Gets the guard condition, or <see langword="null"/> for the default (else) case.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public Condition? When { get; }
+        /// <summary>Gets the guard condition. <see cref="Condition.None"/> means the default (else) case — always matches.</summary>
+        public Condition When { get; }
         /// <summary>Gets the reaction to execute when the condition is met.</summary>
         public Reaction Reaction { get; }
 
-        internal BranchCase(Condition? when, Reaction reaction)
+        internal BranchCase(Condition when, Reaction reaction)
         {
-            When = when;
+            When = when ?? Condition.None;
             Reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
         }
 

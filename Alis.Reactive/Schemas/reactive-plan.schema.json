@@ -297,7 +297,7 @@
     },
     "BranchCase": {
       "type": "object",
-      "required": ["reaction"],
+      "required": ["when", "reaction"],
       "properties": {
         "when": { "$ref": "#/$defs/Condition" },
         "reaction": { "$ref": "#/$defs/Reaction" }

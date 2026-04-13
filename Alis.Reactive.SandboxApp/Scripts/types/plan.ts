@@ -185,7 +185,7 @@ export interface BranchReaction {
 }
 
 export interface BranchCase {
-  when?: Condition;
+  when: Condition;
   reaction: Reaction;
 }
 
