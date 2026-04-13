@@ -408,4 +408,125 @@ describe("runWithRoot — sync re-entry helper", () => {
     ).toThrow("boom");
     expect(getCurrentRoot()).toBeUndefined();
   });
+
+  it("brackets depth so a sync nested run inside reuses the captured root", () => {
+    // Regression for Codex adversarial round 2 finding #1:
+    //   run() sees depth === 0 after an async step resumes and
+    //   runWithRoot is called from executeSequence's continuation.
+    //   If runWithRoot doesn't increment depth, any run() fired inside
+    //   it (e.g. a dispatch reaction's document-event listener) mints
+    //   a fresh root and splits the logical user action into two traces.
+    // Fix: runWithRoot brackets depth; any nested run inside sees
+    //   depth > 0, isNested=true, and reuses the captured root.
+    const captured = { traceId: "c".repeat(32), flags: "01" } as const;
+    let nestedTraceId: string | undefined;
+    runWithRoot(captured, () => {
+      run("nested-after-runWithRoot", {}, () => {
+        nestedTraceId = getCurrentTraceId();
+      });
+    });
+    expect(nestedTraceId).toBe(captured.traceId);
+  });
+
+  it("sync dispatch chain inside runWithRoot re-entry preserves the originating trace-id", async () => {
+    // Simulates the Codex-described path:
+    //   run(outer) -> async fn -> await -> runWithRoot(root, sync body)
+    //   -> sync body triggers run(nested) (as a DOM dispatch listener would)
+    // Expected: nested inherits outer's trace-id under the same logical
+    // interaction. Before the depth-bracket fix, nested would mint a
+    // fresh root.
+    let outerTraceId: string | undefined;
+    let nestedTraceId: string | undefined;
+
+    await run("outer", {}, async () => {
+      outerTraceId = getCurrentTraceId();
+      await Promise.resolve();
+      // After the await, executeSequence's continuation would call
+      // runWithRoot(root, ...) for each remaining step. Simulate by
+      // reconstructing the root from the captured trace-id.
+      runWithRoot({ traceId: outerTraceId!, flags: "01" }, () => {
+        run("nested-dispatch", {}, () => {
+          nestedTraceId = getCurrentTraceId();
+        });
+      });
+    });
+
+    expect(outerTraceId).toBeDefined();
+    expect(nestedTraceId).toBe(outerTraceId);
+  });
+
+  it("depth is fully restored after runWithRoot exits (no leak)", () => {
+    const root1 = { traceId: "d".repeat(32), flags: "01" } as const;
+    const root2 = { traceId: "e".repeat(32), flags: "01" } as const;
+
+    // Before: depth=0, no nesting.
+    let freshBefore: string | undefined;
+    run("before", {}, () => {
+      freshBefore = getCurrentTraceId();
+    });
+
+    // runWithRoot brackets depth internally...
+    runWithRoot(root1, () => {
+      // ... but exits cleanly.
+    });
+
+    // After: a fresh run should still get a fresh root (depth back to 0,
+    // so isNested=false, so we don't leak root1 into unrelated interactions).
+    let freshAfter: string | undefined;
+    run("after", {}, () => {
+      freshAfter = getCurrentTraceId();
+    });
+
+    expect(freshBefore).toBeDefined();
+    expect(freshAfter).toBeDefined();
+    expect(freshAfter).not.toBe(root1.traceId);
+    expect(freshBefore).not.toBe(freshAfter);
+  });
+});
+
+describe("sink failure containment", () => {
+  it("a sink that throws does not propagate the exception out of tracer.info", () => {
+    const badSink: TraceSink = {
+      emit: () => {
+        throw new Error("sink down");
+      },
+      flush: () => {},
+    };
+    // Silence the fallback console.error so it doesn't pollute the test
+    // output. vitest's default jsdom console survives this mocking.
+    const original = console.error;
+    console.error = () => {};
+    try {
+      configure({ level: "trace", sink: badSink });
+      expect(() => tracer("test").info("event", { ok: true })).not.toThrow();
+      expect(() => tracer("test").error("e", {}, new Error("x"))).not.toThrow();
+      expect(() => tracer("test").warn("w")).not.toThrow();
+      expect(() => tracer("test").debug("d")).not.toThrow();
+      expect(() => tracer("test").trace("t")).not.toThrow();
+    } finally {
+      console.error = original;
+    }
+  });
+
+  it("sink failure does not abort the caller's work", () => {
+    const badSink: TraceSink = {
+      emit: () => {
+        throw new TypeError("cannot serialize");
+      },
+      flush: () => {},
+    };
+    const original = console.error;
+    console.error = () => {};
+    try {
+      configure({ level: "trace", sink: badSink });
+      let reachedAfterEmit = false;
+      run("test", {}, () => {
+        tracer("test").info("event");
+        reachedAfterEmit = true;
+      });
+      expect(reachedAfterEmit).toBe(true);
+    } finally {
+      console.error = original;
+    }
+  });
 });

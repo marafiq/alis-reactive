@@ -86,7 +86,26 @@ function makeEmit(scope: string): (
       breadcrumbs: level === "error" ? breadcrumbs.snapshot() : undefined,
     };
 
-    activeSink.emit(ev);
+    // Telemetry is best-effort — a sink failure (JSON.stringify choking on
+    // a circular ref, BigInt, Symbol, etc., or a buggy custom sink) must
+    // NEVER propagate out of emit and abort the reaction / request / plan
+    // boot that happens to be calling it. Fall back to a minimal console
+    // error so the failure is at least visible in DevTools, and swallow
+    // even that if the console itself is broken.
+    try {
+      activeSink.emit(ev);
+    } catch (sinkError) {
+      try {
+        // eslint-disable-next-line no-console
+        console.error(
+          `[alis:tracing] sink.emit failed for ${scope}/${event}:`,
+          sinkError instanceof Error ? sinkError.message : String(sinkError),
+        );
+      } catch {
+        // Even console.error threw — give up silently. The runtime path
+        // that called emit() must continue regardless.
+      }
+    }
   };
 }
 

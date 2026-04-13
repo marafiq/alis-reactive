@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ConsoleSink } from "../../tracing/sink";
+import { ConsoleSink, safeStringify } from "../../tracing/sink";
 import type { TraceEvent } from "../../tracing/types";
 
 function makeEvent(overrides: Partial<TraceEvent> = {}): TraceEvent {
@@ -169,5 +169,119 @@ describe("ConsoleSink.flush", () => {
   it("is a no-op", () => {
     const sink = new ConsoleSink();
     expect(() => sink.flush()).not.toThrow();
+  });
+});
+
+describe("safeStringify — non-JSON-safe value handling", () => {
+  // Regression for Codex adversarial round 2 finding #2: a sink that
+  // JSON.stringifies raw runtime values will throw on circular refs,
+  // BigInt, Symbol, or functions — and that throw must not escape the
+  // tracer. ConsoleSink uses safeStringify for precisely this reason;
+  // these tests lock the contract so no future refactor regresses it.
+
+  it("encodes circular references as [Circular] instead of throwing", () => {
+    const circular: Record<string, unknown> = { name: "parent" };
+    circular.self = circular;
+    expect(() => safeStringify(circular)).not.toThrow();
+    const result = safeStringify(circular);
+    expect(result).toContain("[Circular]");
+    expect(result).toContain("parent");
+  });
+
+  it("encodes deeply nested circular references", () => {
+    const a: Record<string, unknown> = { name: "a" };
+    const b: Record<string, unknown> = { name: "b", a };
+    a.b = b;
+    expect(() => safeStringify(a)).not.toThrow();
+    expect(safeStringify(a)).toContain("[Circular]");
+  });
+
+  it("encodes BigInt as a string with a trailing n suffix", () => {
+    const result = safeStringify({ count: 9007199254740993n });
+    expect(result).toBe('{"count":"9007199254740993n"}');
+  });
+
+  it("encodes Symbol values as their description string", () => {
+    const sym = Symbol("my-symbol");
+    const result = safeStringify({ tag: sym });
+    expect(result).toContain("Symbol(my-symbol)");
+  });
+
+  it("encodes functions with a [Function name] placeholder", () => {
+    function myHandler(): void {}
+    const result = safeStringify({ handler: myHandler });
+    expect(result).toContain("[Function myHandler]");
+  });
+
+  it("encodes anonymous functions as [Function anonymous]", () => {
+    const result = safeStringify({ handler: () => undefined });
+    expect(result).toMatch(/\[Function (handler|anonymous)\]/);
+  });
+
+  it("encodes Error instances as a { name, message } object", () => {
+    const err = new TypeError("bad input");
+    const result = safeStringify({ cause: err });
+    expect(result).toContain('"name":"TypeError"');
+    expect(result).toContain('"message":"bad input"');
+  });
+
+  it("encodes Map as a plain object", () => {
+    const m = new Map<string, number>([["a", 1], ["b", 2]]);
+    const result = safeStringify({ m });
+    expect(result).toContain('"a":1');
+    expect(result).toContain('"b":2');
+  });
+
+  it("encodes Set as an array", () => {
+    const s = new Set([1, 2, 3]);
+    const result = safeStringify({ s });
+    expect(result).toContain("[1,2,3]");
+  });
+
+  it("encodes DOM Node as a compact [Node tag#id] placeholder", () => {
+    const div = document.createElement("div");
+    div.id = "my-div";
+    const result = safeStringify({ el: div });
+    expect(result).toContain("[Node DIV#my-div]");
+  });
+
+  it("handles undefined input", () => {
+    expect(safeStringify(undefined)).toBe("undefined");
+  });
+
+  it("handles null input", () => {
+    expect(safeStringify(null)).toBe("null");
+  });
+
+  it("handles primitive numbers, strings, booleans", () => {
+    expect(safeStringify(42)).toBe("42");
+    expect(safeStringify("hello")).toBe('"hello"');
+    expect(safeStringify(true)).toBe("true");
+  });
+});
+
+describe("ConsoleSink resilience to non-JSON-safe event data", () => {
+  it("does not throw when event.data contains a circular reference", () => {
+    const sink = new ConsoleSink();
+    const circular: Record<string, unknown> = { name: "n" };
+    circular.self = circular;
+    expect(() =>
+      sink.emit(makeEvent({ data: circular as Record<string, unknown> })),
+    ).not.toThrow();
+  });
+
+  it("does not throw when event.data contains a BigInt", () => {
+    const sink = new ConsoleSink();
+    expect(() =>
+      sink.emit(makeEvent({ data: { big: 123n } as Record<string, unknown> })),
+    ).not.toThrow();
+  });
+
+  it("does not throw when event.data contains a DOM node", () => {
+    const sink = new ConsoleSink();
+    const node = document.createElement("span");
+    expect(() =>
+      sink.emit(makeEvent({ data: { node } as Record<string, unknown> })),
+    ).not.toThrow();
   });
 });

@@ -170,16 +170,28 @@ export function run<T>(
 
 /**
  * Run `fn` synchronously with `root` installed as the active interaction
- * context. Restores the previous `current` after `fn` returns. Used by
- * framework async functions to re-enter their captured root before
- * invoking sub-calls whose synchronous body would otherwise read whichever
- * unrelated interaction last touched the global `current`.
+ * context AND with the synchronous nesting depth incremented for the
+ * duration of `fn`. Restores both on exit.
+ *
+ * Used by framework async functions to re-enter their captured root
+ * before invoking sub-calls whose synchronous body would otherwise read
+ * whichever unrelated interaction last touched the global `current`.
+ *
+ * Why depth is bracketed and not just `current`: a re-entered sync body
+ * is logically still inside the originating interaction, so any `run()`
+ * fired from within that body (e.g., a `dispatch` reaction synchronously
+ * triggering a `document-event` listener that calls `runReaction`) must
+ * be treated as nested and must reuse the captured root. Without the
+ * depth bracket, such a nested `run()` would see `depth === 0`, mint a
+ * fresh trace-id, and split what is actually one logical user action
+ * into multiple uncorrelated distributed traces.
  *
  * `fn` may itself return a Promise — `runWithRoot` does NOT await it.
- * The synchronous portion of `fn` runs under `root`. If `fn` schedules
- * async work, that work must take responsibility for re-entering its own
- * root (the standard pattern is: capture at entry, wrap awaits with
- * another `runWithRoot`, use `boundTracer` for own emits).
+ * The synchronous portion of `fn` runs under `root` with depth elevated.
+ * If `fn` schedules async work, that work must take responsibility for
+ * re-entering its own root (the standard pattern is: capture at entry,
+ * wrap awaits with another `runWithRoot`, use `boundTracer` for own
+ * emits).
  *
  * If `root` is undefined, `runWithRoot` is a no-op pass-through.
  */
@@ -190,9 +202,11 @@ export function runWithRoot<T>(
   if (!root) return fn();
   const prev = current;
   current = root;
+  depth++;
   try {
     return fn();
   } finally {
+    depth--;
     current = prev;
   }
 }
