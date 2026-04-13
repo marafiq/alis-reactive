@@ -92,7 +92,7 @@ namespace Alis.Reactive.PlanModel
         internal BranchReaction(List<BranchCase> cases) { Cases = cases ?? throw new ArgumentNullException(nameof(cases)); }
     }
 
-    /// <summary>Pairs an optional guard condition with a reaction to execute.</summary>
+    /// <summary>Pairs a guard condition with a reaction to execute. Use <see cref="Condition.None"/> for the default (else) case.</summary>
     public sealed class BranchCase
     {
         /// <summary>Gets the guard condition. <see cref="Condition.None"/> means the default (else) case — always matches.</summary>
@@ -107,7 +107,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal static BranchCase Of(Condition when, Reaction reaction) => new BranchCase(when, reaction);
-        internal static BranchCase Default(Reaction reaction) => new BranchCase(null, reaction);
+        internal static BranchCase Default(Reaction reaction) => new BranchCase(Condition.None, reaction);
     }
 
     /// <summary>Sets a property value on a component or DOM element.</summary>
