@@ -10,7 +10,11 @@ import "./components/native/loader";  // side-effect: handles target positioning
 import { composeInitialPlans } from "./lifecycle/merge-plan";
 import type { Plan } from "./types";
 import { configure, tracer } from "./tracing";
-import { resolveInitialTracingConfig } from "./tracing/context";
+import {
+  promoteTracingConfig,
+  resolveInitialTracingConfig,
+  type IncrementalTracingState,
+} from "./tracing/context";
 import { registerPlugin } from "./core/plugin-registry";
 
 // Drain passive plugin queue — plugins push here from separate bundles before framework loads
@@ -28,11 +32,10 @@ const planEls = Array.from(
 );
 
 // Pre-parse configure: pick the most verbose `data-trace` across ALL
-// plan elements so a parse error from ANY element emits at the level the
-// page author asked for. Without this step, `plan.parse.fail` events
-// would fire while `activeLevel` is still `off` and be silently dropped.
-// Plan JSON hasn't been parsed yet, so we pass an empty plans array —
-// only dataset attributes contribute to this first configure call.
+// plan elements. Plan JSON has not been parsed yet so only dataset
+// attributes contribute to this initial configure call. Any plan
+// element with an invalid body will emit `plan.parse.fail` at this
+// initial level even if every later plan would have asked for more.
 const preParseConfig = resolveInitialTracingConfig(
   planEls,
   planEls.map(() => ({})),
@@ -41,41 +44,61 @@ configure({ level: preParseConfig.level });
 
 const rootTracer = tracer("root");
 const plans: Plan[] = [];
+const rejectedTraceparents: { index: number; value: string }[] = [];
 
-for (const el of planEls) {
+// Incremental tracing state accumulator. Every successfully-parsed
+// plan's level + traceparent folds in, and `configure()` is re-run
+// BEFORE the next plan element is parsed, so a later `plan.parse.fail`
+// event emits at the level the user asked for via `plan.traceLevel`
+// on any earlier successful plan. Round 5 finding #2: without this
+// incremental promotion, the error level was stuck at whatever only
+// the DOM dataset attribute provided.
+let tracingState: IncrementalTracingState = {
+  level: preParseConfig.level,
+  traceparent: undefined,
+};
+
+for (let i = 0; i < planEls.length; i++) {
+  const el = planEls[i];
+  let plan: Plan;
   try {
     const text = el.textContent?.trim();
     if (!text) throw new Error("[alis] empty plan element");
-    plans.push(JSON.parse(text));
+    plan = JSON.parse(text);
   } catch (e) {
     rootTracer.error(
       "plan.parse.fail",
-      { elementId: el.id || undefined },
+      { elementId: el.id || undefined, planIndex: i },
       e instanceof Error ? e : new Error(String(e)),
     );
-    throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(e as Error).message}`);
+    throw new Error(
+      `[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(e as Error).message}`,
+    );
   }
+
+  plans.push(plan);
+
+  // Promote tracing state with this plan's fields and re-configure
+  // before the next iteration. If the next element is malformed,
+  // rootTracer.error above will emit at the accumulated level.
+  const promoted = promoteTracingConfig(tracingState, el, plan, i);
+  tracingState = promoted.state;
+  if (promoted.rejectedTraceparent) {
+    rejectedTraceparents.push(promoted.rejectedTraceparent);
+  }
+  configure({
+    level: tracingState.level,
+    traceparent: tracingState.traceparent,
+  });
 }
 
-// Re-configure with the full plan set now that parsing has succeeded.
-// `resolveInitialTracingConfig` walks every plan element + parsed plan,
-// preserves the historical dataset-over-plan precedence per-plan, and
-// returns the most-verbose level across all plans plus the first VALID
-// plan carrying a server traceparent. Malformed/stale leading plans do
-// NOT poison selection — later valid traceparents still win.
-if (plans.length > 0) {
-  const finalConfig = resolveInitialTracingConfig(planEls, plans);
-  configure({
-    level: finalConfig.level,
-    traceparent: finalConfig.traceparent,
+// Surface rejected traceparent candidates now that every plan has been
+// parsed and the final tracing level is in effect.
+for (const rejected of rejectedTraceparents) {
+  rootTracer.warn("plan.traceparent.invalid", {
+    planIndex: rejected.index,
+    value: rejected.value,
   });
-  // Surface rejected candidates so silent correlation loss is visible.
-  for (const rejected of finalConfig.invalidTraceparents) {
-    rootTracer.warn("plan.traceparent.invalid", {
-      planIndex: rejected.index,
-      value: rejected.value,
-    });
-  }
 }
 
 for (const plan of composeInitialPlans(plans)) {

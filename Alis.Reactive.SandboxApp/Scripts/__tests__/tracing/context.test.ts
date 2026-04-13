@@ -5,8 +5,10 @@ import {
   generateTraceId,
   isValidLevel,
   parseTraceparent,
+  promoteTracingConfig,
   resolveInitialTracingConfig,
   resolveLevel,
+  type IncrementalTracingState,
 } from "../../tracing/context";
 
 describe("parseTraceparent", () => {
@@ -371,5 +373,156 @@ describe("resolveInitialTracingConfig — multi-plan config resolution (Codex ro
     );
     // Only plans[0] contributes because plans array stops at length 1.
     expect(result2.level).toBe("info");
+  });
+});
+
+describe("promoteTracingConfig — incremental fold for root.ts parse loop (Codex round 5 finding 2)", () => {
+  // root.ts folds each successfully parsed plan's tracing config into an
+  // accumulator BEFORE parsing the next plan element, so a `plan.parse.fail`
+  // event on a malformed later element emits at the verbosity the user
+  // asked for via `plan.traceLevel` on any earlier successful plan.
+  // promoteTracingConfig is the pure fold step.
+
+  const start: IncrementalTracingState = { level: "off", traceparent: undefined };
+
+  it("starts at off and raises to the plan's resolved level", () => {
+    const result = promoteTracingConfig(
+      start,
+      { dataset: {} },
+      { traceLevel: "warn" },
+      0,
+    );
+    expect(result.state.level).toBe("warn");
+    expect(result.state.traceparent).toBeUndefined();
+    expect(result.rejectedTraceparent).toBeUndefined();
+  });
+
+  it("is upward-only on level — a quieter plan does NOT lower an already-raised state", () => {
+    // First plan asks for trace.
+    const after1 = promoteTracingConfig(
+      start,
+      { dataset: {} },
+      { traceLevel: "trace" },
+      0,
+    );
+    expect(after1.state.level).toBe("trace");
+
+    // Second plan only asks for warn.
+    const after2 = promoteTracingConfig(
+      after1.state,
+      { dataset: {} },
+      { traceLevel: "warn" },
+      1,
+    );
+    expect(after2.state.level).toBe("trace");
+  });
+
+  it("honors dataset-over-plan precedence per plan", () => {
+    // plan.traceLevel = trace, dataset = error → dataset wins → level = error.
+    const result = promoteTracingConfig(
+      start,
+      { dataset: { trace: "error" } },
+      { traceLevel: "trace" },
+      0,
+    );
+    expect(result.state.level).toBe("error");
+  });
+
+  it("first valid traceparent wins and is sticky", () => {
+    const first = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+    const second = "00-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbbbbbbbbb-01";
+
+    const after1 = promoteTracingConfig(
+      start,
+      { dataset: {} },
+      { traceparent: first },
+      0,
+    );
+    expect(after1.state.traceparent).toBe(first);
+    expect(after1.rejectedTraceparent).toBeUndefined();
+
+    const after2 = promoteTracingConfig(
+      after1.state,
+      { dataset: {} },
+      { traceparent: second },
+      1,
+    );
+    // Still the first — sticky.
+    expect(after2.state.traceparent).toBe(first);
+    expect(after2.rejectedTraceparent).toBeUndefined();
+  });
+
+  it("reports malformed traceparent and keeps scanning", () => {
+    const after1 = promoteTracingConfig(
+      start,
+      { dataset: {} },
+      { traceparent: "garbage" },
+      0,
+    );
+    expect(after1.state.traceparent).toBeUndefined();
+    expect(after1.rejectedTraceparent).toEqual({ index: 0, value: "garbage" });
+
+    const valid = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+    const after2 = promoteTracingConfig(
+      after1.state,
+      { dataset: {} },
+      { traceparent: valid },
+      1,
+    );
+    expect(after2.state.traceparent).toBe(valid);
+    expect(after2.rejectedTraceparent).toBeUndefined();
+  });
+
+  it("pure function — does not mutate the input state", () => {
+    const input: IncrementalTracingState = { level: "info", traceparent: undefined };
+    const snapshotLevel = input.level;
+    const snapshotTp = input.traceparent;
+
+    promoteTracingConfig(
+      input,
+      { dataset: { trace: "trace" } },
+      { traceparent: "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01" },
+      0,
+    );
+
+    expect(input.level).toBe(snapshotLevel);
+    expect(input.traceparent).toBe(snapshotTp);
+  });
+
+  it("real-world boot sequence: early plan raises level, later malformed traceparent is rejected, parse.fail semantics visible", () => {
+    // Simulate the scenario Codex flagged: plans[0] carries traceLevel=error,
+    // plans[1] carries a malformed traceparent, plans[2] succeeds with
+    // a valid traceparent. After folding all three, the accumulated
+    // state should be: level=error, traceparent=plans[2].traceparent,
+    // one rejected traceparent reported at index 1.
+    const valid = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+
+    const after0 = promoteTracingConfig(
+      start,
+      { dataset: {} },
+      { traceLevel: "error" },
+      0,
+    );
+    expect(after0.state.level).toBe("error");
+
+    const after1 = promoteTracingConfig(
+      after0.state,
+      { dataset: {} },
+      { traceparent: "not-a-traceparent" },
+      1,
+    );
+    expect(after1.state.level).toBe("error"); // level preserved
+    expect(after1.state.traceparent).toBeUndefined();
+    expect(after1.rejectedTraceparent).toEqual({ index: 1, value: "not-a-traceparent" });
+
+    const after2 = promoteTracingConfig(
+      after1.state,
+      { dataset: {} },
+      { traceparent: valid },
+      2,
+    );
+    expect(after2.state.level).toBe("error");
+    expect(after2.state.traceparent).toBe(valid);
+    expect(after2.rejectedTraceparent).toBeUndefined();
   });
 });

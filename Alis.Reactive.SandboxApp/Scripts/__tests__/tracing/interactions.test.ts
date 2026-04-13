@@ -150,6 +150,136 @@ describe("run — nested reuses outer trace", () => {
   });
 });
 
+describe("run — async nested ownership tracking (Codex round 5 finding 1)", () => {
+  // The fundamental scenario: an outer sync run dispatches a nested run
+  // whose fn is async. Outer is sync-nested at entry (depth > 0) so it
+  // reuses the outer root. Outer finishes its sync body immediately.
+  // Later the async nested promise settles, and its finish callback must
+  // NOT restore the outer's captured `prev` because the outer frame is
+  // long gone and `prev` is stale. If it did, it would clobber whatever
+  // interaction is currently active (or leave a stale root ghosting
+  // `current` until the next run arrives).
+  //
+  // Fix: finish() checks ownership via a monotonic frameId. If the
+  // nested's frame still owns `current` at settle time, async runs clear
+  // `current` instead of restoring `prev`. If another frame has taken
+  // over, the nested's finish restores the settle-time state exactly
+  // (i.e. does not touch the other frame's work).
+
+  it("async nested settling after outer + an unrelated interaction leaves current clean", async () => {
+    let resolveInner!: () => void;
+    const innerGate = new Promise<void>((r) => { resolveInner = r; });
+
+    let outerTraceId: string | undefined;
+    let innerStartTraceId: string | undefined;
+
+    run("outer-sync", {}, () => {
+      outerTraceId = getCurrentTraceId();
+      // Sync-nested inner with async fn. Fire-and-forget: the caller
+      // discards the promise, matching what runReaction does for
+      // document-event dispatch handlers.
+      const innerPromise = run("inner-async", {}, async () => {
+        innerStartTraceId = getCurrentTraceId();
+        await innerGate;
+      });
+      void innerPromise;
+    });
+
+    // Outer finished. Inner's promise is still pending. Start an
+    // unrelated top-level interaction.
+    let otherTraceId: string | undefined;
+    run("unrelated-click", {}, () => {
+      otherTraceId = getCurrentTraceId();
+    });
+
+    // The unrelated interaction cleaned up — current should be clear.
+    expect(getCurrentTraceId()).toBeUndefined();
+
+    // Resolve the inner's async. Its finish callback runs on the
+    // microtask queue.
+    resolveInner();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // After inner settles, current must STILL be undefined. The bug
+    // before ownership tracking: inner.finish would restore `prev`
+    // (the outer's old root), clobbering the clean state.
+    expect(getCurrentTraceId()).toBeUndefined();
+
+    // Sync-nested inner reuses the outer root (captured at entry).
+    expect(outerTraceId).toBeDefined();
+    expect(innerStartTraceId).toBe(outerTraceId);
+    // The unrelated click gets its own root.
+    expect(otherTraceId).toBeDefined();
+    expect(otherTraceId).not.toBe(outerTraceId);
+  });
+
+  it("async nested settling after outer (no concurrent interaction) does not leave a stale root", async () => {
+    let resolveInner!: () => void;
+    const innerGate = new Promise<void>((r) => { resolveInner = r; });
+
+    run("outer-sync", {}, () => {
+      const innerPromise = run("inner-async", {}, async () => {
+        await innerGate;
+      });
+      void innerPromise;
+    });
+
+    // Outer finished. Inner pending. No concurrent.
+    // current may still be set to outer's root because inner frame still
+    // owns it (outer.finish saw inner as owner and left state alone).
+    // That is acceptable — correctness is about what happens AFTER inner
+    // settles.
+
+    resolveInner();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // After inner settles and we own current at settle time, async runs
+    // clear instead of restoring prev. No stale root.
+    expect(getCurrentTraceId()).toBeUndefined();
+  });
+
+  it("async nested settling does not corrupt a later interaction's trace-id", async () => {
+    let resolveInner!: () => void;
+    const innerGate = new Promise<void>((r) => { resolveInner = r; });
+
+    let outerId: string | undefined;
+    run("outer", {}, () => {
+      outerId = getCurrentTraceId();
+      const innerPromise = run("inner", {}, async () => {
+        await innerGate;
+      });
+      void innerPromise;
+    });
+
+    // Start a later interaction that runs to completion.
+    let firstLaterId: string | undefined;
+    run("later-1", {}, () => {
+      firstLaterId = getCurrentTraceId();
+    });
+
+    // Now the inner settles. Its cleanup must not corrupt future runs.
+    resolveInner();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // Start ANOTHER later interaction after the inner has settled.
+    let secondLaterId: string | undefined;
+    run("later-2", {}, () => {
+      secondLaterId = getCurrentTraceId();
+    });
+
+    expect(outerId).toBeDefined();
+    expect(firstLaterId).toBeDefined();
+    expect(secondLaterId).toBeDefined();
+    // Every top-level run minted its own root.
+    expect(new Set([outerId, firstLaterId, secondLaterId]).size).toBe(3);
+    // And current is clean at the very end.
+    expect(getCurrentTraceId()).toBeUndefined();
+  });
+});
+
 describe("run — concurrent async interactions stay isolated", () => {
   it("a fresh entry-point firing while another is awaiting gets its own trace-id", async () => {
     // This is the regression test for the module-global `current` bug.

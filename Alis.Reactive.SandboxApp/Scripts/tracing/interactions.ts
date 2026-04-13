@@ -50,7 +50,18 @@ export interface InteractionRoot {
 }
 
 let current: InteractionRoot | undefined;
+/**
+ * Monotonic frame id of whichever `run()` invocation last assigned to
+ * `current`. Used at finish() time to detect "we still own current" vs
+ * "another interaction has taken over since we entered", which lets us
+ * avoid clobbering an unrelated interaction when a late-settling async
+ * nested run's `prev` is already stale.
+ *
+ * 0 means "no active owner" — same meaning as `current === undefined`.
+ */
+let currentOwner = 0;
 let depth = 0;
+let nextFrameId = 0;
 let configuredFromTraceparent: InteractionRoot | undefined;
 
 /**
@@ -100,8 +111,10 @@ export function run<T>(
 ): T | Promise<T> {
   // True nesting only: an outer run is on the synchronous call stack.
   // Async-concurrent interactions see depth === 0 and get fresh roots.
+  const frameId = ++nextFrameId;
   const isNested = depth > 0;
   const prev = current;
+  const prevOwner = currentOwner;
   let localRoot: InteractionRoot;
   if (isNested) {
     // Sync nested inside an active interaction — reuse current root so
@@ -125,18 +138,27 @@ export function run<T>(
     localRoot = newRoot();
   }
   current = localRoot;
+  currentOwner = frameId;
 
   depth++;
   const t = tracer("interaction");
   const start = performance.now();
   t.debug("interaction.start", { name, ...attrs });
 
-  const finish = (success: boolean, err?: unknown): void => {
-    // Restore current to localRoot for the emit so the event carries
-    // this interaction's trace-id even if another concurrent interaction
-    // has updated `current` between our entry and this finish callback
-    // firing (which can happen for out-of-order async completion).
+  const finish = (success: boolean, err: unknown, isAsync: boolean): void => {
+    // Snapshot the settle-time state BEFORE we install our root for the
+    // emit. If another interaction has taken over `current` since we
+    // entered `run()`, we must restore to this snapshot instead of
+    // writing our stale `prev` back.
+    const settleCurrent = current;
+    const settleOwner = currentOwner;
+
+    // Temporarily install our root + owner for the emit so the event
+    // carries this interaction's trace-id even if another concurrent
+    // interaction has updated `current` between our entry and this
+    // finish callback firing (out-of-order async completion).
     current = localRoot;
+    currentOwner = frameId;
     if (success) {
       t.debug("interaction.end", { name, ms: performance.now() - start });
     } else {
@@ -146,10 +168,31 @@ export function run<T>(
         err instanceof Error ? err : new Error(String(err)),
       );
     }
-    // Non-nested: clear current entirely so a future event outside any
-    // interaction does not carry a stale trace-id. Nested: restore to
-    // the outer root (which is what `prev` captured at entry).
-    current = isNested ? prev : undefined;
+
+    if (settleOwner === frameId) {
+      // We still own `current` at settle time. Safe to restore our
+      // recorded prev (for sync nested) or clear (for non-nested).
+      //
+      // Exception: async runs always clear instead of restoring prev,
+      // because by the time an async run settles its outer frame has
+      // long since unwound from the synchronous call stack. `prev`
+      // captured at our entry refers to a frame that is no longer
+      // logically alive; writing it back would leave a stale root
+      // ghosting `current` until the next interaction arrives.
+      if (isAsync || !isNested) {
+        current = undefined;
+        currentOwner = 0;
+      } else {
+        current = prev;
+        currentOwner = prevOwner;
+      }
+    } else {
+      // Another frame owns `current`. Our `prev` is stale (or never
+      // existed relative to the current owner). Restore the settle-time
+      // state exactly and do NOT clobber whoever is active now.
+      current = settleCurrent;
+      currentOwner = settleOwner;
+    }
   };
 
   let result: T | Promise<T>;
@@ -157,7 +200,7 @@ export function run<T>(
     result = fn();
   } catch (err) {
     depth--;
-    finish(false, err);
+    finish(false, err, false);
     throw err;
   }
   // Decrement depth as soon as `fn` returns, so the awaiting promise
@@ -167,17 +210,17 @@ export function run<T>(
   if (result instanceof Promise) {
     return result.then(
       (value) => {
-        finish(true);
+        finish(true, undefined, true);
         return value;
       },
       (err) => {
-        finish(false, err);
+        finish(false, err, true);
         throw err;
       },
     );
   }
 
-  finish(true);
+  finish(true, undefined, false);
   return result;
 }
 
@@ -213,14 +256,23 @@ export function runWithRoot<T>(
   fn: () => T,
 ): T {
   if (!root) return fn();
+  const frameId = ++nextFrameId;
   const prev = current;
+  const prevOwner = currentOwner;
   current = root;
+  currentOwner = frameId;
   depth++;
   try {
     return fn();
   } finally {
     depth--;
-    current = prev;
+    // Only restore prev if we still own current. If a nested run
+    // inside fn took over and did not hand ownership back, leave its
+    // state alone.
+    if (currentOwner === frameId) {
+      current = prev;
+      currentOwner = prevOwner;
+    }
   }
 }
 
@@ -277,6 +329,8 @@ function newRoot(): InteractionRoot {
  */
 export function resetForTests(): void {
   current = undefined;
+  currentOwner = 0;
   depth = 0;
+  nextFrameId = 0;
   configuredFromTraceparent = undefined;
 }

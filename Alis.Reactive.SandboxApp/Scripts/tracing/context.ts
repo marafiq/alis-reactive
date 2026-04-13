@@ -116,6 +116,58 @@ export interface InitialTracingConfig {
   readonly invalidTraceparents: readonly { index: number; value: string }[];
 }
 
+/**
+ * Running state for incremental tracing promotion during the plan
+ * parse loop. Each successfully-parsed plan contributes its resolved
+ * level and (optionally) its traceparent to this accumulator, and
+ * `root.ts` calls `configure()` with the new state between plans so
+ * a subsequent `plan.parse.fail` event on a malformed later plan
+ * emits at the verbosity the user asked for via `plan.traceLevel`.
+ */
+export interface IncrementalTracingState {
+  readonly level: Level;
+  readonly traceparent: string | undefined;
+}
+
+/**
+ * Fold one more (planEl, plan) pair into the incremental tracing state.
+ * Level promotion is upward-only (most verbose wins); traceparent is
+ * "first valid wins" and skips malformed candidates with a rejection
+ * report so the caller can emit a structured warning.
+ *
+ * Pure function — no side effects, no module state mutation. Called
+ * once per plan from `root.ts` during the parse loop.
+ */
+export function promoteTracingConfig(
+  state: IncrementalTracingState,
+  planEl: TraceablePlanElement,
+  plan: TraceablePlan,
+  planIndex: number,
+): {
+  readonly state: IncrementalTracingState;
+  readonly rejectedTraceparent: { index: number; value: string } | undefined;
+} {
+  const perPlan = resolveLevel(plan.traceLevel, planEl?.dataset?.trace, "off");
+  const nextLevel: Level =
+    LEVELS[perPlan] > LEVELS[state.level] ? perPlan : state.level;
+
+  let nextTraceparent = state.traceparent;
+  let rejectedTraceparent: { index: number; value: string } | undefined;
+  if (!nextTraceparent && plan.traceparent) {
+    const parsed = parseTraceparent(plan.traceparent);
+    if (parsed) {
+      nextTraceparent = plan.traceparent;
+    } else {
+      rejectedTraceparent = { index: planIndex, value: plan.traceparent };
+    }
+  }
+
+  return {
+    state: { level: nextLevel, traceparent: nextTraceparent },
+    rejectedTraceparent,
+  };
+}
+
 export function resolveInitialTracingConfig(
   planEls: readonly TraceablePlanElement[],
   plans: readonly TraceablePlan[],
