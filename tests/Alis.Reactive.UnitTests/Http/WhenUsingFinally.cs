@@ -56,7 +56,7 @@ public class WhenUsingFinally : PlanTestBase
     }
 
     [Test]
-    public void plan_without_finally_omits_complete_field()
+    public void plan_without_finally_emits_empty_complete_array()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
@@ -68,7 +68,9 @@ public class WhenUsingFinally : PlanTestBase
         var planJson = plan.RenderFormatted();
         AssertSchemaValid(planJson);
 
-        Assert.That(planJson, Does.Not.Contain("\"complete\""));
+        // Null-design-smell elimination: Request.Complete is always present as a domain default.
+        // Plans without Finally() emit "complete": [] — never omit the field.
+        Assert.That(planJson, Does.Contain("\"complete\": []"));
     }
 
     [Test]
@@ -85,10 +87,13 @@ public class WhenUsingFinally : PlanTestBase
         var planJson = plan.RenderFormatted();
         AssertSchemaValid(planJson);
 
+        // Null-design-smell elimination: before/success/error/complete are always present
+        // as domain defaults (empty arrays when not populated). Finally() populates complete;
+        // the other handlers remain empty but still appear in the JSON.
         Assert.That(planJson, Does.Contain("\"before\""));
         Assert.That(planJson, Does.Contain("\"complete\""));
-        Assert.That(planJson, Does.Not.Contain("\"success\""));
-        Assert.That(planJson, Does.Not.Contain("\"error\""));
+        Assert.That(planJson, Does.Contain("\"success\": []"));
+        Assert.That(planJson, Does.Contain("\"error\": []"));
     }
 
     [Test]
