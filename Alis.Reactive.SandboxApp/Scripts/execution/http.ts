@@ -9,9 +9,10 @@ import { validateContainer } from "../validation";
 import { evaluateValue } from "../core/evaluate";
 import { formatForWire } from "../core/wire-format";
 import { resolveRouteParams } from "../core/url-template";
-import { scope } from "../core/trace";
+import { tracer } from "../tracing";
+import { currentTraceparent } from "../tracing/interactions";
 
-const log = scope("http");
+const t = tracer("http");
 
 interface ResolvedFetch {
   readonly url: string;
@@ -57,12 +58,19 @@ function buildFetch(req: Request, gatherResult: GatherResult, plan: Plan, ctx?: 
 
 /** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
 export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
+  // Capture W3C traceparent BEFORE any await so the header reflects the
+  // interaction currently executing, not whichever interaction happens to
+  // be active when the first `await` resolves. See Lesson 2 in the
+  // structured tracing plan — this exact ordering was a Phase 2 BLOCK on
+  // the abandoned branch.
+  const tp = currentTraceparent();
+
   try {
     // 1. Validation gate (if container specified)
     if (req.container) {
       const valid = validateContainer(plan, req.container, ctx);
       if (!valid) {
-        log.debug("validation failed, aborting request");
+        t.debug("http.validation.fail", { url: req.url, method: req.method });
         return;
       }
     }
@@ -78,16 +86,29 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     const gatherResult = resolveGather(req.input, req.method, plan, ctx);
     const resolved = buildFetch(req, gatherResult, plan, ctx);
 
+    // 4. Inject traceparent header if an interaction is active
+    if (tp) {
+      const headers = (resolved.init.headers as Record<string, string>) ?? {};
+      headers["traceparent"] = tp;
+      (resolved.init as { headers: Record<string, string> }).headers = headers;
+    }
+
     // Write gathered payload to ctx so PayloadSource(scope: "request") resolves correctly
     const requestPayload = gatherResult.body instanceof FormData ? {} : gatherResult.body;
     ctx = { ...ctx, request: requestPayload };
 
-    log.debug("fetch", { method: req.method, url: resolved.url });
-
-    // 4. Fetch
+    // 5. Fetch
+    const start = performance.now();
+    t.debug("http.request.send", { method: req.method, url: resolved.url });
     const response = await fetch(resolved.url, resolved.init);
+    t.debug("http.response", {
+      method: req.method,
+      url: resolved.url,
+      status: response.status,
+      ms: performance.now() - start,
+    });
 
-    // 5. Route response
+    // 6. Route response
     const body = await readResponseBody(response);
     if (response.ok) {
       const successCtx: ExecContext = { ...ctx, response: body ?? undefined };
@@ -100,7 +121,11 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     }
   } catch (err) {
     const status = err instanceof TypeError ? 0 : -1;
-    log.error(status === 0 ? "network error" : "client error", { url: req.url, error: String(err) });
+    t.error(
+      "http.request.fail",
+      { url: req.url, method: req.method, status },
+      err instanceof Error ? err : new Error(String(err)),
+    );
     await routeHandlers(req.error, status, plan, ctx);
     await runComplete(req, plan, ctx);
     return; // no chained on error
