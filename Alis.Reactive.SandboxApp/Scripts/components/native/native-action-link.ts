@@ -1,12 +1,12 @@
 // native-action-link.ts — Click handler for <a data-reactive-link> elements.
 // Uses Plan + Reaction types for V3 plan-driven navigation.
 
-import { executeReaction } from "../../execution/execute";
-import { scope } from "../../core/trace";
+import { runReaction } from "../../execution/trigger";
+import { tracer } from "../../tracing";
 import type { Reaction, Plan, Request } from "../../types";
 import { assertNever } from "../../core/assert-never";
 
-const log = scope("native-action-link");
+const t = tracer("action-link");
 const SELECTOR = "a[data-reactive-link]";
 
 let initialized = false;
@@ -40,11 +40,11 @@ function handleClick(event: MouseEvent): void {
 
   const payload = decodePayload(anchor);
   bindHrefToSingleRequest(payload.reaction, anchor.getAttribute("href") ?? anchor.href);
-  log.debug("activate", { id: anchor.id, href: anchor.href });
-  const result = executeReaction(payload.reaction, payload.plan);
-  if (result instanceof Promise) {
-    result.catch(err => log.error("reaction failed", { error: String(err) }));
-  }
+  t.debug("action-link.start", { id: anchor.id, href: anchor.href });
+  runReaction(payload.reaction, payload.plan, {}, "action-link", {
+    id: anchor.id,
+    href: anchor.href,
+  });
 }
 
 function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
