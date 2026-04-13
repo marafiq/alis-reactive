@@ -22,7 +22,7 @@ const BOOTED_ATTR = "alisBooted";
 let bootAbort = new AbortController();
 
 export function boot(plan: Plan): void {
-  log.info("booting", { behaviors: plan.behaviors.length });
+  log.info("booting", { planId: plan.planId, behaviors: plan.behaviors.length });
 
   // Wire validation live-clear for components with container scopes
   wireContainerValidation(plan);
@@ -33,7 +33,7 @@ export function boot(plan: Plan): void {
   setActivePlan(plan);
   registerBootedPlan(plan);
   document.documentElement.dataset[BOOTED_ATTR] = "true";
-  log.info("booted");
+  log.info("booted", { planId: plan.planId });
 }
 
 /**
@@ -71,7 +71,7 @@ export function mergePlan(incoming: Plan): void {
 
   clearSummaryForPlan(merged.planId);
 
-  log.info("merge", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
+  log.info("merged", { planId: merged.planId, newComponents: Object.keys(incoming.components).length });
 }
 
 export function getBootedPlan(planId: string): Plan | undefined {

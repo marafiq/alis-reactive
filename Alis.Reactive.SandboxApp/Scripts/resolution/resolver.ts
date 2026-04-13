@@ -192,4 +192,4 @@ export function wireEvent(
   }
 }
 
-log.debug("loaded");
+log.debug("module.loaded");

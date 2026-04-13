@@ -145,7 +145,7 @@ function executeBranch(
       return executeReaction(c.reaction, plan, ctx);
     }
   }
-  log.trace("no-branch-taken");
+  log.trace("branch.no-match", { caseCount: reaction.cases.length });
 }
 
 function hasConfirm(condition: Condition): boolean {
@@ -169,7 +169,7 @@ async function executeBranchAsync(
       return;
     }
   }
-  log.trace("no-branch-taken");
+  log.trace("branch.no-match", { caseCount: reaction.cases.length });
 }
 
 // ── Parallel executor ─────────────────────────────────────
@@ -186,7 +186,7 @@ async function executeParallel(
     })
   );
   for (const r of results) {
-    if (r.status === "rejected") log.error("parallel step failed", { error: String(r.reason) });
+    if (r.status === "rejected") log.error("parallel.step-failed", { error: String(r.reason) });
   }
   if (reaction.onSettled) {
     const r = executeReaction(reaction.onSettled, plan, ctx);
@@ -203,7 +203,7 @@ function executeSet(reaction: SetReaction, plan: Plan, ctx?: ExecContext): void 
   const root = resolveSource(plan, reaction.on, ctx);
   const value = evaluateValue(reaction.value, plan, ctx);
   const target = reaction.on.kind === "component" ? reaction.on.component : reaction.on.scope;
-  log.trace("set", { target, property: reaction.property, value });
+  log.trace("set.applied", { target, property: reaction.property, value });
 
   if (reaction.on.kind === "payload") {
     // Payload objects (event args, response bodies) don't have JsTypes.
@@ -230,7 +230,7 @@ function executeCall(reaction: CallReaction, plan: Plan, ctx?: ExecContext): voi
   const target = reaction.on.kind === "component" ? reaction.on.component
     : reaction.on.kind === "plugin" ? (reaction.on as import("../types").PluginSource).name
     : reaction.on.scope;
-  log.trace("call", { target, method: reaction.method, args });
+  log.trace("call.invoked", { target, method: reaction.method, args });
 
   if (reaction.on.kind === "payload") {
     // Payload objects (event args, response bodies) don't have JsTypes.
@@ -254,7 +254,7 @@ function executeDispatch(reaction: DispatchReaction, plan: Plan, ctx?: ExecConte
   const detail = isEvaluable(reaction.data)
     ? evaluateValue(reaction.data, plan, ctx)
     : {};
-  log.trace("dispatch", { event: reaction.event, detail });
+  log.trace("dispatch.sent", { event: reaction.event, detail });
   document.dispatchEvent(new CustomEvent(reaction.event, { detail }));
 }
 

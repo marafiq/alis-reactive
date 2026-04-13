@@ -19,10 +19,10 @@ function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext): void {
   try {
     const result = executeReaction(reaction, plan, ctx);
     if (result instanceof Promise) {
-      result.catch(err => log.error("reaction failed", { error: String(err) }));
+      result.catch(err => log.error("reaction.failed-async", { error: String(err) }));
     }
   } catch (err) {
-    log.error("reaction failed (sync)", { error: String(err) });
+    log.error("reaction.failed-sync", { error: String(err) });
   }
 }
 
@@ -46,7 +46,7 @@ export function wireBehavior(
       break;
 
     case "document-event":
-      log.debug("document-event: listening", { event: trigger.event });
+      log.debug("document-event.listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
         const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e };
         runReaction(reaction, plan, ctx);
@@ -61,7 +61,7 @@ export function wireBehavior(
       const eventDef = jsType.events[trigger.event];
       const channel = eventDef?.channel ?? trigger.event;
 
-      log.debug("component-event", { component: trigger.component, event: trigger.event, channel });
+      log.debug("component-event.listening", { component: trigger.component, event: trigger.event, channel });
 
       wireEvent(plan, trigger.component, channel, (eventData) => {
         const ctx: ExecContext = { event: eventData };

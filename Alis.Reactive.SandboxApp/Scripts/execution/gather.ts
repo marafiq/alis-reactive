@@ -34,7 +34,7 @@ function hasFiles(items: unknown[]): boolean {
 function serializeValue(value: unknown, name: string): string {
   const result = toString(value);
   if (!result.ok) {
-    log.warn("gather serialize failed, using empty", { name, error: result.error });
+    log.warn("serialize.failed", { name, error: result.error });
     return "";
   }
   return result.value;
@@ -108,7 +108,7 @@ function selectTransport(
 function emitValue(name: string, raw: unknown, shape: Shape, transport: TransportStrategy): void {
   if (typeof FileList !== "undefined" && raw instanceof FileList) {
     transport.emitArray(name, Array.from(raw), shape);
-    log.trace("file", { name, count: raw.length });
+    log.trace("file.emitted", { name, count: raw.length });
     return;
   }
   if (Array.isArray(raw)) {
@@ -117,7 +117,7 @@ function emitValue(name: string, raw: unknown, shape: Shape, transport: Transpor
   } else {
     transport.emitScalar(name, raw, shape);
   }
-  log.trace("gathered", { name, value: raw });
+  log.trace("value.emitted", { name, value: raw });
 }
 
 /**

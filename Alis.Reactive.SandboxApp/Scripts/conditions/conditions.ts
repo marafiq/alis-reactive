@@ -37,7 +37,7 @@ export function evaluateCondition(condition: Condition, plan: Plan, ctx?: ExecCo
     case "not":
       return !evaluateCondition(condition.term, plan, ctx);
     case "confirm":
-      log.warn("ConfirmCondition in sync context — denying (callers should use async path)");
+      log.warn("confirm.sync-denied");
       return false;
     case "none":
       return true;
@@ -86,7 +86,7 @@ function evaluateCompare(cond: CompareCondition, plan: Plan, ctx?: ExecContext):
   if (unary !== undefined) return unary;
 
   const shapedRight = resolveRight(cond, evalValue, plan, ctx);
-  log.trace("eval", { op: cond.op, left: shapedLeft, right: shapedRight });
+  log.trace("compare", { op: cond.op, left: shapedLeft, right: shapedRight });
 
   return evaluateBinaryOp(cond, shapedLeft, shapedRight);
 }
@@ -176,7 +176,7 @@ function matchesRegex(left: unknown, right: unknown): boolean {
   try {
     return new RegExp(op).test(str);
   } catch {
-    log.warn("invalid condition regex", { operand: right });
+    log.warn("regex.invalid", { operand: right });
     return false;
   }
 }

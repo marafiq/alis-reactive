@@ -38,7 +38,7 @@ export function init(): void {
   // Not a plan component — getElementById is correct.
   const el = document.getElementById(ELEMENT_ID);
   if (!el) {
-    log.warn("confirm element not found", { id: ELEMENT_ID });
+    log.warn("element.not-found", { id: ELEMENT_ID });
     return;
   }
 
@@ -60,5 +60,5 @@ export function init(): void {
     });
   };
 
-  log.info("initialized");
+  log.info("initialized", { id: ELEMENT_ID });
 }
